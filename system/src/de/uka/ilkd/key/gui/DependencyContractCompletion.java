@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -27,7 +28,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
             boolean forced) {
         UseDependencyContractApp cApp = (UseDependencyContractApp) app;
 
-        Services services = goal.proof().getServices();
+        IServices services = goal.proof().getServices();
 
         cApp = cApp.tryToInstantiateContract(services);
 

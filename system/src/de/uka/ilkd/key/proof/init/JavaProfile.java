@@ -12,6 +12,8 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -25,6 +27,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  * This profile sets up KeY for verification of JavaCard programs.
@@ -114,5 +117,14 @@ public class JavaProfile extends AbstractProfile {
      */
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
+    }
+    
+    public Services createServices(KeYExceptionHandler handler) {
+        return new Services(handler);
+    }
+
+    @Override
+    public InitConfig createInitConfig(IServices services, Profile profile) {
+        return new InitConfig((Services) services, profile);
     }
 }

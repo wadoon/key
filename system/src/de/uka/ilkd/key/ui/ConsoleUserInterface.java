@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.Debug;
@@ -76,7 +77,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
     @Override
-    public void proofCreated(ProblemInitializer sender,
+    public void proofCreated(AbstractProblemInitializer sender,
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
@@ -195,13 +196,8 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
    @Override
-   public ProblemInitializer createProblemInitializer() {
-      ProblemInitializer pi = new ProblemInitializer(this, 
-            mediator.getProfile(), 
-            new Services(mediator.getExceptionHandler()), 
-            true, 
-            this);
-      return pi;
+   public AbstractProblemInitializer createProblemInitializer() {
+      return new ProblemInitializer(this, mediator.getProfile(), true, this);
    }
 
    /**

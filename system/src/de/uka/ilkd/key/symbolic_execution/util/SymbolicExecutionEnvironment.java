@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -59,7 +60,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> {
     * Returns the loaded project.
     * @return The loaded project.
     */
-   public InitConfig getInitConfig() {
+   public AbstractInitConfig getInitConfig() {
       return initConfig;
    }
 

@@ -8,10 +8,11 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.lemmatagenerator.EnvironmentCreator;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -65,17 +66,17 @@ public abstract class TacletLoader {
         
         
         public static class TacletFromFileLoader extends TacletLoader{
-                private InitConfig initConfig;
+                private AbstractInitConfig initConfig;
                 private final File fileForDefinitions;
                 private final File fileForTaclets;
                 private final Collection<File> filesForAxioms;
-                private final ProblemInitializer problemInitializer;
+                private final AbstractProblemInitializer problemInitializer;
                 
            
            
                public TacletFromFileLoader(ProgressMonitor pm,
                                 ProblemInitializerListener listener,
-                                ProblemInitializer problemInitializer,
+                                AbstractProblemInitializer problemInitializer,
                                 Profile profile,
                                 File fileForDefinitions, File fileForTaclets,
                                 Collection<File> filesForAxioms,
@@ -88,18 +89,18 @@ public abstract class TacletLoader {
                         this.envForTaclets = env;
                 }
                
-               public TacletFromFileLoader(TacletFromFileLoader loader,InitConfig initConfig){
+               public TacletFromFileLoader(TacletFromFileLoader loader,AbstractInitConfig initConfig){
                        this(loader.monitor,loader.listener,loader.problemInitializer,loader.profile,
                             loader.fileForDefinitions,loader.fileForTaclets,loader.filesForAxioms,loader.envForTaclets,initConfig);
                }
                
                public TacletFromFileLoader(ProgressMonitor pm,
                                ProblemInitializerListener listener,
-                               ProblemInitializer problemInitializer,
+                               AbstractProblemInitializer problemInitializer,
                                Profile profile,
                                File fileForDefinitions, File fileForTaclets,
                                Collection<File> filesForAxioms,
-                               ProofEnvironment env, InitConfig config) {
+                               ProofEnvironment env, AbstractInitConfig config) {
                        this(pm,listener,problemInitializer,profile,fileForDefinitions,fileForTaclets,filesForAxioms,env);
                        this.initConfig = config;
                }
@@ -150,8 +151,8 @@ public abstract class TacletLoader {
                 }  
                 
                
-                private InitConfig createInitConfig(InitConfig reference) {
-                        InitConfig newConfig = reference.copy();
+                private AbstractInitConfig createInitConfig(AbstractInitConfig reference) {
+                        AbstractInitConfig newConfig = reference.copy();
 
                         newConfig.setTaclets(DefaultImmutableSet.<Taclet> nil());
                         newConfig.setTaclet2Builder(new HashMap<Taclet, TacletBuilder>());
@@ -161,11 +162,11 @@ public abstract class TacletLoader {
 
                 
                 private ImmutableSet<Taclet> load(KeYUserProblemFile keyFile,
-                                InitConfig reference) 
+                                AbstractInitConfig reference) 
                                 {
                         
                         // this ensures that necessary Java types are loaded
-                        InitConfig config = createInitConfig(reference);
+                        AbstractInitConfig config = createInitConfig(reference);
 
                         keyFile.setInitConfig(config);
                         try{

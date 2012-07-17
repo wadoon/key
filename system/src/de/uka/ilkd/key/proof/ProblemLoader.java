@@ -28,6 +28,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
@@ -72,8 +74,8 @@ public final class ProblemLoader implements Runnable {
     private PosInTerm currIfInstPosInTerm;
 
 
-    ProblemInitializer init;
-    InitConfig iconfig;
+    AbstractProblemInitializer init;
+    AbstractInitConfig iconfig;
 
     private SwingWorker worker;
     private ProgressMonitor pm;
@@ -195,8 +197,7 @@ public final class ProblemLoader implements Runnable {
            try{
                envInput = createEnvInput(file, classPath, bootClassPath);
                
-               init = new ProblemInitializer(ui, mediator.getProfile(),  
-            		   new Services(mediator.getExceptionHandler()), true, ui);; 
+               init = new ProblemInitializer(ui, mediator.getProfile(),  true, ui);; 
                
                InitConfig initConfig = init.prepare(envInput);
                int proofNum = 0;

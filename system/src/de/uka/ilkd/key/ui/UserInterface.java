@@ -11,9 +11,11 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -94,7 +96,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * </p>
      * @return The instantiated {@link ProblemInitializer}.
      */
-    ProblemInitializer createProblemInitializer();
+    AbstractProblemInitializer createProblemInitializer();
     
     /**
      * Returns the used {@link KeYMediator}.
@@ -112,7 +114,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @throws FileNotFoundException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    InitConfig load(File file, List<File> classPaths, File bootClassPath) throws FileNotFoundException, ProofInputException;
+    AbstractInitConfig load(File file, List<File> classPaths, File bootClassPath) throws FileNotFoundException, ProofInputException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
@@ -122,7 +124,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return The instantiated {@link Proof}.
      * @throws ProofInputException Occurred Exception.
      */
-    Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException;
+    Proof createProof(AbstractInitConfig initConfig, ProofOblInput input) throws ProofInputException;
     
     /**
      * Checks if the auto mode of this {@link UserInterface} supports the given {@link Proof}.

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -35,7 +35,7 @@ public class TacletSoundnessPOLoader {
          * proof obligations and once for adding them to the already existing proof obligation. This is necessary 
          * in order to omit name clashes.  
          */
-        private final InitConfig originalConfig;
+        private final AbstractInitConfig originalConfig;
        
         private LinkedList<LoaderListener> listeners = new LinkedList<LoaderListener>();
         private ProofAggregate resultingProof;
@@ -124,7 +124,7 @@ public class TacletSoundnessPOLoader {
                         TacletFilter filter,
                         boolean loadAsLemmata,
                         TacletLoader loader,
-                        InitConfig originalConfig) {
+                        AbstractInitConfig originalConfig) {
                 super();
                 this.tacletLoader = loader;
                 this.tacletFilter = filter;
@@ -318,7 +318,7 @@ public class TacletSoundnessPOLoader {
                 return p;
         }
         
-        private void removeTaclets(InitConfig initConfig, ImmutableSet<Taclet> taclets){
+        private void removeTaclets(AbstractInitConfig initConfig, ImmutableSet<Taclet> taclets){
                 ImmutableSet<Taclet> oldTaclets = initConfig.getTaclets();
                 ImmutableSet<Taclet> newTaclets = DefaultImmutableSet.nil();
                 HashMap<Taclet,TacletBuilder> map = initConfig.getTaclet2Builder();

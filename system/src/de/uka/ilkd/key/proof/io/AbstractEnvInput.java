@@ -13,6 +13,7 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -30,7 +31,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     protected final File bootClassPath;
     protected final Includes includes;    
     
-    protected InitConfig initConfig;
+    protected AbstractInitConfig initConfig;
     
 
     //-------------------------------------------------------------------------

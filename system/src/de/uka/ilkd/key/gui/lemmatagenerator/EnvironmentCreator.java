@@ -4,15 +4,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class EnvironmentCreator  {
@@ -34,9 +32,7 @@ public class EnvironmentCreator  {
                 keyFile = new KeYUserProblemFile(
                                 dummyFile.getName(), dummyFile, null);
 
-                ProblemInitializer pi = new ProblemInitializer(monitor, profile,
-                                new Services(new KeYRecoderExcHandler()),
-                                false, listener );
+                final AbstractProblemInitializer pi = new ProblemInitializer(monitor, profile, false, listener );
                
                 return pi.prepare(keyFile).getProofEnv();
         }

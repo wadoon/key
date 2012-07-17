@@ -12,11 +12,13 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  *
@@ -114,4 +116,12 @@ public interface Profile {
      */
     String getInternalClasslistFilename();
 
+    
+    /**
+     * create a new services object
+     */
+    IServices createServices(KeYExceptionHandler handler);
+
+    AbstractInitConfig createInitConfig(IServices services, Profile profile);
+    
 }

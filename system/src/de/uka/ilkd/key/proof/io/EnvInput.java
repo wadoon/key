@@ -13,8 +13,8 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
@@ -39,7 +39,7 @@ public interface EnvInput {
      * Sets the initial configuration the read environment input should be
      * added to. Must be called before calling any of the read* methods.
      */
-    void setInitConfig(InitConfig initConfig);
+    void setInitConfig(AbstractInitConfig initConfig);
 
     /**
      * Reads the include section and returns an Includes object.

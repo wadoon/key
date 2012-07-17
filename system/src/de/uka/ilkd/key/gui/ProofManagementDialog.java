@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -452,7 +453,7 @@ public final class ProofManagementDialog extends JDialog {
         Proof proof = findPreferablyClosedProof(po);
         if(proof == null) {
         	UserInterface ui = mediator.getUI();
-            ProblemInitializer pi = 
+            AbstractProblemInitializer pi = 
             		new ProblemInitializer(ui, mediator.getProfile(), services, true, ui);
             try {
                 pi.startProver(initConfig, po, 0);

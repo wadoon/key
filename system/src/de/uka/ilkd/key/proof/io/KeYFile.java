@@ -27,8 +27,8 @@ import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -56,7 +56,7 @@ public class KeYFile implements EnvInput {
     
     private InputStream input;
     
-    protected InitConfig initConfig;
+    protected AbstractInitConfig initConfig;
     
     private String chooseContract = null;
 
@@ -167,7 +167,7 @@ public class KeYFile implements EnvInput {
     
     
     @Override
-        public void setInitConfig(InitConfig conf) {
+        public void setInitConfig(AbstractInitConfig conf) {
         this.initConfig=conf;
     }
 

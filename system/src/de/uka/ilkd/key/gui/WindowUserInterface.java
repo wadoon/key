@@ -9,12 +9,12 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -75,7 +75,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public void proofCreated(ProblemInitializer sender,
+	public void proofCreated(AbstractProblemInitializer sender,
 	        ProofAggregate proofAggregate) {
 		mainWindow.addProblem(proofAggregate);
 		mainWindow.setStandardStatusLine();
@@ -236,13 +236,8 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public ProblemInitializer createProblemInitializer() {
-	    ProblemInitializer pi = new ProblemInitializer(this, 
-	            mainWindow.getMediator().getProfile(), 
-	            new Services(mainWindow.getMediator().getExceptionHandler()), 
-	            true, 
-	            this);
-	    return pi;
+	public AbstractProblemInitializer createProblemInitializer() {
+	    return new ProblemInitializer(this, mainWindow.getMediator().getProfile(), true,  this);
 	}
 
    /**

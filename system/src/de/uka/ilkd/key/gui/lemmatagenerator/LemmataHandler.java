@@ -8,11 +8,11 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -24,7 +24,6 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class LemmataHandler implements TacletFilter {
         private final LemmataAutoModeOptions options;
@@ -61,10 +60,7 @@ public class LemmataHandler implements TacletFilter {
                 File fileForDefinitions =  options.getPathOfRuleFile() != "" ? new File(options.getPathOfDefinitionFile()) :file;
                 Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
                 
-                final ProblemInitializer problemInitializer = new ProblemInitializer(null,
-                                profile, new Services(
-                                                new KeYRecoderExcHandler()),
-                                false, new Listener());
+                final AbstractProblemInitializer problemInitializer = new ProblemInitializer(null, profile, false, new Listener());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null,
                                                       new Listener(),
@@ -181,7 +177,7 @@ public class LemmataHandler implements TacletFilter {
         private class Listener implements ProblemInitializerListener {
 
                 @Override
-                public void proofCreated(ProblemInitializer sender,
+                public void proofCreated(AbstractProblemInitializer sender,
                                 ProofAggregate proofAggregate) {
                         println("The proofs have been initialized.");
                 }

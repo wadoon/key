@@ -4,7 +4,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 
 /**
  * <p>
@@ -65,7 +65,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
+   public void proofCreated(AbstractProblemInitializer sender, ProofAggregate proofAggregate) {
       // Nothing to do
    }
 
