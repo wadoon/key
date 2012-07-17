@@ -18,6 +18,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -80,7 +81,7 @@ public class NoFindTaclet extends Taclet {
      * @param ruleApp the taclet application that is executed
      */
     public ImmutableList<Goal> apply(Goal     goal,
-			    Services services, 
+			    IServices services, 
 			    RuleApp  ruleApp) {
 
 	// Number without the if-goal eventually needed

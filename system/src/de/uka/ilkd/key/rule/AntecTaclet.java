@@ -16,7 +16,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -73,7 +73,7 @@ public class AntecTaclet extends FindTaclet{
      */
     protected void applyReplacewith(TacletGoalTemplate gt, Goal goal,
 				    PosInOccurrence posOfFind,
-				    Services services, 
+				    IServices services, 
 				    MatchConditions matchCond) {
 	if (gt instanceof AntecSuccTacletGoalTemplate) {
 	    final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
@@ -105,7 +105,7 @@ public class AntecTaclet extends FindTaclet{
      */
     protected void applyAdd(Sequent add, Goal goal,
 			    PosInOccurrence posOfFind,
-			    Services services,
+			    IServices services,
 			    MatchConditions matchCond) {
 	addToAntec(add.antecedent(), goal, posOfFind, services, matchCond);
 	addToSucc(add.succedent(), goal, null, services, matchCond);

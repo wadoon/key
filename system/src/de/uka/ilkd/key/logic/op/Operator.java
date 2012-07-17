@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -79,5 +79,5 @@ public interface Operator extends Named, SVSubstitute {
      */
     MatchConditions match(SVSubstitute subst, 
 	                  MatchConditions mc, 
-	                  Services services); 
+	                  IServices services); 
 }

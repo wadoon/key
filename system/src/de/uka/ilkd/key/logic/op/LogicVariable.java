@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -38,7 +38,7 @@ public final class LogicVariable extends AbstractSortedOperator
      */
     @Override
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
-            Services services) {
+            IServices services) {
         if (subst == this) {
             return mc;
         }

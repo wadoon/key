@@ -13,8 +13,8 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.proof.ProgVarReplacer;
  */
 public class InnerVariableNamer extends VariableNamer {
 
-    public InnerVariableNamer(Services services) {
+    public InnerVariableNamer(IServices services) {
     	super(services);
     }
 
@@ -81,7 +81,7 @@ public class InnerVariableNamer extends VariableNamer {
 	// Name proposal = services.getProof().getNameRecorder().getProposal();
 	Name proposal = null;
 
-	final Services services = goal.proof().getServices();
+	final IServices services = goal.proof().getServices();
     if (!oldProgVarProposals.isEmpty()) {
 	    proposal = oldProgVarProposals.head();
 	    oldProgVarProposals = oldProgVarProposals.tail();

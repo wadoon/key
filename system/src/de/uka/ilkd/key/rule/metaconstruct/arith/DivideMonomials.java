@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -28,7 +28,7 @@ public final class DivideMonomials extends AbstractTermTransformer {
 
     
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices services) {
         final Term arg1 = term.sub ( 0 );
         final Term arg2 = term.sub ( 1 );
 

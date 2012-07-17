@@ -17,6 +17,7 @@ import java.util.Map;
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -59,7 +60,7 @@ import de.uka.ilkd.key.util.Triple;
 final class JMLTranslator {
 
     private final static TermBuilder TB = TermBuilder.DF;
-    private Services services;                          // to be used in future
+    private IServices services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
 
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
@@ -140,7 +141,7 @@ final class JMLTranslator {
 
 
     public JMLTranslator(SLTranslationExceptionManager excManager,
-                         Services services) {
+                         IServices services) {
         this.excManager = excManager;
         this.services = services;
         
@@ -170,7 +171,7 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term ensuresTerm = (Term) params[0];
-                Services services = (Services) params[1];
+                IServices services = (IServices) params[1];
 
                 BooleanLDT booleanLDT =
                         services.getTypeConverter().getBooleanLDT();
@@ -190,7 +191,7 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term ensuresTerm = (Term) params[0];
-                Services services = (Services) params[1];
+                IServices services = (IServices) params[1];
 
                 BooleanLDT booleanLDT =
                         services.getTypeConverter().getBooleanLDT();
@@ -214,7 +215,7 @@ final class JMLTranslator {
                 SLExpression lhs = (SLExpression) params[0];
                 Term rhs = (Term) params[1];
                 SLExpression mby = (SLExpression) params[2];
-                Services services = (Services) params[3];
+                IServices services = (IServices) params[3];
 
                 LocationVariable heap =
                         services.getTypeConverter().getHeapLDT().getHeap();
@@ -237,7 +238,7 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term ensuresTerm = (Term) params[0];
-                Services services = (Services) params[1];
+                IServices services = (IServices) params[1];
                 return TB.convertToFormula(ensuresTerm, services);
             }
         });
@@ -266,7 +267,7 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term requiresTerm = (Term) params[0];
-                Services services = (Services) params[1];
+                IServices services = (IServices) params[1];
                 return TB.convertToFormula(requiresTerm, services);
             }
         });
@@ -283,7 +284,7 @@ final class JMLTranslator {
                 LogicVariable eVar = (LogicVariable) params[1];
                 ProgramVariable excVar = (ProgramVariable) params[2];
                 KeYJavaType excType = (KeYJavaType) params[3];
-                Services services = (Services) params[4];
+                IServices services = (IServices) params[4];
 
                 if (result == null) {
                     result = TB.tt();
@@ -318,7 +319,7 @@ final class JMLTranslator {
                 ImmutableList<KeYJavaType> signalsonly =
                         (ImmutableList<KeYJavaType>) params[0];
                 ProgramVariable excVar = (ProgramVariable) params[1];
-                Services services = (Services) params[2];
+                IServices services = (IServices) params[2];
                 // Build appropriate term out of the parsed list of types
                 // i.e. disjunction of "excVar instanceof ExcType"
                 // for every ExcType in the list
@@ -393,7 +394,7 @@ final class JMLTranslator {
                 KeYJavaType declsType = (KeYJavaType) params[3];
                 ImmutableList<LogicVariable> declVars =
                         (ImmutableList<LogicVariable>) params[4];
-                Services services = (Services) params[5];
+                IServices services = (IServices) params[5];
                 KeYJavaType promo = services.getTypeConverter().getPromotedType(declsType, t.getType());
 
                 if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
@@ -586,7 +587,7 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class,
                                 SLExpression.class);
-                final Services services = (Services) params[0];
+                final IServices services = (IServices) params[0];
                 final Term seq = ((SLExpression) params[1]).getTerm();
                 final Term idx = ((SLExpression) params[2]).getTerm();
                 return new SLExpression(TB.seqGet(services, Sort.ANY, seq, idx));
@@ -644,7 +645,7 @@ final class JMLTranslator {
                 final SLExpression e1 = (SLExpression) params[1];
                 final SLExpression e2 = (SLExpression) params[2];
                 final SLExpression e3 = (SLExpression) params[3];
-                final Services services = (Services) params[4];
+                final IServices services = (IServices) params[4];
                 final LogicVariable stepsLV = e3 == null
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTypeConverter().getIntegerLDT().targetSort())
@@ -719,7 +720,7 @@ final class JMLTranslator {
                                 Services.class);
                 SLExpression expr1 = (SLExpression) params[0];
                 SLExpression expr2 = (SLExpression) params[1];
-                Services services = (Services) params[2];
+                IServices services = (IServices) params[2];
 
                 checkSLExpressions(expr1, expr2, excManager, "<==>");
                 return buildEqualityTerm(expr1, expr2, excManager, services);
@@ -738,7 +739,7 @@ final class JMLTranslator {
                                 Services.class);
                 SLExpression expr1 = (SLExpression) params[0];
                 SLExpression expr2 = (SLExpression) params[1];
-                Services services = (Services) params[2];
+                IServices services = (IServices) params[2];
 
                 checkSLExpressions(expr1, expr2, excManager, "<=!=>");
                 SLExpression eq =
@@ -759,7 +760,7 @@ final class JMLTranslator {
                                 Services.class);
                 SLExpression expr1 = (SLExpression) params[0];
                 SLExpression expr2 = (SLExpression) params[1];
-                Services services = (Services) params[2];
+                IServices services = (IServices) params[2];
 
                 checkSLExpressions(expr1, expr2, excManager, "==");
                 return buildEqualityTerm(expr1, expr2, excManager, services);
@@ -778,7 +779,7 @@ final class JMLTranslator {
                                 Services.class);
                 SLExpression expr1 = (SLExpression) params[0];
                 SLExpression expr2 = (SLExpression) params[1];
-                Services services = (Services) params[2];
+                IServices services = (IServices) params[2];
 
                 checkSLExpressions(expr1, expr2, excManager, "!=");
                 SLExpression eq =
@@ -880,7 +881,7 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
                 checkParameters(params, Services.class, JavaIntegerSemanticsHelper.class, KeYJavaType.class, SLExpression.class);
-                Services services = (Services)params[0];
+                IServices services = (IServices)params[0];
                 JavaIntegerSemanticsHelper intHelper = (JavaIntegerSemanticsHelper)params[1];
                 KeYJavaType type = (KeYJavaType)params[2];
                 SLExpression result = (SLExpression)params[3];
@@ -917,7 +918,7 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class, SLExpression.class);
-                Services services = (Services)params[0];
+                IServices services = (IServices)params[0];
                 SLExpression result = (SLExpression)params[1];
                 SLExpression a = (SLExpression)params[2];
                 SLExpression b = (SLExpression)params[3];
@@ -1006,7 +1007,7 @@ final class JMLTranslator {
                 Token escape = (Token) params[0];
                 ImmutableList<SLExpression> list =
                         (ImmutableList<SLExpression>) params[1];
-                Services services = (Services) params[2];
+                IServices services = (IServices) params[2];
 
                 // strip leading "\dl_"
                 String functName = escape.getText().substring(4);
@@ -1094,7 +1095,7 @@ final class JMLTranslator {
                 checkParameters(params, Services.class, SLExpression.class,
                                 String.class, Token.class, SLExpression.class,
                                 SLExpression.class);
-                Services services = (Services) params[0];
+                IServices services = (IServices) params[0];
                 SLExpression receiver = (SLExpression) params[1];
                 String fullyQualifiedName = (String) params[2];
                 Token lbrack = (Token) params[3];
@@ -1144,7 +1145,7 @@ final class JMLTranslator {
                 }
             }
 
-            private SLExpression translateArrayReference(Services services,
+            private SLExpression translateArrayReference(IServices services,
                                                          SLExpression receiver,
                                                          SLExpression rangeFrom,
                                                          SLExpression rangeTo) {
@@ -1176,7 +1177,7 @@ final class JMLTranslator {
             }
 
 
-            private SLExpression translateSequenceReference(Services services,
+            private SLExpression translateSequenceReference(IServices services,
                                                             SLExpression receiver,
                                                             SLExpression rangeFrom,
                                                             SLExpression rangeTo)
@@ -1209,7 +1210,7 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, SLExpression.class, Services.class);
                 SLExpression expr = (SLExpression) params[0];
-                Services services = (Services) params[1];
+                IServices services = (IServices) params[1];
                 if (expr.isTerm()) {
                     Term t = expr.getTerm();
                     LocSetLDT locSetLDT =
@@ -1243,7 +1244,7 @@ final class JMLTranslator {
                 checkParameters(params, ImmutableList.class, Services.class);
                 ImmutableList<SLExpression> exprList =
                         (ImmutableList<SLExpression>) params[0];
-                Services services = (Services) params[1];
+                IServices services = (IServices) params[1];
 
                 ImmutableList<Term> singletons = ImmutableSLList.<Term>nil();
                 for (SLExpression expr : exprList) {
@@ -1285,7 +1286,7 @@ final class JMLTranslator {
                 checkParameters(params, ImmutableList.class, Services.class);
                 ImmutableList<Term> list =
                         (ImmutableList<Term>) params[0];
-                Services services = (Services) params[1];
+                IServices services = (IServices) params[1];
 
                 ImmutableList<Term> disTerms = ImmutableSLList.<Term>nil();
                 while (!list.isEmpty()) {
@@ -1311,7 +1312,7 @@ final class JMLTranslator {
 				checkParameters(params, Services.class);
 				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
 			               .getKeYJavaType(PrimitiveType.JAVA_INT);
-				return new SLExpression(TB.index((Services)params[0]),t);
+				return new SLExpression(TB.index((IServices)params[0]),t);
 			}});
         
         translationMethods.put(JMLKeyWord.VALUES, new JMLTranslationMethod(){
@@ -1545,7 +1546,7 @@ final class JMLTranslator {
          * @return allObjects term (see <code>LocSetADT</code>)
          * @throws SLTranslationException in case <code>t</code> is not a store-ref term cosisting of unions of singletons
          */
-        protected Term getFields(SLTranslationExceptionManager excManager, Term t, Services services) throws SLTranslationException {
+        protected Term getFields(SLTranslationExceptionManager excManager, Term t, IServices services) throws SLTranslationException {
             final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
             if(t.op().equals(locSetLDT.getUnion())) {
                 final Term sub0 = getFields(excManager, t.sub(0),services);
@@ -1674,7 +1675,7 @@ final class JMLTranslator {
         /**
          * Converts a term so that all of its non-rigid operators refer to the pre-state.
          */
-        protected Term convertToOld(Services services, Term heapAtPre, Term term) {
+        protected Term convertToOld(IServices services, Term heapAtPre, Term term) {
             assert heapAtPre != null;
             Map<Term,Term> map = new LinkedHashMap<Term, Term>();
             map.put(TB.getBaseHeap(services), heapAtPre);
@@ -1687,7 +1688,7 @@ final class JMLTranslator {
          */
         protected abstract String name();
 
-        protected abstract Term translate (Services services, Term heapAtPre, Object[] params) throws SLTranslationException;
+        protected abstract Term translate (IServices services, Term heapAtPre, Object[] params) throws SLTranslationException;
 
         public Term translate (Object ... params) throws SLTranslationException{
             if (!(params[0] instanceof Services && params[1] instanceof Term))
@@ -1697,7 +1698,7 @@ final class JMLTranslator {
                         + "\nExpected type was:  Term");
             Term heapAtPre = (Term) params[1];
             assertPost(heapAtPre);
-            return translate((Services)params[0], heapAtPre, Arrays.copyOfRange(params, 1, params.length-1));
+            return translate((IServices)params[0], heapAtPre, Arrays.copyOfRange(params, 1, params.length-1));
         }
     }
 
@@ -1723,7 +1724,7 @@ final class JMLTranslator {
         protected SLExpression buildEqualityTerm(SLExpression a,
                                                  SLExpression b,
                                                  SLTranslationExceptionManager excManager,
-                                                 Services services)
+                                                 IServices services)
                 throws SLTranslationException {
 
             if (a.isTerm() && b.isTerm()) {
@@ -1766,7 +1767,7 @@ final class JMLTranslator {
         protected Term buildEqualityTerm(Term a,
                                          Term b,
                                          SLTranslationExceptionManager excManager1,
-                                         Services services)
+                                         IServices services)
                 throws SLTranslationException {
 
             Term result = null;
@@ -1828,7 +1829,7 @@ final class JMLTranslator {
         @Override
         public SLExpression translate (SLTranslationExceptionManager man, Object ... params ) throws SLTranslationException{
             checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-            JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
+            JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((IServices)params[0],man);
             bigint = ((Services)params[0]).getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             SLExpression e1 = (SLExpression) params[1];
             SLExpression e2 = (SLExpression) params[2];

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -51,7 +52,7 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     * @param root The {@link ProgramElement} to collect undeclared variables in.
     * @param services The {@link Services} to use.
     */
-   public UndeclaredProgramVariableCollector(ProgramElement root, Services services) {
+   public UndeclaredProgramVariableCollector(ProgramElement root, IServices services) {
       super(root, services);
    }
 

@@ -23,8 +23,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
@@ -473,7 +473,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public Services getServices() {
+      public IServices getServices() {
          return null;
       }
 

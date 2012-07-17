@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -38,7 +38,7 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final Services services = goal.proof().getServices();
+        final IServices services = goal.proof().getServices();
         final Monomial aMon =
             Monomial.create ( a.toTerm ( app, pos, goal ), services );
         final Monomial bMon =

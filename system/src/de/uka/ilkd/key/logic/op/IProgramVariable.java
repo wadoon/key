@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -20,6 +20,6 @@ public interface IProgramVariable extends TerminalProgramElement,
 				          Named, 
 				          SortedOperator {
     KeYJavaType getKeYJavaType();
-    KeYJavaType getKeYJavaType(Services javaServ);
-    KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
+    KeYJavaType getKeYJavaType(IServices javaServ);
+    KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec);
 }

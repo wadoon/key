@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -36,7 +36,7 @@ public final class EqualUniqueCondition implements VariableCondition {
     }
     
     
-    private static Term equalUnique(Term t1, Term t2, Services services) {
+    private static Term equalUnique(Term t1, Term t2, IServices services) {
 	if(!(t1.op() instanceof Function 
 	     && t2.op() instanceof Function
 	     && ((Function)t1.op()).isUnique()
@@ -58,7 +58,7 @@ public final class EqualUniqueCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, 
 	    		  	 SVSubstitute instCandidate, 
 	    		  	 MatchConditions mc, 
-	    		  	 Services services) {
+	    		  	 IServices services) {
 	SVInstantiations svInst = mc.getInstantiations();
 	Term tInst   = (Term) svInst.getInstantiation(t);
 	Term t2Inst  = (Term) svInst.getInstantiation(t2);

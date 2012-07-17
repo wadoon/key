@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -26,7 +26,7 @@ public interface DependencyContract extends Contract {
      */
     public Term getDep(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
-	               Services services);    
+	               IServices services);    
         
     /**
      * Returns the dependency set of the contract.
@@ -34,5 +34,5 @@ public interface DependencyContract extends Contract {
     public Term getDep(Term heapTerm,
 	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
-	               Services services);
+	               IServices services);
 }

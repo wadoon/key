@@ -10,9 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -22,11 +19,10 @@ import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -34,6 +30,7 @@ import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -49,6 +46,8 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -338,7 +337,7 @@ public abstract class Taclet implements Rule, Named {
      * e.g. wanted if an if-sequent is matched
      * @param matchCond the SVInstantiations/Constraint that are
      * required because of formerly matchings
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return the new MatchConditions needed to match template with
      * term , if possible, null otherwise
@@ -347,7 +346,7 @@ public abstract class Taclet implements Rule, Named {
 				    Term            template,
 				    boolean         ignoreUpdates,
 				    MatchConditions matchCond,
-				    Services        services) {
+				    IServices        services) {
 	Debug.out("Start Matching rule: ", name);
 	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
 		 services);	
@@ -363,7 +362,7 @@ public abstract class Taclet implements Rule, Named {
      * @param template the Term that is checked if it can match term
      * @param matchCond the SVInstantiations/Constraint that are
      * required because of formerly matchings
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return the new MatchConditions needed to match template with
      * term , if possible, null otherwise
@@ -371,7 +370,7 @@ public abstract class Taclet implements Rule, Named {
     protected MatchConditions match(Term            term,
 				    Term            template,
 				    MatchConditions matchCond,
-				    Services        services) {
+				    IServices        services) {
 	return match(term, template, false, matchCond, services);
     }
 
@@ -383,7 +382,7 @@ public abstract class Taclet implements Rule, Named {
      * candidate for a possible instantiation of var
      * @param matchCond the MatchConditions which have to be respected
      * for the new match
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the Java type model
      * @return the match conditions resulting from matching
      * <code>var</code> with <code>instantiationCandidate</code> or
@@ -392,7 +391,7 @@ public abstract class Taclet implements Rule, Named {
     public MatchConditions checkVariableConditions(SchemaVariable var, 
                                                    SVSubstitute instantiationCandidate,
                                                    MatchConditions matchCond,
-                                                   Services services) {
+                                                   IServices services) {
 
 	if (instantiationCandidate instanceof Term) {
 	    Term term = (Term) instantiationCandidate;
@@ -419,7 +418,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
 
-    public MatchConditions checkConditions(MatchConditions cond, Services services) {
+    public MatchConditions checkConditions(MatchConditions cond, IServices services) {
         if (cond == null) {
             return null;
         }
@@ -462,7 +461,7 @@ public abstract class Taclet implements Rule, Named {
     private final MatchConditions matchBoundVariables(Term term, 
 						      Term template, 
 						      MatchConditions matchCond,
-						      Services services) {
+						      IServices services) {
 	
         matchCond = matchCond.extendRenameTable();
         
@@ -505,14 +504,14 @@ public abstract class Taclet implements Rule, Named {
      * be matched
      * @param matchCond the MatchConditions that has to be paid respect when
      * trying to match the JavaBlocks
-     * @param services the Services object encapsulating information about the
+     * @param services the IServices object encapsulating information about the
      * program context
      * @return the new matchconditions if a match is possible, otherwise null
      */
     protected final MatchConditions matchJavaBlock(Term term, 
 						   Term template, 
 						   MatchConditions matchCond,
-						   Services services) {
+						   IServices services) {
       
 	if (term.javaBlock().isEmpty()) {
 	    if (!template.javaBlock().isEmpty()){
@@ -552,7 +551,7 @@ public abstract class Taclet implements Rule, Named {
 				      final Term             template, 
 				      final boolean          ignoreUpdates,
 				      MatchConditions  	     matchCond,
-				      final Services         services) {
+				      final IServices         services) {
 	Debug.out("Match: ", template);
 	Debug.out("With: ",  term);
         
@@ -629,7 +628,7 @@ public abstract class Taclet implements Rule, Named {
      * @param p_toMatch list of constraint formulas to match p_template to
      * @param p_template template formula as in "match"
      * @param p_matchCond already performed instantiations
-     * @param p_services the Services object encapsulating information
+     * @param p_services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return Two lists (in an IfMatchResult object), containing the
      * the elements of p_toMatch that could successfully be matched
@@ -638,7 +637,7 @@ public abstract class Taclet implements Rule, Named {
     public IfMatchResult matchIf ( Iterator<IfFormulaInstantiation> p_toMatch,
 				   Term                             p_template,
 				   MatchConditions                  p_matchCond,
-				   Services                         p_services ) {
+				   IServices                         p_services ) {
 	ImmutableList<IfFormulaInstantiation> resFormulas = ImmutableSLList
 	        .<IfFormulaInstantiation> nil();
 	ImmutableList<MatchConditions> resMC = ImmutableSLList
@@ -679,7 +678,7 @@ public abstract class Taclet implements Rule, Named {
      */
     public MatchConditions matchIf ( Iterator<IfFormulaInstantiation> p_toMatch,
 				     MatchConditions                  p_matchCond,
-				     Services                         p_services ) {
+				     IServices                         p_services ) {
 
 	Iterator<SequentFormula>     itIfSequent   = ifSequent () .iterator ();
 
@@ -870,13 +869,13 @@ public abstract class Taclet implements Rule, Named {
      * a new term is created by replacing variables of term whose replacement is
      * found in the given SVInstantiations 
      * @param term the Term the syntactical replacement is performed on
-     * @param services the Services
+     * @param services the IServices
      * @param mc the {@link MatchConditions} with all instantiations and
      * the constraint 
      * @return the (partially) instantiated term  
      */
     protected Term syntacticalReplace(Term term,
-				      Services services,
+				      IServices services,
 				      MatchConditions mc) {	
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
@@ -915,14 +914,14 @@ public abstract class Taclet implements Rule, Named {
      * the given constrained formula is instantiated and then
      * the result (usually a complete instantiated formula) is returned.
      * @param schemaFormula the SequentFormula to be instantiated
-     * @param services the Services object carrying ja related information
+     * @param services the IServices object carrying ja related information
      * @param matchCond the MatchConditions object with the instantiations of
      * the schemavariables, constraints etc.
      * @return the as far as possible instantiated SequentFormula
      */
     private SequentFormula 
 	instantiateReplacement(SequentFormula schemaFormula,
-			       Services           services,
+			       IServices           services,
 			       MatchConditions    matchCond) { 
 
 	final SVInstantiations svInst = matchCond.getInstantiations ();
@@ -942,12 +941,12 @@ public abstract class Taclet implements Rule, Named {
      * instantiates the given semisequent with the instantiations found in 
      * Matchconditions
      * @param semi the Semisequent to be instantiated
-     * @param services the Services
+     * @param services the IServices
      * @param matchCond the MatchConditions including the mapping 
      * Schemavariables to concrete logic elements
      * @return the instanted formulas of the semisquent as list
      */
-    private ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services, 
+    private ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, IServices services, 
             MatchConditions matchCond) {       
         
         ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
@@ -968,14 +967,14 @@ public abstract class Taclet implements Rule, Named {
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
      * @param goal the Goal that knows the node the formulae have to be added
      * @param pos the PosInOccurrence describing the place in the sequent
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
      */
     protected void replaceAtPos(Semisequent semi,
 				Goal goal,
 				PosInOccurrence pos,
-				Services services, 
+				IServices services, 
 				MatchConditions matchCond) {
 	goal.changeFormula(instantiateSemisequent(semi, services, matchCond),
                 pos);
@@ -992,7 +991,7 @@ public abstract class Taclet implements Rule, Named {
      * @param pos the PosInOccurrence describing the place in the sequent
      * @param antec boolean true(false) if elements have to be added to the
      * antecedent(succedent) (only looked at if pos == null)
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
      */
@@ -1000,7 +999,7 @@ public abstract class Taclet implements Rule, Named {
 			    Goal goal,			  
 			    PosInOccurrence pos,
 			    boolean antec,
-			    Services services, 
+			    IServices services, 
 			    MatchConditions matchCond ) {
 	final ImmutableList<SequentFormula> replacements = 
             instantiateSemisequent(semi, services, matchCond);
@@ -1022,14 +1021,14 @@ public abstract class Taclet implements Rule, Named {
      * @param goal the Goal that knows the node the formulae have to be added
      * @param pos the PosInOccurrence describing the place in the
      * sequent or null for head of antecedent
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
      */
     protected void addToAntec(Semisequent semi,
 			      Goal goal,
 			      PosInOccurrence pos,
-			      Services services, 
+			      IServices services, 
 			      MatchConditions matchCond) { 
 	addToPos(semi, goal, pos, true, services, matchCond);
     }
@@ -1044,14 +1043,14 @@ public abstract class Taclet implements Rule, Named {
      * @param goal the Goal that knows the node the formulae have to be added
      * @param pos the PosInOccurrence describing the place in the
      * sequent or null for head of antecedent
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
      */
     protected void addToSucc(Semisequent semi,
 			     Goal goal,
 			     PosInOccurrence pos,
-			     Services services, 
+			     IServices services, 
 			     MatchConditions matchCond) {
 	addToPos(semi, goal, pos, false, services, matchCond);
     }
@@ -1074,12 +1073,12 @@ public abstract class Taclet implements Rule, Named {
      * template to the node of the given goal
      * @param rules the rules to be added
      * @param goal the goal describing the node where the rules should be added
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
      */
     protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, 
-				Services services,
+				IServices services,
 				MatchConditions matchCond) {
                                 
 	final Iterator<Taclet> it = rules.iterator();
@@ -1169,7 +1168,7 @@ public abstract class Taclet implements Rule, Named {
 
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs, Goal goal,
                                     PosInOccurrence posOfFind,
-                                    Services services, 
+                                    IServices services, 
                                     MatchConditions matchCond) {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
 	for (final SchemaVariable sv : pvs) {
@@ -1193,14 +1192,14 @@ public abstract class Taclet implements Rule, Named {
     /** the rule is applied to the given goal using the
      * information of rule application.
      * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param tacletApp the rule application that is executed.
      * @return List of the goals created by the rule which have to be
      * proved. If this is a close-goal-taclet ( this.closeGoal () ),
      * the first goal of the return list is the goal that should be
      * closed (with the constraint this taclet is applied under).
      */
-    public abstract ImmutableList<Goal> apply(Goal goal, Services services, 
+    public abstract ImmutableList<Goal> apply(Goal goal, IServices services, 
 				     RuleApp tacletApp);
 
 

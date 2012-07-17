@@ -11,8 +11,8 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -58,12 +58,12 @@ public abstract class TypeResolver {
     public abstract boolean isComplete(SchemaVariable sv, 
             			       SVSubstitute instCandidate, 
             			       SVInstantiations instMap, 
-            			       Services services);
+            			       IServices services);
     
     public abstract Sort resolveSort(SchemaVariable sv, 
             			     SVSubstitute instCandidate, 
             			     SVInstantiations instMap, 
-            			     Services services);
+            			     IServices services);
     
     
     //-------------------------------------------------------------------------
@@ -84,13 +84,13 @@ public abstract class TypeResolver {
         
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
+                SVInstantiations instMap, IServices services) {            
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
         @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {
+                SVInstantiations instMap, IServices services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
         
@@ -110,13 +110,13 @@ public abstract class TypeResolver {
 
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
+                SVInstantiations instMap, IServices services) {            
             return true;
         }
 
         @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {
+                SVInstantiations instMap, IServices services) {
             return s;
         }
         
@@ -140,13 +140,13 @@ public abstract class TypeResolver {
         
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {       
+                SVInstantiations instMap, IServices services) {       
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
         @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {
+                SVInstantiations instMap, IServices services) {
             
             final Sort s;        
             
@@ -189,7 +189,7 @@ public abstract class TypeResolver {
         @Override
         public boolean isComplete(SchemaVariable sv,
                 SVSubstitute instCandidate, SVInstantiations instMap,
-                Services services) {
+                IServices services) {
             
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
@@ -198,7 +198,7 @@ public abstract class TypeResolver {
         public Sort resolveSort(SchemaVariable sv, 
         			SVSubstitute instCandidate,
         			SVInstantiations instMap, 
-        			Services services) {     
+        			IServices services) {     
             final Sort result;
             
             final SVSubstitute inst = (SVSubstitute) (memberSV == sv ? instCandidate : 
@@ -221,7 +221,7 @@ public abstract class TypeResolver {
             return result;
         }
     
-        private Sort getContainerSort(Operator op, Services services) {
+        private Sort getContainerSort(Operator op, IServices services) {
             Sort result = null;
             if (op instanceof ProgramVariable) {
                 result  = ((ProgramVariable)op).getContainerType().getSort();

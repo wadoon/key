@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -51,7 +52,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var,
             SVSubstitute instCandidate, MatchConditions matchCond,
-            Services services) {
+            IServices services) {
         if (var != labelSV && 
                 matchCond.getInstantiations().isInstantiated(labelSV)) { 
             var = labelSV;

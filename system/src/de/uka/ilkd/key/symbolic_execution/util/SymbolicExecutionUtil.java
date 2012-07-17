@@ -11,6 +11,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
@@ -241,7 +242,7 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
-   public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(Services services,
+   public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(IServices services,
                                                                                      TypeReference contextObjectType,
                                                                                      IProgramMethod contextMethod,
                                                                                      ReferencePrefix contextObject,
@@ -263,7 +264,7 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
-   public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(Services services,
+   public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(IServices services,
                                                                                      IExecutionContext context,
                                                                                      Node node,
                                                                                      IProgramVariable variable) {
@@ -303,7 +304,7 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
-   public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
+   public static SiteProofVariableValueInput createExtractVariableValueSequent(IServices services,
                                                                                Node node,
                                                                                IProgramVariable variable) {
       // Make sure that correct parameters are given
@@ -336,7 +337,7 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
-   public static SiteProofVariableValueInput createExtractTermSequent(Services services,
+   public static SiteProofVariableValueInput createExtractTermSequent(IServices services,
                                                                       Node node,
                                                                       Term term) {
       // Make sure that correct parameters are given
@@ -472,7 +473,7 @@ public final class SymbolicExecutionUtil {
     * @param term The {@link Term} to check.
     * @return {@code true} is heap update, {@code false} is something else.
     */
-   public static boolean isHeapUpdate(Services services, Term term) {
+   public static boolean isHeapUpdate(IServices services, Term term) {
       boolean heapUpdate = false;
       if (term != null) {
          ImmutableArray<Term> subs = term.subs();
@@ -613,7 +614,7 @@ public final class SymbolicExecutionUtil {
     */
    public static IProgramVariable findSelfTerm(Node node) {
       JavaBlock jb = node.getAppliedRuleApp().posInOccurrence().subTerm().javaBlock();
-      Services services = node.proof().getServices();
+      IServices services = node.proof().getServices();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
       if (context instanceof ExecutionContext) {
          ReferencePrefix prefix = ((ExecutionContext)context).getRuntimeInstance();

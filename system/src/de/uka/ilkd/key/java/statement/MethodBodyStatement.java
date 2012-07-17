@@ -13,6 +13,7 @@ package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -287,7 +288,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                          getBodySource());        
     }
 
-    public String reuseSignature(Services services, ExecutionContext ec) {
+    public String reuseSignature(IServices services, ExecutionContext ec) {
        return super.reuseSignature(services, ec)+"("+getBodySource().getName()+")";
     }
 

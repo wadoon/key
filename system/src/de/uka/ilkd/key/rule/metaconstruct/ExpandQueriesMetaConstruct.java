@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.math.BigInteger;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -32,7 +32,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
  *  meta construct appears in a positive context wrt. to logical negation, (e.g. in the succedent or negated in the antecedent)
  *  False implies means that the meta construct appears in a negative context. (e.g. in the antecedent or negated in the succedent)
  */
-   public Term transform(Term term, SVInstantiations svInst, Services services) {
+   public Term transform(Term term, SVInstantiations svInst, IServices services) {
     	Term arg1 = term.sub(0); 
     	Term arg2 = term.sub(1); //true or false. If true, than the application of the meta construct
     	boolean positiveContext;

@@ -21,7 +21,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -185,7 +185,7 @@ public final class SpecificationRepository {
         }
         
         assert kjt != null;
-        final JavaInfo javaInfo = services.getJavaInfo();
+        final IProgramInfo javaInfo = services.getJavaInfo();
         for(KeYJavaType sub : javaInfo.getAllSubtypes(kjt)) {
             assert sub != null;
             final IProgramMethod subPM 

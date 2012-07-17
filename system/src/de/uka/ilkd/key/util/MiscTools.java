@@ -17,8 +17,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
@@ -63,7 +63,7 @@ public final class MiscTools {
      * Returns the receiver term of the passed method frame, or null if
      * the frame belongs to a static method.
      */
-    public static Term getSelfTerm(MethodFrame mf, Services services) {
+    public static Term getSelfTerm(MethodFrame mf, IServices services) {
 	ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
 	ReferencePrefix rp = ec.getRuntimeInstance();
 	if(!(rp instanceof TypeReference) && rp != null) {
@@ -74,7 +74,7 @@ public final class MiscTools {
     }
     
     public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe, 
-	    					     	    Services services) {
+	    					     	    IServices services) {
 	final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
 	rpvc.start();
 	return rpvc.result();
@@ -83,7 +83,7 @@ public final class MiscTools {
     
     public static ImmutableSet<ProgramVariable> getLocalOuts(
 	    					ProgramElement pe, 
-	    			                Services services) {
+	    			                IServices services) {
 	final WrittenPVCollector wpvc = new WrittenPVCollector(pe, services);
 	wpvc.start();
 	return wpvc.result();
@@ -455,7 +455,7 @@ public final class MiscTools {
 	private ImmutableSet<ProgramVariable> declaredPVs 
 		= DefaultImmutableSet.<ProgramVariable>nil();
 
-	public ReadPVCollector(ProgramElement root, Services services) {
+	public ReadPVCollector(ProgramElement root, IServices services) {
 	    super(root, services);
 	}
 
@@ -490,7 +490,7 @@ public final class MiscTools {
 	private ImmutableSet<ProgramVariable> declaredPVs 
 		= DefaultImmutableSet.<ProgramVariable>nil();
 
-	public WrittenPVCollector(ProgramElement root, Services services) {
+	public WrittenPVCollector(ProgramElement root, IServices services) {
 	    super(root, services);
 	}
 

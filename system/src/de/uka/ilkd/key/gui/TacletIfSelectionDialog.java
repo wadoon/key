@@ -16,9 +16,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.IfChoiceModel;
@@ -199,10 +206,10 @@ public class TacletIfSelectionDialog extends JPanel{
          * 
          */
         private static final long serialVersionUID = -7145932915948630147L;
-        private final Services services;
+        private final IServices services;
         private final ListCellRenderer defaultRenderer;
         
-        public IfComboRenderer(ListCellRenderer renderer, Services services) {
+        public IfComboRenderer(ListCellRenderer renderer, IServices services) {
 	    setOpaque(true);
             this.services = services;
             this.defaultRenderer = renderer;

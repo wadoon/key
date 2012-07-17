@@ -12,7 +12,7 @@ package de.uka.ilkd.key.strategy.termProjection;
 
 import java.math.BigInteger;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -36,7 +36,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
         final Term coeffT = leftCoefficient.toTerm ( app, pos, goal );
         final Term polyT = polynomial.toTerm ( app, pos, goal );
 
-        final Services services = goal.proof ().getServices ();
+        final IServices services = goal.proof ().getServices ();
         final BigInteger coeff =
             new BigInteger ( AbstractTermTransformer
                              .convertToDecimalString ( coeffT, services ) );
@@ -45,9 +45,9 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
     }
 
     protected abstract Term divide(Monomial numerator, BigInteger denominator,
-                                   Services services);
+                                   IServices services);
 
-    private Term quotient(BigInteger monoCoeff, Term rightPoly, Services services) {
+    private Term quotient(BigInteger monoCoeff, Term rightPoly, IServices services) {
         final Function add = 
             services.getTypeConverter ().getIntegerLDT ().getAdd ();
         if ( rightPoly.op () == add ) {

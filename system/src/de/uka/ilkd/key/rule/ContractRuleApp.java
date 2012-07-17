@@ -14,12 +14,12 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -69,7 +69,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     	if (complete()) {
     		return this;
     	}
-    	Services services = goal.proof().getServices();
+    	IServices services = goal.proof().getServices();
     	ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
     	        .getApplicableContracts(
     	                UseOperationContractRule.computeInstantiation(

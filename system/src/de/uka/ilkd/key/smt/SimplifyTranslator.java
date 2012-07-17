@@ -13,7 +13,7 @@ package de.uka.ilkd.key.smt;
 import java.util.ArrayList;
 
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 
 import de.uka.ilkd.key.logic.Sequent;
 
@@ -70,11 +70,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
      * @param services
      * 		      The services Object belonging to the sequent.
      */
-    public SimplifyTranslator(Sequent sequent, Services services,Configuration config) {
+    public SimplifyTranslator(Sequent sequent, IServices services,Configuration config) {
 	super(sequent, services,config);
     }
     
-    public SimplifyTranslator(Services services,Configuration config) {
+    public SimplifyTranslator(IServices services,Configuration config) {
 	super(services,config);
     }
     

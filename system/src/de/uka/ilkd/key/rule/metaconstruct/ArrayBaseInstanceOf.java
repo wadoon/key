@@ -13,7 +13,7 @@
  */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -41,7 +41,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
      * reference array sort or a term with an <tt>exactInstance</tt> symbol as top level 
      * depending on a reference array sort.
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices services) {
         final Term array = term.sub(0);
         final Term element = term.sub(1);
 

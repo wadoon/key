@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 
 public interface Trigger {
@@ -24,7 +24,7 @@ public interface Trigger {
      */
     public abstract ImmutableSet<Substitution> 
                            getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
-                                   Services services);
+                                   IServices services);
     
     public abstract Term getTriggerTerm();
 }

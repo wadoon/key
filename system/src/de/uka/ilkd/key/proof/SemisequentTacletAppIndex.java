@@ -13,7 +13,7 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -41,7 +41,7 @@ public class SemisequentTacletAppIndex {
      */
     private void addTermIndices ( ImmutableList<SequentFormula> cfmas,
                                   Sequent                  s,
-                                  Services                 services,
+                                  IServices                 services,
                                   TacletIndex              tacletIndex,
                                   NewRuleListener          listener ) {
         while ( !cfmas.isEmpty() ) {
@@ -59,7 +59,7 @@ public class SemisequentTacletAppIndex {
      */
     private void addTermIndex ( SequentFormula cfma,
                                 Sequent            s,
-                                Services           services,
+                                IServices           services,
                                 TacletIndex        tacletIndex,
                                 NewRuleListener    listener ) {
         final PosInOccurrence pos =
@@ -82,7 +82,7 @@ public class SemisequentTacletAppIndex {
     private void addTaclets ( RuleFilter         filter, 
                               SequentFormula cfma,
                               Sequent            s,
-                              Services           services,
+                              IServices           services,
                               TacletIndex        tacletIndex,
                               NewRuleListener    listener ) {
         final TermTacletAppIndex oldIndex = termIndices.get ( cfma );
@@ -151,7 +151,7 @@ public class SemisequentTacletAppIndex {
     private void updateTermIndices ( ImmutableList<TermTacletAppIndex> oldIndices,
                                      ImmutableList<FormulaChangeInfo>  infos,
                                      Sequent                  newSeq,
-                                     Services                 services,
+                                     IServices                 services,
                                      TacletIndex              tacletIndex,
                                      NewRuleListener          listener ) {
 
@@ -182,7 +182,7 @@ public class SemisequentTacletAppIndex {
 
     private void updateTermIndices ( ImmutableList<FormulaChangeInfo> infos,
                                      Sequent                 newSeq,
-                                     Services                services,
+                                     IServices                services,
                                      TacletIndex             tacletIndex,
                                      NewRuleListener         listener ) {
 
@@ -202,7 +202,7 @@ public class SemisequentTacletAppIndex {
      */
     public SemisequentTacletAppIndex ( Sequent         s,
                                        boolean         antec,
-                                       Services        services,
+                                       IServices        services,
                                        TacletIndex     tacletIndex,
                                        NewRuleListener listener,
                                        RuleFilter      ruleFilter,
@@ -247,7 +247,7 @@ public class SemisequentTacletAppIndex {
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
                                                   RuleFilter filter,
-                                                  Services services) {
+                                                  IServices services) {
         return getTermIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
     }
 
@@ -256,7 +256,7 @@ public class SemisequentTacletAppIndex {
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
     public SemisequentTacletAppIndex sequentChanged ( SequentChangeInfo sci,
-                                                      Services          services,
+                                                      IServices          services,
                                                       TacletIndex       tacletIndex,
                                                       NewRuleListener   listener) {
         if ( sci.hasChanged ( antec ) ) {
@@ -282,7 +282,7 @@ public class SemisequentTacletAppIndex {
      */
     public SemisequentTacletAppIndex addTaclets ( RuleFilter      filter,
                                                   Sequent         s,
-                                                  Services        services,
+                                                  IServices        services,
                                                   TacletIndex     tacletIndex,
                                                   NewRuleListener listener) {
         final SemisequentTacletAppIndex result = copy();

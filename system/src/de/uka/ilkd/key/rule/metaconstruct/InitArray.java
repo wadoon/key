@@ -107,7 +107,7 @@ public abstract class InitArray extends ProgramTransformer {
     protected ProgramVariable[] evaluateInitializers 
 	( Statement[] p_stmnts, 
 	  Expression p_creationExpression,
-	  Services services ) {
+	  IServices services ) {
 
 	ImmutableArray<Expression> initializers =
 	    extractInitializers ( p_creationExpression );

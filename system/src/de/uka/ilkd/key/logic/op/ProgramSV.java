@@ -235,13 +235,13 @@ public final class ProgramSV extends AbstractSV
 
     
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public KeYJavaType getKeYJavaType(IServices javaServ) {
         return null;
     }
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
         return null;
     }
   
@@ -249,7 +249,7 @@ public final class ProgramSV extends AbstractSV
     @Override
     public MatchConditions match(SVSubstitute substitute, 
 				 MatchConditions mc, 
-				 Services services) {
+				 IServices services) {
 
         final ProgramSVSort svSort = (ProgramSVSort)sort();
      
@@ -273,14 +273,14 @@ public final class ProgramSV extends AbstractSV
      * violating some variable condition
      * @param pe the ProgramElement <code>var</code> is mapped to
      * @param matchCond the MatchConditions to be updated
-     * @param services the Services provide access to the Java model
+     * @param services the IServices provide access to the Java model
      * @return the updated match conditions including mapping 
      * <code>var</code> to <code>pe</code> or null if some variable
      * condition would be hurt by the mapping
      */
     private MatchConditions addProgramInstantiation(ProgramElement pe,
                                                     MatchConditions matchCond,
-                                                    Services services) {
+                                                    IServices services) {
         if (matchCond == null) {
             return null;
         }
@@ -316,14 +316,14 @@ public final class ProgramSV extends AbstractSV
      * violating some variable condition
      * @param list the ProgramList <code>var</code> is mapped to
      * @param matchCond the MatchConditions to be updated
-     * @param services the Services provide access to the Java model
+     * @param services the IServices provide access to the Java model
      * @return the updated match conditions including mapping 
      * <code>var</code> to <code>list</code> or null if some variable
      * condition would be hurt by the mapping
      */
     private MatchConditions addProgramInstantiation(ProgramList list,
                                                     MatchConditions matchCond,
-                                                    Services services) {
+                                                    IServices services) {
 	if (matchCond == null) {
             return null;
         }
@@ -344,7 +344,7 @@ public final class ProgramSV extends AbstractSV
     
     
     private MatchConditions matchListSV(SourceData source, MatchConditions matchCond) {
-	final Services services = source.getServices();
+	final IServices services = source.getServices();
 	ProgramElement src = source.getSource();
 
 	if (src == null) {
@@ -379,13 +379,13 @@ public final class ProgramSV extends AbstractSV
      * returns true, if the given SchemaVariable can stand for the
      * ProgramElement 
      * @param match the ProgramElement to be matched
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return true if the SchemaVariable can stand for the given element
      */
     private boolean check(ProgramElement match,
                           ExecutionContext ec,
-                          Services services) {        
+                          IServices services) {        
         if (match == null) {           
             return false;
         }
@@ -399,7 +399,7 @@ public final class ProgramSV extends AbstractSV
 	    return matchListSV(source, matchCond);
         }	
 	
-        final Services services  = source.getServices();        
+        final IServices services  = source.getServices();        
         final ProgramElement src = source.getSource();        
         Debug.out("Program match start (template, source)", this, src);
 

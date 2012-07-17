@@ -15,7 +15,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -49,14 +49,14 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 public final class DLSpecFactory {
 
     private static final TermBuilder TB = TermBuilder.DF;
-    private final Services services;
+    private final IServices services;
         
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
 
-    public DLSpecFactory(Services services) {
+    public DLSpecFactory(IServices services) {
 	assert services != null;
 	this.services = services;
     }

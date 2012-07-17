@@ -23,6 +23,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -65,7 +66,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     private final Constraint metavariableInst;
     private ImmutableMap<SchemaVariable,Term> newInstantiations =
                                 DefaultImmutableMap.<SchemaVariable,Term>nilMap();
-    private Services services;
+    private IServices services;
     private Term computedResult = null;
     private TypeConverter typeConverter = null;
     private final boolean allowPartialReplacement;
@@ -89,7 +90,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 
     /**
      */
-    public SyntacticalReplaceVisitor(Services              services, 
+    public SyntacticalReplaceVisitor(IServices              services, 
 				     SVInstantiations      svInst,
 				     Constraint            metavariableInst,
 				     boolean               allowPartialReplacement,
@@ -103,12 +104,12 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	subStack = new Stack<Object>(); // of Term
     }
 
-    public SyntacticalReplaceVisitor(Services services, 
+    public SyntacticalReplaceVisitor(IServices services, 
 				     SVInstantiations svInst) { 
 	this ( services, svInst, Constraint.BOTTOM, false, true );
     }
 
-    public SyntacticalReplaceVisitor(Services services, 
+    public SyntacticalReplaceVisitor(IServices services, 
 				     Constraint metavariableInst) { 
 	this ( services,
 	       SVInstantiations.EMPTY_SVINSTANTIATIONS,
@@ -116,7 +117,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	       false, true );
     }
 
-    public SyntacticalReplaceVisitor(Services services, 
+    public SyntacticalReplaceVisitor(IServices services, 
                                      SVInstantiations svInst,
                                      Constraint metavariableInst) { 
         this ( services, svInst, metavariableInst, false, true );
@@ -144,7 +145,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	return pe;
     }
 
-    private Services getServices () {
+    private IServices getServices () {
 	if ( services == null )
 	    services = new Services ();
 	return services;

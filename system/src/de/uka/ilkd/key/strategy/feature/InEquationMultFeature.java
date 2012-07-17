@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -95,7 +95,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     }
 
     protected final boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final Services services = goal.proof ().getServices ();
+        final IServices services = goal.proof ().getServices ();
         final Monomial targetM =
             Monomial.create ( targetCandidate.toTerm ( app, pos, goal ),
                               services );

@@ -13,7 +13,7 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,7 +27,7 @@ import java.util.Map;
   */
 public class HeapContext {
 
-  public static List<LocationVariable> getModHeaps(Services services, boolean transaction) {
+  public static List<LocationVariable> getModHeaps(IServices services, boolean transaction) {
       List<LocationVariable> result = new ArrayList<LocationVariable>();
       final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
       for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -39,7 +39,7 @@ public class HeapContext {
       return result;
   }
 
-  public static Map<LocationVariable,LocationVariable> getBeforeAtPreVars(List<LocationVariable> heaps, Services services, String contextName) {
+  public static Map<LocationVariable,LocationVariable> getBeforeAtPreVars(List<LocationVariable> heaps, IServices services, String contextName) {
     Map<LocationVariable,LocationVariable> result = new LinkedHashMap<LocationVariable,LocationVariable>();
     for(LocationVariable heap : heaps) {
        final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heap.name()+contextName, heap.sort(), true);
@@ -48,7 +48,7 @@ public class HeapContext {
     return result;
   }
 
-  public static Map<LocationVariable,Term> getAtPres(Map<LocationVariable,LocationVariable> atPreVars, Services services) {
+  public static Map<LocationVariable,Term> getAtPres(Map<LocationVariable,LocationVariable> atPreVars, IServices services) {
     final Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
     for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
        final LocationVariable lv = atPreVars.get(heap);

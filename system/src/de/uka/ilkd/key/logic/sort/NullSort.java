@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -35,8 +35,8 @@ public final class NullSort implements Sort  {
     
     private final Sort objectSort;
     
-    private WeakReference<Services> lastServices 
-    	= new WeakReference<Services>(null);
+    private WeakReference<IServices> lastServices 
+    	= new WeakReference<IServices>(null);
     private WeakReference<ImmutableSet<Sort>> extCache
         = new WeakReference<ImmutableSet<Sort>>(null);
     
@@ -61,9 +61,8 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public ImmutableSet<Sort> extendsSorts(Services services) {
+    public ImmutableSet<Sort> extendsSorts(IServices services) {
 	assert services != null;
-	assert objectSort == services.getJavaInfo().objectSort();
 	
 	ImmutableSet<Sort> result = extCache.get();
 	if(result == null || lastServices.get() != services) {
@@ -76,7 +75,7 @@ public final class NullSort implements Sort  {
 		}
 	    }
 	    
-	    lastServices = new WeakReference<Services>(services);
+	    lastServices = new WeakReference<IServices>(services);
 	    extCache = new WeakReference<ImmutableSet<Sort>>(result);
 	}
 	
@@ -99,7 +98,7 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public final SortDependingFunction getCastSymbol(Services services) {
+    public final SortDependingFunction getCastSymbol(IServices services) {
         SortDependingFunction result
             = SortDependingFunction.getFirstInstance(CAST_NAME, services)
         			   .getInstanceFor(this, services);
@@ -109,7 +108,7 @@ public final class NullSort implements Sort  {
     
     
     @Override    
-    public final SortDependingFunction getInstanceofSymbol(Services services) {
+    public final SortDependingFunction getInstanceofSymbol(IServices services) {
 	SortDependingFunction result
 	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);
@@ -119,7 +118,7 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public final SortDependingFunction getExactInstanceofSymbol(Services services) {
+    public final SortDependingFunction getExactInstanceofSymbol(IServices services) {
 	SortDependingFunction result
             = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);

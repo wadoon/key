@@ -12,6 +12,7 @@ package de.uka.ilkd.key.ldt;
 
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -47,7 +48,7 @@ public abstract class LDT implements Named {
     //constructors
     //-------------------------------------------------------------------------
     
-    protected LDT(Name name, Services services) {
+    protected LDT(Name name, IServices services) {
 	sort = (Sort) services.getNamespaces().sorts().lookup(name);
 	assert sort != null;
         this.name = name;
@@ -74,7 +75,7 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(Services services, String funcName) {
+    protected final Function addFunction(IServices services, String funcName) {
 	final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         assert f != null : "LDT: Function " + funcName + " not found";
@@ -83,7 +84,7 @@ public abstract class LDT implements Named {
     
     
     protected final SortDependingFunction addSortDependingFunction(
-	    					Services services, 
+	    					IServices services, 
 	    					String kind) {	
 	final SortDependingFunction f 
 		= SortDependingFunction.getFirstInstance(new Name(kind), 
@@ -185,7 +186,7 @@ public abstract class LDT implements Named {
     public abstract boolean isResponsible(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
 	    		Term sub, 
-	    		Services services, 
+	    		IServices services, 
 	    		ExecutionContext ec);
 
 
@@ -194,7 +195,7 @@ public abstract class LDT implements Named {
      * @return the Term that represents the given literal in its logic
      * form
      */ 
-    public abstract Term translateLiteral(Literal lit, Services services);
+    public abstract Term translateLiteral(Literal lit, IServices services);
 
     /** returns the function symbol for the given operation 
      * @return  the function symbol for the given operation 

@@ -50,7 +50,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
      */
     public CreatingASTVisitor(ProgramElement root, 
                               boolean preservesPos,
-                              Services services) {
+                              IServices services) {
         super(root, services);
 	this.preservesPositionInfo = preservesPos;
     }

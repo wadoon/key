@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -66,7 +67,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> {
     * Returns the {@link Services} of {@link #getInitConfig()}.
     * @return The {@link Services} of {@link #getInitConfig()}.
     */
-   public Services getServices() {
+   public IServices getServices() {
       return initConfig.getServices();
    }
 

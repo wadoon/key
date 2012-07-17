@@ -19,9 +19,9 @@ import junit.framework.TestCase;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -606,16 +606,16 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    }
    
    /**
-    * Searches a {@link IProgramMethod} in the given {@link Services}.
-    * @param services The {@link Services} to search in.
+    * Searches a {@link IProgramMethod} in the given {@link IServices}.
+    * @param services The {@link IServices} to search in.
     * @param containerTypeName The name of the type which contains the method.
     * @param methodFullName The method name to search.
     * @return The first found {@link IProgramMethod} in the type.
     */
-   protected static IProgramMethod searchProgramMethod(Services services, 
+   protected static IProgramMethod searchProgramMethod(IServices services, 
                                                       String containerTypeName, 
                                                       final String methodFullName) {
-      JavaInfo javaInfo = services.getJavaInfo();
+      IProgramInfo javaInfo = services.getJavaInfo();
       KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
       assertNotNull(containerKJT);
       ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
@@ -655,7 +655,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Load java file
       InitConfig initConfig = ui.load(javaFile, null, null);
       // Search method to proof
-      Services services = initConfig.getServices();
+      IServices services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
       // Create default contract for method to test
       FunctionalOperationContract contract = SymbolicExecutionUtil.createDefaultContract(services, pm, null);
@@ -704,7 +704,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Load java file
       InitConfig initConfig = ui.load(javaFile, null, null);
       // Search method to proof
-      Services services = initConfig.getServices();
+      IServices services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
       // Start proof
       ProofOblInput input = new MethodPartPO(initConfig, methodFullName, pm, precondition, startPosition, endPosition, true);

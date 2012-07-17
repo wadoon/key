@@ -10,15 +10,10 @@
 
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -32,27 +27,12 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services{
+public class Services extends AbstractServices {
     
-    /**
-     * the proof
-     */
-    private Proof proof;
-
-    /**
-     * proof specific namespaces (functions, predicates, sorts, variables)
-     */
-    private NamespaceSet namespaces = new NamespaceSet();
-
     /** used to determine whether an expression is a compile-time 
      * constant and if so the type and result of the expression
      */
     private ConstantExpressionEvaluator cee;
-
-    /** used to convert types, expressions and so on to logic elements
-     * (in special into to terms or formulas)
-     */
-    private TypeConverter typeconverter;
 
     /**
      * the information object on the Java model
@@ -60,31 +40,12 @@ public class Services{
     private final JavaInfo javainfo;
         
     /**
-     * variable namer for inner renaming
-     */
-    private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
-
-    /**
-     * the exception-handler
-     */
-    private KeYExceptionHandler exceptionHandler;
-    
-
-    /**
-     * map of names to counters
-     */
-    private HashMap<String, Counter> counters = new HashMap<String, Counter>();
-
-    /**
      * specification repository
      */
-    private SpecificationRepository specRepos 
+    SpecificationRepository specRepos 
     	= new SpecificationRepository(this);
     
 
-    private NameRecorder nameRecorder;
-    
-    
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -120,25 +81,16 @@ public class Services{
     }
 
     
-    public KeYExceptionHandler getExceptionHandler(){
-	return exceptionHandler;
-    }
-    
-
-    public void setExceptionHandler(KeYExceptionHandler keh){
-	exceptionHandler = keh;
-    }
-
-    
-    /**
-     * Returns the TypeConverter associated with this Services object.
-     */
-    public TypeConverter getTypeConverter(){
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IServices#getTypeConverter()
+	 */
+    @Override
+	public TypeConverter getTypeConverter(){
         return typeconverter;
     }
 
     
-    private void setTypeConverter(TypeConverter tc) {
+    void setTypeConverter(TypeConverter tc) {
 	typeconverter = tc;
     }
 
@@ -159,41 +111,39 @@ public class Services{
     }
     
     
-    public NameRecorder getNameRecorder() {
-        return nameRecorder;
-    }
-
-    
-    public void saveNameRecorder(Node n) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IServices#saveNameRecorder(de.uka.ilkd.key.proof.Node)
+	 */
+    @Override
+	public void saveNameRecorder(Node n) {
         n.setNameRecorder(nameRecorder);
         nameRecorder = new NameRecorder();
     }
 
     
-    public void addNameProposal(Name proposal) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IServices#addNameProposal(de.uka.ilkd.key.logic.Name)
+	 */
+    @Override
+	public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
     }
     
     
-    public SpecificationRepository getSpecificationRepository() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IServices#getSpecificationRepository()
+	 */
+    @Override
+	public SpecificationRepository getSpecificationRepository() {
 	return specRepos;
     }
     
     
-    /**
-     * Returns the VariableNamer associated with this Services object.
-     */
-    public VariableNamer getVariableNamer() {
-        return innerVarNamer;
-    }
-    
-
-    /**
-     * creates a new services object containing a copy of the java info of
-     * this object and a new TypeConverter (shallow copy)
-     * @return the copy
-     */
-    public Services copy() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IServices#copy()
+	 */
+    @Override
+	public Services copy() {
 	Debug.assertTrue
 	    (!(getJavaInfo().getKeYProgModelInfo().getServConf() 
 	       instanceof SchemaCrossReferenceServiceConfiguration),
@@ -210,11 +160,11 @@ public class Services{
     }
     
 
-    /**
-     * creates a new service object with the same ldt information 
-     * as the actual one
-     */
-    public Services copyPreservesLDTInformation() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IServices#copyPreservesLDTInformation()
+	 */
+    @Override
+	public Services copyPreservesLDTInformation() {
 	Debug.assertTrue
 	    (!(javainfo.getKeYProgModelInfo().getServConf() 
 	       instanceof SchemaCrossReferenceServiceConfiguration),
@@ -225,64 +175,21 @@ public class Services{
         nameRecorder = nameRecorder.copy();
 	return s;
     }
-    
-    
-    public Services copyProofSpecific(Proof p_proof) {
-        final Services s = new Services(getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key());
-        s.proof = p_proof;
-        s.specRepos = specRepos;
-        s.setTypeConverter(getTypeConverter().copy(s));
-        s.setExceptionHandler(getExceptionHandler());
-        s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        return s;
-    }
 
-    
-    /*
-     * returns an existing named counter, creates a new one otherwise
-     */
-    public Counter getCounter(String name) {
-        Counter c = counters.get(name);
-        if (c != null) return c;
-        c = new Counter(name);
-        counters.put(name, c);
-        return c;
-    }
-    
-    
-    public void setBackCounters(Node n) {        
-        for (final Counter c : counters.values()) {
-            c.undo(n);
-        }
-    }
-    
-    
-    /**
-     * returns the namespaces for functions, predicates etc.
-     * @return the proof specific namespaces
-     */
-    public NamespaceSet getNamespaces() {
-        return namespaces;
-    }
-    
-    
-    /**
-     * sets the namespaces of known predicates, functions, variables
-     * @param namespaces the NamespaceSet with the proof specific namespaces
-     */
-    public void setNamespaces(NamespaceSet namespaces) {
-        this.namespaces = namespaces;
-    }
-    
-    
-    /**
-     * Returns the proof to which this object belongs, or null if it does not 
-     * belong to any proof.
-     */
-    public Proof getProof() {
-	return proof;
-    }
+    /* (non-Javadoc)
+ 	 * @see de.uka.ilkd.key.java.IServices#copyProofSpecific(Proof)
+ 	 */
+	@Override
+	public Services copyProofSpecific(Proof p_proof) {
+	    final Services s = new Services(getJavaInfo().getKeYProgModelInfo().getServConf(),
+	            getJavaInfo().getKeYProgModelInfo().rec2key());
+	    s.proof = p_proof;
+	    s.specRepos = specRepos;
+	    s.setTypeConverter(getTypeConverter().copy(s));
+	    s.setExceptionHandler(getExceptionHandler());
+	    s.setNamespaces(namespaces.copy());
+	    nameRecorder = nameRecorder.copy();
+	    return s;
+	}
 
 }

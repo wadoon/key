@@ -16,8 +16,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -66,7 +66,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Instantiation instantiate(LoopInvariantBuiltInRuleApp app, Services services) throws RuleAbortException {
+    private Instantiation instantiate(LoopInvariantBuiltInRuleApp app, IServices services) throws RuleAbortException {
 	
     Term focusTerm = app.posInOccurrence().subTerm();
         
@@ -121,7 +121,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
 
-    private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
+    private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, IServices services) {
       Term anonUpdate = null;
       for(ProgramVariable pv : localOuts) {
         final String anonFuncName 
@@ -145,7 +145,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Pair<Term,Term> createAnonUpdate(LocationVariable heap,
 	    			While loop, 
 	    			Term mod,
-	    			Services services) {
+	    			IServices services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap.name()+"_loop"));
 	final Function anonHeapFunc = new Function(anonHeapName,
@@ -211,7 +211,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
+    public ImmutableList<Goal> apply(Goal goal, IServices services, RuleApp ruleApp) throws RuleAbortException {
 	final KeYJavaType booleanKJT = services.getTypeConverter()
 	                                       .getBooleanType();
 	final KeYJavaType intKJT 

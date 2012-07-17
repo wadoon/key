@@ -15,7 +15,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
@@ -43,7 +43,7 @@ public class Monomial {
     public static final Monomial ONE = new Monomial ( ImmutableSLList.<Term>nil(),
                                                       BigInteger.ONE );
     
-    public static Monomial create(Term monoTerm, Services services) {
+    public static Monomial create(Term monoTerm, IServices services) {
         Monomial res = monomialCache.get ( monoTerm );
         if ( res == null ) {
             res = createHelp ( monoTerm, services );
@@ -52,7 +52,7 @@ public class Monomial {
         return res;
     }
 
-    private static Monomial createHelp(Term monomial, Services services) {
+    private static Monomial createHelp(Term monomial, IServices services) {
         final Analyser a = new Analyser ( services );
         a.analyse ( monomial );
         return new Monomial ( a.parts, a.coeff );
@@ -198,7 +198,7 @@ public class Monomial {
     }
     
     
-    public Term toTerm (Services services) {
+    public Term toTerm (IServices services) {
         final Operator mul = 
 	    services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
@@ -234,10 +234,10 @@ public class Monomial {
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
         public ImmutableList<Term> parts = ImmutableSLList.<Term>nil();
-        private final Services services;
+        private final IServices services;
         private final Operator numbers, mul;
         	
-        public Analyser(final Services services) {
+        public Analyser(final IServices services) {
             this.services = services;
 	    final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             numbers = integerLDT.getNumberSymbol();

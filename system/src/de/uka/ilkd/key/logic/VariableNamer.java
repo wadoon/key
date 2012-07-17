@@ -13,15 +13,16 @@ package de.uka.ilkd.key.logic;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.ScopeDefiningElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -82,7 +83,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * pointer to services object
      */
-    protected final Services services;
+    protected final IServices services;
 
     protected final HashMap<ProgramVariable,ProgramVariable> map = new LinkedHashMap<ProgramVariable,ProgramVariable>();
     protected HashMap<ProgramVariable,ProgramVariable> renamingHistory = new LinkedHashMap<ProgramVariable,ProgramVariable>();
@@ -94,7 +95,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * @param services pointer to services object
      */
-    public VariableNamer(Services services) {
+    public VariableNamer(IServices services) {
     	this.services = services;
     }
 
@@ -481,7 +482,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     public String getProposal(TacletApp app,
     			      SchemaVariable var,
-    			      Services services,
+    			      IServices services,
     			      Node undoAnchor,
     			      ImmutableList<String> previousProposals) {
 	//determine posOfDeclaration from TacletApp
@@ -645,7 +646,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     public String getSuggestiveNameProposalForProgramVariable(
                                                 SchemaVariable sv,
                                                 TacletApp app,
-						Services services,
+						IServices services,
 						ImmutableList<String> previousProposals){
 	if(suggestive_off) {
 	    return getProposal(app, sv, services, null, previousProposals);
@@ -710,7 +711,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
     private ProgramElement instantiateExpression(ProgramElement e,
                                                  SVInstantiations svInst,
-						 Services services) {
+						 IServices services) {
         ProgramReplaceVisitor trans =
 	    new ProgramReplaceVisitor(e, services, svInst, false);
 	trans.start();

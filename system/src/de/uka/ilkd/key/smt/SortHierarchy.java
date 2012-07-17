@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -57,7 +57,7 @@ class SortWrapper {
     }
 
     void computeParentSorts(LinkedList<SortWrapper> sorts, boolean explicitNullHierarchy, boolean explicitHierarchy,
-	      Services services) {
+	      IServices services) {
 	for (SortWrapper sw : sorts) {
 	    if (this.extendsTrans(sw)) {
 		addParent(sw,explicitNullHierarchy,explicitHierarchy,services);
@@ -80,7 +80,7 @@ class SortWrapper {
 	}
     }
 
-   private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy, boolean explicitHierarchy, Services services) {
+   private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy, boolean explicitHierarchy, IServices services) {
 	Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
 	if((explicitNullHierarchy && this.getSort() == nullOp.sort())|| explicitHierarchy){
 	    parentSorts.add(parent);
@@ -121,7 +121,7 @@ public class SortHierarchy {
      */
     protected SortHierarchy(HashMap<Sort, StringBuffer> sortnames,
 	    HashMap<Sort, StringBuffer> prednames, boolean explicitNullHierarchy, boolean explicitHierarchy,
-	    Services services) {
+	    IServices services) {
 	for (Entry<Sort, StringBuffer> entry : sortnames.entrySet()) {
 	    sorts.add(new SortWrapper(entry.getKey(), entry.getValue(),
 		    prednames.get(entry.getKey())));

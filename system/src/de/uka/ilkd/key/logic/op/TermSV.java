@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -41,7 +41,7 @@ public final class TermSV extends AbstractSV {
     @Override
     public MatchConditions match(SVSubstitute subst, 
 	    			 MatchConditions mc,
-	    			 Services services) {	
+	    			 IServices services) {	
         if(subst instanceof Term) {
             return addInstantiation((Term) subst, mc, services);
         }

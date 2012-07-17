@@ -18,14 +18,22 @@ import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -39,7 +47,7 @@ class ContractSelectionPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1681223715264203991L;
-    private final Services services;
+    private final IServices services;
     private final JList contractList;
     private final TitledBorder border;
     
@@ -51,7 +59,7 @@ class ContractSelectionPanel extends JPanel {
     /**
      * Creates a contract selection panel containing the specified contracts.
      */
-    public ContractSelectionPanel(Services services, 
+    public ContractSelectionPanel(IServices services, 
 	                          boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
@@ -78,7 +86,7 @@ class ContractSelectionPanel extends JPanel {
 		}
 	    }
         });
-        final Services serv = services;
+        final IServices serv = services;
         contractList.setCellRenderer(new DefaultListCellRenderer() {
             /**
              * 

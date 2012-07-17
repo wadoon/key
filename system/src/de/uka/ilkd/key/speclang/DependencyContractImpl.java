@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -149,7 +150,7 @@ public final class DependencyContractImpl implements DependencyContract {
                        ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-	    	       Services services) {
+	    	       IServices services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -170,7 +171,7 @@ public final class DependencyContractImpl implements DependencyContract {
                        ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-	    	       Services services) {
+	    	       IServices services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
@@ -190,7 +191,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-	    	       Services services) {
+	    	       IServices services) {
 	assert heapTerm != null;
 	assert (selfTerm == null) == (originalSelfVar == null);
 	assert paramTerms != null;
@@ -215,7 +216,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-	    	       Services services) {
+	    	       IServices services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPre(heap, heapTerm, selfTerm, paramTerms, atPres, services);
@@ -231,7 +232,7 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public Term getMby(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
-	               Services services) {
+	               IServices services) {
 	assert hasMby();
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -254,7 +255,7 @@ public final class DependencyContractImpl implements DependencyContract {
     public Term getMby(Term heapTerm,
 	               Term selfTerm, 
 	               ImmutableList<Term> paramTerms, 
-	               Services services) {
+	               IServices services) {
 	assert hasMby();
 	assert heapTerm != null;
 	assert (selfTerm == null) == (originalSelfVar == null);
@@ -304,7 +305,7 @@ public final class DependencyContractImpl implements DependencyContract {
     
     
     @Override
-    public String proofToString(Services services) {
+    public String proofToString(IServices services) {
 	assert false;
 	return null;
     }
@@ -313,7 +314,7 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public Term getDep(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
-	               Services services) {
+	               IServices services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -335,7 +336,7 @@ public final class DependencyContractImpl implements DependencyContract {
     public Term getDep(Term heapTerm,
 	               Term selfTerm, 
 	               ImmutableList<Term> paramTerms, 
-	               Services services) {
+	               IServices services) {
 	assert heapTerm != null;
 	assert (selfTerm == null) == (originalSelfVar == null);
 	assert paramTerms != null;

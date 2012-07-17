@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -49,7 +49,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         
         
         @Override
-        public TacletFormula translate(Taclet taclet, Services services) {
+        public TacletFormula translate(Taclet taclet, IServices services) {
                 String result = checkTaclet(taclet);
                 if(result != null){
                         throw new IllegalTacletException(result);
@@ -67,7 +67,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         
 
 
-        private Term replace(Taclet taclet, Term term, Services services) {
+        private Term replace(Taclet taclet, Term term, IServices services) {
                 if (term.op() instanceof SchemaVariable) {
                         return getInstantiation(taclet,
                                         (SchemaVariable) term.op(), services);
@@ -138,7 +138,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @return instantiation of the schema variable <code>var</code>.
          */
         private Term getInstantiation(Taclet owner, SchemaVariable var,
-                        Services services) {
+                        IServices services) {
                 Term instantiation = mapping.get(var);
                 if (instantiation == null) {
                         instantiation = createInstantiation(owner, var,
@@ -160,7 +160,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * 
          */
         private Term getInstantation(Taclet owner, VariableSV var,
-                        Services services) {
+                        IServices services) {
                 Term instantiation = mapping.get(var);
                 if (instantiation == null) {
                         instantiation = createInstantiation(owner, var,
@@ -171,7 +171,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
 
         private Term createInstantiation(Taclet owner, SchemaVariable sv,
-                        Services services) {
+                        IServices services) {
                 if (sv instanceof VariableSV) {
                         return createInstantiation(owner, (VariableSV) sv,
                                         services);
@@ -206,7 +206,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          *         variable.
          */
         private Term createInstantiation(Taclet owner, VariableSV sv,
-                        Services services) {
+                        IServices services) {
                 Name name = createUniqueName(services, "v_"+sv.name().toString());
                 LogicVariable variable = new LogicVariable(name,
                                 sv.sort());
@@ -219,7 +219,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * <code>sv</code>.
          */
         private Term createInstantiation(Taclet owner, TermSV sv,
-                        Services services) {
+                        IServices services) {
                 return createSimpleInstantiation(owner, sv, services);
         }
 
@@ -229,7 +229,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * <code>sv</code>.
          */
         private Term createInstantiation(Taclet owner, FormulaSV sv,
-                        Services services) {
+                        IServices services) {
                 return createSimpleInstantiation(owner, sv, services);
         }
 
@@ -241,7 +241,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * and Term schema variables.
          */
         private Term createSimpleInstantiation(Taclet owner, SchemaVariable sv,
-                        Services services) {
+                        IServices services) {
                 ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv)
                                 .prefix();
 
@@ -253,7 +253,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return TermBuilder.DF.func(function, args);
         }
 
-        private Name createUniqueName(Services services, String baseName) {
+        private Name createUniqueName(IServices services, String baseName) {
                 return new Name(TermBuilder.DF.newName(services, baseName));
         }
 
@@ -268,7 +268,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
 
         private Term[] computeArgs(Taclet owner,
-                        ImmutableSet<SchemaVariable> svSet, Services services) {
+                        ImmutableSet<SchemaVariable> svSet, IServices services) {
                 Term[] args = new Term[svSet.size()];
                 int i = 0;
                 for (SchemaVariable sv : svSet) {
@@ -282,7 +282,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * Rebuilds a term recursively and replaces all schema variables with
          * skolem terms/variables. 
          *   */
-        private Term rebuild(Taclet taclet, Term term, Services services,
+        private Term rebuild(Taclet taclet, Term term, IServices services,
                         HashSet<QuantifiableVariable> boundedVariables) {
                 Term[] newSubs = new Term[term.arity()];
                 int i = 0;

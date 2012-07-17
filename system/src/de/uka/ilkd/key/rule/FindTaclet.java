@@ -17,7 +17,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -90,13 +90,13 @@ public abstract class FindTaclet extends Taclet {
      * must be ensured to be satisfiable, i.e.
      *       <tt> matchCond.getConstraint ().isSatisfiable () </tt>
      * must return true
-     * @param services the Services 
+     * @param services the IServices 
      * @return the found schema variable mapping or <tt>null</tt> if 
      * the matching failed
      */
     public MatchConditions matchFind(Term term,
             MatchConditions matchCond,
-            Services services) {
+            IServices services) {
         return match(term, find(), 
                 ignoreTopLevelUpdates(),
                 matchCond, services);
@@ -108,12 +108,12 @@ public abstract class FindTaclet extends Taclet {
      * in the Taclet
      * @param goal the Goal where the rule is applied
      * @param posOfFind the PosInOccurrence belonging to the find expression
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt, Goal goal,
 					     PosInOccurrence posOfFind,
-					     Services services,
+					     IServices services,
 					     MatchConditions matchCond);
 
 
@@ -123,12 +123,12 @@ public abstract class FindTaclet extends Taclet {
      * @param goal the Goal to be updated
      * @param posOfFind the PosInOccurrence describes the place where to add
      * the semisequent 
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
     protected abstract void applyAdd(Sequent add, Goal goal,
 				     PosInOccurrence posOfFind,
-				     Services services,
+				     IServices services,
 				     MatchConditions matchCond);
 
 
@@ -136,11 +136,11 @@ public abstract class FindTaclet extends Taclet {
      * the rule is applied on the given goal using the
      * information of rule application. 
      * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param ruleApp the taclet application that is executed.
      */
     public ImmutableList<Goal> apply(Goal     goal,
-			    Services services,
+			    IServices services,
 			    RuleApp  ruleApp) {
 
 	// Number without the if-goal eventually needed

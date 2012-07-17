@@ -15,6 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -260,7 +261,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * determines the arguments types and constructs a signature of the current
      * method
      */
-    public ImmutableList<KeYJavaType> getMethodSignature(Services services,
+    public ImmutableList<KeYJavaType> getMethodSignature(IServices services,
 						ExecutionContext ec) {
 	ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
 	if (arguments != null) {
@@ -353,7 +354,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         p.printMethodReference(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services services, 
+    public KeYJavaType getKeYJavaType(IServices services, 
 				      ExecutionContext ec) {
 	IProgramMethod meth = method(services, 
 	        determineStaticPrefixType(services, ec), ec);
@@ -364,7 +365,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 		      
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {	
+    public KeYJavaType getKeYJavaType(IServices javaServ) {	
 	return getKeYJavaType();
     }
 

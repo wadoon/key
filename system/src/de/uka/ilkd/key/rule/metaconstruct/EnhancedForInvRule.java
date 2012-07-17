@@ -62,7 +62,7 @@ public final class EnhancedForInvRule extends AbstractTermTransformer {
     /**
      * The JavaInfo object which is handed over as a parameter of calculate.
      */
-    private JavaInfo javaInfo;
+    private IProgramInfo javaInfo;
 
     /**
      * the type converter - taken from services
@@ -194,9 +194,9 @@ public final class EnhancedForInvRule extends AbstractTermTransformer {
      * 
      * @see de.uka.ilkd.key.logic.op.AbstractTermTransformer#transform(de.uka.ilkd.key.logic.Term,
      *      de.uka.ilkd.key.rule.inst.SVInstantiations,
-     *      de.uka.ilkd.key.java.Services)
+     *      IServices)
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices services) {
 
         // global initialisation
         init(term, services);
@@ -391,7 +391,7 @@ public final class EnhancedForInvRule extends AbstractTermTransformer {
      *         possible to the given basename
      */
     private ProgramVariable getNewLocalvariable(String varNameBase,
-            String varType, Services services) {
+            String varType, IServices services) {
 
         return getNewLocalvariable(varNameBase,
                 javaInfo.getKeYJavaType(varType), services);
@@ -411,7 +411,7 @@ public final class EnhancedForInvRule extends AbstractTermTransformer {
      *         possible to the given basename
      */
     private ProgramVariable getNewLocalvariable(String varNameBase,
-            KeYJavaType varType, Services services) {
+            KeYJavaType varType, IServices services) {
         return KeYJavaASTFactory.localVariable(
                 services.getVariableNamer().getTemporaryNameProposal(
                         varNameBase), varType);

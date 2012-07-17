@@ -13,7 +13,7 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -31,7 +31,7 @@ public class RuleJustificationInfo {
 	return rule2justif.get(r);
     }
 
-    public RuleJustification getJustification(RuleApp r, Services services) {
+    public RuleJustification getJustification(RuleApp r, IServices services) {
 	RuleJustification just = getJustification(r.rule());
         if (just instanceof ComplexRuleJustification) {
             return ((ComplexRuleJustification) just).getSpecificJustification(r, services);

@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.math.BigInteger;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -133,7 +133,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
                                      TacletApp app,
                                      PosInOccurrence pos,
                                      Goal goal) {
-        final Services services = goal.proof ().getServices ();
+        final IServices services = goal.proof ().getServices ();
         final Polynomial poly =
             Polynomial.create ( polyProj.toTerm ( app, pos, goal ), services );
 

@@ -17,7 +17,7 @@ import javax.swing.DefaultComboBoxModel;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
@@ -44,12 +44,12 @@ public class IfChoiceModel extends DefaultComboBoxModel {
    /** namespaces (variables, functions, sorts, etc.) */
     private NamespaceSet nss;
     private AbbrevMap scm;
-    private Services services;
+    private IServices services;
 
 
     public IfChoiceModel ( Term                         p_ifFma,
 			   ImmutableList<IfFormulaInstantiation> p_candidates,
-			   Services                     p_services,
+			   IServices                     p_services,
 			   NamespaceSet                 nss,
 			   AbbrevMap                    scm) {
 	super ( createIfInsts ( p_candidates ) );

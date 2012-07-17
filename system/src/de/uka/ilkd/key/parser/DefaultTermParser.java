@@ -14,6 +14,7 @@ import java.io.Reader;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -40,7 +41,7 @@ public final class DefaultTermParser {
      * invalid sort. */    
     public Term parse(Reader in, 
 	    	      Sort sort, 
-	    	      Services services,
+	    	      IServices services,
                       Namespace var_ns,
                       Namespace func_ns, 
                       Namespace sort_ns,
@@ -69,7 +70,7 @@ public final class DefaultTermParser {
      * invalid sort. */    
     public Term parse(Reader in, 
 	    	      Sort sort, 
-	    	      Services services,
+	    	      IServices services,
                       NamespaceSet nss, 
                       AbbrevMap scm)
         throws ParserException
@@ -80,7 +81,7 @@ public final class DefaultTermParser {
 		                in,
 		                services.getExceptionHandler()), 
 		                "",
-				new Recoder2KeY (services, nss),
+				new Recoder2KeY ((Services)services, nss),
                                 services, 
                                 nss, 
                                 scm);

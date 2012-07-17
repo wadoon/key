@@ -15,10 +15,9 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.HeapContext;
 
 public interface RuleApp {
 
@@ -39,7 +38,7 @@ public interface RuleApp {
      * @param services the Services encapsulating all java information
      * @return list of new created goals 
      */
-    ImmutableList<Goal> execute(Goal goal, Services services);
+    ImmutableList<Goal> execute(Goal goal, IServices services);
 
     /** returns true if all variables are instantiated
      * @return true if all variables are instantiated 

@@ -17,6 +17,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -186,7 +187,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                            ProgramVariable resultVar, 
                            ProgramVariable exceptionVar, 
                            Map<LocationVariable, LocationVariable> atPreVars, 
-                           Services services) {
+                           IServices services) {
        return contract.getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, services);
     }
     

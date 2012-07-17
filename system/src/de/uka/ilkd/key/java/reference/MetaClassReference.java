@@ -142,7 +142,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
 	throw new IllegalStateException
 	    ("Metaclass references are not supported by KeY as" + 
 	     "\'java.lang.Class\' is not part of the Java Card standard");

@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -137,7 +138,7 @@ public final class IntegerLDT extends LDT {
     //constructors
     //-------------------------------------------------------------------------
 
-    public IntegerLDT(Services services) {
+    public IntegerLDT(IServices services) {
 	super(NAME, services);
 
         //initialise caches for function symbols from integerHeader.key 
@@ -472,7 +473,7 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	                         Term sub, 
-	                         Services services, 
+	                         IServices services, 
 	                         ExecutionContext ec) {
         if(sub != null && sub.sort().extendsTrans(targetSort())) {
             if(op instanceof Negative) {
@@ -485,7 +486,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, IServices services) {
         int length = 0;
         boolean minusFlag = false;
         Debug.assertTrue(lit instanceof IntLiteral || 

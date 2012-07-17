@@ -15,7 +15,7 @@ import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.*;
@@ -47,7 +47,7 @@ public class ApplyTacletDialogModel {
 
     /** namespace of variables */
     private NamespaceSet nss;
-    private Services services ;
+    private IServices services ;
  
     private AbbrevMap scm;
     private Proof proof;
@@ -57,7 +57,7 @@ public class ApplyTacletDialogModel {
      * model and a table model
      */
     public ApplyTacletDialogModel(TacletApp app, Sequent seq,
-				  Services services,
+				  IServices services,
 				  NamespaceSet nss,
 				  AbbrevMap scm, Goal goal) {
 	this.app = app;

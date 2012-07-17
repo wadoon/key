@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -33,7 +33,7 @@ public final class AddCast extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
-	    		  Services services ) {
+	    		  IServices services ) {
 	Term sub = term.sub(0);
 	Sort sort = term.sub(1).sort();
 	

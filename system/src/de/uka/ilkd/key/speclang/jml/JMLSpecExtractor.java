@@ -16,6 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -177,7 +178,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @return set of formulas specifying non-nullity for field/variables
      */  
     public static ImmutableSet<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt, 
-	    boolean isImplicitVar, String fileName, Position pos, Services services) {
+	    boolean isImplicitVar, String fileName, Position pos, IServices services) {
 	ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil(); 
 	final Type varType  = kjt.getJavaType(); 
 

@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -38,7 +38,7 @@ public final class ObserverCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, 
 	    		  	 SVSubstitute instCandidate, 
 	    		  	 MatchConditions mc, 
-	    		  	 Services services) {
+	    		  	 IServices services) {
 	SVInstantiations svInst = mc.getInstantiations();
 	final Term obsInst  = (Term) svInst.getInstantiation(obs);
 	

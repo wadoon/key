@@ -19,7 +19,11 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SynchronizedBlock;
@@ -28,9 +32,23 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AntecTaclet;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.NoFindTaclet;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.SuccTaclet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -310,13 +328,13 @@ public final class TacletIndex  {
     /** returns a list of Taclets and instantiations from the given list of 
      * taclets with
      * respect to term and the filter object.
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      */
     private ImmutableList<NoPosTacletApp> getFindTaclet(ImmutableList<NoPosTacletApp> taclets,
 					       RuleFilter           filter,
 					       PosInOccurrence      pos,
-					       Services             services) { 
+					       IServices             services) { 
 	return matchTaclets ( taclets,
 			      filter,
 			      pos,
@@ -330,7 +348,7 @@ public final class TacletIndex  {
     private ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
 					      RuleFilter           p_filter,
 					      PosInOccurrence      pos,
-					      Services             services) { 
+					      IServices             services) { 
 	
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if (tacletApps == null) {
@@ -471,14 +489,14 @@ public final class TacletIndex  {
  * @param pos the PosOfOccurrence describing the formula for which to look 
 * for top level taclets    
  * @param filter Only return taclets the filter selects
- * @param services the Services object encapsulating information
+ * @param services the IServices object encapsulating information
 * about the java datastructures like (static)types etc.
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
     public ImmutableList<NoPosTacletApp> getAntecedentTaclet(PosInOccurrence pos,						    
 						    RuleFilter filter,
-						    Services   services) {                        
+						    IServices   services) {                        
         return getTopLevelTaclets(antecList,
 				  filter,
 				  pos,
@@ -489,14 +507,14 @@ public final class TacletIndex  {
  * @param pos the PosOfOccurrence describing the formula for which to look 
 * for top level taclets 
  * @param filter Only return taclets the filter selects
- * @param services the Services object encapsulating information
+ * @param services the IServices object encapsulating information
 * about the java datastructures like (static)types etc.
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
     public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence pos,						  
 						   RuleFilter filter,
-						   Services   services) {       
+						   IServices   services) {       
            
         return getTopLevelTaclets(succList,
 				  filter,
@@ -508,7 +526,7 @@ public final class TacletIndex  {
 	getTopLevelTaclets(HashMap<Object, ImmutableList<NoPosTacletApp>> findTaclets,
 			   RuleFilter filter,
 			   PosInOccurrence pos,			   
-			   Services services) {
+			   IServices services) {
       
         assert pos.isTopLevel();
               
@@ -526,14 +544,14 @@ public final class TacletIndex  {
 
   /** get all Rewrite-Taclets.
  * @param filter Only return taclets the filter selects
- * @param services the Services object encapsulating information
+ * @param services the IServices object encapsulating information
 * about the java datastructures like (static)types etc.
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
 						 RuleFilter      filter,
-						 Services        services) { 
+						 IServices        services) { 
 	ImmutableList<NoPosTacletApp> result = matchTaclets(getList(rwList, pos.subTerm(), false),
 			    filter,
 			    pos,
@@ -544,14 +562,14 @@ public final class TacletIndex  {
 
     /** get all Taclets having no find expression.
      * @param filter Only return taclets the filter selects
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return IList<NoPosTacletApp> containing all applicable
      * rules and an empty part for the instantiations because no
      * instantiations are necessary.
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(RuleFilter filter,
-	                                        Services   services) {   
+	                                        IServices   services) {   
 	return matchTaclets ( noFindList,
 			      filter,
 			      null,

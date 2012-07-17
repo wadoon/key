@@ -172,7 +172,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /** TO BE IMPLEMENTED
      */
-    public de.uka.ilkd.key.java.abstraction.Package getPackage(Services s) {
+    public de.uka.ilkd.key.java.abstraction.Package getPackage(IServices s) {
        System.err.println("Method in class TypeDeclaration not implemented." );
        return null;
     }
@@ -185,7 +185,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /** 
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getAllSupertypes(Services services) {
+    public ImmutableList<ClassType> getAllSupertypes(IServices services) {
 	System.err.println("Method in class TypeDeclaration not implemented." );     
 	return null;
     }
@@ -193,7 +193,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /** 
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Field> getFields(Services services) {
+    public ImmutableList<Field> getFields(IServices services) {
         System.err.println("Method in class TypeDeclaration not implemented." );
         return null;
     }
@@ -201,7 +201,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * [dlohner] The given parameter is obsolete with this implementation.
      */
-    public ImmutableList<Field> getAllFields(Services services) {
+    public ImmutableList<Field> getAllFields(IServices services) {
         if (members == null) {
             return ImmutableSLList.<Field>nil();
         }
@@ -221,7 +221,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /** TO BE IMPLEMENTED
      */
-    public ImmutableList<Method> getMethods(Services services) {     
+    public ImmutableList<Method> getMethods(IServices services) {     
 	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
@@ -229,28 +229,28 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /** TO BE IMPLEMENTED
      */
-    public ImmutableList<Method> getAllMethods(Services services) {
+    public ImmutableList<Method> getAllMethods(IServices services) {
 	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
 
     /** TO BE IMPLEMENTED
      */
-    public ImmutableList<Constructor> getConstructors(Services services) {
+    public ImmutableList<Constructor> getConstructors(IServices services) {
       	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
 
     /** TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getTypes(Services services) {
+    public ImmutableList<ClassType> getTypes(IServices services) {
 	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
 
     /** TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getAllTypes(Services services) {
+    public ImmutableList<ClassType> getAllTypes(IServices services) {
 	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }

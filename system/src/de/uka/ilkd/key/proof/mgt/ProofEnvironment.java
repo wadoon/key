@@ -16,7 +16,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -72,7 +72,7 @@ public class ProofEnvironment {
 	ruleConfig=rc;
     }
         
-    public Services getInitialServices() {
+    public IServices getInitialServices() {
         return initConfig.getServices();
     }
 

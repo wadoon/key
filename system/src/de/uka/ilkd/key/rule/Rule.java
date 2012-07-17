@@ -13,7 +13,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -31,7 +31,7 @@ public interface Rule {
      * resulting from the rule application
      * @throws Exception 
      */
-    ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException;
+    ImmutableList<Goal> apply(Goal goal, IServices services, RuleApp ruleApp) throws RuleAbortException;
     
     /** 
      * the name of the rule

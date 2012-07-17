@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -118,7 +118,7 @@ abstract class AbstractOperator implements Operator {
     @Override
     public MatchConditions match(SVSubstitute subst, 
 	    		         MatchConditions mc,
-	    		         Services services) {
+	    		         IServices services) {
         if(subst == this) {
             return mc;
         }

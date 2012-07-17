@@ -9,6 +9,7 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -70,7 +71,7 @@ public class QueryExpand implements BuiltInRule {
 
     @Override
 
-    public ImmutableList<Goal> apply(Goal goal, Services services,
+    public ImmutableList<Goal> apply(Goal goal, IServices services,
             RuleApp ruleApp) {
 
         final PosInOccurrence pio = ruleApp.posInOccurrence();
@@ -221,7 +222,7 @@ public class QueryExpand implements BuiltInRule {
     
     
     private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
-            ImmutableArray<ParameterDeclaration> paramDecls, Services services) {
+            ImmutableArray<ParameterDeclaration> paramDecls, IServices services) {
 
         final Namespace progvarsNS = services.getNamespaces().programVariables();
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
@@ -582,7 +583,7 @@ public class QueryExpand implements BuiltInRule {
         if (pio!=null && pio.subTerm().op() instanceof IProgramMethod && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
-            final Sort nullSort = goal.proof().getJavaInfo().nullSort();
+            final Sort nullSort = goal.getServices().nullSort();
             if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) && 
                     !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();

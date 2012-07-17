@@ -16,6 +16,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -51,7 +52,7 @@ public class TestVariableNamer extends TestCase {
     private static final TermBuilder TB = TermBuilder.DF;
 
     private final Proof proof = new Proof(new Services());
-    private final Services services = proof.getServices();
+    private final IServices services = proof.getServices();
     private final ProgramVariable x     = constructProgramVariable("x");
     private final ProgramVariable xx    = constructProgramVariable("x");
     private final ProgramVariable y     = constructProgramVariable("y");

@@ -13,8 +13,9 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -31,7 +32,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 public class ThrownExceptionFeature extends BinaryFeature {
 
-    public static Feature create(String[] blockedExceptions, Services services) {
+    public static Feature create(String[] blockedExceptions, IServices services) {
         return new ThrownExceptionFeature(blockedExceptions, services);
     }
 
@@ -47,10 +48,10 @@ public class ThrownExceptionFeature extends BinaryFeature {
      *            the Services
      */
     private ThrownExceptionFeature(String[] p_filteredExceptions,
-            Services services) {
+            IServices services) {
         final List<Sort> filtered = new ArrayList<Sort>();
 
-        final JavaInfo javaInfo = services.getJavaInfo();
+        final IProgramInfo javaInfo = services.getJavaInfo();
 
         for (String p_filteredException : p_filteredExceptions) {
             final KeYJavaType nullPointer = javaInfo
@@ -77,7 +78,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
                 .getExecutionContext());
     }
 
-    protected boolean filter(Term term, Services services, ExecutionContext ec) {
+    protected boolean filter(Term term, IServices services, ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw

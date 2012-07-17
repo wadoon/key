@@ -18,7 +18,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -60,7 +60,7 @@ public class PosInSequentTransferable implements Transferable {
      * (string flavor only supported if pis denotes a term or formula, not the 
      *  complete sequent)     
      */
-    public PosInSequentTransferable(PosInSequent pis, Services serv) {
+    public PosInSequentTransferable(PosInSequent pis, IServices serv) {
         this.pis = pis;
         if (!pis.isSequent()) {
             this.stringSelection = ProofSaver.

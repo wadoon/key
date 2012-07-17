@@ -8,7 +8,7 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -49,12 +49,12 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         protected Collection<TranslationListener> listener = new LinkedList<TranslationListener>();
 
         protected TacletConditions conditions;
-        private Services services;
+        private IServices services;
 
         private GenericTranslator genericTranslator = new GenericTranslator(
                         this);
 
-        public AssumptionGenerator(Services services) {
+        public AssumptionGenerator(IServices services) {
                 this.services = services;
 
         }
@@ -157,14 +157,14 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                 return res;
         }
 
-        static public boolean isAbstractOrInterface(Sort sort, Services services) {
+        static public boolean isAbstractOrInterface(Sort sort, IServices services) {
                 if (!isReferenceSort(sort, services))
                         return false;
                 return sort.isAbstract();
 
         }
 
-        static public boolean isReferenceSort(Sort sort, Services services) {
+        static public boolean isReferenceSort(Sort sort, IServices services) {
                 return (sort.extendsTrans(services.getJavaInfo().objectSort()) && !(sort instanceof NullSort));
 
         }
@@ -254,7 +254,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          */
         static public void checkTable(byte[][] referenceTable,
                         Sort[] instTable, Sort[] genericTable,
-                        TacletConditions conditions, Services services) {
+                        TacletConditions conditions, IServices services) {
 
                 for (int r = 0; r < referenceTable.length; r++) {
                         for (int c = 0; c < referenceTable[r].length; c++) {

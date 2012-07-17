@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -42,7 +42,7 @@ public final class ModalOperatorSV extends AbstractSV  {
     @Override
     public MatchConditions match(SVSubstitute subst, 
 	    			 MatchConditions mc,
-	    			 Services services) {        
+	    			 IServices services) {        
         if (!(subst instanceof Modality)) {
             Debug.out("FAILED. ModalOperatorSV matches only modalities " +
                         "(template, orig)",

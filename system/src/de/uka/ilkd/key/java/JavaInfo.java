@@ -64,7 +64,7 @@ import de.uka.ilkd.key.util.LRUCache;
  * {@link KeYProgModelInfo}. This class can be extended to provide further 
  * services.
  */ 
-public final class JavaInfo {
+public final class JavaInfo implements IProgramInfo {
 
 
     public static class CacheKey {
@@ -164,7 +164,11 @@ public final class JavaInfo {
 	nullType  = proto.getNullType();
     }
 
-    /**
+    public JavaInfo(JavaInfo javaInfo, IServices serv) {
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
      * returns the underlying KeYProgModelInfo providing access to the
      * Recoder structures.
      */
@@ -176,21 +180,19 @@ public final class JavaInfo {
         this.kpmi = kpmi;
     }   
 
-    /**
-     * convenience method that returns the Recoder-to-KeY mapping underlying
-     * the KeYProgModelInfo of this JavaInfo
-     */
-    public KeYRecoderMapping rec2key() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#rec2key()
+	 */
+    @Override
+	public KeYRecoderMapping rec2key() {
 	return getKeYProgModelInfo().rec2key();
     }
 
-    /**
-     * copies this JavaInfo and uses the given Services object as the
-     * Services object of the copied JavaInfo
-     * @param serv the Services the copy will use and vice versa
-     * @return a copy of the JavaInfo
-     */
-    public JavaInfo copy(Services serv) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#copy(de.uka.ilkd.key.java.Services)
+	 */
+    @Override
+	public IProgramInfo copy(IServices serv) {
  	return new JavaInfo(this, serv);
     }
 
@@ -205,22 +207,21 @@ public final class JavaInfo {
         return services.getTypeConverter();
     }
 
-    /**
-     * returns the services associated with this JavaInfo
-     */
-    public Services getServices(){
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getServices()
+	 */
+    @Override
+	public IServices getServices(){
 	return services;
     }
 
     //------------------- common services ----------------------
 
-    /**
-     * returns the full name of a given {@link
-     * de.uka.ilkd.key.java.abstraction.KeYJavaType}. 
-     * @param t the KeYJavaType including the package prefix
-     * @return the full name
-     */
-    public String getFullName(KeYJavaType t) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getFullName(de.uka.ilkd.key.java.abstraction.KeYJavaType)
+	 */
+    @Override
+	public String getFullName(KeYJavaType t) {
         return kpmi.getFullName(t);
     }
 
@@ -241,14 +242,11 @@ public final class JavaInfo {
 	sortCachedSize = 0;
     }
 
-    /**
-     * looks up the fully qualifying name given by a String 
-     * in the list of all available
-     * KeYJavaTypes in the Java model
-     * @param fullName the String
-     * @return the KeYJavaType with the name of the String
-     */
-    public KeYJavaType getTypeByName(String fullName) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getTypeByName(java.lang.String)
+	 */
+    @Override
+	public KeYJavaType getTypeByName(String fullName) {
         fullName = translateArrayType(fullName);
         if(name2KJTCache == null || kpmi.rec2key().size() > nameCachedSize){
             buildNameCache();
@@ -313,15 +311,11 @@ public final class JavaInfo {
 	return s;
     }
 
-    /**
-     * looks up a KeYJavaType with given name. If the name is a fully
-     * qualifying name with package prefix an element with this full name is
-     * taken. If the name does not contain a full package prefix some
-     * KeYJavaType with this short name is taken.     
-     * @param className the name to look for (either full or short)
-     * @return a class matching the name
-     */
-    public KeYJavaType getTypeByClassName(String className) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getTypeByClassName(java.lang.String)
+	 */
+    @Override
+	public KeYJavaType getTypeByClassName(String className) {
 	KeYJavaType result = getTypeByName(className);
 	className = translateArrayType(className);
         /* TODO: get rid of this short name thing; introduce second parameter
@@ -390,13 +384,11 @@ public final class JavaInfo {
     }
 
     
-    /**
-     * returns all known KeYJavaTypes of the current
-     * program type model
-     * @return all known KeYJavaTypes of the current
-     * program type model
-     */
-    public Set<KeYJavaType> getAllKeYJavaTypes() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllKeYJavaTypes()
+	 */
+    @Override
+	public Set<KeYJavaType> getAllKeYJavaTypes() {
 	final Set<KeYJavaType> result  = new HashSet<KeYJavaType>();
         for (final Object o : kpmi.allElements()) {     
 	    if (o instanceof KeYJavaType) {		
@@ -462,12 +454,11 @@ public final class JavaInfo {
 	}
     }
 
-    /**
-     * returns a KeYJavaType (either primitive of object type) having the
-     * full name of the given String fullName 
-     * @param fullName a String with the type name to lookup 
-     */
-    public KeYJavaType getKeYJavaType(String fullName) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getKeYJavaType(java.lang.String)
+	 */
+    @Override
+	public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ?
             (KeYJavaType)getKeYJavaTypeByClassName(fullName) :
@@ -475,30 +466,36 @@ public final class JavaInfo {
     }
 
 
-    /**
-     * this is an alias for getTypeByClassName
-     */
-    public KeYJavaType getKeYJavaTypeByClassName(String className) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getKeYJavaTypeByClassName(java.lang.String)
+	 */
+    @Override
+	public KeYJavaType getKeYJavaTypeByClassName(String className) {
         return getTypeByClassName(className);
     }
 
 
-    /**
-     * returns true iff the given subType KeYJavaType is a sub type of the
-     * given KeYJavaType superType.
-     */
-    public boolean isSubtype(KeYJavaType subType, KeYJavaType superType) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#isSubtype(de.uka.ilkd.key.java.abstraction.KeYJavaType, de.uka.ilkd.key.java.abstraction.KeYJavaType)
+	 */
+    @Override
+	public boolean isSubtype(KeYJavaType subType, KeYJavaType superType) {
         return kpmi.isSubtype(subType, superType);
     }
     
-    public boolean isInterface(KeYJavaType t){
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#isInterface(de.uka.ilkd.key.java.abstraction.KeYJavaType)
+	 */
+    @Override
+	public boolean isInterface(KeYJavaType t){
         return (t.getJavaType() instanceof InterfaceDeclaration);
     }
 
-    /** 
-     * returns a KeYJavaType having the given sort
-     */
-     public KeYJavaType getKeYJavaType(Sort sort) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getKeYJavaType(de.uka.ilkd.key.logic.sort.Sort)
+	 */
+     @Override
+	public KeYJavaType getKeYJavaType(Sort sort) {
 	 if(sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize){
 	     sortCachedSize = kpmi.rec2key().size();
 	     sort2KJTCache = new HashMap<Sort, KeYJavaType>();
@@ -516,10 +513,11 @@ public final class JavaInfo {
      }
 
 
-    /**
-     * returns the KeYJavaType belonging to the given Type t
-     */
-    public KeYJavaType getKeYJavaType(Type t) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getKeYJavaType(de.uka.ilkd.key.java.abstraction.Type)
+	 */
+    @Override
+	public KeYJavaType getKeYJavaType(Type t) {
 	if(type2KJTCache == null) {
 	    type2KJTCache = new HashMap<Type, KeYJavaType>();
 	    for (final Object o : kpmi.allElements()) {
@@ -550,17 +548,19 @@ public final class JavaInfo {
         return kpmi.getMethods(kjt);
     }
 
-    /**
-     * returns all methods from the given Type as IProgramMethods
-     */
-    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllProgramMethods(de.uka.ilkd.key.java.abstraction.KeYJavaType)
+	 */
+    @Override
+	public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         return kpmi.getAllProgramMethods(kjt);
     }
     
-    /**
-     * returns all methods declared in the given Type as IProgramMethods
-     */
-    public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllProgramMethodsLocallyDeclared(de.uka.ilkd.key.java.abstraction.KeYJavaType)
+	 */
+    @Override
+	public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
     
@@ -1138,7 +1138,11 @@ public final class JavaInfo {
         return getJavaIoSerializable().getSort();        
     }
     
-    public Sort nullSort() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#nullSort()
+	 */
+    @Override
+	public Sort nullSort() {
 	return getNullType().getSort();
     }
     
@@ -1171,12 +1175,11 @@ public final class JavaInfo {
     }
 
     
-    /**
-     * returns the default execution context. This is equiavlent to executing the program
-     * in a static method of a class placed in the default package 
-     * @return the default execution context
-     */
-    public ExecutionContext getDefaultExecutionContext() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getDefaultExecutionContext()
+	 */
+    @Override
+	public ExecutionContext getDefaultExecutionContext() {
         if (defaultExecutionContext == null) {                                   
             // ensure that default classes are available
             if (!kpmi.rec2key().parsedSpecial()) {
@@ -1191,21 +1194,19 @@ public final class JavaInfo {
     }
     
 
-    /**
-     * returns all proper subtypes of a given type
-     * @param type the KeYJavaType whose subtypes are returned
-     * @return list of all subtypes
-     */
-    public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType type) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllSubtypes(de.uka.ilkd.key.java.abstraction.KeYJavaType)
+	 */
+    @Override
+	public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType type) {
         return kpmi.getAllSubtypes(type);
     }
 
-    /**
-     * returns all supertypes of a given type
-     * @param type the KeYJavaType whose supertypes are returned
-     * @return list of all supertypes
-     */
-    public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllSupertypes(de.uka.ilkd.key.java.abstraction.KeYJavaType)
+	 */
+    @Override
+	public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
             ImmutableList<KeYJavaType> res = ImmutableSLList.<KeYJavaType>nil();
             for (Sort s: getSuperSorts(type.getSort()))
@@ -1242,18 +1243,11 @@ public final class JavaInfo {
     }        
     
     
-    /**
-     * returns the list of all common subtypes of types <tt>k1</tt> and <tt>k2</tt>
-     * (inclusive one of them if they are equal or subtypes themselves)
-     * attention: <tt>Null</tt> is not a jav atype only a logic sort, i.e.
-     * if <tt>null</tt> is the only element shared between <tt>k1</tt> and <tt>k2</tt> 
-     * the returned list will be empty
-     * 
-     * @param k1 the first KeYJavaType denoting a class type
-     * @param k2 the second KeYJavaType denoting a classtype
-     * @return the list of common subtypes of types <tt>k1</tt> and <tt>k2</tt>
-     */
-    public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {        
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getCommonSubtypes(de.uka.ilkd.key.java.abstraction.KeYJavaType, de.uka.ilkd.key.java.abstraction.KeYJavaType)
+	 */
+    @Override
+	public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {        
         final CacheKey ck = new CacheKey(k1, k2);
         ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
         
@@ -1298,10 +1292,11 @@ public final class JavaInfo {
         return length;
     }
     
-    /**
-     * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of an object.
-     */
-    public IObserverFunction getInv() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.ProgramInfo#getInv()
+	 */
+    @Override
+	public IObserverFunction getInv() {
 	if(inv == null) {
 	    inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,

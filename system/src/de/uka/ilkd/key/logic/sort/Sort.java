@@ -11,8 +11,8 @@
 
 package de.uka.ilkd.key.logic.sort;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -48,7 +48,7 @@ public interface Sort extends Named {
     /**
      * Returns the direct supersorts of this sort.
      */
-    ImmutableSet<Sort> extendsSorts(Services services); 
+    ImmutableSet<Sort> extendsSorts(IServices services); 
 
     /**
      * Tells whether the given sort is a reflexive, transitive supersort of this 
@@ -64,17 +64,17 @@ public interface Sort extends Named {
     /**
      * returns the cast symbol of this Sort
      */
-    SortDependingFunction getCastSymbol(Services services);
+    SortDependingFunction getCastSymbol(IServices services);
     
     /**
      * returns the instanceof symbol of this Sort
      */
-    SortDependingFunction getInstanceofSymbol(Services services);
+    SortDependingFunction getInstanceofSymbol(IServices services);
     
     /**
      * returns the exactinstanceof symbol of this Sort
      */
-    SortDependingFunction getExactInstanceofSymbol(Services services);
+    SortDependingFunction getExactInstanceofSymbol(IServices services);
 
     String declarationString();
 }

@@ -140,7 +140,7 @@ public class ThisReference
 	return this;
     }    
 
-    public KeYJavaType getKeYJavaType(Services javaServ, 
+    public KeYJavaType getKeYJavaType(IServices javaServ, 
 				      ExecutionContext ec) {
 	return ec.getTypeReference().getKeYJavaType();
     }

@@ -12,7 +12,7 @@
 package de.uka.ilkd.key.java.expression;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -80,14 +80,14 @@ public abstract class Assignment extends Operator
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return the type of the assignment expression
      */
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
 	return getExpressionAt(0).getKeYJavaType(javaServ, ec);
     }
     
 
     /** overriden from Operator
      */
-    public String reuseSignature(Services services, ExecutionContext ec) {
+    public String reuseSignature(IServices services, ExecutionContext ec) {
 	String base=super.reuseSignature(services, ec);
 	Expression rhs;
 	try{

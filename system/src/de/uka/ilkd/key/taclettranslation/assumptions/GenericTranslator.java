@@ -19,7 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -42,7 +42,7 @@ class GenericTranslator {
         private boolean appendGenericTerm = false;
         // private HashSet<GenericSort> usedGenericSorts;
         private VariablePool pool;
-        private Services services;
+        private IServices services;
         private ArrayList<TranslationListener> listener = new ArrayList<TranslationListener>();
 
         GenericTranslator(VariablePool pool) {
@@ -53,7 +53,7 @@ class GenericTranslator {
          * Translates generic variables.
          */
         public Collection<Term> translate(Term term, ImmutableSet<Sort> sorts,
-                        Taclet t, TacletConditions conditions, Services serv,
+                        Taclet t, TacletConditions conditions, IServices serv,
                         int maxGeneric) throws IllegalTacletException {
                 this.services = serv;
 

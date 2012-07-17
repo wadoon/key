@@ -12,7 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
@@ -32,19 +32,19 @@ public interface LoopInvariant extends SpecificationElement {
 
     
     /** Returns the invariant formula. */
-    public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+    public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, IServices services);
 
     /**
      * Returns the modifies clause.
      */
-    public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+    public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, IServices services);
     
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
             		   Map<LocationVariable,Term> atPres,
-            		   Services services);
+            		   IServices services);
     
     /**
      * Returns the term internally used for self. 
@@ -85,7 +85,7 @@ public interface LoopInvariant extends SpecificationElement {
     public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
             			      Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
-            			      Services services); 
+            			      IServices services); 
     
     /** 
      * Loop invariants can be visited like source elements:

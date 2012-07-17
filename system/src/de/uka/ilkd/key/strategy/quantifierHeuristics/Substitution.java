@@ -15,7 +15,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -70,7 +70,7 @@ class Substitution {
     }   
   
     
-    public Term apply(Term t, Services services) {
+    public Term apply(Term t, IServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
@@ -96,7 +96,7 @@ class Substitution {
      * Try to apply the substitution to a term, introducing casts if
      * necessary (may never be the case any more, XXX)
      */
-    public Term applyWithoutCasts(Term t, Services services) {
+    public Term applyWithoutCasts(Term t, IServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();

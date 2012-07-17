@@ -12,8 +12,8 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.HashSet;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -37,7 +37,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * @param services the Services object
      */
     public ProgramVariableCollector(ProgramElement root, 
-                                    Services services) {
+                                    IServices services) {
 	super(root, services);
         assert services != null;
         collectHeapVariables();

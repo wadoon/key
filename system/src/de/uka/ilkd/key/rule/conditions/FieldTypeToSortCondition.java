@@ -52,7 +52,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var,
                                  SVSubstitute svSubst,
                                  MatchConditions matchCond,
-                                 Services services) {
+                                 IServices services) {
             
         if (var != exprOrTypeSV) {
             return matchCond;

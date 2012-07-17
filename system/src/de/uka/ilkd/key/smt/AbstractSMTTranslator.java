@@ -16,7 +16,8 @@ import java.util.*;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -217,7 +218,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @param services
          *                The services object belonging to sequent.
          */
-        public AbstractSMTTranslator(Sequent sequent, Services services,
+        public AbstractSMTTranslator(Sequent sequent, IServices services,
                         Configuration config) {
                 this.config = config;
                 integerSort = services.getTypeConverter().getIntegerLDT()
@@ -232,12 +233,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @param s
          * 
          */
-        public AbstractSMTTranslator(Services s, Configuration config) {
+        public AbstractSMTTranslator(IServices s, Configuration config) {
                 this(null, s, config);
         }
 
         public final StringBuffer translateProblem(Term problem,
-                        Services services, SMTSettings settings)
+                        IServices services, SMTSettings settings)
                         throws IllegalFormulaException {
                 smtSettings = settings;
                 StringBuffer hb = translateTerm(problem,
@@ -272,7 +273,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 			return config;
 		}
 
-        private Function getMultiplicationFunction(Services services) {
+        private Function getMultiplicationFunction(IServices services) {
                 if (multiplicationFunction == null) {
                         Function reference = services.getTypeConverter()
                                         .getIntegerLDT().getMul();
@@ -297,7 +298,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @param assumptionTypes
          * @return ArrayList of Formulas, that are assumed to be true.
          */
-        private ArrayList<StringBuffer> getAssumptions(Services services,
+        private ArrayList<StringBuffer> getAssumptions(IServices services,
                         ArrayList<ContextualBlock> assumptionTypes,
                         SMTSettings settings) throws IllegalFormulaException {
                 ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
@@ -386,7 +387,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @return ArrayList of formulas, assuring the assumption.
          */
         private ArrayList<StringBuffer> getSpecialSortPredicates(
-                        Services services) throws IllegalFormulaException {
+                        IServices services) throws IllegalFormulaException {
                 ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 
                 for (Function o : this.specialFunctions) {
@@ -457,7 +458,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return toReturn;
         }
 
-        private StringBuffer buildComplText(Services serv,
+        private StringBuffer buildComplText(IServices serv,
                         StringBuffer formula, SMTSettings settings)
                         throws IllegalFormulaException {
                 ArrayList<ContextualBlock> assumptionTypes = new ArrayList<ContextualBlock>();
@@ -477,7 +478,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * 
          * @return a sort hierarchy for the sorts
          */
-        private SortHierarchy buildSortHierarchy(Services services,
+        private SortHierarchy buildSortHierarchy(IServices services,
                         SMTSettings settings) {
 
                 return new SortHierarchy(this.usedDisplaySort,
@@ -494,7 +495,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @return The well defined formula.
          */
         private ArrayList<StringBuffer> getSortHierarchyPredicates(
-                        Services services, SMTSettings settings) {
+                        IServices services, SMTSettings settings) {
                 Function nullOp = services.getTypeConverter().getHeapLDT()
                                 .getNull();
                 SortHierarchy sh = this.buildSortHierarchy(services, settings);
@@ -860,7 +861,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         
      
 
-        private Term createLogicalVar(Services services, String baseName,
+        private Term createLogicalVar(IServices services, String baseName,
                         Sort sort) {
                 return TermBuilder.DF.var(new LogicVariable(new Name(
                                 TermBuilder.DF.newName(services, baseName)),
@@ -868,7 +869,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         private ArrayList<StringBuffer> buildAssumptionsForUninterpretedMultiplication(
-                        Services services) throws IllegalFormulaException {
+                        IServices services) throws IllegalFormulaException {
                 ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
                 Sort sort = services.getTypeConverter().getIntegerLDT()
                                 .getMul().sort();
@@ -932,7 +933,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return result;
         }
         
-        private ArrayList<StringBuffer> buildAssumptionsForSorts(Services services){
+        private ArrayList<StringBuffer> buildAssumptionsForSorts(IServices services){
         	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
         	if(this.isMultiSorted()){
          		for(Sort sort : usedRealSort.keySet()){
@@ -956,17 +957,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 : constantsForBigIntegers;
         }
 
-        private Term getRightBorderAsTerm(long integer, Services services) {
+        private Term getRightBorderAsTerm(long integer, IServices services) {
                 return TermBuilder.DF.zTerm(services, Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
         }
 
-        private Long getRightBorderAsInteger(long integer, Services services) {
+        private Long getRightBorderAsInteger(long integer, IServices services) {
                 return integer < 0 ? getMinNumber() : getMaxNumber();
         }
 
-        private StringBuffer getNameForIntegerConstant(Services services,
+        private StringBuffer getNameForIntegerConstant(IServices services,
                         long integer) {
                 String val = Long.toString(integer);
                 val = integer < 0 ? "negative_value" : "positive_value";
@@ -975,7 +976,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         }
 
-        private StringBuffer buildUniqueConstant(long integer, Services services)
+        private StringBuffer buildUniqueConstant(long integer, IServices services)
                         throws IllegalFormulaException {
                 HashMap<Long, StringBuffer> map = getRightConstantContainer(integer);
                 StringBuffer buf = map.get(integer);
@@ -1628,7 +1629,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         private final StringBuffer translateTermIte(Term iteTerm,
                         Vector<QuantifiableVariable> quantifiedVars,
-                        Services services) throws IllegalFormulaException {
+                        IServices services) throws IllegalFormulaException {
 
                 // make typecasts, if this is neccesary. Subterms might contain
                 // integer values,
@@ -1700,7 +1701,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         protected StringBuffer translateTerm(Term term,
                         Vector<QuantifiableVariable> quantifiedVars,
-                        Services services) throws IllegalFormulaException {
+                        IServices services) throws IllegalFormulaException {
 
        
                 Operator op = term.op();
@@ -2112,7 +2113,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         private StringBuffer translateAsUninterpretedFunction(Function fun,
                         Vector<QuantifiableVariable> quantifiedVars,
-                        ImmutableArray<Term> subs, Services services)
+                        ImmutableArray<Term> subs, IServices services)
                         throws IllegalFormulaException {
                 // an uninterpreted function. just
                 // translate it as such
@@ -2135,12 +2136,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return translateFunc(fun, subterms);
         }
 
-        private boolean isNumberSymbol(Services services, Operator op) {
+        private boolean isNumberSymbol(IServices services, Operator op) {
                 return op == services.getTypeConverter().getIntegerLDT()
                                 .getNumberSymbol();
         }
 
-        private boolean isComplexMultiplication(Services services, Term t1,
+        private boolean isComplexMultiplication(IServices services, Term t1,
                         Term t2) {
                 return !isNumberSymbol(services, t1.op())
                                 && !isNumberSymbol(services, t2.op());
@@ -2234,7 +2235,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         private StringBuffer getModalityPredicate(Term t,
                         Vector<QuantifiableVariable> quantifiedVars,
-                        Services services) throws IllegalFormulaException {
+                        IServices services) throws IllegalFormulaException {
                 // check, if the modality was already translated.
                 for (Term toMatch : modalityPredicates.keySet()) {
                         if (toMatch.equalsModRenaming(t)) {
@@ -2325,7 +2326,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         protected final StringBuffer translateUnknown(Term term,
                         Vector<QuantifiableVariable> quantifiedVars,
-                        Services services) throws IllegalFormulaException {
+                        IServices services) throws IllegalFormulaException {
 
                 // translate the term as uninterpreted function/predicate
                 Operator op = term.op();
@@ -2580,7 +2581,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @param services
          *                used for <code>translateTerm</code>
          */
-        private ArrayList<StringBuffer> translateTaclets(Services services,
+        private ArrayList<StringBuffer> translateTaclets(IServices services,
                         SMTSettings settings) throws IllegalFormulaException {
                 Collection<Taclet> taclets = settings.getTaclets();
 

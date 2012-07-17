@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -45,7 +46,7 @@ public final class SeqLDT extends LDT {
     private final Function values;
     
     
-    public SeqLDT(Services services) {
+    public SeqLDT(IServices services) {
 	super(NAME, services);
         seqGet        = addSortDependingFunction(services, "seqGet");
         seqLen        = addFunction(services, "seqLen");
@@ -60,7 +61,7 @@ public final class SeqLDT extends LDT {
     }
     
     
-    public Function getSeqGet(Sort instanceSort, Services services) {
+    public Function getSeqGet(Sort instanceSort, IServices services) {
 	return seqGet.getInstanceFor(instanceSort, services);
     }
     
@@ -130,7 +131,7 @@ public final class SeqLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 Term sub, 
-	    			 Services services, 
+	    			 IServices services, 
 	    			 ExecutionContext ec) {
 	return op instanceof SeqSingleton
 	       || op instanceof SeqConcat
@@ -143,7 +144,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, IServices services) {
 	assert lit instanceof EmptySeqLiteral;
 	return TermBuilder.DF.func(seqEmpty);
     }

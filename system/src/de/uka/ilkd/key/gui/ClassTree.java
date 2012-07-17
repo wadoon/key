@@ -29,6 +29,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -56,7 +57,7 @@ public class ClassTree extends JTree {
 
     public ClassTree(boolean addContractTargets, 
 	             boolean skipLibraryClasses,
-	    	     Services services,
+	    	     IServices services,
 	    	     Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons) {
 	super(new DefaultTreeModel(createTree(addContractTargets, 
 					      skipLibraryClasses, 
@@ -165,7 +166,7 @@ public class ClassTree extends JTree {
     private static void insertIntoTree(DefaultMutableTreeNode rootNode, 
 	    			       KeYJavaType kjt,
 	    			       boolean addContractTargets,
-	    			       Services services) {	
+	    			       IServices services) {	
         String fullClassName = kjt.getFullName();
         int length = fullClassName.length();
         int index = -1;
@@ -246,7 +247,7 @@ public class ClassTree extends JTree {
      * @param ov The {@link ObserverFunction} for that a display name is needed.
      * @return The display name for the given {@link ObserverFunction}.
      */
-    public static final String getDisplayName(Services services, IObserverFunction ov) {
+    public static final String getDisplayName(IServices services, IObserverFunction ov) {
         StringBuffer sb = new StringBuffer();
         String prettyName = services.getTypeConverter()
                                     .getHeapLDT()
@@ -276,7 +277,7 @@ public class ClassTree extends JTree {
     
     private static DefaultMutableTreeNode createTree(boolean addContractTargets,
 	    					     boolean skipLibraryClasses,
-	    					     Services services) {
+	    					     IServices services) {
 	//get all classes
 	final Set<KeYJavaType> kjts 
 		= services.getJavaInfo().getAllKeYJavaTypes();

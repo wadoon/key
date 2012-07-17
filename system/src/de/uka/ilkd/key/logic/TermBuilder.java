@@ -16,6 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -125,7 +126,7 @@ public final class TermBuilder {
      * Returns an available name constructed by affixing a counter to the passed
      * base name.
      */
-    public String newName(Services services, String baseName) {
+    public String newName(IServices services, String baseName) {
 	final Name savedName = services.getNameRecorder().getProposal();
 	if(savedName != null) {
 	    return savedName.toString();
@@ -149,7 +150,7 @@ public final class TermBuilder {
      * Returns an available name constructed by affixing a counter to a self-
      * chosen base name for the passed sort.
      */
-    public String newName(Services services, Sort sort) {
+    public String newName(IServices services, Sort sort) {
 	return newName(services, shortBaseName(sort));
     }
     
@@ -164,7 +165,7 @@ public final class TermBuilder {
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
-    public LocationVariable selfVar(Services services, 
+    public LocationVariable selfVar(IServices services, 
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
 	String name = "self";
@@ -179,7 +180,7 @@ public final class TermBuilder {
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
-    public LocationVariable selfVar(Services services, 
+    public LocationVariable selfVar(IServices services, 
                                     IProgramMethod pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
@@ -195,7 +196,7 @@ public final class TermBuilder {
      * Creates program variables for the parameters. Take care to register them
      * in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(Services services, 
+    public ImmutableList<ProgramVariable> paramVars(IServices services, 
                                                     IObserverFunction obs,
                                                     boolean makeNamesUnique) {
         ImmutableList<ProgramVariable> result 
@@ -225,7 +226,7 @@ public final class TermBuilder {
      * Creates program variables for the parameters. Take care to register them
      * in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(Services services,
+    public ImmutableList<ProgramVariable> paramVars(IServices services,
 	    String postfix, IObserverFunction obs, boolean makeNamesUnique) {
 	final ImmutableList<ProgramVariable> paramVars 
 		= paramVars(services, obs, true);
@@ -246,7 +247,7 @@ public final class TermBuilder {
      * Creates a program variable for the result. Take care to register it
      * in the namespaces.
      */
-    public LocationVariable resultVar(Services services, 
+    public LocationVariable resultVar(IServices services, 
                                       IProgramMethod pm,
                                       boolean makeNameUnique) {
 	return resultVar(services, "result", pm, makeNameUnique);
@@ -257,7 +258,7 @@ public final class TermBuilder {
      * Creates a program variable for the result with passed name. Take care to
      * register it in the namespaces.
      */
-    public LocationVariable resultVar(Services services, String name,
+    public LocationVariable resultVar(IServices services, String name,
 	    IProgramMethod pm, boolean makeNameUnique) {
 	if(pm.isVoid() || pm.isConstructor()) {
 	    return null;
@@ -303,7 +304,7 @@ public final class TermBuilder {
      * Creates a program variable for the atPre heap. Take care to register it
      * in the namespaces.
      */
-    public LocationVariable heapAtPreVar(Services services,
+    public LocationVariable heapAtPreVar(IServices services,
 	    				 String baseName,
                                          Sort sort,
 	    			         boolean makeNameUnique) {
@@ -410,7 +411,7 @@ public final class TermBuilder {
     }
     
     
-    public Term cast(Services services, Sort s, Term t) {
+    public Term cast(IServices services, Sort s, Term t) {
 	return tf.createTerm(s.getCastSymbol(services), t);
     }
     
@@ -480,7 +481,7 @@ public final class TermBuilder {
                      Term a,
                      Term b,
                      Term t,
-                     Services services) {
+                     IServices services) {
         Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
         return func(bsum,
                     new Term[]{a, b, t},
@@ -638,13 +639,13 @@ public final class TermBuilder {
     }
     
     
-    public Term instance(Services services, Sort s, Term t) {
+    public Term instance(IServices services, Sort s, Term t) {
 	return equals(func(s.getInstanceofSymbol(services), t),
 		      TRUE(services));
     }
     
     
-    public Term exactInstance(Services services, Sort s, Term t) {
+    public Term exactInstance(IServices services, Sort s, Term t) {
 	return equals(func(s.getExactInstanceofSymbol(services), t), 
 		      TRUE(services));
     }
@@ -653,7 +654,7 @@ public final class TermBuilder {
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.
      */
-    public Term convertToFormula(Term a, Services services) {
+    public Term convertToFormula(Term a, IServices services) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
         if (a.sort() == Sort.FORMULA) {
             return a;
@@ -671,7 +672,7 @@ public final class TermBuilder {
     //updates    
     //-------------------------------------------------------------------------
     
-    public Term elementary(Services services, 
+    public Term elementary(IServices services, 
 	                   UpdateableOperator lhs, 
 	                   Term rhs) {
 	ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);	
@@ -679,7 +680,7 @@ public final class TermBuilder {
     }
     
     
-    public Term elementary(Services services, Term lhs, Term rhs) {
+    public Term elementary(IServices services, Term lhs, Term rhs) {
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	if(lhs.op() instanceof UpdateableOperator) {
 	    assert lhs.arity() == 0 : "uh oh: " + lhs;
@@ -702,12 +703,12 @@ public final class TermBuilder {
     }    
 
 
-    public Term elementary(Services services, Term heapTerm) {
+    public Term elementary(IServices services, Term heapTerm) {
         return elementary(services, getBaseHeap(services), heapTerm);
     }
 
 
-    public Term elementary(Services services, LocationVariable heap) {
+    public Term elementary(IServices services, LocationVariable heap) {
         return elementary(services, var(heap));
     }
 
@@ -746,7 +747,7 @@ public final class TermBuilder {
     }
     
     
-    public Term parallel(Services services, Term[] lhss, Term[] values) {
+    public Term parallel(IServices services, Term[] lhss, Term[] values) {
 	if(lhss.length != values.length) {
 	    throw new TermCreationException(
 		    "Tried to create parallel update with " 
@@ -760,7 +761,7 @@ public final class TermBuilder {
     }
     
     
-    public Term parallel(Services services,
+    public Term parallel(IServices services,
                          Iterable<Term> lhss,
                          Iterable<Term> values) {
         ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
@@ -819,7 +820,7 @@ public final class TermBuilder {
     }
     
     
-    public Term applyElementary(Services services,
+    public Term applyElementary(IServices services,
 	                        Term loc,
 	                        Term value,
 	                        Term target) {
@@ -827,14 +828,14 @@ public final class TermBuilder {
     }
 
 
-    public Term applyElementary(Services services,
+    public Term applyElementary(IServices services,
 	                        Term heap,
 	                        Term target) {
 	return apply(elementary(services, heap), target);
     }
 
 
-    public ImmutableList<Term> applyElementary(Services services,
+    public ImmutableList<Term> applyElementary(IServices services,
 	                        Term heap,
 	                        Iterable<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
@@ -855,7 +856,7 @@ public final class TermBuilder {
     }
     
     
-    public Term applyParallel(Services services, 
+    public Term applyParallel(IServices services, 
 	                      Term[] lhss, 
 	                      Term[] values, 
 	                      Term target) {
@@ -891,12 +892,12 @@ public final class TermBuilder {
     //boolean operators    
     //-------------------------------------------------------------------------
     
-    public Term TRUE(Services services) {
+    public Term TRUE(IServices services) {
         return services.getTypeConverter().getBooleanLDT().getTrueTerm();
     }
     
     
-    public Term FALSE(Services services) {
+    public Term FALSE(IServices services) {
         return services.getTypeConverter().getBooleanLDT().getFalseTerm();
     }
     
@@ -906,36 +907,36 @@ public final class TermBuilder {
     //integer operators     
     //-------------------------------------------------------------------------
     
-    public Term geq(Term t1, Term t2, Services services) {
+    public Term geq(Term t1, Term t2, IServices services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getGreaterOrEquals(), t1, t2);
     }
     
     
-    public Term gt(Term t1, Term t2, Services services) {
+    public Term gt(Term t1, Term t2, IServices services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getGreaterThan(), t1, t2);
     }
     
     
-    public Term lt(Term t1, Term t2, Services services) {
+    public Term lt(Term t1, Term t2, IServices services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getLessThan(), t1, t2);
     }    
     
     
-    public Term leq(Term t1, Term t2, Services services) {
+    public Term leq(Term t1, Term t2, IServices services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getLessOrEquals(), t1, t2);
     }    
     
     
-    public Term zero(Services services) {
+    public Term zero(IServices services) {
 	return services.getTypeConverter().getIntegerLDT().zero();
     }
 
     
-    public Term one(Services services) {
+    public Term one(IServices services) {
         return services.getTypeConverter().getIntegerLDT().one();
     }
     
@@ -944,7 +945,7 @@ public final class TermBuilder {
      * @param numberString String representing an integer
      * @return Term in Z-Notation representing the given number
      */
-    public Term zTerm(Services services, String numberString) {
+    public Term zTerm(IServices services, String numberString) {
         Operator v;
         Term t;
         boolean negate = false;
@@ -974,7 +975,7 @@ public final class TermBuilder {
     }
     
     
-    public Term add(Services services, Term t1, Term t2) {
+    public Term add(IServices services, Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Term zero = integerLDT.zero();
         if(t1.equals(zero)) {
@@ -988,14 +989,14 @@ public final class TermBuilder {
 
 
     public Term inInt(Term var,
-                      Services services) {
+                      IServices services) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
                 new Name("inInt"));
         return func(f, var);
     }
     
-    public Term index(Services services){
+    public Term index(IServices services){
     	return func(services.getTypeConverter().getIntegerLDT().getIndex());
     }
 
@@ -1016,24 +1017,24 @@ public final class TermBuilder {
         return ff();
     }
     
-    public Term empty(Services services) {
+    public Term empty(IServices services) {
 	return func(services.getTypeConverter().getLocSetLDT().getEmpty());
     }
     
     
-    public Term allLocs(Services services) {
+    public Term allLocs(IServices services) {
 	return func(services.getTypeConverter().getLocSetLDT().getAllLocs());
     }    
     
     
-    public Term singleton(Services services, Term o, Term f) {
+    public Term singleton(IServices services, Term o, Term f) {
 	return func(services.getTypeConverter().getLocSetLDT().getSingleton(), 
 		    o, 
 		    f);
     }
     
     
-    public Term union(Services services, Term s1, Term s2) {
+    public Term union(IServices services, Term s1, Term s2) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty()) {
 	    return s2;
@@ -1045,7 +1046,7 @@ public final class TermBuilder {
     }
     
     
-    public Term union(Services services, Term ... subTerms) {
+    public Term union(IServices services, Term ... subTerms) {
         Term result = empty(services);
         for(Term sub : subTerms) {
 	    result = union(services, result, sub);
@@ -1054,7 +1055,7 @@ public final class TermBuilder {
     }
     
     
-    public Term union(Services services, Iterable<Term> subTerms) {
+    public Term union(IServices services, Iterable<Term> subTerms) {
         Term result = empty(services);
         for(Term sub : subTerms) {
 	    result = union(services, result, sub);
@@ -1063,7 +1064,7 @@ public final class TermBuilder {
     }
     
         
-    public Term intersect(Services services, Term s1, Term s2) {
+    public Term intersect(IServices services, Term s1, Term s2) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
 	    return empty(services);
@@ -1073,7 +1074,7 @@ public final class TermBuilder {
     }
     
     
-    public Term intersect(Services services, Term ... subTerms) {
+    public Term intersect(IServices services, Term ... subTerms) {
         Term result = empty(services);
         for(Term sub : subTerms) {
 	    result = intersect(services, result, sub);
@@ -1082,7 +1083,7 @@ public final class TermBuilder {
     }
     
     
-    public Term intersect(Services services, Iterable<Term> subTerms) {
+    public Term intersect(IServices services, Iterable<Term> subTerms) {
         Term result = empty(services);
         for(Term sub : subTerms) {
 	    result = intersect(services, result, sub);
@@ -1091,7 +1092,7 @@ public final class TermBuilder {
     }
     
     
-    public Term setMinus(Services services, Term s1, Term s2) {
+    public Term setMinus(IServices services, Term s1, Term s2) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
 	    return s1;
@@ -1101,7 +1102,7 @@ public final class TermBuilder {
     }
     
     
-    public Term infiniteUnion(Services services, 
+    public Term infiniteUnion(IServices services, 
 	                      QuantifiableVariable[] qvs, 
 	                      Term s) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
@@ -1112,7 +1113,7 @@ public final class TermBuilder {
     }
     
     
-    public Term guardedInfiniteUnion(Services services, 
+    public Term guardedInfiniteUnion(IServices services, 
 	    			     QuantifiableVariable[] qvs, 
 	    			     Term guard, 
 	    			     Term s) {
@@ -1122,7 +1123,7 @@ public final class TermBuilder {
     }
     
     
-    public Term setComprehension(Services services, 
+    public Term setComprehension(IServices services, 
 	                         QuantifiableVariable[] qvs, 
 	                         Term o, 
 	                         Term f) {
@@ -1130,7 +1131,7 @@ public final class TermBuilder {
     }
     
     
-    public Term guardedSetComprehension(Services services, 
+    public Term guardedSetComprehension(IServices services, 
 	                         	QuantifiableVariable[] qvs,
 	                         	Term guard,
 	                         	Term o,
@@ -1142,28 +1143,28 @@ public final class TermBuilder {
     }
     
     
-    public Term allFields(Services services, Term o) {
+    public Term allFields(IServices services, Term o) {
 	return func(services.getTypeConverter().getLocSetLDT().getAllFields(), o);
     }
     
     
-    public Term allObjects(Services services, Term f) {
+    public Term allObjects(IServices services, Term f) {
 	return func(services.getTypeConverter().getLocSetLDT().getAllObjects(), f);
     }
     
     
-    public Term arrayRange(Services services, Term o, Term lower, Term upper) {
+    public Term arrayRange(IServices services, Term o, Term lower, Term upper) {
 	return func(services.getTypeConverter().getLocSetLDT().getArrayRange(), 
 		    new Term[]{o, lower, upper});
     }        
     
     
-    public Term freshLocs(Services services, Term h) {
+    public Term freshLocs(IServices services, Term h) {
 	return func(services.getTypeConverter().getLocSetLDT().getFreshLocs(), h);
     }    
     
     
-    public Term elementOf(Services services, Term o, Term f, Term s) {
+    public Term elementOf(IServices services, Term o, Term f, Term s) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s.op() == ldt.getEmpty()) {
 	    return ff();
@@ -1173,7 +1174,7 @@ public final class TermBuilder {
     }
     
     
-    public Term subset(Services services, Term s1, Term s2) {
+    public Term subset(IServices services, Term s1, Term s2) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty()) {
 	    return tt();
@@ -1183,7 +1184,7 @@ public final class TermBuilder {
     }
     
     
-    public Term disjoint(Services services, Term s1, Term s2) {
+    public Term disjoint(IServices services, Term s1, Term s2) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
 	    return tt();
@@ -1193,7 +1194,7 @@ public final class TermBuilder {
     }
     
     
-    public Term createdInHeap(Services services, Term s, Term h) {
+    public Term createdInHeap(IServices services, Term s, Term h) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s.op() == ldt.getEmpty()) {
 	    return tt();
@@ -1203,7 +1204,7 @@ public final class TermBuilder {
     }    
     
     
-    public Term createdLocs(Services services) {
+    public Term createdLocs(IServices services) {
         return setMinus(services, 
         	        allLocs(services), 
                         freshLocs(services, getBaseHeap(services))); 
@@ -1215,17 +1216,17 @@ public final class TermBuilder {
     //heap operators    
     //-------------------------------------------------------------------------
     
-    public Term NULL(Services services) {
+    public Term NULL(IServices services) {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
 
-    public Term wellFormed(Term heap, Services services) {
+    public Term wellFormed(Term heap, IServices services) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), 
         	    heap);
     }
     
 
-    public Term wellFormed(LocationVariable heap, Services services) {
+    public Term wellFormed(LocationVariable heap, IServices services) {
         return wellFormed(var(heap), services);
     }
     
@@ -1250,7 +1251,7 @@ public final class TermBuilder {
     }
 
     
-    public Term select(Services services, Sort asSort, Term h, Term o, Term f) {
+    public Term select(IServices services, Sort asSort, Term h, Term o, Term f) {
 	return func(services.getTypeConverter().getHeapLDT().getSelect(
 		    asSort, 
 		    services), 
@@ -1258,15 +1259,15 @@ public final class TermBuilder {
     }
 
     
-    public Term dot(Services services, Sort asSort, Term o, Term f) {
+    public Term dot(IServices services, Sort asSort, Term o, Term f) {
         return select(services, asSort, getBaseHeap(services), o, f);
     }
 
-    public Term getBaseHeap(Services services) {
+    public Term getBaseHeap(IServices services) {
         return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
     
-    public Term dot(Services services, Sort asSort, Term o, Function f) {
+    public Term dot(IServices services, Sort asSort, Term o, Function f) {
 	final Sort fieldSort 
 		= services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort
@@ -1275,12 +1276,12 @@ public final class TermBuilder {
     }
     
 
-    public Term staticDot(Services services, Sort asSort, Term f) {
+    public Term staticDot(IServices services, Sort asSort, Term f) {
         return dot(services, asSort, NULL(services), f);
     }
     
     
-    public Term staticDot(Services services, Sort asSort, Function f) {
+    public Term staticDot(IServices services, Sort asSort, Function f) {
 	final Sort fieldSort 
 		= services.getTypeConverter().getHeapLDT().getFieldSort();
 	return f.sort() == fieldSort
@@ -1289,12 +1290,12 @@ public final class TermBuilder {
     }
     
 
-    public Term arr(Services services, Term idx) {
+    public Term arr(IServices services, Term idx) {
 	return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
     
 
-    public Term dotArr(Services services, Term ref, Term idx) {
+    public Term dotArr(IServices services, Term ref, Term idx) {
         if(ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
                     "term without providing an " +
@@ -1319,13 +1320,13 @@ public final class TermBuilder {
     }    
     
     
-    public Term dotLength(Services services, Term a) {
+    public Term dotLength(IServices services, Term a) {
 	final TypeConverter tc = services.getTypeConverter();
 	return func(tc.getHeapLDT().getLength(), a); 
     }
     
     
-    public Term created(Services services, Term h, Term o) {
+    public Term created(IServices services, Term h, Term o) {
 	final TypeConverter tc = services.getTypeConverter();	
 	return equals(select(services,
 		              tc.getBooleanLDT().targetSort(),
@@ -1336,13 +1337,13 @@ public final class TermBuilder {
     }
 
 
-    public Term created(Services services, Term o) {
+    public Term created(IServices services, Term o) {
 	return created(services, getBaseHeap(services), o);
     }
 
     
     
-    public Term initialized(Services services, Term o) {
+    public Term initialized(IServices services, Term o) {
 	final TypeConverter tc = services.getTypeConverter();	
 	return equals(dot(services,
 		          tc.getBooleanLDT().targetSort(),
@@ -1352,7 +1353,7 @@ public final class TermBuilder {
     }
 
     
-    public Term classPrepared(Services services, Sort classSort) {
+    public Term classPrepared(IServices services, Sort classSort) {
 	final TypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
 		                tc.getBooleanLDT().targetSort(),
@@ -1361,7 +1362,7 @@ public final class TermBuilder {
 		      TRUE(services));	
     }
     
-    public Term classInitialized(Services services, Sort classSort) {
+    public Term classInitialized(IServices services, Sort classSort) {
 	final TypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
 		                tc.getBooleanLDT().targetSort(),
@@ -1370,7 +1371,7 @@ public final class TermBuilder {
 		      TRUE(services));
     }
 
-    public Term classInitializationInProgress(Services services, 
+    public Term classInitializationInProgress(IServices services, 
 	    				      Sort classSort) {
 	final TypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
@@ -1382,7 +1383,7 @@ public final class TermBuilder {
     }
 
         
-    public Term classErroneous(Services services, Sort classSort) {
+    public Term classErroneous(IServices services, Sort classSort) {
 	final TypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
 		                tc.getBooleanLDT().targetSort(),
@@ -1392,35 +1393,35 @@ public final class TermBuilder {
     }
 
     
-    public Term store(Services services, Term h, Term o, Term f, Term v) {
+    public Term store(IServices services, Term h, Term o, Term f, Term v) {
         return func(services.getTypeConverter().getHeapLDT().getStore(), 
         	    new Term[]{h, o, f, v});
     }
 
 
-    public Term create(Services services, Term h, Term o) {
+    public Term create(IServices services, Term h, Term o) {
         return func(services.getTypeConverter().getHeapLDT().getCreate(), 
         	     new Term[]{h, o});
     }
 
     
-    public Term anon(Services services, Term h1, Term s, Term h2) {
+    public Term anon(IServices services, Term h1, Term s, Term h2) {
 	return func(services.getTypeConverter().getHeapLDT().getAnon(), 
 		    new Term[]{h1, s, h2});
     }
     
                
-    public Term fieldStore(Services services, Term o, Function f, Term v) {
+    public Term fieldStore(IServices services, Term o, Function f, Term v) {
         return store(services, getBaseHeap(services), o, func(f), v);
     }
     
     
-    public Term staticFieldStore(Services services, Function f, Term v) {
+    public Term staticFieldStore(IServices services, Function f, Term v) {
 	return fieldStore(services, NULL(services), f, v);
     }
     
     
-    public Term arrayStore(Services services, Term o, Term i, Term v) {
+    public Term arrayStore(IServices services, Term o, Term i, Term v) {
         return store(services, 
                 getBaseHeap(services), 
         	     o, 
@@ -1545,7 +1546,7 @@ public final class TermBuilder {
     }
     
     
-    public Term anonUpd(LocationVariable heap, Services services, Term mod, Term anonHeap) {
+    public Term anonUpd(LocationVariable heap, IServices services, Term mod, Term anonHeap) {
 	return elementary(services,
 		          heap,
 		          anon(services, 
@@ -1555,7 +1556,7 @@ public final class TermBuilder {
     }
     
         
-    public Term forallHeaps(Services services, Term t) {
+    public Term forallHeaps(IServices services, Term t) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final LogicVariable heapLV 
 		= new LogicVariable(new Name("h"), heapLDT.targetSort());
@@ -1573,13 +1574,13 @@ public final class TermBuilder {
     //reachability operators    
     //-------------------------------------------------------------------------
     
-    public Term acc(Services services, Term h, Term s, Term o1, Term o2) {
+    public Term acc(IServices services, Term h, Term s, Term o1, Term o2) {
 	return func(services.getTypeConverter().getHeapLDT().getAcc(), 
 		    new Term[]{h, s, o1, o2});
     }
     
     
-    public Term reach(Services services, 
+    public Term reach(IServices services, 
 	    	      Term h, 
 	    	      Term s, 
 	    	      Term o1, 
@@ -1594,7 +1595,7 @@ public final class TermBuilder {
     //sequence operators    
     //-------------------------------------------------------------------------
     
-    public Term seqGet(Services services, Sort asSort, Term s, Term idx) {
+    public Term seqGet(IServices services, Sort asSort, Term s, Term idx) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort, 
 		    						      services), 
 		    s,
@@ -1602,41 +1603,41 @@ public final class TermBuilder {
     }
     
     
-    public Term seqLen(Services services, Term s) {
+    public Term seqLen(IServices services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
     }
     
     /** Function representing the least index of an element x in a sequence s (or underspecified) */
-    public Term indexOf(Services services, Term s, Term x){
+    public Term indexOf(IServices services, Term s, Term x){
 	return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
     }
     
     
-    public Term seqEmpty(Services services) {
+    public Term seqEmpty(IServices services) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
     }
     
     
-    public Term seqSingleton(Services services, Term x) {
+    public Term seqSingleton(IServices services, Term x) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), 
 		    x);
     }
     
     
-    public Term seqConcat(Services services, Term s, Term s2) {
+    public Term seqConcat(IServices services, Term s, Term s2) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqConcat(), 
 		    s, 
 		    s2);
     }
     
     
-    public Term seqSub(Services services, Term s, Term from, Term to) {
+    public Term seqSub(IServices services, Term s, Term from, Term to) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqSub(), 
 		    new Term[]{s, from, to});
     }
     
     
-    public Term seqReverse(Services services, Term s) {
+    public Term seqReverse(IServices services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
 
@@ -1646,7 +1647,7 @@ public final class TermBuilder {
     
 
     
-    public ImmutableSet<Term> unionToSet(Term s, Services services) {
+    public ImmutableSet<Term> unionToSet(Term s, IServices services) {
     final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
     assert s.sort().equals(setLDT.targetSort());
     final Function union = setLDT.getUnion();
@@ -1696,13 +1697,13 @@ public final class TermBuilder {
                        Term a,
                        Term b,
                        Term t,
-                       Services services) {
+                       IServices services) {
         return func(services.getTypeConverter().getSeqLDT().getSeqDef(),
                     new Term[]{a, b, t},
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
     
-    public Term values(Services services){
+    public Term values(IServices services){
     	return func(services.getTypeConverter().getSeqLDT().getValues());
     }
 

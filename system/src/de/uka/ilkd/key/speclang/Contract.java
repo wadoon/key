@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -56,13 +56,13 @@ public interface Contract extends SpecificationElement {
                        ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    	       Services services);
+	    	       IServices services);
 
     public Term getPre(List<LocationVariable> heapContext,
                        ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    	       Services services);
+	    	       IServices services);
     
     /**
      * Returns the precondition of the contract.
@@ -72,14 +72,14 @@ public interface Contract extends SpecificationElement {
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-	    	       Services services);    
+	    	       IServices services);    
 
     public Term getPre(List<LocationVariable> heapContext,
                        Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-	    	       Services services);    
+	    	       IServices services);    
     
     
     /**
@@ -87,7 +87,7 @@ public interface Contract extends SpecificationElement {
      */
     public Term getMby(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
-	               Services services);    
+	               IServices services);    
         
     /**
      * Returns the measured_by clause of the contract.
@@ -95,12 +95,12 @@ public interface Contract extends SpecificationElement {
     public Term getMby(Term heapTerm,
 	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
-	               Services services);
+	               IServices services);
     
     /**
      * Returns the contract in pretty HTML format.
      */
-    public String getHTMLText(Services services);
+    public String getHTMLText(IServices services);
     
     /**
      * Tells whether, on saving a proof where this contract is available, the
@@ -115,7 +115,7 @@ public interface Contract extends SpecificationElement {
      * Returns a parseable String representation of the contract. 
      * Precondition: toBeSaved() must be true.
      */
-    public String proofToString(Services services);
+    public String proofToString(IServices services);
     
     
     /**

@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -30,7 +31,7 @@ public final class FloatLDT extends LDT {
     
     public static final Name NAME = new Name("float");    
 
-    public FloatLDT(Services services) {
+    public FloatLDT(IServices services) {
 	super(NAME, services);
     }
     
@@ -57,14 +58,14 @@ public final class FloatLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    		         Term sub, 
-	    		         Services services, 
+	    		         IServices services, 
 	    		         ExecutionContext ec) {
 	return false;
     }
 
     
     @Override 
-    public Term translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, IServices services) {
 	return null;
     }
 

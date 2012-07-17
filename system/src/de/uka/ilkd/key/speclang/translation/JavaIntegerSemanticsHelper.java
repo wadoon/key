@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -35,7 +35,7 @@ public class JavaIntegerSemanticsHelper {
     //constructors
     //-------------------------------------------------------------------------
 
-    public JavaIntegerSemanticsHelper(Services services,
+    public JavaIntegerSemanticsHelper(IServices services,
 			    SLTranslationExceptionManager excManager) {
 	assert services != null;
 	assert excManager != null;

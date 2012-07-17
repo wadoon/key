@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -205,7 +206,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param root The root {@link Node} with the initial {@link Sequent}.
     * @param services The {@link Services} to use.
     */
-   protected void initMethodCallStack(final Node root, Services services) {
+   protected void initMethodCallStack(final Node root, IServices services) {
       // Find all modalities in the succedent
       final List<Term> modalityTerms = new LinkedList<Term>();
       for (SequentFormula sequentFormula : root.sequent().succedent()) {

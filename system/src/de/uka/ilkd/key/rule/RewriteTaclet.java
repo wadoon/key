@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -137,7 +138,7 @@ public final class RewriteTaclet extends FindTaclet {
     public MatchConditions checkUpdatePrefix
 	( PosInOccurrence p_pos,
 	  MatchConditions p_mc,
-	  Services        p_services ) {
+	  IServices        p_services ) {
 	if ( getStateRestriction() == NONE)  
 	    return p_mc;
 
@@ -264,7 +265,7 @@ public final class RewriteTaclet extends FindTaclet {
     protected void applyReplacewith(TacletGoalTemplate gt, 
 				    Goal               goal,
 				    PosInOccurrence    posOfFind,
-				    Services           services,
+				    IServices           services,
 				    MatchConditions    matchCond) {
 	if ( gt instanceof RewriteTacletGoalTemplate ) {
             SequentFormula cf 
@@ -292,7 +293,7 @@ public final class RewriteTaclet extends FindTaclet {
     protected void applyAdd(Sequent         add, 
 			    Goal            goal,
 			    PosInOccurrence posOfFind,
-			    Services        services,
+			    IServices        services,
 			    MatchConditions matchCond) {
 	if (posOfFind.isInAntec()) {
 	    addToAntec(add.antecedent(), goal, posOfFind, services, matchCond);

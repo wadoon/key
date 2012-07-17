@@ -15,7 +15,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -37,17 +37,17 @@ class PredictCostProver {
     /** clauses from <code>instance</code> of CNF */
     private Set<Clause> clauses = new HashSet<Clause>();
 
-    private Services services;
+    private IServices services;
 
     private PredictCostProver(Term instance, ImmutableSet<Term> assertList,
-	    Services services) {
+	    IServices services) {
 	this.assertLiterals = assertList;
 	this.services = services;
 	initClauses(instance);
     }
 
     public static long computerInstanceCost(Substitution sub, Term matrix,
-	    ImmutableSet<Term> assertList, Services services) {
+	    ImmutableSet<Term> assertList, IServices services) {
 
 	if (!sub.isGround()) {
 	    // non-ground substitutions not supported yet

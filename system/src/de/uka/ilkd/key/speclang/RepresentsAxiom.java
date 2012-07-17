@@ -15,7 +15,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
@@ -86,7 +86,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 		   || originalRep.sub(0).sub(1).op().equals(originalSelfVar));
     }
     
-    private Term instance(boolean finalClass, SchemaVariable selfSV, Services services){
+    private Term instance(boolean finalClass, SchemaVariable selfSV, IServices services){
         return target.isStatic() || finalClass || VisibilityModifier.allowsInheritance(visibility)
         ? TB.tt() :TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
     }
@@ -94,7 +94,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     private Term getAxiom(ParsableVariable heapVar, 
 	    		  ParsableVariable selfVar,
-	    		  Services services) {
+	    		  IServices services) {
 	assert heapVar != null;
 	assert (selfVar == null) == target.isStatic();
 	final Map<ProgramVariable, ParsableVariable> map = new HashMap<ProgramVariable, ParsableVariable>();
@@ -129,7 +129,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     public ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            Services services) {
+            IServices services) {
         LocationVariable heap =
                 services.getTypeConverter().getHeapLDT().getHeap();
         ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
@@ -162,7 +162,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
-	    						Services services) {
+	    						IServices services) {
 	if(!isFunctional()) {
 	    return DefaultImmutableSet.nil();
 	} else {

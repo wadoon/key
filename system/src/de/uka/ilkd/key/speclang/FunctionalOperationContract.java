@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -34,7 +34,7 @@ public interface FunctionalOperationContract extends OperationContract {
      */
     public Modality getModality();
 
-    public boolean isReadOnlyContract(Services services);
+    public boolean isReadOnlyContract(IServices services);
     /**
      * Returns the postcondition of the contract.
      */
@@ -44,7 +44,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        ProgramVariable resultVar, 
 	    	        ProgramVariable excVar,
 	    	        Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    	        Services services);
+	    	        IServices services);
 
     public Term getPost(List<LocationVariable> heapContext,
                         ProgramVariable selfVar, 
@@ -52,7 +52,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        ProgramVariable resultVar, 
 	    	        ProgramVariable excVar,
 	    	        Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    	        Services services);
+	    	        IServices services);
     
     /**
      * Returns the postcondition of the contract.
@@ -64,7 +64,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Term resultTerm, 
 	    	        Term excTerm,
 	    	        Map<LocationVariable,Term> atPres,
-	    	        Services services);
+	    	        IServices services);
 
     public Term getPost(List<LocationVariable> heapContext,
                         Term heapTerm,
@@ -73,7 +73,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Term resultTerm, 
 	    	        Term excTerm,
 	    	        Map<LocationVariable,Term> atPres,
-	    	        Services services);
+	    	        IServices services);
 
 
 }

@@ -15,8 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.Name;
@@ -56,7 +56,7 @@ public class VariableNameProposer implements InstantiationProposer {
      */
     public String getProposal(TacletApp app,
     			      SchemaVariable var,
-			      Services services,
+			      IServices services,
 			      Node undoAnchor,
 			      ImmutableList<String> previousProposals) {
 	if(var instanceof SkolemTermSV) {
@@ -86,7 +86,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * Warning: this method is buggy. It causes problems with proof reloading.
      * Use the method TermBuilder.newName instead.
      */
-    public Name getNewName(Services services, Name baseName) {
+    public Name getNewName(IServices services, Name baseName) {
         NamespaceSet namespaces = services.getNamespaces();
 
         Name name = services.getNameRecorder().getProposal();            
@@ -108,7 +108,7 @@ public class VariableNameProposer implements InstantiationProposer {
      */
     private String getNameProposalForSkolemTermVariable(TacletApp p_app,
     						        SchemaVariable p_var,
-						        Services services,
+						        IServices services,
 						        Node undoAnchor,
                                                         ImmutableList<String> previousProposals) {
 	return getNameProposalForSkolemTermVariable
@@ -153,7 +153,7 @@ public class VariableNameProposer implements InstantiationProposer {
 
 
     private String getNameProposalForSkolemTermVariable(String name,
-    						       Services services,
+    						       IServices services,
 						       Node undoAnchor,
                                                        ImmutableList<String> previousProposals) {
 
@@ -173,7 +173,7 @@ public class VariableNameProposer implements InstantiationProposer {
 
     
     public String getNameProposal(String basename, 
-	    			  Services services, 
+	    			  IServices services, 
 	    			  Node undoAnchor) {
         final NamespaceSet nss = services.getNamespaces();
         Name l_name;
@@ -199,7 +199,7 @@ public class VariableNameProposer implements InstantiationProposer {
      */
     private String getNameProposalForVariableSV(TacletApp app,
 						SchemaVariable var,
-						Services services,
+						IServices services,
 						Node undoAnchor) {
 	return VARIABLE_NAME_PREFIX + services.getCounter(VARCOUNTER_NAME)
 	  				      .getCountPlusPlusWithParent(undoAnchor);
@@ -213,7 +213,7 @@ public class VariableNameProposer implements InstantiationProposer {
      */
     private String getNameProposalForLabel(TacletApp app,
 					   SchemaVariable var,
-					   Services services,
+					   IServices services,
 					   Node undoAnchor,
                                            ImmutableList<String> previousProposals) {       
 	        

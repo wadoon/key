@@ -12,7 +12,7 @@ package de.uka.ilkd.key.strategy.termProjection;
 
 import java.math.BigInteger;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
@@ -28,7 +28,7 @@ public abstract class DividePolynomialsProjection
                                                       ProjectionToTerm polynomial) {
         return new DividePolynomialsProjection ( leftCoefficient, polynomial ) {
             protected Term divide(Monomial numerator, BigInteger denominator,
-                                  Services services) {
+                                  IServices services) {
                 final BigInteger newRightCoeff =
                     divide ( numerator.getCoefficient (), denominator );
                 return numerator.setCoefficient ( newRightCoeff ).toTerm ( services );
@@ -41,7 +41,7 @@ public abstract class DividePolynomialsProjection
                                                     ProjectionToTerm polynomial) {
         return new DividePolynomialsProjection ( leftCoefficient, polynomial ) {
             protected Term divide(Monomial numerator, BigInteger denominator,
-                                  Services services) {
+                                  IServices services) {
                 final BigInteger newRightCoeff =
                     divide ( numerator.getCoefficient ().negate (), denominator ).negate ();
                 return numerator.setCoefficient ( newRightCoeff ).toTerm ( services );

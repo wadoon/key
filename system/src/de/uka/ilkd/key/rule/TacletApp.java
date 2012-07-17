@@ -15,8 +15,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -213,7 +214,7 @@ public abstract class TacletApp implements RuleApp {
     protected static SVInstantiations resolveCollisionVarSV(
 	    					Taclet taclet,
 	    					SVInstantiations insts,
-	    					Services services) {
+	    					IServices services) {
 
 	HashMap<LogicVariable, SchemaVariable> collMap = new HashMap<LogicVariable, SchemaVariable>();
 
@@ -322,7 +323,7 @@ public abstract class TacletApp implements RuleApp {
 	    Taclet taclet,
 	    SVInstantiations insts, 
 	    SchemaVariable varSV,
-	    Services services) {
+	    IServices services) {
 	Term term = getTermBelowQuantifier(taclet, varSV);
 	LogicVariable newVariable = new LogicVariable(new Name(((Term) insts
 		.getInstantiation(varSV)).op().name().toString()
@@ -346,7 +347,7 @@ public abstract class TacletApp implements RuleApp {
 	    Term t, 
 	    SchemaVariable u, 
 	    Term y,
-	    Services services) {
+	    IServices services) {
 
 	SVInstantiations result = insts;
 	LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u))
@@ -383,10 +384,10 @@ public abstract class TacletApp implements RuleApp {
      * @param goal
      *            the Goal at which the Taclet is applied
      * @param services
-     *            the Services encapsulating all java information
+     *            the IServices encapsulating all java information
      * @return list of new created goals
      */
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
+    public ImmutableList<Goal> execute(Goal goal, IServices services) {
 
 	if (!complete()) {
 	    throw new IllegalStateException("Tried to apply rule \n" + taclet
@@ -404,11 +405,11 @@ public abstract class TacletApp implements RuleApp {
      * @param goal
      *            the Goal where to apply the rule
      * @param services
-     *            the Services encapsulating all java information
+     *            the IServices encapsulating all java information
      * @return list of new created goals
      */
     /*
-     * public ImmutableList<Goal> executeForceIf(Goal goal, Services services) { if
+     * public ImmutableList<Goal> executeForceIf(Goal goal, IServices services) { if
      * (!complete()) { throw new
      * IllegalStateException("Applied rule not complete."); }
      * goal.addAppliedRuleApp(this); return taclet().apply(goal, services, this,
@@ -453,7 +454,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv, 
 	    				     Term term,
-	    				     Services services, 
+	    				     IServices services, 
 	    				     boolean interesting) {
 
 	if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
@@ -506,7 +507,7 @@ public abstract class TacletApp implements RuleApp {
     /**
      * @return A TacletApp with this.sufficientlyComplete() or null
      */
-    public final TacletApp tryToInstantiate(Services services) {
+    public final TacletApp tryToInstantiate(IServices services) {
 	final VariableNamer varNamer = services.getVariableNamer();
 	final TermBuilder tb = TermBuilder.DF;
 
@@ -602,7 +603,7 @@ public abstract class TacletApp implements RuleApp {
      */
     private static TacletApp forceGenericSortInstantiation(TacletApp app,
 	    						   SchemaVariable sv,
-	    						   Services services) {
+	    						   IServices services) {
 	final GenericSortCondition c = GenericSortCondition.forceInstantiation(
 		sv.sort(), false);
 	if (c != null) {
@@ -628,7 +629,7 @@ public abstract class TacletApp implements RuleApp {
      */
     private SVInstantiations forceGenericSortInstantiations(
 	    SVInstantiations insts,
-	    Services services) {
+	    IServices services) {
 	// force all generic sorts to be instantiated
 	try {
 	    for (final SchemaVariable sv : uninstantiatedVars()) {
@@ -645,13 +646,13 @@ public abstract class TacletApp implements RuleApp {
 
     /**
      * @param services
-     *            the Services class allowing access to the type model
+     *            the IServices class allowing access to the type model
      * @return p_s iff p_s is not a generic sort, the concrete sort p_s is
      *         instantiated with currently otherwise
      * @throws GenericSortException
      *             iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(SchemaVariable p_sv, Services services) {
+    public Sort getRealSort(SchemaVariable p_sv, IServices services) {
 	return instantiations().getGenericSortInstantiations().getRealSort(
 		p_sv, services);
     }
@@ -662,12 +663,12 @@ public abstract class TacletApp implements RuleApp {
      * function having the occurring metavariables as arguments
      * 
      * @param services
-     *            the Services class allowing access to the type model
+     *            the IServices class allowing access to the type model
      */
     public TacletApp createSkolemConstant(String instantiation,
 	    		                  SchemaVariable sv, 
 	    		                  boolean interesting, 
-	    		                  Services services) {
+	    		                  IServices services) {
 	return createSkolemConstant(instantiation, 
 				    sv,
 				    getRealSort(sv, services), 
@@ -679,14 +680,14 @@ public abstract class TacletApp implements RuleApp {
 	    				  SchemaVariable sv, 
 	    				  Sort sort, 
 	    				  boolean interesting,
-	    				  Services services) {
+	    				  IServices services) {
 	final Function c 
 		= new Function(new Name(instantiation), sort, new Sort[0]);
 	return addInstantiation(sv, TB.func(c), interesting, services);
     }
     
     
-    public void registerSkolemConstants(Services services) {
+    public void registerSkolemConstants(IServices services) {
 	final SVInstantiations insts = instantiations();
 	final Iterator<SchemaVariable> svIt = insts.svIterator();
 	while(svIt.hasNext()) {
@@ -712,19 +713,19 @@ public abstract class TacletApp implements RuleApp {
     public abstract TacletApp addInstantiation(SchemaVariable sv, 
 	    				       Term term,
 	    				       boolean interesting,
-	    				       Services services);
+	    				       IServices services);
 
     public abstract TacletApp addInstantiation(SchemaVariable sv,
 	    				       Object[] list, 
 	    				       boolean interesting,
-	    				       Services services);
+	    				       IServices services);
 
     /**
      * adds a new instantiation to this TacletApp. This method does not check
      * (beside some very rudimentary tests) if the instantiation is possible. If
      * you cannot guarantee that adding the entry <code>(sv, pe)</code> will
      * result in a valid taclet instantiation, you have to use
-     * {@link #addCheckedInstantiation(SchemaVariable, ProgramElement, Services, boolean)}
+     * {@link #addCheckedInstantiation(SchemaVariable, ProgramElement, IServices, boolean)}
      * instead
      * 
      * @param sv
@@ -742,7 +743,7 @@ public abstract class TacletApp implements RuleApp {
     public abstract TacletApp addInstantiation(SchemaVariable sv,
 	    				       ProgramElement pe, 
 	    				       boolean interesting,
-	    				       Services services);
+	    				       IServices services);
 
     /**
      * checks if the instantiation of <code>sv</code> with <code>pe</code> is
@@ -755,7 +756,7 @@ public abstract class TacletApp implements RuleApp {
      * @param pe
      *            the ProgramElement the SV is instantiated with
      * @param services
-     *            the Services
+     *            the IServices
      * @param interesting
      *            a boolean marking if the instantiation of this sv needs to be
      *            saved for later proof loading (<code>interesting==true</code>)
@@ -773,7 +774,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv,
 	    				     ProgramElement pe, 
-	    				     Services services, 
+	    				     IServices services, 
 	    				     boolean interesting) {
 
 	MatchConditions cond = matchConditions();
@@ -811,7 +812,7 @@ public abstract class TacletApp implements RuleApp {
 
     public TacletApp addInstantiation(SchemaVariable sv, 
 	    			      Name name, 
-	    			      Services services) {
+	    			      IServices services) {
 	return addInstantiation(SVInstantiations.EMPTY_SVINSTANTIATIONS
 				.addInteresting(sv, name, services), 
 				services);
@@ -827,7 +828,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the new Taclet application
      */
     public abstract TacletApp addInstantiation(SVInstantiations svi,
-	    				       Services services);
+	    				       IServices services);
 
     /**
      * creates a new Taclet application containing all the instantiations given
@@ -839,7 +840,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the new Taclet application
      */
     protected abstract TacletApp setInstantiation(SVInstantiations svi,
-	    				          Services services);
+	    				          IServices services);
 
     /**
      * creates a new Taclet application containing all the instantiations,
@@ -847,7 +848,7 @@ public abstract class TacletApp implements RuleApp {
      * old ones
      */
     public abstract TacletApp setMatchConditions(MatchConditions mc,
-	    					 Services services);
+	    					 IServices services);
 
     /**
      * creates a new Taclet application containing all the instantiations,
@@ -857,7 +858,7 @@ public abstract class TacletApp implements RuleApp {
     protected abstract TacletApp setAllInstantiations(
 	    	MatchConditions mc,
 	    	ImmutableList<IfFormulaInstantiation> ifInstantiations,
-	    	Services services);
+	    	IServices services);
 
     /**
      * Creates a new Taclet application by matching the given formulas against
@@ -867,7 +868,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public TacletApp setIfFormulaInstantiations(
 	    ImmutableList<IfFormulaInstantiation> p_list, 
-	    Services p_services) {
+	    IServices p_services) {
 	assert p_list != null && ifInstsCorrectSize(taclet, p_list)
 		&& ifInstantiations == null : "If instantiations list has wrong size or is null "
 		+ "or the if formulas have already been instantiated";
@@ -886,7 +887,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public ImmutableList<TacletApp> findIfFormulaInstantiations(
 	    Sequent p_seq,
-	    Services p_services) {
+	    IServices p_services) {
 
 	Debug.assertTrue(ifInstantiations == null,
 		"The if formulas have already been instantiated");
@@ -927,7 +928,7 @@ public abstract class TacletApp implements RuleApp {
 	    ImmutableList<IfFormulaInstantiation> p_toMatch,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch2nd,
 	    ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
-	    MatchConditions p_matchCond, Services p_services) {
+	    MatchConditions p_matchCond, IServices p_services) {
 
 	while (p_ifSeqTail.isEmpty()) {
 	    if (p_ifSeqTail2nd == null) {
@@ -982,7 +983,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the new TacletApp
      */
     public PosTacletApp setPosInOccurrence(PosInOccurrence pos, 
-	    			           Services services) {
+	    			           IServices services) {
 	if (taclet() instanceof NoFindTaclet) {
 	    throw new IllegalStateException("Cannot add position to an taclet"
 		    + " without find");
@@ -1057,7 +1058,7 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @return a conflict resolved TacletApp, remainder equal to this TacletApp
      */
-    public TacletApp prepareUserInstantiation(Services services) {
+    public TacletApp prepareUserInstantiation(IServices services) {
 	TacletApp result = this;
 	SchemaVariable varSV = varSVNameConflict();
 	while (varSV != null) {

@@ -19,6 +19,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -230,7 +231,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    		      ProgramVariable resultVar, 
 	    		      ProgramVariable excVar,
 	    		      Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    		      Services services) {
+	    		      IServices services) {
 	final Map<ProgramVariable, ProgramVariable> result = new LinkedHashMap<ProgramVariable, ProgramVariable>();
 	
         //self
@@ -285,7 +286,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    		      Term resultTerm, 
 	    		      Term excTerm,
                               Map<LocationVariable,Term> atPres,
-	    		      Services services) {
+	    		      IServices services) {
 	final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
 	
 	//heap
@@ -380,7 +381,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                        ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                       Services services) {
+                       IServices services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -399,7 +400,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                        ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                       Services services) {
+                       IServices services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
@@ -419,7 +420,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-                       Services services) {
+                       IServices services) {
 	assert heapTerm != null;		
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -442,7 +443,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-                       Services services) {
+                       IServices services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPre(heap, heapTerm, selfTerm, paramTerms, atPres, services);
@@ -458,7 +459,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     @Override
     public Term getMby(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
-                       Services services) {
+                       IServices services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -478,7 +479,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     public Term getMby(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Services services) {
+                       IServices services) {
 	assert heapTerm != null;		
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -581,7 +582,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     
     @Override
-    public String proofToString(Services services) {
+    public String proofToString(IServices services) {
 	assert toBeSaved;
 	final StringBuffer sb = new StringBuffer();
     final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -678,7 +679,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                         ProgramVariable resultVar, 
                         ProgramVariable excVar,
                         Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                        Services services) {
+                        IServices services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -702,7 +703,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                         ProgramVariable resultVar, 
                         ProgramVariable excVar,
                         Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                        Services services) {
+                        IServices services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPost(heap, selfVar, paramVars, resultVar, excVar, atPreVars, services);
@@ -724,7 +725,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                         Term resultTerm, 
                         Term excTerm,
                         Map<LocationVariable,Term> atPres,
-                        Services services) {
+                        IServices services) {
 	assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -751,7 +752,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                         Term resultTerm, 
                         Term excTerm,
                         Map<LocationVariable,Term> atPres,
-                        Services services) {
+                        IServices services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPost(heap, heapTerm, selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
@@ -764,14 +765,14 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
        return result;
     }
 
-    public boolean isReadOnlyContract(Services services) {
+    public boolean isReadOnlyContract(IServices services) {
         return originalMods.get(services.getTypeConverter().getHeapLDT().getHeap()).op() == 
                 services.getTypeConverter().getLocSetLDT().getEmpty();
     }
     
     public Term getAnyMod(Term mod, ProgramVariable selfVar, 
                        ImmutableList<ProgramVariable> paramVars,
-                       Services services) {
+                       IServices services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -789,14 +790,14 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     @Override
     public Term getMod(LocationVariable heap, ProgramVariable selfVar, 
                        ImmutableList<ProgramVariable> paramVars,
-                       Services services) {
+                       IServices services) {
        return getAnyMod(this.originalMods.get(heap), selfVar, paramVars, services);
     }
 
     private Term getAnyMod(Term mod, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Services services) {
+                       IServices services) {
 	assert heapTerm != null;	
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -822,7 +823,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     public Term getMod(LocationVariable heap, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Services services) {
+                       IServices services) {
         return getAnyMod(this.originalMods.get(heap), heapTerm, selfTerm, paramTerms, services);
     }    
     

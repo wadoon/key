@@ -49,7 +49,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /** universal namespace of variables, minimum for input in a row */
     private NamespaceSet nss;
     /** the java service object */
-    private Services services;
+    private IServices services;
     /** the abbreviationmap */
     private AbbrevMap scm;
     /** the current goal */
@@ -64,7 +64,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      * @param app the TacletApp where to get the necessary entries
      */
     public TacletInstantiationsTableModel(TacletApp    app, 
-					  Services     services,
+					  IServices     services,
 					  NamespaceSet nss,
 					  AbbrevMap    scm,
 					  Goal	       goal) {
@@ -323,7 +323,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     public static ProgramElement getProgramElement(TacletApp app,
 						   String instantiation,
 						   SchemaVariable sv,
-						   Services services) {
+						   IServices services) {
 	Sort svSort = sv.sort();
 	if (svSort == ProgramSVSort.LABEL) {
 	    return VariableNamer.parseName(instantiation);
@@ -332,7 +332,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	    if (nvc != null) {
 		KeYJavaType kjt;
 		Object o = nvc.getTypeDefiningObject();
-		JavaInfo javaInfo = services.getJavaInfo ();
+		IProgramInfo javaInfo = services.getJavaInfo ();
 		if (o instanceof SchemaVariable) {
 	            final TypeConverter tc = services.getTypeConverter();
 		    final SchemaVariable peerSV = (SchemaVariable)o;

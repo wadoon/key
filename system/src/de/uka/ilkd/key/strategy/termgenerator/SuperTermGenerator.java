@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
@@ -66,7 +66,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     }
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
-        private Services services;
+        private IServices services;
         private Operator binFunc;
 
         protected SuperTermWithIndexGenerator(TermFeature cond) {
@@ -119,7 +119,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
 
                     public MatchConditions match(SVSubstitute subst, 
                 	    			 MatchConditions mc, 
-                	    			 Services services) {
+                	    			 IServices services) {
                 	return subst == this ? mc : null;
                     }    
                 };

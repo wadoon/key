@@ -18,6 +18,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -355,7 +356,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                    ProgramVariable resultVar, 
                                    ProgramVariable exceptionVar,
                                    Map<LocationVariable, LocationVariable> atPreVars, 
-                                   Services services);
+                                   IServices services);
 
    /**
     * Checks if an uninterpreted predicate is added to the postcondition or not.

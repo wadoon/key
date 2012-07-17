@@ -15,8 +15,8 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
@@ -27,7 +27,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 
 /** 
@@ -67,7 +66,7 @@ public class NoPosTacletApp extends TacletApp {
     public static NoPosTacletApp
 	createNoPosTacletApp(Taclet           taclet, 
 			     SVInstantiations instantiations,
-			     Services         services) {
+			     IServices         services) {
 	return createNoPosTacletApp ( taclet,
 				      instantiations,
 				      null,
@@ -78,7 +77,7 @@ public class NoPosTacletApp extends TacletApp {
 	createNoPosTacletApp(Taclet                       taclet, 
 			     SVInstantiations             instantiations,
 			     ImmutableList<IfFormulaInstantiation> ifInstantiations,
-			     Services                     services) {
+			     IServices                     services) {
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
 
@@ -95,7 +94,7 @@ public class NoPosTacletApp extends TacletApp {
  
     public static NoPosTacletApp createNoPosTacletApp(Taclet             taclet,
 						      MatchConditions    matchCond,
-						      Services           services) {
+						      IServices           services) {
 	return createNoPosTacletApp ( taclet,
 				      matchCond.getInstantiations   (),
 				      null,
@@ -113,7 +112,7 @@ public class NoPosTacletApp extends TacletApp {
     public static NoPosTacletApp
 	createFixedNoPosTacletApp( Taclet             taclet,
 				   SVInstantiations   instantiations,
-				   Services           services) {
+				   IServices           services) {
 	NoPosTacletApp res = createNoPosTacletApp ( taclet,
 						    instantiations,
 						    null,
@@ -192,7 +191,7 @@ public class NoPosTacletApp extends TacletApp {
     public TacletApp addInstantiation(SchemaVariable sv, 
 	    			      Term term,
 				      boolean interesting,
-				      Services services) {
+				      IServices services) {
 	if (interesting)
 	    return createNoPosTacletApp(taclet(), 
 					instantiations()
@@ -211,7 +210,7 @@ public class NoPosTacletApp extends TacletApp {
     public TacletApp addInstantiation(SchemaVariable sv, 
 	    			      Object[] list,
 	    			      boolean interesting,
-	    			      Services services) {
+	    			      IServices services) {
 	if (interesting) {
 	    return createNoPosTacletApp(taclet(), 
 		    			instantiations().addInterestingList(sv, list, services), 
@@ -239,7 +238,7 @@ public class NoPosTacletApp extends TacletApp {
     public TacletApp addInstantiation(SchemaVariable sv, 
 	    			      ProgramElement pe,
 				      boolean interesting,
-				      Services services) {
+				      IServices services) {
 	if (interesting) {
 	    return createNoPosTacletApp(taclet(), 
 					instantiations()
@@ -264,7 +263,7 @@ public class NoPosTacletApp extends TacletApp {
      * @return the new Taclet application
      */
     public TacletApp addInstantiation(SVInstantiations svi,
-	    			      Services services) {
+	    			      IServices services) {
 	return new NoPosTacletApp(taclet(),
 				  svi.union(instantiations(), services),
 				  ifFormulaInstantiations ());
@@ -281,7 +280,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setInstantiation(SVInstantiations svi,
-	    				 Services services) {
+	    				 IServices services) {
 	return new NoPosTacletApp(taclet(), svi,
 				  ifFormulaInstantiations ());
     }
@@ -293,7 +292,7 @@ public class NoPosTacletApp extends TacletApp {
      * by the mc object and forget the old ones
      */
     public TacletApp setMatchConditions(MatchConditions mc,
-	    				Services services) {
+	    				IServices services) {
 	return createNoPosTacletApp( taclet(),
 				     mc.getInstantiations   (),
 				     ifFormulaInstantiations (),
@@ -308,7 +307,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     protected TacletApp setAllInstantiations ( MatchConditions              mc,
 					       ImmutableList<IfFormulaInstantiation> ifInstantiations,
-					       Services                     services) {
+					       IServices                     services) {
 	return createNoPosTacletApp( taclet(),
 				     mc.getInstantiations   (),
 				     ifInstantiations,
@@ -348,7 +347,7 @@ public class NoPosTacletApp extends TacletApp {
      * @return TacletApp with the resulting instantiations or null
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
-				    Services        services) {
+				    IServices        services) {
         NoPosTacletApp result = matchFind(pos, services, null);
 	return result;
     }
@@ -360,7 +359,7 @@ public class NoPosTacletApp extends TacletApp {
        anyway).
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
-				    Services        services,
+				    IServices        services,
 				    Term t) {
         if ((t==null) && (pos!=null)) t = pos.subTerm ();
 
@@ -389,7 +388,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     private NoPosTacletApp evalCheckRes(MatchConditions res, 
-	    			        Services services) {
+	    			        IServices services) {
 	if ( res == null )
 	    return null;
 
@@ -405,7 +404,7 @@ public class NoPosTacletApp extends TacletApp {
 
     
     protected MatchConditions setupMatchConditions(PosInOccurrence pos,
-		  				   Services services) {
+		  				   IServices services) {
 	SVInstantiations svInst = taclet() instanceof NoFindTaclet ? 
                 instantiations   () : instantiations   ().clearUpdateContext ();
         

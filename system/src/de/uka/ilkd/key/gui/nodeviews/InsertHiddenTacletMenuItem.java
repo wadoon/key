@@ -13,7 +13,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.NoFindTaclet;
@@ -38,10 +38,10 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
      * @param parent the JFrame with the parent frame
      * @param notInfo the NotationInfo to be used for pretty printing 
      * the apps
-     * @param services the Services
+     * @param services the IServices
      */
     public InsertHiddenTacletMenuItem(JFrame parent, 
-            NotationInfo notInfo, Services services) {
+            NotationInfo notInfo, IServices services) {
         super("Insert Hidden", parent, notInfo, services);  
     }
  

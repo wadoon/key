@@ -13,7 +13,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -99,7 +99,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private Map /*Operator, Operator, Term -> Term*/<Term, Term> getReplaceMap(
             Term selfTerm,
             Map<LocationVariable,Term> atPres,
-            Services services) {
+            IServices services) {
         final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
         
         //self
@@ -130,7 +130,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private Map<Term,Term> getInverseReplaceMap(
             Term selfTerm,
             Map<LocationVariable,Term> atPres,
-            Services services) {
+            IServices services) {
        final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
        final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
        for(Map.Entry<Term, Term> next: replaceMap.entrySet()) {
@@ -154,7 +154,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public Term getInvariant(LocationVariable heap,
                              Term selfTerm,
             		     Map<LocationVariable,Term> atPres,
-            		     Services services) {
+            		     IServices services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
@@ -164,7 +164,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public Term getModifies(LocationVariable heap, Term selfTerm,
             		    Map<LocationVariable,Term> atPres,
-            		    Services services) {
+            		    IServices services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
@@ -176,7 +176,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public Term getVariant(Term selfTerm, 
             		   Map<LocationVariable,Term> atPres,
-            		   Services services) {
+            		   IServices services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
@@ -230,7 +230,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
             			      Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
-            			      Services services) {
+            			      IServices services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPres, services);

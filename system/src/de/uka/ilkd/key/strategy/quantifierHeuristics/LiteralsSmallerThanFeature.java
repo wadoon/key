@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -36,7 +36,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         new QuanEliminationAnalyser ();
     
     // ugly, but we need some services
-    private Services               services = null;
+    private IServices               services = null;
     private PosInOccurrence        focus = null;
 
     private LiteralsSmallerThanFeature(ProjectionToTerm left,
@@ -61,7 +61,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     protected boolean compareTerms(Term leftTerm, Term rightTerm,
-                                   PosInOccurrence pos, Services p_services) {
+                                   PosInOccurrence pos, IServices p_services) {
         services = p_services;
         focus = pos;
         

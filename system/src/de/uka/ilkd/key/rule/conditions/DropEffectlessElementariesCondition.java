@@ -12,10 +12,16 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -83,7 +89,7 @@ public final class DropEffectlessElementariesCondition
     
     private static Term dropEffectlessElementaries(Term update, 
 	    					   Term target,
-	    					   Services services) {
+	    					   IServices services) {
 	TermProgramVariableCollector collector 
 		= new TermProgramVariableCollector(services);
 	target.execPostOrder(collector);
@@ -100,7 +106,7 @@ public final class DropEffectlessElementariesCondition
     public MatchConditions check(SchemaVariable var, 
 	    		  	 SVSubstitute instCandidate, 
 	    		  	 MatchConditions mc, 
-	    		  	 Services services) {
+	    		  	 IServices services) {
 	SVInstantiations svInst = mc.getInstantiations();
 	Term uInst      = (Term) svInst.getInstantiation(u);
 	Term xInst      = (Term) svInst.getInstantiation(x);

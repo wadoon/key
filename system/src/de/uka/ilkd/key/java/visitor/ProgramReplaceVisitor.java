@@ -10,8 +10,8 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -41,7 +41,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
      * @param root the ProgramElement where to begin
      */
     public ProgramReplaceVisitor(ProgramElement root,
-				 Services services, 
+				 IServices services, 
 				 SVInstantiations svi,
 				 boolean allowPartialReplacement) {
 	super(root, false, services);

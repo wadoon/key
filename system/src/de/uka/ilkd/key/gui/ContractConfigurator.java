@@ -17,7 +17,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.speclang.Contract;
 
 
@@ -39,7 +39,7 @@ public class ContractConfigurator extends JDialog {
     //-------------------------------------------------------------------------
     
     public ContractConfigurator(JDialog owner,
-            		        Services services, 
+            		        IServices services, 
             		        Contract[] contracts,
             		        String title,
             		        boolean allowMultipleContracts) {
@@ -52,7 +52,7 @@ public class ContractConfigurator extends JDialog {
     
     
     public ContractConfigurator(Frame owner,
-                                Services services,
+                                IServices services,
                                 Contract[] contracts,
                                 String title,
                                 boolean allowMultipleContracts) {
@@ -71,7 +71,7 @@ public class ContractConfigurator extends JDialog {
     /**
      * Helper for constructors.
      */
-    private void init(Services services, 
+    private void init(IServices services, 
                       Contract[] contracts,
                       String title,
                       boolean allowMultipleContracts) {        

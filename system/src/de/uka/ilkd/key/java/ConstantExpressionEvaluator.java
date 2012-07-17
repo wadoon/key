@@ -32,7 +32,7 @@ public class ConstantExpressionEvaluator {
 	services = s;
     }
 
-    public Services getServices() {
+    public IServices getServices() {
 	return services;
     }
 

@@ -22,5 +22,5 @@ public interface Expression extends ProgramElement {
     /** 
      * returns the {@link KeYJavaType} of an expression 
      */
-    KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
+    KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec);
 }

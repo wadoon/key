@@ -32,7 +32,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -150,7 +150,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             return;
         }
              
-        final Services services = seqView.mediator().getServices();
+        final IServices services = seqView.mediator().getServices();
 
         ImmutableList<PosTacletApp> applicableApps = 
             getAllApplicableApps(sourcePos, targetPos, services);        
@@ -200,7 +200,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      */
     private ImmutableList<PosTacletApp>  getAllApplicableApps(final PosInSequent sourcePos, 
             					    final PosInSequent targetPos, 
-            					    final Services services) {        
+            					    final IServices services) {        
         final Sequent sequent = 
             seqView.mediator().getSelectedGoal().sequent();
         
@@ -232,14 +232,14 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * returns all applicable apps respecting direction information in drag an drop 
      * @param sourcePos PosInSequent where the drag gesture started
      * @param targetPos PosInSequent where the drop action took place
-     * @param services the Services
+     * @param services the IServices
      * @param sequent the Sequent 
      * @return  all applicable apps respecting direction information in drag an drop
      */
     private ImmutableList<PosTacletApp>  getDirectionDependentApps(
 	    final PosInSequent sourcePos, 
             final PosInSequent targetPos, 
-            final Services services,
+            final IServices services,
             final Sequent sequent) {
         
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
@@ -285,14 +285,14 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * respecting direction information in drag an drop 
      * @param sourcePos PosInSequent where the drag gesture started
      * @param targetPos PosInSequent where the drop action took place
-     * @param services the Services
+     * @param services the IServices
      * @param sequent the Sequent 
      * @return  all applicable apps respecting direction information in drag an drop
      */
     private ImmutableList<PosTacletApp>  getDirectionIndependentApps(
 	    PosInSequent sourcePos, 
             PosInSequent targetPos, 
-            final Services services,
+            final IServices services,
             final Sequent sequent) {
         
         return getDirectionDependentApps(sourcePos, targetPos, services,
@@ -321,7 +321,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      */
     private ImmutableList<PosTacletApp>  getApplicableTaclets(PosInSequent findPos,
             				            TacletFilter filter,
-            				            Services services) {
+            				            IServices services) {
 
         if (findPos == null || findPos.isSequent()) {
             return ImmutableSLList.<PosTacletApp>nil();
@@ -360,7 +360,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp>  addPositionInformation(
             ImmutableList<TacletApp>  tacletApps, 
             PosInOccurrence findPos,
-            Services services) {
+            IServices services) {
 
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
         for (TacletApp tacletApp : tacletApps) {
@@ -391,11 +391,11 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * is relative to
      * @param ifPIO the PosInOccurrence describing the position of the term to 
      * be matched against the if sequent of the taclets
-     * @param services the Services 
+     * @param services the IServices 
      * @return the IList<PosTacletApp> that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
-            Sequent seq, PosInOccurrence ifPIO, Services services) {
+            Sequent seq, PosInOccurrence ifPIO, IServices services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
 
@@ -456,11 +456,11 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * is relative to
      * @param missingSVPIO the PosInOccurrence describing the position of the term an 
      * uninstantiated SV will be matched against 
-     * @param services the Services 
+     * @param services the IServices 
      * @return the IList<PosTacletApp> that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
-             PosInOccurrence missingSVPIO, Services services) {
+             PosInOccurrence missingSVPIO, IServices services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
         if (missingSVPIO == null) {        

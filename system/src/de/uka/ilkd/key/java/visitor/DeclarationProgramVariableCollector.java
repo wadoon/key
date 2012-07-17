@@ -13,8 +13,8 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
@@ -39,7 +39,7 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
     /** creates a new declaration visitor */
     public DeclarationProgramVariableCollector(ProgramElement root, 
-                                               Services services) {
+                                               IServices services) {
 	super(root, services);
     }
     

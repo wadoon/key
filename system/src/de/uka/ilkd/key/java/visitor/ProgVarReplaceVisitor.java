@@ -16,8 +16,8 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -25,7 +25,13 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.ExtList;
@@ -56,7 +62,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param st the statement where the prog vars are replaced
      * @param map the HashMap with the replacements
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map map, Services services) {
+    public ProgVarReplaceVisitor(ProgramElement st, Map map, IServices services) {
 	super(st, true, services);
 	this.replaceMap = map;
         assert services != null;
@@ -73,7 +79,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     public ProgVarReplaceVisitor(ProgramElement st, 
                                  Map map, 
                                  boolean replaceall, 
-                                 Services services) {
+                                 IServices services) {
         this(st, map, services);
         this.replaceallbynew = replaceall;
     }

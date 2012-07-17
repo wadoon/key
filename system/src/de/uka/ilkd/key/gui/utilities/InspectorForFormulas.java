@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui.utilities;
 import java.io.StringReader;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexer;
@@ -15,12 +15,12 @@ import de.uka.ilkd.key.parser.ParserMode;
  */
 public class InspectorForFormulas implements CheckedUserInputInspector{
 
-    private final Services services;
+    private final IServices services;
 
     
     
     
-    public InspectorForFormulas(Services services) {
+    public InspectorForFormulas(IServices services) {
         super();
         this.services = services;
     }
@@ -45,7 +45,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
 
     }
     
-    public static Term translate(Services services, String toBeChecked){
+    public static Term translate(IServices services, String toBeChecked){
         try {
             KeYParser parser =
                     new KeYParser (ParserMode.TERM, new KeYLexer ( new StringReader ( toBeChecked ),

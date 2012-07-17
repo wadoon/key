@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -72,7 +72,7 @@ public class QueryExpandCost implements Feature {
     
 	@Override
 	public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
-		final Services services = goal.proof().getServices();
+		final IServices services = goal.proof().getServices();
 		final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 		final Term t = pos.subTerm();
 
@@ -121,7 +121,7 @@ public class QueryExpandCost implements Feature {
 	 * @return Cost that is computed base on the integer literals occurring in the numerical arguments of the query t.
 	 * @see <code>literalsToCost</code>
 	 */
-	private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv){
+	private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, IServices serv){
 		final Namespace sorts = serv.getNamespaces().sorts();
 		final Sort intSort = (Sort) sorts.lookup(IntegerLDT.NAME);
 		int cost=0;
@@ -144,7 +144,7 @@ public class QueryExpandCost implements Feature {
               (*) The sum is modified by extrapolating negative numbers from zero by one. The
                   cost of a query f(n-1) a slightly higher cost than the cost of f(n+1).
      */
-	private static int sumOfAbsLiteralsTimesTwo(Term t, IntegerLDT iLDT, Services serv){
+	private static int sumOfAbsLiteralsTimesTwo(Term t, IntegerLDT iLDT, IServices serv){
 		//if(t.op() instanceof Function && iLDT.hasLiteralFunction((Function)t.op())){
 		if(t.op() == iLDT.getNumberSymbol()){
 			String strVal = AbstractTermTransformer.convertToDecimalString(t, serv);

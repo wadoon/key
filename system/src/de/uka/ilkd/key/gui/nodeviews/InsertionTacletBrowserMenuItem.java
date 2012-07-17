@@ -23,7 +23,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -50,13 +50,13 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
     /** the selected taclet to be applied */
     private TacletApp selectedTaclet;
     /** the services */
-    protected Services services;
+    protected IServices services;
     
     /** the base title; used title = basetitle + ( nrOfItems ) */
     private String baseTitle;
 
     public InsertionTacletBrowserMenuItem(String title, JFrame parent, 
-            NotationInfo notInfo, Services services) {
+            NotationInfo notInfo, IServices services) {
         
         super(title);
         this.baseTitle = title;
@@ -276,11 +276,11 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
     static class TacletAppListItem {
         private final TacletApp app;
         private final NotationInfo notInfo;
-        private final Services services;
+        private final IServices services;
         private final Sequent seq;
         
         public TacletAppListItem(TacletApp app, Sequent seq, NotationInfo notInfo, 
-                Services services) {
+                IServices services) {
             this.app      = app;
             this.seq = seq;
             this.notInfo  =  notInfo;

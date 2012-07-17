@@ -11,7 +11,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -26,7 +26,7 @@ public final class MetaJavaIntShiftLeft extends AbstractTermTransformer {
     }
 
     
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices services) {
 	Term arg1 = term.sub(0);
 	Term arg2 = term.sub(1);
 	BigInteger intArg1;

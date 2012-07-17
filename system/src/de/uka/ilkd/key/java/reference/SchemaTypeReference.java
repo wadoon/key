@@ -11,9 +11,9 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -47,13 +47,13 @@ public class SchemaTypeReference extends TypeReferenceImp
 	return null;
     }
 
-    public KeYJavaType getKeYJavaType(Services services) {
+    public KeYJavaType getKeYJavaType(IServices services) {
 	KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fullName);
 	assert kjt != null : "KeYJavaType is null for SchemaTypeReference " + this + " - " + fullName; 
         return kjt;
     }
 
-    public ProgramElement getConcreteProgramElement(Services services) {
+    public ProgramElement getConcreteProgramElement(IServices services) {
         return new TypeRef(getKeYJavaType(services));
     }
 

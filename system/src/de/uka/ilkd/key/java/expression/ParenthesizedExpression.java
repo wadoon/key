@@ -123,7 +123,7 @@ public class ParenthesizedExpression extends Operator
 	return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
 	return getExpressionAt(0).getKeYJavaType(javaServ, ec);
     }
 

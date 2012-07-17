@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -56,7 +56,7 @@ public class RootsGenerator implements TermGenerator {
     }
 
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Services services = goal.proof ().getServices ();
+        final IServices services = goal.proof ().getServices ();
         final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
         
         final Term powerRel = powerRelation.toTerm ( app, pos, goal );
@@ -100,7 +100,7 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Term breakDownEq(Term var, BigInteger lit, int pow,
-                             Services services) {
+                             IServices services) {
         final Term zero = tb.zero(services);
 
         if ( ( pow % 2 == 0 ) ) {
@@ -146,7 +146,7 @@ public class RootsGenerator implements TermGenerator {
         return null;
     }
 
-    private Term breakDownGeq(Term var, BigInteger lit, int pow, Services services) {
+    private Term breakDownGeq(Term var, BigInteger lit, int pow, IServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
             
@@ -175,7 +175,7 @@ public class RootsGenerator implements TermGenerator {
         return null;
     }
 
-    private Term breakDownLeq(Term var, BigInteger lit, int pow, Services services) {
+    private Term breakDownLeq(Term var, BigInteger lit, int pow, IServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
             

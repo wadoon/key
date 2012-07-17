@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -19,14 +19,14 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 
 public class InspectorForDecisionPredicates implements CheckedUserInputInspector{
 
-    private final Services services;
+    private final IServices services;
     private final Node node;
     private final int  cutMode;
     private final List<ApplicationCheck> additionalChecks = new LinkedList<ApplicationCheck>();
     
     
     
-    public InspectorForDecisionPredicates(Services services, Node node, int cutMode,
+    public InspectorForDecisionPredicates(IServices services, Node node, int cutMode,
     		List<ApplicationCheck> additionalChecks) {
         super();
         this.services = services;
@@ -71,7 +71,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     }
     
-    public static Term translate(Services services, String toBeChecked){
+    public static Term translate(IServices services, String toBeChecked){
         try {
             KeYParser parser =
                     new KeYParser (ParserMode.TERM, new KeYLexer ( new StringReader ( toBeChecked ),

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -36,7 +36,7 @@ class TwoSidedMatching {
     private final Substitution triggerSubstWithMVs;
     private final Term targetWithMVs;
     
-    TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
+    TwoSidedMatching(UniTrigger trigger, Term targetTerm, IServices services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm );
@@ -57,7 +57,7 @@ class TwoSidedMatching {
         }
     }
     
-    ImmutableSet<Substitution> getSubstitutions(Services services) {
+    ImmutableSet<Substitution> getSubstitutions(IServices services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
             return DefaultImmutableSet.<Substitution>nil();
@@ -65,7 +65,7 @@ class TwoSidedMatching {
 	return getAllSubstitutions ( targetWithMVs, services );
     }
     
-    private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
+    private ImmutableSet<Substitution> getAllSubstitutions(Term target, IServices services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
@@ -86,7 +86,7 @@ class TwoSidedMatching {
     
     /** find a substitution in a allterm by using unification */
     private Substitution match(Term triggerTerm, Term targetTerm, 
-            Services services) {
+            IServices services) {
         final Constraint c =
             Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
                                       services );

@@ -2,7 +2,7 @@ package de.uka.ilkd.key.proof.delayedcut;
 
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -52,7 +52,7 @@ public class DelayedCut {
             return firstAppliedRuleApp;
         }
         
-        public Services getServices(){
+        public IServices getServices(){
             return proof.getServices();
         }
         public Node getNode() {

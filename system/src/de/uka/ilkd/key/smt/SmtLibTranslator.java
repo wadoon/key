@@ -12,7 +12,7 @@ package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
@@ -72,16 +72,16 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
      * @param sequent
      *                The sequent which shall be translated.
      *                
-     * @param services The Services Object belonging to the sequent.
+     * @param services The IServices Object belonging to the sequent.
      */
-    public SmtLibTranslator(Sequent sequent, Services services, Configuration config) {
+    public SmtLibTranslator(Sequent sequent, IServices services, Configuration config) {
 	super(sequent, services,config);
     }
 
     /**
      * For translating only terms and not complete sequents.
      */
-    public SmtLibTranslator(Services s,Configuration config) {
+    public SmtLibTranslator(IServices s,Configuration config) {
 	super(s,config);
     }
 

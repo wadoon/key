@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -53,7 +53,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     * {@inheritDoc}
     */
    @Override
-   public Services getServices() {
+   public IServices getServices() {
       return getProof().getServices();
    }
 

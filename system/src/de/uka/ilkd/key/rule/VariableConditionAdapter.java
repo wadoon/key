@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -41,7 +42,7 @@ public abstract class VariableConditionAdapter implements VariableCondition {
     public final MatchConditions check(SchemaVariable var, 
 	    			       SVSubstitute instCandidate, 
 	    			       MatchConditions mc, 
-	    			       Services services) {
+	    			       IServices services) {
 	return check(var, 
 		     instCandidate, 
 		     mc.getInstantiations(), 

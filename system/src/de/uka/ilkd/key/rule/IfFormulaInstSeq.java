@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -96,7 +96,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 	return toString(null);
     }
     
-    public String toString (Services services) {
+    public String toString (IServices services) {
         return ProofSaver.printAnything(cf.formula(), services);
     }
 

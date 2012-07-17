@@ -10,16 +10,29 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -67,7 +80,7 @@ public class Proof implements Named {
     private String problemHeader = "";
 
     /** the java information object: JavaInfo+TypeConverter */
-    private final Services services;
+    private final IServices services;
 
     /** maps the Abbreviations valid for this proof to their corresponding terms.*/
     private AbbrevMap abbreviations = new AbbrevMap();
@@ -100,7 +113,7 @@ public class Proof implements Named {
     
 
     /** constructs a new empty proof with name */
-    private Proof(Name name, Services services, ProofSettings settings) {
+    private Proof(Name name, IServices services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
 	this.services = services.copyProofSpecific(this);
@@ -131,20 +144,20 @@ public class Proof implements Named {
 
     
     /** constructs a new empty proof */
-    public Proof(Services services) {
+    public Proof(IServices services) {
 	this ( "", services );
     }
 
 
     /** constructs a new empty proof with name */
-    public Proof(String name, Services services) {
+    public Proof(String name, IServices services) {
 	this ( new Name ( name ),
                services,
                new ProofSettings ( ProofSettings.DEFAULT_SETTINGS ) );
     }
     
     private Proof(String name, Sequent problem, TacletIndex rules,
-            BuiltInRuleIndex builtInRules, Services services,
+            BuiltInRuleIndex builtInRules, IServices services,
             ProofSettings settings) {
 
         this ( new Name ( name ), services, settings );
@@ -164,7 +177,7 @@ public class Proof implements Named {
     }
     
     public Proof(String name, Term problem, String header, TacletIndex rules,
-         BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
+         BuiltInRuleIndex builtInRules, IServices services, ProofSettings settings) {
         this ( name, Sequent.createSuccSequent
                  (Semisequent.EMPTY_SEMISEQUENT.insert(0, 
                          new SequentFormula(problem)).semisequent()), 
@@ -174,7 +187,7 @@ public class Proof implements Named {
     
     
     public Proof(String name, Sequent sequent, String header, TacletIndex rules,
-            BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
+            BuiltInRuleIndex builtInRules, IServices services, ProofSettings settings) {
         this ( name, sequent, rules, builtInRules, services, settings );
         problemHeader = header;
     }
@@ -206,7 +219,7 @@ public class Proof implements Named {
                   String header,
                   TacletIndex rules,
                   BuiltInRuleIndex builtInRules,
-                  Services services) {
+                  IServices services) {
         this ( name,
                problem,
                header,
@@ -242,13 +255,8 @@ public class Proof implements Named {
 	return getServices().getNamespaces();
     }
 
-    /** returns the JavaInfo with the java type information */
-    public JavaInfo getJavaInfo() {
-	return getServices().getJavaInfo();
-    }
-
     /** returns the Services with the java service classes */
-    public Services getServices() {
+    public IServices getServices() {
        return services;
     }
 

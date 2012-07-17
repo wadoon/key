@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -55,7 +55,7 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     	return result;
     }
 
-    public String toString(Services services) {
+    public String toString(IServices services) {
         return ProofSaver.printAnything(cf.formula(), services);       
     }
 }

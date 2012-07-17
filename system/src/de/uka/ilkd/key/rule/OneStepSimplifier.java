@@ -22,6 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -321,7 +322,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      * actually used context formulas are passed out as "ifInsts". 
      */
     private SequentFormula replaceKnown(
-	    				Services services, 
+	    				IServices services, 
 	                             	SequentFormula cf,
 	                             	Map<Term,PosInOccurrence> context,
 	                             	/*out*/ List<PosInOccurrence> ifInsts) {
@@ -478,7 +479,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     
     @Override
     public ImmutableList<Goal> apply(Goal goal, 
-	    			     Services services, 
+	    			     IServices services, 
 	    			     RuleApp ruleApp) {
 	final ImmutableList<Goal> result = goal.split(1);
 	final Goal resultGoal = result.head();

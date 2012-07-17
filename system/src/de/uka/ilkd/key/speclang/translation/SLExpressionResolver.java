@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
@@ -32,7 +32,7 @@ public abstract class SLExpressionResolver {
     protected static final TermBuilder TB = TermBuilder.DF;        
 
     protected final JavaInfo javaInfo;
-    protected final Services services;
+    protected final IServices services;
     protected final SLResolverManager manager;
     protected final KeYJavaType specInClass;
     

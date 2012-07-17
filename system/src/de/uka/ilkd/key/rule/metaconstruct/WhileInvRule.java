@@ -52,7 +52,7 @@ public class WhileInvRule extends AbstractTermTransformer {
     /** The JavaInfo object which is handed over as
      * a parameter of calculate.
      */
-    private JavaInfo javaInfo;
+    private IProgramInfo javaInfo;
     private TypeConverter typeConv;
     private TermFactory tf;
 
@@ -99,7 +99,7 @@ public class WhileInvRule extends AbstractTermTransformer {
     
     
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices services) {
         
         // global initialisation
         init(term, services);
@@ -249,7 +249,7 @@ public class WhileInvRule extends AbstractTermTransformer {
      * to the given basename
      */
     private ProgramVariable getNewLocalvariable
-    (String varNameBase, String varType, Services services) {
+    (String varNameBase, String varType, IServices services) {
         
         return getNewLocalvariable(varNameBase, 
                                    javaInfo.getKeYJavaType(varType), services);
@@ -265,7 +265,7 @@ public class WhileInvRule extends AbstractTermTransformer {
      * to the given basename
      */
     private ProgramVariable getNewLocalvariable
-    (String varNameBase, KeYJavaType varType, Services services) {        
+    (String varNameBase, KeYJavaType varType, IServices services) {        
         return KeYJavaASTFactory.
           localVariable(services.getVariableNamer().
                         getTemporaryNameProposal(varNameBase), varType);

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -73,7 +74,7 @@ public class TacletGenerator {
                                       ImmutableList<ProgramVariable> programVars,
                                       KeYJavaType kjt,
                                       RuleSet ruleSet,
-                                      Services services) {
+                                      IServices services) {
         // create schema terms
         final ImmutableList<SchemaVariable> schemaVars =
                 createSchemaVariables(programVars);
@@ -95,7 +96,7 @@ public class TacletGenerator {
                                         Term originalAxiom,
                                         ImmutableList<ProgramVariable> programVars,
                                         RuleSet ruleSet,
-                                        Services services) {
+                                        IServices services) {
         // create schema terms
         final ImmutableList<SchemaVariable> schemaVars =
                 createSchemaVariables(programVars);
@@ -535,7 +536,7 @@ public class TacletGenerator {
 
     private Pair<Term, ImmutableSet<Taclet>> limitTerm(Term t,
                                                       ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-                                                      Services services) {
+                                                      IServices services) {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
 
         //recurse to subterms
@@ -631,7 +632,7 @@ public class TacletGenerator {
 
     private Term prepareExactInstanceGuard(KeYJavaType kjt,
                                            IObserverFunction target,
-                                           Services services,
+                                           IServices services,
                                            final SchemaVariable selfSV) {
         final boolean finalClass =
                 kjt.getJavaType() instanceof ClassDeclaration

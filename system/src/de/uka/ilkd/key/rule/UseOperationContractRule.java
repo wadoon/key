@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -408,7 +409,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
         
 
-    private Instantiation instantiate(Term focusTerm, Services services) {
+    private Instantiation instantiate(Term focusTerm, IServices services) {
 	//result cached?
 	if(focusTerm == lastFocusTerm) {
 	    return lastInstantiation;
@@ -433,7 +434,7 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Computes instantiation for contract rule on passed focus term.
      * Internally only serves as helper for instantiate(). 
      */
-    public static Instantiation computeInstantiation(Term focusTerm, Services services) {
+    public static Instantiation computeInstantiation(Term focusTerm, IServices services) {
 	//leading update?
 	final Term u;
 	final Term progPost;
@@ -535,7 +536,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     
     @Override    
     public ImmutableList<Goal> apply(Goal goal, 
-	    			     Services services, 
+	    			     IServices services, 
 	    			     RuleApp ruleApp) {
 	//get instantiation
 	final Instantiation inst 

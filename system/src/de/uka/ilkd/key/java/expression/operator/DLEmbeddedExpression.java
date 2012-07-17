@@ -2,6 +2,7 @@ package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -43,7 +44,7 @@ public class DLEmbeddedExpression extends Operator {
      * @see de.uka.ilkd.key.java.expression.Operator#getKeYJavaType(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.java.reference.ExecutionContext)
      */
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
         
         Sort sort = functionSymbol.sort();
         

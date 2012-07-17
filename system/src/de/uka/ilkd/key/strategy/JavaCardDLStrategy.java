@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -531,7 +531,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return d;
     }
 
-    private void setUpStringNormalisation (RuleSetDispatchFeature d, Services services) {
+    private void setUpStringNormalisation (RuleSetDispatchFeature d, IServices services) {
     
 	// translates an integer into its string representation
 	bindRuleSet ( d, "integerToString", -10000);

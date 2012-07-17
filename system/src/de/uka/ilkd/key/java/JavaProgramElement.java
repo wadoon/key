@@ -153,7 +153,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
      *  used to determine program similarity.
      * @param ec TODO
      */
-    public String reuseSignature(Services services, ExecutionContext ec) {
+    public String reuseSignature(IServices services, ExecutionContext ec) {
        final String s = getClass().toString();
        return s.substring(s.lastIndexOf('.')+1, s.length());
     }

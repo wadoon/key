@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -52,9 +52,9 @@ class TestCommons extends TestCase {
     }
     
     
-    private Services services;
+    private IServices services;
     
-    protected Services getServices(){
+    protected IServices getServices(){
 	return services;
     }
 

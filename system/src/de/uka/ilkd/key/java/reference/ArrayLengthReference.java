@@ -77,11 +77,11 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public KeYJavaType getKeYJavaType(IServices javaServ) {
 	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);	
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, 
+    public KeYJavaType getKeYJavaType(IServices javaServ, 
 				      ExecutionContext ec) {
 	return getKeYJavaType(javaServ);
     }

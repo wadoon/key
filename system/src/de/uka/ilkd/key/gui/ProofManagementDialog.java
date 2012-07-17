@@ -49,7 +49,7 @@ import javax.swing.event.TreeSelectionListener;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -84,7 +84,7 @@ public final class ProofManagementDialog extends JDialog {
     private static boolean startedProof;
 
     private InitConfig initConfig;
-    private Services services;
+    private IServices services;
     private SpecificationRepository specRepos;
 
     private JTabbedPane tabbedPane;
@@ -328,7 +328,7 @@ public final class ProofManagementDialog extends JDialog {
             			     		 "Proof Management");
             //determine own defaults if not given
             if(selectedKJT == null || selectedTarget == null) {
-        	Services services = initConfig.getServices();
+        	IServices services = initConfig.getServices();
         	Set<KeYJavaType> kjts 
         		= services.getJavaInfo().getAllKeYJavaTypes();
         	final KeYJavaType[] kjtsarr 

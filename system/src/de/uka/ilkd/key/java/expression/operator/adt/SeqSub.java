@@ -11,8 +11,8 @@
 
 package de.uka.ilkd.key.java.expression.operator.adt;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -58,7 +58,7 @@ public class SeqSub extends Operator {
     
     
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
 	final TypeConverter tc=javaServ.getTypeConverter();
 	return tc.getPromotedType
 	    (tc.getKeYJavaType((de.uka.ilkd.key.java.Expression)getChildAt(0), ec),

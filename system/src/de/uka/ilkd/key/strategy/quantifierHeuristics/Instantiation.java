@@ -17,7 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -50,7 +50,7 @@ class Instantiation {
     /** Terms bound in every formula on <code>goal</code> */
     private final ImmutableSet<Term> matchedTerms;
 
-    private Instantiation(Term allterm, Sequent seq, Services services) {
+    private Instantiation(Term allterm, Sequent seq, IServices services) {
 	firstVar = allterm.varsBoundHere(0).get(0);
 	matrix = TriggerUtils.discardQuantifiers(allterm);
 	matchedTerms = sequentToTerms(seq);
@@ -63,7 +63,7 @@ class Instantiation {
     private static Sequent lastSequent = null;
     private static Instantiation lastResult = null;
 
-    static Instantiation create(Term qf, Sequent seq, Services services) {
+    static Instantiation create(Term qf, Sequent seq, IServices services) {
 	if (qf == lastQuantifiedFormula && seq == lastSequent)
 	    return lastResult;
 
@@ -90,7 +90,7 @@ class Instantiation {
      *            their cost and store the pair of instance (Term) and
      *            cost(Long) in <code>instancesCostCache</code>
      */
-    private void addInstances(ImmutableSet<Term> terms, Services services) {
+    private void addInstances(ImmutableSet<Term> terms, IServices services) {
 	for (final Trigger t : triggersSet.getAllTriggers()) {
 	    for (final Substitution sub : t.getSubstitutionsFromTerms(terms,
 		    services)) {
@@ -102,7 +102,7 @@ class Instantiation {
 	// addArbitraryInstance ();
     }
 
-    private void addArbitraryInstance(Services services) {
+    private void addArbitraryInstance(IServices services) {
 	ImmutableMap<QuantifiableVariable, Term> varMap = DefaultImmutableMap
 	        .<QuantifiableVariable, Term> nilMap();
 
@@ -117,12 +117,12 @@ class Instantiation {
     }
 
     private Term createArbitraryInstantiation(QuantifiableVariable var,
-	    Services services) {
+	    IServices services) {
         return tb.func (var.sort().getCastSymbol (services),
 	        tb.zero(services));
     }
 
-    private void addInstance(Substitution sub, Services services) {
+    private void addInstance(Substitution sub, IServices services) {
 	final long cost = PredictCostProver.computerInstanceCost(sub,
 	        getMatrix(), assumedLiterals, services);
 	if (cost != -1)
@@ -171,7 +171,7 @@ class Instantiation {
      * formula and current goal.
      */
     static RuleAppCost computeCost(Term inst, Term form, Sequent seq,
-	    Services services) {
+	    IServices services) {
 	return Instantiation.create(form, seq, services).computeCostHelp(inst);
     }
 

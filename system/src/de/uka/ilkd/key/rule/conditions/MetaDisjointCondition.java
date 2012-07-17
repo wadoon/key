@@ -12,6 +12,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -35,7 +36,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
     
     private static boolean clearlyDisjoint(Term t1, 
 	    				   Term t2, 
-	    				   Services services) {
+	    				   IServices services) {
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 	if(t1.op() instanceof Function && ((Function)t1.op()).isUnique()
            && t2.op() instanceof Function && ((Function)t2.op()).isUnique()

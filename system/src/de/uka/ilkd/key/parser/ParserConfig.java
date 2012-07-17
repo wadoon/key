@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYRecoderMapping;
 import de.uka.ilkd.key.java.Services;
@@ -18,18 +19,18 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 
 public class ParserConfig {
 
-    private Services services;
+    private IServices services;
     private NamespaceSet nss;
 
     
-    public ParserConfig(Services services, 
+    public ParserConfig(IServices services, 
 			NamespaceSet nss) {
 	this.services = services;
 	this.nss      = nss;
     }
 
 
-    public Services services() {
+    public IServices services() {
 	return services;
     }
 
@@ -37,11 +38,7 @@ public class ParserConfig {
 	return nss;
     }
 
-    public JavaInfo javaInfo() {
-	return services.getJavaInfo();
-    }
-
-    public KeYRecoderMapping keyRecoderMapping() {
+/*    public KeYRecoderMapping keyRecoderMapping() {
 	return services.getJavaInfo().rec2key();
     }
 
@@ -52,6 +49,6 @@ public class ParserConfig {
     public KeYCrossReferenceServiceConfiguration serviceConfiguration() {
 	return services.getJavaInfo().
 	    getKeYProgModelInfo().getServConf();
-    }
+    } */
 
 }

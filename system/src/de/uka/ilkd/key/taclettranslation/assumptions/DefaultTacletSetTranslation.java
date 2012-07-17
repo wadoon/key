@@ -19,7 +19,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -75,7 +75,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
          */
         private HashSet<QuantifiableVariable> usedQuantifiedVariable = new HashSet<QuantifiableVariable>();
 
-        private Services services;
+        private IServices services;
 
         private HashSet<SchemaVariable> usedFormulaSV = new HashSet<SchemaVariable>();
 
@@ -84,7 +84,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
         
         private final SMTSettings settings;
 
-        public DefaultTacletSetTranslation(Services services, SMTSettings settings) {
+        public DefaultTacletSetTranslation(IServices services, SMTSettings settings) {
  
 
                 // translators = translators.append(tt);

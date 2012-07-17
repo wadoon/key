@@ -13,7 +13,7 @@ package de.uka.ilkd.key.rule;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -142,7 +142,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
     
     @Override
     public ImmutableList<Goal> apply(Goal goal, 
-	    			     Services services, 
+	    			     IServices services, 
 	    			     RuleApp ruleApp) {
 	final PosInOccurrence pio = ruleApp.posInOccurrence();
 	final ImmutableList<Goal> result = goal.split(1);	

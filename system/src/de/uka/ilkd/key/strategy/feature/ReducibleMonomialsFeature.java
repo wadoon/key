@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -58,7 +58,7 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         final Term dividendT = dividend.toTerm ( app, pos, goal );
         final Term divisorT = divisor.toTerm ( app, pos, goal );
         
-        final Services services = goal.proof().getServices();
+        final IServices services = goal.proof().getServices();
         final Monomial mDividend = Monomial.create ( dividendT, services );
         final Monomial mDivisor = Monomial.create ( divisorT, services );
         

@@ -12,7 +12,7 @@ package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -82,7 +82,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 	}
 
 	@Override
-	public ImmutableList<Goal> apply(Goal goal, Services services,
+	public ImmutableList<Goal> apply(Goal goal, IServices services,
 	        RuleApp ruleApp) {
 		if (goal.proof().env().getJustifInfo().getJustification(rule) == null) {
 			goal.proof().env().getJustifInfo().addJustification(rule,

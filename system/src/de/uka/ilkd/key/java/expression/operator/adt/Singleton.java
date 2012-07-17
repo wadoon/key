@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.java.expression.operator.adt;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -49,7 +49,7 @@ public class Singleton extends Operator {
         return 1;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
 	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     }    
 }

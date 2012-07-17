@@ -12,7 +12,7 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -59,10 +59,10 @@ public abstract class ComparativeOperator extends Operator {
         return INFIX;
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {
 	return getKeYJavaType(services);
     }
-    public KeYJavaType getKeYJavaType(Services services) {
+    public KeYJavaType getKeYJavaType(IServices services) {
 	return services.getTypeConverter().getBooleanType();
     }
 

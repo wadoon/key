@@ -45,7 +45,7 @@ public final class JavaTools {
      * Returns the passed java block without its active statement.
      */
     public static JavaBlock removeActiveStatement(JavaBlock jb, 
-                              Services services) {
+                              IServices services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
         Statement newProg = (Statement)
@@ -83,7 +83,7 @@ public final class JavaTools {
      * Returns the innermost method frame of the passed java block
      */
     public static MethodFrame getInnermostMethodFrame(JavaBlock jb, 
-                                      Services services) { 
+                                      IServices services) { 
         final ProgramElement pe = jb.program();
         final MethodFrame result = new JavaASTVisitor(pe, services) {
             private MethodFrame res;
@@ -107,7 +107,7 @@ public final class JavaTools {
 
     public static ExecutionContext getInnermostExecutionContext(
         						JavaBlock jb, 
-        						Services services) {
+        						IServices services) {
     final MethodFrame frame = getInnermostMethodFrame(jb, services);
     return frame == null 
                ? null

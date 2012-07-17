@@ -4,11 +4,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.HeapContext;
 
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
@@ -61,7 +60,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * @return list of new created goals 
      */
     @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
+    public ImmutableList<Goal> execute(Goal goal, IServices services) {
     goal.addAppliedRuleApp(this);	
     ImmutableList<Goal> result = null;
     try {

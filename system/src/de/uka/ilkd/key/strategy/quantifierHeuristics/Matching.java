@@ -12,7 +12,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 
 /**
@@ -37,7 +37,7 @@ class Matching {
 
     public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger,
                                                      Term targetTerm, 
-                                                     Services services) {
+                                                     IServices services) {
         TwoSidedMatching tsm = new TwoSidedMatching ( trigger, targetTerm, services );
         return tsm.getSubstitutions (services);
     }      

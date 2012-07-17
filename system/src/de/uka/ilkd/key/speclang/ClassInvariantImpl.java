@@ -13,7 +13,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
@@ -80,7 +80,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     
     private Map<Operator, Operator> getReplaceMap(
                 ParsableVariable selfVar, 
-                Services services) {
+                IServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
         
         if(selfVar != null && originalSelfVar != null) {
@@ -116,7 +116,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     
     
     @Override
-    public Term getInv(ParsableVariable selfVar, Services services) {
+    public Term getInv(ParsableVariable selfVar, IServices services) {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);

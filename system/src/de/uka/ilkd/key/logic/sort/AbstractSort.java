@@ -12,7 +12,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
@@ -44,7 +44,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override
-    public final ImmutableSet<Sort> extendsSorts(Services services) {
+    public final ImmutableSet<Sort> extendsSorts(IServices services) {
 	return extendsSorts();
     }
 
@@ -82,7 +82,7 @@ public abstract class AbstractSort implements Sort {
     
 
     @Override
-    public final SortDependingFunction getCastSymbol(Services services) {
+    public final SortDependingFunction getCastSymbol(IServices services) {
         SortDependingFunction result
             = SortDependingFunction.getFirstInstance(CAST_NAME, services)
         			   .getInstanceFor(this, services);
@@ -92,7 +92,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override    
-    public final SortDependingFunction getInstanceofSymbol(Services services) {
+    public final SortDependingFunction getInstanceofSymbol(IServices services) {
 	SortDependingFunction result
 	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);
@@ -102,7 +102,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override
-    public final SortDependingFunction getExactInstanceofSymbol(Services services) {
+    public final SortDependingFunction getExactInstanceofSymbol(IServices services) {
 	SortDependingFunction result
             = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);

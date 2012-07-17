@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -89,7 +90,7 @@ public final class HeapLDT extends LDT {
     //constructors
     //------------------------------------------------------------------------- 
     
-    public HeapLDT(Services services) {
+    public HeapLDT(IServices services) {
 	super(NAME, services);
 	final Namespace sorts    = services.getNamespaces().sorts();
 	final Namespace progVars = services.getNamespaces().programVariables();
@@ -189,7 +190,7 @@ public final class HeapLDT extends LDT {
     /**
      * Returns the select function for the given sort.
      */
-    public Function getSelect(Sort instanceSort, Services services) {
+    public Function getSelect(Sort instanceSort, IServices services) {
 	return select.getInstanceFor(instanceSort, services);
     }
     
@@ -244,24 +245,24 @@ public final class HeapLDT extends LDT {
     }
     
         
-    public Function getClassPrepared(Sort instanceSort, Services services) {
+    public Function getClassPrepared(Sort instanceSort, IServices services) {
 	return classPrepared.getInstanceFor(instanceSort, services);
     }
     
     
-    public Function getClassInitialized(Sort instanceSort, Services services) {
+    public Function getClassInitialized(Sort instanceSort, IServices services) {
 	return classInitialized.getInstanceFor(instanceSort, services);
     }
     
     
     public Function getClassInitializationInProgress(Sort instanceSort, 
-	    					     Services services) {
+	    					     IServices services) {
 	return classInitializationInProgress.getInstanceFor(instanceSort, 
 							    services);
     }
     
     
-    public Function getClassErroneous(Sort instanceSort, Services services) {
+    public Function getClassErroneous(Sort instanceSort, IServices services) {
 	return classErroneous.getInstanceFor(instanceSort, services);
     }
     
@@ -333,7 +334,7 @@ public final class HeapLDT extends LDT {
      * side effect.
      */
     public Function getFieldSymbolForPV(LocationVariable fieldPV, 
-	    				Services services) {
+	    				IServices services) {
 	assert fieldPV.isMember();	
 	assert fieldPV != services.getJavaInfo().getArrayLength();
 	
@@ -407,14 +408,14 @@ public final class HeapLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 Term sub, 
-	    			 Services services, 
+	    			 IServices services, 
 	    			 ExecutionContext ec) {
 	return false;
     }
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, IServices services) {
 	assert false;
 	return null;
     }

@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -50,7 +50,7 @@ public class Polynomial {
     public final static Polynomial ONE =
         new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );    
 
-    public static Polynomial create(Term polyTerm, Services services) {
+    public static Polynomial create(Term polyTerm, IServices services) {
         Polynomial res = polynomialCache.get ( polyTerm );
         if ( res == null ) {
             res = createHelp ( polyTerm, services );
@@ -59,7 +59,7 @@ public class Polynomial {
         return res;
     }
 
-    private static Polynomial createHelp(Term polynomial, Services services) {
+    private static Polynomial createHelp(Term polynomial, IServices services) {
         final Analyser a = new Analyser ( services );
         a.analyse ( polynomial );
         return new Polynomial ( a.parts, a.constantPart );
@@ -189,7 +189,7 @@ public class Polynomial {
         return difference ( parts, p.parts ).isEmpty ();
     }
     
-    public Term toTerm (Services services) {
+    public Term toTerm (IServices services) {
         final Operator add = 
             services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;
@@ -224,11 +224,11 @@ public class Polynomial {
     private static class Analyser {
         public BigInteger constantPart = BigInteger.ZERO;
         public ImmutableList<Monomial> parts = ImmutableSLList.<Monomial>nil();
-        private final Services services;
+        private final IServices services;
         private final TypeConverter tc;
         private final Operator numbers, add;
             
-        public Analyser(final Services services) {
+        public Analyser(final IServices services) {
             this.services = services;
             this.tc = services.getTypeConverter ();
             final IntegerLDT intLDT = tc.getIntegerLDT ();

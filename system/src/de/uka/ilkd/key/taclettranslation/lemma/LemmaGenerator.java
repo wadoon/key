@@ -3,7 +3,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
@@ -15,7 +15,7 @@ import de.uka.ilkd.key.taclettranslation.TacletTranslator;
  * of the taclet.
  */
 public interface LemmaGenerator extends TacletTranslator {
-         public TacletFormula translate(Taclet taclet, Services services);
+         public TacletFormula translate(Taclet taclet, IServices services);
 }
 
 class LemmaFormula implements TacletFormula {

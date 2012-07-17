@@ -12,7 +12,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.HashSet;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
@@ -21,10 +21,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 public class TermProgramVariableCollector extends Visitor {
 
     private final HashSet<LocationVariable> result = new HashSet<LocationVariable> ();
-    private final Services services;
+    private final IServices services;
 
     
-    public TermProgramVariableCollector(Services services) {
+    public TermProgramVariableCollector(IServices services) {
         this.services = services;
     }
         

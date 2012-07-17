@@ -209,12 +209,12 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     
     /** overriden from JavaProgramElement. 
      */
-    public String reuseSignature(Services services, ExecutionContext ec) {
+    public String reuseSignature(IServices services, ExecutionContext ec) {
        return super.reuseSignature(services, ec)+"("+
           services.getTypeConverter().getKeYJavaType(this, ec).getName()+")";
     }
 
-    public abstract KeYJavaType getKeYJavaType(Services javaServ, 
+    public abstract KeYJavaType getKeYJavaType(IServices javaServ, 
 					       ExecutionContext ec);
 
 }

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -115,7 +116,7 @@ public class MethodCall extends ProgramTransformer {
     
 
     /** gets an array of expression and returns a list of types */
-    private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args, Services services) {        
+    private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args, IServices services) {        
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil(); 
 	for (int i = args.size()-1; i >= 0 ; i--) {
 	    Expression argument = args.get(i);

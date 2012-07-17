@@ -15,7 +15,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -39,14 +39,14 @@ public final class ProgVarReplacer {
     /**
      * The services object
      */
-    private final Services services;
+    private final IServices services;
 
 
     /**
      * creates a ProgVarReplacer that replaces program variables as specified
      * by the map parameter
      */
-    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, IServices services) {
         this.map = map;
         this.services = services;
     }

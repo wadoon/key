@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
@@ -44,7 +44,7 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      * @throws IllegalArgumentException
      *             if the pv is neither a constant nor ntc.
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices services) {
         term = term.sub(0);
         Operator op = term.op();
 

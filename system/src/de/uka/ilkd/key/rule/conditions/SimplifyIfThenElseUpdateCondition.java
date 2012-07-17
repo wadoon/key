@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -56,7 +56,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
             rhs2 = identity;
         }
         
-        public Term createIfElseTerm(Term phi, Services services){
+        public Term createIfElseTerm(Term phi, IServices services){
             if(rhs1.equals(rhs2)){
                 return TermBuilder.DF.elementary(services, op, rhs1);
             }
@@ -146,7 +146,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     }
 
-    private Term simplify(Term phi, Term u1, Term u2, Term t, Services services){
+    private Term simplify(Term phi, Term u1, Term u2, Term t, IServices services){
 
         TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map = createMap();
         
@@ -170,7 +170,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var,
             SVSubstitute instCandidate, MatchConditions mc,
-            Services services) {
+            IServices services) {
         SVInstantiations svInst = mc.getInstantiations();
         
         Term u1Inst      = (Term) svInst.getInstantiation(u1);

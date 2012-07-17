@@ -23,7 +23,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -111,7 +111,7 @@ public final class LogicPrinter {
     private final NotationInfo notationInfo;
 
     /** the services object */
-    private final Services services;
+    private final IServices services;
 
     /** This chooses the layout. */
     private Layouter layouter;
@@ -126,7 +126,7 @@ public final class LogicPrinter {
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
     
     
-    public static String quickPrintTerm(Term t, Services services) {
+    public static String quickPrintTerm(Term t, IServices services) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services);
@@ -142,7 +142,7 @@ public final class LogicPrinter {
         return p.result().toString();
     }
     
-    public static String quickPrintSemisequent(Semisequent s, Services services) {
+    public static String quickPrintSemisequent(Semisequent s, IServices services) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services);
@@ -160,7 +160,7 @@ public final class LogicPrinter {
     }
     
     
-    public static String quickPrintSequent(Sequent s, Services services) {
+    public static String quickPrintSequent(Sequent s, IServices services) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services);
@@ -187,7 +187,7 @@ public final class LogicPrinter {
     public LogicPrinter(ProgramPrinter prgPrinter,
                         NotationInfo notationInfo,
                         Backend backend, 
-                        Services services,
+                        IServices services,
                         boolean purePrint) {
 	this.backend      = backend;
 	this.layouter     = new Layouter(backend,2);
@@ -208,11 +208,11 @@ public final class LogicPrinter {
      *
      * @param prgPrinter   the ProgramPrinter that pretty-prints Java programs
      * @param notationInfo the NotationInfo for the concrete syntax
-     * @param services     The Services object
+     * @param services     The IServices object
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
                         NotationInfo notationInfo,
-                        Services services) {
+                        IServices services) {
 	this(prgPrinter, 
              notationInfo, 
              new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
@@ -229,11 +229,11 @@ public final class LogicPrinter {
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param purePrint    if true the PositionTable will not be calculated
      *               (simulates the behaviour of the former PureSequentPrinter)
-     * @param services     the Services object               
+     * @param services     the IServices object               
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
                         NotationInfo notationInfo, 
-                        Services services,
+                        IServices services,
                         boolean purePrint) {
 	this(prgPrinter, 
 	     notationInfo,
@@ -1942,12 +1942,12 @@ public final class LogicPrinter {
      * the attribute
      * @param sort the ObjectSort specifying the hierarchy
      * where to test for uniqueness
-     * @param services the Services class used to access the type hierarchy
+     * @param services the IServices class used to access the type hierarchy
      * @return true if the attribute is uniquely determined
      */
     public static boolean printInShortForm(String programName, 
 	    				   Sort sort,
-	    				   Services services) {
+	    				   IServices services) {
         if ( ! ( services != null  
         	  && sort.extendsTrans(services.getJavaInfo().objectSort()))) {
             return false;

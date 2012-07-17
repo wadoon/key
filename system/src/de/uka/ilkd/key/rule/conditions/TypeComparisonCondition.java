@@ -14,7 +14,7 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -163,7 +163,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	
 	//if not, compute it 
 	if(result == null) {
-	    final JavaInfo javaInfo = services.getJavaInfo();
+	    final IProgramInfo javaInfo = services.getJavaInfo();
 	    
 	    //array sorts are disjoint if their element sorts are disjoint
 	    Sort fstElemSort = fstSort;

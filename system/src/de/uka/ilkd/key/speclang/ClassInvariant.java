@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -30,7 +30,7 @@ public interface ClassInvariant extends SpecificationElement {
      * Returns the invariant formula without implicit all-quantification over
      * the receiver object.
      */
-    public Term getInv(ParsableVariable selfVar, Services services);
+    public Term getInv(ParsableVariable selfVar, IServices services);
 
 
     /**

@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -35,7 +35,7 @@ public interface OperationContract extends Contract {
      */
     public Term getMod(LocationVariable heapVar, ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
-                       Services services);
+                       IServices services);
     
     
     /**
@@ -44,7 +44,7 @@ public interface OperationContract extends Contract {
     public Term getMod(LocationVariable heapVar, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Services services);
+                       IServices services);
 
     /**
      * Returns the modifies_backup clause of the contract.

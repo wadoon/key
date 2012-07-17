@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
@@ -50,7 +50,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * The services object is stored in order to have the possibility to
          * access it in every method
          */
-        private Services services;
+        private IServices services;
         /**
          * The record of the communication between KeY and the given solver. If everything works fine,
          * it also contains the final result.
@@ -103,7 +103,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
 
         SMTSolverImplementation(SMTProblem problem, SolverListener listener,
-                        Services services, SolverType myType) {
+                        IServices services, SolverType myType) {
                 this.problem = problem;
                 this.listener = listener;
                 this.services = services;

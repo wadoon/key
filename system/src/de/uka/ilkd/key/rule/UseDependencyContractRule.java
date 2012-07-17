@@ -18,6 +18,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -110,7 +111,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }    
     
     
-    private boolean hasRawSteps(Term heapTerm, Sequent seq, Services services) {
+    private boolean hasRawSteps(Term heapTerm, Sequent seq, IServices services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
@@ -135,7 +136,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     private static void getRawSteps(Term heapTerm, 
 	    		     Sequent seq, 
-	    		     Services services, 
+	    		     IServices services, 
 	    		     List<Term> result) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
@@ -158,7 +159,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     private static PosInOccurrence getFreshLocsStep(PosInOccurrence heapPos, 
 	    				     Sequent seq, 
-	    				     Services services) {
+	    				     IServices services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 	final Term heapTerm = heapPos.subTerm();
@@ -190,7 +191,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     		 getChangedLocsForStep(Term heapTerm, 
 	                       	       Term stepHeap, 
 	                       	       Sequent seq,
-	                       	       Services services) {
+	                       	       IServices services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
@@ -286,7 +287,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     public static List<PosInOccurrence> getSteps(PosInOccurrence pos,
 	    				  Sequent seq,
-	    				  Services services) {
+	    				  IServices services) {
 	final Term focus = pos.subTerm();
 	assert focus.op() instanceof IObserverFunction;
 	
@@ -326,7 +327,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static PosInOccurrence findStepInIfInsts(
 	    		List<PosInOccurrence> steps,
 	    		UseDependencyContractApp app,
-	    		Services services) {
+	    		IServices services) {
     	for(PosInOccurrence pio : app.ifInsts()) {
     		if(steps.contains(pio)) {
     			return pio;
@@ -341,7 +342,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
      * target.
      */
     public static ImmutableSet<Contract> getApplicableContracts(
-	    					Services services,  
+	    					IServices services,  
                                                 KeYJavaType kjt,
                                                 IObserverFunction target) {
         ImmutableSet<Contract> result 
@@ -412,7 +413,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     @Override    
     public ImmutableList<Goal> apply(Goal goal,
-	    			     Services services,
+	    			     IServices services,
 	    			     RuleApp ruleApp) {		
 	//collect information
 	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();

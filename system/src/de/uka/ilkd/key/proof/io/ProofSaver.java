@@ -17,14 +17,17 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.JOptionPane;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -35,8 +38,19 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstDirect;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.inst.NameInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -452,12 +466,12 @@ public class ProofSaver {
     }
 
 
-    public static StringBuffer printTerm(Term t, Services serv) {
+    public static StringBuffer printTerm(Term t, IServices serv) {
         return printTerm(t, serv, false);
     }
 
 
-    public static StringBuffer printTerm(Term t, Services serv, 
+    public static StringBuffer printTerm(Term t, IServices serv, 
             boolean shortAttrNotation) {
         StringBuffer result;
         LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
@@ -473,7 +487,7 @@ public class ProofSaver {
     }
 
 
-    public static String printAnything(Object val, Services services) {
+    public static String printAnything(Object val, IServices services) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
         }
@@ -494,13 +508,13 @@ public class ProofSaver {
     }
 
 
-    private static String printSequent(Sequent val, Services services) {
+    private static String printSequent(Sequent val, IServices services) {
         LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.toString();
     }
 
-    private static LogicPrinter createLogicPrinter(Services serv, 
+    private static LogicPrinter createLogicPrinter(IServices serv, 
             boolean shortAttrNotation) {
 
         NotationInfo ni = new NotationInfo();

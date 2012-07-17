@@ -11,9 +11,9 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 
 /**
@@ -24,7 +24,7 @@ public class LabelCollector extends JavaASTVisitor {
     private HashSet<Label> labels;
     
     public LabelCollector(ProgramElement root,                           
-                          Services services) {
+                          IServices services) {
         super(root, services);        
         this.labels = new HashSet<Label>(20);
     }

@@ -17,6 +17,7 @@ import java.io.StringReader;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -81,7 +82,7 @@ public class TacletForTests {
 		InitConfig ic = pi.prepare(envInput);
               	nss      = ic.namespaces(); 
                 rules    = ic.createTacletIndex();
-                services = ic.getServices();
+                services = (Services) ic.getServices();
 		lastFile = file;
 		variables = envInput.variables();
 	    }
@@ -101,7 +102,7 @@ public class TacletForTests {
 	return services ().getJavaInfo ();
     }
 
-    public static JavaInfo getJavaInfo() {
+    public static IProgramInfo getJavaInfo() {
 	return javaInfo();
     }
 

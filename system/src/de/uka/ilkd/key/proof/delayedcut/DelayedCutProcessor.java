@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -18,7 +17,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
     
 /**
@@ -288,7 +294,7 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    private LinkedList<Goal> apply(Goal goal, RuleApp app, Services services){
+    private LinkedList<Goal> apply(Goal goal, RuleApp app, IServices services){
         if(app instanceof TacletApp){
         	TacletApp tapp = (TacletApp) app;
         	final SVInstantiations insts = tapp.instantiations();
@@ -317,7 +323,7 @@ public class DelayedCutProcessor implements Runnable {
         return goals;
     }
     
-    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, Services services){
+    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, IServices services){
     	 try{
     		return apply(goal, app, services);
     	}catch(Throwable e){
@@ -329,7 +335,7 @@ public class DelayedCutProcessor implements Runnable {
      * Based on an old rule application a new rule application is built. Mainly 
      * the position is updated.
      */
-    private RuleApp createNewRuleApp(NodeGoalPair pair, Services services){
+    private RuleApp createNewRuleApp(NodeGoalPair pair, IServices services){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         
         
@@ -357,7 +363,7 @@ public class DelayedCutProcessor implements Runnable {
         
     }
     
-    private void check(Goal goal,final RuleApp app, PosInOccurrence newPos, Services services){
+    private void check(Goal goal,final RuleApp app, PosInOccurrence newPos, IServices services){
         if(newPos == null){
             return;
         }
@@ -403,7 +409,7 @@ public class DelayedCutProcessor implements Runnable {
     }
     
     
-    private PosInOccurrence translate(NodeGoalPair pair,Services services){
+    private PosInOccurrence translate(NodeGoalPair pair,IServices services){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if(oldRuleApp == null ||oldRuleApp.posInOccurrence() == null){
             return null;

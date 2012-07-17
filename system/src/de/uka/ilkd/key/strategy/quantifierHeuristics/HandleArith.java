@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -41,7 +41,7 @@ class HandleArith {
      *         <code>falseT</code> if false, and <code>problem</code> if it
      *         cann't be proved.
      */
-    public static Term provedByArith(Term problem, Services services) {
+    public static Term provedByArith(Term problem, IServices services) {
         Term arithTerm = formatArithTerm ( problem, services );
         if ( arithTerm.equals ( falseT ) )
             return provedArithEqual ( problem, services );
@@ -61,7 +61,7 @@ class HandleArith {
      * @return true if atom.sub(0) is euqual to atom.sub(1), false if not
      *         equal, else return atom
      */
-    public static Term provedArithEqual(Term problem, Services services) {
+    public static Term provedArithEqual(Term problem, IServices services) {
         boolean temp = true;
         Term pro = problem;
         Operator op = pro.op ();
@@ -94,7 +94,7 @@ class HandleArith {
      * @param axiom
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
-    public static Term provedByArith(Term problem, Term axiom, Services services) {
+    public static Term provedByArith(Term problem, Term axiom, IServices services) {
         Term cd = formatArithTerm ( problem, services );
         Term ab = formatArithTerm ( axiom, services );
         if ( cd.op() == Junctor.FALSE || ab.op() == Junctor.FALSE ) return problem;
@@ -120,7 +120,7 @@ class HandleArith {
      * @param problem
      * @return falseT if <code>term</code>'s operator is not >= or <=
      */
-    private static Term formatArithTerm(Term problem, Services services) {
+    private static Term formatArithTerm(Term problem, IServices services) {
         Term pro = problem;
         Operator op = pro.op ();
         boolean opNot = false;

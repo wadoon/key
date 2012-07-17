@@ -15,7 +15,7 @@ import java.util.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -48,14 +48,14 @@ class TriggersSet {
      */
     private final Substitution replacementWithMVs;
 
-    private TriggersSet(Term allTerm, Services services) {
+    private TriggersSet(Term allTerm, IServices services) {
         this.allTerm = allTerm;
         replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm);
         uniQuantifiedVariables = getAllUQS(allTerm);
         initTriggers(services);
     }
 
-    static TriggersSet create(Term allTerm, Services services) {
+    static TriggersSet create(Term allTerm, IServices services) {
         TriggersSet trs = cache.get(allTerm);
         if (trs == null) {
             // add check whether it is in PCNF
@@ -84,7 +84,7 @@ class TriggersSet {
     /**
      * initial all <code>Trigger</code>s by finding triggers in every clauses
      */
-    private void initTriggers(Services services) {
+    private void initTriggers(IServices services) {
         final QuantifiableVariable var =
                 allTerm.varsBoundHere(0).get(0);
         final Iterator<Term> it =
@@ -176,7 +176,7 @@ class TriggersSet {
          *to the goal trigger set. At last construct multi-triggers from
          * those elements. 
          */
-        public void createTriggers(Services services) {
+        public void createTriggers(IServices services) {
             final Iterator<Term> it =
                     TriggerUtils.iteratorByOperator(clause, Junctor.OR);
             while (it.hasNext()) {
@@ -197,7 +197,7 @@ class TriggersSet {
          * @param services  the Services 
          * @return true   if find any trigger from <code>term</code>
          */
-        private boolean recAddTriggers(Term term, Services services) {
+        private boolean recAddTriggers(Term term, IServices services) {
             if (!mightContainTriggers(term)) {
                 return false;
             }
@@ -299,7 +299,7 @@ class TriggersSet {
          * Further criteria for triggers. This is just a HACK, there should be
          * a more general framework for characterising acceptable triggers
          */
-        private boolean isAcceptableTrigger(Term term, Services services) {
+        private boolean isAcceptableTrigger(Term term, IServices services) {
             final Operator op = term.op();
 
             // we do not want to match on expressions a.<created>
@@ -338,7 +338,7 @@ class TriggersSet {
          * add a uni-trigger to triggers set or add an element of
          * multi-triggers for this clause
          */
-        private void addUniTrigger(Term term, Services services) {
+        private void addUniTrigger(Term term, IServices services) {
             if (!isAcceptableTrigger(term, services)) {
                 return;
             }

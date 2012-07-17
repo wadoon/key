@@ -17,7 +17,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -62,7 +62,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
     }
     
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Services services = goal.proof ().getServices ();
+        final IServices services = goal.proof ().getServices ();
         
         final Monomial sourceM =
             Monomial.create ( source.toTerm ( app, pos, goal ), services );
@@ -94,7 +94,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * This method will change the object <code>cofactorPolys</code>.
      */
     private ImmutableList<Term> computeMultiples(Monomial sourceM, Monomial targetM,
-                                        List<CofactorPolynomial> cofactorPolys, Services services) {
+                                        List<CofactorPolynomial> cofactorPolys, IServices services) {
         ImmutableList<Term> res = ImmutableSLList.<Term>nil();
         
         final List<CofactorItem> cofactorMonos = new ArrayList<CofactorItem> ();
@@ -129,7 +129,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
     }
 
     private ImmutableList<Term> addRes(CofactorMonomial newMono, Monomial sourceM,
-                              ImmutableList<Term> res, Services services) {
+                              ImmutableList<Term> res, IServices services) {
         final Monomial mono = newMono.mono;
         final Polynomial cofactor = newMono.cofactor;
 
@@ -153,7 +153,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      *          <code>CofactorPolynomial</code>. The initial cofactor is set
      *          to zero.
      */
-    private List<CofactorPolynomial> extractPolys(Goal goal, Services services) {
+    private List<CofactorPolynomial> extractPolys(Goal goal, IServices services) {
         final IntegerLDT numbers =
             services.getTypeConverter ().getIntegerLDT ();
 

@@ -21,10 +21,11 @@ import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -79,7 +80,7 @@ public final class ProblemInitializer {
     private static InitConfig baseConfig;
  
     private final Profile profile;
-    private final Services services;
+    private final IServices services;
     private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     private final ProblemInitializerListener listener;
@@ -89,7 +90,7 @@ public final class ProblemInitializer {
     //------------------------------------------------------------------------- 
     
     public ProblemInitializer(ProgressMonitor mon,
-	                      Profile profile, Services services, boolean registerProof,
+	                      Profile profile, IServices services, boolean registerProof,
 	                      ProblemInitializerListener listener) {
 	this.profile = profile;
 	this.services = services;
@@ -376,7 +377,7 @@ public final class ProblemInitializer {
 	    }
 	} else if(term.javaBlock() != null && !term.javaBlock().isEmpty()) {
 	    final ProgramElement pe = term.javaBlock().program();
-	    final Services serv = rootGoal.proof().getServices();
+	    final IServices serv = rootGoal.proof().getServices();
 	    final ImmutableSet<ProgramVariable> freeProgVars 
 	    	= MiscTools.getLocalIns(pe, serv)
 	    	           .union(MiscTools.getLocalOuts(pe, serv));

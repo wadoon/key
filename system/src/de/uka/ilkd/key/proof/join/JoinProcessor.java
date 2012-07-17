@@ -7,7 +7,7 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -38,7 +38,7 @@ import de.uka.ilkd.key.rule.Taclet;
 public class JoinProcessor implements Runnable{
     private boolean used = false;
     private final Proof proof;
-    private final Services services;
+    private final IServices services;
     private final ProspectivePartner partner;
     private final LinkedList<Listener> listeners = new LinkedList<Listener>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";

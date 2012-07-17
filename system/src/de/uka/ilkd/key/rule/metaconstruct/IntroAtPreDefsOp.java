@@ -15,8 +15,8 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -45,7 +45,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
-	    		  Services services) {
+	    		  IServices services) {
         final Term target = term.sub(0);
         final boolean transaction =
               (target.op() != null &&

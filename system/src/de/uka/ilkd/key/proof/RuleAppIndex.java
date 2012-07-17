@@ -17,7 +17,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -166,7 +166,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<TacletApp> getTacletAppAt(TacletFilter    filter,
 					  PosInOccurrence pos,
-					  Services        services) { 
+					  IServices        services) { 
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
@@ -196,7 +196,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter    filter,
 						  PosInOccurrence pos,
-						  Services        services) {
+						  IServices        services) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
@@ -225,7 +225,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
 					      PosInOccurrence pos,
-					      Services        services) { 
+					      IServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
@@ -251,7 +251,7 @@ public final class RuleAppIndex  {
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter    filter,
-						Services        services) { 
+						IServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
@@ -279,7 +279,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
 						  PosInOccurrence pos,
-						  Services        services) { 
+						  IServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
@@ -386,7 +386,7 @@ public final class RuleAppIndex  {
      * @param services the Services
      */
     public void reportAutomatedRuleApps (NewRuleListener l,
-                                         Services services) {
+                                         IServices services) {
         automatedTacletAppIndex.reportRuleApps ( l, services );
         builtInRuleAppIndex().reportRuleApps ( l, goal );
     }

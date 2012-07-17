@@ -11,8 +11,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -66,7 +66,7 @@ abstract class AbstractSV extends AbstractSortedOperator
      */
     protected MatchConditions addInstantiation(ProgramElement pe,
 	    				       MatchConditions matchCond, 
-	    				       Services services) {
+	    				       IServices services) {
 
 	final SVInstantiations instantiations = matchCond.getInstantiations();
 	final SVSubstitute inMap = (SVSubstitute) instantiations
@@ -112,7 +112,7 @@ abstract class AbstractSV extends AbstractSortedOperator
      */
     protected final MatchConditions addInstantiation(Term term,
             					     MatchConditions matchCond, 
-            					     Services services) {
+            					     IServices services) {
 
         if (this.isRigid() && !term.isRigid()) {
             Debug.out("FAILED. Illegal Instantiation");
@@ -161,5 +161,5 @@ abstract class AbstractSV extends AbstractSortedOperator
     @Override
     public abstract MatchConditions match(SVSubstitute subst, 
 	                  		  MatchConditions mc, 
-	                  		  Services services);
+	                  		  IServices services);
 }

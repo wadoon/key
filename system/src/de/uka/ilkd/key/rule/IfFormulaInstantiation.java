@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.SequentFormula;
 
 
@@ -26,5 +26,5 @@ public interface IfFormulaInstantiation {
      */
     SequentFormula getConstrainedFormula ();
 
-    String             toString              (Services services);
+    String             toString              (IServices services);
 }

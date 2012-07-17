@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -70,7 +70,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var,
                                  SVSubstitute svSubst,
                                  MatchConditions matchCond,
-                                 Services services) {
+                                 IServices services) {
         if ( var != exprOrTypeSV ) {
             return matchCond;
         }

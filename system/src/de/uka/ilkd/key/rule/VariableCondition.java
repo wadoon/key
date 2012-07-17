@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
@@ -40,6 +40,6 @@ public interface VariableCondition {
     MatchConditions check(SchemaVariable var, 
 	    		  SVSubstitute instCandidate, 
 	    		  MatchConditions matchCond, 
-	    		  Services services);
+	    		  IServices services);
 
 }

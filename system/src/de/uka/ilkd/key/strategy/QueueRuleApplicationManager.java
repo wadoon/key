@@ -16,7 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableHeap;
 import de.uka.ilkd.key.collection.ImmutableLeftistHeap;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -301,7 +301,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         return goal;
     }
 
-    private Services getServices() {
+    private IServices getServices() {
 	return getProof ().getServices ();
     }
 

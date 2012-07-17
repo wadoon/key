@@ -8,6 +8,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -285,7 +286,7 @@ public class MethodPartPO extends AbstractOperationPO {
                           ProgramVariable resultVar, 
                           ProgramVariable exceptionVar, 
                           Map<LocationVariable, LocationVariable> atPreVars, 
-                          Services services) {
+                          IServices services) {
       return TB.tt();
    }
 

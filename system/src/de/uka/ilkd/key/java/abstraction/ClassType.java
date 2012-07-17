@@ -12,7 +12,7 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 
 /**
    A program model element representing class types.
@@ -49,13 +49,13 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
 	The order allows to resolve member overloading or overloading.
 	@return the array of all supertypes of this type in topological order.
     */
-    ImmutableList<ClassType> getAllSupertypes(Services services);
+    ImmutableList<ClassType> getAllSupertypes(IServices services);
 
     /** 
 	Returns the fields locally defined within this class type.
 	@return the array of field members of this type.
     */
-    ImmutableList<Field> getFields(Services services);
+    ImmutableList<Field> getFields(IServices services);
 
     
     /** 
@@ -65,13 +65,13 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
 	@return the array of visible field members of this type and its
 	supertypes.
     */
-    ImmutableList<Field> getAllFields(Services services);
+    ImmutableList<Field> getAllFields(IServices services);
 
     /** 
 	Returns the methods locally defined within this class type.
 	@return the array of methods of this type.
     */    
-    ImmutableList<Method> getMethods(Services services);
+    ImmutableList<Method> getMethods(IServices services);
 
     /** 
 	Returns all visible methods that are defined in this class type
@@ -79,13 +79,13 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
 	with respect to the inheritance hierarchy.
 	@return the array of visible methods of this type and its supertypes.
     */    
-    ImmutableList<Method> getAllMethods(Services services);
+    ImmutableList<Method> getAllMethods(IServices services);
 
     /** 
 	Returns the constructors locally defined within this class type.
 	@return the array of constructors of this type.
     */
-    ImmutableList<Constructor> getConstructors(Services services);
+    ImmutableList<Constructor> getConstructors(IServices services);
     
     /** 
 	Returns all class types that are inner types of this class type,
@@ -94,6 +94,6 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
 	or any of its supertypes.
 	@see #getAllSupertypes
     */
-    ImmutableList<ClassType> getAllTypes(Services services);
+    ImmutableList<ClassType> getAllTypes(IServices services);
 
 }

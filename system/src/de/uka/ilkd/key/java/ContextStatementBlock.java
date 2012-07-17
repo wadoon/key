@@ -163,7 +163,7 @@ public class ContextStatementBlock extends StatementBlock {
         }
         
         final ProgramElement src = newSource.getSource();
-        final Services services  = source.getServices();
+        final IServices services  = source.getServices();
         
         ExecutionContext lastExecutionContext = null;
                
@@ -254,7 +254,7 @@ public class ContextStatementBlock extends StatementBlock {
             int pos, 
             PosInProgram relPos, 
             ProgramElement src,
-            Services services) {
+            IServices services) {
         
         final SVInstantiations instantiations = matchCond.getInstantiations();        
         final ExecutionContext lastExecutionContext = instantiations.getExecutionContext();
@@ -287,7 +287,7 @@ public class ContextStatementBlock extends StatementBlock {
      * @return the inner most execution context
      */
     private MatchConditions matchInnerExecutionContext(MatchConditions matchCond, 
-            final Services services, ExecutionContext lastExecutionContext, 
+            final IServices services, ExecutionContext lastExecutionContext, 
             final ProgramPrefix prefix, int pos, final ProgramElement src) {
         
         // partial context instantiation

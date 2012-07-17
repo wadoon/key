@@ -31,7 +31,7 @@ public class SourceData {
     private int childPos;
 
     /** the services */
-    private final Services services;
+    private final IServices services;
     
     
     /**
@@ -42,7 +42,7 @@ public class SourceData {
      * @param childPos the int giving the index of the child of <tt>element</tt> to be matched
      * @param services the Services 
      */
-    public SourceData(ProgramElement element, int childPos, Services services) {
+    public SourceData(ProgramElement element, int childPos, IServices services) {
 	assert services != null;
 	assert element != null;
         this.services = services;
@@ -120,7 +120,7 @@ public class SourceData {
      * returns the services object 
      * @return the services object 
      */
-    public Services getServices() {              
+    public IServices getServices() {              
         return services;
     }
 

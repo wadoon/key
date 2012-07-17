@@ -12,7 +12,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -99,7 +99,7 @@ public final class SortDependingFunction extends Function {
     private static MatchConditions matchSorts(Sort s1, 
 	    			              Sort s2, 
 	    			              MatchConditions mc,
-	    			              Services services) {
+	    			              IServices services) {
         assert !(s2 instanceof GenericSort)
                : "Sort s2 is not allowed to be of type generic.";
         if (!(s1 instanceof GenericSort)) {
@@ -150,7 +150,7 @@ public final class SortDependingFunction extends Function {
     
     
     public static SortDependingFunction getFirstInstance(Name kind,
-	    					         Services services) {
+	    					         IServices services) {
 	return (SortDependingFunction) 
 			services.getNamespaces()
 			        .functions()
@@ -159,7 +159,7 @@ public final class SortDependingFunction extends Function {
         
 
     public SortDependingFunction getInstanceFor(Sort sort, 
-	    				        Services services) {
+	    				        IServices services) {
 	if(sort == this.sortDependingOn) {
 	    return this;
 	}
@@ -228,7 +228,7 @@ public final class SortDependingFunction extends Function {
     @Override    
     public MatchConditions match(SVSubstitute subst, 
                                  MatchConditions mc,
-                                 Services services) {  
+                                 IServices services) {  
         if(!(subst instanceof SortDependingFunction)) {
             Debug.out("FAILED. Given operator cannot be matched by a sort" +
             		"depending function (template, orig)", this, subst);

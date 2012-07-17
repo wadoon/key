@@ -12,7 +12,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -48,7 +48,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     
     private static Term dropEffectlessStoresHelper(
 	    		Term heapTerm, 
-	    		Services services,
+	    		IServices services,
 	    		ImmutableSet<Pair<Term,Term>> overwrittenLocs,
 	    		Function store) {
 	if(heapTerm.op() == store) {
@@ -79,7 +79,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }    
     
     
-    private static Term dropEffectlessStores(Term t, Services services) {
+    private static Term dropEffectlessStores(Term t, IServices services) {
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	assert t.sort() == heapLDT.targetSort();
 	return dropEffectlessStoresHelper(
@@ -94,7 +94,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, 
 	    		  	 SVSubstitute instCandidate, 
 	    		  	 MatchConditions mc, 
-	    		  	 Services services) {	
+	    		  	 IServices services) {	
 	SVInstantiations svInst = mc.getInstantiations();
 	Term hInst      = (Term) svInst.getInstantiation(h);
 	Term oInst      = (Term) svInst.getInstantiation(o);

@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -78,7 +78,7 @@ public interface Constraint {
      * @return TOP if not possible, else a new constraint with after unification
      *         of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services);
+    Constraint unify(Term t1, Term t2, IServices services);
 
     /**
      * tries to unify terms t1 and t2.
@@ -94,7 +94,7 @@ public interface Constraint {
      * @return TOP if not possible, else a new constraint with after unification
      *         of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services,
+    Constraint unify(Term t1, Term t2, IServices services,
 	    BooleanContainer unchanged);
 
     /**
@@ -125,7 +125,7 @@ public interface Constraint {
      *            the Services providing access to the type model
      * @return the joined constraint
      */
-    Constraint join(Constraint co, Services services);
+    Constraint join(Constraint co, IServices services);
 
     /**
      * joins constraint co with this constraint and returns the joint new
@@ -143,7 +143,7 @@ public interface Constraint {
      *            strong as co
      * @return the joined constraint
      */
-    Constraint join(Constraint co, Services services, BooleanContainer unchanged);
+    Constraint join(Constraint co, IServices services, BooleanContainer unchanged);
 
     /**
      * @return a constraint derived from this one by removing all constraints on
@@ -185,11 +185,11 @@ public interface Constraint {
 	 * 
 	 * @return always this
 	 */
-	public Constraint unify(Term t1, Term t2, Services services) {
+	public Constraint unify(Term t1, Term t2, IServices services) {
 	    return this;
 	}
 
-	public Constraint unify(Term t1, Term t2, Services services,
+	public Constraint unify(Term t1, Term t2, IServices services,
 		BooleanContainer unchanged) {
 	    unchanged.setVal(true);
 	    return this;
@@ -215,7 +215,7 @@ public interface Constraint {
 	 * 
 	 * @return this
 	 */
-	public Constraint join(Constraint co, Services services) {
+	public Constraint join(Constraint co, IServices services) {
 	    return this;
 	}
 
@@ -224,7 +224,7 @@ public interface Constraint {
 	 * 
 	 * @return this
 	 */
-	public Constraint join(Constraint co, Services services,
+	public Constraint join(Constraint co, IServices services,
 		BooleanContainer c) {
 	    c.setVal(true);
 	    return this;

@@ -18,8 +18,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
-
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 
 /**
@@ -154,7 +154,7 @@ public class SolverLauncher implements SolverListener {
      *            A list of solver types that should be used for the problem.
      */
     public void launch(Collection<SolverType> solverTypes,
-	    Collection<SMTProblem> problems, Services services) {
+	    Collection<SMTProblem> problems, IServices services) {
 	checkLaunchCall();
 	launchIntern(solverTypes, problems, services);
     }
@@ -213,7 +213,7 @@ public class SolverLauncher implements SolverListener {
      */
     private Collection<SMTProblem> prepareSolvers(
 	    Collection<SolverType> factories, Collection<SMTProblem> problems,
-	    Services services) {
+	    IServices services) {
 	for (SMTProblem problem : problems) {
 	    for (SolverType factory : factories) {
 		if (factory.isInstalled(false)) {
@@ -240,7 +240,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void launchIntern(Collection<SolverType> factories,
-	    Collection<SMTProblem> problems, Services services)
+	    Collection<SMTProblem> problems, IServices services)
 	    {
 
 	// consider only installed solvers.

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -23,7 +24,7 @@ public interface IExecutionElement {
     * Returns the {@link Services} used in {@link #getProof()}.
     * @return The {@link Services} used in {@link #getProof()}.
     */
-   public Services getServices();
+   public IServices getServices();
    
    /**
     * Returns the {@link Proof} from which the symbolic execution tree was extracted.

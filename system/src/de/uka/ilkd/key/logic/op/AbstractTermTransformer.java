@@ -12,7 +12,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -133,7 +133,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     /** @return String representing a logical integer literal 
      *  in decimal representation
      */
-    public static String convertToDecimalString(Term term, Services services) {
+    public static String convertToDecimalString(Term term, IServices services) {
       	StringBuilder result = new StringBuilder();
 	boolean neg = false;
 	
@@ -173,7 +173,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
             
     @Override    
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
-            Services services) {
+            IServices services) {
 	// by default meta operators do not match anything 	
         return null;
     }    

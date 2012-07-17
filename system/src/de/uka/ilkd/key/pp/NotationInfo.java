@@ -12,7 +12,7 @@ package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -235,7 +235,7 @@ public final class NotationInfo {
      * available.
      */
     @SuppressWarnings("unchecked")
-    private void addFancyNotations(Services services) {
+    private void addFancyNotations(IServices services) {
         if (fancyNotationCache != null){
             notationTable = fancyNotationCache;
             return;
@@ -292,7 +292,7 @@ public final class NotationInfo {
      * @param services
      */
     @SuppressWarnings("unchecked")
-    private void addVeryFancyNotations(Services services){
+    private void addVeryFancyNotations(IServices services){
         if (veryFancyNotationCache != null){
             notationTable = veryFancyNotationCache;
             return;
@@ -327,7 +327,7 @@ public final class NotationInfo {
     //public interface
     //-------------------------------------------------------------------------
     
-    public void refresh(Services services) {
+    public void refresh(IServices services) {
 	createDefaultNotationTable();
 	assert defaultNotationCache != null;
 	if(PRETTY_SYNTAX && services != null) {
@@ -351,7 +351,7 @@ public final class NotationInfo {
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    public Notation getNotation(Operator op, Services services) {
+    public Notation getNotation(Operator op, IServices services) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

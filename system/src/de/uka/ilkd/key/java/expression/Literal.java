@@ -65,7 +65,7 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
      * @param ec the ExecutionContext in which the expression is evaluated 
      * @return the literal's type
      */
-    public KeYJavaType getKeYJavaType(Services javaServ, 
+    public KeYJavaType getKeYJavaType(IServices javaServ, 
 				      ExecutionContext ec) {
 	return getKeYJavaType(javaServ);
     }

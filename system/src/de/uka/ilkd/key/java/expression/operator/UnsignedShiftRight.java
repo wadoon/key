@@ -12,8 +12,8 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -97,7 +97,7 @@ public class UnsignedShiftRight extends Operator {
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
 	final TypeConverter tc=javaServ.getTypeConverter();
 	return tc.getPromotedType
 	    (tc.getKeYJavaType((Expression)getChildAt(0), ec));

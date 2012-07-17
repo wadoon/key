@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -30,7 +30,7 @@ public final class ConstantValue extends AbstractTermTransformer {
     }
 
 
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices services) {
 	term = term.sub ( 0 );
 	Operator op = term.op ();
 

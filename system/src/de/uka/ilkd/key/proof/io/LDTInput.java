@@ -15,7 +15,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -134,7 +134,7 @@ public class LDTInput implements EnvInput {
 	}
 		
 	//create LDT objects
-        Services services = initConfig.getServices();
+        IServices services = initConfig.getServices();
         ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
                         	.prepend(new IntegerLDT(services))
                         	.prepend(new BooleanLDT(services))

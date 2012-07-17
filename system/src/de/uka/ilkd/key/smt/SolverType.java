@@ -12,8 +12,7 @@ package de.uka.ilkd.key.smt;
 
 import java.io.File;
 
-
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 
 
@@ -32,7 +31,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 		 * Creates an instance of SMTSolver representing a concrete instance of that solver.
 		 * 		 */
         public SMTSolver createSolver(SMTProblem problem,
-                        SolverListener listener, Services services);
+                        SolverListener listener, IServices services);
 
         /**
          * Returns the name of the solver.
@@ -70,7 +69,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
         /**
          * The translator to be used. So far each solver supports only one format. 
          */
-        public SMTTranslator createTranslator(Services services);
+        public SMTTranslator createTranslator(IServices services);
         /**
          * The delimiters of the messages that are sent from the solver to KeY. For example it could be "\n"
          */
@@ -130,7 +129,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
-                                SolverListener listener, Services services) {
+                                SolverListener listener, IServices services) {
                         return new SMTSolverImplementation(problem, listener,
                                         services, this);
                 }
@@ -156,7 +155,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                         return true;
                 };
                 @Override
-                public SMTTranslator createTranslator(Services services) {
+                public SMTTranslator createTranslator(IServices services) {
                         return new SmtLib2Translator(services,
                                         new Configuration(false,false));
                 }
@@ -239,7 +238,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
-                                SolverListener listener, Services services) {
+                                SolverListener listener, IServices services) {
                         return new SMTSolverImplementation(problem, listener,
                                         services, this);
                 }
@@ -266,7 +265,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 };
 
                 @Override
-                public SMTTranslator createTranslator(Services services) {
+                public SMTTranslator createTranslator(IServices services) {
                         return new SmtLibTranslator(services,
                                         new Configuration(false,true));
                 }
@@ -321,13 +320,13 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
-                                SolverListener listener, Services services) {
+                                SolverListener listener, IServices services) {
                         return new SMTSolverImplementation(problem, listener,
                                         services, this);
                 }
 
                 @Override
-                public SMTTranslator createTranslator(Services services) {
+                public SMTTranslator createTranslator(IServices services) {
                         return new SmtLibTranslator(services,
                                         new Configuration(true,true));
                 }
@@ -405,13 +404,13 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
-                                SolverListener listener, Services services) {
+                                SolverListener listener, IServices services) {
                         return new SMTSolverImplementation(problem, listener,
                                         services, this);
                 }
 
                 @Override
-                public SMTTranslator createTranslator(Services services) {
+                public SMTTranslator createTranslator(IServices services) {
                         return new SimplifyTranslator(services,
                                         new Configuration(false,true));
                 }

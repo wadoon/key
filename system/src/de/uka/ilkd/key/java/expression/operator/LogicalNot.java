@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -87,7 +87,7 @@ public class LogicalNot extends Operator {
         p.printLogicalNot(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {
 	return services.getTypeConverter().getBooleanType();
     }
 

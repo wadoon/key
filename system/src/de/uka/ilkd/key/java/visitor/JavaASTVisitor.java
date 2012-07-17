@@ -12,10 +12,10 @@ package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Import;
 import de.uka.ilkd.key.java.PackageSpecification;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
@@ -170,14 +170,14 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 public abstract class JavaASTVisitor extends JavaASTWalker 
     implements Visitor {
     
-    protected final Services services;
+    protected final IServices services;
     
 
     /** create the JavaASTVisitor
      * @param root the ProgramElement where to begin
      * @param services the Services object
      */
-    public JavaASTVisitor(ProgramElement root, Services services) {
+    public JavaASTVisitor(ProgramElement root, IServices services) {
 	super(root);
         this.services = services;
     }

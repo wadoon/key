@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -200,7 +200,7 @@ public class TacletAppIndex  {
 
     private ImmutableList<TacletApp> getFindTacletWithPos ( PosInOccurrence pos,
                                                    TacletFilter    filter,
-                                                   Services        services ) {
+                                                   IServices        services ) {
         Debug.assertFalse ( pos == null );
         ImmutableList<NoPosTacletApp> tacletInsts = getFindTaclet ( pos, filter,
                                                            services );
@@ -214,7 +214,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<TacletApp> getTacletAppAt(PosInOccurrence pos,
                                           TacletFilter    filter,
-                                          Services        services) {
+                                          IServices        services) {
         ImmutableList<TacletApp> sal = getFindTacletWithPos ( pos, filter, services );
         return prepend ( sal,
                          getNoFindTaclet ( filter, services ) );
@@ -228,7 +228,7 @@ public class TacletAppIndex  {
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
                                             PosInOccurrence pos,
-                                            Services services) {
+                                            IServices services) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
@@ -245,7 +245,7 @@ public class TacletAppIndex  {
     
     static TacletApp createTacletApp(NoPosTacletApp tacletApp,
                                      PosInOccurrence pos,
-                                     Services services) {
+                                     IServices services) {
         if ( tacletApp.taclet () instanceof FindTaclet ) {
             PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos, services );
             if ( newTacletApp != null ) {
@@ -260,12 +260,12 @@ public class TacletAppIndex  {
 
     /** 
      * collects all NoFindTacletInstantiations
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter filter,
-                                                Services services) {
+                                                IServices services) {
         RuleFilter effectiveFilter = new AndRuleFilter ( filter, ruleFilter );
         return tacletIndex ().getNoFindTaclet ( effectiveFilter, services );
     }
@@ -275,13 +275,13 @@ public class TacletAppIndex  {
      * constrainedFormula described by a
      * PosInOccurrence
      * @param pos the PosInOccurrence to focus 
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, 
                                                  TacletFilter    filter,
-                                                 Services        services) { 
+                                                 IServices        services) { 
 
         final Iterator<NoPosTacletApp> it =
             getFindTaclet ( pos, filter, services ).iterator();
@@ -300,13 +300,13 @@ public class TacletAppIndex  {
     /** 
      * collects all FindTaclets with instantiations and position
      * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos,
                                               TacletFilter    filter,
-                                              Services        services) { 
+                                              IServices        services) { 
         return getIndex ( pos ).getTacletAppAt ( pos, filter );
     }
 
@@ -316,13 +316,13 @@ public class TacletAppIndex  {
      * Positions below this. The method calls getTacletAppAt for all the
      * Positions below.
      * @param pos the position where to start from
-     * @param services the Services object encapsulating information
+     * @param services the IServices object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return the possible rule applications 
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
                                                   TacletFilter    filter,
-                                                  Services        services) {
+                                                  IServices        services) {
         final ImmutableList<TacletApp> findTaclets =
             getIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
         return prepend ( findTaclets,
@@ -429,7 +429,7 @@ public class TacletAppIndex  {
         return seq;
     }
 
-    private Services getServices() {
+    private IServices getServices() {
         return getProof ().getServices ();
     }
 
@@ -454,7 +454,7 @@ public class TacletAppIndex  {
      * every cached taclet app.
      */
     public void reportRuleApps (NewRuleListener l,
-                                Services services) {
+                                IServices services) {
         if ( antecIndex != null ) antecIndex.reportRuleApps ( l );
         if ( succIndex != null ) succIndex.reportRuleApps ( l );
 

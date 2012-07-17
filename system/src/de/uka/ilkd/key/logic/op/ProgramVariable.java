@@ -218,13 +218,13 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
     
     @Override    
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public KeYJavaType getKeYJavaType(IServices javaServ) {
 	return getKeYJavaType();
     }
 
     
     @Override    
-    public KeYJavaType getKeYJavaType(Services javaServ, 
+    public KeYJavaType getKeYJavaType(IServices javaServ, 
 				      ExecutionContext ec) {
 	return getKeYJavaType();
     }

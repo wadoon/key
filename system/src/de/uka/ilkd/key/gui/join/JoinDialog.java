@@ -25,7 +25,7 @@ import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
 import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.gui.utilities.StdDialog;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -46,7 +46,7 @@ public class JoinDialog extends StdDialog{
     private static final long serialVersionUID = 1L;
     private final     ContentPanel content;
     public JoinDialog(List<ProspectivePartner> partnerList, Proof proof,
-            PredicateEstimator estimator, Services services) {
+            PredicateEstimator estimator, IServices services) {
         super("Joining",  5, false);
         content = new ContentPanel(partnerList, proof,estimator,new CheckedUserInputListener(){
 
@@ -88,7 +88,7 @@ public class JoinDialog extends StdDialog{
             final CheckedUserInputInspector inspector;
             final boolean applicable;
             
-            public ContentItem(ProspectivePartner partner, Services services,
+            public ContentItem(ProspectivePartner partner, IServices services,
             					boolean applicable) {
                 super();
                 this.partner = partner;
@@ -144,7 +144,7 @@ public class JoinDialog extends StdDialog{
         
         public ContentPanel(List<ProspectivePartner> partnerList,final Proof proof,
                 PredicateEstimator estimator,
-               final  CheckedUserInputListener listener,Services services) {
+               final  CheckedUserInputListener listener,IServices services) {
             super(BoxLayout.Y_AXIS);
     
             this.proof = proof;
@@ -176,7 +176,7 @@ public class JoinDialog extends StdDialog{
        
         }    
 
-        private void fill(List<ProspectivePartner> partnerList, Services services){
+        private void fill(List<ProspectivePartner> partnerList, IServices services){
         	Node node = partnerList.get(0).getNode(0);
             getHeadline().setText("<html><b>Join Goal " +node.serialNr()+"</b></html>");
             getSequentViewer1().setSequent(node.sequent(), proof.getServices());

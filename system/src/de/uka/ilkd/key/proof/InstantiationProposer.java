@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -32,7 +32,7 @@ public interface InstantiationProposer {
      */
     public String getProposal(TacletApp app, 
     			      SchemaVariable var, 
-			      Services services,
+			      IServices services,
 			      Node undoAnchor,
 			      ImmutableList<String> previousProposals);
 }
