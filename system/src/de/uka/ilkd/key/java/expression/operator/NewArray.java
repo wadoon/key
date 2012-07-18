@@ -72,6 +72,7 @@ public class NewArray extends TypeOperator
 	this.arrayInitializer = init;
         this.dimensions  = dimensions;
 	this.keyJavaType = keyJavaType;
+
 	assert dimensions > 0;	
     }
     
@@ -91,6 +92,7 @@ public class NewArray extends TypeOperator
 	this.arrayInitializer = init;
         this.dimensions  = dimensions;
 	this.keyJavaType = keyJavaType;
+	
 	assert dimensions > 0;
     }
 
@@ -248,7 +250,8 @@ public class NewArray extends TypeOperator
     /**
      * same as getKeYJavaType()
      */
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    @Override
+    public KeYJavaType getKeYJavaType(IServices javaServ) {
 	return getKeYJavaType();
     }
 

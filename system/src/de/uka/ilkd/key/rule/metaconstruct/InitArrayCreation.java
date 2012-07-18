@@ -204,7 +204,7 @@ public class InitArrayCreation extends InitArray {
 	    (bodyStmnts, na.getArguments(), services);
 
  	final KeYJavaType arrayType = na.getKeYJavaType(services);
-
+ 	 	
 	createNDimensionalArray(bodyStmnts, newObject, arrayType, 
 				dimensions, services);
 
@@ -224,6 +224,7 @@ public class InitArrayCreation extends InitArray {
 
 	if ( pe instanceof NewArray ) {
 	    na = (NewArray) pe;
+	    
 	    if (na.getArrayInitializer() == null) {
 		return arrayCreationWithoutInitializers(array, na, services);
 	    }

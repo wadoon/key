@@ -347,8 +347,10 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                         } else {
                             peerInstExpr = (Expression)peerInst;
                         }
+                        
                         kjt = tc.getKeYJavaType(peerInstExpr, 
                         			app.instantiations().getContextInstantiation().activeStatementContext());
+
                     }
 		} else {
 		    kjt = javaInfo.getKeYJavaType((Type)o);

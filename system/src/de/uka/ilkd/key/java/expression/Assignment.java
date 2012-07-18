@@ -80,6 +80,7 @@ public abstract class Assignment extends Operator
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return the type of the assignment expression
      */
+    @Override
     public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
 	return getExpressionAt(0).getKeYJavaType(javaServ, ec);
     }

@@ -123,11 +123,13 @@ public class Instanceof extends TypeOperator {
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printInstanceof(this);
     }
-
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    
+    @Override
+    public KeYJavaType getKeYJavaType(IServices javaServ) {
 	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
+    @Override
     public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
 	return getKeYJavaType(javaServ);
     }

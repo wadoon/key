@@ -29,7 +29,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  @author mulbrich
  *  @since 2006-12-03
  */
-public final class ArrayTypeCondition extends VariableConditionAdapter {
+public final class ArrayTypeCondition extends VariableConditionAdapter<Services> {
 
     private final SchemaVariable var;
     private final boolean negated;

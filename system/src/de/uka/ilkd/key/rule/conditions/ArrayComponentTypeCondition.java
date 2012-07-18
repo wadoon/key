@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  This variable condition checks if an array component is of reference type
  */
 public final class ArrayComponentTypeCondition 
-				extends VariableConditionAdapter {
+				extends VariableConditionAdapter<Services> {
 
     private final SchemaVariable var;
     private final boolean checkReferenceType;

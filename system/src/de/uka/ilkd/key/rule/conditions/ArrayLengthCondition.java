@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public final class ArrayLengthCondition extends VariableConditionAdapter {
+public final class ArrayLengthCondition extends VariableConditionAdapter<Services> {
 
     private final SchemaVariable reference;
     private final boolean negation;

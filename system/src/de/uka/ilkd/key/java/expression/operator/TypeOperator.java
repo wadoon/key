@@ -107,6 +107,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         return typeReference;
     }
 
+    @Override
     public KeYJavaType getKeYJavaType(IServices javaServ, 
 				      ExecutionContext ec) {
 	return getKeYJavaType(javaServ);
