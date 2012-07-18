@@ -22,6 +22,7 @@ import java.util.Stack;
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
@@ -68,7 +68,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                                 DefaultImmutableMap.<SchemaVariable,Term>nilMap();
     private IServices services;
     private Term computedResult = null;
-    private TypeConverter typeConverter = null;
+    private AbstractTypeConverter typeConverter = null;
     private final boolean allowPartialReplacement;
     private final boolean resolveSubsts;
 
@@ -151,7 +151,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	return services;
     }
 
-    private TypeConverter getTypeConverter () {
+    private AbstractTypeConverter getTypeConverter () {
 	if ( typeConverter == null )
 	    typeConverter = getServices ().getTypeConverter();
 	return typeConverter;

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public abstract class AbstractServices implements IServices {
 
@@ -29,7 +30,7 @@ public abstract class AbstractServices implements IServices {
 	/** used to convert types, expressions and so on to logic elements
 	 * (in special into to terms or formulas)
 	 */
-	protected TypeConverter typeconverter;
+	protected AbstractTypeConverter typeconverter;
 	/**
 	 * variable namer for inner renaming
 	 */
@@ -42,10 +43,21 @@ public abstract class AbstractServices implements IServices {
 	 * map of names to counters
 	 */
 	private HashMap<String, Counter> counters = new HashMap<String, Counter>();
+	
 	protected NameRecorder nameRecorder;
 
-	public AbstractServices() {
-		super();
+        protected AbstractServices(KeYExceptionHandler exceptionHandler) {
+            if(exceptionHandler == null){
+                this.exceptionHandler = new KeYRecoderExcHandler();
+            }else{
+                this.exceptionHandler = exceptionHandler;
+            }
+            nameRecorder = new NameRecorder();
+        }
+
+        protected AbstractServices(KeYExceptionHandler exceptionHandler, AbstractTypeConverter tc) {
+            this(exceptionHandler);
+            typeconverter = tc;
 	}
 	
 	@Override
@@ -69,6 +81,10 @@ public abstract class AbstractServices implements IServices {
 	@Override
 	public VariableNamer getVariableNamer() {
 	    return innerVarNamer;
+	}
+
+	public void setTypeConverter(AbstractTypeConverter tc) {
+	    typeconverter = tc;
 	}
 
 	@Override

@@ -11,9 +11,9 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -42,7 +42,7 @@ public abstract class BinaryOperator extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
-	final TypeConverter tc=javaServ.getTypeConverter();
+	final AbstractTypeConverter tc=javaServ.getTypeConverter();
 	try {
 	return tc.getPromotedType
 	    (tc.getKeYJavaType((Expression)getChildAt(0), ec),

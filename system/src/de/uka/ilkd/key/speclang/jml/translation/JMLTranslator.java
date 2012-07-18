@@ -1830,7 +1830,7 @@ final class JMLTranslator {
         @Override
         public SLExpression translate (SLTranslationExceptionManager man, Object ... params ) throws SLTranslationException{
             checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-            JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((IServices)params[0],man);
+            JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
             bigint = ((Services)params[0]).getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             SLExpression e1 = (SLExpression) params[1];
             SLExpression e2 = (SLExpression) params[2];

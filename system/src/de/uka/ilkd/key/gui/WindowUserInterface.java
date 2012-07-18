@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 public class WindowUserInterface extends AbstractUserInterface {
 
-	private MainWindow mainWindow;
+    private MainWindow mainWindow;
 
 
     private LinkedList<InteractiveRuleApplicationCompletion> completions =

@@ -41,10 +41,11 @@ public abstract class AbstractProfile implements Profile {
     private GoalChooserBuilder prototype;
 
     protected AbstractProfile(String standardRuleFilename,
+            Class<?> relativeRulesPath,
             ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
         standardRules = new RuleCollection(RuleSource
-                .initRuleFile(standardRuleFilename),
+                .initRuleFile(relativeRulesPath, standardRuleFilename),
                 initBuiltInRules());
         strategies = getStrategyFactories();
         this.supportedGCB = supportedGCB;
@@ -54,6 +55,7 @@ public abstract class AbstractProfile implements Profile {
 
     }
 
+    
     private static
         ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
@@ -67,8 +69,8 @@ public abstract class AbstractProfile implements Profile {
         return result;
     }
 
-    public AbstractProfile(String standardRuleFilename) {
-        this(standardRuleFilename,
+    protected AbstractProfile(String standardRuleFilename, Class<?> relativeRulesPath) {
+        this(standardRuleFilename, relativeRulesPath,
                 DefaultImmutableSet.<GoalChooserBuilder>nil().
                 add(new DefaultGoalChooserBuilder()).
                 add(new DepthFirstGoalChooserBuilder()).

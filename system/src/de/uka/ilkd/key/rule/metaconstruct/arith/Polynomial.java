@@ -16,8 +16,8 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -225,7 +225,7 @@ public class Polynomial {
         public BigInteger constantPart = BigInteger.ZERO;
         public ImmutableList<Monomial> parts = ImmutableSLList.<Monomial>nil();
         private final IServices services;
-        private final TypeConverter tc;
+        private final AbstractTypeConverter tc;
         private final Operator numbers, add;
             
         public Analyser(final IServices services) {

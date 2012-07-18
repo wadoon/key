@@ -15,7 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.proof.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -40,12 +40,8 @@ public class JavaProfile extends AbstractProfile {
         new JavaCardDLStrategy.Factory();
 
 
-    protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
-        super(standardRules, gcb);
-     }
-
     protected JavaProfile(String standardRules) {
-        super(standardRules);
+        super(standardRules, Proof.class);
      }
 
     public JavaProfile() {

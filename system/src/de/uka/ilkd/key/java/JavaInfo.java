@@ -159,14 +159,11 @@ public final class JavaInfo implements IProgramInfo {
 	services	= s;	 
     }
 
-    protected JavaInfo(JavaInfo proto, Services s) {
-	this ( proto.getKeYProgModelInfo().copy(), s );
-	nullType  = proto.getNullType();
-    }
 
-    public JavaInfo(JavaInfo javaInfo, IServices serv) {
-		// TODO Auto-generated constructor stub
-	}
+    public JavaInfo(JavaInfo proto, IServices s) {
+        this ( proto.getKeYProgModelInfo().copy(), (Services) s );
+        nullType  = proto.getNullType();
+    }
 
 	/**
      * returns the underlying KeYProgModelInfo providing access to the
@@ -192,8 +189,8 @@ public final class JavaInfo implements IProgramInfo {
 	 * @see de.uka.ilkd.key.java.ProgramInfo#copy(de.uka.ilkd.key.java.Services)
 	 */
     @Override
-	public IProgramInfo copy(IServices serv) {
- 	return new JavaInfo(this, serv);
+    public IProgramInfo copy(IServices serv) {
+        return new JavaInfo(this, serv);
     }
 
     /** 

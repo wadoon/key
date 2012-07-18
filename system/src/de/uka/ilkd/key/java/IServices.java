@@ -20,7 +20,7 @@ public interface IServices {
 	/**
 	 * Returns the TypeConverter associated with this Services object.
 	 */
-	public abstract TypeConverter getTypeConverter();
+	public abstract AbstractTypeConverter getTypeConverter();
 
 	public abstract NameRecorder getNameRecorder();
 

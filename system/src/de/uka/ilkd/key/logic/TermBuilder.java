@@ -21,9 +21,9 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
@@ -1340,13 +1340,13 @@ public final class TermBuilder {
     
     
     public Term dotLength(IServices services, Term a) {
-	final TypeConverter tc = services.getTypeConverter();
+	final AbstractTypeConverter tc = services.getTypeConverter();
 	return func(tc.getHeapLDT().getLength(), a); 
     }
     
     
     public Term created(IServices services, Term h, Term o) {
-	final TypeConverter tc = services.getTypeConverter();	
+	final AbstractTypeConverter tc = services.getTypeConverter();	
 	return equals(select(services,
 		              tc.getBooleanLDT().targetSort(),
 			      h,
@@ -1363,7 +1363,7 @@ public final class TermBuilder {
     
     
     public Term initialized(IServices services, Term o) {
-	final TypeConverter tc = services.getTypeConverter();	
+	final AbstractTypeConverter tc = services.getTypeConverter();	
 	return equals(dot(services,
 		          tc.getBooleanLDT().targetSort(),
 		          o,
@@ -1373,7 +1373,7 @@ public final class TermBuilder {
 
     
     public Term classPrepared(IServices services, Sort classSort) {
-	final TypeConverter tc = services.getTypeConverter();	
+	final AbstractTypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
 		                tc.getBooleanLDT().targetSort(),
 		                tc.getHeapLDT().getClassPrepared(classSort, 
@@ -1382,7 +1382,7 @@ public final class TermBuilder {
     }
     
     public Term classInitialized(IServices services, Sort classSort) {
-	final TypeConverter tc = services.getTypeConverter();	
+	final AbstractTypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
 		                tc.getBooleanLDT().targetSort(),
 		                tc.getHeapLDT().getClassInitialized(classSort, 
@@ -1392,7 +1392,7 @@ public final class TermBuilder {
 
     public Term classInitializationInProgress(IServices services, 
 	    				      Sort classSort) {
-	final TypeConverter tc = services.getTypeConverter();	
+	final AbstractTypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
 		                tc.getBooleanLDT().targetSort(),
 		                tc.getHeapLDT()
@@ -1403,7 +1403,7 @@ public final class TermBuilder {
 
         
     public Term classErroneous(IServices services, Sort classSort) {
-	final TypeConverter tc = services.getTypeConverter();	
+	final AbstractTypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
 		                tc.getBooleanLDT().targetSort(),
 		                tc.getHeapLDT().getClassErroneous(classSort, 

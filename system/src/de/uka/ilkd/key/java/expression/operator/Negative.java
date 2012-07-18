@@ -39,12 +39,12 @@ public class Negative extends Operator {
 
 
     public Negative(Expression expr) {
-	super(expr);
+        super(expr);
     }
 
     /**
- *      Get arity.
- *      @return the int value.
+     *      Get arity.
+     *      @return the int value.
      */
 
     public int getArity() {
@@ -52,8 +52,8 @@ public class Negative extends Operator {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     *      Get precedence.
+     *      @return the int value.
      */
 
     public int getPrecedence() {
@@ -61,8 +61,8 @@ public class Negative extends Operator {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     *      Get notation.
+     *      @return the int value.
      */
 
     public int getNotation() {
@@ -70,10 +70,10 @@ public class Negative extends Operator {
     }
 
     /**
- *        Checks if this operator is left or right associative. Ordinary
- *        unary operators are right associative.
- *        @return <CODE>true</CODE>, if the operator is left associative,
- *        <CODE>false</CODE> otherwise.
+     *        Checks if this operator is left or right associative. Ordinary
+     *        unary operators are right associative.
+     *        @return <CODE>true</CODE>, if the operator is left associative,
+     *        <CODE>false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {
@@ -85,7 +85,7 @@ public class Negative extends Operator {
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnNegative(this);
+        v.performActionOnNegative(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -93,8 +93,8 @@ public class Negative extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {
-	return services.getTypeConverter().
-	    getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
+        return services.getTypeConverter().
+                getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
     }
 
 }

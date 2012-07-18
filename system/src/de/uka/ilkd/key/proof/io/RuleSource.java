@@ -57,18 +57,22 @@ public class RuleSource {
 	    }
 	}
     }
-   
 
     public static RuleSource initRuleFile(String filename) {
+        return initRuleFile(Proof.class, filename);
+    }
+    
+    public static RuleSource initRuleFile(Class<?> relative, String filename) {
         URL u = KeYResourceManager.getManager().
-            getResourceFile(Proof.class, PATH_TO_RULES + filename);
+            getResourceFile(relative, PATH_TO_RULES + filename);
         if (u == null) {
             // a more specific exception type would probably be better
             throw new RuntimeException("Could not find rule file "+PATH_TO_RULES+filename);
         }
-	return new RuleSource(u);
+        return new RuleSource(u);
     }
 
+    
     public static RuleSource initRuleFile(URL url) {
 	return new RuleSource(url);
     }

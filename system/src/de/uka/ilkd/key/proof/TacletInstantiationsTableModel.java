@@ -335,7 +335,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 		Object o = nvc.getTypeDefiningObject();
 		IProgramInfo javaInfo = services.getJavaInfo ();
 		if (o instanceof SchemaVariable) {
-	            final TypeConverter tc = services.getTypeConverter();
+	            final AbstractTypeConverter tc = services.getTypeConverter();
 		    final SchemaVariable peerSV = (SchemaVariable)o;
 		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
                     if(peerInst instanceof TypeReference){

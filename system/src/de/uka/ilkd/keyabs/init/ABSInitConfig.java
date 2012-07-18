@@ -1,29 +1,40 @@
 package de.uka.ilkd.keyabs.init;
 
-import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.proof.mgt.ABSProofEnvironment;
 
 public class ABSInitConfig extends AbstractInitConfig {
 
-    public ABSInitConfig(Profile profile) {
-        super(profile);
+    private ABSServices services;
+    private ABSProofEnvironment env;
+
+    public ABSInitConfig(ABSServices services, Profile profile) {
+        super(profile);        
+        this.services = services;
+        this.env = new ABSProofEnvironment(this);
     }
 
     @Override
-    public IServices getServices() {
-        return null;
+    public ABSServices getServices() {
+        return services;
     }
 
     @Override
     public ProofEnvironment getProofEnv() {
-        return null;
+        return env;
     }
 
     @Override
-    public AbstractInitConfig copy() {
-        return null;
+    public ABSInitConfig copy() {
+        ABSInitConfig ic =  
+                new ABSInitConfig(services.copyPreservesLDTInformation(), profile);
+        super.initCopy(ic);
+        return ic;
     }
+    
 
 }

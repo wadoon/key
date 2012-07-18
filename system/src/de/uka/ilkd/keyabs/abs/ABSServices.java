@@ -2,19 +2,21 @@ package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.java.AbstractServices;
 import de.uka.ilkd.key.java.IProgramInfo;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 public class ABSServices extends AbstractServices {
 
+    public ABSServices(KeYExceptionHandler handler) {
+        super(handler);
+    }
+
     @Override
-    public TypeConverter getTypeConverter() {
-        // TODO Auto-generated method stub
+    public ABSTypeConverter getTypeConverter() {
         return null;
     }
 
@@ -37,9 +39,12 @@ public class ABSServices extends AbstractServices {
     }
 
     @Override
-    public IServices copyPreservesLDTInformation() {
-        // TODO Auto-generated method stub
-        return null;
+    public ABSServices copyPreservesLDTInformation() {
+        ABSServices s = new ABSServices(getExceptionHandler());
+        s.setTypeConverter(getTypeConverter().copy(s));
+        s.setNamespaces(namespaces.copy());
+        nameRecorder = nameRecorder.copy();
+        return s;
     }
 
     @Override

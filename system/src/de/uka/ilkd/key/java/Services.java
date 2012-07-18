@@ -30,7 +30,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * transform Java program elements to logic (where possible) and back.
  */
 public class Services extends AbstractServices {
-    
+
     /** used to determine whether an expression is a compile-time 
      * constant and if so the type and result of the expression
      */
@@ -40,63 +40,51 @@ public class Services extends AbstractServices {
      * the information object on the Java model
      */
     private final JavaInfo javainfo;
-        
+
     /**
      * specification repository
      */
-    SpecificationRepository specRepos 
-    	= new SpecificationRepository(this);
-    
+    private SpecificationRepository specRepos = new SpecificationRepository(this);
 
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
      */
     public Services(KeYExceptionHandler exceptionHandler){
-	cee = new ConstantExpressionEvaluator(this);
-        typeconverter = new TypeConverter(this);
-	if(exceptionHandler == null){
-	    this.exceptionHandler = new KeYRecoderExcHandler();
-	}else{
-	    this.exceptionHandler = exceptionHandler;
-	}
+        super(exceptionHandler);
+        setTypeConverter(new TypeConverter(this));
+        cee = new ConstantExpressionEvaluator(this);
         javainfo = new JavaInfo
-        	(new KeYProgModelInfo(this, typeconverter, this.exceptionHandler), this);
-        nameRecorder = new NameRecorder();
+                (new KeYProgModelInfo(this, getTypeConverter(), this.exceptionHandler), this);
     }
-    
-    
+
+
     // ONLY for tests
     public Services() { 
-	this((KeYExceptionHandler) null);
+        this((KeYExceptionHandler) null);
     }    
-    
 
+    
     private Services(KeYCrossReferenceServiceConfiguration crsc, 
-		     KeYRecoderMapping rec2key) {
-	cee = new ConstantExpressionEvaluator(this);
-	typeconverter = new TypeConverter(this);
-	//	exceptionHandler = new KeYRecoderExcHandler();
-	javainfo = new JavaInfo
-	    (new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
-	nameRecorder = new NameRecorder();
+            KeYRecoderMapping rec2key) {
+        super(new KeYRecoderExcHandler());
+        setTypeConverter(new TypeConverter(this));
+        cee = new ConstantExpressionEvaluator(this);
+        //	exceptionHandler = new KeYRecoderExcHandler();
+        javainfo = new JavaInfo
+                (new KeYProgModelInfo(this, crsc, rec2key, getTypeConverter()), this);
     }
 
-    
+
     /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.IServices#getTypeConverter()
-	 */
+     * @see de.uka.ilkd.key.java.IServices#getTypeConverter()
+     */
     @Override
-	public TypeConverter getTypeConverter(){
-        return typeconverter;
+    public TypeConverter getTypeConverter(){
+        return (TypeConverter) typeconverter;
     }
 
-    
-    void setTypeConverter(TypeConverter tc) {
-	typeconverter = tc;
-    }
 
-    
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
      */
@@ -104,7 +92,7 @@ public class Services extends AbstractServices {
         return cee;
     }
 
-    
+
     /**
      * Returns the JavaInfo associated with this Services object.
      */
@@ -120,88 +108,88 @@ public class Services extends AbstractServices {
         return javainfo;
     }
 
-    
+
     /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.IServices#saveNameRecorder(de.uka.ilkd.key.proof.Node)
-	 */
+     * @see de.uka.ilkd.key.java.IServices#saveNameRecorder(de.uka.ilkd.key.proof.Node)
+     */
     @Override
-	public void saveNameRecorder(Node n) {
+    public void saveNameRecorder(Node n) {
         n.setNameRecorder(nameRecorder);
         nameRecorder = new NameRecorder();
     }
 
-    
+
     /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.IServices#addNameProposal(de.uka.ilkd.key.logic.Name)
-	 */
+     * @see de.uka.ilkd.key.java.IServices#addNameProposal(de.uka.ilkd.key.logic.Name)
+     */
     @Override
-	public void addNameProposal(Name proposal) {
+    public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
     }
-    
-    
+
+
     /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.IServices#getSpecificationRepository()
-	 */
+     * @see de.uka.ilkd.key.java.IServices#getSpecificationRepository()
+     */
     @Override
-	public SpecificationRepository getSpecificationRepository() {
-	return specRepos;
+    public SpecificationRepository getSpecificationRepository() {
+        return specRepos;
     }
-    
-    
-    
+
+
+
     /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.IServices#copy()
-	 */
+     * @see de.uka.ilkd.key.java.IServices#copy()
+     */
     @Override
-	public Services copy() {
-	Debug.assertTrue
-	    (!(getJavaInfo().getKeYProgModelInfo().getServConf() 
-	       instanceof SchemaCrossReferenceServiceConfiguration),
-	     "services: tried to copy schema cross reference service config.");
-	Services s = new Services
-	    (getJavaInfo().getKeYProgModelInfo().getServConf(),
-	     getJavaInfo().getKeYProgModelInfo().rec2key().copy());
+    public Services copy() {
+        Debug.assertTrue
+        (!(getJavaInfo().getKeYProgModelInfo().getServConf() 
+                instanceof SchemaCrossReferenceServiceConfiguration),
+                "services: tried to copy schema cross reference service config.");
+        Services s = new Services
+                (getJavaInfo().getKeYProgModelInfo().getServConf(),
+                        getJavaInfo().getKeYProgModelInfo().rec2key().copy());
         s.specRepos = specRepos;
-	s.setTypeConverter(getTypeConverter().copy(s));
-	s.setExceptionHandler(getExceptionHandler());
-	s.setNamespaces(namespaces.copy());
+        s.setTypeConverter(getTypeConverter().copy(s));
+        s.setExceptionHandler(getExceptionHandler());
+        s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
-	return s;
+        return s;
     }
-    
+
 
     /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.IServices#copyPreservesLDTInformation()
-	 */
+     * @see de.uka.ilkd.key.java.IServices#copyPreservesLDTInformation()
+     */
     @Override
-	public Services copyPreservesLDTInformation() {
-	Debug.assertTrue
-	    (!(javainfo.getKeYProgModelInfo().getServConf() 
-	       instanceof SchemaCrossReferenceServiceConfiguration),
-	     "services: tried to copy schema cross reference service config.");
-	Services s = new Services(getExceptionHandler());
-	s.setTypeConverter(getTypeConverter().copy(s));
-	s.setNamespaces(namespaces.copy());
+    public Services copyPreservesLDTInformation() {
+        Debug.assertTrue
+        (!(javainfo.getKeYProgModelInfo().getServConf() 
+                instanceof SchemaCrossReferenceServiceConfiguration),
+                "services: tried to copy schema cross reference service config.");
+        Services s = new Services(getExceptionHandler());
+        s.setTypeConverter(getTypeConverter().copy(s));
+        s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
-	return s;
+        return s;
     }
 
     /* (non-Javadoc)
- 	 * @see de.uka.ilkd.key.java.IServices#copyProofSpecific(Proof)
- 	 */
-	@Override
-	public Services copyProofSpecific(Proof p_proof) {
-	    final Services s = new Services(getJavaInfo().getKeYProgModelInfo().getServConf(),
-	            getJavaInfo().getKeYProgModelInfo().rec2key());
-	    s.proof = p_proof;
-	    s.specRepos = specRepos;
-	    s.setTypeConverter(getTypeConverter().copy(s));
-	    s.setExceptionHandler(getExceptionHandler());
-	    s.setNamespaces(namespaces.copy());
-	    nameRecorder = nameRecorder.copy();
-	    return s;
-	}
+     * @see de.uka.ilkd.key.java.IServices#copyProofSpecific(Proof)
+     */
+    @Override
+    public Services copyProofSpecific(Proof p_proof) {
+        final Services s = new Services(getJavaInfo().getKeYProgModelInfo().getServConf(),
+                getJavaInfo().getKeYProgModelInfo().rec2key());
+        s.proof = p_proof;
+        s.specRepos = specRepos;
+        s.setTypeConverter(getTypeConverter().copy(s));
+        s.setExceptionHandler(getExceptionHandler());
+        s.setNamespaces(namespaces.copy());
+        nameRecorder = nameRecorder.copy();
+        return s;
+    }
 
 
     @Override

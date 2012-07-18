@@ -123,5 +123,4 @@ public interface Profile {
     IServices createServices(KeYExceptionHandler handler);
 
     AbstractInitConfig createInitConfig(IServices services, Profile profile);
-    
 }

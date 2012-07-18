@@ -14,6 +14,7 @@ package de.uka.ilkd.key.java.reference;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -265,7 +266,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 						ExecutionContext ec) {
 	ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
 	if (arguments != null) {
-            final TypeConverter typeConverter = services.getTypeConverter();
+            final AbstractTypeConverter typeConverter = services.getTypeConverter();
 	    for (int i = arguments.size()-1; i>=0; i--) {		
                 signature = signature.prepend
                     (typeConverter.getKeYJavaType(getArgumentAt(i), ec));

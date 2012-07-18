@@ -9,7 +9,6 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.keyabs.init.ABSProfile;
 
 /**
  * The main entry point for KeY
@@ -92,7 +92,8 @@ public class Main {
     public static UserInterface evaluateOptions(String[] opt) {
         UserInterface ui = null;
     	int index = 0;
-        ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
+        //ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
+    	ProofSettings.DEFAULT_SETTINGS.setProfile(new ABSProfile());
         String uiMode = "INTERACTIVE";
         while (opt.length > index) {
             if ((new File(opt[index])).exists()) {

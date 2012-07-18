@@ -15,22 +15,25 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class ABSInfo implements IProgramInfo {
 
+    private final ABSServices services;
+    
+    public ABSInfo(ABSServices services) {
+        this.services = services;
+    }
+    
     @Override
     public AbstractKeYProgramModelMapping rec2key() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public IProgramInfo copy(IServices serv) {
-        // TODO Auto-generated method stub
-        return null;
+        return new ABSInfo((ABSServices) serv);
     }
 
     @Override
-    public IServices getServices() {
-        // TODO Auto-generated method stub
-        return null;
+    public ABSServices getServices() {
+        return services;
     }
 
     @Override
