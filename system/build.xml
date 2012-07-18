@@ -67,6 +67,7 @@
   	<echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
   	
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser"/>
+        <mkdir dir="${gen.dir}/de/uka/ilkd/keyabs/parser"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
@@ -103,7 +104,7 @@
   </target>
 
 
-  <target name="compile" depends="prepare, keyparser, proofjavaparser, schemajavaparser, 
+  <target name="compile" depends="prepare, keyparser, abskeyparser, proofjavaparser, schemajavaparser, 
   	                                   jmlparser, jmlpreparser, copy"
           description="Compiles all java files into the source directory.">
   	
@@ -162,6 +163,28 @@
         </classpath>
      </antlr>
   </target>
+
+	  <target name="abskeylexer">
+	     <antlr
+	         target="${src.dir}/de/uka/ilkd/keyabs/parser/abslexer.g"
+	         outputdirectory="${gen.dir}/de/uka/ilkd/keyabs/parser">
+	        <classpath>
+	           <pathelement location="${ext.dir}/antlr.jar" />
+	        </classpath>
+	     </antlr>
+	  </target>
+
+
+	  <target name="abskeyparser"  depends="abskeylexer">
+	     <antlr
+	         target="${src.dir}/de/uka/ilkd/keyabs/parser/abskeyparser.g"
+	         outputdirectory="${gen.dir}/de/uka/ilkd/keyabs/parser">
+	        <classpath>
+	           <pathelement location="${ext.dir}/antlr.jar" />
+	        </classpath>
+	     </antlr>
+	  </target>
+
 
 	
 	<target name="jmlprelexer">

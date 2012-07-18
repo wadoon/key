@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.parser;
 
-class UnfittingReplacewithException 
+public class UnfittingReplacewithException 
     extends antlr.SemanticException {
     
     /**

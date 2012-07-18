@@ -37,7 +37,7 @@ public class ABSProfile extends AbstractProfile {
     }
 
     @Override
-    public IServices createServices(KeYExceptionHandler handler) {
+    public ABSServices createServices(KeYExceptionHandler handler) {
         return new ABSServices(handler);
     }
 

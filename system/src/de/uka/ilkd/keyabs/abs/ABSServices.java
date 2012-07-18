@@ -72,7 +72,7 @@ public class ABSServices extends AbstractServices {
     }
 
     @Override
-    public IProgramInfo getProgramInfo() {
+    public ABSInfo getProgramInfo() {
         // TODO Auto-generated method stub
         return null;
     }

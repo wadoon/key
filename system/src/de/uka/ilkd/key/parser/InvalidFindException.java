@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.parser;
 
-class InvalidFindException 
+public class InvalidFindException 
     extends antlr.SemanticException {
     
     /**
