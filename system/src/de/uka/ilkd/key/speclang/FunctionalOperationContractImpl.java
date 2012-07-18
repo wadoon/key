@@ -20,7 +20,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -45,6 +44,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -123,7 +123,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         this.baseName               = baseName;
         this.name = name != null 
                   ? name 
-                  : ContractFactory.generateContractName(baseName, kjt, pm, id);
+                  : JavaContractFactory.generateContractName(baseName, kjt, pm, id);
         this.pm          	    = pm;
         this.kjt                    = kjt;
         this.modality               = modality;
@@ -499,7 +499,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     
     @Override
-    public String getHTMLText(Services services) {
+    public String getHTMLText(IServices services) {
     final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
     final LocationVariable baseHeap = heapLDT.getHeap();
 	final StringBuffer sig = new StringBuffer();
@@ -847,16 +847,16 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig,
+    public ProofOblInput createProofObl(AbstractInitConfig initConfig,
 	    Contract contract) {
-	return new FunctionalOperationContractPO(initConfig,
+	return new FunctionalOperationContractPO((InitConfig) initConfig,
 	        (FunctionalOperationContract) contract);
     }
 
 	        	        
     @Override
     public String getDisplayName() {
-        return ContractFactory.generateDisplayName(baseName, kjt, pm, id);
+        return JavaContractFactory.generateDisplayName(baseName, kjt, pm, id);
     }
 
 
@@ -920,6 +920,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     @Override
     public String getTypeName() {
-        return ContractFactory.generateContractTypeName(baseName, kjt, pm);
+        return JavaContractFactory.generateContractTypeName(baseName, kjt, pm);
     }
 }

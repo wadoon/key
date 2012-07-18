@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.math.BigInteger;
-
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -49,7 +47,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
     	final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
     	if(queryTreatmenIsOn || 
     	   props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
-    		result = QueryExpand.INSTANCE.evaluateQueries(services, arg1, positiveContext, queryTreatmenIsOn);
+    		result = QueryExpand.INSTANCE.evaluateQueries((Services) services, arg1, positiveContext, queryTreatmenIsOn);
     	}else{
     		result = arg1;
     	}

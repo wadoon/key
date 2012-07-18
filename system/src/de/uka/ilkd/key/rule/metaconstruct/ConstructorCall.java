@@ -39,7 +39,7 @@ import de.uka.ilkd.key.util.Debug;
  * <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
-public class ConstructorCall extends ProgramTransformer {
+public class ConstructorCall extends ProgramTransformer<Services> {
 
     private static final String NORMALFORM_IDENTIFIER = 	    
 		de.uka.ilkd.key.java.recoderext.

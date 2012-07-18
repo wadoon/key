@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *   }
  *
  */
-public class UnwindLoop extends ProgramTransformer {
+public class UnwindLoop extends ProgramTransformer<Services> {
 
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel;

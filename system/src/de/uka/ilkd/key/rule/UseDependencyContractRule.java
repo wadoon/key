@@ -382,7 +382,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 	//heap term of observer must be store-term (or anon, create, 
 	//memset, ...)
-	final Services services = goal.proof().getServices();
+	final IServices services = goal.proof().getServices();
 	if(!hasRawSteps(focus.sub(0), goal.sequent(), services)) {
 	    return false;
 	}
@@ -392,7 +392,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final KeYJavaType kjt 
 		= target.isStatic() 
 		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(focus.sub(1).sort());
+	          : services.getProgramInfo().getKeYJavaType(focus.sub(1).sort());
 	assert kjt != null : "could not determine receiver type for " + focus;
 	if(kjt.getSort() instanceof NullSort) {
 	    return false;
@@ -478,7 +478,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}
 	int i = 0;
 	for(Term paramTerm : paramTerms) {
-	    freePre = TB.and(freePre, TB.reachableValue(services,
+	    freePre = TB.and(freePre, TB.reachableValue((Services) services,
 					       		subStep,
 					       		paramTerm, 
 					       		target.getParamType(i++)));

@@ -10,12 +10,20 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.inst.GenericSortCondition;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * Variable condition that enforces a given generic sort to be instantiated with
@@ -24,7 +32,7 @@ import de.uka.ilkd.key.rule.inst.*;
  * The condition can only be fulfilled if the given field term is constant of
  * which the referred type is known.
  */
-public final class FieldTypeToSortCondition implements VariableCondition {
+public final class FieldTypeToSortCondition implements VariableCondition<Services> {
 
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort sort;
@@ -52,7 +60,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var,
                                  SVSubstitute svSubst,
                                  MatchConditions matchCond,
-                                 IServices services) {
+                                 Services services) {
             
         if (var != exprOrTypeSV) {
             return matchCond;

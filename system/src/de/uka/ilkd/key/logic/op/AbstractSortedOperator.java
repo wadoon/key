@@ -13,7 +13,7 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -101,9 +101,9 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 	final Sort s = possibleSub.sort();
 	
 	return s == AbstractTermTransformer.METASORT
-	       || s instanceof ProgramSVSort
+	       || s instanceof IProgramSVSort
 	       || argSort(at) == AbstractTermTransformer.METASORT
-	       || argSort(at) instanceof ProgramSVSort
+	       || argSort(at) instanceof IProgramSVSort
 	       || s.extendsTrans(argSort(at));
     }
     

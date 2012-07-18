@@ -42,7 +42,7 @@ import de.uka.ilkd.key.util.ExtList;
  * 
  */
 
-public class EnhancedForElimination extends ProgramTransformer {
+public class EnhancedForElimination extends ProgramTransformer<Services> {
 
     private Services services;
 

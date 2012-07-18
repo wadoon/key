@@ -39,10 +39,12 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -246,8 +248,8 @@ public final class SLEnvInput extends AbstractEnvInput {
     
     private void createSpecs(SpecExtractor specExtractor) 
             throws ProofInputException {
-        final JavaInfo javaInfo 
-            = initConfig.getServices().getJavaInfo();
+        final IProgramInfo javaInfo 
+            = initConfig.getServices().getProgramInfo();
         final SpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
         
@@ -307,7 +309,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             
             //constructor contracts
             final ImmutableList<IProgramMethod> constructors 
-            	= javaInfo.getConstructors(kjt);
+            	= ((JavaInfo) javaInfo).getConstructors(kjt);
             for(IProgramMethod constructor : constructors) {
         	assert constructor.isConstructor();
         	final ImmutableSet<SpecificationElement> constructorSpecs 
@@ -341,7 +343,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         final GeneralSettings gs 
             = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
-            createSpecs(new JMLSpecExtractor(initConfig.getServices()));
+            createSpecs(new JMLSpecExtractor((Services) initConfig.getServices()));
         }
     }
 }

@@ -211,8 +211,8 @@ public final class JavaInfo implements IProgramInfo {
 	 * @see de.uka.ilkd.key.java.ProgramInfo#getServices()
 	 */
     @Override
-	public IServices getServices(){
-	return services;
+    public Services getServices(){
+        return services;
     }
 
     //------------------- common services ----------------------
@@ -1355,6 +1355,11 @@ public final class JavaInfo implements IProgramInfo {
          * condition
          */
         public abstract boolean isSatisfiedBy(ProgramElement pe);
+    }
+
+    @Override
+    public boolean isReferenceSort(Sort sort) {
+        return sort.extendsTrans(objectSort());
     }
 
 }

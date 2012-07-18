@@ -21,7 +21,7 @@ import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
@@ -39,14 +39,14 @@ public class ProofEnvironment {
     private JavaModel jModel;
     private RuleConfig ruleConfig;
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
-    private final InitConfig initConfig; 
+    private final AbstractInitConfig initConfig; 
     private Set<ProofAggregate> proofs = new HashSet<ProofAggregate>(); //of ProofList
     private int number = 0;
 
     /** constructs a proof environment with the given initial
      * configuration of the proofs contained in the environment.
      */
-    public ProofEnvironment(InitConfig initConfig) {
+    public ProofEnvironment(AbstractInitConfig initConfig) {
 	this.initConfig = initConfig;
     }
 
@@ -87,7 +87,7 @@ public class ProofEnvironment {
     /** returns the initial configuration to be used to load proofs in
      * this environment. 
      */
-    public InitConfig getInitConfig() {
+    public AbstractInitConfig getInitConfig() {
 	return initConfig;
     }
 

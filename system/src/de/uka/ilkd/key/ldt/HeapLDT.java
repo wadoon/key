@@ -336,7 +336,6 @@ public final class HeapLDT extends LDT {
     public Function getFieldSymbolForPV(LocationVariable fieldPV, 
 	    				IServices services) {
 	assert fieldPV.isMember();	
-	assert fieldPV != services.getJavaInfo().getArrayLength();
 	
 	final Name name = new Name(getFieldSymbolName(fieldPV));
 	Function result = (Function) services.getNamespaces()

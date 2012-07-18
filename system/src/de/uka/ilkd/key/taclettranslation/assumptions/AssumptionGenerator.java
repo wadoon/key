@@ -165,7 +165,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         }
 
         static public boolean isReferenceSort(Sort sort, IServices services) {
-                return (sort.extendsTrans(services.getJavaInfo().objectSort()) && !(sort instanceof NullSort));
+                return services.getProgramInfo().isReferenceSort(sort) && !(sort instanceof NullSort);
 
         }
 

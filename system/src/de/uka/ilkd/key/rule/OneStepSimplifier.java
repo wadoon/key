@@ -23,8 +23,13 @@ import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -203,7 +208,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      * Helper for simplifyPosOrSub. Performs a single step of simplification 
      * locally at the given position using the given taclet index.
      */
-    private SequentFormula simplifyPos(Services services,
+    private SequentFormula simplifyPos(IServices services,
 	  	        		   PosInOccurrence pos,
 	  	        		   int indexNr) {
 	final ImmutableList<NoPosTacletApp> apps 
@@ -234,7 +239,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      * recursively at a subterm of the given position using the given taclet 
      * index.
      */    
-    private SequentFormula simplifySub(Services services,
+    private SequentFormula simplifySub(IServices services,
 		   			   PosInOccurrence pos,
 		   			   int indexNr) {
 	for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {
@@ -252,7 +257,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      * Performs a single step of simplification at the given position or its 
      * subterms using the given taclet index.
      */
-    private SequentFormula simplifyPosOrSub(Services services,
+    private SequentFormula simplifyPosOrSub(IServices services,
 	    		     	  	        PosInOccurrence pos,
 	    		     	  	        int indexNr) {
 	final Term term = pos.subTerm();
@@ -345,7 +350,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      * arbitrarily many replace-known steps.
      */
     private SequentFormula simplifyConstrainedFormula(
-	    				Services services,
+	    				IServices services,
 	    				SequentFormula cf,
 	    				Map<Term,PosInOccurrence> context,
 	    				/*out*/ List<PosInOccurrence> ifInsts) {
@@ -373,7 +378,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      * Freshly computes the overall simplification result for the passed 
      * constrained formula. 
      */
-    private Instantiation computeInstantiation(Services services,
+    private Instantiation computeInstantiation(IServices services,
 	    				       SequentFormula cf,
 	    				       Sequent seq) {
 	//collect context formulas (potential if-insts for replace-known)
@@ -425,7 +430,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     /**
      * Tells whether the passed formula can be simplified
      */
-    private boolean applicableTo(Services services, SequentFormula cf) {
+    private boolean applicableTo(IServices services, SequentFormula cf) {
 	final Boolean b = applicabilityCache.get(cf);
 	if(b != null) {
 	    return b.booleanValue();

@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class IsStatic extends ProgramTransformer{
+public class IsStatic extends ProgramTransformer<Services>{
 
     /** creates a typeof ProgramTransformer 
      * @param pe the instance of expression contained by 

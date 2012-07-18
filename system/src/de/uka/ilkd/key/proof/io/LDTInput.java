@@ -16,9 +16,15 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
@@ -38,7 +44,7 @@ public class LDTInput implements EnvInput {
     private final KeYFile[] keyFiles;
     private final LDTInputListener listener;
 
-    private InitConfig initConfig = null;
+    private AbstractInitConfig initConfig = null;
 
 
     /** creates a representation of the LDT files to be used as input
@@ -69,7 +75,7 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public void setInitConfig(InitConfig conf) {
+    public void setInitConfig(AbstractInitConfig conf) {
 	this.initConfig=conf;
 	for(int i = 0; i < keyFiles.length; i++) {
 	    keyFiles[i].setInitConfig(conf);

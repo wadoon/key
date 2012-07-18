@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.parser.schemajava.ParseException;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
@@ -135,7 +136,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
 
-    public boolean lookupSchemaVariableType(String s, ProgramSVSort sort) {
+    public boolean lookupSchemaVariableType(String s, IProgramSVSort sort) {
 	if (svns==null) return false;
 	Named n=svns.lookup(new Name(s));
 	if (n!=null && n instanceof SchemaVariable) {

@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -135,7 +135,7 @@ public class UserDefinedSymbols {
                 }
         }
 
-        public String getRuleHeader(Services services) {
+        public String getRuleHeader(IServices services) {
                 if (parent != null) {
                         if (ruleHeader == null) {
                                 ruleHeader = createRuleHeader(services);
@@ -146,7 +146,7 @@ public class UserDefinedSymbols {
                 }
         }
 
-        private String createRuleHeader(Services services) {
+        private String createRuleHeader(IServices services) {
                 StringBuffer buffer = new StringBuffer();
                 buffer.append("\\rules{");
                 for (Taclet taclet : axioms) {
@@ -161,7 +161,7 @@ public class UserDefinedSymbols {
 
         }
         
-        private StringBuffer createHeaderFor(Taclet taclet, Services services){
+        private StringBuffer createHeaderFor(Taclet taclet, IServices services){
                 NotationInfo info = new NotationInfo();
                 StringBackend backend = new StringBackend(80);
               LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),info, backend,services,true);
@@ -173,7 +173,7 @@ public class UserDefinedSymbols {
 
 
 
-        public String createHeader(Services services) {
+        public String createHeader(IServices services) {
                 StringBuffer result = new StringBuffer();
             
                 result.append("\n\n\\sorts{\n");

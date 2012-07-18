@@ -11,6 +11,8 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -25,7 +27,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 /**
  * The proof obligation for dependency contracts. 
  */
-public final class DependencyContractPO extends AbstractPO 
+public final class DependencyContractPO extends AbstractJavaPO 
                                         implements ContractPO {
     
     private Term mbyAtPre;    
@@ -43,12 +45,24 @@ public final class DependencyContractPO extends AbstractPO
     	assert !(contract instanceof FunctionalOperationContract);
       this.contract = contract;
     }
+   
     
     
     
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------    
+    
+    @Override
+    protected Services getServices() {
+        return (Services)super.getServices();
+    }
+
+    @Override
+    protected JavaInfo getJavaInfo() {
+        return getServices().getJavaInfo();
+    }
+
     
     private Term buildFreePre(ProgramVariable selfVar,
 	                      KeYJavaType selfKJT,
@@ -59,20 +73,20 @@ public final class DependencyContractPO extends AbstractPO
 	final Term selfNotNull 
             = selfVar == null
               ? TB.tt()
-              : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+              : TB.not(TB.equals(TB.var(selfVar), TB.NULL(getServices())));
               
         //"self.<created> = TRUE"
         final Term selfCreated
            = selfVar == null
              ? TB.tt()
-             : TB.created(services, TB.var(selfVar));
+             : TB.created(getServices(), TB.var(selfVar));
 	
         	      
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType
            = selfVar == null
              ? TB.tt()
-             : TB.exactInstance(services, 
+             : TB.exactInstance(getServices(), 
         	                selfKJT.getSort(), 
         	                TB.var(selfVar));
              
@@ -82,27 +96,27 @@ public final class DependencyContractPO extends AbstractPO
         //- "inBounds(p_i)" for integer parameters
         Term paramsOK = TB.tt();
         for(ProgramVariable paramVar : paramVars) {
-            paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
+            paramsOK = TB.and(paramsOK, TB.reachableValue(getServices(), paramVar));
         }
         
         //initial value of measured_by clause
         final Term mbyAtPreDef;
         if(contract.hasMby()) {
             final Function mbyAtPreFunc
-            	= new Function(new Name(TB.newName(services, "mbyAtPre")), 
-        		       services.getTypeConverter()
+            	= new Function(new Name(TB.newName(getServices(), "mbyAtPre")), 
+        		       getServices().getTypeConverter()
         		               .getIntegerLDT()
         		               .targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
-            final Term mby = contract.getMby(selfVar, paramVars, services);
+            final Term mby = contract.getMby(selfVar, paramVars, getServices());
             mbyAtPreDef = TB.equals(mbyAtPre, mby);
         } else {
             mbyAtPreDef = TB.tt();
         }        
              
-        return TB.and(new Term[]{TB.wellFormed(TB.getBaseHeap(services), services), 
-        			 TB.wellFormed(anonHeap, services),
+        return TB.and(new Term[]{TB.wellFormed(TB.getBaseHeap(getServices()), getServices()), 
+        			 TB.wellFormed(anonHeap, getServices()),
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
@@ -120,7 +134,7 @@ public final class DependencyContractPO extends AbstractPO
     public void readProblem() throws ProofInputException {
 	IObserverFunction target = contract.getTarget();
 	if(target instanceof IProgramMethod) {
-	    target = javaInfo.getToplevelPM(contract.getKJT(), 
+	    target = getJavaInfo().getToplevelPM(contract.getKJT(), 
 		    			    (IProgramMethod)target);
 	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
 	    if (target == null) target = contract.getTarget();
@@ -128,13 +142,13 @@ public final class DependencyContractPO extends AbstractPO
 	
 	//prepare variables
 	final ProgramVariable selfVar 
-		= TB.selfVar(services, contract.getKJT(), true);
+		= TB.selfVar(getServices(), contract.getKJT(), true);
 	final ImmutableList<ProgramVariable> paramVars
-		= TB.paramVars(services, target, true);
+		= TB.paramVars(getServices(), target, true);
 
 	//prepare anon heap
 	final Name anonHeapName 
-		= new Name(TB.newName(services, "anonHeap"));
+		= new Name(TB.newName(getServices(), "anonHeap"));
 	final Function anonHeapFunc = new Function(anonHeapName,
 		heapLDT.targetSort());
 	final Term anonHeap = TB.func(anonHeapFunc);
@@ -150,25 +164,25 @@ public final class DependencyContractPO extends AbstractPO
 			                     contract.getKJT(), 
 					     paramVars,
 					     anonHeap),
-			        contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, services));
-	final Term dep = getContract().getDep(selfVar, paramVars, services);
+			        contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, getServices()));
+	final Term dep = getContract().getDep(selfVar, paramVars, getServices());
 	
 	//prepare update
 	final Term changedHeap 
-		= TB.anon(services, 
-			  TB.getBaseHeap(services), 
-			  TB.setMinus(services, 
-				      TB.allLocs(services), 
+		= TB.anon(getServices(), 
+			  TB.getBaseHeap(getServices()), 
+			  TB.setMinus(getServices(), 
+				      TB.allLocs(getServices()), 
 				      dep), 
                           anonHeap);
-	final Term update = TB.elementary(services, 
+	final Term update = TB.elementary(getServices(), 
 					  heapLDT.getHeap(), 
 					  changedHeap);
 	
 	//prepare target term
 	final Term[] subs
 		= new Term[paramVars.size() + (target.isStatic() ? 1 : 2)];
-	subs[0] = TB.getBaseHeap(services);
+	subs[0] = TB.getBaseHeap(getServices());
 	int offset = 1;
 	if(!target.isStatic()) {
 	    subs[1] = TB.var(selfVar);

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -107,7 +108,7 @@ public class QueryExpand implements BuiltInRule {
      * @author Richard Bubel
      * @author gladisch 
      */
-    public Term queryEvalTerm(Services services, Term query, LogicVariable[] instVars){
+    public Term queryEvalTerm(IServices services, Term query, LogicVariable[] instVars){
     	
     	   final IProgramMethod method = (IProgramMethod)query.op();
     	   
@@ -123,7 +124,7 @@ public class QueryExpand implements BuiltInRule {
            //The new symbolc is introduced as a logical variable that is later skolemized by the ex_left rule.
            //  LogicVariable logicResultQV = new LogicVariable(new Name("res_"+method.getName()),query.sort());
            
-           KeYJavaType calleeType = services.getJavaInfo().getKeYJavaType(
+           KeYJavaType calleeType = services.getProgramInfo().getKeYJavaType(
              query.subs().size() == 1 ? // static query
                 query.sort()
                 :
@@ -583,8 +584,9 @@ public class QueryExpand implements BuiltInRule {
         if (pio!=null && pio.subTerm().op() instanceof IProgramMethod && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
-            final Sort nullSort = goal.getServices().nullSort();
-            if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) && 
+            final JavaInfo javaInfo = (JavaInfo) goal.getServices().getProgramInfo();
+            final Sort nullSort = javaInfo.nullSort();
+            if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(javaInfo.objectSort()) && 
                     !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while ( it.next() != -1 ) {

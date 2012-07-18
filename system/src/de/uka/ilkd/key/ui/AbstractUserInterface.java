@@ -40,7 +40,7 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public InitConfig load(File file, List<File> classPath, File bootClassPath) throws FileNotFoundException, ProofInputException {
+    public AbstractInitConfig load(File file, List<File> classPath, File bootClassPath) throws FileNotFoundException, ProofInputException {
        ProblemLoader loader = new ProblemLoader(file, classPath, bootClassPath, getMediator());
        EnvInput envInput = loader.createEnvInput(file, classPath, bootClassPath);
        AbstractProblemInitializer init = createProblemInitializer();

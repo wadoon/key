@@ -10,18 +10,15 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.io.StringReader;
 import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
-import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
@@ -88,27 +85,13 @@ public class IfChoiceModel extends DefaultComboBoxModel {
 	return res;
     }
 
-
-    /** creates a new Termparser that parses the given string
-     * @param s the String to parse 
-     */
-    private KeYParser stringParser(String s) {
-	return new KeYParser(ParserMode.TERM,new KeYLexer(new StringReader(s),services.getExceptionHandler()),
-			      "", 
-			      new Recoder2KeY(services,
-					      nss),			      
-			      services, nss, scm);
-    }
-
-
     /** 
      * parses and returns the term encoded as string 's' 
      * @param s the String to parse 
      * @return the term encoded in 's' 
      */
     public Term parseFormula(String s) throws antlr.ANTLRException {
-	KeYParser p = stringParser(s);
-	return p.formula();
+	return ProblemLoader.parseTerm(s, services, nss.variables(), nss.programVariables(), scm);
     }
 
 

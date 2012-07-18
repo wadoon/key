@@ -78,7 +78,7 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
     }
 
     public KeYJavaType getKeYJavaType(IServices javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);	
+	return javaServ.getProgramInfo().getKeYJavaType(PrimitiveType.JAVA_INT);	
     }
 
     public KeYJavaType getKeYJavaType(IServices javaServ, 

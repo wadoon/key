@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -50,7 +49,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
      * @return
      */
     private static PosInOccurrence letUserChooseStep(
-            List<PosInOccurrence> steps, boolean forced, Services services) {
+            List<PosInOccurrence> steps, boolean forced, IServices services) {
 
         if (steps.size() == 0) {
             return null;

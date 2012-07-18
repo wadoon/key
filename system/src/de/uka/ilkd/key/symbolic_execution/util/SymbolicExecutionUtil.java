@@ -55,7 +55,6 @@ import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -164,7 +163,7 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Contract}.
     * @throws SLTranslationException Occurred Exception.
     */
-   public static FunctionalOperationContract createDefaultContract(Services services, 
+   public static FunctionalOperationContract createDefaultContract(IServices services, 
                                                                    IProgramMethod pm,
                                                                    String precondition) throws SLTranslationException {
       // Create TextualJMLSpecCase
@@ -175,7 +174,7 @@ public final class SymbolicExecutionUtil {
          textualSpecCase.addRequires(new PositionedString(precondition));
       }
       // Create contract
-      JMLSpecFactory factory = new JMLSpecFactory(services);
+      JMLSpecFactory factory = new JMLSpecFactory((Services) services);
       ImmutableSet<Contract> contracts = factory.createJMLOperationContracts(pm, textualSpecCase);
       return (FunctionalOperationContract)contracts.iterator().next();
    }
@@ -207,7 +206,7 @@ public final class SymbolicExecutionUtil {
          }
       };
       // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig(source.getServices().copy(), profile);
+      AbstractInitConfig initConfig = profile.createInitConfig(source.getServices().copy(), profile);
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
@@ -523,7 +522,7 @@ public final class SymbolicExecutionUtil {
     */
    public static List<IProgramVariable> collectAllElementaryUpdateTerms(Node node) {
       if (node != null) {
-         Services services = node.proof().getServices();
+         IServices services = node.proof().getServices();
          List<IProgramVariable> result = new LinkedList<IProgramVariable>();
          for (SequentFormula sf : node.sequent().antecedent()) {
             internalCollectAllElementaryUpdateTerms(services, result, sf.formula());
@@ -546,7 +545,7 @@ public final class SymbolicExecutionUtil {
     * @param result The result {@link List} to fill.
     * @param term The current term to analyze.
     */
-   private static void internalCollectAllElementaryUpdateTerms(Services services, List<IProgramVariable> result, Term term) {
+   private static void internalCollectAllElementaryUpdateTerms(IServices services, List<IProgramVariable> result, Term term) {
       if (term != null) {
          if (term.op() instanceof ElementaryUpdate) {
             if (SymbolicExecutionUtil.isHeapUpdate(services, term)) {
@@ -578,7 +577,8 @@ public final class SymbolicExecutionUtil {
     * @param result The result {@link List} to fill.
     * @param term The current term to analyze.
     */
-   private static void internalCollectStaticProgramVariablesOnHeap(Services services, Set<IProgramVariable> result, Term term) {
+   private static void internalCollectStaticProgramVariablesOnHeap(IServices iservices, Set<IProgramVariable> result, Term term) {
+      Services services = (Services)iservices;
       final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
       try {
          if (term.op() == heapLDT.getStore()) {
@@ -662,7 +662,7 @@ public final class SymbolicExecutionUtil {
             }
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
-               IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
+               IProgramMethod pm = mbs.getProgramMethod((Services) node.proof().getServices());
                return !pm.isImplicit(); // Do not include implicit methods
             }
          }
@@ -979,7 +979,7 @@ public final class SymbolicExecutionUtil {
       int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
       TacletGoalTemplate goalTemplate = app.taclet().goalTemplates().take(childIndex).head();
       // Apply instantiations of schema variables to sequent of goal template
-      Services services = node.proof().getServices();
+      IServices services = node.proof().getServices();
       SVInstantiations instantiations = app.instantiations();
       ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
       ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
@@ -1009,7 +1009,7 @@ public final class SymbolicExecutionUtil {
     * @param semisequent The {@link Semisequent} to apply instantiations on.
     * @return The list of created {@link Term}s in which schema variables are replaced with the instantiation.
     */
-   private static ImmutableList<Term> listSemisequentTerms(Services services, 
+   private static ImmutableList<Term> listSemisequentTerms(IServices services, 
                                                            SVInstantiations svInst, 
                                                            Semisequent semisequent) {
       ImmutableList<Term> terms = ImmutableSLList.nil();

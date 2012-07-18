@@ -13,18 +13,38 @@ package de.uka.ilkd.key.proof;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
+import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -37,7 +57,17 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstDirect;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -199,7 +229,7 @@ public final class ProblemLoader implements Runnable {
                
                init = new ProblemInitializer(ui, mediator.getProfile(),  true, ui);; 
                
-               InitConfig initConfig = init.prepare(envInput);
+               AbstractInitConfig initConfig = init.prepare(envInput);
                int proofNum = 0;
                final String chooseContract;
                if(envInput instanceof KeYFile) {
@@ -234,11 +264,11 @@ public final class ProblemLoader implements Runnable {
         	       throw new RuntimeException("Contract not found: " 
         		                          + baseContractName);
         	   } else {
-                       po = contract.createProofObl(initConfig, contract);
+                       po = contract.createProofObl((InitConfig) initConfig, contract);
                    }
         	   
                } else { 
-        	   ProofManagementDialog.showInstance(mediator, initConfig);
+        	   ProofManagementDialog.showInstance(mediator, (InitConfig) initConfig);
         	   if(ProofManagementDialog.startedProof()) {
         	       return status;
         	   } else {
@@ -282,7 +312,6 @@ public final class ProblemLoader implements Runnable {
        }
        return status;
    }
-
 
 
     public void loadPreferences(String preferences) {
@@ -533,7 +562,7 @@ public final class ProblemLoader implements Runnable {
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
-        Services services = mediator.getServices();
+        IServices services = mediator.getServices();
         
 
         if (currFormula != 0) { // otherwise we have no pos
@@ -564,7 +593,7 @@ public final class ProblemLoader implements Runnable {
 
     /** 1st pass: only VariableSV */
     public static TacletApp parseSV1(TacletApp app, SchemaVariable sv,
-                                     String value, Services services) {
+                                     String value, IServices services) {
         LogicVariable lv = new LogicVariable(new Name(value),
                                            app.getRealSort(sv, services));
         Term instance = TermFactory.DEFAULT.createTerm(lv);
@@ -578,7 +607,7 @@ public final class ProblemLoader implements Runnable {
                                      String value, 
                                      Goal targetGoal) {        
         final Proof p = targetGoal.proof();
-        final Services services = p.getServices();
+        final IServices services = p.getServices();
         TacletApp result;
         if(sv instanceof VariableSV) {
             // ignore -- already done
@@ -601,7 +630,7 @@ public final class ProblemLoader implements Runnable {
     }
 
 
-    private TacletApp constructInsts(TacletApp app, Services services) {
+    private TacletApp constructInsts(TacletApp app, IServices services) {
         if (loadedInsts == null) return app;
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
@@ -661,8 +690,8 @@ public final class ProblemLoader implements Runnable {
                                        "\nVar namespace is: "+varNS+"\n", e);
         }
     }
-    public static Term parseTerm(String value, Services services,
-            Namespace varNS, Namespace progVar_ns) {
+    public static Term parseTerm(String value, IServices services,
+            Namespace varNS, Namespace progVar_ns, AbbrevMap scm) {
         try { 
             return new DefaultTermParser().
                 parse(new StringReader(value), null,
@@ -671,17 +700,23 @@ public final class ProblemLoader implements Runnable {
                       services.getNamespaces().functions(),
                       services.getNamespaces().sorts(),
                       progVar_ns,
-                      new AbbrevMap());
+                      scm);
         } catch(ParserException e) {
             throw new RuntimeException("Error while parsing value "+value+
                                        "\nVar namespace is: "+varNS+"\n", e);
         }
     }
 
+    public static Term parseTerm(String value, IServices services,
+            Namespace varNS, Namespace progVar_ns) {
+        return parseTerm(value, services, varNS, progVar_ns, new AbbrevMap());
+    }
+    
     public static Term parseTerm(String value, Proof proof) {
         return parseTerm(value, proof, proof.getNamespaces().variables(),
                 proof.getNamespaces().programVariables());
     }
+   
 
 
     private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
@@ -716,4 +751,5 @@ public final class ProblemLoader implements Runnable {
     public KeYExceptionHandler getExceptionHandler() {
         return exceptionHandler;
     }
+
 }

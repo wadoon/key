@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -27,7 +26,7 @@ public class LoopInvariantRuleCompletion implements
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
             boolean forced) {
-        Services services = goal.proof().getServices();
+        Services services = (Services) goal.proof().getServices();
 
         LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) app
                 .tryToInstantiate(goal);

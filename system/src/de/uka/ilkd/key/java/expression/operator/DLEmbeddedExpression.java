@@ -2,10 +2,9 @@ package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -53,7 +52,7 @@ public class DLEmbeddedExpression extends Operator {
             return kjt;
         } else {
             // FIXME FIXME FIXME Unknown types are mapped to int.
-            return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+            return javaServ.getProgramInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
         }
     }
 
@@ -77,7 +76,7 @@ public class DLEmbeddedExpression extends Operator {
         p.printDLEmbeddedExpression(this);
     }
 
-    public void check(Services javaServ) throws ConvertException {
+    public void check(IServices javaServ) throws ConvertException {
         
         if(functionSymbol == null)
             throw new ConvertException("null function symbol");
@@ -108,11 +107,11 @@ public class DLEmbeddedExpression extends Operator {
         }
     }
 
-    private KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
+    private KeYJavaType getKeYJavaType(IServices javaServ, Sort argSort) {
         // JavaInfo returns wrong data for sort integer! We need to find it over
         // other paths.
-        JavaInfo javaInfo = javaServ.getJavaInfo();
-        KeYJavaType intType = javaInfo.getPrimitiveKeYJavaType("int");
+        IProgramInfo javaInfo = javaServ.getProgramInfo();
+        KeYJavaType intType = javaInfo.getKeYJavaType("int");
         if(argSort == intType.getSort()) {
             return intType;
         } else {

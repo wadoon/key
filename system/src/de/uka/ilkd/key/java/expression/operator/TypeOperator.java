@@ -14,7 +14,6 @@ package de.uka.ilkd.key.java.expression.operator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -113,7 +112,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 	return getKeYJavaType(javaServ);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public KeYJavaType getKeYJavaType(IServices javaServ) {
 	return getTypeReference().getKeYJavaType();
     }
 

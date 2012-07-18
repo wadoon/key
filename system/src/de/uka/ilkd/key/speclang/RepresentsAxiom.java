@@ -16,6 +16,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
@@ -129,7 +130,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     public ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            IServices services) {
+            Services services) {
         LocationVariable heap =
                 services.getTypeConverter().getHeapLDT().getHeap();
         ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);

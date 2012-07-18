@@ -52,7 +52,7 @@ public class WhileInvRule extends AbstractTermTransformer {
     /** The JavaInfo object which is handed over as
      * a parameter of calculate.
      */
-    private IProgramInfo javaInfo;
+    private JavaInfo javaInfo;
     private TypeConverter typeConv;
     private TermFactory tf;
 
@@ -99,8 +99,9 @@ public class WhileInvRule extends AbstractTermTransformer {
     
     
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, IServices services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices iservices) {
         
+        Services services = (Services)iservices;
         // global initialisation
         init(term, services);
         

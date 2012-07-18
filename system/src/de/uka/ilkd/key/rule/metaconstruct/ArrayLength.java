@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ArrayLength extends ProgramTransformer {
+public class ArrayLength extends ProgramTransformer<Services> {
     
      /** creates a typeof ProgramTransformer 
      * @param expr the instance of expression contained by 

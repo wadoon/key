@@ -101,7 +101,7 @@ public class Conditional extends Operator {
 		type2.getJavaType() == PrimitiveType.JAVA_SHORT || 
 		type1.getJavaType() == PrimitiveType.JAVA_SHORT &&
 		type2.getJavaType() == PrimitiveType.JAVA_BYTE)
-		return javaServ.getJavaInfo().
+		return javaServ.getProgramInfo().
 		    getKeYJavaType(PrimitiveType.JAVA_SHORT);
 	    if (tc.isImplicitNarrowing(getExpressionAt(1),
 						  (PrimitiveType)type2.getJavaType()))

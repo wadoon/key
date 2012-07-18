@@ -48,7 +48,7 @@ public class SchemaTypeReference extends TypeReferenceImp
     }
 
     public KeYJavaType getKeYJavaType(IServices services) {
-	KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fullName);
+	KeYJavaType kjt = services.getProgramInfo().getKeYJavaType(fullName);
 	assert kjt != null : "KeYJavaType is null for SchemaTypeReference " + this + " - " + fullName; 
         return kjt;
     }

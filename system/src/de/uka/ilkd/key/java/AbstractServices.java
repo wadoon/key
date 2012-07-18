@@ -47,6 +47,9 @@ public abstract class AbstractServices implements IServices {
 	public AbstractServices() {
 		super();
 	}
+	
+	@Override
+	public abstract IProgramInfo getProgramInfo();
 
 	@Override
 	public KeYExceptionHandler getExceptionHandler() {

@@ -45,7 +45,7 @@ public class TestJavaInfo extends TestCase {
         if (down != 0) return;
         HelperClassForTests helper =  new HelperClassForTests();
         final ProofAggregate agg = helper.parse(new File(testfile));
-        services = agg.getFirstProof().getServices();
+        services = (Services) agg.getFirstProof().getServices();
         javaInfo = services.getJavaInfo();
     }
     

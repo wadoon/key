@@ -19,9 +19,9 @@ import junit.framework.TestCase;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.IProgramInfo;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -615,7 +615,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    protected static IProgramMethod searchProgramMethod(IServices services, 
                                                       String containerTypeName, 
                                                       final String methodFullName) {
-      IProgramInfo javaInfo = services.getJavaInfo();
+      IProgramInfo javaInfo = services.getProgramInfo();
       KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
       assertNotNull(containerKJT);
       ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
@@ -653,7 +653,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Create user interface
       CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
       // Load java file
-      InitConfig initConfig = ui.load(javaFile, null, null);
+      InitConfig initConfig = (InitConfig) ui.load(javaFile, null, null);
       // Search method to proof
       IServices services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
@@ -702,7 +702,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Create user interface
       CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
       // Load java file
-      InitConfig initConfig = ui.load(javaFile, null, null);
+      InitConfig initConfig = (InitConfig) ui.load(javaFile, null, null);
       // Search method to proof
       IServices services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);

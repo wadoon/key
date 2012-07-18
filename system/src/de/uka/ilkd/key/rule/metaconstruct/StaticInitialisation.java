@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 
-public class StaticInitialisation extends ProgramTransformer {
+public class StaticInitialisation extends ProgramTransformer<Services> {
     
     public StaticInitialisation(Expression expr) {
 	super("static-initialisation", expr); 

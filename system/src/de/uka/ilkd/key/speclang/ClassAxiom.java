@@ -13,6 +13,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -54,7 +55,7 @@ public abstract class ClassAxiom implements SpecificationElement {
      */
     public abstract ImmutableSet<Taclet> getTaclets(
 	    		ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-	    		IServices services);    
+	    		Services services);    
 
     @Override
     public String getDisplayName() {

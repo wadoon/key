@@ -57,7 +57,7 @@ public class SeqGet extends Operator {
 
     @Override
     public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+        return javaServ.getProgramInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
     }
 
 

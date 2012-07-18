@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * creates an assignment instantiationOf(#newObjectsV).<initialized> = true
  */
-public class PostWork extends ProgramTransformer {
+public class PostWork extends ProgramTransformer<Services> {
     
     
      /** creates a typeof ProgramTransformer 

@@ -4,6 +4,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -149,7 +150,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
             // Start site proof to extract the value of the result variable.
             de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput sequentToProve = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
                                                                                                                                                                                      mbs.getBodySourceAsTypeReference(),
-                                                                                                                                                                                     mbs.getProgramMethod(getServices()),
+                                                                                                                                                                                     mbs.getProgramMethod((Services) getServices()),
                                                                                                                                                                                      mbs.getDesignatedContext(), 
                                                                                                                                                                                      methodReturnNode, 
                                                                                                                                                                                      resultVar);

@@ -40,7 +40,7 @@ import de.uka.ilkd.key.util.Triple;
  * @author bruns
  *
  */
-public class ContractFactory {
+public class JavaContractFactory {
 
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
@@ -49,7 +49,7 @@ public class ContractFactory {
     private final TermBuilder tb = TermBuilder.DF;
     
 
-    public ContractFactory (Services services){
+    public JavaContractFactory (Services services){
         assert services != null;
         this.services = services;
     }
@@ -194,8 +194,8 @@ public class ContractFactory {
 
     @Override
     public boolean equals (Object o){
-        if (o instanceof ContractFactory){
-            return MiscTools.equalsOrNull(services, ((ContractFactory)o).services);
+        if (o instanceof JavaContractFactory){
+            return MiscTools.equalsOrNull(services, ((JavaContractFactory)o).services);
         } else {
             return false;
         }

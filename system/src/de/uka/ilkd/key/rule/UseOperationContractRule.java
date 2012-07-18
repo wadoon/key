@@ -267,12 +267,12 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Returns the operation contracts which are applicable for the passed 
      * operation and the passed modality
      */
-    private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
-	    						  						  Services services, 
-                                                          IProgramMethod pm, 
-                                                          KeYJavaType kjt,
-                                                          Modality modality) {
-        ImmutableSet<FunctionalOperationContract> result 
+	private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
+	        IServices services, 
+	        IProgramMethod pm, 
+	        KeYJavaType kjt,
+	        Modality modality) {
+	    ImmutableSet<FunctionalOperationContract> result 
                 = services.getSpecificationRepository()
                           .getOperationContracts(kjt, pm, modality);
         
@@ -434,8 +434,9 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Computes instantiation for contract rule on passed focus term.
      * Internally only serves as helper for instantiate(). 
      */
-    public static Instantiation computeInstantiation(Term focusTerm, IServices services) {
-	//leading update?
+    public static Instantiation computeInstantiation(Term focusTerm, IServices iservices) {
+	Services services = (Services) iservices;
+        //leading update?
 	final Term u;
 	final Term progPost;
 	if(focusTerm.op() instanceof UpdateApplication) {
@@ -536,9 +537,11 @@ public final class UseOperationContractRule implements BuiltInRule {
     
     @Override    
     public ImmutableList<Goal> apply(Goal goal, 
-	    			     IServices services, 
+	    			     IServices iservices, 
 	    			     RuleApp ruleApp) {
-	//get instantiation
+        Services services = (Services) iservices;
+        
+        //get instantiation
 	final Instantiation inst 
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
         final JavaBlock jb = inst.progPost.javaBlock();

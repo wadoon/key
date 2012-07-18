@@ -11,9 +11,9 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -95,7 +95,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 	return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType("java.lang.String");
+    public KeYJavaType getKeYJavaType(IServices javaServ) {
+	return javaServ.getProgramInfo().getKeYJavaType("java.lang.String");
     }
 }

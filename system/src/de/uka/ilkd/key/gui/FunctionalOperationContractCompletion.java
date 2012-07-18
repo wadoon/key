@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -18,7 +19,7 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
 
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
-        IServices services = goal.proof().getServices();
+        Services services = (Services) goal.proof().getServices();
 
         if (forced) {
             app = app.tryToInstantiate(goal);
@@ -31,8 +32,7 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
                 app.posInOccurrence().subTerm(), services);
         
         ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
-                .getApplicableContracts(
-                        inst, services);
+                .getApplicableContracts(inst, services);
         
         FunctionalOperationContract[] contractsArr = contracts
                 .toArray(new FunctionalOperationContract[contracts.size()]);

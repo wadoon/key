@@ -15,7 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
@@ -164,7 +164,7 @@ public final class SortDependingFunction extends Function {
 	    return this;
 	}
 	
-	assert !(sort instanceof ProgramSVSort);
+	assert !(sort instanceof IProgramSVSort);
 	assert sort != AbstractTermTransformer.METASORT;
 	
 	SortDependingFunction result 

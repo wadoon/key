@@ -116,7 +116,7 @@ public class ClassTree extends JTree {
     
     public ClassTree(boolean addContractTargets, 
 	             boolean skipLibraryClasses,
-	    	     Services services) {
+	    	     IServices services) {
 	this(addContractTargets, 
 	     skipLibraryClasses, 
 	     services, 

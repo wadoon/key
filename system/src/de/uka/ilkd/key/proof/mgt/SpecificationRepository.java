@@ -55,7 +55,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.JavaContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -77,7 +77,7 @@ public final class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private static final TermBuilder TB = TermBuilder.DF;
-    private final ContractFactory cf;
+    private final JavaContractFactory cf;
     
     private final Map<Pair<KeYJavaType,IObserverFunction>, ImmutableSet<Contract>> contracts 
     		= new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,ImmutableSet<Contract>>();
@@ -116,7 +116,7 @@ public final class SpecificationRepository {
 
     public SpecificationRepository(Services services) {
 	this.services = services;
-	cf = new ContractFactory(services);
+	cf = new JavaContractFactory(services);
     }
     
 

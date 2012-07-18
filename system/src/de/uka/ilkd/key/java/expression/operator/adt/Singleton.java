@@ -50,6 +50,6 @@ public class Singleton extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+	return javaServ.getProgramInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     }    
 }

@@ -17,7 +17,6 @@ import java.io.StringReader;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -33,7 +32,12 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
@@ -79,7 +83,7 @@ public class TacletForTests {
 	    if (!file.equals(lastFile)) {
 		KeYFileForTests envInput = new KeYFileForTests("Test", file);	
 		AbstractProblemInitializer pi = new ProblemInitializer(profile); 
-		InitConfig ic = pi.prepare(envInput);
+		AbstractInitConfig ic = pi.prepare(envInput);
               	nss      = ic.namespaces(); 
                 rules    = ic.createTacletIndex();
                 services = (Services) ic.getServices();
@@ -102,7 +106,7 @@ public class TacletForTests {
 	return services ().getJavaInfo ();
     }
 
-    public static IProgramInfo getJavaInfo() {
+    public static JavaInfo getJavaInfo() {
 	return javaInfo();
     }
 

@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class MultipleVarDecl extends ProgramTransformer {
+public class MultipleVarDecl extends ProgramTransformer<Services> {
 
     public MultipleVarDecl(SchemaVariable sv) {
 	super(new Name("multiple-var-decl"), (ProgramSV)sv);

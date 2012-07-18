@@ -45,7 +45,7 @@ import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.JavaContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
@@ -80,7 +80,7 @@ public class JMLSpecFactory {
 
     private static final de.uka.ilkd.key.logic.TermBuilder TB = TermBuilder.DF;
     private final de.uka.ilkd.key.java.Services services;
-    private final ContractFactory cf;
+    private final JavaContractFactory cf;
     private int invCounter;
     /**
      * Used to check that there is only one represents clause per type and
@@ -95,7 +95,7 @@ public class JMLSpecFactory {
     public JMLSpecFactory(Services services) {
         assert services != null;
         this.services = services;
-        cf = new ContractFactory(services);
+        cf = new JavaContractFactory(services);
         modelFields = new HashSet<Pair<KeYJavaType, IObserverFunction>>();
     }
 

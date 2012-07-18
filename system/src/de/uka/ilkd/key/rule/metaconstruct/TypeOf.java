@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class TypeOf extends ProgramTransformer {
+public class TypeOf extends ProgramTransformer<Services> {
     
 	/** creates a typeof ProgramTransformer 
 	 * @param pe the instance of expression contained by 

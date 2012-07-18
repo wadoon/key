@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ArrayPostDecl extends ProgramTransformer {
+public class ArrayPostDecl extends ProgramTransformer<Services> {
 
     public ArrayPostDecl(SchemaVariable sv) {
 	super(new Name("array-post-declaration"), (ProgramSV)sv);

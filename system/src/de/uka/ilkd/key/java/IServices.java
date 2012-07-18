@@ -2,6 +2,7 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
@@ -73,5 +74,12 @@ public interface IServices {
 	 * belong to any proof.
 	 */
 	public abstract Proof getProof();
+	
+	public abstract IProgramInfo getProgramInfo();
+
+	public abstract IProgramInfo getJavaInfo();
+
+	public abstract TermBuilder getTermBuilder();
+
 
 }

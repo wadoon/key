@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -19,13 +17,14 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
  * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet
@@ -66,7 +65,7 @@ public class NoFindTaclet extends Taclet {
      * @param matchCond the MatchConditions with all required instantiations 
      */
     protected void applyAdd(Sequent add, Goal goal, 
-			    Services services,
+			    IServices services,
 			    MatchConditions matchCond) {
 	addToAntec(add.antecedent(), goal, null, services, matchCond);
 	addToSucc (add.succedent(),  goal, null, services, matchCond);

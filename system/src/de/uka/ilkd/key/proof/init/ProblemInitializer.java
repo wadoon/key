@@ -19,6 +19,7 @@ import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -122,15 +123,16 @@ public final class ProblemInitializer extends AbstractProblemInitializer {
      * Helper for readEnvInput().
      */
     @Override
-    protected void readJava(EnvInput envInput, InitConfig initConfig) 
+    protected void readJava(EnvInput envInput, AbstractInitConfig initConfig) 
     		throws ProofInputException {
 	//this method must only be called once per init config	
-	assert !initConfig.getServices()
-			  .getJavaInfo()
-			  .rec2key()
-			  .parsedSpecial();
-	assert initConfig.getProofEnv().getJavaModel() == null;
-	
+        final Services javaServices = (Services) initConfig.getServices();
+        assert !javaServices
+        .getJavaInfo()
+        .rec2key()
+        .parsedSpecial();
+        assert initConfig.getProofEnv().getJavaModel() == null;
+
 	//read Java source and classpath settings
 	envInput.setInitConfig(initConfig);
 	final String javaPath = envInput.readJavaPath();
@@ -138,7 +140,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer {
 	final File bootClassPath = envInput.readBootClassPath();
 	
 	//create Recoder2KeY, set classpath
-	final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
+	final Recoder2KeY r2k = new Recoder2KeY((Services) javaServices, 
                                                 initConfig.namespaces());
 	r2k.setClassPath(bootClassPath, classPath);
 
@@ -146,7 +148,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer {
 	if(javaPath != null) {
             reportStatus("Reading Java source");
             final ProjectSettings settings 
-            	=  initConfig.getServices()
+            	=  javaServices
             	             .getJavaInfo()
             	             .getKeYProgModelInfo()
                 	     .getServConf()
@@ -176,9 +178,9 @@ public final class ProblemInitializer extends AbstractProblemInitializer {
     //------------------------------------------------------------------------- 
     
     @Override
-    protected void registerProgramDefinedSymbols(InitConfig initConfig)
+    protected void registerProgramDefinedSymbols(AbstractInitConfig initConfig)
             throws ProofInputException {
-        final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+        final JavaInfo javaInfo = (JavaInfo) initConfig.getServices().getProgramInfo();
         final Namespace functions 
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 
@@ -209,4 +211,5 @@ public final class ProblemInitializer extends AbstractProblemInitializer {
         } else
                 throw new ProofInputException("Problem initialization without JavaInfo!");
     }
+
 }

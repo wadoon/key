@@ -21,9 +21,10 @@ import java.util.StringTokenizer;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -1870,7 +1871,7 @@ public final class LogicPrinter {
      * @return true if the attribute is uniquely determined
      */
     public boolean printInShortForm(String programName, Sort sort) {
-        return printInShortForm(programName, sort, services);
+        return printInShortForm(programName, sort, services instanceof Services ? (Services) services : null);
     }
 
     /**
@@ -1947,7 +1948,7 @@ public final class LogicPrinter {
      */
     public static boolean printInShortForm(String programName, 
 	    				   Sort sort,
-	    				   IServices services) {
+	    				   Services services) {
         if ( ! ( services != null  
         	  && sort.extendsTrans(services.getJavaInfo().objectSort()))) {
             return false;

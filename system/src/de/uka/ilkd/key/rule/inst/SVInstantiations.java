@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInProgram;
@@ -50,7 +51,7 @@ public class SVInstantiations {
             .createProgramSV(new ProgramElementName("Context"),
                     new ProgramSVSort(new Name("ContextStatementBlock")) {
                         public boolean canStandFor(ProgramElement pe,
-                                IServices services) {
+                                Services services) {
                             return true;
                         }
                     },

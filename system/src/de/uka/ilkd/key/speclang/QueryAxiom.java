@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
@@ -96,7 +97,7 @@ public final class QueryAxiom extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(
 	    		ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, 
-	    		IServices services) {
+	    		Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	
 	//create schema variables

@@ -15,7 +15,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -38,8 +38,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.JavaContractFactory;
 
 
 /**
@@ -48,17 +48,18 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  */
 public final class DLSpecFactory {
 
-    private static final TermBuilder TB = TermBuilder.DF;
-    private final IServices services;
+    private final TermBuilder TB;
+    private final Services services;
         
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
 
-    public DLSpecFactory(IServices services) {
+    public DLSpecFactory(Services services) {
 	assert services != null;
 	this.services = services;
+	TB = services.getTermBuilder();
     }
 
     
@@ -246,7 +247,7 @@ public final class DLSpecFactory {
 	assert fma != null;
 	assert modifies != null;
 	
-	final ContractFactory cf = new ContractFactory(services);
+	final JavaContractFactory cf = new JavaContractFactory(services);
 
 	//extract parts of fma
 	final Term pre = extractPre(fma);

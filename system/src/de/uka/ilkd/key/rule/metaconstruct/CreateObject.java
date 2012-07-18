@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * another implicit method <code>lt;prepare&gt;</code> for setting the fields
  * values.
  */
-public class CreateObject extends ProgramTransformer {
+public class CreateObject extends ProgramTransformer<Services> {
 
     public CreateObject(ProgramElement newExpr) {	
 	super("create-object", newExpr); 

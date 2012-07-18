@@ -14,6 +14,7 @@ package de.uka.ilkd.key.java;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -109,7 +110,15 @@ public class Services extends AbstractServices {
     public JavaInfo getJavaInfo() {
         return javainfo;
     }
-    
+
+    /**
+     * Returns the JavaInfo associated with this Services object.
+     */
+    @Override
+    public JavaInfo getProgramInfo() {
+        return javainfo;
+    }
+
     
     /* (non-Javadoc)
 	 * @see de.uka.ilkd.key.java.IServices#saveNameRecorder(de.uka.ilkd.key.proof.Node)
@@ -137,6 +146,7 @@ public class Services extends AbstractServices {
 	public SpecificationRepository getSpecificationRepository() {
 	return specRepos;
     }
+    
     
     
     /* (non-Javadoc)
@@ -191,5 +201,11 @@ public class Services extends AbstractServices {
 	    nameRecorder = nameRecorder.copy();
 	    return s;
 	}
+
+
+    @Override
+    public TermBuilder getTermBuilder() {
+        return TermBuilder.DF;
+    }
 
 }

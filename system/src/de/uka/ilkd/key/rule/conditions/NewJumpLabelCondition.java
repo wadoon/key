@@ -18,7 +18,6 @@ import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -90,7 +89,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     
     private boolean isUnique(Label label, 
                              List<ProgramElement> programs, 
-                             Services services) {
+                             IServices services) {
         for (final ProgramElement pe : programs) {
             final LabelCollector lc = new LabelCollector(pe, services); 
             lc.start();

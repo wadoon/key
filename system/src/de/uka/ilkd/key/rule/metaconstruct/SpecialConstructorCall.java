@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
-public class SpecialConstructorCall extends ProgramTransformer {
+public class SpecialConstructorCall extends ProgramTransformer<Services> {
 
     private static final ProgramElementName NORMALFORM_IDENTIFIER = 
         new ProgramElementName

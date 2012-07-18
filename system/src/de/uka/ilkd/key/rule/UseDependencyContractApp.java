@@ -6,7 +6,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -102,7 +101,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     	return app;
     }
 
-	public UseDependencyContractApp tryToInstantiateContract(final Services services) {
+	public UseDependencyContractApp tryToInstantiateContract(final IServices services) {
 	    final Term focus = posInOccurrence().subTerm();
     	final IObserverFunction target = (IObserverFunction) focus.op();
     
@@ -114,7 +113,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     		kjt = target.getContainerType();
     	} else {
     		selfTerm = focus.sub(1);
-    		kjt = services.getJavaInfo().getKeYJavaType(
+    		kjt = services.getProgramInfo().getKeYJavaType(
     		        selfTerm.sort());
     	}
     	ImmutableSet<Contract> contracts = UseDependencyContractRule.getApplicableContracts(

@@ -120,7 +120,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 	    n++;
 	}
 	final KeYJavaType kjt = i.getKeYJavaType(javaServ, ec);
-        final JavaInfo javaInfo = javaServ.getJavaInfo();
+        final JavaInfo javaInfo = (JavaInfo) javaServ.getProgramInfo();
 	return javaInfo.getKeYJavaType(
 		ArraySort.getArraySortForDim(kjt.getSort(),
 					     kjt.getJavaType(),

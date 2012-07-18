@@ -33,7 +33,7 @@ import de.uka.ilkd.key.util.ExtList;
 /** This class is used to perform program transformations needed 
  * for the symbolic execution of a switch-case statement.
  */
-public class SwitchToIf extends ProgramTransformer {
+public class SwitchToIf extends ProgramTransformer<Services> {
 
     public static int labelCount = 0;
     private boolean noNewBreak = true;

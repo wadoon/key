@@ -40,7 +40,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * validate (verify) rules and import nearly the complete power of Java into
  * taclets.
  */
-public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
+public abstract class ProgramTransformer<S extends IServices> extends JavaNonTerminalProgramElement
     implements StatementContainer, Statement, Expression, TypeReference {
 
     /** the name of the meta construct */
@@ -74,7 +74,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return the transformated program
      */
     public abstract ProgramElement transform
-	(ProgramElement pe, Services services, SVInstantiations svInst);
+	(ProgramElement pe, S services, SVInstantiations svInst);
     
     /** returns the name of the meta construct 
      * @return the name of the meta construct 
@@ -215,7 +215,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
 	return null;
     }
 
-    public KeYJavaType getKeYJavaType(IServices javaServ) {
+    public KeYJavaType getKeYJavaType(S javaServ) {
 	return getKeYJavaType();
     }
 

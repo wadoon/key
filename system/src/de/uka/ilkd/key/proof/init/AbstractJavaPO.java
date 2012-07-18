@@ -13,8 +13,8 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.IProgramInfo;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Namespace;
@@ -41,13 +41,12 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * An abstract proof obligation implementing common functionality.
  */
-public abstract class AbstractPO implements ProofOblInput {
+public abstract class AbstractJavaPO implements ProofOblInput {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
     protected static final TermBuilder TB = TermBuilder.DF;
-    protected final InitConfig initConfig;
-    protected final IServices services;
-    protected final IProgramInfo javaInfo;
+    protected final AbstractInitConfig initConfig;
+    private final Services services;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
     protected final String name;
@@ -61,15 +60,24 @@ public abstract class AbstractPO implements ProofOblInput {
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-    public AbstractPO(InitConfig initConfig,
+    public AbstractJavaPO(InitConfig initConfig,
                       String name) {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
-        this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
         this.name = name;
         taclets = DefaultImmutableSet.nil();
+    }
+
+
+    protected Services getServices() {
+        return services;
+    }
+
+
+    protected JavaInfo getJavaInfo() {
+        return getServices().getProgramInfo();
     }
 
 
@@ -105,7 +113,7 @@ public abstract class AbstractPO implements ProofOblInput {
                         node, axioms);
                 for (ClassAxiom nodeAxiom : nodeAxioms) {
                     final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes = nodeAxiom.getUsedObservers(
-                            services);
+                            getServices());
                     for (Pair<Sort, IObserverFunction> nextNode : nextNodes) {
                         if (nextNode.equals(to)) {
                             return true;
@@ -149,7 +157,7 @@ public abstract class AbstractPO implements ProofOblInput {
         for (ClassAxiom axiom : axioms) {
             final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
                     getSCC(axiom, axioms);
-            for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
+            for (Taclet axiomTaclet : axiom.getTaclets(scc, getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
                                              + axiom.getName();
                 taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
@@ -162,7 +170,7 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void register(ProgramVariable pv) {
-         Namespace progVarNames = services.getNamespaces().programVariables();
+         Namespace progVarNames = getServices().getNamespaces().programVariables();
          if (pv != null && progVarNames.lookup(pv.name()) == null) {
              progVarNames.addSafely(pv);
          }
@@ -177,7 +185,7 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void register(Function f) {
-         Namespace functionNames = services.getNamespaces().functions();
+         Namespace functionNames = getServices().getNamespaces().functions();
          if (f != null && functionNames.lookup(f.name()) == null) {
              assert f.sort() != Sort.UPDATE;
              if (f.sort() == Sort.FORMULA) {
@@ -234,7 +242,7 @@ public abstract class AbstractPO implements ProofOblInput {
         if (!contractsToSave.isEmpty()) {
             sb.append("\\contracts {\n");
             for (Contract c : contractsToSave) {
-                sb.append(c.proofToString(services));
+                sb.append(c.proofToString(getServices()));
             }
             sb.append("}\n\n");
         }

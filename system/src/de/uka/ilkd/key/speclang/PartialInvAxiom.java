@@ -14,6 +14,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -46,7 +47,7 @@ public final class PartialInvAxiom extends ClassAxiom {
      * @param isStatic whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or instance invariants (i.e., &lt;inv&gt;)
      * @param services
      */
-    public PartialInvAxiom(ClassInvariant inv, boolean isStatic, IServices services) {
+    public PartialInvAxiom(ClassInvariant inv, boolean isStatic, Services services) {
 	assert inv != null;
 	this.inv = inv;
 	assert !isStatic || inv.isStatic();
@@ -55,7 +56,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 	assert target != null;
     }
     
-    public PartialInvAxiom(ClassInvariant inv, String displayName, IServices services){
+    public PartialInvAxiom(ClassInvariant inv, String displayName, Services services){
         this(inv, false, services);
         this.displayName = displayName;
     }
@@ -87,7 +88,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            IServices services) {
+            Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 
         for (int i = 0; i < 2; i++) {

@@ -134,7 +134,7 @@ public class SolverLauncher implements SolverListener {
      *            A list of solver types that should be used for the problem.
      * 
      */
-    public void launch(SMTProblem problem, Services services,
+    public void launch(SMTProblem problem, IServices services,
 	    SolverType... solverTypes) {
 	checkLaunchCall();
 	launchIntern(problem, services, solverTypes);
@@ -227,7 +227,7 @@ public class SolverLauncher implements SolverListener {
 	return problems;
     }
 
-    private void launchIntern(SMTProblem problem, Services services,
+    private void launchIntern(SMTProblem problem, IServices services,
 	    SolverType[] solverTypes)  {
 
 	LinkedList<SolverType> types = new LinkedList<SolverType>();

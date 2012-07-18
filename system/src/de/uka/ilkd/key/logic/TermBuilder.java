@@ -11,6 +11,11 @@
 package de.uka.ilkd.key.logic;
 
 
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -25,20 +30,34 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.Pair;
-
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 
 /**
@@ -1231,14 +1250,14 @@ public final class TermBuilder {
     }
     
     
-    public Term inv(Services services, Term h, Term o) {
+    public Term inv(IServices services, Term h, Term o) {
 	return func(services.getJavaInfo().getInv(),
 		    h,
 		    o);
     }    
     
     
-    public Term inv(Services services, Term o) {
+    public Term inv(IServices services, Term o) {
 	return inv(services, getBaseHeap(services),  o);
     }
     
@@ -1435,8 +1454,8 @@ public final class TermBuilder {
 	    		       Term t, 
 	    		       KeYJavaType kjt) {
 	assert t.sort().extendsTrans(kjt.getSort()) 
-	       || t.sort() instanceof ProgramSVSort;
-	final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
+	       || t.sort() instanceof IProgramSVSort;
+	final Sort s = t.sort() instanceof IProgramSVSort ? kjt.getSort() : t.sort();
 	final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 	if(s.extendsTrans(services.getJavaInfo().objectSort())) {

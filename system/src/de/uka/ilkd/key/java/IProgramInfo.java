@@ -150,4 +150,6 @@ public interface IProgramInfo {
 	 */
 	public abstract IObserverFunction getInv();
 
+	public abstract boolean isReferenceSort(Sort sort);
+
 }

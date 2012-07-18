@@ -26,7 +26,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  l1:l2:{...} 
  * </code>
  */
-public class DoBreak extends ProgramTransformer {
+public class DoBreak extends ProgramTransformer<Services> {
     
 
      /** creates a do-break ProgramTransformer 

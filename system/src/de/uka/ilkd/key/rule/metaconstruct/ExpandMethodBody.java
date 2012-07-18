@@ -34,7 +34,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ExpandMethodBody extends ProgramTransformer {
+public class ExpandMethodBody extends ProgramTransformer<Services> {
 
     static int counter = 0;
 

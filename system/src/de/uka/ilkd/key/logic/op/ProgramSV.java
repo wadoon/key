@@ -13,7 +13,19 @@ package de.uka.ilkd.key.logic.op;
 import java.io.IOException;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.LoopInitializer;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceData;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
@@ -29,7 +41,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -56,7 +68,7 @@ public final class ProgramSV extends AbstractSV
      * @param name the Name of the SchemaVariable
      * allowed to match a list of program constructs
      */    
-    ProgramSV(Name name, ProgramSVSort s, boolean isListSV) {
+    ProgramSV(Name name, IProgramSVSort s, boolean isListSV) {
 	super(name, s, false, false);
 	this.isListSV = isListSV;
     }
@@ -251,7 +263,7 @@ public final class ProgramSV extends AbstractSV
 				 MatchConditions mc, 
 				 IServices services) {
 
-        final ProgramSVSort svSort = (ProgramSVSort)sort();
+        final IProgramSVSort svSort = (IProgramSVSort)sort();
      
 	if (substitute instanceof Term && svSort.canStandFor((Term)substitute)) {
             return addInstantiation((Term)substitute, mc, services);
@@ -389,7 +401,7 @@ public final class ProgramSV extends AbstractSV
         if (match == null) {           
             return false;
         }
-        return ((ProgramSVSort)sort()).canStandFor(match, ec, services);
+        return ((IProgramSVSort)sort()).canStandFor(match, ec, services);
     }
         
 

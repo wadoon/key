@@ -16,7 +16,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.DependencyContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -77,7 +77,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	this.baseName = baseName;
         this.name = name != null 
                   ? name 
-                  : ContractFactory.generateContractName(baseName, kjt, target,
+                  : JavaContractFactory.generateContractName(baseName, kjt, target,
                                        id);
 	this.kjt = kjt;
 	this.target = target;
@@ -277,7 +277,7 @@ public final class DependencyContractImpl implements DependencyContract {
    
     
     @Override
-    public String getHTMLText(Services services) {
+    public String getHTMLText(IServices services) {
 	final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
         final String mby = hasMby() 
         	           ? LogicPrinter.quickPrintTerm(originalMby, services)
@@ -364,7 +364,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public String getDisplayName() {
-        return ContractFactory.generateDisplayName(baseName, kjt, target, id);
+        return JavaContractFactory.generateDisplayName(baseName, kjt, target, id);
     }
 
 
@@ -379,9 +379,9 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig,
+    public ProofOblInput createProofObl(AbstractInitConfig initConfig,
 	    Contract contract) {
-	return new DependencyContractPO(initConfig,
+	return new DependencyContractPO((InitConfig) initConfig,
 	        (DependencyContract) contract);
     }
 
@@ -419,6 +419,6 @@ public final class DependencyContractImpl implements DependencyContract {
     
     @Override
     public String getTypeName() {
-        return ContractFactory.generateContractTypeName(baseName, kjt, target);
+        return JavaContractFactory.generateContractTypeName(baseName, kjt, target);
     }
 }

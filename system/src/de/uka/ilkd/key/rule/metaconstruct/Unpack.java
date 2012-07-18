@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-public class Unpack extends ProgramTransformer {
+public class Unpack extends ProgramTransformer<Services> {
 
 
     /** creates a typeof ProgramTransformer 

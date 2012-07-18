@@ -181,7 +181,7 @@ public class MethodPartPO extends AbstractOperationPO {
                                        blockToExecute);
       StatementBlock result = new StatementBlock(mf);
       // Collect undeclared variables
-      undeclaredVariableCollector = new UndeclaredProgramVariableCollector(result, services);
+      undeclaredVariableCollector = new UndeclaredProgramVariableCollector(result, getServices());
       undeclaredVariableCollector.start();
       // Register undeclared variables
       Set<LocationVariable> undeclaredVariables = undeclaredVariableCollector.result();
@@ -318,7 +318,7 @@ public class MethodPartPO extends AbstractOperationPO {
                               Map<LocationVariable, LocationVariable> atPreVars) {
       Term update = null;
       for(LocationVariable heap : atPreVars.keySet()) {
-         final Term u = TB.elementary(services, atPreVars.get(heap), TB.getBaseHeap(services));
+         final Term u = TB.elementary(getServices(), atPreVars.get(heap), TB.getBaseHeap(getServices()));
          if(update == null) {
             update = u;
          }else{

@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -46,8 +47,8 @@ public class NullLiteral extends Literal {
         p.printNullLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getNullType();
+    public KeYJavaType getKeYJavaType(IServices javaServ) {
+	return ((Services) javaServ).getJavaInfo().getNullType();
     }
 
 }

@@ -14,8 +14,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -252,7 +252,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public InitConfig load(File file, List<File> classPath, File bootClassPath) throws FileNotFoundException, ProofInputException {
+   public AbstractInitConfig load(File file, List<File> classPath, File bootClassPath) throws FileNotFoundException, ProofInputException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }

@@ -67,7 +67,7 @@ public abstract class AbstractEnvInput implements EnvInput {
         
     
     @Override
-    public final void setInitConfig(InitConfig initConfig) {
+    public final void setInitConfig(AbstractInitConfig initConfig) {
 	this.initConfig = initConfig;
     }
     

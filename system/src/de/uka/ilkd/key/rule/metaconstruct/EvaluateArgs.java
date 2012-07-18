@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class EvaluateArgs extends ProgramTransformer{
+public class EvaluateArgs extends ProgramTransformer<Services>{
 
     /** creates a typeof ProgramTransformer 
      * @param pe the instance of expression contained by 

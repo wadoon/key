@@ -196,8 +196,10 @@ public final class EnhancedForInvRule extends AbstractTermTransformer {
      *      de.uka.ilkd.key.rule.inst.SVInstantiations,
      *      IServices)
      */
-    public Term transform(Term term, SVInstantiations svInst, IServices services) {
+    public Term transform(Term term, SVInstantiations svInst, IServices iservices) {
 
+        Services services = (Services)iservices;
+        
         // global initialisation
         init(term, services);
 

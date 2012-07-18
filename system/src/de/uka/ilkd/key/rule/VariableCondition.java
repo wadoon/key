@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
  * that know only black and white answers there exists a convenience class 
  * {@link de.uka.ilkd.key.rule.VariableConditionAdapter}.     
  */
-public interface VariableCondition {
+public interface VariableCondition<S extends IServices> {
 
     /**
      * checks if the condition for a correct instantiation is fulfilled
@@ -40,6 +40,6 @@ public interface VariableCondition {
     MatchConditions check(SchemaVariable var, 
 	    		  SVSubstitute instCandidate, 
 	    		  MatchConditions matchCond, 
-	    		  IServices services);
+	    		  S services);
 
 }

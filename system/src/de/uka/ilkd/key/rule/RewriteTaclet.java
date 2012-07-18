@@ -10,20 +10,32 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.IntIterator;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
  * A RewriteTaclet represents a taclet, whose find can be matched against any
@@ -176,7 +188,7 @@ public final class RewriteTaclet extends FindTaclet {
     private Term replace(Term term, 
 	    		 Term with, 
 	    		 IntIterator it,
-			 Services services, 
+			 IServices services, 
 			 MatchConditions mc, 
                          Sort maxSort) {
 	if (it.hasNext()) {	    
@@ -219,7 +231,7 @@ public final class RewriteTaclet extends FindTaclet {
     private SequentFormula applyReplacewithHelper(
 	    				RewriteTacletGoalTemplate gt, 
 				 	PosInOccurrence    posOfFind,
-				 	Services           services,
+				 	IServices           services,
 				 	MatchConditions    matchCond) {
 	Term term = posOfFind.constrainedFormula().formula();
 	IntIterator it = posOfFind.posInTerm().iterator();
@@ -239,7 +251,7 @@ public final class RewriteTaclet extends FindTaclet {
     }
     
     
-    public SequentFormula getRewriteResult(Services services, 
+    public SequentFormula getRewriteResult(IServices services, 
 	    				       TacletApp app) {
 	assert goalTemplates().size() == 1;
 	assert goalTemplates().head().sequent().isEmpty();	
@@ -259,7 +271,7 @@ public final class RewriteTaclet extends FindTaclet {
      * @param gt TacletGoalTemplate used to get the replaceexpression in the Taclet
      * @param goal the Goal where the rule is applied
      * @param posOfFind the PosInOccurrence belonging to the find expression
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
     protected void applyReplacewith(TacletGoalTemplate gt, 
@@ -287,7 +299,7 @@ public final class RewriteTaclet extends FindTaclet {
      * @param goal the Goal to be updated
      * @param posOfFind the PosInOccurrence describes the place where to add
      * the semisequent
-     * @param services the Services encapsulating all java information
+     * @param services the IServices encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
     protected void applyAdd(Sequent         add, 

@@ -9,6 +9,8 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -207,7 +209,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          else {
             Term parentTerm = parentVariable.createSelectTerm();
             if (programVariable != null) {
-               if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
+               if (((JavaInfo)getServices().getJavaInfo()).getArrayLength() == getProgramVariable()) {
                   // Special handling for length attribute of arrays
                   Function function = getServices().getTypeConverter().getHeapLDT().getLength();
                   return TermBuilder.DF.func(function, parentTerm);
@@ -276,7 +278,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
       List<IExecutionVariable> children = new LinkedList<IExecutionVariable>();
       Sort valueSort = getValue().sort();
-      if (valueSort != getServices().getJavaInfo().getNullType().getSort()) {
+      if (valueSort != getServices().getProgramInfo().nullSort()) {
          KeYJavaType keyType = getServices().getJavaInfo().getKeYJavaType(valueSort);
          Type javaType = keyType.getJavaType();
          if (javaType instanceof ArrayDeclaration) {
@@ -302,7 +304,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             // Normal value
             ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
             for (Field field : fields) {
-               ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
+               ImmutableList<ProgramVariable> vars = ((Services)getServices()).getJavaInfo().getAllAttributes(field.getFullName(), keyType);
                for (ProgramVariable var : vars) {
                   if (!var.isImplicit() && !var.isStatic()) {
                      children.add(new ExecutionVariable(getMediator(), getProofNode(), this, field.getProgramVariable()));

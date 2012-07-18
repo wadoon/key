@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -22,7 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * which can either fail or be successful, but which do not create a
  * constraint. 
  */
-public abstract class VariableConditionAdapter implements VariableCondition {
+public abstract class VariableConditionAdapter<S extends Services> implements VariableCondition<S> {
 
     /**
      * checks if the condition for a correct instantiation is fulfilled
@@ -42,7 +41,7 @@ public abstract class VariableConditionAdapter implements VariableCondition {
     public final MatchConditions check(SchemaVariable var, 
 	    			       SVSubstitute instCandidate, 
 	    			       MatchConditions mc, 
-	    			       IServices services) {
+	    			       S services) {
 	return check(var, 
 		     instCandidate, 
 		     mc.getInstantiations(), 

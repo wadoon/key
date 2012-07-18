@@ -1,17 +1,14 @@
 package de.uka.ilkd.key.proof.join;
 
-import java.io.StringReader;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 
 public interface PredicateEstimator {
@@ -131,18 +128,9 @@ class StdPredicateEstimator implements PredicateEstimator{
         return null;
     }
     
-    private Term translate(String estimation, Services services){
-            try {
-            KeYParser parser =
-                    new KeYParser (ParserMode.TERM, new KeYLexer ( new StringReader ( estimation ),
-                                     services.getExceptionHandler() ), "",
-                                     services,   // should not be needed
-                                     services.getNamespaces() );
-                return parser.term();
-             } catch (Throwable e) {
-                 
-                return null;
-             }
+    private static Term translate(String estimation, IServices services){
+        return ProblemLoader.parseTerm(estimation, services, services.getNamespaces().variables(), 
+                services.getNamespaces().programVariables());   
     }
     
 

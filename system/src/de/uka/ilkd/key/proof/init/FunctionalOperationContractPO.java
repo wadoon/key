@@ -154,11 +154,11 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         final Term mbyAtPreDef;
         if (contract.hasMby()) {
             final Function mbyAtPreFunc =
-                    new Function(new Name(TB.newName(services, "mbyAtPre")),
-                                 services.getTypeConverter().getIntegerLDT().targetSort());
+                    new Function(new Name(TB.newName(getServices(), "mbyAtPre")),
+                                 getServices().getTypeConverter().getIntegerLDT().targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
-            final Term mby = contract.getMby(selfVar, paramVars, services);
+            final Term mby = contract.getMby(selfVar, paramVars, getServices());
             mbyAtPreDef = TB.equals(mbyAtPre, mby);
         } else {
             mbyAtPreDef = TB.tt();
@@ -204,11 +204,11 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
           final Term ft;
           if(!getContract().hasModifiesClause() && heap == getBaseHeap()) {
             // strictly pure have a different contract.
-            ft = TB.frameStrictlyEmpty(services, TB.var(heap), heapToAtPre.get(heap));
+            ft = TB.frameStrictlyEmpty(getServices(), TB.var(heap), heapToAtPre.get(heap));
           }else{
-            ft = TB.frame(services, TB.var(heap),
+            ft = TB.frame(getServices(), TB.var(heap),
                  heapToAtPre.get(heap), getContract().getMod(heap, selfVar,
-                         paramVars, services));
+                         paramVars, getServices()));
           }
           if(frameTerm == null) {
             frameTerm = ft;
@@ -224,7 +224,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * @return The {@link LocationVariable} which contains the base heap.
      */
     private LocationVariable getBaseHeap() {
-       return services.getTypeConverter().getHeapLDT().getHeap();
+       return getServices().getTypeConverter().getHeapLDT().getHeap();
     }
     
     /**
@@ -244,7 +244,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                                Map<LocationVariable,LocationVariable> atPreVars) {
        Term update = null;
        for(LocationVariable heap : atPreVars.keySet()) {
-          final Term u = TB.elementary(services, atPreVars.get(heap), TB.getBaseHeap(services));
+          final Term u = TB.elementary(getServices(), atPreVars.get(heap), TB.getBaseHeap(getServices()));
           if(update == null) {
              update = u;
           }else{
@@ -254,7 +254,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
         Iterator<ProgramVariable> paramIt = paramVars.iterator();
         while (formalParamIt.hasNext()) {
-            Term paramUpdate = TB.elementary(services,
+            Term paramUpdate = TB.elementary(getServices(),
                                              formalParamIt.next(),
                                              TB.var(paramIt.next()));
             update = TB.parallel(update, paramUpdate);

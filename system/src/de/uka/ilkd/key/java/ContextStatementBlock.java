@@ -295,7 +295,7 @@ public class ContextStatementBlock extends StatementBlock {
         ExecutionContext innerContext = lastExecutionContext;
         
         if (innerContext == null) {
-            innerContext = services.getJavaInfo().getDefaultExecutionContext();
+            innerContext = services.getProgramInfo().getDefaultExecutionContext();
             if (prefix != null) {            
                 for (int i = pos - 1; i>=0; i--) {
                     final ProgramPrefix prefixEl = prefix.getPrefixElementAt(i);                                   

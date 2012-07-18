@@ -62,7 +62,7 @@ import de.uka.ilkd.key.util.Debug;
 /** 
  * Symbolically executes a method invocation
  */ 
-public class MethodCall extends ProgramTransformer {
+public class MethodCall extends ProgramTransformer<Services> {
 
 
 
