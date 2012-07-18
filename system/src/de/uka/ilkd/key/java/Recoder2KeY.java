@@ -93,7 +93,7 @@ public class Recoder2KeY implements JavaReader {
      * 
      * It is used for syntactical structures and types.
      */
-    private KeYRecoderMapping mapping;
+    private AbstractKeYProgramModelMapping mapping;
 
     /**
      * Recoder's serviceConfiguration that is used throughout this process.
@@ -147,7 +147,7 @@ public class Recoder2KeY implements JavaReader {
      * @param tc
      *            the type converter, not null
      */
-    public Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
+    public Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, AbstractKeYProgramModelMapping rec2key, NamespaceSet nss, TypeConverter tc) {
         this(services, servConf, null, rec2key, nss, tc);
     }
 
@@ -190,7 +190,7 @@ public class Recoder2KeY implements JavaReader {
      *             if arguments are not valid (null e.g.)
      */
     private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, String classPath, 
-	    KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
+	    AbstractKeYProgramModelMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
         if (servConf == null)
             throw new IllegalArgumentException("service configuration is null");
@@ -274,7 +274,7 @@ public class Recoder2KeY implements JavaReader {
         return servConf;
     }
 
-    public KeYRecoderMapping rec2key() {
+    public AbstractKeYProgramModelMapping rec2key() {
         return mapping;
     }
 

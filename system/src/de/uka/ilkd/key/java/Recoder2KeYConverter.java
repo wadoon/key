@@ -321,7 +321,7 @@ public class Recoder2KeYConverter {
      * 
      * @return the mapping, not null.
      */
-    protected KeYRecoderMapping getMapping() {
+    protected AbstractKeYProgramModelMapping getMapping() {
         // quite contra-intuitive naming, yet right here
         return rec2key.rec2key();
     }

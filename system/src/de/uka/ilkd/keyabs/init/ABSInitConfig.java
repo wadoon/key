@@ -1,4 +1,4 @@
-package de.uka.ilkd.keyabs.abs;
+package de.uka.ilkd.keyabs.init;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;

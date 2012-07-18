@@ -28,7 +28,7 @@ public class TestKeYRecoderMapping extends TestCase{
     private ProgramElement kp;
     private recoder.ModelElement rm, rm2;
     private ModelElement km;
-    private KeYRecoderMapping mapping;
+    private AbstractKeYProgramModelMapping mapping;
 
 
 

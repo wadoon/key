@@ -3,9 +3,9 @@ package de.uka.ilkd.keyabs.abs;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.AbstractKeYProgramModelMapping;
 import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.KeYRecoderMapping;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class ABSInfo implements IProgramInfo {
 
     @Override
-    public KeYRecoderMapping rec2key() {
+    public AbstractKeYProgramModelMapping rec2key() {
         // TODO Auto-generated method stub
         return null;
     }

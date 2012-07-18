@@ -16,7 +16,7 @@ public interface IProgramInfo {
 	 * convenience method that returns the Recoder-to-KeY mapping underlying
 	 * the KeYProgModelInfo of this JavaInfo
 	 */
-	public abstract KeYRecoderMapping rec2key();
+	public abstract AbstractKeYProgramModelMapping rec2key();
 
 	/**
 	 * copies this JavaInfo and uses the given Services object as the
