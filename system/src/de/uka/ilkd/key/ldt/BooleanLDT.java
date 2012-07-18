@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -47,9 +48,9 @@ public final class BooleanLDT extends LDT {
         super(NAME, services);
         
         bool_true       = addFunction(services, "TRUE");
-	term_bool_true  = TermBuilder.DF.func(bool_true);
+	term_bool_true  = JavaProfile.DF().func(bool_true);
 	bool_false      = addFunction(services, "FALSE");
-	term_bool_false = TermBuilder.DF.func(bool_false);
+	term_bool_false = JavaProfile.DF().func(bool_false);
     }
     
     

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms
@@ -176,7 +176,7 @@ public interface Constraint {
 	public Term getInstantiation(Metavariable p_mv) {
 	    // As there is in fact no instantiation satisfying this
 	    // constraint, we could return everything
-	    return TermBuilder.DF.var(p_mv);
+	    return JavaProfile.DF().var(p_mv);
 	}
 
 	/**

@@ -145,11 +145,11 @@ options {
     private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
     private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
-    private ParserConfig schemaConfig;
-    private ParserConfig normalConfig;
+    private ParserConfig<Services> schemaConfig;
+    private ParserConfig<Services> normalConfig;
     
     // the current active config
-    private ParserConfig parserConfig;
+    private ParserConfig<Services> parserConfig;
 
     private Term quantifiedArrayGuard = null;
     
@@ -274,8 +274,8 @@ options {
     public KeYParser(ParserMode mode, 
     		     TokenStream lexer, 
                      String filename, 
-                     ParserConfig schemaConfig,
-                     ParserConfig normalConfig, 
+                     ParserConfig<Services> schemaConfig,
+                     ParserConfig<Services> normalConfig, 
                      HashMap taclet2Builder,
                      ImmutableSet<Taclet> taclets) { 
         this(lexer, filename, null, null, mode);
@@ -377,12 +377,10 @@ options {
     }
 
     public JavaInfo getJavaInfo() {
-        if(isProblemParser()) 
-          return parserConfig.javaInfo();
-    	if(getServices() != null)
+        if(getServices() != null)
           return getServices().getJavaInfo();
-	else
-	  return null;
+        else
+          return null;
     }
 
     public Services getServices() {

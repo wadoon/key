@@ -47,6 +47,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 /**
@@ -54,7 +55,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  */
 public final class FunctionalOperationContractImpl implements FunctionalOperationContract {
     
-    protected static final TermBuilder TB = TermBuilder.DF;
+    protected static final TermBuilder TB = JavaProfile.DF();
 
     final String baseName;
     final String name;

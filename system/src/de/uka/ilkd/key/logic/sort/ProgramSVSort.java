@@ -89,16 +89,16 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
 
     //----------- Types of Expression Program SVs ----------------------------
     
-    public static final IProgramSVSort<Services> LEFTHANDSIDE
+    public static final ProgramSVSort LEFTHANDSIDE
 	= new LeftHandSideSort();
 
     public static final ProgramSVSort VARIABLE
 	= new ProgramVariableSort();
 
-    public static final IProgramSVSort<Services> STATICVARIABLE
+    public static final ProgramSVSort STATICVARIABLE
 	= new StaticVariableSort();
     
-    public static final IProgramSVSort<Services> LOCALVARIABLE
+    public static final ProgramSVSort LOCALVARIABLE
         = new LocalVariableSort();
     
     public static final ProgramSVSort SIMPLEEXPRESSION 
@@ -107,22 +107,22 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
     public static final ProgramSVSort NONSIMPLEEXPRESSION 
 	= new NonSimpleExpressionSort();
     
-    public static final IProgramSVSort<Services> EXPRESSION
+    public static final ProgramSVSort EXPRESSION
 	= new ExpressionSort();
 
 
     //----------- Initialisation and Creation expressions -------------------
     
-    public static final IProgramSVSort<Services> SIMPLE_NEW = new SimpleNewSVSort();
+    public static final ProgramSVSort SIMPLE_NEW = new SimpleNewSVSort();
     
-    public static final IProgramSVSort<Services> NONSIMPLE_NEW = new NonSimpleNewSVSort();    
+    public static final ProgramSVSort NONSIMPLE_NEW = new NonSimpleNewSVSort();    
 
-    public static final IProgramSVSort<Services> NEWARRAY = new NewArraySVSort();
+    public static final ProgramSVSort NEWARRAY = new NewArraySVSort();
 
-    public static final IProgramSVSort<Services> ARRAYINITIALIZER
+    public static final ProgramSVSort ARRAYINITIALIZER
 	= new ArrayInitializerSVSort();
 
-    public static final IProgramSVSort<Services> SPECIALCONSTRUCTORREFERENCE
+    public static final ProgramSVSort SPECIALCONSTRUCTORREFERENCE
 	= new SpecialConstructorReferenceSort();
 
     
@@ -137,16 +137,16 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
     public static final ProgramSVSort STATEMENT
 	= new StatementSort();
 
-    public static final IProgramSVSort<Services> CATCH
+    public static final ProgramSVSort CATCH
 	= new CatchSort();
 
-    public static final IProgramSVSort<Services> METHODBODY
+    public static final ProgramSVSort METHODBODY
 	= new MethodBodySort();
 
-    public static final IProgramSVSort<Services> NONMODELMETHODBODY
+    public static final ProgramSVSort NONMODELMETHODBODY
 	= new NonModelMethodBodySort();
 
-    public static final IProgramSVSort<Services> PROGRAMMETHOD
+    public static final ProgramSVSort PROGRAMMETHOD
     = new ProgramMethodSort();
 
     //-----------Types--------------------------------------------------------
@@ -154,13 +154,13 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
     public static final ProgramSVSort TYPE
 	= new TypeReferenceSort();
 
-    public static final IProgramSVSort<Services> TYPENOTPRIMITIVE
+    public static final ProgramSVSort TYPENOTPRIMITIVE
 	= new TypeReferenceNotPrimitiveSort();
 
 
     //-----------Others-------------------------------------------------------
 
-    public static final IProgramSVSort<Services> METHODNAME
+    public static final ProgramSVSort METHODNAME
 	= new MethodNameSort();
     
     public static final ProgramSVSort LABEL
@@ -169,43 +169,43 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
     
     //-----------Specials for primitive types---------------------------------
     
-    public static final IProgramSVSort<Services> JAVABOOLEANEXPRESSION 
+    public static final ProgramSVSort JAVABOOLEANEXPRESSION 
 	= new ExpressionSpecialPrimitiveTypeSort
 	("JavaBooleanExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_BOOLEAN});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVABYTEEXPRESSION 
+    public static final ProgramSVSort SIMPLEJAVABYTEEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaByteExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_BYTE});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVACHAREXPRESSION 
+    public static final ProgramSVSort SIMPLEJAVACHAREXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaCharExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_CHAR});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVASHORTEXPRESSION 
+    public static final ProgramSVSort SIMPLEJAVASHORTEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaShortExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_SHORT});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVAINTEXPRESSION 
+    public static final ProgramSVSort SIMPLEJAVAINTEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaIntExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_INT});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVALONGEXPRESSION 
+    public static final ProgramSVSort SIMPLEJAVALONGEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaLongExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_LONG});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVABYTESHORTEXPRESSION
+    public static final ProgramSVSort SIMPLEJAVABYTESHORTEXPRESSION
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaByteShortExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_BYTE,
 			 PrimitiveType.JAVA_SHORT});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVABYTESHORTINTEXPRESSION
+    public static final ProgramSVSort SIMPLEJAVABYTESHORTINTEXPRESSION
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaByteShortIntExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_BYTE,
@@ -213,7 +213,7 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
 			 PrimitiveType.JAVA_INT});
 
 
-    public static final IProgramSVSort<Services> SIMPLEANYJAVATYPEEXPRESSION 
+    public static final ProgramSVSort SIMPLEANYJAVATYPEEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("AnyJavaTypeExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_BYTE,
@@ -222,7 +222,7 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
 			 PrimitiveType.JAVA_LONG});
 
     
-    public static final IProgramSVSort<Services> SIMPLEANYJAVANUMBERTYPEEXPRESSION 
+    public static final ProgramSVSort SIMPLEANYJAVANUMBERTYPEEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("AnyJavaNumberTypeExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_BYTE,
@@ -231,20 +231,20 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
 			 PrimitiveType.JAVA_LONG,
 			 PrimitiveType.JAVA_CHAR});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVASHORTINTLONGEXPRESSION
+    public static final ProgramSVSort SIMPLEJAVASHORTINTLONGEXPRESSION
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaShortIntLongExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_SHORT,
 			 PrimitiveType.JAVA_INT,
 	                 PrimitiveType.JAVA_LONG});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVAINTLONGEXPRESSION
+    public static final ProgramSVSort SIMPLEJAVAINTLONGEXPRESSION
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaIntLongExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_INT,
 	                 PrimitiveType.JAVA_LONG});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVACHARBYTESHORTINTEXPRESSION
+    public static final ProgramSVSort SIMPLEJAVACHARBYTESHORTINTEXPRESSION
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaCharByteShortIntExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_CHAR,
@@ -252,12 +252,12 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
 			 PrimitiveType.JAVA_SHORT,
 			 PrimitiveType.JAVA_INT});
     
-    public static final IProgramSVSort<Services> SIMPLEJAVABIGINTEXPRESSION
+    public static final ProgramSVSort SIMPLEJAVABIGINTEXPRESSION
     = new SimpleExpressionSpecialPrimitiveTypeSort
     ("JavaBigintExpression", new PrimitiveType[]{PrimitiveType.JAVA_BIGINT});
 
     
-    public static final IProgramSVSort<Services> SIMPLEANYNUMBERTYPEEXPRESSION 
+    public static final ProgramSVSort SIMPLEANYNUMBERTYPEEXPRESSION 
     = new SimpleExpressionSpecialPrimitiveTypeSort
     ("AnyNumberTypeExpression", new
      PrimitiveType[]{PrimitiveType.JAVA_BYTE,
@@ -267,46 +267,46 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
              PrimitiveType.JAVA_CHAR,
              PrimitiveType.JAVA_BIGINT});
 
-    public static final IProgramSVSort<Services> SIMPLEJAVABOOLEANEXPRESSION 
+    public static final ProgramSVSort SIMPLEJAVABOOLEANEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("SimpleJavaBooleanExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_BOOLEAN});
 
-    public static final IProgramSVSort<Services> SIMPLESTRINGEXPRESSION
+    public static final ProgramSVSort SIMPLESTRINGEXPRESSION
 	= new SimpleExpressionStringSort("SimpleStringExpression");
     
-    public static final IProgramSVSort<Services> SIMPLENONSTRINGOBJECTEXPRESSION
+    public static final ProgramSVSort SIMPLENONSTRINGOBJECTEXPRESSION
 	= new SimpleExpressionNonStringObjectSort("SimpleNonStringObjectExpression");
 
     
 
     //--------------- Specials that can be get rid of perhaps--------------
 
-    public static final IProgramSVSort<Services> LOOPINIT = new LoopInitSort();
+    public static final ProgramSVSort LOOPINIT = new LoopInitSort();
 
-    public static final IProgramSVSort<Services> GUARD = new GuardSort();
+    public static final ProgramSVSort GUARD = new GuardSort();
 
-    public static final IProgramSVSort<Services> FORUPDATES = new ForUpdatesSort();
+    public static final ProgramSVSort FORUPDATES = new ForUpdatesSort();
     
-    public static final IProgramSVSort<Services> FORLOOP = new ForLoopSort();
+    public static final ProgramSVSort FORLOOP = new ForLoopSort();
 
-    public static final IProgramSVSort<Services> MULTIPLEVARDECL
+    public static final ProgramSVSort MULTIPLEVARDECL
 	= new MultipleVariableDeclarationSort();
 
-    public static final IProgramSVSort<Services> ARRAYPOSTDECL
+    public static final ProgramSVSort ARRAYPOSTDECL
 	= new ArrayPostDeclarationSort();
     
-    public static final IProgramSVSort<Services> SWITCH
+    public static final ProgramSVSort SWITCH
 	= new SwitchSVSort(); 
 
-    public static final IProgramSVSort<Services> CONSTANT_PRIMITIVE_TYPE_VARIABLE
+    public static final ProgramSVSort CONSTANT_PRIMITIVE_TYPE_VARIABLE
 	= new ConstantProgramVariableSort(new Name("ConstantPrimitiveTypeVariable"), false);
 
-    public static final IProgramSVSort<Services> CONSTANT_STRING_VARIABLE
+    public static final ProgramSVSort CONSTANT_STRING_VARIABLE
 	= new ConstantProgramVariableSort(new Name("ConstantStringVariable"), true);
 
     
-    public static final IProgramSVSort<Services> VARIABLEINIT
+    public static final ProgramSVSort VARIABLEINIT
 	= new ProgramSVSort(new Name("VariableInitializer")) {
         public boolean canStandFor(ProgramElement pe, 
                 Services services) {
@@ -314,16 +314,16 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
         }
     };
 
-    public static final IProgramSVSort<Services> NONSTRINGLITERAL = new NonStringLiteralSort();
-    public static final IProgramSVSort<Services> STRINGLITERAL = new StringLiteralSort();
+    public static final ProgramSVSort NONSTRINGLITERAL = new NonStringLiteralSort();
+    public static final ProgramSVSort STRINGLITERAL = new StringLiteralSort();
 
     //--------------- Specials that match on certain names-----------------
 
-    public static final IProgramSVSort<Services> ARRAYLENGTH
+    public static final ProgramSVSort ARRAYLENGTH
 	= new ArrayLengthSort();
    
     //---------------REFERENCE SORTS ------------------------
-    public static final IProgramSVSort<Services> EXECUTIONCONTEXT = new ExecutionContextSort();
+    public static final ProgramSVSort EXECUTIONCONTEXT = new ExecutionContextSort();
 
 
     //--------------------------------------------------------------------------

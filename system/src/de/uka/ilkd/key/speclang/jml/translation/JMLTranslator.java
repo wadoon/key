@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
@@ -59,7 +60,7 @@ import de.uka.ilkd.key.util.Triple;
  */
 final class JMLTranslator {
 
-    private final static TermBuilder TB = TermBuilder.DF;
+    private final static TermBuilder TB = JavaProfile.DF();
     private IServices services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
 

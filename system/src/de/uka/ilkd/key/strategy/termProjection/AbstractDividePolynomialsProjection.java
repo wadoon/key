@@ -15,10 +15,10 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
@@ -55,7 +55,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
                                          services );
             final Term right = quotient ( monoCoeff, rightPoly.sub ( 1 ),
                                           services );
-            return TermBuilder.DF.func ( add, left, right );
+            return JavaProfile.DF().func ( add, left, right );
         }
         
         final Monomial rightMono = Monomial.create ( rightPoly, services );

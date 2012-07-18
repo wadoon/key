@@ -38,6 +38,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -52,7 +53,7 @@ import de.uka.ilkd.key.util.Pair;
 public class TacletGenerator {
 
     private static final TacletGenerator instance = new TacletGenerator();
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
 
 
     private TacletGenerator() {

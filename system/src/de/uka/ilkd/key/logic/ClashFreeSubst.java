@@ -15,9 +15,10 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 public class ClashFreeSubst {
-    protected static final TermBuilder TB = TermBuilder.DF;
+    protected static final TermBuilder TB = JavaProfile.DF();
 
     QuantifiableVariable v;
     Term s;

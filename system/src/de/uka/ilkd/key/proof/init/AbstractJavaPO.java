@@ -44,7 +44,7 @@ import de.uka.ilkd.key.util.Pair;
 public abstract class AbstractJavaPO implements ProofOblInput {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
-    protected static final TermBuilder TB = TermBuilder.DF;
+    protected static final TermBuilder TB = JavaProfile.DF();
     protected final AbstractInitConfig initConfig;
     private final Services services;
     protected final HeapLDT heapLDT;

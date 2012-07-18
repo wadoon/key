@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -50,7 +51,7 @@ public class TestJMLTranslator extends TestCase {
                                           + File.separator + "_testcase"
                                           + File.separator + "speclang"
                                           + File.separator + "testFile.key";
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
     private static JavaInfo javaInfo;
     private static Services services;
     private static KeYJavaType testClassType;

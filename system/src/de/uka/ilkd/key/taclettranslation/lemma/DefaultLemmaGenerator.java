@@ -10,7 +10,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -250,11 +250,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 Name name = createUniqueName(services, "f_"+sv.name().toString());
 
                 Function function = new Function(name, sv.sort(), argSorts);
-                return TermBuilder.DF.func(function, args);
+                return JavaProfile.DF().func(function, args);
         }
 
         private Name createUniqueName(IServices services, String baseName) {
-                return new Name(TermBuilder.DF.newName(services, baseName));
+                return new Name(JavaProfile.DF().newName(services, baseName));
         }
 
         private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet) {

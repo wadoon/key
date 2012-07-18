@@ -25,7 +25,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.WaryClashFreeSubst;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 public class TestClashFreeSubst extends TestCase {
  
@@ -211,7 +211,7 @@ public class TestClashFreeSubst extends TestCase {
 			    top.varsBoundHere(0).get(i);
 		    }
 		    subStack.pop();
-		    subStack.push(TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
+		    subStack.push(JavaProfile.DF().all(ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
 		    return;
 		}
 	    }

@@ -12,7 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.java.IServices;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class HeapContext {
   public static Map<LocationVariable,LocationVariable> getBeforeAtPreVars(List<LocationVariable> heaps, IServices services, String contextName) {
     Map<LocationVariable,LocationVariable> result = new LinkedHashMap<LocationVariable,LocationVariable>();
     for(LocationVariable heap : heaps) {
-       final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heap.name()+contextName, heap.sort(), true);
+       final LocationVariable atPreVar = JavaProfile.DF().heapAtPreVar(services, heap.name()+contextName, heap.sort(), true);
        result.put(heap, atPreVar);
     }
     return result;
@@ -52,7 +52,7 @@ public class HeapContext {
     final Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
     for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
        final LocationVariable lv = atPreVars.get(heap);
-       final Term t = lv == null ? null : TermBuilder.DF.var(lv);
+       final Term t = lv == null ? null : JavaProfile.DF().var(lv);
        result.put(heap, t);
     }
     return result;

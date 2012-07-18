@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -31,7 +32,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public final class DropEffectlessElementariesCondition 
 						implements VariableCondition {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
     
     private final UpdateSV u;
     private final SchemaVariable x;

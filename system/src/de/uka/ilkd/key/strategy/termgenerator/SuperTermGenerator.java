@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -133,8 +134,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
 
         protected Term generateOneTerm(Term superterm, int child) {
-            final Term index = TermBuilder.DF.zTerm ( services, "" + child );
-            return TermBuilder.DF.tf().createTerm( binFunc, superterm, index );
+            final Term index = JavaProfile.DF().zTerm ( services, "" + child );
+            return JavaProfile.DF().tf().createTerm( binFunc, superterm, index );
         }
     }
     

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 
 /**
@@ -28,7 +29,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
  */
 class HandleArith {
 	
-	private final static TermBuilder tb = TermBuilder.DF;	
+	private final static TermBuilder tb = JavaProfile.DF();	
 	private final static Term trueT = tb.tt (), falseT = tb.ff ();
 	
 	private HandleArith() {}

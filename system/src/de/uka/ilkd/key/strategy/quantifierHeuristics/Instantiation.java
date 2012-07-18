@@ -21,13 +21,14 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 class Instantiation {
 
-    private final static TermBuilder tb = TermBuilder.DF;
+    private final static TermBuilder tb = JavaProfile.DF();
 
     /** universally quatifiable variable bound in<code>allTerm</code> */
     private final QuantifiableVariable firstVar;

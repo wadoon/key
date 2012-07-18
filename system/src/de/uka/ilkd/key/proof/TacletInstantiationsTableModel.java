@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -204,7 +205,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
             KeYParser parser =
                 new KeYParser (ParserMode.DECLARATION, new KeYLexer ( new StringReader ( s ),
                                  services.getExceptionHandler() ), "",
-                                 services,   // should not be needed
+                                 (Services) services,   // should not be needed
                                  nss );
             return parser.id_declaration ();
         } catch (antlr.RecognitionException re) {
@@ -430,7 +431,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     public TacletApp createTacletAppFromVarInsts()
         throws SVInstantiationException {
 
-        final TermBuilder tb = TermBuilder.DF;
+        final TermBuilder tb = JavaProfile.DF();
 	TacletApp      result = originalApp;
 	SchemaVariable sv     = null;
 	Sort           sort   = null;

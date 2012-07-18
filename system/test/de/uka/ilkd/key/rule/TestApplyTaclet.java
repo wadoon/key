@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -106,7 +107,7 @@ public class TestApplyTaclet extends TestCase{
     }
 
     public void setUp() {
-	TermBuilder tf=TermBuilder.DF;
+	TermBuilder tf=JavaProfile.DF();
 
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();

@@ -22,10 +22,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 public class TestSemisequent extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
  
     private SequentFormula[] con;
 

@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
@@ -103,7 +104,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         }
 
-        private static final TermBuilder TB = TermBuilder.DF;
+        private static final TermBuilder TB = JavaProfile.DF();
         
         private int nameCounter =0;
 
@@ -298,7 +299,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         .getIntegerLDT().getMul();
 
                         multiplicationFunction = new Function(new Name(
-                                        TermBuilder.DF.newName(services,
+                                        JavaProfile.DF().newName(services,
                                                         "unin_mult")),
                                         reference.sort(), reference.argSorts());
                 }
@@ -882,8 +883,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         private Term createLogicalVar(IServices services, String baseName,
                         Sort sort) {
-                return TermBuilder.DF.var(new LogicVariable(new Name(
-                                TermBuilder.DF.newName(services, baseName)),
+                return JavaProfile.DF().var(new LogicVariable(new Name(
+                                JavaProfile.DF().newName(services, baseName)),
                                 sort));
         }
 
@@ -893,7 +894,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 Sort sort = services.getTypeConverter().getIntegerLDT()
                                 .getMul().sort();
                 Function mult = getMultiplicationFunction(services);
-                TermBuilder tb = TermBuilder.DF;
+                TermBuilder tb = JavaProfile.DF();
                 Term zero = tb.zero(services);
                 Term one = tb.one(services);
                 LinkedList<Term> multAssumptions = new LinkedList<Term>();
@@ -977,7 +978,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         private Term getRightBorderAsTerm(long integer, IServices services) {
-                return TermBuilder.DF.zTerm(services, Long
+                return JavaProfile.DF().zTerm(services, Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
         }
@@ -990,7 +991,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         long integer) {
                 String val = Long.toString(integer);
                 val = integer < 0 ? "negative_value" : "positive_value";
-                return new StringBuffer(TermBuilder.DF.newName(services, "i")
+                return new StringBuffer(JavaProfile.DF().newName(services, "i")
                                 + "_" + val);
 
         }

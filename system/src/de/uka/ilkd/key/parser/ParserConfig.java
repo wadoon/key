@@ -10,27 +10,22 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.KeYRecoderMapping;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.NamespaceSet;
 
-public class ParserConfig {
+public class ParserConfig<S extends IServices> {
 
-    private IServices services;
+    private S services;
     private NamespaceSet nss;
 
     
-    public ParserConfig(IServices services, 
+    public ParserConfig(S services, 
 			NamespaceSet nss) {
 	this.services = services;
 	this.nss      = nss;
     }
 
 
-    public IServices services() {
+    public S services() {
 	return services;
     }
 

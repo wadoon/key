@@ -27,6 +27,7 @@ import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
@@ -297,8 +298,8 @@ public class TestTermParser extends TestCase {
 	LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = TermBuilder.DF.all(thisx,
-	     TermBuilder.DF.all(l1,
+	Term t1 = JavaProfile.DF().all(thisx,
+	     JavaProfile.DF().all(l1,
 	      tf.createTerm
 	      (Junctor.NOT,
 	       tf.createTerm(Equality.EQUALS,
@@ -344,7 +345,7 @@ public class TestTermParser extends TestCase {
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = TermBuilder.DF.ex(thisx,
+	Term t1 = JavaProfile.DF().ex(thisx,
 	     tf.createTerm
 	     (Junctor.NOT,
 	      tf.createTerm(isempty,new Term[]{tf.createTerm(thisx)}, null, null)));

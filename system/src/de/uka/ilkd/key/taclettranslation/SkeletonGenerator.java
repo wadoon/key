@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 
 public interface SkeletonGenerator{
@@ -50,7 +51,7 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
       *         both antecedent and succendent are empty.
       */
      protected Term translate(Sequent s) {
- 	TermBuilder builder = TermBuilder.DF;
+ 	TermBuilder builder = JavaProfile.DF();
 
  	ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
  	ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());

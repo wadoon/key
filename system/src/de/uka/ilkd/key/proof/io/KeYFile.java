@@ -106,7 +106,7 @@ public class KeYFile implements EnvInput {
                              new KeYLexer(is,
                                           initConfig.getServices().getExceptionHandler()),
                              file.toString(), 
-                             initConfig.getServices(),
+                             (Services) initConfig.getServices(),
                              initConfig.namespaces());
     }
 

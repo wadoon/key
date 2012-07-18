@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
@@ -43,7 +44,7 @@ public class RootsGenerator implements TermGenerator {
 
     private final ProjectionToTerm powerRelation;
 
-    final TermBuilder tb = TermBuilder.DF;        
+    final TermBuilder tb = JavaProfile.DF();        
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf ( 2 );
 

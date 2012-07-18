@@ -20,7 +20,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.*;
 
@@ -119,7 +119,7 @@ public class NodeInfo {
        if (ruleApp instanceof PosTacletApp) {
            PosTacletApp pta = (PosTacletApp) ruleApp;
            if (!isSymbolicExecution(pta.taclet())) return null;
-           Term t = TermBuilder.DF.goBelowUpdates(pta.posInOccurrence().subTerm());
+           Term t = JavaProfile.DF().goBelowUpdates(pta.posInOccurrence().subTerm());
            final ProgramElement pe = t.javaBlock().program();
            if (pe != null) {
                firstStatement = pe.getFirstElement();

@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -46,7 +47,7 @@ public class JavaContractFactory {
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private final Services services;
-    private final TermBuilder tb = TermBuilder.DF;
+    private final TermBuilder tb = JavaProfile.DF();
     
 
     public JavaContractFactory (Services services){

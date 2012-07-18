@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
@@ -344,7 +345,7 @@ public class CreateTacletForTests extends TestCase {
 
 	z = new LogicVariable(new Name("z"),sort1);
        	Term t_z=tf.createTerm(z,new Term[0]);
-	Term t_allzpz=TermBuilder.DF.all(z, tf.createTerm(func_p,new Term[]{t_z}));
+	Term t_allzpz=JavaProfile.DF().all(z, tf.createTerm(func_p,new Term[]{t_z}));
  	SequentFormula cf3=new SequentFormula(t_allzpz);
  	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
  					  Semisequent.EMPTY_SEMISEQUENT

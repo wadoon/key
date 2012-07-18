@@ -35,11 +35,11 @@ import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -78,7 +78,7 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class JMLSpecFactory {
 
-    private static final de.uka.ilkd.key.logic.TermBuilder TB = TermBuilder.DF;
+    private static final de.uka.ilkd.key.logic.TermBuilder TB = JavaProfile.DF();
     private final de.uka.ilkd.key.java.Services services;
     private final JavaContractFactory cf;
     private int invCounter;

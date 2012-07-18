@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
@@ -28,7 +29,7 @@ public class HeuristicInstantiation implements TermGenerator {
 	
     public final static TermGenerator INSTANCE = new HeuristicInstantiation ();
     
-    private final TermBuilder tb = TermBuilder.DF;
+    private final TermBuilder tb = JavaProfile.DF();
     
     private HeuristicInstantiation() {}
     

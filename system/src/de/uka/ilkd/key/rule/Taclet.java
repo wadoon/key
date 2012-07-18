@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
@@ -95,7 +96,7 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
 
     /** name of the taclet */
     private final Name name;

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,10 +9,8 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 
@@ -71,18 +68,9 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     }
     
-    public static Term translate(IServices services, String toBeChecked){
-        try {
-            KeYParser parser =
-                    new KeYParser (ParserMode.TERM, new KeYLexer ( new StringReader ( toBeChecked ),
-                                     services.getExceptionHandler() ), "",
-                                     services,   // should not be needed
-                                     services.getNamespaces() );
-                return parser.term();
-             } catch (Throwable e) {
-                 
-                return null;
-             }
+    public static Term translate(IServices services, String toBeChecked){       
+        return ProblemLoader.parseTerm(toBeChecked, services, services.getNamespaces().variables(), 
+                services.getNamespaces().programVariables());
     }
 
 }

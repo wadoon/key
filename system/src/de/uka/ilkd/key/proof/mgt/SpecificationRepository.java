@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -76,7 +77,7 @@ import de.uka.ilkd.key.util.Pair;
 public final class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
     private final JavaContractFactory cf;
     
     private final Map<Pair<KeYJavaType,IObserverFunction>, ImmutableSet<Contract>> contracts 

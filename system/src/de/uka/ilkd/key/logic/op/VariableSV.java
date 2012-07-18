@@ -13,8 +13,8 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
@@ -40,7 +40,7 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
 	    			 IServices services) {                
         final Term substTerm;
         if(subst instanceof LogicVariable) {
-            substTerm = TermBuilder.DF.var((LogicVariable)subst);
+            substTerm = JavaProfile.DF().var((LogicVariable)subst);
         } else if(subst instanceof Term && 
                  ((Term)subst).op() instanceof QuantifiableVariable) {
             substTerm = (Term) subst;

@@ -7,13 +7,13 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -94,7 +94,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          // Search final value of the exceptional variable which is used to check if the verified program terminates normally
          ImmutableArray<Term> value = null;
          for (SequentFormula f : getProofNode().sequent().succedent()) {
-            Pair<ImmutableList<Term>,Term> updates = TermBuilder.DF.goBelowUpdates2(f.formula());
+            Pair<ImmutableList<Term>,Term> updates = JavaProfile.DF().goBelowUpdates2(f.formula());
             Iterator<Term> iter = updates.first.iterator();
             while (value == null && iter.hasNext()) {
                value = extractValueFromUpdate(iter.next(), exceptionVariable);

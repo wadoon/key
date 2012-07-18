@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -77,9 +78,9 @@ public class TestCollisionResolving extends TestCase {
 	Term t_q_x = TermFactory.DEFAULT.createTerm(q, new Term[]{t_x}, null, null);
 	
 	Term t_all_p_x =
-	    TermBuilder.DF.all(x, t_p_x);
+	    JavaProfile.DF().all(x, t_p_x);
 	Term t_ex_q_x =
-	    TermBuilder.DF.ex(x, t_q_x);
+	    JavaProfile.DF().ex(x, t_q_x);
 	Term term = 
 	    TermFactory.DEFAULT.createTerm(Junctor.AND, t_all_p_x,
 						  t_ex_q_x);
@@ -125,13 +126,13 @@ public class TestCollisionResolving extends TestCase {
 	Term t_q_x = TermFactory.DEFAULT.createTerm(q, new Term[]{t_x}, null, null);
 	
 	Term t_ex_q_x =
-	    TermBuilder.DF.ex(x, t_q_x);
+	    JavaProfile.DF().ex(x, t_q_x);
 
 	Term t_px_and_exxqx = 
 	    TermFactory.DEFAULT.createTerm(Junctor.AND, t_p_x,
 						  t_ex_q_x);
 	Term term =
-	    TermBuilder.DF.all(x, t_px_and_exxqx);
+	    JavaProfile.DF().all(x, t_px_and_exxqx);
 
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_context").taclet();

@@ -7,7 +7,6 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -58,10 +58,10 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         
         public Term createIfElseTerm(Term phi, IServices services){
             if(rhs1.equals(rhs2)){
-                return TermBuilder.DF.elementary(services, op, rhs1);
+                return JavaProfile.DF().elementary(services, op, rhs1);
             }
-            Term ifThenElse = TermBuilder.DF.ife(phi, rhs1, rhs2);
-            return TermBuilder.DF.elementary(services,op,ifThenElse);
+            Term ifThenElse = JavaProfile.DF().ife(phi, rhs1, rhs2);
+            return JavaProfile.DF().elementary(services,op,ifThenElse);
             
         }
         
@@ -157,12 +157,12 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         if(!collect(map,u2,false)){
             return null;
         }
-        Term result = TermBuilder.DF.skip();
+        Term result = JavaProfile.DF().skip();
         for(ElementaryUpdateWrapper euw : map.values()){
-            result = TermBuilder.DF.parallel(result, euw.createIfElseTerm(phi, services));
+            result = JavaProfile.DF().parallel(result, euw.createIfElseTerm(phi, services));
         }
         
-        result = TermBuilder.DF.apply(result, t);
+        result = JavaProfile.DF().apply(result, t);
         return result;
     }
     
@@ -183,8 +183,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
             return mc;
         }
         
-        u1Inst = u1Inst == null ? TermBuilder.DF.skip() : u1Inst;
-        u2Inst = u2Inst == null ? TermBuilder.DF.skip() : u2Inst;
+        u1Inst = u1Inst == null ? JavaProfile.DF().skip() : u1Inst;
+        u2Inst = u2Inst == null ? JavaProfile.DF().skip() : u2Inst;
 
         Term properResultInst = simplify(phiInst, u1Inst, u2Inst, tInst, services);
         if(properResultInst == null) {

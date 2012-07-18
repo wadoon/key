@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
 /**
@@ -63,7 +64,7 @@ public class QueryExpand implements BuiltInRule {
 
     private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
 
-    private static final TermBuilder tb = TermBuilder.DF;
+    private static final TermBuilder tb = JavaProfile.DF();
     
     /** Stores a number that indicates the time when term occurred for the first time where
      * this rule was applicable. The time is the number of rules applied on this branch.*/

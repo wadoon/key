@@ -6,10 +6,10 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 public interface PredicateEstimator {
     public static final PredicateEstimator STD_ESTIMATOR = new StdPredicateEstimator();
@@ -53,7 +53,7 @@ class StdPredicateEstimator implements PredicateEstimator{
                     @Override
                     public Term getPredicate() {
                         if(!positive){
-                            return TermBuilder.DF.not(term);
+                            return JavaProfile.DF().not(term);
                         }
                         return term;
                     }

@@ -24,8 +24,8 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -180,7 +180,7 @@ public final class LocSetLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, IServices services) {
 	assert lit instanceof EmptySetLiteral;
-	return TermBuilder.DF.func(empty);
+	return JavaProfile.DF().func(empty);
     }
     
 

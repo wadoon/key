@@ -21,8 +21,8 @@ import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -245,7 +245,7 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, IServices services) {
-	final Term term_empty = TermBuilder.DF.func(clEmpty);
+	final Term term_empty = JavaProfile.DF().func(clEmpty);
 
 	char[] charArray;
 	Term result = term_empty;
@@ -263,7 +263,7 @@ public final class CharListLDT extends LDT {
 	}
 
 	for (int i = charArray.length - 2; i >= 1; i--) {
-	    result = TermBuilder.DF.func(clCons,
+	    result = JavaProfile.DF().func(clCons,
 		    intLDT.translateLiteral(new CharLiteral(charArray[i]), 
 			                    services),
 		    result);

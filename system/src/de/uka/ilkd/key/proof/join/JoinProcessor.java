@@ -14,13 +14,13 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.delayedcut.NodeGoalPair;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -179,14 +179,14 @@ public class JoinProcessor implements Runnable{
     private Term createCutFormula(){
         Term ifElseTerm = buildIfElseTerm();
         Term phi = createPhi();
-        return TermBuilder.DF.or(ifElseTerm, phi);
+        return JavaProfile.DF().or(ifElseTerm, phi);
     }
     
     private Term buildIfElseTerm(){
-         Term thenTerm = TermBuilder.DF.apply(partner.getUpdate(0),partner.getCommonFormula());
-         Term elseTerm = TermBuilder.DF.apply(partner.getUpdate(1),partner.getCommonFormula());
+         Term thenTerm = JavaProfile.DF().apply(partner.getUpdate(0),partner.getCommonFormula());
+         Term elseTerm = JavaProfile.DF().apply(partner.getUpdate(1),partner.getCommonFormula());
          
-         return TermBuilder.DF.ife(partner.getCommonPredicate(), thenTerm,elseTerm);
+         return JavaProfile.DF().ife(partner.getCommonPredicate(), thenTerm,elseTerm);
         
     }
     
@@ -204,13 +204,13 @@ public class JoinProcessor implements Runnable{
          Collection<Term> gamma2      = computeDifference(partner.getSequent(1).antecedent(),commonGamma,null);
          
          Collection<Term> constrainedGamma1 = createConstrainedTerms(gamma1, partner.getCommonPredicate(), true);
-         Collection<Term> constrainedGamma2 = createConstrainedTerms(gamma2, TermBuilder.DF.not(partner.getCommonPredicate()), true);
+         Collection<Term> constrainedGamma2 = createConstrainedTerms(gamma2, JavaProfile.DF().not(partner.getCommonPredicate()), true);
          
 
          Collection<Term> constrainedDelta1 = createConstrainedTerms(delta1, partner.getCommonPredicate(), false);
-         Collection<Term> constrainedDelta2 = createConstrainedTerms(delta2, TermBuilder.DF.not(partner.getCommonPredicate()), false);
+         Collection<Term> constrainedDelta2 = createConstrainedTerms(delta2, JavaProfile.DF().not(partner.getCommonPredicate()), false);
          
-         Term phi = TermBuilder.DF.ff();
+         Term phi = JavaProfile.DF().ff();
          phi = createDisjunction(phi,commonGamma,true);
          phi = createDisjunction(phi,constrainedGamma1,true);
          phi = createDisjunction(phi,constrainedGamma2,true);
@@ -226,9 +226,9 @@ public class JoinProcessor implements Runnable{
     private Term createDisjunction(Term seed, Collection<Term> formulas, boolean needNot ){
         for(Term formula : formulas){
             if(needNot){
-                seed = TermBuilder.DF.or(seed,TermBuilder.DF.not(formula));
+                seed = JavaProfile.DF().or(seed,JavaProfile.DF().not(formula));
             }else{
-                seed = TermBuilder.DF.or(seed,formula);
+                seed = JavaProfile.DF().or(seed,formula);
             }
         }
         return seed;
@@ -238,9 +238,9 @@ public class JoinProcessor implements Runnable{
         Collection<Term> result = new LinkedList<Term>();
         for(Term term : terms){
             if(gamma){
-                result.add(TermBuilder.DF.imp(predicate,term));
+                result.add(JavaProfile.DF().imp(predicate,term));
             }else{
-                result.add(TermBuilder.DF.and(predicate,term));
+                result.add(JavaProfile.DF().and(predicate,term));
             }
         }
         return result;

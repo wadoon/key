@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
 /**
@@ -121,7 +122,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
         Term res = or.replace(originalInv);
-        res = TermBuilder.DF.convertToFormula(res, services);
+        res = JavaProfile.DF().convertToFormula(res, services);
         return res;
     }
 

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -137,7 +138,7 @@ public class TestSchemaModalOperators extends TestCase {
 
 	Term replace = tf.createTerm(
 	    osv,
-	    new Term[]{TermBuilder.DF.tt()},
+	    new Term[]{JavaProfile.DF().tt()},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
@@ -150,10 +151,10 @@ public class TestSchemaModalOperators extends TestCase {
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
-	Term goal = TermBuilder.DF.prog(
+	Term goal = JavaProfile.DF().prog(
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
-            TermBuilder.DF.ff());
+            JavaProfile.DF().ff());
          MatchConditions mc=(t.match                                                   
                             (goal,                                                        
                              find,                                                

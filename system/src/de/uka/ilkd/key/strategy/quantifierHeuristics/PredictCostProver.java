@@ -21,13 +21,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 /**
  * TODO: rewrite, this seems pretty inefficient ...
  */
 class PredictCostProver {
 
-    private final static TermBuilder tb = TermBuilder.DF;
+    private final static TermBuilder tb = JavaProfile.DF();
 
     private final static Term trueT = tb.tt(), falseT = tb.ff();
 

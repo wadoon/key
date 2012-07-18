@@ -20,12 +20,12 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -202,7 +202,7 @@ public class Polynomial {
                               ( add, res, it.next ().toTerm ( services ) );
         }
         
-        final Term cTerm = TermBuilder.DF.zTerm(services, constantPart.toString());
+        final Term cTerm = JavaProfile.DF().zTerm(services, constantPart.toString());
         
         if ( res == null )
             res = cTerm;

@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -61,7 +62,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     public static final WhileInvariantRule INSTANCE = new WhileInvariantRule();
 
     private static final Name NAME = new Name("Loop Invariant");
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
 
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;

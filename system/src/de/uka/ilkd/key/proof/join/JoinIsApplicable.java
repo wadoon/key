@@ -6,9 +6,9 @@ import java.util.List;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 public class JoinIsApplicable {
     public static final JoinIsApplicable INSTANCE = new JoinIsApplicable();
@@ -41,14 +41,14 @@ public class JoinIsApplicable {
     private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio ,Goal g2){
         Term referenceFormula = pio.subTerm();
      
-        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(0) : TermBuilder.DF.skip();
+        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(0) : JavaProfile.DF().skip();
 
         referenceFormula = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(1) : referenceFormula;
         
         
         for(SequentFormula sf : g2.sequent().succedent()){
             Term formula = sf.formula();
-            Term update2 = TermBuilder.DF.skip();
+            Term update2 = JavaProfile.DF().skip();
             if(formula.op() instanceof UpdateApplication 
                && !formula.equals(referenceFormula)){
                     update2 = formula.sub(0);// don't change the order of this and the following line.

@@ -82,10 +82,9 @@ public final class DefaultTermParser {
 		                services.getExceptionHandler()), 
 		                "",
 				new Recoder2KeY ((Services)services, nss),
-                                services, 
+                                (Services) services, 
                                 nss, 
                                 scm);
-
 	    return parser.term();
         } catch (RecognitionException re) {
             throw new ParserException(re.getMessage(),

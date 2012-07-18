@@ -20,12 +20,12 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
 
@@ -158,7 +158,7 @@ public class EqualityConstraint implements Constraint {
         if ( t == null ) {
             t = map.get ( p_mv );
             if ( t == null )
-                t = TermBuilder.DF.var ( p_mv );
+                t = JavaProfile.DF().var ( p_mv );
             else
                 t = instantiate ( t );
 
@@ -774,7 +774,7 @@ public class EqualityConstraint implements Constraint {
 			( (entry.getValue ()).op () ) ) ) {
 		    removeConstraint.map.put
 			( (Metavariable)(entry.getValue ()).op (),
-			  TermBuilder.DF.var
+			  JavaProfile.DF().var
 			  ( entry.getKey () ) );
 		    it.remove ();
 		}

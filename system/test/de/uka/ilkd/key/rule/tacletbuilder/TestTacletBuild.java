@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -50,8 +51,8 @@ public class TestTacletBuild extends TestCase {
 	    TacletForTests.getVariables().lookup(new Name("v"));
 	Term b=tf.createTerm((SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("b")), NO_SUBTERMS);
-	Term t1=TermBuilder.DF.ex((QuantifiableVariable)u, b);
-	Term t2=TermBuilder.DF.ex((QuantifiableVariable)v, b);
+	Term t1=JavaProfile.DF().ex((QuantifiableVariable)u, b);
+	Term t2=JavaProfile.DF().ex((QuantifiableVariable)v, b);
 	RewriteTacletBuilder sb=new RewriteTacletBuilder();
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
@@ -80,11 +81,11 @@ public class TestTacletBuild extends TestCase {
 	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=TermBuilder.DF.all((QuantifiableVariable)u, A);
+	Term t1=JavaProfile.DF().all((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
 	     (0, new SequentFormula(t1)).semisequent());
-	Term t2=TermBuilder.DF.ex((QuantifiableVariable)u, A);
+	Term t2=JavaProfile.DF().ex((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
 	sb.setFind(t2);
@@ -105,8 +106,8 @@ public class TestTacletBuild extends TestCase {
 	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=TermBuilder.DF.all( (QuantifiableVariable)u, A);
-	Term t2=TermBuilder.DF.ex((QuantifiableVariable)u, A);
+	Term t1=JavaProfile.DF().all( (QuantifiableVariable)u, A);
+	Term t2=JavaProfile.DF().ex((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT
 	     .insert(0, new SequentFormula(t1)).semisequent()
@@ -132,7 +133,7 @@ public class TestTacletBuild extends TestCase {
 	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=TermBuilder.DF.all((QuantifiableVariable)u, A);
+	Term t1=JavaProfile.DF().all((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setFind(tf.createTerm(Junctor.AND,t1,t1));
 	try {

@@ -15,7 +15,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 

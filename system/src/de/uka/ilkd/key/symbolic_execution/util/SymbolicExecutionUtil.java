@@ -41,7 +41,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -116,7 +115,7 @@ public final class SymbolicExecutionUtil {
          Term goalImplication = sequentToImplication(goal.sequent());
          goalImplications = goalImplications.append(goalImplication);
       }
-      return TermBuilder.DF.or(goalImplications);
+      return JavaProfile.DF().or(goalImplications);
    }
    
    /**
@@ -129,12 +128,12 @@ public final class SymbolicExecutionUtil {
          ImmutableList<Term> antecedents = listSemisequentTerms(sequent.antecedent());
          ImmutableList<Term> succedents = listSemisequentTerms(sequent.succedent());
          // Construct branch condition from created antecedent and succedent terms as new implication 
-         Term left = TermBuilder.DF.and(antecedents);
-         Term right = TermBuilder.DF.or(succedents);
-         return TermBuilder.DF.imp(left, right);
+         Term left = JavaProfile.DF().and(antecedents);
+         Term right = JavaProfile.DF().or(succedents);
+         return JavaProfile.DF().imp(left, right);
       }
       else {
-         return TermBuilder.DF.tt();
+         return JavaProfile.DF().tt();
       }
    }
    
@@ -277,16 +276,16 @@ public final class SymbolicExecutionUtil {
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(JavaProfile.DF().newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
+      Term newTerm = JavaProfile.DF().func(newPredicate, JavaProfile.DF().var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
-      Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
+      Term modalityTerm = JavaProfile.DF().dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = JavaProfile.DF().goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
+      Term newSuccedentToProve = JavaProfile.DF().applySequential(originalUpdates, modalityTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -311,15 +310,15 @@ public final class SymbolicExecutionUtil {
       assert node != null;
       assert variable instanceof ProgramVariable;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(JavaProfile.DF().newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
+      Term newTerm = JavaProfile.DF().func(newPredicate, JavaProfile.DF().var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = JavaProfile.DF().goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
+      Term newSuccedentToProve = JavaProfile.DF().applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -344,14 +343,14 @@ public final class SymbolicExecutionUtil {
       assert node != null;
       assert term != null;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, term.sort());
+      Function newPredicate = new Function(new Name(JavaProfile.DF().newName(services, "ResultPredicate")), Sort.FORMULA, term.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, term);
+      Term newTerm = JavaProfile.DF().func(newPredicate, term);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = JavaProfile.DF().goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
+      Term newSuccedentToProve = JavaProfile.DF().applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -841,7 +840,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
       Term term = ruleApp.posInOccurrence().constrainedFormula().formula();
-      term = TermBuilder.DF.goBelowUpdates(term);
+      term = JavaProfile.DF().goBelowUpdates(term);
       JavaBlock block = term.javaBlock();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
       return context != null && context.getMethodContext() != null && context.getMethodContext().isImplicit();
@@ -984,14 +983,14 @@ public final class SymbolicExecutionUtil {
       ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
       ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
       // Construct branch condition from created antecedent and succedent terms as new implication 
-      Term left = TermBuilder.DF.and(antecedents);
-      Term right = TermBuilder.DF.or(succedents);
-      Term implication = TermBuilder.DF.imp(left, right);
+      Term left = JavaProfile.DF().and(antecedents);
+      Term right = JavaProfile.DF().or(succedents);
+      Term implication = JavaProfile.DF().imp(left, right);
       Term result;
       // Check if an update context is available
       if (!instantiations.getUpdateContext().isEmpty()) {
          // Append update context because otherwise the formula is evaluated in wrong state
-         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
+         result = JavaProfile.DF().applySequential(instantiations.getUpdateContext(), implication);
          // Simplify branch condition
          result = SymbolicExecutionUtil.simplify(node.proof(), result);
       }

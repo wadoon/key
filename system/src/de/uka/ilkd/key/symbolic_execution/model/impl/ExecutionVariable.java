@@ -20,13 +20,13 @@ import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -199,12 +199,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       if (isStaticVariable()) {
          // Static field access
          Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-         return TermBuilder.DF.staticDot(getServices(), getProgramVariable().sort(), function);
+         return JavaProfile.DF().staticDot(getServices(), getProgramVariable().sort(), function);
       }
       else {
          if (getParentVariable() == null) {
             // Direct access to a variable, so return it as term
-            return TermBuilder.DF.var((ProgramVariable)getProgramVariable());
+            return JavaProfile.DF().var((ProgramVariable)getProgramVariable());
          }
          else {
             Term parentTerm = parentVariable.createSelectTerm();
@@ -212,18 +212,18 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                if (((JavaInfo)getServices().getJavaInfo()).getArrayLength() == getProgramVariable()) {
                   // Special handling for length attribute of arrays
                   Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-                  return TermBuilder.DF.func(function, parentTerm);
+                  return JavaProfile.DF().func(function, parentTerm);
                }
                else {
                   // Field access on the parent variable
                   Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-                  return TermBuilder.DF.dot(getServices(), getProgramVariable().sort(), parentTerm, function);
+                  return JavaProfile.DF().dot(getServices(), getProgramVariable().sort(), parentTerm, function);
                }
             }
             else {
                // Special handling for array indices.
-               Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
-               return TermBuilder.DF.dotArr(getServices(), parentTerm, idx);
+               Term idx = JavaProfile.DF().zTerm(getServices(), "" + arrayIndex);
+               return JavaProfile.DF().dotArr(getServices(), parentTerm, idx);
             }
          }
       }

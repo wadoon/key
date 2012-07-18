@@ -28,6 +28,7 @@ import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.*;
 
 public class TestTacletPopup {
@@ -67,7 +68,7 @@ public class TestTacletPopup {
 
     static Sort nat = new SortImpl(new Name("Nat"));
 
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
 
     public static Namespace var_ns=new Namespace();
     public static Namespace func_ns=new Namespace();

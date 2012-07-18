@@ -17,6 +17,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
@@ -101,7 +102,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
-    protected static final TermBuilder TB = TermBuilder.DF;
+    protected static final TermBuilder TB = JavaProfile.DF();
     
     
     private static Sort[] createMetaSortArray(int arity) {

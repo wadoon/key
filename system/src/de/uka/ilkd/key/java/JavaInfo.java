@@ -47,12 +47,12 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -623,7 +623,7 @@ public final class JavaInfo implements IProgramInfo {
 				     String className) {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	Term[] subs = new Term[args.length+2];
-	subs[0] = TermBuilder.DF.getBaseHeap(services);
+	subs[0] = JavaProfile.DF().getBaseHeap(services);
 	subs[1] = prefix;
 	for(int i = 2; i < subs.length; i++) {
               Term t = args[i-2];             
@@ -650,7 +650,7 @@ public final class JavaInfo implements IProgramInfo {
 					       +" in "+className+" must have"
 					       +" a non-void type.");
 	}
-	return TermBuilder.DF.tf().createTerm(pm, subs);
+	return JavaProfile.DF().tf().createTerm(pm, subs);
     }
 
 

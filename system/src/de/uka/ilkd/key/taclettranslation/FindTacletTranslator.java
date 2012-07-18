@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -40,10 +41,10 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
 
 
 
-    private static final Term STD_REPLACE = TermBuilder.DF.ff(),
-    				 STD_ADD =     TermBuilder.DF.ff(), 
-    				 STD_ASSUM = TermBuilder.DF.ff(),
-    				 STD_FIND = TermBuilder.DF.ff();
+    private static final Term STD_REPLACE = JavaProfile.DF().ff(),
+    				 STD_ADD =     JavaProfile.DF().ff(), 
+    				 STD_ASSUM = JavaProfile.DF().ff(),
+    				 STD_FIND = JavaProfile.DF().ff();
    
 
 
@@ -63,7 +64,7 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
      */
     private Term translateReplaceAndAddTerm(TacletGoalTemplate template,
 	    Term find) {
-	TermBuilder tb = TermBuilder.DF;
+	TermBuilder tb = JavaProfile.DF();
 	Term replace = find;
 	if(template instanceof RewriteTacletGoalTemplate){
 	    replace = ((RewriteTacletGoalTemplate)template).replaceWith();
@@ -94,7 +95,7 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
      */
     private Term translateReplaceAndAddFormula(
 	    TacletGoalTemplate template, Term find) {
-	TermBuilder tb = TermBuilder.DF;
+	TermBuilder tb = JavaProfile.DF();
 	
 	Term replace = find;
 	if(template instanceof RewriteTacletGoalTemplate){
@@ -113,13 +114,13 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
     }
     
     private Term translateEqivalence(Term t1, Term t2){
-	TermBuilder tb = TermBuilder.DF;
+	TermBuilder tb = JavaProfile.DF();
 	return tb.equals(t1, t2);
     }
     
     private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type){
 	
-	TermBuilder tb = TermBuilder.DF;
+	TermBuilder tb = JavaProfile.DF();
 	Sequent replace=null;
 	if(template instanceof AntecSuccTacletGoalTemplate){
 	    replace = ((AntecSuccTacletGoalTemplate)template).replaceWith();
@@ -147,7 +148,7 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
 	
 
 	FindTaclet findTaclet = (FindTaclet) t;
-	TermBuilder tb = TermBuilder.DF;
+	TermBuilder tb = JavaProfile.DF();
 
 	// the standard translation of the patterns.
 

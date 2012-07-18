@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -49,7 +50,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TestVariableNamer extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
 
     private final Proof proof = new Proof(new Services());
     private final IServices services = proof.getServices();

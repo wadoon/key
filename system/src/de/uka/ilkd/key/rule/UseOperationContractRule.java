@@ -63,6 +63,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -81,7 +82,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                             = new UseOperationContractRule();    
 
     private static final Name NAME = new Name("Use Operation Contract");
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
     
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;   
@@ -552,7 +553,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .getInstantiation(); 
         assert contract.getTarget().equals(inst.pm);
 
-        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
+        Modality md = (Modality)JavaProfile.DF().goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
         boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
         final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 

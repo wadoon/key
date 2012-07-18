@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -497,7 +498,7 @@ public final class IntegerLDT extends LDT {
 
         char[] int_ch=null;
         assert sharp != null;
-        Term result = TermBuilder.DF.func(sharp);
+        Term result = JavaProfile.DF().func(sharp);
 
         Function identifier=numbers;
         if (lit instanceof CharLiteral) {
@@ -556,12 +557,12 @@ public final class IntegerLDT extends LDT {
         }
         
         for (int i = 0; i < length; i++) {
-            result = TermBuilder.DF.func(numberSymbol[int_ch[i]-'0'], result);
+            result = JavaProfile.DF().func(numberSymbol[int_ch[i]-'0'], result);
         }
         if (minusFlag) {
-            result = TermBuilder.DF.func(neglit, result);
+            result = JavaProfile.DF().func(neglit, result);
         }
-        result = TermBuilder.DF.func(identifier, result);
+        result = JavaProfile.DF().func(identifier, result);
 
         Debug.out("integerldt: result of translating literal (lit, result):", 
                   lit, result);

@@ -15,8 +15,8 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -40,9 +40,9 @@ public final class MetaGeq extends AbstractTermTransformer {
 	boolean result = bigIntArg1.compareTo(bigIntArg2) >= 0;
 	
 	if (result)
-	    return TermBuilder.DF.tt();
+	    return JavaProfile.DF().tt();
 	else
-	    return TermBuilder.DF.ff();
+	    return JavaProfile.DF().ff();
 
     }
 

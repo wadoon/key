@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 /**
  * This class decribes a substitution,which store a map(varMap) from quantifiable 
@@ -30,7 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class Substitution {
 
-    private final TermBuilder tb = TermBuilder.DF;
+    private final TermBuilder tb = JavaProfile.DF();
     
     private final ImmutableMap<QuantifiableVariable,Term> varMap;
     

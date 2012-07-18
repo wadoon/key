@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
@@ -73,7 +74,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	Expression loopIndex = (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	if (!( loopIndex instanceof ProgramVariable))
     		return rawInv;
-    	final TermBuilder tb = TermBuilder.DF;
+    	final TermBuilder tb = JavaProfile.DF();
 		final Term loopIdxVar = tb.var((ProgramVariable)loopIndex);
     	
     	
@@ -168,7 +169,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public Term programTerm() {
         if (posInOccurrence() != null) {
-            return TermBuilder.DF.goBelowUpdates(posInOccurrence().subTerm());
+            return JavaProfile.DF().goBelowUpdates(posInOccurrence().subTerm());
         }
         return null;
     }

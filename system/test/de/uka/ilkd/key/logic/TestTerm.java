@@ -20,13 +20,14 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 
 
 public class TestTerm extends TestCase { 
 
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
     private static final TermFactory tf=TermFactory.DEFAULT;
 
     private Sort sort1=new SortImpl(new Name("S1"));

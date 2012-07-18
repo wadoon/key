@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
 /*
@@ -34,7 +35,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
                                             = new PullOutConditionalsRule();
     
     private static final Name NAME = new Name("Pull Out Conditionals");
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
     
     private final List<List<Term>> equivalenceClasses 
     	= new LinkedList<List<Term>>();

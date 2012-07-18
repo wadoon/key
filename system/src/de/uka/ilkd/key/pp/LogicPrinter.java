@@ -34,7 +34,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
@@ -52,6 +51,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NewDependingOn;
@@ -1003,7 +1003,7 @@ public final class LogicPrinter {
             //heap not printed
             markEndSub();
 
-            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+            if(objectTerm.equals(JavaProfile.DF().NULL(services))
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
         	String className 

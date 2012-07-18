@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
 /**
@@ -24,7 +25,7 @@ import de.uka.ilkd.key.logic.op.Function;
  */
 public class JavaIntegerSemanticsHelper {
 
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
 
     private final SLTranslationExceptionManager excManager;
     private final TypeConverter tc;

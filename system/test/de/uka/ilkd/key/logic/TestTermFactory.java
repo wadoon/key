@@ -18,6 +18,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 /** class tests the term factory
 */
@@ -136,7 +137,7 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testQuantifierTerm() {
-	Term t_forallx_px=TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
+	Term t_forallx_px=JavaProfile.DF().all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
 	Assert.assertEquals(t_forallx_px,
 			    new TermImpl(Quantifier.ALL,new ImmutableArray<Term>(t1()), new ImmutableArray<QuantifiableVariable>(x), null));
     }
@@ -164,7 +165,7 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testSubstitutionTerm() {
-	Term t_x_subst_fy_in_px=TermBuilder.DF.subst(WarySubstOp.SUBST, x, t3(),
+	Term t_x_subst_fy_in_px=JavaProfile.DF().subst(WarySubstOp.SUBST, x, t3(),
 							  t1());
 	Assert.assertEquals(new TermImpl(WarySubstOp.SUBST, new ImmutableArray<Term>(new Term[]{ t3(),t1() }),
 				    	 new ImmutableArray<QuantifiableVariable>(x), null), 
@@ -200,7 +201,7 @@ public class TestTermFactory extends TestCase {
 	Exception exc=new Exception();
         Term result = null;
 	try {
-	    result=TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
+	    result=JavaProfile.DF().all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -268,18 +269,18 @@ public class TestTermFactory extends TestCase {
 	Term t = tf.createTerm(g, new Term[]{tf.createTerm(v2), 
 				             tf.createTerm(v1)});
 	Function c=new Function(new Name("c"), osort2, new Sort[0]);
-	Term st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+	Term st = JavaProfile.DF().subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
 	c=new Function(new Name("c"), osort4, new Sort[0]);
-	st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+	st = JavaProfile.DF().subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
 	c=new Function(new Name("c"), osort3, new Sort[0]);
-	st = TermBuilder.DF.subst(WarySubstOp.SUBST, v1, 
+	st = JavaProfile.DF().subst(WarySubstOp.SUBST, v1, 
 					    tf.createTerm(c), t);
 	Exception exc=new Exception();
 	try {
 	    c=new Function(new Name("c"), osort1, new Sort[0]);
-	    st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+	    st = JavaProfile.DF().subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
 	} catch (TermCreationException e) {
 	    exc=e;	    
@@ -288,7 +289,7 @@ public class TestTermFactory extends TestCase {
 	exc=new Exception();
 	try {
 	    c=new Function(new Name("c"), osort3, new Sort[0]);
-	    st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+	    st = JavaProfile.DF().subst(WarySubstOp.SUBST, v2, 
 					   tf.createTerm(c), t);
 	    
 	} catch (TermCreationException e) {

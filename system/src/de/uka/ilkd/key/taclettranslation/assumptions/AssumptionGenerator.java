@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
@@ -359,7 +360,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          */
         protected static Term quantifyTerm(Term term)
                         throws IllegalTacletException {
-                TermBuilder tb = TermBuilder.DF;
+                TermBuilder tb = JavaProfile.DF();
                 // Quantify over all free variables.
                 for (QuantifiableVariable qv : term.freeVars()) {
 
@@ -456,7 +457,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          */
         protected Term changeTerm(Term term) {
 
-                TermBuilder tb = TermBuilder.DF;
+                TermBuilder tb = JavaProfile.DF();
 
                 // translate schema variables into logical variables
                 if (term.op() instanceof SchemaVariable) {

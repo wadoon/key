@@ -16,7 +16,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -1641,9 +1641,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     instOf ( "subsumRightBigger" ) ) } ) );
                    
         final TermBuffer one = new TermBuffer ();
-        one.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "1" ) );
+        one.setContent ( JavaProfile.DF().zTerm ( p_proof.getServices (), "1" ) );
         final TermBuffer two = new TermBuffer ();
-        two.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "2" ) );
+        two.setContent ( JavaProfile.DF().zTerm ( p_proof.getServices (), "2" ) );
 
         bindRuleSet ( d, "inEqSimp_or_tautInEqs",
            SumFeature.createSum ( new Feature[] {
@@ -1877,7 +1877,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer intRel = new TermBuffer ();
         final TermBuffer atom = new TermBuffer ();
         final TermBuffer zero = new TermBuffer ();
-        zero.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "0" ) );
+        zero.setContent ( JavaProfile.DF().zTerm ( p_proof.getServices (), "0" ) );
         final TermBuffer rootInf = new TermBuffer ();
 
         final Feature posNegSplitting =

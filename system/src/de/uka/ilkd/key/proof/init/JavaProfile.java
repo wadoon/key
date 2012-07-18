@@ -14,6 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -126,5 +127,9 @@ public class JavaProfile extends AbstractProfile {
     @Override
     public InitConfig createInitConfig(IServices services, Profile profile) {
         return new InitConfig((Services) services, profile);
+    }
+
+    public static TermBuilder DF() {
+        return TermBuilder.DF;
     }
 }

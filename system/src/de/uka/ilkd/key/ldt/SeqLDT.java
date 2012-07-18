@@ -20,10 +20,10 @@ import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -146,7 +146,7 @@ public final class SeqLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, IServices services) {
 	assert lit instanceof EmptySeqLiteral;
-	return TermBuilder.DF.func(seqEmpty);
+	return JavaProfile.DF().func(seqEmpty);
     }
     
 

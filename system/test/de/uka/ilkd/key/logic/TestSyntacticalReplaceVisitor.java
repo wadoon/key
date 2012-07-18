@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
@@ -26,7 +27,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TestSyntacticalReplaceVisitor extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
        
     SVInstantiations insts=null;
 

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 /**
  * Expression resolvers are used by specification parsers (e.g. for JML
@@ -29,7 +30,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
  */
 public abstract class SLExpressionResolver {
     
-    protected static final TermBuilder TB = TermBuilder.DF;        
+    protected static final TermBuilder TB = JavaProfile.DF();        
 
     protected final JavaInfo javaInfo;
     protected final IServices services;

@@ -19,13 +19,13 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -215,16 +215,16 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(getServices(), "ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(JavaProfile.DF().newName(getServices(), "ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
+      Term newTerm = JavaProfile.DF().func(newPredicate, JavaProfile.DF().var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
-      Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
+      Term modalityTerm = JavaProfile.DF().dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = JavaProfile.DF().goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
+      Term newSuccedentToProve = JavaProfile.DF().applySequential(originalUpdates, modalityTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();

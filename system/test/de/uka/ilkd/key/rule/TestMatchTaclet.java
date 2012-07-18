@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.IHTacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -44,7 +45,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public class TestMatchTaclet extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
     
     FindTaclet if_addrule_conflict;
     FindTaclet find_addrule_conflict;
@@ -578,7 +579,7 @@ public class TestMatchTaclet extends TestCase {
 	TermFactory tf=TermFactory.DEFAULT;
 	Function aPred = (Function)TacletForTests.getFunctions().lookup(new Name("A"));
 	Term sub = tf.createTerm(aPred);
-	Term match=TermBuilder.DF.all(new LogicVariable(new Name("lv"), osort4), 
+	Term match=JavaProfile.DF().all(new LogicVariable(new Name("lv"), osort4), 
 					   sub);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_variableSV").taclet();   

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 /**
  * This class is used to create metavariables for every universal variables in 
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 @Deprecated
 class ReplacerOfQuanVariablesWithMetavariables {
 
-    final private static TermBuilder tb = TermBuilder.DF;
+    final private static TermBuilder tb = JavaProfile.DF();
 
     private ReplacerOfQuanVariablesWithMetavariables () {}
     

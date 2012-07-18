@@ -18,9 +18,9 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
 /**
@@ -139,19 +139,19 @@ public class SMTProblem {
 
                 ImmutableList<Term> ante = ImmutableSLList.nil();
 
-                ante = ante.append(TermBuilder.DF.tt());
+                ante = ante.append(JavaProfile.DF().tt());
                 for (SequentFormula f : s.antecedent()) {
                         ante = ante.append(f.formula());
                 }
 
                 ImmutableList<Term> succ = ImmutableSLList.nil();
-                succ = succ.append(TermBuilder.DF.ff());
+                succ = succ.append(JavaProfile.DF().ff());
                 for (SequentFormula f : s.succedent()) {
                         succ = succ.append(f.formula());
                 }
 
-                return TermBuilder.DF.imp(TermBuilder.DF.and(ante),
-                                TermBuilder.DF.or(succ));
+                return JavaProfile.DF().imp(JavaProfile.DF().and(ante),
+                                JavaProfile.DF().or(succ));
 
         }
 

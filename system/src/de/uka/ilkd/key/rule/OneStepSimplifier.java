@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.LRUCache;
 
 
@@ -48,7 +49,7 @@ public final class OneStepSimplifier implements BuiltInRule,
                                             = new OneStepSimplifier();
     
     private static final Name NAME = new Name("One Step Simplification");
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
     
     private static final ImmutableList<String> ruleSets 
     	= ImmutableSLList.<String>nil().append("concrete")    	                            

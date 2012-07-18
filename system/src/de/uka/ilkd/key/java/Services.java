@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -205,7 +206,7 @@ public class Services extends AbstractServices {
 
     @Override
     public TermBuilder getTermBuilder() {
-        return TermBuilder.DF;
+        return JavaProfile.DF();
     }
 
 }

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
 /**
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 public abstract class SLResolverManager {
     
     public final SLTranslationExceptionManager excManager;
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
 
     private ImmutableList<SLExpressionResolver> resolvers 
     	= ImmutableSLList.<SLExpressionResolver>nil();

@@ -36,7 +36,6 @@ import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -51,6 +50,7 @@ import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -372,7 +372,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
             if(visitedOp instanceof ElementaryUpdate 
         	&& elementaryUpdateLhs != null) {
         	assert neededsubs.length == 1;
-        	Term newTerm = TermBuilder.DF.elementary(services, 
+        	Term newTerm = JavaProfile.DF().elementary(services, 
         						 elementaryUpdateLhs, 
         						 neededsubs[0]);
         	pushNew(newTerm);

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.proof.VariableNameProposer;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -41,7 +42,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 public abstract class TacletApp implements RuleApp {
 
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = JavaProfile.DF();
 
     /** the taclet for which the application information is collected */
     private final Taclet taclet;
@@ -509,7 +510,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public final TacletApp tryToInstantiate(IServices services) {
 	final VariableNamer varNamer = services.getVariableNamer();
-	final TermBuilder tb = TermBuilder.DF;
+	final TermBuilder tb = JavaProfile.DF();
 
 	TacletApp app = this;
 	ImmutableList<String> proposals = ImmutableSLList.<String>nil();
