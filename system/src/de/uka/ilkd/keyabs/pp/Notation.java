@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.pp;
+package de.uka.ilkd.keyabs.pp;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -19,6 +19,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -51,15 +52,15 @@ public abstract class Notation {
      * this to call one of the <code>printXYZTerm</code> of
      * {@link LogicPrinter}, which do the layout.
      */
-    public abstract void print(Term t, ILogicPrinter sp) throws IOException;
+    public abstract void print(Term t, LogicPrinter sp) throws IOException;
 
     /**
      * Print a term without beginning a new block. See
      * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea
      * behind this. The standard implementation just delegates to
-     * {@link #print(Term,ILogicPrinter)}
+     * {@link #print(Term,LogicPrinter)}
      */
-    public void printContinuingBlock(Term t, ILogicPrinter sp)
+    public void printContinuingBlock(Term t, LogicPrinter sp)
 	    throws IOException {
 	print(t, sp);
     }
@@ -77,7 +78,7 @@ public abstract class Notation {
 	    this.name = name;
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printConstant(name);
 	}
     }
@@ -95,7 +96,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printPrefixTerm(name, t.sub(0), ass);
 	}
 
@@ -115,7 +116,7 @@ public abstract class Notation {
 	    this.assRight = assRight;
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printInfixTerm(t.sub(0), assLeft, name, t.sub(1), assRight);
 	}
 
@@ -145,7 +146,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
 	}
 
@@ -167,7 +168,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() instanceof Modality;
 	    assert t.javaBlock() != null;
 	    sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
@@ -187,7 +188,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printModalityTerm("\\modality{" + t.op().name().toString()
 			+ "}", t.javaBlock(), "\\endmodality", t, ass);
 	}
@@ -203,7 +204,7 @@ public abstract class Notation {
 	    super(115);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() == UpdateApplication.UPDATE_APPLICATION;
 	    final Operator targetOp = UpdateApplication.getTarget(t).op();
 	    final int assTarget 
@@ -225,7 +226,7 @@ public abstract class Notation {
 	    super(150);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printElementaryUpdate(":=", t, 0);
 	}
     }    
@@ -240,7 +241,7 @@ public abstract class Notation {
 	    super(100);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() == UpdateJunctor.PARALLEL_UPDATE;
 	    
 	    sp.printParallelUpdate("||", t, 10);
@@ -256,7 +257,7 @@ public abstract class Notation {
 	    super(120);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    QuantifiableVariable v = instQV(t, sp, 1);
 	    final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
 		    .op() == Equality.EQUALS ? 75 : 60) : 110);
@@ -291,7 +292,7 @@ public abstract class Notation {
 	    super(130);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printFunctionTerm(t.op().name().toString(), t);
 	}
     }
@@ -313,7 +314,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printCast(pre, post, t, ass);
 	}
     }
@@ -327,7 +328,7 @@ public abstract class Notation {
 	    super(140);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSelect(t);
 	}
     }
@@ -341,7 +342,7 @@ public abstract class Notation {
 	    super(130);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printLength(t);
 	}
     }       
@@ -356,7 +357,7 @@ public abstract class Notation {
 	    super(130);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printObserver(t);
 	}
     }
@@ -372,7 +373,7 @@ public abstract class Notation {
 	    super(130);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSingleton(t);
 	}
     }
@@ -392,7 +393,7 @@ public abstract class Notation {
 	        this.symbol = symbol;
 	    }
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printElementOf(t, symbol);
 	}
     }      
@@ -417,7 +418,7 @@ public abstract class Notation {
 	    keyword = keyw;
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printIfThenElseTerm(t, keyword);
 	}
     }
@@ -431,7 +432,7 @@ public abstract class Notation {
 	    super(1000);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    if (t.op() instanceof ProgramVariable) {
 		sp
 			.printConstant(t.op().name().toString().replaceAll(
@@ -446,7 +447,7 @@ public abstract class Notation {
     
     public static final class SchemaVariableNotation extends VariableNotation {
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    // logger.debug("SSV: " + t+ " [" + t.op() + "]");
 	    Debug.assertTrue(t.op() instanceof SchemaVariable);
 	    Object o = sp.getInstantiations().getInstantiation(
@@ -535,7 +536,7 @@ public abstract class Notation {
 	    return number.toString();
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    final String number = printNumberTerm(t);
 	    if (number != null) {
 		sp.printConstant(number);
@@ -579,7 +580,7 @@ public abstract class Notation {
 	    return ("'" + Character.valueOf(charVal)).toString() + "'";
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    final String charString = printCharTerm(t);
 	    if (charString != null) {
 		sp.printConstant(charString);
@@ -611,7 +612,7 @@ public abstract class Notation {
 	    return (result + "\"");
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printConstant(printStringTerm(t));
 	}
     }

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.TermParser;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -204,5 +205,11 @@ public class Services extends AbstractServices {
     public TermParser getTermParser() {
         return new DefaultTermParser();
     }
+
+
+	@Override
+	public UIConfiguration getUIConfiguration() {
+		return JavaProfile.UNPARSER;
+	}
 
 }

@@ -321,7 +321,7 @@ public class ProofDiffFrame extends JFrame {
         }
 
         LogicPrinter logicPrinter = 
-                new LogicPrinter(new ProgramPrinter(null), 
+        		proof.getServices().getUIConfiguration().createLogicPrinter(new ProgramPrinter(null), 
                         new NotationInfo(),
                         proof.getServices(),
                         true);

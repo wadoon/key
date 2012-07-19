@@ -297,7 +297,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
 
         public String longDescription() {
             final LogicPrinter printer = 
-                new LogicPrinter(new ProgramPrinter(), notInfo, services, true);
+                services.getUIConfiguration().createLogicPrinter(new ProgramPrinter(), notInfo, services, true);
             printer.setInstantiation(app.instantiations());
             printer.printSequent(seq);
             return printer.toString();

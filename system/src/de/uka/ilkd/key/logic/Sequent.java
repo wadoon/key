@@ -337,10 +337,10 @@ public class Sequent implements Iterable<SequentFormula> {
 
  
     public StringBuffer prettyprint(IServices services) {
-	de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter 
-					       (new de.uka.ilkd.key.pp.ProgramPrinter(null), 
-						new NotationInfo(),
-						services));
+		de.uka.ilkd.key.pp.LogicPrinter lp = services.getUIConfiguration()
+				.createLogicPrinter(
+						new de.uka.ilkd.key.pp.ProgramPrinter(null),
+						new NotationInfo(), services);
 	lp.printSequent(this);
 	return lp.result();
     }

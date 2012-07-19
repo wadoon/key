@@ -41,7 +41,8 @@ public class RuleJustificationByAddRules implements RuleJustification{
     public String toString() {
 	String mother;
 	if(motherTaclet().rule() instanceof Taclet) {
-            LogicPrinter tacPrinter = new LogicPrinter 
+            LogicPrinter tacPrinter =
+            		node.proof().getServices().getUIConfiguration().createLogicPrinter 
                 (new ProgramPrinter(null),                       
                  new NotationInfo(),   
                  node.proof().getServices(),

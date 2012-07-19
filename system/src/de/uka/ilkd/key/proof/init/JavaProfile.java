@@ -15,6 +15,8 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.pp.JavaUIConfiguration;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -38,6 +40,7 @@ public class JavaProfile extends AbstractProfile {
 
     private final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
+	public static final UIConfiguration UNPARSER = new JavaUIConfiguration();
 
 
     protected JavaProfile(String standardRules) {
@@ -128,4 +131,9 @@ public class JavaProfile extends AbstractProfile {
     public static TermBuilder DF() {
         return TermBuilder.DF;
     }
+
+	@Override
+	public UIConfiguration getUIConfiguration() {
+		return UNPARSER;
+	}
 }

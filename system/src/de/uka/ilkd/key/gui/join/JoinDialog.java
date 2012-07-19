@@ -127,7 +127,7 @@ public class JoinDialog extends StdDialog{
                 if(partner.getCommonPredicate() == null){
                     return "";
                 }
-                LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+                LogicPrinter printer = proof.getServices().getUIConfiguration().createLogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
                 try{
                     printer.printTerm(partner.getCommonPredicate());
                 }catch (Throwable e){

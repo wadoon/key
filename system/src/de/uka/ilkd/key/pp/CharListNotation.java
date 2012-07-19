@@ -21,7 +21,7 @@ public final class CharListNotation extends Notation {
     }
 
     @Override
-    public void print(Term t, LogicPrinter sp) throws IOException {
+    public void print(Term t, ILogicPrinter sp) throws IOException {
 	if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
 	    sp.printTerm(t);
 	} else {

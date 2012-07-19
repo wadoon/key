@@ -55,7 +55,7 @@ public class RuleView extends JPanel implements TreeSelectionListener, java.io.S
     		DefaultMutableTreeNode node = (DefaultMutableTreeNode)ruleTree.getLastSelectedPathComponent();
         	if(node.isLeaf()){
         		TacletView tv = TacletView.getInstance();
-        		tv.showTacletView(node);
+        		tv.showTacletView(node, mediator.getServices().getUIConfiguration());
             } 
     	}    	
     }

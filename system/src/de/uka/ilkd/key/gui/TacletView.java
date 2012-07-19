@@ -24,6 +24,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class TacletView implements ActionListener{
@@ -82,11 +83,11 @@ public class TacletView implements ActionListener{
     }
     
     
-    public void showTacletView(Taclet tac, boolean modal){
+    private void showTacletView(Taclet tac, boolean modal, UIConfiguration uic){
 	frame.setModal(modal);
         scrollPane.setBorder(BorderFactory.createTitledBorder
                 (getDisplayName(tac)));
-        content.setText(getTacletByName(tac));
+        content.setText(getTacletByName(tac, uic));
 
         content.setCaretPosition(0);
 
@@ -95,12 +96,12 @@ public class TacletView implements ActionListener{
     }
 
     
-    public void showTacletView(DefaultMutableTreeNode node){
+    public void showTacletView(DefaultMutableTreeNode node, UIConfiguration uic){
         Taclet tac;
         if (node.getUserObject() instanceof Taclet) {
             tac = (Taclet) node.getUserObject();        
         } else return;
-        showTacletView(tac,false);
+        showTacletView(tac,false, uic);
 
     }
 
@@ -110,10 +111,10 @@ public class TacletView implements ActionListener{
     }
 
 
-    private String getTacletByName(Taclet tac){
+    private String getTacletByName(Taclet tac, UIConfiguration uic){
         String rule;
         LogicPrinter lp = 
-            new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
+            uic.createLogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(tac);
         rule = lp.toString();
 

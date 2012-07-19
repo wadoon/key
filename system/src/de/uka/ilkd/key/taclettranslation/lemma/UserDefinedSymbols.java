@@ -164,7 +164,7 @@ public class UserDefinedSymbols {
         private StringBuffer createHeaderFor(Taclet taclet, IServices services){
                 NotationInfo info = new NotationInfo();
                 StringBackend backend = new StringBackend(80);
-              LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),info, backend,services,true);
+              LogicPrinter printer = services.getUIConfiguration().createLogicPrinter(new ProgramPrinter(),info, backend,services,true);
               printer.printTaclet(taclet);
            
               return new StringBuffer(backend.getString()+";");

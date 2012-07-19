@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.WriterBackend;
@@ -48,7 +49,10 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         Writer w = new StringWriter();
         
         WriterBackend backend = new WriterBackend(w, 68);
-        LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w,
+        
+        UIConfiguration uic = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration();
+        
+        LogicPrinter tp = uic.createLogicPrinter(new ProgramPrinter(w,
     							  connectedTo.instantiations()),
     				       notationInfo, backend, null,
     				       true);
@@ -74,7 +78,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     	    taclet_sb = new StringBuffer();
     	    w = new StringWriter();
     	    backend = new WriterBackend(w, 68);
-    	    tp = new LogicPrinter
+    	    tp = uic.createLogicPrinter
     	    (new ProgramPrinter(w), notationInfo, backend, null, true);
     	    tp.printTaclet(connectedTo.taclet());
 

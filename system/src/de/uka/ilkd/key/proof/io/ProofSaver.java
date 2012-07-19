@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -519,8 +520,13 @@ public class ProofSaver {
 
         NotationInfo ni = new NotationInfo();
         LogicPrinter p = null;
-
-        p =  new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
+        UIConfiguration uic;
+        if (serv == null) {
+        	uic = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration();
+        } else {
+        	uic = serv.getUIConfiguration();
+        }
+        p =  uic.createLogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
         return p;
     }
 }

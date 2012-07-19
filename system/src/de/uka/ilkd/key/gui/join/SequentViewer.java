@@ -30,7 +30,7 @@ public class SequentViewer extends JTextPane{
         
         public void setSequent(Sequent sequent, IServices services){
                 if(services != null){
-                        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),
+                        LogicPrinter printer = services.getUIConfiguration().createLogicPrinter(new ProgramPrinter(),
                                                               new NotationInfo(),
                                                               services);
                         printer.printSequent(sequent);

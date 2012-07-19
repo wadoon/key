@@ -8,13 +8,11 @@
 //
 //
 
-package de.uka.ilkd.key.pp;
+package de.uka.ilkd.keyabs.pp;
 
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -37,6 +35,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 
@@ -163,11 +162,7 @@ public final class NotationInfo implements INotationInfo {
     private HashMap<Object, Notation> fancyNotationCache = null;
     private HashMap<Object, Notation> veryFancyNotationCache = null;
     
-    /**
-     * Maps terms to abbreviations and reverse.
-     */
-    private AbbrevMap scm = new AbbrevMap();
-    
+   
     
 
     //-------------------------------------------------------------------------
@@ -260,7 +255,7 @@ public final class NotationInfo implements INotationInfo {
 	tbl.put(integerLDT.getNeg(),new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 	tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
         	
-	//heap operators
+/*	//heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	if (heapLDT != null) {
 	    tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
@@ -284,12 +279,12 @@ public final class NotationInfo implements INotationInfo {
 	//string operators
 	final CharListLDT charListLDT 
 		= services.getTypeConverter().getCharListLDT();
-	if (charListLDT != null) {
 	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",PRIORITY_CAST,PRIORITY_ATOM,PRIORITY_ATOM));
 	tbl.put(charListLDT.getClCons(), new CharListNotation());
 	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
-	}
-	    this.notationTable = tbl;
+
+	*/
+	this.notationTable = tbl;
     }
     
     /**
@@ -332,11 +327,7 @@ public final class NotationInfo implements INotationInfo {
     //public interface
     //-------------------------------------------------------------------------
     
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.pp.INotationInfo#refresh(de.uka.ilkd.key.java.IServices)
-	 */
-    @Override
-	public void refresh(IServices services) {
+    public void refresh(IServices services) {
 	createDefaultNotationTable();
 	assert defaultNotationCache != null;
 	if(PRETTY_SYNTAX && services != null) {
@@ -346,30 +337,11 @@ public final class NotationInfo implements INotationInfo {
 	}
     }    
         
-    
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.pp.INotationInfo#getAbbrevMap()
-	 */
-    @Override
-	public AbbrevMap getAbbrevMap(){
-	return scm;
-    }
-    
-
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.pp.INotationInfo#setAbbrevMap(de.uka.ilkd.key.pp.AbbrevMap)
-	 */
-    @Override
-	public void setAbbrevMap(AbbrevMap am){
-	scm = am;
-    }
-
-    
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.pp.INotationInfo#getNotation(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.java.IServices)
-	 */
-    @Override
-	public Notation getNotation(Operator op, IServices services) {
+       
+    /** Get the Notation for a given Operator.  
+     * If no notation is registered, a Function notation is returned.
+     */
+    public Notation getNotation(Operator op, IServices services) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

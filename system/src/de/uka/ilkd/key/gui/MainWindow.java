@@ -1021,7 +1021,7 @@ public final class MainWindow extends JFrame  {
      */
     private void printSequentView(Sequent sequent) {
         SequentPrintFilter filter = new IdentitySequentPrintFilter ( sequent );
-        final LogicPrinter printer = new LogicPrinter
+        final LogicPrinter printer = mediator.getServices().getUIConfiguration().createLogicPrinter
         (new ProgramPrinter(null), 
                 getMediator().getNotationInfo(),
                 mediator.getServices());
@@ -1223,7 +1223,7 @@ public final class MainWindow extends JFrame  {
             if(getMediator()!=null && getMediator().getSelectedProof()!=null){
                 goal = getMediator().getSelectedGoal();
             } else{//There is no proof. Either not loaded yet or it is abandoned 
-                final LogicPrinter printer = new LogicPrinter
+                final LogicPrinter printer = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration().createLogicPrinter
                 (new ProgramPrinter(null), null,null);
                 sequentView.setPrinter(printer, null);
                 return;

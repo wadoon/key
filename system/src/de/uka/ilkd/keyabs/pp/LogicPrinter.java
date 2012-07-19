@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.pp;
+package de.uka.ilkd.keyabs.pp;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -27,7 +27,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -36,9 +35,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -51,7 +48,15 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.pp.ILogicPrinter;
+import de.uka.ilkd.key.pp.INotationInfo;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.ModalityPositionTable;
+import de.uka.ilkd.key.pp.PositionTable;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NewDependingOn;
@@ -109,7 +114,7 @@ public final class LogicPrinter implements ILogicPrinter {
     private ProgramPrinter prgPrinter;
 
     /** Contains information on the concrete syntax of operators. */
-    private final NotationInfo notationInfo;
+    private final INotationInfo notationInfo;
 
     /** the services object */
     private final IServices services;
@@ -132,7 +137,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        ILogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
                                           ni, 
                                           services);
         try {
@@ -148,7 +153,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        ILogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
                                           ni, 
                                           services);
 
@@ -166,7 +171,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        ILogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
                                           ni, 
                                           services);
         p.printSequent(s);
@@ -185,8 +190,8 @@ public final class LogicPrinter implements ILogicPrinter {
      * @param purePrint    if true the PositionTable will not be calculated
                     (simulates the behaviour of the former PureSequentPrinter)
      */
-    LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
+    public LogicPrinter(ProgramPrinter prgPrinter,
+                        INotationInfo notationInfo,
                         Backend backend, 
                         IServices services,
                         boolean purePrint) {
@@ -211,8 +216,8 @@ public final class LogicPrinter implements ILogicPrinter {
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param services     The IServices object
      */
-    LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
+    public LogicPrinter(ProgramPrinter prgPrinter,
+                        INotationInfo notationInfo,
                         IServices services) {
 	this(prgPrinter, 
              notationInfo, 
@@ -232,8 +237,8 @@ public final class LogicPrinter implements ILogicPrinter {
      *               (simulates the behaviour of the former PureSequentPrinter)
      * @param services     the IServices object               
      */
-    LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo, 
+    public LogicPrinter(ProgramPrinter prgPrinter,
+                        INotationInfo notationInfo, 
                         IServices services,
                         boolean purePrint) {
 	this(prgPrinter, 
@@ -246,17 +251,18 @@ public final class LogicPrinter implements ILogicPrinter {
 
 
 
-    /**
-     * @return the notationInfo associated with this LogicPrinter
-     */
-    public NotationInfo getNotationInfo(){
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#getNotationInfo()
+	 */
+    @Override
+	public INotationInfo getNotationInfo(){
         return notationInfo;
     }
-    /**
-     * Resets the Backend, the Layouter and (if applicable) the ProgramPrinter
-     * of this Object.
-     */
-    public void reset() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#reset()
+	 */
+    @Override
+	public void reset() {
         backend = new PosTableStringBackend(lineWidth);
         layouter = new Layouter(backend,2);
         if (prgPrinter != null) {
@@ -264,30 +270,22 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    /**
-     * sets the line width to the new value but does <em>not</em>
-     *  reprint the sequent.
-     * The actual set line width is the maximum of
-     *   {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
-     * @param lineWidth the max. number of character to put on one line
-     * @return the actual set line width
-     */
-    public int setLineWidth(int lineWidth) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#setLineWidth(int)
+	 */
+    @Override
+	public int setLineWidth(int lineWidth) {
         this.lineWidth = lineWidth<DEFAULT_LINE_WIDTH ?
                 DEFAULT_LINE_WIDTH : lineWidth;
         return this.lineWidth;
     }
 
 
-    /** Reprints the sequent.  This can be useful if settings like
-     * PresentationFeatures or abbreviations have changed.
-     * @param seq The Sequent to be reprinted
-     * @param filter The SequentPrintFilter for seq
-     * @param lineWidth the max. number of character to put on one line
-     *   (the actual taken linewidth is the max of
-     *   {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
-     */
-    public void update(Sequent seq, 
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#update(de.uka.ilkd.key.logic.Sequent, de.uka.ilkd.key.pp.SequentPrintFilter, int)
+	 */
+    @Override
+	public void update(Sequent seq, 
 	    	       SequentPrintFilter filter,
 	    	       int lineWidth) {
         setLineWidth(lineWidth);
@@ -296,10 +294,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /**
-     * sets instantiations of schema variables
-     */
-    public void setInstantiation(SVInstantiations instantiations) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#setInstantiation(de.uka.ilkd.key.rule.inst.SVInstantiations)
+	 */
+    @Override
+	public void setInstantiation(SVInstantiations instantiations) {
         this.instantiations = instantiations;
     }
     
@@ -343,19 +342,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
     
 
-    /**
-     * Pretty-print a taclet. Line-breaks are taken care of.
-     *
-     * @param taclet
-     *           The Taclet to be pretty-printed.
-     * @param sv
-     *           The instantiations of the SchemaVariables
-     * @param showWholeTaclet
-     *           Should the find, varcond and heuristic part be pretty-printed?
-     * @param declareSchemaVars
-     *           Should declarations for the schema variables used in the taclet be pretty-printed?
-     */
-    public void printTaclet(Taclet taclet, 
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printTaclet(de.uka.ilkd.key.rule.Taclet, de.uka.ilkd.key.rule.inst.SVInstantiations, boolean, boolean)
+	 */
+    @Override
+	public void printTaclet(Taclet taclet, 
 	    		    SVInstantiations sv,
                             boolean showWholeTaclet,
                             boolean declareSchemaVars) {
@@ -401,14 +392,11 @@ public final class LogicPrinter implements ILogicPrinter {
 	instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
     }
 
-    /**
-     * Pretty-print a taclet. Line-breaks are taken care of. No instantiation is
-     * applied.
-     *
-     * @param taclet
-     *           The Taclet to be pretty-printed.
-     */
-    public void printTaclet(Taclet taclet) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printTaclet(de.uka.ilkd.key.rule.Taclet)
+	 */
+    @Override
+	public void printTaclet(Taclet taclet) {
         // the last argument used to be false. Changed that - M.Ulbrich
         printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true); 
     }
@@ -664,14 +652,11 @@ public final class LogicPrinter implements ILogicPrinter {
 	}
     }
 
-    /**
-     * Pretty-prints a ProgramElement.
-     *
-     * @param pe
-     *           You've guessed it, the ProgramElement to be pretty-printed
-     * @throws IOException
-     */
-    public void printProgramElement(ProgramElement pe) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printProgramElement(de.uka.ilkd.key.java.ProgramElement)
+	 */
+    @Override
+	public void printProgramElement(ProgramElement pe) throws IOException {
         if (pe instanceof ProgramVariable) {
             printProgramVariable((ProgramVariable) pe);
         } else {
@@ -682,27 +667,20 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    /**
-     * Pretty-Prints a ProgramVariable in the logic, not in Java blocks. Prints
-     * out the full (logic) name, so if A.b is private, it becomes a.A::b .
-     *
-     * @param pv
-     *           The ProgramVariable in the logic
-     * @throws IOException
-     */
-    public void printProgramVariable(ProgramVariable pv) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printProgramVariable(de.uka.ilkd.key.logic.op.ProgramVariable)
+	 */
+    @Override
+	public void printProgramVariable(ProgramVariable pv) throws IOException {
 	Debug.log4jDebug("PP PV " + pv.name(), LogicPrinter.class.getName());
         layouter.beginC().print(pv.name().toString()).end();
     }
 
-    /**
-     * Pretty-prints a ProgramSV.
-     *
-     * @param pe
-     *           You've guessed it, the ProgramSV to be pretty-printed
-     * @throws IOException
-     */
-    public void printProgramSV(ProgramSV pe)
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printProgramSV(de.uka.ilkd.key.logic.op.ProgramSV)
+	 */
+    @Override
+	public void printProgramSV(ProgramSV pe)
         throws IOException {
         StringWriter w = new StringWriter();
         PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
@@ -717,17 +695,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /**
-     * Pretty-print a sequent.
-     * The sequent arrow is rendered as <code>==&gt;</code>.  If the
-     * sequent doesn't fit in one line, a line break is inserted after each
-     * formula, the sequent arrow is on a line of its own, and formulae
-     * are indented w.r.t. the arrow.
-     * @param seq The Sequent to be pretty-printed
-     * @param filter The SequentPrintFilter for seq
-     * @param finalbreak Print an additional line-break at the end of the sequent.
-     */
-    public void printSequent(Sequent seq,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSequent(de.uka.ilkd.key.logic.Sequent, de.uka.ilkd.key.pp.SequentPrintFilter, boolean)
+	 */
+    @Override
+	public void printSequent(Sequent seq,
                              SequentPrintFilter filter,
                              boolean finalbreak) {
         if ( seq != null ) {
@@ -737,7 +709,11 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    public void printSequent(SequentPrintFilter filter,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSequent(de.uka.ilkd.key.pp.SequentPrintFilter, boolean)
+	 */
+    @Override
+	public void printSequent(SequentPrintFilter filter,
                              boolean finalbreak) {
         try {
             ImmutableList<SequentPrintFilterEntry> antec = filter.getAntec();
@@ -762,7 +738,11 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    public void printSequent(Sequent seq,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSequent(de.uka.ilkd.key.logic.Sequent, boolean)
+	 */
+    @Override
+	public void printSequent(Sequent seq,
                              boolean finalbreak) {
         try {
             Semisequent antec = seq.antecedent();
@@ -787,41 +767,28 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /**
-     * Pretty-print a sequent.
-     * The sequent arrow is rendered as <code>=&gt;</code>.  If the
-     * sequent doesn't fit in one line, a line break is inserted after each
-     * formula, the sequent arrow is on a line of its own, and formulae
-     * are indented w.r.t. the arrow.
-     * A line-break is printed after the Sequent.
-     * @param seq The Sequent to be pretty-printed
-     * @param filter The SequentPrintFilter for seq
-     */
-    public void printSequent(Sequent seq, SequentPrintFilter filter) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSequent(de.uka.ilkd.key.logic.Sequent, de.uka.ilkd.key.pp.SequentPrintFilter)
+	 */
+    @Override
+	public void printSequent(Sequent seq, SequentPrintFilter filter) {
         printSequent(seq, filter, true);
     }
 
-    /**
-     * Pretty-print a sequent.
-     * The sequent arrow is rendered as <code>=&gt;</code>.  If the
-     * sequent doesn't fit in one line, a line break is inserted after each
-     * formula, the sequent arrow is on a line of its own, and formulae
-     * are indented w.r.t. the arrow.
-     * A line-break is printed after the Sequent.
-     * No filtering is done.
-     * @param seq The Sequent to be pretty-printed
-     */
-    public void printSequent(Sequent seq) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSequent(de.uka.ilkd.key.logic.Sequent)
+	 */
+    @Override
+	public void printSequent(Sequent seq) {
         printSequent(seq, true);
     }
 
 
-    /**
-     * Pretty-prints a Semisequent.  Formulae are separated by commas.
-     *
-     * @param semiseq the semisequent to be printed
-     */
-    public void printSemisequent(Semisequent semiseq)
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSemisequent(de.uka.ilkd.key.logic.Semisequent)
+	 */
+    @Override
+	public void printSemisequent(Semisequent semiseq)
         throws IOException
     {
         for (int i=0;i<semiseq.size();i++) {
@@ -834,7 +801,11 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    public void printSemisequent (ImmutableList<SequentPrintFilterEntry> p_formulas )
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSemisequent(de.uka.ilkd.key.collection.ImmutableList)
+	 */
+    @Override
+	public void printSemisequent (ImmutableList<SequentPrintFilterEntry> p_formulas )
         throws IOException {
         Iterator<SequentPrintFilterEntry> it   = p_formulas.iterator ();
         SequentPrintFilterEntry           entry;
@@ -850,39 +821,30 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    /**
-     * Pretty-prints a constrained formula. The constraint
-     * "Constraint.BOTTOM" is suppressed
-     *
-     * @param cfma the constrained formula to be printed
-     */
-    public void printConstrainedFormula(SequentFormula cfma)
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printConstrainedFormula(de.uka.ilkd.key.logic.SequentFormula)
+	 */
+    @Override
+	public void printConstrainedFormula(SequentFormula cfma)
         throws IOException {
 	printTerm(cfma.formula());
     }
 
 
 
-    /**
-     * Pretty-prints a term or formula.  How it is rendered depends on
-     * the NotationInfo given to the constructor.
-     *
-     * @param t the Term to be printed
-     */
-    public void printTerm(Term t) throws IOException {
-        if(notationInfo.getAbbrevMap().isEnabled(t)){
-            startTerm(0);
-            layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
-        } else {
-            notationInfo.getNotation(t.op(), services).print(t,this);
-        }
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printTerm(de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public void printTerm(Term t) throws IOException {
+    	notationInfo.getNotation(t.op(), services).print(t,this);
     }
 
-    /**
-     * Pretty-prints a set of terms.
-     * @param terms the terms to be printed
-     */
-    public void printTerm(ImmutableSet<Term> terms)
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printTerm(de.uka.ilkd.key.collection.ImmutableSet)
+	 */
+    @Override
+	public void printTerm(ImmutableSet<Term> terms)
         throws IOException {
         getLayouter().print("{");
         Iterator<Term> it = terms.iterator();
@@ -895,83 +857,49 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /**
-     * Pretty-prints a term or formula in the same block.  How it is
-     * rendered depends on the NotationInfo given to the constructor.
-     * `In the same block' means that no extra indentation will be
-     * added if line breaks are necessary.  A formula <code>a &amp; (b
-     * &amp; c)</code> would print <code>a &amp; b &amp; c</code>, omitting
-     * the redundant parentheses.  The subformula <code>b &amp; c</code>
-     * is printed using this method to get a layout of
-     *
-     * <pre>
-     *   a
-     * &amp; b
-     * &amp; c
-     * </pre>
-     * instead of
-     * <pre>
-     *   a
-     * &amp;   b
-     *   &amp; c
-     * </pre>
-     *
-     *
-     * @param t the Term to be printed */
-    public void printTermContinuingBlock(Term t) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printTermContinuingBlock(de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public void printTermContinuingBlock(Term t) throws IOException {
         notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
     }
 
 
-    /** Print a term in <code>f(t1,...tn)</code> style.  If the
-     * operator has arity 0, no parentheses are printed, i.e.
-     * <code>f</code> instead of <code>f()</code>.  If the term
-     * doesn't fit on one line, <code>t2...tn</code> are aligned below
-     * <code>t1</code>.
-     *
-     * @param name the name to be printed before the parentheses.
-     * @param t the term to be printed.  */
-    public void printFunctionTerm(String name, Term t) throws IOException {	
-	//XXX
-	if(NotationInfo.PRETTY_SYNTAX
-           && services != null
-           && t.op() instanceof Function
-           && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort() 
-           && t.arity() == 0
-           && t.boundVars().isEmpty()) {
-            startTerm(0);            
-            final String prettyFieldName 
-            	= services.getTypeConverter()
-                          .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());            
-            layouter.print(prettyFieldName);
-        } 
-        
-        else {
-            startTerm(t.arity());
-            layouter.print(name);
-            if(!t.boundVars().isEmpty()) {
-        	layouter.print("{").beginC(0);
-        	printVariables(t.boundVars());
-        	layouter.print("}").end();
-            }
-            if(t.arity() > 0) {
-                layouter.print("(").beginC(0);
-                for(int i = 0, n = t.arity(); i < n; i++) {
-                    markStartSub();
-                    printTerm(t.sub(i));
-                    markEndSub();
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printFunctionTerm(java.lang.String, de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public void printFunctionTerm(String name, Term t) throws IOException {	
+    	//XXX
+    	startTerm(t.arity());
+    	layouter.print(name);
+    	if(!t.boundVars().isEmpty()) {
+    		layouter.print("{").beginC(0);
+    		printVariables(t.boundVars());
+    		layouter.print("}").end();
+    	}
+    	if(t.arity() > 0) {
+    		layouter.print("(").beginC(0);
+    		for(int i = 0, n = t.arity(); i < n; i++) {
+    			markStartSub();
+    			printTerm(t.sub(i));
+    			markEndSub();
 
-                    if(i < n - 1) {
-                        layouter.print(",").brk(1,0);
-                    }
-                }
-                layouter.print(")").end();
-            }
-        }
+    			if(i < n - 1) {
+    				layouter.print(",").brk(1,0);
+    			}
+    		}
+    		layouter.print(")").end();
+    	}
     }
 
-    public void printCast(String pre, 
+
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printCast(java.lang.String, java.lang.String, de.uka.ilkd.key.logic.Term, int)
+	 */
+    @Override
+	public void printCast(String pre, 
 	    		  String post,
 	    		  Term t, 
 	    		  int ass) throws IOException {
@@ -985,147 +913,42 @@ public final class LogicPrinter implements ILogicPrinter {
     }
     
     
-    public void printSelect(Term t) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSelect(de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public void printSelect(Term t) throws IOException {
         assert t.boundVars().isEmpty();            
         assert t.arity() == 3;	
-	final HeapLDT heapLDT = services == null 
-			        ? null 
-			        : services.getTypeConverter().getHeapLDT();
-        if(NotationInfo.PRETTY_SYNTAX
-            && heapLDT != null
-            && t.sub(0).op() == heapLDT.getHeap()) {
-            startTerm(3);
-            
-            final Term objectTerm = t.sub(1);
-            final Term fieldTerm  = t.sub(2);
-                
-            markStartSub();
-            //heap not printed
-            markEndSub();
-
-            if(objectTerm.equals(JavaProfile.DF().NULL(services))
-                && fieldTerm.op() instanceof Function
-                && ((Function)fieldTerm.op()).isUnique()) {
-        	String className 
-        		= heapLDT.getClassName((Function)fieldTerm.op());
-        	
-        	if(className == null) {
-        	    markStartSub();
-        	    printTerm(objectTerm);
-        	    markEndSub();
-        	} else {
-        	    markStartSub();
-        	    //"null" not printed
-        	    markEndSub();
-        	    layouter.print(className);
-        	}
-        	
-        	layouter.print(".");
-        	
-                markStartSub();
-                startTerm(0);                    
-                printTerm(fieldTerm);
-                markEndSub();                    
-            } else if(fieldTerm.arity() == 0) {
-        	markStartSub();
-                printTerm(objectTerm);
-                markEndSub();
-        	
-                layouter.print(".");
-                
-                markStartSub();
-                startTerm(0);                    
-                printTerm(fieldTerm);
-                markEndSub();                    
-            } else if(fieldTerm.op() == heapLDT.getArr()) {
-        	markStartSub();
-                printTerm(objectTerm);
-                markEndSub();
-        	
-                layouter.print("[");
-                
-                markStartSub();
-                startTerm(1);
-                markStartSub();
-                printTerm(fieldTerm.sub(0));
-                markEndSub();
-                markEndSub();
-                
-                layouter.print("]");
-            } else {
-        	printFunctionTerm(t.op().name().toString(), t);
-            }	
-        } else {
-            printFunctionTerm(t.op().name().toString(), t);
-        }
+        printFunctionTerm(t.op().name().toString(), t);
     }
     
     
-    public void printLength(Term t) throws IOException {
-	final HeapLDT heapLDT = services == null 
-        			? null 
-        			: services.getTypeConverter().getHeapLDT();
-	if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
-	    assert t.op() == heapLDT.getLength();
-	    startTerm(t.arity());
-	    
-	    markStartSub();
-	    printTerm(t.sub(0));
-	    markEndSub();
-	    layouter.print(".length");
-	} else {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printLength(de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public void printLength(Term t) throws IOException {
 	    printFunctionTerm(t.op().name().toString(), t);            
-	}	
     }
     
     
-    public void printObserver(Term t) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printObserver(de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public void printObserver(Term t) throws IOException {
 	assert t.op() instanceof IObserverFunction;
 	assert t.boundVars().isEmpty();
-	final HeapLDT heapLDT = services == null 
-			        ? null 
-			        : services.getTypeConverter().getHeapLDT();	
-	if(NotationInfo.PRETTY_SYNTAX
-           && heapLDT != null 
-           && t.sub(0).op() == heapLDT.getHeap()) {
-	    final IObserverFunction obs = (IObserverFunction) t.op();
-            startTerm(t.arity());
-            markStartSub();
-            //heap not printed
-            markEndSub();
-            
-            if(!obs.isStatic()) {
-        	markStartSub();
-        	printTerm(t.sub(1));
-        	markEndSub();
-        	layouter.print(".");
-            }
-            
-            final String prettyFieldName 
-            	= services.getTypeConverter()
-                          .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());
-            layouter.print(prettyFieldName);
-            
-            if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
-        	layouter.print("(").beginC(0);
-        	for(int i = 0, n = obs.getNumParams(); i < n; i++) {
-        	    markStartSub();
-        	    printTerm(t.sub(i + (obs.isStatic() ? 1 : 2)));
-        	    markEndSub();
-                    if(i < n - 1) {
-                        layouter.print(",").brk(1,0);
-                    }
-        	}
-        	layouter.print(")").end();
-            }
-        } else {
-            printFunctionTerm(t.op().name().toString(), t);            
-        }
+	printFunctionTerm(t.op().name().toString(), t);            
     }
     
     
-    public void printSingleton(Term t) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSingleton(de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public void printSingleton(Term t) throws IOException {
 	assert t.arity() == 2;
 	startTerm(2);	 
 	layouter.print("{(").beginC(0);;
@@ -1144,7 +967,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }  
     
     
-    public void printElementOf(Term t) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printElementOf(de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public void printElementOf(Term t) throws IOException {
 	assert t.arity() == 3;
 	startTerm(3);
 	
@@ -1168,7 +995,11 @@ public final class LogicPrinter implements ILogicPrinter {
 	markEndSub();	
     }     
     
-    public void printElementOf(Term t, String symbol) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printElementOf(de.uka.ilkd.key.logic.Term, java.lang.String)
+	 */
+    @Override
+	public void printElementOf(Term t, String symbol) throws IOException {
         if (symbol == null) {
             printElementOf(t);
             return;
@@ -1198,14 +1029,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
     
 
-    /** Print a unary term in prefix style.  For instance
-     * <code>!a</code>.  No line breaks are possible.
-     *
-     * @param name the prefix operator
-     * @param t    the subterm to be printed
-     * @param ass  the associativity for the subterm
-     */
-    public void printPrefixTerm(String name,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printPrefixTerm(java.lang.String, de.uka.ilkd.key.logic.Term, int)
+	 */
+    @Override
+	public void printPrefixTerm(String name,
                                 Term t,int ass)
         throws IOException
     {
@@ -1215,15 +1043,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /** Print a unary term in postfix style.  For instance
-     * <code>t.a</code>, where <code>.a</code> is the postfix operator.
-     * No line breaks are possible.
-     *
-     * @param name the postfix operator
-     * @param t    the subterm to be printed
-     * @param ass  the associativity for the subterm
-     */
-     public void printPostfixTerm(Term t,int ass,String name)
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printPostfixTerm(de.uka.ilkd.key.logic.Term, int, java.lang.String)
+	 */
+     @Override
+	public void printPostfixTerm(Term t,int ass,String name)
         throws IOException
     {
         startTerm(1);
@@ -1232,25 +1056,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /** Print a binary term in infix style.  For instance <code>p
-     * &amp; q</code>, where <code>&amp;</code> is the infix
-     * operator.  If line breaks are necessary, the format is like
-     *
-     * <pre>
-     *   p
-     * & q
-     * </pre>
-     *
-     * The subterms are printed using
-     * {@link #printTermContinuingBlock(Term)}.
-     *
-     * @param l    the left subterm
-     * @param assLeft associativity for left subterm
-     * @param name the infix operator
-     * @param r    the right subterm
-     * @param assRight associativity for right subterm
-     */
-    public void printInfixTerm(Term l,int assLeft,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printInfixTerm(de.uka.ilkd.key.logic.Term, int, java.lang.String, de.uka.ilkd.key.logic.Term, int)
+	 */
+    @Override
+	public void printInfixTerm(Term l,int assLeft,
                                String name,
                                Term r,int assRight)
         throws IOException
@@ -1263,18 +1073,11 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.end();
     }
 
-    /** Print a binary term in infix style, continuing a containing
-     * block.  See {@link #printTermContinuingBlock(Term)} for the
-     * idea.  Otherwise like
-     * {@link #printInfixTerm(Term,int,String,Term,int)}.
-     *
-     * @param l    the left subterm
-     * @param assLeft associativity for left subterm
-     * @param name the infix operator
-     * @param r    the right subterm
-     * @param assRight associativity for right subterm
-     * */
-    public void printInfixTermContinuingBlock(Term l,int assLeft,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printInfixTermContinuingBlock(de.uka.ilkd.key.logic.Term, int, java.lang.String, de.uka.ilkd.key.logic.Term, int)
+	 */
+    @Override
+	public void printInfixTermContinuingBlock(Term l,int assLeft,
                                               String name,
                                               Term r,int assRight)
         throws IOException
@@ -1288,22 +1091,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /**
-     * Print a term with an update. This looks like
-     * <code>{u} t</code>.  If line breaks are necessary, the
-     * format is
-     *
-     * <pre>
-     * {u}
-     *   t
-     * </pre>
-     *
-     * @param l       the left brace
-     * @param r       the right brace
-     * @param t       the update term
-     * @param ass3    associativity for phi
-     */
-    public void printUpdateApplicationTerm (String l,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printUpdateApplicationTerm(java.lang.String, java.lang.String, de.uka.ilkd.key.logic.Term, int)
+	 */
+    @Override
+	public void printUpdateApplicationTerm (String l,
                                             String r,
                                             Term t,
                                             int ass3) throws IOException {
@@ -1327,14 +1119,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }    
     
     
-   /**
-     * Print an elementary update.  This looks like
-     * <code>loc := val</code>
-     *
-     * @param asgn    the assignment operator (including spaces)
-     * @param ass2    associativity for the new values
-     */
-    public void printElementaryUpdate(String asgn,
+   /* (non-Javadoc)
+ * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printElementaryUpdate(java.lang.String, de.uka.ilkd.key.logic.Term, int)
+ */
+    @Override
+	public void printElementaryUpdate(String asgn,
                                       Term t,
                                       int ass2) throws IOException {
 	ElementaryUpdate op = (ElementaryUpdate)t.op();
@@ -1375,7 +1164,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
     
     
-    public void printParallelUpdate(String separator, Term t, int ass) 
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printParallelUpdate(java.lang.String, de.uka.ilkd.key.logic.Term, int)
+	 */
+    @Override
+	public void printParallelUpdate(String separator, Term t, int ass) 
     					    throws IOException {
 	layouter.beginC(0);
 	printParallelUpdateHelper(separator, t, ass);
@@ -1391,12 +1184,7 @@ public final class LogicPrinter implements ILogicPrinter {
             if(v instanceof LogicVariable) {
                 Term t =
                     TermFactory.DEFAULT.createTerm(v);
-                if(notationInfo.getAbbrevMap().containsTerm(t)) {
-                    layouter.print (v.sort().name().toString() + " " +
-                                    notationInfo.getAbbrevMap().getAbbrev(t));
-                } else {
                     layouter.print (v.sort().name() + " " + v.name ());
-                }
             } else {
                 layouter.print (v.name().toString());
             }
@@ -1408,7 +1196,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
       
-    public void printIfThenElseTerm(Term t, String keyword) throws IOException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printIfThenElseTerm(de.uka.ilkd.key.logic.Term, java.lang.String)
+	 */
+    @Override
+	public void printIfThenElseTerm(Term t, String keyword) throws IOException {
         startTerm(t.arity());
 
         layouter.beginC ( 0 );
@@ -1440,24 +1232,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /** Print a substitution term.  This looks like
-     * <code>{var/t}s</code>.  If line breaks are necessary, the
-     * format is
-     *
-     * <pre>
-     * {var/t}
-     *   s
-     * </pre>
-     *
-     * @param l       the String used as left brace symbol
-     * @param v       the {@link QuantifiableVariable} to be substituted
-     * @param t       the Term to be used as new value 
-     * @param ass2    the int defining the associativity for the new value
-     * @param r       the String used as right brace symbol
-     * @param phi     the substituted term/formula
-     * @param ass3    the int defining the associativity for phi
-     */
-    public void printSubstTerm(String l,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printSubstTerm(java.lang.String, de.uka.ilkd.key.logic.op.QuantifiableVariable, de.uka.ilkd.key.logic.Term, int, java.lang.String, de.uka.ilkd.key.logic.Term, int)
+	 */
+    @Override
+	public void printSubstTerm(String l,
                                QuantifiableVariable v,
                                Term t,int ass2,
                                String r,
@@ -1474,24 +1253,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /** Print a quantified term.  Normally, this looks like
-     * <code>all x:s.phi</code>.  If line breaks are necessary,
-     * the format is
-     *
-     * <pre>
-     * all x:s.
-     *   phi
-     * </pre>
-     *
-     * Note that the parameter <code>var</code> has to contain the
-     * variable name with colon and sort.
-     *
-     * @param name the name of the quantifier
-     * @param vars  the quantified variables (+colon and sort)
-     * @param phi  the quantified formula
-     * @param ass  associativity for phi
-     */
-    public void printQuantifierTerm(String name,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printQuantifierTerm(java.lang.String, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.Term, int)
+	 */
+    @Override
+	public void printQuantifierTerm(String name,
                                     ImmutableArray<QuantifiableVariable> vars,
                                     Term phi, 
                                     int ass)
@@ -1506,12 +1272,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     
-    /** Print a constant.  This just prints the string <code>s</code> and
-     * marks it as a nullary term.
-     *
-     * @param s the constant
-     */
-    public void printConstant(String s)
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printConstant(java.lang.String)
+	 */
+    @Override
+	public void printConstant(String s)
         throws IOException {
 
         startTerm(0);
@@ -1519,15 +1284,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /**
-     * Print a Java block.  This is formatted using the ProgramPrinter
-     * given to the constructor.  The result is indented according to
-     * the surrounding material.  The first `executable' statement is
-     * marked for highlighting.
-     *
-     * @param j the Java block to be printed
-     */
-    public void printJavaBlock(JavaBlock j)
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printJavaBlock(de.uka.ilkd.key.logic.JavaBlock)
+	 */
+    @Override
+	public void printJavaBlock(JavaBlock j)
         throws IOException
     {
         java.io.StringWriter sw = new java.io.StringWriter();
@@ -1595,17 +1356,12 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /** Print a DL modality formula.  <code>phi</code> is the whole
-     * modality formula, not just the subformula inside the modality.
-     * Normally, this looks like
-     * <code>&lt;Program&gt;psi</code>, where <code>psi = phi.sub(0)</code>.
-     * No line breaks are inserted, as the program itself is always broken.
-     * In case of a program modality with arity greater than 1,
-     * the subformulae are listed between parens, like
-     * <code>&lt;Program&gt;(psi1,psi2)</code>
-     */
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printModalityTerm(java.lang.String, de.uka.ilkd.key.logic.JavaBlock, java.lang.String, de.uka.ilkd.key.logic.Term, int)
+	 */
 
-    public void printModalityTerm(String left,
+    @Override
+	public void printModalityTerm(String left,
                                   JavaBlock jb,
                                   String right,
                                   Term phi,
@@ -1626,19 +1382,14 @@ public final class LogicPrinter implements ILogicPrinter {
                                  + " @[" + o.getClass().getName() + "]@",
                                  LogicPrinter.class.getName());
 
-                if(notationInfo.getAbbrevMap().isEnabled(phi)){
-                    startTerm(0);
-                    layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));
-                } else {
-                    Term[] ta = new Term[phi.arity()];
-                    for (int i = 0; i < phi.arity(); i++) {
-                        ta[i] = phi.sub(i);
-                    }
-                    Term term = TermFactory.DEFAULT.
-			createTerm((Modality)o, ta, phi.boundVars(), phi.javaBlock());
-                    notationInfo.getNotation((Modality)o, services).print(term, this);
-                    return;
+                Term[] ta = new Term[phi.arity()];
+                for (int i = 0; i < phi.arity(); i++) {
+                	ta[i] = phi.sub(i);
                 }
+                Term term = TermFactory.DEFAULT.
+                		createTerm((Modality)o, ta, phi.boundVars(), phi.javaBlock());
+                notationInfo.getNotation((Modality)o, services).print(term, this);
+                return;
 
             }
         }
@@ -1665,13 +1416,11 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    /**
-     * Returns the pretty-printed sequent.  This should only be called
-     * after a <tt>printSequent</tt> invocation returns.
-     *
-     * @return the pretty-printed sequent.
-     */
-    public String toString() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#toString()
+	 */
+    @Override
+	public String toString() {
         try {
             layouter.flush();
         } catch (IOException e) {
@@ -1681,14 +1430,11 @@ public final class LogicPrinter implements ILogicPrinter {
         return ((PosTableStringBackend)backend).getString()+"\n";
     }
 
-    /**
-     * Returns the pretty-printed sequent in a StringBuffer.  This
-     * should only be called after a <tt>printSequent</tt> invocation
-     * returns.
-     *
-     * @return the pretty-printed sequent.  
-     */
-    public StringBuffer result() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#result()
+	 */
+    @Override
+	public StringBuffer result() {
         try {
             layouter.flush();
         } catch (IOException e) {
@@ -1706,23 +1452,22 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    /**
-     * returns the PositionTable representing position information on
-     * the sequent of this LogicPrinter. Subclasses may overwrite
-     * this method with a null returning body if position information
-     * is not computed there.
-     */
-    public InitialPositionTable getPositionTable() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#getPositionTable()
+	 */
+    @Override
+	public InitialPositionTable getPositionTable() {
         if (pure) {
             return null;
         }
         return ((PosTableStringBackend)backend).getPositionTable();
     }
 
-    /** Returns the ProgramPrinter
-     * @return the ProgramPrinter
-     */
-    public ProgramPrinter programPrinter() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#programPrinter()
+	 */
+    @Override
+	public ProgramPrinter programPrinter() {
         return prgPrinter;
     }
 
@@ -1771,10 +1516,11 @@ public final class LogicPrinter implements ILogicPrinter {
 	}
     }
 
-    /**
-     * @return The SVInstantiations given with the last printTaclet call.
-     */
-    public SVInstantiations getInstantiations() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#getInstantiations()
+	 */
+    @Override
+	public SVInstantiations getInstantiations() {
         return instantiations;
     }
 
@@ -1844,16 +1590,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /**
-     * returns true if an attribute term shall be printed in short form.
-     * In opposite to the other <tt>printInShortForm</tt> methods
-     * it takes care of meta variable instantiations
-     * @param attributeProgramName the String of the attribute's program
-     * name
-     * @param t the Term used as reference prefix
-     * @return true if an attribute term shall be printed in short form.
-     */
-    public boolean printInShortForm(String attributeProgramName,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printInShortForm(java.lang.String, de.uka.ilkd.key.logic.Term)
+	 */
+    @Override
+	public boolean printInShortForm(String attributeProgramName,
                                     Term t) {
         final Sort prefixSort;
         prefixSort = t.sort();
@@ -1861,16 +1602,11 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
 
-    /**
-     * tests if the program name together with the prefix sort
-     * determines the attribute in a unique way
-     * @param programName the String denoting the program name of
-     * the attribute
-     * @param sort the ObjectSort in whose reachable hierarchy
-     * we test for uniqueness
-     * @return true if the attribute is uniquely determined
-     */
-    public boolean printInShortForm(String programName, Sort sort) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printInShortForm(java.lang.String, de.uka.ilkd.key.logic.sort.Sort)
+	 */
+    @Override
+	public boolean printInShortForm(String programName, Sort sort) {
         return printInShortForm(programName, sort, services instanceof Services ? (Services) services : null);
     }
 

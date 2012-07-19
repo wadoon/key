@@ -122,7 +122,7 @@ public abstract class ApplyTacletDialog extends JDialog {
         Writer w = new StringWriter();
         //WriterBackend backend = new WriterBackend(w, 68);
         
-        LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w), 
+        LogicPrinter tp = mediator.getServices().getUIConfiguration().createLogicPrinter(new ProgramPrinter(w), 
                 new NotationInfo(), backend, mediator.getServices(), true);
         
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),

@@ -2,6 +2,7 @@ package de.uka.ilkd.keyabs.init;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
@@ -11,6 +12,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.pp.ABSUIConfiguration;
 import de.uka.ilkd.keyabs.proof.ABSProof;
 import de.uka.ilkd.keyabs.strategy.ABSDLStrategy;
 
@@ -18,6 +20,7 @@ public class ABSProfile extends AbstractProfile {
 
     private final static StrategyFactory DEFAULT =
             new ABSDLStrategy.Factory();
+	public static final UIConfiguration UNPARSER = new ABSUIConfiguration();
 
     public ABSProfile() {
             super("standardRulesABS.key", ABSProof.class,
@@ -46,4 +49,9 @@ public class ABSProfile extends AbstractProfile {
             Profile profile) {
         return new ABSInitConfig((ABSServices) services, profile);
     }
+
+	@Override
+	public UIConfiguration getUIConfiguration() {
+		return UNPARSER;
+	}
 }

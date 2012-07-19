@@ -161,8 +161,8 @@ public class NonGoalInfoView extends JTextArea {
     public NonGoalInfoView (Node node, KeYMediator mediator) {
 	filter = new IdentitySequentPrintFilter( node.sequent () );
 	
-   LogicPrinter printer = new LogicPrinter
-         (new ProgramPrinter(null), 
+   LogicPrinter printer = mediator.getServices().getUIConfiguration().createLogicPrinter
+         (new ProgramPrinter(null),
           mediator.getNotationInfo(),
           mediator.getServices());
    String s = computeText(mediator, node, filter, printer);
@@ -199,7 +199,7 @@ public class NonGoalInfoView extends JTextArea {
      */
     public static String computeText(KeYMediator mediator, Node node) {
        SequentPrintFilter filter = new IdentitySequentPrintFilter(node.sequent());
-       LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null), 
+       LogicPrinter printer = node.proof().getServices().getUIConfiguration().createLogicPrinter(new ProgramPrinter(null), 
                                                mediator.getNotationInfo(), 
                                                node.proof().getServices());
        return computeText(mediator, node, filter, printer);
@@ -225,7 +225,7 @@ public class NonGoalInfoView extends JTextArea {
                                      SequentPrintFilter filter, 
                                      LogicPrinter printer) {
        
-         printer.printSequent (null, filter);
+         printer.printSequent (null, filter); 
          String s = printer.toString();
               printer=null;
          RuleApp app = node.getAppliedRuleApp();
@@ -234,7 +234,7 @@ public class NonGoalInfoView extends JTextArea {
          if ( app != null ) {
              s = s + "\n \nUpcoming rule application: \n";
              if (app.rule() instanceof Taclet) {
-            LogicPrinter tacPrinter = new LogicPrinter 
+            LogicPrinter tacPrinter = node.proof().getServices().getUIConfiguration().createLogicPrinter 
                 (new ProgramPrinter(null),                        
                  mediator.getNotationInfo(),
                  mediator.getServices(),

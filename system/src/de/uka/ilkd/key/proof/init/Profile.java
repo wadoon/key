@@ -14,6 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.Rule;
@@ -122,5 +123,22 @@ public interface Profile {
      */
     IServices createServices(KeYExceptionHandler handler);
 
+    /**
+     * Initialization
+     * @param services
+     * @param profile
+     * @return
+     */
     AbstractInitConfig createInitConfig(IServices services, Profile profile);
+
+
+
+    /**
+     * pretty printing etc.
+     * @return
+     */
+    UIConfiguration getUIConfiguration();
+
 }
+
+

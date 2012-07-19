@@ -644,7 +644,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 				     modalityTerm);
 	final Term contractTerm 
 		= TB.tf().createTerm(Junctor.IMP, originalPres.get(baseHeap), updateTerm);
-	final LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), 
+	final LogicPrinter lp = services.getUIConfiguration().createLogicPrinter(new ProgramPrinter(), 
             			   	       	 new NotationInfo(), 
             			   	       	 null);
 	try {

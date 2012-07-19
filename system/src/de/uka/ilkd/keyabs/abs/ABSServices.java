@@ -5,10 +5,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.parser.ABSDefaultTermParser;
 import de.uka.ilkd.key.parser.TermParser;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.keyabs.init.ABSProfile;
 import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
 
 public class ABSServices extends AbstractServices {
@@ -113,5 +115,10 @@ public class ABSServices extends AbstractServices {
     public TermParser getTermParser() {
         return new ABSDefaultTermParser();
     }
+
+	@Override
+	public UIConfiguration getUIConfiguration() {
+		return ABSProfile.UNPARSER;
+	}
 
 }

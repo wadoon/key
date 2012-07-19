@@ -775,7 +775,7 @@ public class GoalList extends JList {
     private String seqToString (Sequent seq) {
         String res = seqToString.get ( seq );
         if ( res == null ) {
-            LogicPrinter sp = new LogicPrinter ( new ProgramPrinter ( null ),
+            LogicPrinter sp = mediator.getServices().getUIConfiguration().createLogicPrinter ( new ProgramPrinter ( null ),
                                                  mediator ().getNotationInfo (),
                                                  mediator().getServices(),
                                                  true );

@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.parser.TermParser;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
@@ -83,6 +84,8 @@ public interface IServices {
 	public abstract TermBuilder getTermBuilder();
 
 	public abstract TermParser getTermParser();
+
+	public abstract UIConfiguration getUIConfiguration();
 
 
 }
