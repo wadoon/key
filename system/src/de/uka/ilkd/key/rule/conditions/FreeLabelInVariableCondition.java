@@ -21,7 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public final class FreeLabelInVariableCondition 
-				extends VariableConditionAdapter {
+				extends VariableConditionAdapter<Services> {
 
     private final SchemaVariable label;
     private final SchemaVariable statement;

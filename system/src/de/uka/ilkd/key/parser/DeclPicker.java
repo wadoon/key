@@ -14,6 +14,7 @@ import antlr.CharScanner;
 import antlr.Token;
 import antlr.TokenStream;
 import antlr.TokenStreamSelector;
+import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 
 
 public class DeclPicker implements TokenStream {
@@ -33,7 +34,11 @@ public class DeclPicker implements TokenStream {
   }
 
   public TokenStreamSelector getSelector() {
-    return ((KeYLexer)input).getSelector();
+      if (input instanceof KeYLexer) {
+          return ((KeYLexer)input).getSelector();
+      } else {
+          return ((ABSKeYLexer)input).getSelector();
+      }
   }
   
   public void commit() {

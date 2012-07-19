@@ -15,6 +15,8 @@ import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.TermParser;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -195,6 +197,12 @@ public class Services extends AbstractServices {
     @Override
     public TermBuilder getTermBuilder() {
         return JavaProfile.DF();
+    }
+
+
+    @Override
+    public TermParser getTermParser() {
+        return new DefaultTermParser();
     }
 
 }

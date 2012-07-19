@@ -190,9 +190,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
-        Term term = new DefaultTermParser().parse(
-           new StringReader(s), null, services, copy, scm);
-        return term;
+        return services.getTermParser().parse(new StringReader(s), null, services, copy, scm );
     }
 
     /**

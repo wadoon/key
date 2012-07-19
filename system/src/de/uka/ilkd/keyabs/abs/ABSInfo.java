@@ -3,7 +3,6 @@ package de.uka.ilkd.keyabs.abs;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.AbstractKeYProgramModelMapping;
 import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -16,14 +15,21 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class ABSInfo implements IProgramInfo {
 
     private final ABSServices services;
+    private final KeYABSMapping program2key;
     
     public ABSInfo(ABSServices services) {
-        this.services = services;
+        this(services, new KeYABSMapping());
     }
     
+    public ABSInfo(ABSServices services,
+            KeYABSMapping program2key) {
+        this.services = services;
+        this.program2key = program2key;
+    }
+
     @Override
-    public AbstractKeYProgramModelMapping rec2key() {
-        return null;
+    public KeYABSMapping rec2key() {
+        return program2key;
     }
 
     @Override
@@ -38,8 +44,7 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public String getFullName(KeYJavaType t) {
-        // TODO Auto-generated method stub
-        return null;
+        return t.getFullName();
     }
 
     @Override
@@ -151,5 +156,6 @@ public class ABSInfo implements IProgramInfo {
         // TODO Auto-generated method stub
         return false;
     }
-
+    
+    
 }

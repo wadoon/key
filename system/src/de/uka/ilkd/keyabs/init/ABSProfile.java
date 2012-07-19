@@ -8,16 +8,16 @@ import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.proof.ABSProof;
+import de.uka.ilkd.keyabs.strategy.ABSDLStrategy;
 
 public class ABSProfile extends AbstractProfile {
 
     private final static StrategyFactory DEFAULT =
-            new JavaCardDLStrategy.Factory();
+            new ABSDLStrategy.Factory();
 
     public ABSProfile() {
             super("standardRulesABS.key", ABSProof.class,

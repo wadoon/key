@@ -33,7 +33,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * a static method. For determining the method the callee and the
  * arguments of the method are needed as arguments.
  */
-public final class StaticMethodCondition extends VariableConditionAdapter {
+public final class StaticMethodCondition extends VariableConditionAdapter<Services> {
 
     private final boolean negation;
     private final SchemaVariable caller;

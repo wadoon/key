@@ -26,7 +26,7 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public final class MetaDisjointCondition extends VariableConditionAdapter {
+public final class MetaDisjointCondition extends VariableConditionAdapter<IServices> {
         
     private final TermSV var1;
     private final TermSV var2;
@@ -89,7 +89,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, 
 			 SVSubstitute subst, 
 			 SVInstantiations svInst,
-			 Services services) {
+			 IServices services) {
 	final Term s1Inst = (Term) svInst.getInstantiation(var1);
 	final Term s2Inst = (Term) svInst.getInstantiation(var2);
 	if(s1Inst == null || s2Inst == null) {

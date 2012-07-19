@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author mulbrich
  * @since 2006-12-14
  */
-public final class EnumTypeCondition extends VariableConditionAdapter {
+public final class EnumTypeCondition extends VariableConditionAdapter<Services> {
 
     private final TypeResolver resolver;
     private final boolean negated;

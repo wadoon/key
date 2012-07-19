@@ -41,7 +41,7 @@ public class LDTInput implements EnvInput {
     
     private static final String NAME = "language data types";
 
-    private final KeYFile[] keyFiles;
+    private final IKeYFile[] keyFiles;
     private final LDTInputListener listener;
 
     private AbstractInitConfig initConfig = null;
@@ -52,7 +52,7 @@ public class LDTInput implements EnvInput {
      * @param keyFiles an array containing the LDT .key files
      * @param main the main class used to report the progress of reading
      */
-    public LDTInput(KeYFile[] keyFiles, LDTInputListener listener) {
+    public LDTInput(IKeYFile[] keyFiles, LDTInputListener listener) {
 	this.keyFiles = keyFiles;
 	this.listener=listener;
     }
@@ -138,16 +138,18 @@ public class LDTInput implements EnvInput {
 	    }
 	    keyFiles[i].readRulesAndProblem();
 	}
-		
+
 	//create LDT objects
         IServices services = initConfig.getServices();
         ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
                         	.prepend(new IntegerLDT(services))
                         	.prepend(new BooleanLDT(services))
-                        	.prepend(new LocSetLDT(services))
-                        	.prepend(new HeapLDT(services))
-                        	.prepend(new SeqLDT(services))
-                        	.prepend(new CharListLDT(services));
+                        	//.prepend(new LocSetLDT(services))
+                        	//.prepend(new HeapLDT(services))
+                        	//.prepend(new SeqLDT(services))
+                        	//.prepend(new CharListLDT(services))
+                        	;
+
         initConfig.getServices().getTypeConverter().init(ldts);
     }
   

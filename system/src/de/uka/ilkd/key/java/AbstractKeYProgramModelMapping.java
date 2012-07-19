@@ -10,7 +10,7 @@ public abstract class AbstractKeYProgramModelMapping {
 	/** have special classes been parsed in */
 	protected boolean parsedSpecial = false;
 
-	public abstract KeYRecoderMapping copy();
+	public abstract AbstractKeYProgramModelMapping copy();
 
 	/** maps a  program element (or something similar, e.g. Type)
 	* to the KeY-equivalent

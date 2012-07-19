@@ -33,6 +33,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.IKeYFile;
+import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -210,6 +212,18 @@ public final class ProblemInitializer extends AbstractProblemInitializer {
             }
         } else
                 throw new ProofInputException("Problem initialization without JavaInfo!");
+    }
+
+    @Override
+    protected IKeYFile createKeYFile(Includes in, String name) {
+        return new KeYFile(name, in.get(name), progMon);
+    }
+
+    @Override
+    protected IKeYFile createTacletBaseKeYFile() {
+        return new KeYFile("taclet base", 
+                  profile.getStandardRules().getTacletBase(),
+              progMon);
     }
 
 }

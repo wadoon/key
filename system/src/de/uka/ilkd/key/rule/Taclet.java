@@ -881,8 +881,8 @@ public abstract class Taclet implements Rule, Named {
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
                                       mc.getInstantiations());
+	
 	term.execPostOrder(srVisitor);
-
 	return srVisitor.getTerm();
     }
     

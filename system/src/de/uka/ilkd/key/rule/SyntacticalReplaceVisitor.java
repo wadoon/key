@@ -22,13 +22,13 @@ import java.util.Stack;
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
@@ -147,7 +147,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 
     private IServices getServices () {
 	if ( services == null )
-	    services = new Services ();
+	    services = ProofSettings.DEFAULT_SETTINGS.getProfile().createServices(null);
 	return services;
     }
 
@@ -460,7 +460,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     public void subtreeLeft(Term subtreeRoot){
 	if (subtreeRoot.op() instanceof TermTransformer) {
 	    TermTransformer mop = (TermTransformer) subtreeRoot.op();
-	    pushNew(mop.transform((Term)subStack.pop(),svInst, getServices()));
+	    final Term transform = mop.transform((Term)subStack.pop(),svInst, getServices());
+	    pushNew(transform);
 	} 
    }
 }

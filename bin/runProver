@@ -71,7 +71,7 @@ fi
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar recoderKey.jar"
+key_ext_jars="antlr.jar recoderKey.jar absfrontend.jar"
 
 keyclasspath="$KEY_HOME/system/binary/"
 

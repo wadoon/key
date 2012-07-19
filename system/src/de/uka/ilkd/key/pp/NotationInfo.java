@@ -262,13 +262,16 @@ public final class NotationInfo {
         	
 	//heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
-	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
-	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
-	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
+	if (heapLDT != null) {
+	    tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+	    tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
+	    tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
+	    tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
+	}
 	
-	//set operators
-	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        //set operators
+        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        if (setLDT != null) {
 	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
@@ -276,14 +279,16 @@ public final class NotationInfo {
 	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
 	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-	
+        }
+        
 	//string operators
 	final CharListLDT charListLDT 
 		= services.getTypeConverter().getCharListLDT();
+	if (charListLDT != null) {
 	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",PRIORITY_CAST,PRIORITY_ATOM,PRIORITY_ATOM));
 	tbl.put(charListLDT.getClCons(), new CharListNotation());
 	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
-	
+	}
 	    this.notationTable = tbl;
     }
     

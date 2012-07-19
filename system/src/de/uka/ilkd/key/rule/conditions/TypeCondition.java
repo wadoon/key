@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  This variable condition checks if a schemavariable is instantiated 
  *  with a reference or primitive type
  */
-public final class TypeCondition extends VariableConditionAdapter {
+public final class TypeCondition extends VariableConditionAdapter<IServices> {
 
     private final TypeResolver resolver;
     private final boolean nonNull;
@@ -60,7 +60,7 @@ public final class TypeCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable p_var, 
 			 SVSubstitute candidate, 
 			 SVInstantiations svInst,
-			 Services services) {
+			 IServices services) {
         
         if (!resolver.isComplete(p_var, candidate, svInst, services)) {
             // instantiation not yet complete
@@ -69,10 +69,10 @@ public final class TypeCondition extends VariableConditionAdapter {
         final Sort s = resolver.resolveSort(p_var, candidate, svInst, services);
         
         if (isReference) {        
-            return (s.extendsTrans(services.getJavaInfo().objectSort()) 
-        	    && !(nonNull && s instanceof NullSort));
+            return services.getProgramInfo().isReferenceSort(s) 
+        	    && !(nonNull && s instanceof NullSort);
         } else {
-            return !(s.extendsTrans(services.getJavaInfo().objectSort()));
+            return !(services.getProgramInfo().isReferenceSort(s));
         }
     }
 

@@ -56,6 +56,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -250,7 +251,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             throws ProofInputException {
         final IProgramInfo javaInfo 
             = initConfig.getServices().getProgramInfo();
-        final SpecificationRepository specRepos 
+        final ISpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
         
         //read DL library specs before any other specs

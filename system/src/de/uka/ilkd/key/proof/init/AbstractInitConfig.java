@@ -36,7 +36,7 @@ public abstract class AbstractInitConfig {
      * maps categories to their default choice (both represented as Strings),
      * which is used if no other choice is specified in the problemfile
      */
-    protected HashMap<String,String> category2DefaultChoice = new LinkedHashMap<String,String>();
+    private HashMap<String,String> category2DefaultChoice = new LinkedHashMap<String,String>();
     /**
      * maps taclets to their TacletBuilders. This information is needed when
      * a taclet contains GoalTemplates annotated with taclet-options because

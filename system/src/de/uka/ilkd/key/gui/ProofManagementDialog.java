@@ -61,8 +61,8 @@ import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Pair;
@@ -86,7 +86,7 @@ public final class ProofManagementDialog extends JDialog {
 
     private AbstractInitConfig initConfig;
     private IServices services;
-    private SpecificationRepository specRepos;
+    private ISpecificationRepository specRepos;
 
     private JTabbedPane tabbedPane;
     private Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons;

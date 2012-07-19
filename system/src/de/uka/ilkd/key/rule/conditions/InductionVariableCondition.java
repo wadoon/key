@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -14,7 +14,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * A variable is marked as such if its name has the suffix is "Ind" or "IND" and the name has length>3.
  * @author gladisch
  */
-public class InductionVariableCondition extends VariableConditionAdapter {
+public class InductionVariableCondition extends VariableConditionAdapter<IServices> {
 
     private final SchemaVariable arg;
     private final boolean negation;
@@ -27,7 +27,7 @@ public class InductionVariableCondition extends VariableConditionAdapter {
 	
 	@Override
 	public boolean check(SchemaVariable var, SVSubstitute instCandidate,
-			SVInstantiations instMap, Services services) {
+			SVInstantiations instMap, IServices services) {
 		// TODO Auto-generated method stub
 		StrategyProperties strategyProperties = services.getProof().getSettings().
 		                                         getStrategySettings().getActiveStrategyProperties();

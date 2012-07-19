@@ -56,9 +56,9 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.JavaContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
+import de.uka.ilkd.key.speclang.JavaContractFactory;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
@@ -74,7 +74,7 @@ import de.uka.ilkd.key.util.Pair;
  * axioms, and loop invariants. Provides methods for adding such elements to the
  * repository, and for retrieving them afterwards.
  */
-public final class SpecificationRepository {
+public final class SpecificationRepository implements ISpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private static final TermBuilder TB = JavaProfile.DF();
@@ -215,9 +215,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns all known class invariants for the passed type.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getClassInvariants(de.uka.ilkd.key.java.abstraction.KeYJavaType)
      */
+    @Override
     public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
 	ImmutableSet<ClassInvariant> result = invs.get(kjt);
 	return result == null 
@@ -486,9 +487,10 @@ public final class SpecificationRepository {
     //public interface
     //------------------------------------------------------------------------- 
     
-    /**
-     * Returns all registered contracts.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getAllContracts()
      */
+    @Override
     public ImmutableSet<Contract> getAllContracts() {
 	ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
 	for(ImmutableSet<Contract> s : contracts.values()) {
@@ -498,9 +500,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns all registered (atomic) contracts for the passed target.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getContracts(de.uka.ilkd.key.java.abstraction.KeYJavaType, de.uka.ilkd.key.logic.op.IObserverFunction)
      */
+    @Override
     public ImmutableSet<Contract> getContracts(KeYJavaType kjt,
 	    				       IObserverFunction target) {
 	assert kjt != null;
@@ -515,10 +518,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns all registered (atomic) operation contracts for the passed 
-     * operation.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getOperationContracts(de.uka.ilkd.key.java.abstraction.KeYJavaType, de.uka.ilkd.key.logic.op.IProgramMethod)
      */
+    @Override
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(
 	    						KeYJavaType kjt, 
 	    						IProgramMethod pm) {
@@ -533,10 +536,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns all registered (atomic) operation contracts for the passed 
-     * operation which refer to the passed modality.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getOperationContracts(de.uka.ilkd.key.java.abstraction.KeYJavaType, de.uka.ilkd.key.logic.op.IProgramMethod, de.uka.ilkd.key.logic.op.Modality)
      */
+    @Override
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(
 	    				       KeYJavaType kjt,	    
 	    				       IProgramMethod pm,
@@ -555,10 +558,10 @@ public final class SpecificationRepository {
     }
     
 
-    /**
-     * Returns the registered (atomic or combined) contract corresponding to the 
-     * passed name, or null.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getContractByName(java.lang.String)
      */
+    @Override
     public Contract getContractByName(String name) {
         if(name == null || name.length() == 0) {
             return null;
@@ -583,10 +586,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns a set encompassing the passed contract and all its versions 
-     * inherited to overriding methods.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getInheritedContracts(de.uka.ilkd.key.speclang.Contract)
      */
+    @Override
     public ImmutableSet<Contract> getInheritedContracts(Contract contract) {
 	ImmutableSet<Contract> result 
 		= DefaultImmutableSet.<Contract>nil().add(contract);
@@ -604,10 +607,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns a set encompassing the passed contracts and all its versions 
-     * inherited to overriding methods.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getInheritedContracts(de.uka.ilkd.key.collection.ImmutableSet)
      */    
+    @Override
     public ImmutableSet<Contract> getInheritedContracts(
 	    			ImmutableSet<Contract> contractSet) {
 	ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
@@ -618,10 +621,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns all functions for which contracts are registered in the passed
-     * type.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getContractTargets(de.uka.ilkd.key.java.abstraction.KeYJavaType)
      */
+    @Override
     public ImmutableSet<IObserverFunction> getContractTargets(KeYJavaType kjt) {
 	final ImmutableSet<IObserverFunction> result = contractTargets.get(kjt);
         return result == null 
@@ -630,10 +633,10 @@ public final class SpecificationRepository {
     }
         
     
-    /**
-     * Registers the passed (atomic) contract, and inherits it to all
-     * overriding methods.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addContract(de.uka.ilkd.key.speclang.Contract)
      */
+    @Override
     public void addContract(Contract contract) {
 	contract = prepareContract(contract);
 	
@@ -647,16 +650,20 @@ public final class SpecificationRepository {
         assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) : "target "+contract.getTarget()+" missing for contract "+contract;
     }
     
-    /** Registers the passed (atomic) contract without inheriting it. */
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addContractNoInheritance(de.uka.ilkd.key.speclang.Contract)
+     */
+    @Override
     public void addContractNoInheritance(Contract contract){
         registerContract(prepareContract(contract));
     }
 
     
     
-    /**
-     * Registers the passed contracts.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addContracts(de.uka.ilkd.key.collection.ImmutableSet)
      */
+    @Override
     public void addContracts(ImmutableSet<Contract> toAdd) {
         for(Contract contract : toAdd) {
             addContract(contract);
@@ -711,10 +718,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Registers the passed class invariant, and inherits it to all
-     * subclasses if it is public or protected.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassInvariant(de.uka.ilkd.key.speclang.ClassInvariant)
      */
+    @Override
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
@@ -736,9 +743,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Registers the passed class invariants.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassInvariants(de.uka.ilkd.key.collection.ImmutableSet)
      */
+    @Override
     public void addClassInvariants(ImmutableSet<ClassInvariant> toAdd) {
         for(ClassInvariant inv : toAdd) {
             addClassInvariant(inv);
@@ -848,9 +856,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Registers the passed class axiom.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassAxiom(de.uka.ilkd.key.speclang.ClassAxiom)
      */
+    @Override
     public void addClassAxiom(ClassAxiom ax) {
         KeYJavaType kjt = ax.getKJT();
         ImmutableSet<ClassAxiom> currentAxioms = axioms.get(kjt);
@@ -889,9 +898,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Registers the passed class axioms.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassAxioms(de.uka.ilkd.key.collection.ImmutableSet)
      */
+    @Override
     public void addClassAxioms(ImmutableSet<ClassAxiom> toAdd) {
         for(ClassAxiom ax : toAdd) {
             addClassAxiom(ax);
@@ -899,9 +909,10 @@ public final class SpecificationRepository {
     }    
     
     
-    /**
-     * Returns all proofs registered for the passed PO (or stronger POs).
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getProofs(de.uka.ilkd.key.proof.init.ProofOblInput)
      */
+    @Override
     public ImmutableSet<Proof> getProofs(ProofOblInput po) {
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
         for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
@@ -916,10 +927,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns all proofs registered for the passed atomic contract, or for
-     * combined contracts including the passed atomic contract
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getProofs(de.uka.ilkd.key.speclang.Contract)
      */
+    @Override
     public ImmutableSet<Proof> getProofs(Contract atomicContract) {
         assert !atomicContract.getName().contains(CONTRACT_COMBINATION_MARKER)
                : "Contract must be atomic";
@@ -939,10 +950,10 @@ public final class SpecificationRepository {
     }    
     
 
-    /**
-     * Returns all proofs registered for the passed target and its overriding
-     * targets.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getProofs(de.uka.ilkd.key.java.abstraction.KeYJavaType, de.uka.ilkd.key.logic.op.IObserverFunction)
      */
+    @Override
     public ImmutableSet<Proof> getProofs(KeYJavaType kjt, 
 	    				 IObserverFunction target) {
 	final ImmutableSet<Pair<KeYJavaType,IObserverFunction>> targets 
@@ -968,9 +979,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns all proofs registered with this specification repository.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getAllProofs()
      */
+    @Override
     public ImmutableSet<Proof> getAllProofs() {
 	ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
 	Collection<ImmutableSet<Proof>> proofSets = proofs.values();
@@ -981,9 +993,10 @@ public final class SpecificationRepository {
     }
     
     
-    /**
-     * Returns the PO that the passed proof is about, or null.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getPOForProof(de.uka.ilkd.key.proof.Proof)
      */
+    @Override
     public ContractPO getPOForProof(Proof proof) {
 	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
 		: proofs.entrySet()) {
@@ -1006,17 +1019,19 @@ public final class SpecificationRepository {
     }
     
 
-    /**
-     * Registers the passed proof. 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#registerProof(de.uka.ilkd.key.proof.init.ProofOblInput, de.uka.ilkd.key.proof.Proof)
      */
+    @Override
     public void registerProof(ProofOblInput po, Proof proof) {
         proofs.put(po, getProofs(po).add(proof));
     }    
     
     
-    /**
-     * Unregisters the passed proof.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#removeProof(de.uka.ilkd.key.proof.Proof)
      */
+    @Override
     public void removeProof(Proof proof) {
         for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
         	: proofs.entrySet()) {

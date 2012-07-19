@@ -4,11 +4,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.parser.TermParser;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 public interface IServices {
@@ -28,7 +29,7 @@ public interface IServices {
 
 	public abstract void addNameProposal(Name proposal);
 
-	public abstract SpecificationRepository getSpecificationRepository();
+	public abstract ISpecificationRepository getSpecificationRepository();
 
 	/**
 	 * Returns the VariableNamer associated with this Services object.
@@ -80,6 +81,8 @@ public interface IServices {
 	public abstract IProgramInfo getJavaInfo();
 
 	public abstract TermBuilder getTermBuilder();
+
+	public abstract TermParser getTermParser();
 
 
 }

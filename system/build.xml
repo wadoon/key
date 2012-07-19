@@ -43,6 +43,7 @@
      <classpath>
       <pathelement location="${ext.dir}/antlr.jar"/>
       <pathelement location="${ext.dir}/recoderKey.jar"/>
+      <pathelement location="${ext.dir}/absfrontend.jar"/>
       <pathelement location="${ext.dir}/javacc.jar"/>
       <pathelement location="${ext.dir}/junit.jar"/>
       <pathelement path="${dist.dir}"/>
@@ -118,6 +119,7 @@
       <classpath>
         <pathelement location="${ext.dir}/antlr.jar"/>
         <pathelement location="${ext.dir}/recoderKey.jar"/>
+        <pathelement location="${ext.dir}/absfrontend.jar"/>
         <pathelement location="${ext.dir}/javacc.jar"/>
         <pathelement location="${ext.dir}/junit.jar"/>
       </classpath>

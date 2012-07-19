@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Ensures the given ProgramElement denotes a local variable
  */
-public final class LocalVariableCondition extends VariableConditionAdapter {
+public final class LocalVariableCondition extends VariableConditionAdapter<IServices> {
 
     private final SchemaVariable var;
     private final boolean neg;
@@ -40,7 +40,7 @@ public final class LocalVariableCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, 
             		 SVSubstitute candidate, 
             		 SVInstantiations svInst,
-            		 Services services) {
+            		 IServices services) {
 
         if (var != this.var) { 
             return true; 

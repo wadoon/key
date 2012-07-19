@@ -6,6 +6,8 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 
@@ -89,14 +91,15 @@ public class ABSTypeConverter extends AbstractTypeConverter {
 
     @Override
     public Term convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
-        // TODO Auto-generated method stub
+        if (pe instanceof IntLiteral) {
+            return getIntegerLDT().translateLiteral((IntLiteral) pe, getServices());
+        }
         return null;
     }
 
     @Override
     public Term convertToLogicElement(ProgramElement pe) {
-        // TODO Auto-generated method stub
-        return null;
+        return convertToLogicElement(pe, getServices().getProgramInfo().getDefaultExecutionContext());
     }
 
     @Override

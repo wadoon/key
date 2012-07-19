@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * This variable condition checks if a given type denotes an abstract class or
  * interface type.
  */
-public final class AbstractOrInterfaceType extends VariableConditionAdapter {
+public final class AbstractOrInterfaceType extends VariableConditionAdapter<Services> {
 
     private final TypeResolver resolver;
     private final boolean negated;

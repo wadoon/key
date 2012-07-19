@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.IProgramInfo;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Named;
@@ -31,7 +31,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * General varcond for checking relationships between types of schema variables.
  */
-public final class TypeComparisonCondition extends VariableConditionAdapter {
+public final class TypeComparisonCondition extends VariableConditionAdapter<IServices> {
     
     public static enum Mode 
                 {NOT_SAME,           /* checks if sorts are not same */
@@ -80,7 +80,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, 
 			 SVSubstitute subst, 
 			 SVInstantiations svInst,
-			 Services services) {
+			 IServices services) {
         
         if (!fst.isComplete(var, subst, svInst, services) 
              || !snd.isComplete(var, subst, svInst, services)) {
@@ -95,7 +95,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     
     private boolean checkSorts(final Sort fstSort, 
 	                       final Sort sndSort, 
-	                       final Services services) {
+	                       final IServices services) {
         switch (mode) {
         case SAME:
             return fstSort == sndSort;
@@ -154,7 +154,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
      */
     private boolean checkDisjointness(Sort fstSort, 
 	    			      Sort sndSort, 
-	    			      Services services) {
+	    			      IServices services) {
 	//sorts identical?
 	if(fstSort == sndSort) {
 	    return false;
@@ -177,9 +177,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	    }
 	    
 	    //object sorts?
-	    final Sort objectSort = services.getJavaInfo().objectSort();	    
-	    boolean fstElemIsObject = fstElemSort.extendsTrans(objectSort);
-	    boolean sndElemIsObject = sndElemSort.extendsTrans(objectSort);
+	    boolean fstElemIsObject = services.getProgramInfo().isReferenceSort(fstElemSort);
+	    boolean sndElemIsObject = services.getProgramInfo().isReferenceSort(sndElemSort);
 	    
 	    //try to get KeYJavaTypes (only works for types existing in program)
 	    final KeYJavaType fstKJT = javaInfo.getKeYJavaType(fstSort);

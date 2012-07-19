@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.io;
+package de.uka.ilkd.keyabs.init.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,26 +20,28 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
+import de.uka.ilkd.key.proof.io.IKeYFile;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
+import de.uka.ilkd.keyabs.parser.ABSKeYParser;
 
 
 /** 
  * Represents an input from a .key file producing an environment.
  */
-public class KeYFile implements IKeYFile {
+public class ABSKeYFile implements IKeYFile {
     
     private final String name;
     
@@ -56,7 +58,7 @@ public class KeYFile implements IKeYFile {
     
     private InputStream input;
     
-    protected AbstractInitConfig initConfig;
+    protected ABSInitConfig initConfig;
     
     private String chooseContract = null;
 
@@ -75,14 +77,11 @@ public class KeYFile implements IKeYFile {
     /** creates a new representation for a given file by indicating a name
      * and a RuleSource representing the physical source of the .key file.
      */
-    public KeYFile(String name, 
+    public ABSKeYFile(String name, 
                    RuleSource file, 
                    ProgressMonitor monitor) {
         assert name != null;
         assert file != null;
-        
-        try { throw null; } catch (Exception e) {e.printStackTrace();}
-        
         this.name = name;
         this.file = file;
         this.monitor = monitor;
@@ -92,7 +91,7 @@ public class KeYFile implements IKeYFile {
     /** creates a new representation for a given file by indicating a name
      * and a file representing the physical source of the .key file.
      */
-    public KeYFile(String name, 
+    public ABSKeYFile(String name, 
                    File file, 
                    ProgressMonitor monitor) {
 	this(name, RuleSource.initRuleFile(file), monitor);
@@ -104,12 +103,12 @@ public class KeYFile implements IKeYFile {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private KeYParser createDeclParser(InputStream is) throws FileNotFoundException {
-        return new KeYParser(ParserMode.DECLARATION,
-                             new KeYLexer(is,
+    private ABSKeYParser createDeclParser(InputStream is) throws FileNotFoundException {
+        return new ABSKeYParser(ParserMode.DECLARATION,
+                             new ABSKeYLexer(is,
                                           initConfig.getServices().getExceptionHandler()),
                              file.toString(), 
-                             (Services) initConfig.getServices(),
+                             initConfig.getServices(),
                              initConfig.namespaces());
     }
 
@@ -130,9 +129,9 @@ public class KeYFile implements IKeYFile {
                 return null;
             }
             try {
-                KeYParser problemParser 
-                    = new KeYParser(ParserMode.PROBLEM,
-                                    new KeYLexer(getNewStream(), null), 
+                ABSKeYParser problemParser 
+                    = new ABSKeYParser(ParserMode.PROBLEM,
+                                    new ABSKeYLexer(getNewStream(), null), 
                                     file.toString());
                 ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.setProfile(ProofSettings.DEFAULT_SETTINGS.getProfile());
@@ -170,8 +169,8 @@ public class KeYFile implements IKeYFile {
     
     
     @Override
-        public void setInitConfig(AbstractInitConfig conf) {
-        this.initConfig=conf;
+    public void setInitConfig(AbstractInitConfig conf) {
+        this.initConfig = (ABSInitConfig) conf;
     }
 
     
@@ -179,15 +178,14 @@ public class KeYFile implements IKeYFile {
     public Includes readIncludes() throws ProofInputException {
         if (includes == null) {
             try {
-                ParserConfig pc = new ParserConfig
-                (new Services(), 
+                ParserConfig<ABSServices> pc = new ParserConfig<ABSServices>(new ABSServices(), 
                         new NamespaceSet());
                 // FIXME: there is no exception handler here, thus, when parsing errors are ecountered
                 // during collection of includes (it is enough to mispell \include) the error
                 // message is very uninformative - ProofInputException without filename, line and column
                 // numbers. Somebody please fix that. /Woj
-                KeYParser problemParser = new KeYParser(ParserMode.PROBLEM, 
-                        new KeYLexer(getNewStream(),
+                ABSKeYParser problemParser = new ABSKeYParser(ParserMode.PROBLEM, 
+                        new ABSKeYLexer(getNewStream(),
                                 null), 
                                 file.toString(), 
                                 pc, 
@@ -252,8 +250,8 @@ public class KeYFile implements IKeYFile {
             return javaPath;       
         }
         try {
-            KeYParser problemParser = new KeYParser(ParserMode.PROBLEM,
-                                                    new KeYLexer(getNewStream(),
+            ABSKeYParser problemParser = new ABSKeYParser(ParserMode.PROBLEM,
+                                                    new ABSKeYLexer(getNewStream(),
                                                                  null), 
                                                     file.toString());
             
@@ -295,25 +293,25 @@ public class KeYFile implements IKeYFile {
     @Override
     public void read() throws ProofInputException {
 	if(initConfig == null) {
-	    throw new IllegalStateException("KeYFile: InitConfig not set.");
+	    throw new IllegalStateException("ABSKeYFile: InitConfig not set.");
 	}
         
         //read .key file
 	try {
-            Debug.out("Reading KeY file", file);
+            Debug.out("Reading ABSKeY file", file);
                    
-            final ParserConfig normalConfig 
-                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces());                       
-            final ParserConfig schemaConfig 
-                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+            final ParserConfig<ABSServices> normalConfig 
+                    = new ParserConfig<ABSServices>(initConfig.getServices(), initConfig.namespaces());                       
+            final ParserConfig<ABSServices> schemaConfig 
+                    = new ParserConfig<ABSServices>(initConfig.getServices(), initConfig.namespaces());
 
             CountingBufferedReader cinp = 
                     new CountingBufferedReader
                         (getNewStream(),monitor,getNumberOfChars()/100);
             try {
-                KeYParser problemParser 
-                = new KeYParser(ParserMode.PROBLEM, 
-                        new KeYLexer(cinp, 
+                ABSKeYParser problemParser 
+                = new ABSKeYParser(ParserMode.PROBLEM, 
+                        new ABSKeYLexer(cinp, 
                                 initConfig.getServices()
                                 .getExceptionHandler()), 
                                 file.toString(), 
@@ -325,14 +323,16 @@ public class KeYFile implements IKeYFile {
                 initConfig.addCategory2DefaultChoices(problemParser.
                         getCategory2Default());
                 ImmutableSet<Taclet> st = problemParser.getTaclets();
+
                 initConfig.setTaclets(st);
 
-                ISpecificationRepository specRepos 
+                /*SpecificationRepository specRepos 
                 = initConfig.getServices().getSpecificationRepository();
+                
                 specRepos.addContracts(problemParser.getContracts());
                 specRepos.addClassInvariants(problemParser.getInvariants());
-                chooseContract = problemParser.getChooseContract();
-                Debug.out("Read KeY file   ", file);
+                chooseContract = problemParser.getChooseContract();*/
+                Debug.out("Read ABSKeY file   ", file);
             } finally {
                 cinp.close();
             }
@@ -346,40 +346,35 @@ public class KeYFile implements IKeYFile {
     }
 
     
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.io.IKeYFile#readSorts()
+    /** reads the sorts declaration of the .key file only, 
+     * modifying the sort namespace
+     * of the initial configuration 
      */
-    @Override
     public void readSorts() throws ProofInputException {
         try {
             InputStream is = getNewStream();
-            try { 
-                KeYParser p=createDeclParser(is);          
-                p.parseSorts();
-                initConfig.addCategory2DefaultChoices(p.getCategory2Default());
-            } finally {
-                is.close();
-            }
+            ABSKeYParser p=createDeclParser(is);          
+            p.parseSorts();
+            initConfig.addCategory2DefaultChoices(p.getCategory2Default());
 	} catch (antlr.ANTLRException e) {
+            e.printStackTrace();
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
             throw new ProofInputException(fnfe);
-        } catch (IOException io) {
-            throw new ProofInputException(io);            
         }
     }
     
     
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.io.IKeYFile#readFuncAndPred()
+    /** reads the functions and predicates declared in the .key file only, 
+     * modifying the function namespaces of the respective taclet options. 
      */
-    @Override
     public void readFuncAndPred() throws ProofInputException {	
 	if(file == null) return;
 	try {
             InputStream is = getNewStream();
             try { 
-                KeYParser p=createDeclParser(getNewStream());
+                ABSKeYParser p=createDeclParser(getNewStream());
                 p.parseFuncAndPred();
             } finally {
                 is.close();
@@ -394,24 +389,24 @@ public class KeYFile implements IKeYFile {
     }
 
     
-   /* (non-Javadoc)
- * @see de.uka.ilkd.key.proof.io.IKeYFile#readRulesAndProblem()
- */
-    @Override
+   /** reads the rules and problems declared in the .key file only, 
+     * modifying the set of rules 
+     * of the initial configuration 
+     */
     public void readRulesAndProblem() 
             throws ProofInputException {
-        final ParserConfig schemaConfig = 
-	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
-        final ParserConfig normalConfig = 
-	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+        final ParserConfig<ABSServices> schemaConfig = 
+	    new ParserConfig<ABSServices>(initConfig.getServices(), initConfig.namespaces());
+        final ParserConfig<ABSServices> normalConfig = 
+	    new ParserConfig<ABSServices>(initConfig.getServices(), initConfig.namespaces());
         
         try {
             final CountingBufferedReader cinp = new CountingBufferedReader
                     (getNewStream(), monitor, getNumberOfChars()/100);
             try {
-                KeYParser problemParser 
-                = new KeYParser(ParserMode.PROBLEM,
-                        new KeYLexer(cinp, 
+                ABSKeYParser problemParser 
+                = new ABSKeYParser(ParserMode.PROBLEM,
+                        new ABSKeYLexer(cinp, 
                                 initConfig.getServices()
                                 .getExceptionHandler()), 
                                 file.toString(),
@@ -434,10 +429,6 @@ public class KeYFile implements IKeYFile {
     }
 
     
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.io.IKeYFile#close()
-     */
-    @Override
     public void close() {
         try {
             if (input != null) { 
@@ -449,10 +440,6 @@ public class KeYFile implements IKeYFile {
     }
     
     
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.io.IKeYFile#chooseContract()
-     */
-    @Override
     public String chooseContract() {
         return chooseContract;
     }
@@ -466,10 +453,10 @@ public class KeYFile implements IKeYFile {
     
     @Override    
     public boolean equals(Object o) {
-        if(!(o instanceof KeYFile)) {
+        if(!(o instanceof ABSKeYFile)) {
             return false;
         }
-        KeYFile kf = (KeYFile) o;
+        ABSKeYFile kf = (ABSKeYFile) o;
         return kf.file.getExternalForm().equals(file.getExternalForm());
 
     }

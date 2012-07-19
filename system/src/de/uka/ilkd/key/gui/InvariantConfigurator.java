@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.TermParser;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -94,7 +95,7 @@ public class InvariantConfigurator {
             private static final long serialVersionUID = 1L;
 
             private StringWriter sw = new StringWriter();
-            private DefaultTermParser parser = new DefaultTermParser();
+            private TermParser parser = new DefaultTermParser();
             
             
             //Creates a new Printer, pretty Syntax cannot be parsed up to now!

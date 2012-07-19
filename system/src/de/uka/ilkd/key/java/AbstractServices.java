@@ -14,111 +14,108 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public abstract class AbstractServices implements IServices {
 
-	/**
-	 * the proof
-	 */
-	protected Proof proof;
+    /**
+     * the proof
+     */
+    protected Proof proof;
 
-	public abstract IServices copyPreservesLDTInformation();
+    public abstract IServices copyPreservesLDTInformation();
 
-	public abstract IServices copy();
+    public abstract IServices copy();
 
-	/**
-	 * proof specific namespaces (functions, predicates, sorts, variables)
-	 */
-	protected NamespaceSet namespaces = new NamespaceSet();
-	/** used to convert types, expressions and so on to logic elements
-	 * (in special into to terms or formulas)
-	 */
-	protected AbstractTypeConverter typeconverter;
-	/**
-	 * variable namer for inner renaming
-	 */
-	private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
-	/**
-	 * the exception-handler
-	 */
-	protected KeYExceptionHandler exceptionHandler;
-	/**
-	 * map of names to counters
-	 */
-	private HashMap<String, Counter> counters = new HashMap<String, Counter>();
-	
-	protected NameRecorder nameRecorder;
+    /**
+     * proof specific namespaces (functions, predicates, sorts, variables)
+     */
+    protected NamespaceSet namespaces = new NamespaceSet();
+    /**
+     * used to convert types, expressions and so on to logic elements (in
+     * special into to terms or formulas)
+     */
+    protected AbstractTypeConverter typeconverter;
+    /**
+     * variable namer for inner renaming
+     */
+    private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
+    /**
+     * the exception-handler
+     */
+    protected KeYExceptionHandler exceptionHandler;
+    /**
+     * map of names to counters
+     */
+    private HashMap<String, Counter> counters = new HashMap<String, Counter>();
 
-        protected AbstractServices(KeYExceptionHandler exceptionHandler) {
-            if(exceptionHandler == null){
-                this.exceptionHandler = new KeYRecoderExcHandler();
-            }else{
-                this.exceptionHandler = exceptionHandler;
-            }
-            nameRecorder = new NameRecorder();
+    protected NameRecorder nameRecorder;
+
+    protected AbstractServices(KeYExceptionHandler exceptionHandler) {
+        if (exceptionHandler == null) {
+            this.exceptionHandler = new KeYRecoderExcHandler();
+        } else {
+            this.exceptionHandler = exceptionHandler;
         }
+        nameRecorder = new NameRecorder();
+    }
 
-        protected AbstractServices(KeYExceptionHandler exceptionHandler, AbstractTypeConverter tc) {
-            this(exceptionHandler);
-            typeconverter = tc;
-	}
-	
-	@Override
-	public abstract IProgramInfo getProgramInfo();
+    @Override
+    public abstract IProgramInfo getProgramInfo();
 
-	@Override
-	public KeYExceptionHandler getExceptionHandler() {
-	return exceptionHandler;
-	}
+    @Override
+    public KeYExceptionHandler getExceptionHandler() {
+        return exceptionHandler;
+    }
 
-	@Override
-	public void setExceptionHandler(KeYExceptionHandler keh) {
-	exceptionHandler = keh;
-	}
+    @Override
+    public void setExceptionHandler(KeYExceptionHandler keh) {
+        exceptionHandler = keh;
+    }
 
-	@Override
-	public NameRecorder getNameRecorder() {
-	    return nameRecorder;
-	}
+    @Override
+    public NameRecorder getNameRecorder() {
+        return nameRecorder;
+    }
 
-	@Override
-	public VariableNamer getVariableNamer() {
-	    return innerVarNamer;
-	}
+    @Override
+    public VariableNamer getVariableNamer() {
+        return innerVarNamer;
+    }
 
-	public void setTypeConverter(AbstractTypeConverter tc) {
-	    typeconverter = tc;
-	}
+    public void setTypeConverter(AbstractTypeConverter tc) {
+        typeconverter = tc;
+    }
 
-	@Override
-	public abstract IServices copyProofSpecific(Proof p_proof);
+    @Override
+    public abstract IServices copyProofSpecific(Proof p_proof);
 
-	@Override
-	public Counter getCounter(String name) {
-	    Counter c = counters.get(name);
-	    if (c != null) return c;
-	    c = new Counter(name);
-	    counters.put(name, c);
-	    return c;
-	}
+    @Override
+    public Counter getCounter(String name) {
+        Counter c = counters.get(name);
+        if (c != null)
+            return c;
+        c = new Counter(name);
+        counters.put(name, c);
+        return c;
+    }
 
-	@Override
-	public void setBackCounters(Node n) {        
-	    for (final Counter c : counters.values()) {
-	        c.undo(n);
-	    }
-	}
+    @Override
+    public void setBackCounters(Node n) {
+        for (final Counter c : counters.values()) {
+            c.undo(n);
+        }
+    }
 
-	@Override
-	public NamespaceSet getNamespaces() {
-	    return namespaces;
-	}
+    @Override
+    public NamespaceSet getNamespaces() {
+        return namespaces;
+    }
 
-	@Override
-	public void setNamespaces(NamespaceSet namespaces) {
-	    this.namespaces = namespaces;
-	}
+    @Override
+    public void setNamespaces(NamespaceSet namespaces) {
+        this.namespaces = namespaces;
+    }
 
-	@Override
-	public Proof getProof() {
-	return proof;
-	}
+    @Override
+    public Proof getProof() {
+        return proof;
+    }
 
 }

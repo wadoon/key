@@ -39,7 +39,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 	      argSorts == null ? 0 : argSorts.size(), 
               whereToBind, 
               isRigid);
-	assert sort != null;
+	assert sort != null : "Symbol " + name + " has no sort defined.";
 	this.argSorts = argSorts == null ? EMPTY_SORT_LIST : argSorts;
 	this.sort = sort;
     }

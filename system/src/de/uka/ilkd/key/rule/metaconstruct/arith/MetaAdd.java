@@ -26,7 +26,6 @@ public final class MetaAdd extends AbstractTermTransformer {
 	super(new Name("#add"), 2);
     }
 
-
     public Term transform(Term term, SVInstantiations svInst, IServices services) {
 	Term arg1 = term.sub(0);
 	Term arg2 = term.sub(1);

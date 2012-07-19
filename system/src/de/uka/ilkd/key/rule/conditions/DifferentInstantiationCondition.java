@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public final class DifferentInstantiationCondition 
-	extends VariableConditionAdapter {
+	extends VariableConditionAdapter<IServices> {
 
     private final SchemaVariable var1, var2;
     
@@ -35,7 +35,7 @@ public final class DifferentInstantiationCondition
     public boolean check(SchemaVariable var, 
             		 SVSubstitute candidate, 
             		 SVInstantiations svInst,
-            		 Services services) {
+            		 IServices services) {
 	if(var == var1) {
 	    final Object inst2 = svInst.getInstantiation(var2);
 	    return inst2 == null || !inst2.equals(candidate);

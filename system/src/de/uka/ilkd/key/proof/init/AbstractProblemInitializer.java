@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
@@ -92,6 +92,8 @@ public abstract class AbstractProblemInitializer {
             listener.reportStatus(this,status,progressMax);
         }
     }
+    
+    
 
     /**
      * Helper for readIncludes().
@@ -104,11 +106,11 @@ public abstract class AbstractProblemInitializer {
                 }
                 
                 //collect all ldt includes into a single LDTInput
-                KeYFile[] keyFile = new KeYFile[in.getLDTIncludes().size()];
+                IKeYFile[] keyFile = new IKeYFile[in.getLDTIncludes().size()];
                 
                 int i = 0;
                 for (String name : in.getLDTIncludes()) {
-                    keyFile[i++] = new KeYFile(name, in.get(name), progMon);
+                    keyFile[i++] = createKeYFile(in, name);
                 }
             
                 LDTInput ldtInp = new LDTInput(keyFile, new LDTInputListener() {
@@ -124,6 +126,10 @@ public abstract class AbstractProblemInitializer {
                 readEnvInput(ldtInp, initConfig);
             }
 
+    protected abstract IKeYFile createKeYFile(Includes in, String name);
+    protected abstract IKeYFile createTacletBaseKeYFile();
+
+    
     /**
      * Helper for readEnvInput().
      */
@@ -135,10 +141,10 @@ public abstract class AbstractProblemInitializer {
                 
                 //read LDT includes
                 readLDTIncludes(in, initConfig);
-                
+
                 //read normal includes
                 for (String fileName : in.getIncludes()) {
-                    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon);
+                    IKeYFile keyFile = createKeYFile(in, fileName);
                     readEnvInput(keyFile, initConfig);
                 }
             }
@@ -193,7 +199,7 @@ public abstract class AbstractProblemInitializer {
                     envInput.read();	    
             
                     //clean namespaces
-                    cleanupNamespaces(initConfig);	    	    
+                    cleanupNamespaces(initConfig);
                 }
             }
 
@@ -280,8 +286,7 @@ public abstract class AbstractProblemInitializer {
                     proofs[i].setNamespaces(proofs[i].getNamespaces());//TODO: refactor Proof.setNamespaces() so this becomes unnecessary
                     populateNamespaces(proofs[i]);
                 }
-                initConfig.getProofEnv().registerProof(problem, pl);
-            
+                initConfig.getProofEnv().registerProof(problem, pl);            
             }
 
     /**
@@ -299,15 +304,14 @@ public abstract class AbstractProblemInitializer {
         //ABSTODO: below should become a call to an abstract method createBaseConfig implemented by the subclasses to avoid the cast in 
         // createInitConfig
         baseConfig = profile.createInitConfig(services, profile);
+        
     
         RuleSource tacletBase = profile.getStandardRules().getTacletBase();
         if(tacletBase != null) {
-        	KeYFile tacletBaseFile
-        	    = new KeYFile("taclet base", 
-        		          profile.getStandardRules().getTacletBase(),
-    		          progMon);
+        	IKeYFile tacletBaseFile = createTacletBaseKeYFile();
         	readEnvInput(tacletBaseFile, baseConfig);
         }	    
+
     }
       return prepare(envInput, baseConfig);
     
@@ -322,13 +326,13 @@ public abstract class AbstractProblemInitializer {
             initConfig.getProofEnv().registerRule(r, 
                     profile.getJustification(r));
         }
-    
+
         //read Java
         readJava(envInput, initConfig);
-    
+
         //register function and predicate symbols defined by Java program
         registerProgramDefinedSymbols(initConfig);
-    
+
         //read envInput
         readEnvInput(envInput, initConfig);
     
@@ -336,6 +340,7 @@ public abstract class AbstractProblemInitializer {
         if(listener !=null){
            listener.progressStopped(this); 
         }
+        
         return initConfig;
     }
 

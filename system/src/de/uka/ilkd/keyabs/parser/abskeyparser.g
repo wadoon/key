@@ -49,6 +49,7 @@ header {
 
   import de.uka.ilkd.keyabs.abs.*;
   import de.uka.ilkd.keyabs.init.*;
+  import de.uka.ilkd.keyabs.proof.*;
 
   import de.uka.ilkd.key.parser.*;
   import de.uka.ilkd.key.java.*;
@@ -105,7 +106,6 @@ options {
     private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
     private HashSet usedChoiceCategories = new HashSet();
     private HashMap taclet2Builder;
-    private AbbrevMap scm;
     private KeYExceptionHandler keh = null;
 
     // these variables are set if a file is read in step by
@@ -194,11 +194,9 @@ options {
                      String filename, 
                      JavaReader jr, 
                      ABSServices services,
-                     NamespaceSet nss, 
-                     AbbrevMap scm) {
+                     NamespaceSet nss) {
         this(lexer, filename, services, nss, mode);
         this.javaReader = jr;
-        this.scm = scm;
     }
 
     public ABSKeYParser(ParserMode mode, 
@@ -221,8 +219,8 @@ options {
                      TokenStream lexer,
 		     ABSServices services,
 		     NamespaceSet nss) {
-	this(mode, lexer, 
-	     (JavaReader) null,
+	this(mode, lexer, "", 
+	     (JavaReader) null, services,
    	     nss);
     }
 
@@ -238,7 +236,6 @@ options {
                      HashMap taclet2Builder) {
         this(lexer, filename, services, nss, mode);
         switchToSchemaMode();
-        this.scm = new AbbrevMap();
         this.javaReader = jr;
         this.taclet2Builder = taclet2Builder;
     }
@@ -259,7 +256,6 @@ options {
             this.capturer = (DeclPicker) lexer;
         }
         if (normalConfig!=null)
-        scm = new AbbrevMap();
         this.schemaConfig = schemaConfig;
         this.normalConfig = normalConfig;       
 	switchToNormalMode();
@@ -277,7 +273,6 @@ options {
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
         }
-        scm = new AbbrevMap();
         this.schemaConfig = null;
         this.normalConfig = null;       
 	switchToNormalMode();
@@ -534,7 +529,7 @@ options {
                                    filename+"\n " +e);
             }
         } else {
-            source = RuleSource.initRuleFile(filename+".key"); 
+            source = RuleSource.initRuleFile(ABSProof.class, filename+".key"); 
         }
         if (ldt) {
             includes.putLDT(filename, source);
@@ -895,15 +890,15 @@ options {
 	if (result == null) {
 	    if(name.equals(NullSort.NAME.toString())) {
 	        Sort objectSort 
-	        	= (Sort) sorts().lookup(new Name("java.lang.Object"));
+	        	= (Sort) sorts().lookup(new Name("ABSAnyInterface"));
 	        if(objectSort == null) {
 	            semanticError("Null sort cannot be used before "
-	                          + "java.lang.Object is declared");
+	                          + "ABSAnyInterface is declared");
 	        }
 	        result = new NullSort(objectSort);
 	        sorts().add(result);
 	    } else {
-  	    	result = (Sort) sorts().lookup(new Name("java.lang."+name));
+  	    	result = (Sort) sorts().lookup(new Name("abs.lang."+name));
   	    }
 	}
 	return result;
@@ -1340,6 +1335,7 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                 s = new SortImpl(sort_name, ext, isAbstractSort);
                             }
                             assert s != null;
+                            
                             sorts().add ( s ); 
 
                             createdSorts = createdSorts.append(s);
@@ -1873,6 +1869,7 @@ sortId_check [boolean checkSort] returns [Sort s = null]
 }
     :
         p = sortId_check_help[checkSort]
+        { s = p.first; }
     ;
 
 // Generic and non-generic sorts, array sorts allowed
@@ -1882,6 +1879,7 @@ any_sortId_check [boolean checkSort] returns [Sort s = null]
 }
     :   
         p = any_sortId_check_help[checkSort]
+        { s=p.first; }
     ;
     
     
@@ -1939,6 +1937,8 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             }
             
             Sort s = lookupSort(name);
+            
+            
             if(checkSort && s == null) {
                 throw new NotDeclException("sort", 
                                            name, 
@@ -2001,7 +2001,7 @@ funcpred_name returns [String result = null]
     (sort_name DOUBLECOLON) => (prefix = sort_name 
         DOUBLECOLON name = simple_ident {result = prefix + "::" + name;})
   | 
-    (prefix = simple_ident {result = prefix; })
+    (prefix = simple_ident_dots {result = prefix; })
 ;
 
 
@@ -2720,7 +2720,8 @@ funcpredvarterm returns [Term a = null]
     | 
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number:NUM_LITERAL
         { a = toZNotation(neg+number.getText(), functions());}    
-    | varfuncid = funcpred_name (LIMITED {limited = true;})?
+    | varfuncid = funcpred_name                                   
+    (LIMITED {limited = true;})?
         (
             (
                LBRACE 
@@ -2759,7 +2760,9 @@ funcpredvarterm returns [Term a = null]
 	                }
 	
 	                if(boundVars == null) {
+                          try {
 	                    a = tf.createTerm(op, args);
+	                    } catch (Throwable t) { t.printStackTrace(); }
 	                } else {
 	                    //sanity check
 	                    assert op instanceof Function;
@@ -2867,6 +2870,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
               INSEQUENTSTATE { stateRestriction = RewriteTaclet.IN_SEQUENT_STATE; } 
             ) ? ) ?
         { 
+        
             b = createTacletBuilderFor(find, stateRestriction);
             b.setName(new Name(name.getText()));
             b.setIfSequent(ifSeq);
@@ -3748,6 +3752,7 @@ problem returns [ Term a = null ]
                             taclets = taclets.addUnique(s);
                         }
                     } catch(de.uka.ilkd.key.collection.NotUniqueException e) {
+                        System.out.println("oops");
                         semanticError
                         ("Cannot add taclet \"" + s.name() + 
                             "\" to rule base as a taclet with the same "+

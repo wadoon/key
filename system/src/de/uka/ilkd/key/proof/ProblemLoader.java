@@ -56,7 +56,7 @@ import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -75,6 +75,9 @@ import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.keyabs.init.ABSProblemInitializer;
+import de.uka.ilkd.keyabs.init.ABSProfile;
+import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
 
 
 public final class ProblemLoader implements Runnable {
@@ -198,6 +201,9 @@ public final class ProblemLoader implements Runnable {
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
             // KeY problem specification or saved proof
+            if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile) {
+                return new ABSKeYUserProblemFile(filename, file, pm);
+            }
             return new KeYUserProblemFile(filename, file, pm);
             
         } else if (file.isDirectory()){ 
@@ -227,13 +233,13 @@ public final class ProblemLoader implements Runnable {
            try{
                envInput = createEnvInput(file, classPath, bootClassPath);
                
-               init = new ProblemInitializer(ui, mediator.getProfile(),  true, ui);; 
+               init = createProblemInitializer();
                
                AbstractInitConfig initConfig = init.prepare(envInput);
                int proofNum = 0;
                final String chooseContract;
-               if(envInput instanceof KeYFile) {
-        	   chooseContract = ((KeYFile)envInput).chooseContract();
+               if(envInput instanceof IKeYFile) {
+        	   chooseContract = ((IKeYFile)envInput).chooseContract();
                } else {
         	   chooseContract = null;
                }
@@ -311,6 +317,13 @@ public final class ProblemLoader implements Runnable {
            }
        }
        return status;
+   }
+
+   protected AbstractProblemInitializer createProblemInitializer() {
+       if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile) {
+           return new ABSProblemInitializer(ui, mediator.getProfile(), true, ui);
+       }
+       return new ProblemInitializer(ui, mediator.getProfile(),  true, ui);
    }
 
 

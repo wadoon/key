@@ -34,7 +34,7 @@ import de.uka.ilkd.key.speclang.Contract;
 public final class ProofCorrectnessMgt {
 
     private final Proof proof;
-    private final SpecificationRepository specRepos;
+    private final ISpecificationRepository specRepos;
     private final DefaultMgtProofListener proofListener 
 	= new DefaultMgtProofListener();
     private final DefaultMgtProofTreeListener proofTreeListener

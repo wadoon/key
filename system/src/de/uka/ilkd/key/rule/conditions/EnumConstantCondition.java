@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @since 2006-12-04
  * @version 2006-12-11
  */
-public final class EnumConstantCondition extends VariableConditionAdapter {
+public final class EnumConstantCondition extends VariableConditionAdapter<Services> {
 
     private final SchemaVariable reference;
 
