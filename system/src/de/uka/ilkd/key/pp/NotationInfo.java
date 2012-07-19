@@ -369,8 +369,8 @@ public final class NotationInfo implements INotationInfo {
 	 * @see de.uka.ilkd.key.pp.INotationInfo#getNotation(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.java.IServices)
 	 */
     @Override
-	public Notation getNotation(Operator op, IServices services) {
-        Notation result = notationTable.get(op);
+	public INotation getNotation(Operator op, IServices services) {
+        INotation result = notationTable.get(op);
         if(result != null) {
             return result;
         }

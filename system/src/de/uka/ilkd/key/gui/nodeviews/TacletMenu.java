@@ -250,6 +250,9 @@ class TacletMenu extends JMenu {
 
     private void createAbbrevSection(Term t, MenuControl control){
 	AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
+	if (scm == null) {
+		return;
+	}
 	JMenuItem sc = null;
 	if(scm.containsTerm(t)){
 	    sc = new JMenuItem("Change abbreviation");

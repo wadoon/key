@@ -14,6 +14,6 @@ public interface INotationInfo {
 	/** Get the Notation for a given Operator.  
 	 * If no notation is registered, a Function notation is returned.
 	 */
-	public abstract Notation getNotation(Operator op, IServices services);
+	public abstract INotation getNotation(Operator op, IServices services);
 
 }

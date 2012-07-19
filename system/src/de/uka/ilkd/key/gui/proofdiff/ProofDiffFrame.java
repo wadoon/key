@@ -23,8 +23,7 @@ import javax.swing.WindowConstants;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
@@ -320,11 +319,8 @@ public class ProofDiffFrame extends JFrame {
             throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
         }
 
-        LogicPrinter logicPrinter = 
-        		proof.getServices().getUIConfiguration().createLogicPrinter(new ProgramPrinter(null), 
-                        new NotationInfo(),
-                        proof.getServices(),
-                        true);
+        ILogicPrinter logicPrinter = 
+        		proof.getServices().getUIConfiguration().createLogicPrinter(proof.getServices(), true);
 
         node.sequent().prettyprint(logicPrinter);
 

@@ -19,15 +19,25 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.ILogicPrinter;
+import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
@@ -44,7 +54,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
     /** the added action listeners */
     private List<ActionListener> listenerList = new LinkedList<ActionListener>();
     /** the notation info to pretty print the taclet apps */
-    protected NotationInfo notInfo;
+    protected INotationInfo notInfo;
     /** the parent frame of the selection dialog to be displayed */
     protected JFrame parent;
     /** the selected taclet to be applied */
@@ -56,7 +66,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
     private String baseTitle;
 
     public InsertionTacletBrowserMenuItem(String title, JFrame parent, 
-            NotationInfo notInfo, IServices services) {
+            INotationInfo notInfo, IServices services) {
         
         super(title);
         this.baseTitle = title;
@@ -275,11 +285,11 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
      */
     static class TacletAppListItem {
         private final TacletApp app;
-        private final NotationInfo notInfo;
+        private final INotationInfo notInfo;
         private final IServices services;
         private final Sequent seq;
         
-        public TacletAppListItem(TacletApp app, Sequent seq, NotationInfo notInfo, 
+        public TacletAppListItem(TacletApp app, Sequent seq, INotationInfo notInfo, 
                 IServices services) {
             this.app      = app;
             this.seq = seq;
@@ -296,8 +306,8 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
         }
 
         public String longDescription() {
-            final LogicPrinter printer = 
-                services.getUIConfiguration().createLogicPrinter(new ProgramPrinter(), notInfo, services, true);
+            final ILogicPrinter printer = 
+                services.getUIConfiguration().createLogicPrinter(notInfo, services, true);
             printer.setInstantiation(app.instantiations());
             printer.printSequent(seq);
             return printer.toString();

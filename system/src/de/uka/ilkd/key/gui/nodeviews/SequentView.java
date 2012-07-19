@@ -12,7 +12,11 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
@@ -34,13 +38,17 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.ApplyTacletDialog;
+import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.GUIListener;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
@@ -87,7 +95,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
         new HashMap<Color, DefaultHighlightPainter>();
     
     // the used sequentprinter
-    private LogicPrinter printer;
+    private ILogicPrinter printer;
 
     // the used sequent filter
     private SequentPrintFilter filter;
@@ -458,7 +466,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
     /** sets the LogicPrinter to use
      * @param sp the LogicPrinter that is used
      */
-    public void setPrinter(LogicPrinter sp, Sequent s) {
+    public void setPrinter(ILogicPrinter sp, Sequent s) {
     	setPrinter ( sp, null, s );
     }
 
@@ -470,7 +478,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
      * @param sp the LogicPrinter that is used
      * @param f the SequentPrintFilter that is used
      */
-    public void setPrinter(LogicPrinter sp, SequentPrintFilter f, Sequent s) {
+    public void setPrinter(ILogicPrinter sp, SequentPrintFilter f, Sequent s) {
         printer = sp;
         filter  = f;
         seq = s;
@@ -479,7 +487,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
     /** return used LogicPrinter
      * @return the LogicPrinter that is used
      */
-    public LogicPrinter printer() {
+    public ILogicPrinter printer() {
     	return printer;
     }
 

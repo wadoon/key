@@ -43,12 +43,13 @@ import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
@@ -161,10 +162,9 @@ public class NonGoalInfoView extends JTextArea {
     public NonGoalInfoView (Node node, KeYMediator mediator) {
 	filter = new IdentitySequentPrintFilter( node.sequent () );
 	
-   LogicPrinter printer = mediator.getServices().getUIConfiguration().createLogicPrinter
-         (new ProgramPrinter(null),
-          mediator.getNotationInfo(),
-          mediator.getServices());
+   ILogicPrinter printer = mediator.getServices().
+		   getUIConfiguration().createLogicPrinter(mediator.getNotationInfo(),
+				   mediator.getServices());
    String s = computeText(mediator, node, filter, printer);
    posTable = printer.getPositionTable();
 
@@ -199,7 +199,7 @@ public class NonGoalInfoView extends JTextArea {
      */
     public static String computeText(KeYMediator mediator, Node node) {
        SequentPrintFilter filter = new IdentitySequentPrintFilter(node.sequent());
-       LogicPrinter printer = node.proof().getServices().getUIConfiguration().createLogicPrinter(new ProgramPrinter(null), 
+       ILogicPrinter printer = node.proof().getServices().getUIConfiguration().createLogicPrinter(
                                                mediator.getNotationInfo(), 
                                                node.proof().getServices());
        return computeText(mediator, node, filter, printer);
@@ -223,7 +223,7 @@ public class NonGoalInfoView extends JTextArea {
     public static String computeText(KeYMediator mediator, 
                                      Node node, 
                                      SequentPrintFilter filter, 
-                                     LogicPrinter printer) {
+                                     ILogicPrinter printer) {
        
          printer.printSequent (null, filter); 
          String s = printer.toString();
@@ -234,8 +234,9 @@ public class NonGoalInfoView extends JTextArea {
          if ( app != null ) {
              s = s + "\n \nUpcoming rule application: \n";
              if (app.rule() instanceof Taclet) {
-            LogicPrinter tacPrinter = node.proof().getServices().getUIConfiguration().createLogicPrinter 
-                (new ProgramPrinter(null),                        
+            UIConfiguration uic = node.proof().getServices().getUIConfiguration();
+			ILogicPrinter tacPrinter = uic.createLogicPrinter 
+                (uic.createDefaultProgramPrinter(),                        
                  mediator.getNotationInfo(),
                  mediator.getServices(),
                  true);  

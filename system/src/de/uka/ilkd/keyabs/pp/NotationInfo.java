@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -382,4 +383,20 @@ public final class NotationInfo implements INotationInfo {
 
         return new Notation.FunctionNotation();
     }
+
+
+
+	@Override
+	public AbbrevMap getAbbrevMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public void setAbbrevMap(AbbrevMap am) {
+		// TODO Auto-generated method stub
+		
+	}
 }

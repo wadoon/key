@@ -672,7 +672,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 	            if (v.hasInitializer()) {
 			ProgramElement rhs = instantiateExpression(
 			    v.getInitializer(), app.instantiations(), services);
-			name = ProofSaver.printProgramElement(rhs);
+			name = ProofSaver.printProgramElement(rhs, services);
 			break;
 		    } else if (c.getStatementAt(1) instanceof CopyAssignment) {
 	        	CopyAssignment p2 = (CopyAssignment) c.getStatementAt(1);
@@ -704,7 +704,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 	    return 
 	    	getTemporaryNameProposal(DEFAULT_BASENAME).toString();
 	}
-	return "["+ProofSaver.printProgramElement(e)+"]";
+	return "["+ProofSaver.printProgramElement(e, services)+"]";
     }
 
 

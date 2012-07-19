@@ -137,7 +137,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        ILogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        ILogicPrinter p = new LogicPrinter(services.getUIConfiguration().createDefaultProgramPrinter(), 
                                           ni, 
                                           services);
         try {
@@ -153,7 +153,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        ILogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        ILogicPrinter p = new LogicPrinter(services.getUIConfiguration().createDefaultProgramPrinter(), 
                                           ni, 
                                           services);
 
@@ -171,7 +171,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        ILogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        ILogicPrinter p = new LogicPrinter(services.getUIConfiguration().createDefaultProgramPrinter(), 
                                           ni, 
                                           services);
         p.printSequent(s);

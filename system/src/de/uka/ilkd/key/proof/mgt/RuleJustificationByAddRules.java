@@ -11,9 +11,7 @@
 package de.uka.ilkd.key.proof.mgt;
 
 
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -41,11 +39,9 @@ public class RuleJustificationByAddRules implements RuleJustification{
     public String toString() {
 	String mother;
 	if(motherTaclet().rule() instanceof Taclet) {
-            LogicPrinter tacPrinter =
+            ILogicPrinter tacPrinter =
             		node.proof().getServices().getUIConfiguration().createLogicPrinter 
-                (new ProgramPrinter(null),                       
-                 new NotationInfo(),   
-                 node.proof().getServices(),
+                (node.proof().getServices(),
                  true);      
             tacPrinter.printTaclet((Taclet)(motherTaclet().rule()));
             mother = tacPrinter.toString();

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -164,7 +164,7 @@ public class UserDefinedSymbols {
         private StringBuffer createHeaderFor(Taclet taclet, IServices services){
                 NotationInfo info = new NotationInfo();
                 StringBackend backend = new StringBackend(80);
-              LogicPrinter printer = services.getUIConfiguration().createLogicPrinter(new ProgramPrinter(),info, backend,services,true);
+              ILogicPrinter printer = services.getUIConfiguration().createLogicPrinter(info, backend,services,true);
               printer.printTaclet(taclet);
            
               return new StringBuffer(backend.getString()+";");

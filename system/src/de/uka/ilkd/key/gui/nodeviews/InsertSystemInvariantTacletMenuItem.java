@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -43,7 +43,7 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
      * @param services the IServices
      */
     public InsertSystemInvariantTacletMenuItem(JFrame parent, 
-            NotationInfo notInfo, IServices services) {
+            INotationInfo notInfo, IServices services) {
         super("Insert Class Invariant", parent, notInfo, services);        
     }
     
@@ -91,7 +91,7 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
      */
     static class ClassInvAppItem extends TacletAppListItem {
        
-        public ClassInvAppItem(TacletApp app, Sequent seq, NotationInfo notInfo, 
+        public ClassInvAppItem(TacletApp app, Sequent seq, INotationInfo notInfo, 
                 IServices services) {
             super(app, seq, notInfo, services);
         }

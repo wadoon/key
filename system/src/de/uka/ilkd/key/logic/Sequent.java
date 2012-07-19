@@ -16,7 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 
 
@@ -327,22 +327,19 @@ public class Sequent implements Iterable<SequentFormula> {
        return formulaNumber <= antecedent.size();
     }
     
-    public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer) {
+    public void prettyprint(de.uka.ilkd.key.pp.ILogicPrinter printer) {
 	printer.printSequent(this);
     }
   
-    public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer, SequentPrintFilter filter) {
+    public void prettyprint(de.uka.ilkd.key.pp.ILogicPrinter printer, SequentPrintFilter filter) {
 	printer.printSequent(this, filter);
     }
 
  
     public StringBuffer prettyprint(IServices services) {
-		de.uka.ilkd.key.pp.LogicPrinter lp = services.getUIConfiguration()
-				.createLogicPrinter(
-						new de.uka.ilkd.key.pp.ProgramPrinter(null),
-						new NotationInfo(), services);
-	lp.printSequent(this);
-	return lp.result();
+		ILogicPrinter lp = services.getUIConfiguration().createLogicPrinter(services);
+		lp.printSequent(this);
+		return lp.result();
     }
 
     /** removes the formula at position p (NOTICE:Sequent determines

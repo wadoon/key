@@ -51,6 +51,16 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.ILogicPrinter;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.ModalityPositionTable;
+import de.uka.ilkd.key.pp.Notation;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PositionTable;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -132,7 +142,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        LogicPrinter p = new LogicPrinter(services.getUIConfiguration().createDefaultProgramPrinter(), 
                                           ni, 
                                           services);
         try {
@@ -148,7 +158,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        LogicPrinter p = new LogicPrinter(services.getUIConfiguration().createDefaultProgramPrinter(), 
                                           ni, 
                                           services);
 
@@ -166,7 +176,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+        LogicPrinter p = new LogicPrinter(services.getUIConfiguration().createDefaultProgramPrinter(), 
                                           ni, 
                                           services);
         p.printSequent(s);

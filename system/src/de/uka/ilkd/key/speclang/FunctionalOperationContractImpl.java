@@ -40,9 +40,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
@@ -644,9 +643,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 				     modalityTerm);
 	final Term contractTerm 
 		= TB.tf().createTerm(Junctor.IMP, originalPres.get(baseHeap), updateTerm);
-	final LogicPrinter lp = services.getUIConfiguration().createLogicPrinter(new ProgramPrinter(), 
-            			   	       	 new NotationInfo(), 
-            			   	       	 null);
+	final ILogicPrinter lp = services.getUIConfiguration().createLogicPrinter();
 	try {
 	    lp.printTerm(contractTerm);
 	} catch(IOException e) {

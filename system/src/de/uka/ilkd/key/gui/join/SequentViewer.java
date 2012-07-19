@@ -5,9 +5,7 @@ import javax.swing.JTextPane;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 
 
 public class SequentViewer extends JTextPane{
@@ -30,9 +28,7 @@ public class SequentViewer extends JTextPane{
         
         public void setSequent(Sequent sequent, IServices services){
                 if(services != null){
-                        LogicPrinter printer = services.getUIConfiguration().createLogicPrinter(new ProgramPrinter(),
-                                                              new NotationInfo(),
-                                                              services);
+                        ILogicPrinter printer = services.getUIConfiguration().createLogicPrinter(services);
                         printer.printSequent(sequent);
                         setText(printer.toString());
                 }

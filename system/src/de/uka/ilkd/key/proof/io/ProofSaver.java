@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.UIConfiguration;
@@ -66,7 +66,7 @@ public class ProofSaver {
    final protected Proof proof;
    final protected String internalVersion;
    
-   LogicPrinter printer;
+   ILogicPrinter printer;
    
    public ProofSaver(Proof proof, String filename, String internalVersion) {
       //this.main = main;
@@ -236,7 +236,7 @@ public class ProofSaver {
       if (appliedRuleApp == null && (proof.getGoal(node)!=null)) { // open goal
          tree.append(prefix); 
          tree.append("(opengoal \"");
-         LogicPrinter logicPrinter = 
+         ILogicPrinter logicPrinter = 
 	     createLogicPrinter(proof.getServices(), false);
 
          logicPrinter.printSequent(node.sequent());
@@ -386,7 +386,7 @@ public class ProofSaver {
 	 if (value instanceof ProgramInstantiation) {
 	     ProgramElement pe = 
 		 ((ProgramInstantiation) value).getProgramElement();
-	     singleInstantiation += printProgramElement(pe);
+	     singleInstantiation += printProgramElement(pe, proof.getServices());
 	 }
          else
 	 if (value instanceof NameInstantiationEntry) {
@@ -457,9 +457,9 @@ public class ProofSaver {
 	return result;
     }
 
-    public static String printProgramElement(ProgramElement pe) {
+    public static String printProgramElement(ProgramElement pe, IServices services) {
         java.io.StringWriter sw = new java.io.StringWriter();
-        ProgramPrinter prgPrinter = new ProgramPrinter(sw);
+        ProgramPrinter prgPrinter = services.getUIConfiguration().createProgramPrinter(sw);
         try{
             pe.prettyPrint(prgPrinter);
         } catch(IOException ioe) {System.err.println(ioe);}
@@ -475,7 +475,7 @@ public class ProofSaver {
     public static StringBuffer printTerm(Term t, IServices serv, 
             boolean shortAttrNotation) {
         StringBuffer result;
-        LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
+        ILogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         try {
             logicPrinter.printTerm(t);
         } catch(IOException ioe) {
@@ -490,7 +490,7 @@ public class ProofSaver {
 
     public static String printAnything(Object val, IServices services) {
         if (val instanceof ProgramElement) {
-            return printProgramElement((ProgramElement) val);
+            return printProgramElement((ProgramElement) val, services);
         }
         else
             if (val instanceof Term) {
@@ -510,23 +510,23 @@ public class ProofSaver {
 
 
     private static String printSequent(Sequent val, IServices services) {
-        LogicPrinter printer = createLogicPrinter(services, services == null);
+        ILogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.toString();
     }
 
-    private static LogicPrinter createLogicPrinter(IServices serv, 
+    private static ILogicPrinter createLogicPrinter(IServices serv, 
             boolean shortAttrNotation) {
 
         NotationInfo ni = new NotationInfo();
-        LogicPrinter p = null;
+        ILogicPrinter p = null;
         UIConfiguration uic;
         if (serv == null) {
         	uic = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration();
         } else {
         	uic = serv.getUIConfiguration();
         }
-        p =  uic.createLogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
+        p =  uic.createLogicPrinter(uic.createProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
         return p;
     }
 }

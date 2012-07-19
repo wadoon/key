@@ -8,8 +8,9 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
@@ -58,7 +59,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
         int i = 0;
-        final LogicPrinter lp = services.getUIConfiguration().createLogicPrinter(null, new NotationInfo(), services);
+        final ILogicPrinter lp = services.getUIConfiguration().createLogicPrinter(services);
         lp.setLineWidth(120);
 
         for (PosInOccurrence step : steps) {

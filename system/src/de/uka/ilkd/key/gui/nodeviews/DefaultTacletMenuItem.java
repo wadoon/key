@@ -16,8 +16,8 @@ import java.io.Writer;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ILogicPrinter;
+import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -42,7 +42,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param notationInfo the NotationInfo used to print terms
      */
     public DefaultTacletMenuItem(JMenuItem menu, 
-            TacletApp connectedTo, NotationInfo notationInfo) {
+            TacletApp connectedTo, INotationInfo notationInfo) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;	    	    
         StringBuffer taclet_sb = new StringBuffer();
@@ -52,8 +52,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         
         UIConfiguration uic = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration();
         
-        LogicPrinter tp = uic.createLogicPrinter(new ProgramPrinter(w,
-    							  connectedTo.instantiations()),
+        ILogicPrinter tp = uic.createLogicPrinter(uic.createProgramPrinter(w, connectedTo.instantiations()),
     				       notationInfo, backend, null,
     				       true);
         tp.printTaclet(connectedTo.taclet(), 
@@ -79,7 +78,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     	    w = new StringWriter();
     	    backend = new WriterBackend(w, 68);
     	    tp = uic.createLogicPrinter
-    	    (new ProgramPrinter(w), notationInfo, backend, null, true);
+    	    (uic.createProgramPrinter(w), notationInfo, backend, null, true);
     	    tp.printTaclet(connectedTo.taclet());
 
         }

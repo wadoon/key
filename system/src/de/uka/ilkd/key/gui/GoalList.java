@@ -27,7 +27,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPopupMenu;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
@@ -39,8 +38,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -775,7 +775,8 @@ public class GoalList extends JList {
     private String seqToString (Sequent seq) {
         String res = seqToString.get ( seq );
         if ( res == null ) {
-            LogicPrinter sp = mediator.getServices().getUIConfiguration().createLogicPrinter ( new ProgramPrinter ( null ),
+        	UIConfiguration uic = mediator.getServices().getUIConfiguration();
+            ILogicPrinter sp =uic.createLogicPrinter ( uic.createDefaultProgramPrinter(),
                                                  mediator ().getNotationInfo (),
                                                  mediator().getServices(),
                                                  true );

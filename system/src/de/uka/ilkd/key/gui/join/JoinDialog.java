@@ -27,8 +27,7 @@ import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.gui.utilities.StdDialog;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -127,7 +126,7 @@ public class JoinDialog extends StdDialog{
                 if(partner.getCommonPredicate() == null){
                     return "";
                 }
-                LogicPrinter printer = proof.getServices().getUIConfiguration().createLogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+                ILogicPrinter printer = proof.getServices().getUIConfiguration().createLogicPrinter(proof.getServices());
                 try{
                     printer.printTerm(partner.getCommonPredicate());
                 }catch (Throwable e){

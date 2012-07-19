@@ -111,8 +111,8 @@ import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
@@ -1021,11 +1021,9 @@ public final class MainWindow extends JFrame  {
      */
     private void printSequentView(Sequent sequent) {
         SequentPrintFilter filter = new IdentitySequentPrintFilter ( sequent );
-        final LogicPrinter printer = mediator.getServices().getUIConfiguration().createLogicPrinter
-        (new ProgramPrinter(null), 
-                getMediator().getNotationInfo(),
-                mediator.getServices());
-                
+        final ILogicPrinter printer = mediator.getServices().getUIConfiguration().createLogicPrinter
+        		(getMediator().getNotationInfo(), mediator.getServices());
+
         sequentView.setPrinter(printer, filter, null);
         sequentView.printSequent();
         
@@ -1223,8 +1221,7 @@ public final class MainWindow extends JFrame  {
             if(getMediator()!=null && getMediator().getSelectedProof()!=null){
                 goal = getMediator().getSelectedGoal();
             } else{//There is no proof. Either not loaded yet or it is abandoned 
-                final LogicPrinter printer = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration().createLogicPrinter
-                (new ProgramPrinter(null), null,null);
+                final ILogicPrinter printer = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration().createLogicPrinter();
                 sequentView.setPrinter(printer, null);
                 return;
             }

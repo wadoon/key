@@ -25,20 +25,15 @@ public class ProgramPrinter extends PrettyPrinter {
      * @param writer
      *                the Writer to print in, may be <code>null</code>.
      */
-    public ProgramPrinter(Writer writer) {
+    ProgramPrinter(Writer writer) {
         super(writer);
     }
 
-    public ProgramPrinter(Writer writer, SVInstantiations svi) {
+    ProgramPrinter(Writer writer, SVInstantiations svi) {
         super(writer, svi);
     }
 
-    public ProgramPrinter() {
+    ProgramPrinter() {
         super(null);
-    }
-
-    public ProgramPrinter(Writer w, boolean b,
-            SVInstantiations instantiations) {
-        super(w,b,instantiations);
     }
 }

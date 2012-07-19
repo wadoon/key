@@ -15,7 +15,7 @@ import javax.swing.JFrame;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -41,7 +41,7 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
      * @param services the IServices
      */
     public InsertHiddenTacletMenuItem(JFrame parent, 
-            NotationInfo notInfo, IServices services) {
+            INotationInfo notInfo, IServices services) {
         super("Insert Hidden", parent, notInfo, services);  
     }
  

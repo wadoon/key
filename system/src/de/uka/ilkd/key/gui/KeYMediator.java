@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
@@ -70,7 +71,7 @@ public class KeYMediator {
     private InteractiveProver interactiveProver;
 
     /** the notation info used to print sequents */
-    private final NotationInfo notationInfo;
+    private final INotationInfo notationInfo;
 
     /** listenerList with to gui listeners */
     private EventListenerList listenerList = new EventListenerList();
@@ -99,7 +100,7 @@ public class KeYMediator {
     */
     public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
-	notationInfo        = new NotationInfo();
+	notationInfo        = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration().createDefaultNotationInfo();
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
 	keySelectionModel   = new KeYSelectionModel();
@@ -121,7 +122,7 @@ public class KeYMediator {
     /** returns the used NotationInfo
      * @return the used NotationInfo
      */
-    public NotationInfo getNotationInfo() {
+    public INotationInfo getNotationInfo() {
 	return notationInfo;
     }
 

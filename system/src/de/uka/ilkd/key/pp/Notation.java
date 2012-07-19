@@ -28,7 +28,7 @@ import de.uka.ilkd.key.util.Debug;
  * represent different kinds of concrete syntax, like prefix, infix, postfix,
  * function style, attribute style, etc.
  */
-public abstract class Notation {
+public abstract class Notation implements INotation {
 
     /**
      * The priority of this operator in the given concrete syntax. This is
@@ -41,25 +41,25 @@ public abstract class Notation {
 	this.priority = priority;
     }
 
-    /** get the priority of the term */
-    public final int getPriority() {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.pp.INotation#getPriority()
+	 */
+    @Override
+	public final int getPriority() {
 	return priority;
     }
 
-    /**
-     * Print a term to a {@link LogicPrinter}. Concrete subclasses override
-     * this to call one of the <code>printXYZTerm</code> of
-     * {@link LogicPrinter}, which do the layout.
-     */
-    public abstract void print(Term t, ILogicPrinter sp) throws IOException;
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.pp.INotation#print(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.pp.ILogicPrinter)
+	 */
+    @Override
+	public abstract void print(Term t, ILogicPrinter sp) throws IOException;
 
-    /**
-     * Print a term without beginning a new block. See
-     * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea
-     * behind this. The standard implementation just delegates to
-     * {@link #print(Term,ILogicPrinter)}
-     */
-    public void printContinuingBlock(Term t, ILogicPrinter sp)
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.pp.INotation#printContinuingBlock(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.pp.ILogicPrinter)
+	 */
+    @Override
+	public void printContinuingBlock(Term t, ILogicPrinter sp)
 	    throws IOException {
 	print(t, sp);
     }

@@ -12,22 +12,33 @@
 package de.uka.ilkd.key.gui;
 
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -122,8 +133,9 @@ public abstract class ApplyTacletDialog extends JDialog {
         Writer w = new StringWriter();
         //WriterBackend backend = new WriterBackend(w, 68);
         
-        LogicPrinter tp = mediator.getServices().getUIConfiguration().createLogicPrinter(new ProgramPrinter(w), 
-                new NotationInfo(), backend, mediator.getServices(), true);
+        UIConfiguration uic = mediator.getServices().getUIConfiguration();
+		ILogicPrinter tp = uic.createLogicPrinter(uic.createProgramPrinter(w), 
+                backend, mediator.getServices(), true);
         
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
         tp.printTaclet(taclet, 

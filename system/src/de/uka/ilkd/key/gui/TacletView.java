@@ -18,11 +18,16 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.rule.Taclet;
@@ -113,8 +118,8 @@ public class TacletView implements ActionListener{
 
     private String getTacletByName(Taclet tac, UIConfiguration uic){
         String rule;
-        LogicPrinter lp = 
-            uic.createLogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
+        ILogicPrinter lp = 
+            uic.createLogicPrinter(null, true);
         lp.printTaclet(tac);
         rule = lp.toString();
 
