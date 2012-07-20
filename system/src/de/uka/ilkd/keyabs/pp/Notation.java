@@ -40,41 +40,26 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Notation implements INotation {
 
     /**
-     * The priority of this operator in the given concrete syntax. This is
-     * used to determine whether parentheses are required around a subterm.
+     * The standard concrete syntax for casts.
      */
-    private final int priority;
+    public static final class CastFunction extends Notation {
 
-    /** Create a Notation with a given priority. */
-    protected Notation(int priority) {
-	this.priority = priority;
+	final String pre, post;
+
+	final int ass;
+
+	public CastFunction(String pre, String post, int prio, int ass) {
+	    super(prio);
+	    this.pre = pre;
+	    this.post = post;
+	    this.ass = ass;
+	}
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    sp.printCast(pre, post, t, ass);
+	}
     }
 
-    /** get the priority of the term */
-    public final int getPriority() {
-	return priority;
-    }
-
-    /**
-     * Print a term to a {@link LogicPrinter}. Concrete subclasses override
-     * this to call one of the <code>printXYZTerm</code> of
-     * {@link LogicPrinter}, which do the layout.
-     */
-    public abstract void print(Term t, ILogicPrinter sp) throws IOException;
-
-    /**
-     * Print a term without beginning a new block. See
-     * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea
-     * behind this. The standard implementation just delegates to
-     * {@link #print(Term,LogicPrinter)}
-     */
-    public void printContinuingBlock(Term t, ILogicPrinter sp)
-	    throws IOException {
-	print(t, sp);
-    }
-
-    
-    
     /**
      * The standard concrete syntax for constants like true and false.
      */
@@ -92,22 +77,71 @@ public abstract class Notation implements INotation {
     }
 
     /**
-     * The standard concrete syntax for prefix operators.
+     * The standard concrete syntax for elementary updates.
      */
-    public static final class Prefix extends Notation {
-	private final String name;
-	private final int ass;
+    public static final class ElementaryUpdateNotation extends Notation {
 
-	public Prefix(String name, int prio, int ass) {
-	    super(prio);
-	    this.name = name;
-	    this.ass = ass;
+	public ElementaryUpdateNotation() {
+	    super(150);
 	}
 
 	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printPrefixTerm(name, t.sub(0), ass);
+	    sp.printElementaryUpdate(":=", t, 0);
+	}
+    }
+
+    /**
+     * The standard concrete syntax for the element of operator.
+     */
+    public static final class ElementOfNotation extends Notation {
+        private String symbol;
+
+	public ElementOfNotation() {
+	    super(130);
+	}
+	
+	    public ElementOfNotation(String symbol){
+	        this();
+	        this.symbol = symbol;
+	    }
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    sp.printElementOf(t, symbol);
+	}
+    }
+
+    /**
+     * The standard concrete syntax for function and predicate terms.
+     */
+    public static final class FunctionNotation extends Notation {
+
+	public FunctionNotation() {
+	    super(130);
 	}
 
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    sp.printFunctionTerm(t.op().name().toString(), t);
+	}
+    }
+
+    
+    
+    /**
+     * The standard concrete syntax for conditional terms
+     * <code>if (phi) (t1) (t2)</code>.
+     */
+    public static final class IfThenElse extends Notation {
+
+	private final String keyword;
+
+	public IfThenElse(int priority, String keyw) {
+	    super(priority);
+	    keyword = keyw;
+	}
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    sp.printIfThenElseTerm(t, keyword);
+	}
     }
 
     /**
@@ -138,29 +172,22 @@ public abstract class Notation implements INotation {
 	}
 
     }
-    
 
-    
     /**
-     * The standard concrete syntax for quantifiers.
+     * The standard concrete syntax for length.
      */
-    public static final class Quantifier extends Notation {
-	private final String name;
-	private final int ass;
-
-	public Quantifier(String name, int prio, int ass) {
-	    super(prio);
-	    this.name = name;
-	    this.ass = ass;
+    public static final class LengthNotation extends Notation {
+	public LengthNotation() {
+	    super(130);
 	}
 
 	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
+	    sp.printLength(t);
 	}
-
     }
     
 
+    
     /**
      * The standard concrete syntax for DL modalities box and diamond.
      */
@@ -201,45 +228,8 @@ public abstract class Notation implements INotation {
 			+ "}", t.javaBlock(), "\\endmodality", t, ass);
 	}
     }
-
     
-    /**
-     * The standard concrete syntax for update application.
-     */
-    public static final class UpdateApplicationNotation extends Notation {
 
-	public UpdateApplicationNotation() {
-	    super(115);
-	}
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    assert t.op() == UpdateApplication.UPDATE_APPLICATION;
-	    final Operator targetOp = UpdateApplication.getTarget(t).op();
-	    final int assTarget 
-	    = (t.sort() == Sort.FORMULA 
-		    ? (targetOp.arity() == 1 ? 60 : 85) 
-			    : 110);
-
-	    sp.printUpdateApplicationTerm("{", "}", t, assTarget);
-	}
-    }
-    
-    
-    /**
-     * The standard concrete syntax for elementary updates.
-     */
-    public static final class ElementaryUpdateNotation extends Notation {
-
-	public ElementaryUpdateNotation() {
-	    super(150);
-	}
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printElementaryUpdate(":=", t, 0);
-	}
-    }    
-    
-    
     /**
      * The standard concrete syntax for parallel updates 
      */
@@ -254,204 +244,48 @@ public abstract class Notation implements INotation {
 	    
 	    sp.printParallelUpdate("||", t, 10);
 	}
-    }    
-    
-    
-    /**
-      * The standard concrete syntax for substitution terms.
-      */
-    public static final class Subst extends Notation {
-	public Subst() {
-	    super(120);
-	}
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    QuantifiableVariable v = instQV(t, sp, 1);
-	    final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
-		    .op() == Equality.EQUALS ? 75 : 60) : 110);
-	    sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
-		    assTarget);
-	}
-	
-	private QuantifiableVariable instQV(Term t, ILogicPrinter sp, int subTerm) {
-	    QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
-
-	    if (v instanceof SchemaVariable) {
-		Object object = (sp.getInstantiations()
-			.getInstantiation((SchemaVariable) v));
-		if (object != null) {
-		    Debug.assertTrue(object instanceof Term);
-		    Debug
-		    .assertTrue(((Term) object).op() instanceof QuantifiableVariable);
-		    v = (QuantifiableVariable) (((Term) object).op());
-		}
-	    }
-	    return v;
-	}
     }
 
     
     /**
-     * The standard concrete syntax for function and predicate terms.
+     * The standard concrete syntax for prefix operators.
      */
-    public static final class FunctionNotation extends Notation {
+    public static final class Prefix extends Notation {
+	private final String name;
+	private final int ass;
 
-	public FunctionNotation() {
-	    super(130);
-	}
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printFunctionTerm(t.op().name().toString(), t);
-	}
-    }
-
-    
-    /**
-     * The standard concrete syntax for casts.
-     */
-    public static final class CastFunction extends Notation {
-
-	final String pre, post;
-
-	final int ass;
-
-	public CastFunction(String pre, String post, int prio, int ass) {
+	public Prefix(String name, int prio, int ass) {
 	    super(prio);
-	    this.pre = pre;
-	    this.post = post;
+	    this.name = name;
 	    this.ass = ass;
 	}
 
 	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printCast(pre, post, t, ass);
+	    sp.printPrefixTerm(name, t.sub(0), ass);
 	}
+
     }
     
     
     /**
-     * The standard concrete syntax for select.
+     * The standard concrete syntax for quantifiers.
      */
-    public static final class SelectNotation extends Notation {
-	public SelectNotation() {
-	    super(140);
+    public static final class Quantifier extends Notation {
+	private final String name;
+	private final int ass;
+
+	public Quantifier(String name, int prio, int ass) {
+	    super(prio);
+	    this.name = name;
+	    this.ass = ass;
 	}
 
 	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printSelect(t);
-	}
-    }
-    
-    
-    /**
-     * The standard concrete syntax for length.
-     */
-    public static final class LengthNotation extends Notation {
-	public LengthNotation() {
-	    super(130);
+	    sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
 	}
 
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printLength(t);
-	}
-    }       
+    }    
     
-    
-    /**
-     * The standard concrete syntax for observer function terms.
-     */
-    static final class ObserverNotation extends Notation {
-
-	public ObserverNotation() {
-	    super(130);
-	}
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printObserver(t);
-	}
-    }
-    
-    
-    
-    /**
-     * The standard concrete syntax for singleton sets.
-     */
-    public static final class SingletonNotation extends Notation {
-
-	public SingletonNotation() {
-	    super(130);
-	}
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printSingleton(t);
-	}
-    }
-    
-    /**
-     * The standard concrete syntax for the element of operator.
-     */
-    public static final class ElementOfNotation extends Notation {
-        private String symbol;
-
-	public ElementOfNotation() {
-	    super(130);
-	}
-	
-	    public ElementOfNotation(String symbol){
-	        this();
-	        this.symbol = symbol;
-	    }
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printElementOf(t, symbol);
-	}
-    }      
-    
-    
-    
-    /**
-     * The standard concrete syntax for set comprehension.
-     */
-    
-    
-    /**
-     * The standard concrete syntax for conditional terms
-     * <code>if (phi) (t1) (t2)</code>.
-     */
-    public static final class IfThenElse extends Notation {
-
-	private final String keyword;
-
-	public IfThenElse(int priority, String keyw) {
-	    super(priority);
-	    keyword = keyw;
-	}
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printIfThenElseTerm(t, keyword);
-	}
-    }
-
-    
-    /**
-     * The standard concrete syntax for all kinds of variables.
-     */
-    public static class VariableNotation extends Notation {
-	public VariableNotation() {
-	    super(1000);
-	}
-
-	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    if (t.op() instanceof ProgramVariable) {
-		sp
-			.printConstant(t.op().name().toString().replaceAll(
-				"::", "."));
-	    } else {
-		Debug.out("Unknown variable type");
-		sp.printConstant(t.op().name().toString());
-	    }
-	}
-    }
-
     
     public static final class SchemaVariableNotation extends VariableNotation {
 
@@ -496,18 +330,165 @@ public abstract class Notation implements INotation {
 		}
 	    }
 	}
+    }    
+    
+    
+    /**
+     * The standard concrete syntax for select.
+     */
+    public static final class SelectNotation extends Notation {
+	public SelectNotation() {
+	    super(140);
+	}
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    sp.printSelect(t);
+	}
     }
 
+    
+    /**
+     * The standard concrete syntax for singleton sets.
+     */
+    public static final class SingletonNotation extends Notation {
+
+	public SingletonNotation() {
+	    super(130);
+	}
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    sp.printSingleton(t);
+	}
+    }
+
+    
+    /**
+      * The standard concrete syntax for substitution terms.
+      */
+    public static final class Subst extends Notation {
+	public Subst() {
+	    super(120);
+	}
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    QuantifiableVariable v = instQV(t, sp, 1);
+	    final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
+		    .op() == Equality.EQUALS ? 75 : 60) : 110);
+	    sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
+		    assTarget);
+	}
+	
+	private QuantifiableVariable instQV(Term t, ILogicPrinter sp, int subTerm) {
+	    QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
+
+	    if (v instanceof SchemaVariable) {
+		Object object = (sp.getInstantiations()
+			.getInstantiation((SchemaVariable) v));
+		if (object != null) {
+		    Debug.assertTrue(object instanceof Term);
+		    Debug
+		    .assertTrue(((Term) object).op() instanceof QuantifiableVariable);
+		    v = (QuantifiableVariable) (((Term) object).op());
+		}
+	    }
+	    return v;
+	}
+    }
+    
+    
+    /**
+     * The standard concrete syntax for update application.
+     */
+    public static final class UpdateApplicationNotation extends Notation {
+
+	public UpdateApplicationNotation() {
+	    super(115);
+	}
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    assert t.op() == UpdateApplication.UPDATE_APPLICATION;
+	    final Operator targetOp = UpdateApplication.getTarget(t).op();
+	    final int assTarget 
+	    = (t.sort() == Sort.FORMULA 
+		    ? (targetOp.arity() == 1 ? 60 : 85) 
+			    : 110);
+
+	    sp.printUpdateApplicationTerm("{", "}", t, assTarget);
+	}
+    }
+    
+    
+    /**
+     * The standard concrete syntax for all kinds of variables.
+     */
+    public static class VariableNotation extends Notation {
+	public VariableNotation() {
+	    super(1000);
+	}
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    if (t.op() instanceof ProgramVariable) {
+		sp
+			.printConstant(t.op().name().toString().replaceAll(
+				"::", "."));
+	    } else {
+		Debug.out("Unknown variable type");
+		sp.printConstant(t.op().name().toString());
+	    }
+	}
+    }       
+    
+    
+    /**
+     * The standard concrete syntax for the character literal indicator `C'.
+     */
+    static final class CharLiteral extends Notation {
+	private static String printCharTerm(Term t) {
+
+	    char charVal = 0;
+	    int intVal = 0;
+
+	    String result = NumLiteral.printNumberTerm(t.sub(0));
+
+	    if (result == null) {
+		return null;
+	    }
+
+	    try {
+		intVal = Integer.parseInt(result);
+		charVal = (char) intVal;
+		if (intVal - charVal != 0)
+		    throw new NumberFormatException(); // overflow!
+
+	    } catch (NumberFormatException ex) {
+		System.out.println("Oops. " + result + " is not of type char");
+		return null;
+	    }
+
+	    return ("'" + Character.valueOf(charVal)).toString() + "'";
+	}
+
+	public CharLiteral() {
+	    super(1000);
+	}
+
+	public void print(Term t, ILogicPrinter sp) throws IOException {
+	    final String charString = printCharTerm(t);
+	    if (charString != null) {
+		sp.printConstant(charString);
+	    } else {
+		sp.printFunctionTerm(t.op().name().toString(), t);
+	    }
+	}
+    }
+    
+    
     
     /**
      * The standard concrete syntax for the number literal indicator `Z'.
      * This is only used in the `Pretty&amp;Untrue' syntax.
      */
     static final class NumLiteral extends Notation {
-	public NumLiteral() {
-	    super(120);
-	}
-
 	public static String printNumberTerm(Term numberTerm) {
 	    Term t = numberTerm;
 
@@ -544,6 +525,10 @@ public abstract class Notation implements INotation {
 	    return number.toString();
 	}
 
+	public NumLiteral() {
+	    super(120);
+	}
+
 	public void print(Term t, ILogicPrinter sp) throws IOException {
 	    final String number = printNumberTerm(t);
 	    if (number != null) {
@@ -554,60 +539,32 @@ public abstract class Notation implements INotation {
 	}
     }
     
-
     /**
-     * The standard concrete syntax for the character literal indicator `C'.
+     * The standard concrete syntax for observer function terms.
      */
-    static final class CharLiteral extends Notation {
-	public CharLiteral() {
-	    super(1000);
-	}
+    static final class ObserverNotation extends Notation {
 
-	private static String printCharTerm(Term t) {
-
-	    char charVal = 0;
-	    int intVal = 0;
-
-	    String result = NumLiteral.printNumberTerm(t.sub(0));
-
-	    if (result == null) {
-		return null;
-	    }
-
-	    try {
-		intVal = Integer.parseInt(result);
-		charVal = (char) intVal;
-		if (intVal - charVal != 0)
-		    throw new NumberFormatException(); // overflow!
-
-	    } catch (NumberFormatException ex) {
-		System.out.println("Oops. " + result + " is not of type char");
-		return null;
-	    }
-
-	    return ("'" + Character.valueOf(charVal)).toString() + "'";
+	public ObserverNotation() {
+	    super(130);
 	}
 
 	public void print(Term t, ILogicPrinter sp) throws IOException {
-	    final String charString = printCharTerm(t);
-	    if (charString != null) {
-		sp.printConstant(charString);
-	    } else {
-		sp.printFunctionTerm(t.op().name().toString(), t);
-	    }
+	    sp.printObserver(t);
 	}
-    }
+    }      
     
-
+    
+    
+    /**
+     * The standard concrete syntax for set comprehension.
+     */
+    
+    
     /**
      * The standard concrete syntax for the string literal indicator `cat'
      * or `epsilon'.
      */
     static final class StringLiteral extends Notation {
-
-	public StringLiteral() {
-	    super(1000);
-	}
 
 	public static String printStringTerm(Term t) {
 	    String result = "\"";
@@ -620,8 +577,51 @@ public abstract class Notation implements INotation {
 	    return (result + "\"");
 	}
 
+	public StringLiteral() {
+	    super(1000);
+	}
+
 	public void print(Term t, ILogicPrinter sp) throws IOException {
 	    sp.printConstant(printStringTerm(t));
 	}
+    }
+
+    
+    /**
+     * The priority of this operator in the given concrete syntax. This is
+     * used to determine whether parentheses are required around a subterm.
+     */
+    private final int priority;
+
+    
+    /** Create a Notation with a given priority. */
+    protected Notation(int priority) {
+	this.priority = priority;
+    }
+
+    
+    /** get the priority of the term */
+    public final int getPriority() {
+	return priority;
+    }
+    
+
+    /**
+     * Print a term to a {@link LogicPrinter}. Concrete subclasses override
+     * this to call one of the <code>printXYZTerm</code> of
+     * {@link LogicPrinter}, which do the layout.
+     */
+    public abstract void print(Term t, ILogicPrinter sp) throws IOException;
+    
+
+    /**
+     * Print a term without beginning a new block. See
+     * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea
+     * behind this. The standard implementation just delegates to
+     * {@link #print(Term,LogicPrinter)}
+     */
+    public void printContinuingBlock(Term t, ILogicPrinter sp)
+	    throws IOException {
+	print(t, sp);
     }
 }

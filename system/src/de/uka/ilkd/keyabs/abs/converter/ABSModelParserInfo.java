@@ -35,241 +35,242 @@ import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 
 public class ABSModelParserInfo {
 
-	private static final Name ABS_BOOLEAN_TYPE_NAME = new Name(
-			"ABS.StdLib.Bool");
-	private static final Name ABS_INT_TYPE_NAME = new Name("ABS.StdLib.Int");
-	private final HashMap<Name, InterfaceDecl> interfaces = new HashMap<Name, InterfaceDecl>();
-	private final HashMap<Name, DataTypeDecl> datatypes = new HashMap<Name, DataTypeDecl>();
-	private final HashMap<Name,ParametricDataTypeDecl> parametricDatatypes = new HashMap<Name, ParametricDataTypeDecl>();
-	private final HashMap<Name, List<DataConstructor>> dataTypes2dataConstructors = new HashMap<Name, List<DataConstructor>>();
+    private static final Name ABS_BOOLEAN_TYPE_NAME = new Name(
+            "ABS.StdLib.Bool");
+    private static final Name ABS_INT_TYPE_NAME = new Name("ABS.StdLib.Int");
+    private static Sort checkBuiltInType(IServices iServices, Entry<Name, DataTypeDecl> dataType) {
+        Sort dataTypeSort = null;
+        if (dataType.getKey().equals(ABS_INT_TYPE_NAME)) {
+            dataTypeSort = (Sort) iServices.getNamespaces().sorts()
+                    .lookup(new Name("int"));
+        } else if (dataType.getKey().equals(ABS_BOOLEAN_TYPE_NAME)) {
+            dataTypeSort = (Sort) iServices.getNamespaces().sorts()
+                    .lookup(new Name("boolean"));
+        }
+        return dataTypeSort;
+    }
+    private static String createFullyQualifiedName(InterfaceTypeUse ifdecl) {
+        return ifdecl.getModuleDecl().getName() + "." + ifdecl.getName();
+    }
+    private static String createFullyQualifiedName(final TypeDecl interf) {
+        return interf.getModule().getName() + "." + interf.getName();
+    }
+    private static ImmutableSet<Sort> createListOfExtendedSortsFromTypeDeclaration(
+            IServices iServices, final HashMap<Name, KeYJavaType> names2type,
+            Entry<Name, InterfaceDecl> interf) {
+        ImmutableSet<Sort> extSorts = DefaultImmutableSet.<Sort> nil();
+        for (InterfaceTypeUse ifdecl : interf.getValue()
+                .getExtendedInterfaceUseList()) {
 
-	private final CoreAbsBackend absBackend;
-	private String sourceDirectory;
-	private String[] compilationUnitsFiles;
-	private JavaModel absModelDescription;
-	private boolean alreadyParsed;
-	private Model absModel;
+            Name itfName = new Name(createFullyQualifiedName(ifdecl));
+            Sort extSort = (Sort) iServices.getNamespaces().sorts()
+                    .lookup(itfName);
 
-	public HashMap<Name, InterfaceDecl> getInterfaces() {
-		return interfaces;
-	}
+            if (extSort == null) {// should actually always hold
+                extSort = names2type.get(itfName).getSort();
+            }
+            assert extSort != null;
+            extSorts = extSorts.add(extSort);
+        }
+        return extSorts;
+    }
 
-	public HashMap<Name, DataTypeDecl> getDatatypes() {
-		return datatypes;
-	}
+    private final HashMap<Name, InterfaceDecl> interfaces = new HashMap<Name, InterfaceDecl>();
+    private final HashMap<Name, DataTypeDecl> datatypes = new HashMap<Name, DataTypeDecl>();
+    private final HashMap<Name,ParametricDataTypeDecl> parametricDatatypes = new HashMap<Name, ParametricDataTypeDecl>();
+    private final HashMap<Name, List<DataConstructor>> dataTypes2dataConstructors = new HashMap<Name, List<DataConstructor>>();
+    private final CoreAbsBackend absBackend;
+    private String sourceDirectory;
 
-	public HashMap<Name,ParametricDataTypeDecl> getParametricDatatypes() {
-		return parametricDatatypes;
-	}
+    private String[] compilationUnitsFiles;
 
-	public HashMap<Name, List<DataConstructor>> getDataTypes2dataConstructors() {
-		return dataTypes2dataConstructors;
-	}
+    private JavaModel absModelDescription;
 
-	public ABSModelParserInfo() {
-		this.absBackend = new CoreAbsBackend();
-		this.absBackend.setWithStdLib(true);
-	}
+    private boolean alreadyParsed;
 
-	public void setup(JavaModel absModel) {
-		this.absModelDescription = absModel;
-		sourceDirectory = absModel.getModelDir();
-		File sourceDir = new File(sourceDirectory);
-		File[] compilationUnits = sourceDir.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".abs");
-			}
-		});
-		compilationUnitsFiles = new String[compilationUnits.length];
-		int i = 0;
-		for (File f : compilationUnits) {
-			compilationUnitsFiles[i++] = f.getAbsolutePath();
-		}
-	}
+    private Model absModel;
 
-	public void readABSModel() throws IOException {
-		if (!alreadyParsed && compilationUnitsFiles != null) {
-			absModel = absBackend.parseFiles(compilationUnitsFiles);
-			collectTypesAndFunctionDeclarations(absModel);
-			alreadyParsed = true;
-		}
-	}
+    public ABSModelParserInfo() {
+        this.absBackend = new CoreAbsBackend();
+        this.absBackend.setWithStdLib(true);
+    }
 
-	private void collectTypesAndFunctionDeclarations(ASTNode<?> child) {
-		try {
-			for (int i = 0; i < child.getNumChild(); i++) {
-				ASTNode<?> currentNode = child.getChild(i);
-				if (currentNode instanceof InterfaceDecl) {
-					final InterfaceDecl interf = (InterfaceDecl) currentNode;
-					interfaces.put(new Name(createFullyQualifiedName(interf)),
-							interf);
-				} else if (currentNode instanceof ParametricDataTypeDecl) {
-					
-					
-					final ParametricDataTypeDecl dataType = (ParametricDataTypeDecl) currentNode;
-					final Name dataTypeName = new Name(createFullyQualifiedName(dataType));
-				
-					if (dataType.getNumTypeParameter() > 0) {
-						System.out.println("===> " + dataType.getClass() + " PARAMETRIC "+dataType.getType());
-						parametricDatatypes.put(dataTypeName, (ParametricDataTypeDecl)dataType);
-					} else {
-						datatypes.put(dataTypeName, dataType);
-					}
-					collectConstructors(dataType, dataTypeName);
-				} else if (currentNode instanceof FunctionDecl) {
-					FunctionDecl fd = (FunctionDecl) currentNode;
-					/*
-					 * System.out.println(fd.getName() + ":" +
-					 * fd.qualifiedName() + ":::" + fd.getParamList() + ":::" +
-					 * fd.getTypeUse() + ":::" +
-					 * fd.getTypeUse().getDecl().isTypeParameter());
-					 */
-				} else if (currentNode instanceof MethodSig) {
-					MethodSig msig = (MethodSig) currentNode;
-					// System.out.println("Method" + msig.getName());
-				} else if (currentNode instanceof VarDecl) {
-					VarDecl vd = (VarDecl) currentNode;
-					/*
-					 * System.out.println("Local Var " + vd.getName() + " " +
-					 * vd.getType() + " " + vd.getInitExp());
-					 */
-				} else {
-					collectTypesAndFunctionDeclarations(currentNode);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void finish(IServices iServices) {
+        // create KeYJavaTypes and put them in map
+        registerAndCreateABSInterfaceType2SortMapping(iServices);
+        registerAndCreateABSDataType2SortMapping(iServices);
 
-	private String createFullyQualifiedName(final TypeDecl interf) {
-		return interf.getModule().getName() + "." + interf.getName();
-	}
+    }
 
-	private void collectConstructors(DataTypeDecl decl, Name dataTypeName) {
-		List<DataConstructor> constructors = decl.getDataConstructors();
-		dataTypes2dataConstructors.put(dataTypeName, constructors);
+    public HashMap<Name, DataTypeDecl> getDatatypes() {
+        return datatypes;
+    }
 
-	}
+    public HashMap<Name, List<DataConstructor>> getDataTypes2dataConstructors() {
+        return dataTypes2dataConstructors;
+    }
 
-	public void finish(IServices iServices) {
-		// create KeYJavaTypes and put them in map
-		registerAndCreateABSInterfaceType2SortMapping(iServices);
-		registerAndCreateABSDataType2SortMapping(iServices);
+    public HashMap<Name, InterfaceDecl> getInterfaces() {
+        return interfaces;
+    }
 
-	}
+    public HashMap<Name,ParametricDataTypeDecl> getParametricDatatypes() {
+        return parametricDatatypes;
+    }
 
-	private void registerAndCreateABSDataType2SortMapping(IServices iServices) {
-		Sort topSort = (Sort) iServices.getNamespaces().sorts()
-				.lookup(new Name("any"));
+    public void readABSModel() throws IOException {
+        if (!alreadyParsed && compilationUnitsFiles != null) {
+            absModel = absBackend.parseFiles(compilationUnitsFiles);
+            collectTypesAndFunctionDeclarations(absModel);
+            alreadyParsed = true;
+        }
+    }
 
-		assert topSort != null;
+    public void setup(JavaModel absModel) {
+        this.absModelDescription = absModel;
+        sourceDirectory = absModel.getModelDir();
+        File sourceDir = new File(sourceDirectory);
+        File[] compilationUnits = sourceDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".abs");
+            }
+        });
+        compilationUnitsFiles = new String[compilationUnits.length];
+        int i = 0;
+        for (File f : compilationUnits) {
+            compilationUnitsFiles[i++] = f.getAbsolutePath();
+        }
+    }
 
-		for (Entry<Name, DataTypeDecl> dataType : datatypes.entrySet()) {
-			final ABSDatatype absType = new ABSDatatype(dataType.getKey());
-			Sort dataTypeSort = (Sort) iServices.getNamespaces().sorts()
-					.lookup(dataType.getKey());
-			if (dataTypeSort == null) {
-				checkBuiltInType(iServices, dataType);
-				dataTypeSort = new SortImpl(dataType.getKey(), topSort);
-			}
+    private void collectConstructors(DataTypeDecl decl, Name dataTypeName) {
+        List<DataConstructor> constructors = decl.getDataConstructors();
+        dataTypes2dataConstructors.put(dataTypeName, constructors);
 
-			final KeYJavaType abs2sort = new KeYJavaType(absType, dataTypeSort);
-			iServices.getProgramInfo().rec2key().put(absType, abs2sort);
-		}
-	}
+    }
 
-	private void checkBuiltInType(IServices iServices,
-			Entry<Name, DataTypeDecl> dataType) {
-		Sort dataTypeSort;
-		if (dataType.getKey().equals(ABS_INT_TYPE_NAME)) {
-			dataTypeSort = (Sort) iServices.getNamespaces().sorts()
-					.lookup(new Name("int"));
-		} else if (dataType.getKey().equals(ABS_BOOLEAN_TYPE_NAME)) {
-			dataTypeSort = (Sort) iServices.getNamespaces().sorts()
-					.lookup(new Name("boolean"));
-		}
-	}
+    private void collectTypesAndFunctionDeclarations(ASTNode<?> child) {
+        try {
+            for (int i = 0; i < child.getNumChild(); i++) {
+                ASTNode<?> currentNode = child.getChild(i);
+                if (currentNode instanceof InterfaceDecl) {
+                    final InterfaceDecl interf = (InterfaceDecl) currentNode;
+                    interfaces.put(new Name(createFullyQualifiedName(interf)),
+                            interf);
+                } else if (currentNode instanceof ParametricDataTypeDecl) {
 
-	private void registerAndCreateABSInterfaceType2SortMapping(
-			IServices iServices) {
-		Sort anyInterfaceSort = (Sort) iServices.getNamespaces().sorts()
-				.lookup(new ProgramElementName("ABSAnyInterface"));
 
-		assert anyInterfaceSort != null;
+                    final ParametricDataTypeDecl dataType = (ParametricDataTypeDecl) currentNode;
+                    final Name dataTypeName = new Name(createFullyQualifiedName(dataType));
 
-		@SuppressWarnings("unchecked")
-		Entry<Name, InterfaceDecl>[] interfArray = sortInterfacesAscendingInNumberOfExtendedTypes();
+                    if (dataType.getNumTypeParameter() > 0) {
+                        System.out.println("===> " + dataType.getClass() + " PARAMETRIC "+dataType.getType());
+                        parametricDatatypes.put(dataTypeName, (ParametricDataTypeDecl)dataType);
+                    } else {
+                        datatypes.put(dataTypeName, dataType);
+                    }
+                    collectConstructors(dataType, dataTypeName);
+                } else if (currentNode instanceof FunctionDecl) {
+                    FunctionDecl fd = (FunctionDecl) currentNode;
+                    /*
+                     * System.out.println(fd.getName() + ":" +
+                     * fd.qualifiedName() + ":::" + fd.getParamList() + ":::" +
+                     * fd.getTypeUse() + ":::" +
+                     * fd.getTypeUse().getDecl().isTypeParameter());
+                     */
+                } else if (currentNode instanceof MethodSig) {
+                    MethodSig msig = (MethodSig) currentNode;
+                    // System.out.println("Method" + msig.getName());
+                } else if (currentNode instanceof VarDecl) {
+                    VarDecl vd = (VarDecl) currentNode;
+                    /*
+                     * System.out.println("Local Var " + vd.getName() + " " +
+                     * vd.getType() + " " + vd.getInitExp());
+                     */
+                } else {
+                    collectTypesAndFunctionDeclarations(currentNode);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		final HashMap<Name, KeYJavaType> names2type = new HashMap<>();
+    private void registerAndCreateABSDataType2SortMapping(IServices iServices) {
+        Sort topSort = (Sort) iServices.getNamespaces().sorts()
+                .lookup(new Name("any"));
 
-		for (Entry<Name, InterfaceDecl> interf : interfArray) {
-			final ABSInterfaceType absType = new ABSInterfaceType(
-					interf.getKey());
-			Sort interfaceSort = (Sort) iServices.getNamespaces().sorts()
-					.lookup(interf.getKey());
+        assert topSort != null;
 
-			if (interfaceSort == null) {
-				if (interf.getValue().getExtendedInterfaceUseList()
-						.getNumChild() == 0) {
-					interfaceSort = new SortImpl(interf.getKey(),
-							anyInterfaceSort);
-				} else {
-					ImmutableSet<Sort> extSorts = createListOfExtendedSortsFromTypeDeclaration(
-							iServices, names2type, interf);
-					interfaceSort = new SortImpl(interf.getKey(), extSorts,
-							true);
-				}
-			}
+        for (Entry<Name, DataTypeDecl> dataType : datatypes.entrySet()) {
+            final ABSDatatype absType = new ABSDatatype(dataType.getKey());
+            Sort dataTypeSort = (Sort) iServices.getNamespaces().sorts()
+                    .lookup(dataType.getKey());
+            if (dataTypeSort == null) {
+                dataTypeSort = checkBuiltInType(iServices, dataType);
+                if (dataTypeSort == null) {
+                    dataTypeSort = new SortImpl(dataType.getKey(), topSort);
+                }
+            }
+            final KeYJavaType abs2sort = new KeYJavaType(absType, dataTypeSort);
+            iServices.getProgramInfo().rec2key().put(absType, abs2sort);
+        }
+    }
 
-			final KeYJavaType abs2sort = new KeYJavaType(absType, interfaceSort);
-			iServices.getProgramInfo().rec2key().put(absType, abs2sort);
-		}
-	}
+    private void registerAndCreateABSInterfaceType2SortMapping(
+            IServices iServices) {
+        Sort anyInterfaceSort = (Sort) iServices.getNamespaces().sorts()
+                .lookup(new ProgramElementName("ABSAnyInterface"));
 
-	private ImmutableSet<Sort> createListOfExtendedSortsFromTypeDeclaration(
-			IServices iServices, final HashMap<Name, KeYJavaType> names2type,
-			Entry<Name, InterfaceDecl> interf) {
-		ImmutableSet<Sort> extSorts = DefaultImmutableSet.<Sort> nil();
-		for (InterfaceTypeUse ifdecl : interf.getValue()
-				.getExtendedInterfaceUseList()) {
+        assert anyInterfaceSort != null;
 
-			Name itfName = new Name(createFullyQualifiedName(ifdecl));
-			Sort extSort = (Sort) iServices.getNamespaces().sorts()
-					.lookup(itfName);
+        @SuppressWarnings("unchecked")
+        Entry<Name, InterfaceDecl>[] interfArray = sortInterfacesAscendingInNumberOfExtendedTypes();
 
-			if (extSort == null) {// should actually always hold
-				extSort = names2type.get(itfName).getSort();
-			}
-			assert extSort != null;
-			extSorts = extSorts.add(extSort);
-		}
-		return extSorts;
-	}
+        final HashMap<Name, KeYJavaType> names2type = new HashMap<Name, KeYJavaType>();
 
-	private Entry<Name, InterfaceDecl>[] sortInterfacesAscendingInNumberOfExtendedTypes() {
-		@SuppressWarnings("unchecked")
-		Entry<Name, InterfaceDecl>[] interfArray = interfaces.entrySet()
-				.toArray(new Entry[interfaces.size()]);
+        for (Entry<Name, InterfaceDecl> interf : interfArray) {
+            final ABSInterfaceType absType = new ABSInterfaceType(
+                    interf.getKey());
+            Sort interfaceSort = (Sort) iServices.getNamespaces().sorts()
+                    .lookup(interf.getKey());
 
-		Arrays.sort(interfArray, new Comparator<Entry<Name, InterfaceDecl>>() {
-			@Override
-			public int compare(Entry<Name, InterfaceDecl> o1,
-					Entry<Name, InterfaceDecl> o2) {
-				int extendedTypes1 = o1.getValue()
-						.getExtendedInterfaceUseList().getNumChild();
-				int extendedTypes2 = o2.getValue()
-						.getExtendedInterfaceUseList().getNumChild();
-				return extendedTypes1 < extendedTypes2 ? 1
-						: extendedTypes1 > extendedTypes2 ? -1 : 0;
-			}
-		});
-		return interfArray;
-	}
+            if (interfaceSort == null) {
+                if (interf.getValue().getExtendedInterfaceUseList()
+                        .getNumChild() == 0) {
+                    interfaceSort = new SortImpl(interf.getKey(),
+                            anyInterfaceSort);
+                } else {
+                    ImmutableSet<Sort> extSorts = createListOfExtendedSortsFromTypeDeclaration(
+                            iServices, names2type, interf);
+                    interfaceSort = new SortImpl(interf.getKey(), extSorts,
+                            true);
+                }
+            }
 
-	private String createFullyQualifiedName(InterfaceTypeUse ifdecl) {
-		return ifdecl.getModuleDecl().getName() + "." + ifdecl.getName();
-	}
+            final KeYJavaType abs2sort = new KeYJavaType(absType, interfaceSort);
+            iServices.getProgramInfo().rec2key().put(absType, abs2sort);
+        }
+    }
+
+    private Entry<Name, InterfaceDecl>[] sortInterfacesAscendingInNumberOfExtendedTypes() {
+        @SuppressWarnings("unchecked")
+        Entry<Name, InterfaceDecl>[] interfArray = interfaces.entrySet()
+        .toArray(new Entry[interfaces.size()]);
+
+        Arrays.sort(interfArray, new Comparator<Entry<Name, InterfaceDecl>>() {
+            @Override
+            public int compare(Entry<Name, InterfaceDecl> o1,
+                    Entry<Name, InterfaceDecl> o2) {
+                int extendedTypes1 = o1.getValue()
+                        .getExtendedInterfaceUseList().getNumChild();
+                int extendedTypes2 = o2.getValue()
+                        .getExtendedInterfaceUseList().getNumChild();
+                return extendedTypes1 < extendedTypes2 ? 1
+                        : extendedTypes1 > extendedTypes2 ? -1 : 0;
+            }
+        });
+        return interfArray;
+    }
 
 }

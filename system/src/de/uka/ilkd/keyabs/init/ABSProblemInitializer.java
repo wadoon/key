@@ -29,12 +29,6 @@ import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
 
 public class ABSProblemInitializer extends AbstractProblemInitializer {
 
-    public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
-            IServices services, boolean registerProof,
-            ProblemInitializerListener listener) {
-        super(mon, profile, services, registerProof, listener);
-    }
-    
     public ABSProblemInitializer(ProgressMonitor mon,
             Profile profile, 
             boolean registerProof,
@@ -43,7 +37,48 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
                 profile.createServices(new KeYRecoderExcHandler()), 
                 registerProof, listener);
     }
+    
+    public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
+            IServices services, boolean registerProof,
+            ProblemInitializerListener listener) {
+        super(mon, profile, services, registerProof, listener);
+    }
 
+
+    @Override
+    protected IKeYFile createKeYFile(Includes in, String name) {
+        return new ABSKeYFile(name, in.get(name), progMon);
+    }
+
+    @Override
+    protected IKeYFile createTacletBaseKeYFile() {
+        return new ABSKeYFile("taclet base", 
+                  profile.getStandardRules().getTacletBase(),
+              progMon);
+    }
+
+    @Override
+    protected void readJava(EnvInput envInput, AbstractInitConfig initConfig)
+            throws ProofInputException {
+        ABSModelParserInfo parserInfo = ((ABSServices)initConfig.getServices()).getProgramInfo().getABSParserInfo();
+        
+	    String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());
+        JavaModel absModelDescription = new JavaModel("/Users/bubel/tmp/testabs/", modelTag, new LinkedList<File>(), null);
+        
+        parserInfo.setup(absModelDescription);
+        try {
+			parserInfo.readABSModel();
+		} catch (IOException e) {
+			throw new ProofInputException(e);
+		}
+        
+        parserInfo.finish(initConfig.getServices());
+        
+        
+        
+        initConfig.getProofEnv().setJavaModel(absModelDescription);
+
+    }
 
     @Override
     protected void registerProgramDefinedSymbols(AbstractInitConfig initConfig)
@@ -77,41 +112,6 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
             }
         }
   
-    }
-
-    @Override
-    protected void readJava(EnvInput envInput, AbstractInitConfig initConfig)
-            throws ProofInputException {
-        ABSModelParserInfo parserInfo = ((ABSServices)initConfig.getServices()).getProgramInfo().getABSParserInfo();
-        
-	    String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());
-        JavaModel absModelDescription = new JavaModel("/Users/bubel/tmp/testabs/", modelTag, new LinkedList<File>(), null);
-        
-        parserInfo.setup(absModelDescription);
-        try {
-			parserInfo.readABSModel();
-		} catch (IOException e) {
-			throw new ProofInputException(e);
-		}
-        
-        parserInfo.finish(initConfig.getServices());
-        
-        
-        
-        initConfig.getProofEnv().setJavaModel(absModelDescription);
-
-    }
-
-    @Override
-    protected IKeYFile createKeYFile(Includes in, String name) {
-        return new ABSKeYFile(name, in.get(name), progMon);
-    }
-
-    @Override
-    protected IKeYFile createTacletBaseKeYFile() {
-        return new ABSKeYFile("taclet base", 
-                  profile.getStandardRules().getTacletBase(),
-              progMon);
     }
 
 }

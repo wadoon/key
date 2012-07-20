@@ -14,6 +14,16 @@ import de.uka.ilkd.key.util.pp.WriterBackend;
 public class ABSUIConfiguration extends UIConfiguration {
 
 	@Override
+	public INotationInfo createDefaultNotationInfo() {
+		return new NotationInfo();
+	}
+
+	@Override
+	public ProgramPrinter createDefaultProgramPrinter() {
+		return null;
+	}
+
+	@Override
 	public ILogicPrinter createLogicPrinter(ProgramPrinter programPrinter,
 			INotationInfo notationInfo, IServices services, boolean pureprint) {
 		return new LogicPrinter(programPrinter, notationInfo, services, pureprint);
@@ -34,22 +44,12 @@ public class ABSUIConfiguration extends UIConfiguration {
 	}
 
 	@Override
-	public INotationInfo createDefaultNotationInfo() {
-		return new NotationInfo();
-	}
-
-	@Override
-	public ProgramPrinter createDefaultProgramPrinter() {
+	public ProgramPrinter createProgramPrinter(Writer writer) {
 		return null;
 	}
 
 	@Override
 	public ProgramPrinter createProgramPrinter(Writer writer, SVInstantiations svi) {
-		return null;
-	}
-
-	@Override
-	public ProgramPrinter createProgramPrinter(Writer writer) {
 		return null;
 	}
 

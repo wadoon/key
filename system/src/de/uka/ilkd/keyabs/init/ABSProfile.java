@@ -30,13 +30,9 @@ public class ABSProfile extends AbstractProfile {
     }
 
     @Override
-    public String name() {
-        return "ABS Profile";
-    }
-
-    @Override
-    public StrategyFactory getDefaultStrategyFactory() {
-        return DEFAULT;
+    public AbstractInitConfig createInitConfig(IServices services,
+            Profile profile) {
+        return new ABSInitConfig((ABSServices) services, profile);
     }
 
     @Override
@@ -45,13 +41,17 @@ public class ABSProfile extends AbstractProfile {
     }
 
     @Override
-    public AbstractInitConfig createInitConfig(IServices services,
-            Profile profile) {
-        return new ABSInitConfig((ABSServices) services, profile);
+    public StrategyFactory getDefaultStrategyFactory() {
+        return DEFAULT;
     }
 
-	@Override
+    @Override
 	public UIConfiguration getUIConfiguration() {
 		return UNPARSER;
 	}
+
+	@Override
+    public String name() {
+        return "ABS Profile";
+    }
 }

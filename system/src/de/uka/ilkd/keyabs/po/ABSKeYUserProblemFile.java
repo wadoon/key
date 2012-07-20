@@ -52,6 +52,46 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
     //-------------------------------------------------------------------------
         
     @Override
+    public boolean equals(Object o){
+        if(!(o instanceof ABSKeYUserProblemFile)) {
+            return false;
+        }
+        final ABSKeYUserProblemFile kf = (ABSKeYUserProblemFile) o;
+        return kf.file.file().getAbsolutePath()
+                             .equals(file.file().getAbsolutePath());
+    }    
+
+
+    @Override
+    public ProofAggregate getPO() throws ProofInputException {
+        assert problemTerm != null;
+        String name = name();
+        ProofSettings settings = getPreferences();
+        return ProofAggregate.createProofAggregate(
+                new Proof(name, 
+                          problemTerm, 
+                          problemHeader,
+                          initConfig.createTacletIndex(), 
+                          initConfig.createBuiltInRuleIndex(),
+                          initConfig.getServices(), 
+                          settings), 
+                name);
+    }
+
+    
+    @Override
+    public int hashCode() {
+        return file.file().getAbsolutePath().hashCode();
+    }
+    
+    
+    @Override
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
+    }
+    
+    
+    @Override
     public void read() throws ProofInputException {
         if(initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
@@ -92,9 +132,9 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
                 
         //read key file itself
         super.read();        
-    }    
-
-
+    }
+        
+    
     @Override
     public void readProblem() throws ProofInputException {
         if (initConfig == null) {
@@ -149,29 +189,6 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
             throw new ProofInputException(e);
         }
     }
-
-    
-    @Override
-    public ProofAggregate getPO() throws ProofInputException {
-        assert problemTerm != null;
-        String name = name();
-        ProofSettings settings = getPreferences();
-        return ProofAggregate.createProofAggregate(
-                new Proof(name, 
-                          problemTerm, 
-                          problemHeader,
-                          initConfig.createTacletIndex(), 
-                          initConfig.createBuiltInRuleIndex(),
-                          initConfig.getServices(), 
-                          settings), 
-                name);
-    }
-    
-    
-    @Override
-    public boolean implies(ProofOblInput po) {
-        return equals(po);
-    }
     
     
     /** 
@@ -186,23 +203,6 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
         } catch(antlr.ANTLRException e) {
             throw new ProofInputException(e);
         }
-    }
-        
-    
-    @Override
-    public boolean equals(Object o){
-        if(!(o instanceof ABSKeYUserProblemFile)) {
-            return false;
-        }
-        final ABSKeYUserProblemFile kf = (ABSKeYUserProblemFile) o;
-        return kf.file.file().getAbsolutePath()
-                             .equals(file.file().getAbsolutePath());
-    }
-    
-    
-    @Override
-    public int hashCode() {
-        return file.file().getAbsolutePath().hashCode();
     }
 
 }

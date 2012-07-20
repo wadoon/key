@@ -22,52 +22,27 @@ public class ABSServices extends AbstractServices {
      */
     private ABSSpecificationRepository specRepos = new ABSSpecificationRepository(this);
     
+    public ABSServices () {
+        this(null, new KeYABSMapping());
+    }
+    
+    public ABSServices (KeYABSMapping map) {
+        this(null, map);
+    }
+
+    public ABSServices (KeYExceptionHandler handler) {
+        this(handler, new KeYABSMapping());
+    }
+
     public ABSServices(KeYExceptionHandler handler, KeYABSMapping program2key) {
         super(handler);
         setTypeConverter(new ABSTypeConverter(this));
         this.info = new ABSInfo(this, program2key);
     }
     
-    public ABSServices (KeYExceptionHandler handler) {
-        this(handler, new KeYABSMapping());
-    }
-
-    public ABSServices (KeYABSMapping map) {
-        this(null, map);
-    }
-
-    public ABSServices () {
-        this(null, new KeYABSMapping());
-    }
-    
-    @Override
-    public ABSTypeConverter getTypeConverter() {
-        return (ABSTypeConverter) typeconverter;
-    }
-
-    @Override
-    public void saveNameRecorder(Node n) {
-        n.setNameRecorder(nameRecorder);
-        nameRecorder = new NameRecorder();
-    }
-
     @Override
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
-    }
-
-    @Override
-    public ABSSpecificationRepository getSpecificationRepository() {
-        return specRepos;
-    }
-
-    @Override
-    public ABSServices copyPreservesLDTInformation() {
-        ABSServices s = new ABSServices(getExceptionHandler());
-        s.setTypeConverter(getTypeConverter().copy(s));
-        s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        return s;
     }
 
     @Override
@@ -76,6 +51,15 @@ public class ABSServices extends AbstractServices {
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setExceptionHandler(getExceptionHandler());
+        s.setNamespaces(namespaces.copy());
+        nameRecorder = nameRecorder.copy();
+        return s;
+    }
+
+    @Override
+    public ABSServices copyPreservesLDTInformation() {
+        ABSServices s = new ABSServices(getExceptionHandler());
+        s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         return s;
@@ -99,13 +83,18 @@ public class ABSServices extends AbstractServices {
     }
 
     @Override
-    public TermBuilder getTermBuilder() {
-        return TermBuilder.DF;
+    public ABSInfo getProgramInfo() {
+        return info;
     }
 
     @Override
-    public ABSInfo getProgramInfo() {
-        return info;
+    public ABSSpecificationRepository getSpecificationRepository() {
+        return specRepos;
+    }
+
+    @Override
+    public TermBuilder getTermBuilder() {
+        return TermBuilder.DF;
     }
 
     @Override
@@ -113,9 +102,20 @@ public class ABSServices extends AbstractServices {
         return new ABSDefaultTermParser();
     }
 
-	@Override
+    @Override
+    public ABSTypeConverter getTypeConverter() {
+        return (ABSTypeConverter) typeconverter;
+    }
+
+    @Override
 	public UIConfiguration getUIConfiguration() {
 		return ABSProfile.UNPARSER;
 	}
+
+	@Override
+    public void saveNameRecorder(Node n) {
+        n.setNameRecorder(nameRecorder);
+        nameRecorder = new NameRecorder();
+    }
 
 }

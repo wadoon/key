@@ -181,51 +181,80 @@ public final class NotationInfo implements INotationInfo {
     //-------------------------------------------------------------------------     
     
         
-    /** Register the standard set of notations (that can be defined without
-     * a services object).
-     */
-    private void createDefaultNotationTable() {
-        if (defaultNotationCache != null){
-            notationTable = defaultNotationCache;
-            return;
-        }
-    defaultNotationCache = new HashMap<Object,Notation>();
-    HashMap<Object,Notation> tbl = defaultNotationCache;
-	
-	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));
-	tbl.put(Junctor.FALSE,new Notation.Constant("false", PRIORITY_ATOM));
-	tbl.put(Junctor.NOT,new Notation.Prefix("!" ,PRIORITY_NEGATION,PRIORITY_NEGATION));
-	tbl.put(Junctor.AND,new Notation.Infix("&"  ,PRIORITY_AND,PRIORITY_AND,PRIORITY_MODALITY));
-	tbl.put(Junctor.OR, new Notation.Infix("|"  ,PRIORITY_OR,PRIORITY_OR,PRIORITY_AND));
-	tbl.put(Junctor.IMP,new Notation.Infix("->" ,PRIORITY_IMP,PRIORITY_OR,PRIORITY_IMP));
-	tbl.put(Equality.EQV,new Notation.Infix("<->",PRIORITY_EQUIVALENCE,PRIORITY_EQUIVALENCE,PRIORITY_IMP));
-	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.TOUT,new Notation.ModalityNotation("\\[[","\\]]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.DIA_TRANSACTION,new Notation.ModalityNotation("\\diamond_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.BOX_TRANSACTION,new Notation.ModalityNotation("\\box_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.TOUT_TRANSACTION,new Notation.ModalityNotation("\\throughout_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
-	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
-	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
-	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());	
-	
-	tbl.put(Function.class, new Notation.FunctionNotation());               
-	tbl.put(LogicVariable.class, new Notation.VariableNotation());
-	tbl.put(LocationVariable.class, new Notation.VariableNotation());
-        tbl.put(ProgramConstant.class, new Notation.VariableNotation());
-	tbl.put(Equality.class, new Notation.Infix("=", PRIORITY_EQUAL, PRIORITY_COMPARISON, PRIORITY_COMPARISON)); 
-	tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
-	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
-	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
-	
-	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
-	this.notationTable = tbl;
-    }
+    @Override
+	public AbbrevMap getAbbrevMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
         
     
+    /** Get the Notation for a given Operator.  
+     * If no notation is registered, a Function notation is returned.
+     */
+    public Notation getNotation(Operator op, IServices services) {
+        Notation result = notationTable.get(op);
+        if(result != null) {
+            return result;
+        }
+
+        result = notationTable.get(op.getClass());
+        if(result != null) {
+            return result;
+        }
+
+        if(op instanceof SchemaVariable) {
+            result = notationTable.get(SchemaVariable.class);
+            if(result != null) {
+                return result;
+            }
+        }
+        
+        if(op instanceof IProgramMethod) {
+           result = notationTable.get(IProgramMethod.class);
+           if(result != null) {
+               return result;
+           }
+        }
+
+        if(op instanceof IObserverFunction) {
+           result = notationTable.get(IObserverFunction.class);
+           if(result != null) {
+               return result;
+           }
+        }
+
+        if(op instanceof SortDependingFunction) {
+            result = notationTable.get(((SortDependingFunction)op).getKind());
+            if(result != null) {
+                return result;
+            }
+        }
+
+        return new Notation.FunctionNotation();
+    }
+    
+    public void refresh(IServices services) {
+	createDefaultNotationTable();
+	assert defaultNotationCache != null;
+	if(PRETTY_SYNTAX && services != null) {
+	    addFancyNotations(services);
+	    if (UNICODE_ENABLED)
+	        addVeryFancyNotations(services);
+	}
+    }
+
+
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
+    
+    @Override
+	public void setAbbrevMap(AbbrevMap am) {
+		// TODO Auto-generated method stub
+		
+	}    
+        
+       
     /**
      * Adds notations that can only be defined when a services object is 
      * available.
@@ -287,8 +316,10 @@ public final class NotationInfo implements INotationInfo {
 	*/
 	this.notationTable = tbl;
     }
-    
-    /**
+
+
+
+	/**
      * Add notations with Unicode symbols.
      * @param services
      */
@@ -324,79 +355,48 @@ public final class NotationInfo implements INotationInfo {
     }
 
 
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
-    
-    public void refresh(IServices services) {
-	createDefaultNotationTable();
-	assert defaultNotationCache != null;
-	if(PRETTY_SYNTAX && services != null) {
-	    addFancyNotations(services);
-	    if (UNICODE_ENABLED)
-	        addVeryFancyNotations(services);
-	}
-    }    
-        
-       
-    /** Get the Notation for a given Operator.  
-     * If no notation is registered, a Function notation is returned.
+
+	/** Register the standard set of notations (that can be defined without
+     * a services object).
      */
-    public Notation getNotation(Operator op, IServices services) {
-        Notation result = notationTable.get(op);
-        if(result != null) {
-            return result;
+    private void createDefaultNotationTable() {
+        if (defaultNotationCache != null){
+            notationTable = defaultNotationCache;
+            return;
         }
-
-        result = notationTable.get(op.getClass());
-        if(result != null) {
-            return result;
-        }
-
-        if(op instanceof SchemaVariable) {
-            result = notationTable.get(SchemaVariable.class);
-            if(result != null) {
-                return result;
-            }
-        }
-        
-        if(op instanceof IProgramMethod) {
-           result = notationTable.get(IProgramMethod.class);
-           if(result != null) {
-               return result;
-           }
-        }
-
-        if(op instanceof IObserverFunction) {
-           result = notationTable.get(IObserverFunction.class);
-           if(result != null) {
-               return result;
-           }
-        }
-
-        if(op instanceof SortDependingFunction) {
-            result = notationTable.get(((SortDependingFunction)op).getKind());
-            if(result != null) {
-                return result;
-            }
-        }
-
-        return new Notation.FunctionNotation();
+    defaultNotationCache = new HashMap<Object,Notation>();
+    HashMap<Object,Notation> tbl = defaultNotationCache;
+	
+	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));
+	tbl.put(Junctor.FALSE,new Notation.Constant("false", PRIORITY_ATOM));
+	tbl.put(Junctor.NOT,new Notation.Prefix("!" ,PRIORITY_NEGATION,PRIORITY_NEGATION));
+	tbl.put(Junctor.AND,new Notation.Infix("&"  ,PRIORITY_AND,PRIORITY_AND,PRIORITY_MODALITY));
+	tbl.put(Junctor.OR, new Notation.Infix("|"  ,PRIORITY_OR,PRIORITY_OR,PRIORITY_AND));
+	tbl.put(Junctor.IMP,new Notation.Infix("->" ,PRIORITY_IMP,PRIORITY_OR,PRIORITY_IMP));
+	tbl.put(Equality.EQV,new Notation.Infix("<->",PRIORITY_EQUIVALENCE,PRIORITY_EQUIVALENCE,PRIORITY_IMP));
+	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+	tbl.put(Modality.TOUT,new Notation.ModalityNotation("\\[[","\\]]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+	tbl.put(Modality.DIA_TRANSACTION,new Notation.ModalityNotation("\\diamond_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+	tbl.put(Modality.BOX_TRANSACTION,new Notation.ModalityNotation("\\box_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+	tbl.put(Modality.TOUT_TRANSACTION,new Notation.ModalityNotation("\\throughout_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
+	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
+	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
+	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());	
+	
+	tbl.put(Function.class, new Notation.FunctionNotation());               
+	tbl.put(LogicVariable.class, new Notation.VariableNotation());
+	tbl.put(LocationVariable.class, new Notation.VariableNotation());
+        tbl.put(ProgramConstant.class, new Notation.VariableNotation());
+	tbl.put(Equality.class, new Notation.Infix("=", PRIORITY_EQUAL, PRIORITY_COMPARISON, PRIORITY_COMPARISON)); 
+	tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
+	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
+	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
+	
+	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
+	this.notationTable = tbl;
     }
-
-
-
-	@Override
-	public AbbrevMap getAbbrevMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public void setAbbrevMap(AbbrevMap am) {
-		// TODO Auto-generated method stub
-		
-	}
 }

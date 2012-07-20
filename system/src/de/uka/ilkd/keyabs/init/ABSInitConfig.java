@@ -1,6 +1,5 @@
 package de.uka.ilkd.keyabs.init;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -19,8 +18,11 @@ public class ABSInitConfig extends AbstractInitConfig {
     }
 
     @Override
-    public ABSServices getServices() {
-        return services;
+    public ABSInitConfig copy() {
+        ABSInitConfig ic =  
+                new ABSInitConfig(services.copyPreservesLDTInformation(), profile);
+        super.initCopy(ic);
+        return ic;
     }
 
     @Override
@@ -29,11 +31,8 @@ public class ABSInitConfig extends AbstractInitConfig {
     }
 
     @Override
-    public ABSInitConfig copy() {
-        ABSInitConfig ic =  
-                new ABSInitConfig(services.copyPreservesLDTInformation(), profile);
-        super.initCopy(ic);
-        return ic;
+    public ABSServices getServices() {
+        return services;
     }
     
 
