@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import abs.frontend.ast.DataConstructor;
 import abs.frontend.ast.List;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -21,6 +22,8 @@ import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.keyabs.abs.ABSInfo;
+import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
 
@@ -45,26 +48,20 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
     @Override
     protected void registerProgramDefinedSymbols(AbstractInitConfig initConfig)
             throws ProofInputException {
-    }
+    	
+    	ABSInfo info = (ABSInfo) initConfig.getServices().getProgramInfo();
 
-    @Override
-    protected void readJava(EnvInput envInput, AbstractInitConfig initConfig)
-            throws ProofInputException {
-    
-        
-        ABSModelParserInfo collector = new ABSModelParserInfo();
-        
-	    String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());
-        JavaModel absModelDescription = new JavaModel("/Users/bubel/tmp/testabs/", modelTag, new LinkedList<File>(), null);
-        
-        collector.setup(absModelDescription);
-        try {
-			collector.readABSModel();
-		} catch (IOException e) {
-			throw new ProofInputException(e);
-		}
-        
-        for (List<DataConstructor>  constructors  : collector.getDataTypes2dataConstructors().values()) {
+		System.out.println("Registering Sorts (" + info.getAllKeYJavaTypes().size() + ")" );
+    	//register sorts
+    	for (KeYJavaType t : info.getAllKeYJavaTypes()) {
+    		initConfig.sortNS().addSafely(t.getSort());
+    	}
+    	
+
+		System.out.println("Registering Functions");
+    	
+    	// test code
+        for (List<DataConstructor> constructors  : info.getABSParserInfo().getDataTypes2dataConstructors().values()) {
             for (DataConstructor c : constructors) {
                 System.out.println("" + c.getName() + ":" + c.getConstructorArgs());
                 
@@ -76,14 +73,32 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
                 // create unique function symbol
                 Function constructorFct = new Function(new ProgramElementName(c.getName(), 
                         c.getModule().getName() + "." + c.getDataTypeDecl().getName()), intS, argSorts, null, true);
-                
-                System.out.println(constructorFct + ":" + constructorFct.arity());
-                
-                initConfig.getServices().getNamespaces().functions().add(constructorFct);
+                                initConfig.getServices().getNamespaces().functions().add(constructorFct);
             }
         }
+  
+    }
+
+    @Override
+    protected void readJava(EnvInput envInput, AbstractInitConfig initConfig)
+            throws ProofInputException {
+        ABSModelParserInfo parserInfo = ((ABSServices)initConfig.getServices()).getProgramInfo().getABSParserInfo();
         
-        initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
+	    String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());
+        JavaModel absModelDescription = new JavaModel("/Users/bubel/tmp/testabs/", modelTag, new LinkedList<File>(), null);
+        
+        parserInfo.setup(absModelDescription);
+        try {
+			parserInfo.readABSModel();
+		} catch (IOException e) {
+			throw new ProofInputException(e);
+		}
+        
+        parserInfo.finish(initConfig.getServices());
+        
+        
+        
+        initConfig.getProofEnv().setJavaModel(absModelDescription);
 
     }
 

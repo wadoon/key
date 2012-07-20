@@ -1,5 +1,8 @@
 package de.uka.ilkd.keyabs.abs;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -11,11 +14,28 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
+import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 
 public class ABSInfo implements IProgramInfo {
 
     private final ABSServices services;
+    
+    /**
+     * maps ABS type declarations to KeYABSTypes (ok at the moment KeYJavaTypes)
+     */
     private final KeYABSMapping program2key;
+    
+    /**
+     * the ABS model
+     */
+    private final ABSModelParserInfo absInfo;
+    
+    /**
+     * hashmap for all known (logic sort, abs type) pairs
+     */
+    private final HashMap<String, KeYJavaType> name2sortABSPair = new HashMap<String, KeYJavaType>();
+    
     
     public ABSInfo(ABSServices services) {
         this(services, new KeYABSMapping());
@@ -23,18 +43,24 @@ public class ABSInfo implements IProgramInfo {
     
     public ABSInfo(ABSServices services,
             KeYABSMapping program2key) {
-        this.services = services;
-        this.program2key = program2key;
+        this(services, program2key, new ABSModelParserInfo());
     }
 
-    @Override
+    private ABSInfo(ABSServices services, KeYABSMapping program2key,
+			ABSModelParserInfo absInfo) {
+        this.services = services;
+        this.program2key = program2key;
+        this.absInfo = absInfo;
+    }
+
+	@Override
     public KeYABSMapping rec2key() {
         return program2key;
     }
 
     @Override
     public IProgramInfo copy(IServices serv) {
-        return new ABSInfo((ABSServices) serv);
+        return new ABSInfo((ABSServices) serv, program2key.copy(), absInfo);
     }
 
     @Override
@@ -49,56 +75,65 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public KeYJavaType getTypeByName(String fullName) {
-        // TODO Auto-generated method stub
-        return null;
+    	ensureValidCache();
+    	return name2sortABSPair.get(fullName);
     }
 
-    @Override
+    private void ensureValidCache() {
+        if (name2sortABSPair.size() != rec2key().size()) {
+        	buildNameCache();
+        }   	
+    }
+    
+    private void buildNameCache() {
+    	name2sortABSPair.clear();
+    	for (Object _sortABS : rec2key().elemsKeY()) {
+    		KeYJavaType sortABS = (KeYJavaType) _sortABS;
+    		name2sortABSPair.put(sortABS.getFullName(), sortABS);
+    	}
+	}
+
+	@Override
     public KeYJavaType getTypeByClassName(String className) {
-        // TODO Auto-generated method stub
-        return null;
+        return getTypeByName(className);
     }
 
     @Override
     public Set<KeYJavaType> getAllKeYJavaTypes() {
-        // TODO Auto-generated method stub
-        return null;
+    	ensureValidCache();
+    	final HashSet<KeYJavaType> set = new HashSet<KeYJavaType>();
+    	set.addAll(name2sortABSPair.values());
+        return Collections.unmodifiableSet(set);
     }
 
     @Override
     public KeYJavaType getKeYJavaType(String fullName) {
-        // TODO Auto-generated method stub
-        return null;
+        return getTypeByName(fullName);
     }
 
     @Override
     public KeYJavaType getKeYJavaTypeByClassName(String className) {
-        // TODO Auto-generated method stub
-        return null;
+        return getTypeByName(className);
     }
 
     @Override
     public boolean isSubtype(KeYJavaType subType, KeYJavaType superType) {
-        // TODO Auto-generated method stub
-        return false;
+        return subType.getSort().extendsTrans(superType.getSort());
     }
 
     @Override
     public boolean isInterface(KeYJavaType t) {
-        // TODO Auto-generated method stub
-        return false;
+        return t.getJavaType() instanceof ABSInterfaceType;
     }
 
     @Override
     public KeYJavaType getKeYJavaType(Sort sort) {
-        // TODO Auto-generated method stub
-        return null;
+        return name2sortABSPair.get(sort.name().toString());
     }
 
     @Override
     public KeYJavaType getKeYJavaType(Type t) {
-        // TODO Auto-generated method stub
-        return null;
+        return name2sortABSPair.get(t.getFullName());
     }
 
     @Override
@@ -116,7 +151,6 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public Sort nullSort() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -153,9 +187,12 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public boolean isReferenceSort(Sort sort) {
-        // TODO Auto-generated method stub
-        return false;
+        return isInterface(getKeYJavaType(sort));
     }
+
+	public ABSModelParserInfo getABSParserInfo() {
+		return absInfo;
+	}
     
     
 }

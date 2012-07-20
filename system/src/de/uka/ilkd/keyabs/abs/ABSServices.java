@@ -21,7 +21,6 @@ public class ABSServices extends AbstractServices {
      * specification repository
      */
     private ABSSpecificationRepository specRepos = new ABSSpecificationRepository(this);
-
     
     public ABSServices(KeYExceptionHandler handler, KeYABSMapping program2key) {
         super(handler);
@@ -40,8 +39,6 @@ public class ABSServices extends AbstractServices {
     public ABSServices () {
         this(null, new KeYABSMapping());
     }
-
-
     
     @Override
     public ABSTypeConverter getTypeConverter() {
