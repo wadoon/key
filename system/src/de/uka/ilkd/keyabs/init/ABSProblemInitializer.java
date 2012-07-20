@@ -1,6 +1,9 @@
 package de.uka.ilkd.keyabs.init;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 import abs.frontend.ast.DataConstructor;
 import abs.frontend.ast.List;
@@ -18,7 +21,7 @@ import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.keyabs.abs.converter.ABSInterfaceCollector;
+import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
 
 public class ABSProblemInitializer extends AbstractProblemInitializer {
@@ -49,9 +52,17 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
             throws ProofInputException {
     
         
-        ABSInterfaceCollector collector = new ABSInterfaceCollector();
+        ABSModelParserInfo collector = new ABSModelParserInfo();
         
-        collector.collect();
+	    String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());
+        JavaModel absModelDescription = new JavaModel("/Users/bubel/tmp/testabs/", modelTag, new LinkedList<File>(), null);
+        
+        collector.setup(absModelDescription);
+        try {
+			collector.readABSModel();
+		} catch (IOException e) {
+			throw new ProofInputException(e);
+		}
         
         for (List<DataConstructor>  constructors  : collector.getDataTypes2dataConstructors().values()) {
             for (DataConstructor c : constructors) {
