@@ -20,53 +20,53 @@ import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 public class ABSInfo implements IProgramInfo {
 
     private final ABSServices services;
-    
+
     /**
      * maps ABS type declarations to KeYABSTypes (ok at the moment KeYJavaTypes)
      */
     private final KeYABSMapping program2key;
-    
+
     /**
      * the ABS model
      */
     private final ABSModelParserInfo absInfo;
-    
+
     /**
      * hashmap for all known (logic sort, abs type) pairs
      */
     private final HashMap<String, KeYJavaType> name2sortABSPair = new HashMap<String, KeYJavaType>();
-    
-    
+
+
     public ABSInfo(ABSServices services) {
         this(services, new KeYABSMapping());
     }
-    
+
     public ABSInfo(ABSServices services,
             KeYABSMapping program2key) {
         this(services, program2key, new ABSModelParserInfo());
     }
 
     private ABSInfo(ABSServices services, KeYABSMapping program2key,
-			ABSModelParserInfo absInfo) {
+            ABSModelParserInfo absInfo) {
         this.services = services;
         this.program2key = program2key;
         this.absInfo = absInfo;
     }
 
-	@Override
+    @Override
     public IProgramInfo copy(IServices serv) {
         return new ABSInfo((ABSServices) serv, program2key.copy(), absInfo);
     }
 
     public ABSModelParserInfo getABSParserInfo() {
-		return absInfo;
-	}
+        return absInfo;
+    }
 
     @Override
     public Set<KeYJavaType> getAllKeYJavaTypes() {
-    	ensureValidCache();
-    	final HashSet<KeYJavaType> set = new HashSet<KeYJavaType>();
-    	set.addAll(name2sortABSPair.values());
+        ensureValidCache();
+        final HashSet<KeYJavaType> set = new HashSet<KeYJavaType>();
+        set.addAll(name2sortABSPair.values());
         return Collections.unmodifiableSet(set);
     }
 
@@ -88,14 +88,14 @@ public class ABSInfo implements IProgramInfo {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         // TODO Auto-generated method stub
         return null;
     }
 
-	@Override
+    @Override
     public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1,
             KeYJavaType k2) {
         // TODO Auto-generated method stub
@@ -121,7 +121,7 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public KeYJavaType getKeYJavaType(Sort sort) {
-        return name2sortABSPair.get(sort.name().toString());
+        return getTypeByName(sort.name().toString());
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public KeYJavaType getKeYJavaType(Type t) {
-        return name2sortABSPair.get(t.getFullName());
+        return getTypeByName(t.getFullName());
     }
 
     @Override
@@ -151,8 +151,8 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public KeYJavaType getTypeByName(String fullName) {
-    	ensureValidCache();
-    	return name2sortABSPair.get(fullName);
+        ensureValidCache();
+        return name2sortABSPair.get(fullName);
     }
 
     @Override
@@ -181,18 +181,16 @@ public class ABSInfo implements IProgramInfo {
     }
 
     private void buildNameCache() {
-    	name2sortABSPair.clear();
-    	for (Object _sortABS : rec2key().elemsKeY()) {
-    		KeYJavaType sortABS = (KeYJavaType) _sortABS;
-    		name2sortABSPair.put(sortABS.getFullName(), sortABS);
-    	}
-	}
+        name2sortABSPair.clear();
+        for (Object _sortABS : rec2key().elemsKeY()) {
+            KeYJavaType sortABS = (KeYJavaType) _sortABS;
+            name2sortABSPair.put(sortABS.getFullName(), sortABS);
+        }
+    }
 
-	private void ensureValidCache() {
+    private void ensureValidCache() {
         if (name2sortABSPair.size() != rec2key().size()) {
-        	buildNameCache();
+            buildNameCache();
         }   	
     }
-    
-    
 }
