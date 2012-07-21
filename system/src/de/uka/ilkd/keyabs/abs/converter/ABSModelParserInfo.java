@@ -166,7 +166,6 @@ public class ABSModelParserInfo {
     private void collectConstructors(DataTypeDecl decl, Name dataTypeName) {
         List<DataConstructor> constructors = decl.getDataConstructors();
         dataTypes2dataConstructors.put(dataTypeName, constructors);
-
     }
 
     private void collectTypesAndFunctionDeclarations(ASTNode<?> child) {

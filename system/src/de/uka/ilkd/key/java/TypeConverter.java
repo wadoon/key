@@ -819,4 +819,10 @@ public final class TypeConverter extends AbstractTypeConverter {
 	tc.init(models);
 	return tc;
     }
+
+    @Override
+    public KeYJavaType getBooleanType() {
+        return services.getJavaInfo()
+                       .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+    }
 }

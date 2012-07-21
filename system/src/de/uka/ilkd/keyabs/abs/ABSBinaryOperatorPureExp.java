@@ -1,16 +1,10 @@
 package de.uka.ilkd.keyabs.abs;
 
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 
-public class ABSBinaryOperatorPureExp extends ABSNonTerminalProgramElement implements IABSPureExpression {
+public abstract class ABSBinaryOperatorPureExp extends ABSNonTerminalProgramElement implements IABSPureExpression {
 
     private final IABSPureExpression left;
     private final IABSPureExpression right;
-    
-    
     
     public ABSBinaryOperatorPureExp(IABSPureExpression left,
             IABSPureExpression right) {
@@ -19,41 +13,18 @@ public class ABSBinaryOperatorPureExp extends ABSNonTerminalProgramElement imple
         this.right = right;
     }
 
-
-
-    @Override
-    public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {
-        return services.getTypeConverter().getIntegerLDT();
-    }
-
-
-
     @Override
     public int getChildCount() {
-        // TODO Auto-generated method stub
-        return 0;
+        return 2;
     }
-
-
 
     @Override
-    public ProgramElement getChildAt(int index) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-
-    @Override
-    public void visit(ABSVisitor v) {
-        // TODO Auto-generated method stub
-        
+    public IABSPureExpression getChildAt(int index) {
+        switch (index) {
+        case 0: return left;
+        case 1: return right;
+        default: throw new IndexOutOfBoundsException();
+        }
     }
     
-    
-    
-    
-    
-    
-
 }

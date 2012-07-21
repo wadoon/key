@@ -1,10 +1,15 @@
 package de.uka.ilkd.keyabs.abs;
 
 import abs.frontend.ast.ASTNode;
+import abs.frontend.ast.AddExp;
+import abs.frontend.ast.AndBoolExp;
 import abs.frontend.ast.AssignStmt;
 import abs.frontend.ast.Block;
 import abs.frontend.ast.FieldUse;
+import abs.frontend.ast.MultExp;
+import abs.frontend.ast.OrBoolExp;
 import abs.frontend.ast.VarUse;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -23,7 +28,17 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((FieldUse)x);
         } else if (x instanceof VarUse) {
             result = convert((VarUse)x);
-        } else {
+        } else if (x instanceof AddExp) {
+            result = convert((AddExp)x);
+        }else if (x instanceof MultExp) {
+            result = convert((MultExp)x);
+        }else if (x instanceof AndBoolExp) {
+            result = convert((AndBoolExp)x);
+        }else if (x instanceof OrBoolExp) {
+            result = convert((OrBoolExp)x);
+        } 
+        
+        if (result == null) {
             result = requestConversion(x);
             if (result == null)
                 throw new IllegalStateException("Unknown AST element " + x + " : " + x.getClass());
@@ -61,11 +76,27 @@ public abstract class AbstractABS2KeYABSConverter {
         return new ABSFieldReference(var);
     }
 
-    public ABSLocalVariableReference convert(VarUse varUse) {
+    public Expression convert(VarUse varUse) {
         IProgramVariable var = lookupLocalVariable(varUse.getName());
         return new ABSLocalVariableReference(var);
     }
 
+    public ABSAddExp convert(AddExp x) {
+        return new ABSAddExp((IABSPureExpression)convert(x.getChild(0)), (IABSPureExpression)convert(x.getChild(1)));
+    }
+    
+    public ABSMultExp convert(MultExp x) {
+        return new ABSMultExp((IABSPureExpression)convert(x.getChild(0)), (IABSPureExpression)convert(x.getChild(1)));
+    }
+
+    public ABSAndBoolExp convert(AndBoolExp x) {
+        return new ABSAndBoolExp((IABSPureExpression)convert(x.getChild(0)), (IABSPureExpression)convert(x.getChild(1)));
+    }
+
+    public ABSOrBoolExp convert(OrBoolExp x) {
+        return new ABSOrBoolExp((IABSPureExpression)convert(x.getChild(0)), (IABSPureExpression)convert(x.getChild(1)));
+    }
+    
     protected abstract IProgramVariable lookupLocalVariable(String name);
 
     protected abstract IProgramVariable lookupFieldVariable(String name);

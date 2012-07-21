@@ -16,4 +16,12 @@ public interface ABSVisitor extends ProgramVisitor {
     void performActionABSStatementBlock(ABSStatementBlock x);
 
     void performActionOnProgramMetaConstruct(ProgramTransformer<ABSServices> x);
+
+    void performActionOnABSAddExp(ABSAddExp absAddExp);
+
+    void performActionOnABSMultExp(ABSMultExp absMultExp);
+
+    void performActionOnABSAndBoolExp(ABSAndBoolExp absAndBoolExp);
+
+    void performActionOnABSOrBoolExp(ABSOrBoolExp absOrBoolExp);
 }

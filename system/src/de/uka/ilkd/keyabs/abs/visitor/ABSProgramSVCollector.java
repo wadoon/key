@@ -42,56 +42,14 @@ public class ABSProgramSVCollector extends ABSVisitorImpl {
         return result;
     }
 
-    @Override
-    public void performActionOnABSFieldReference(ABSFieldReference x) {
-    }
-
-    @Override
-    public void performActionOnABSLocalVariableReference(
-            ABSLocalVariableReference x) {
-    }
-
-    @Override
-    public void performActionOnThisExpression(ThisExpression x) {
-    }
-
-    @Override
-    public void performActionOnCopyAssignment(CopyAssignment x) {
-    }
-
-    @Override
-    public void performActionABSStatementBlock(ABSStatementBlock x) {
-    }
-
-    @Override
+     @Override
     public void performActionOnProgramMetaConstruct(ProgramTransformer<ABSServices> x) {
         result = result.prepend(((ProgramTransformer<ABSServices>) x)
                 .neededInstantiations(instantiations));
     }
 
     @Override
-    public void performActionOnProgramElementName(ProgramElementName x) {
-    }
-
-    @Override
-    public void performActionOnProgramMethod(IProgramMethod x) {
-    }
-
-    @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
         result = result.prepend((SchemaVariable) x);
     }
-
-    @Override
-    public void performActionOnProgramVariable(ProgramVariable x) {
-    }
-
-    @Override
-    public void performActionOnLocationVariable(LocationVariable x) {
-    }
-
-    @Override
-    public void performActionOnProgramConstant(ProgramConstant x) {
-    }
-
 }

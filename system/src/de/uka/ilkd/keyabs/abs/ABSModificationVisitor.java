@@ -170,6 +170,18 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl {
     }
 
     @Override
+    public void performActionOnABSAddExp(ABSAddExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSAddExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    
+    @Override
     public void performActionABSStatementBlock(ABSStatementBlock x) {
         if (hasChanged()) {
             ExtList children = stack.peek();

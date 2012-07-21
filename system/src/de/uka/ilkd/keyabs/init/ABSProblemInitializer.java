@@ -60,6 +60,7 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
     @Override
     protected void readJava(EnvInput envInput, AbstractInitConfig initConfig)
             throws ProofInputException {
+        
         ABSModelParserInfo parserInfo = ((ABSServices)initConfig.getServices()).getProgramInfo().getABSParserInfo();
 
         String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());

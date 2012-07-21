@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -12,7 +11,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
-public class ABSTypeConverter extends AbstractTypeConverter {
+public final class ABSTypeConverter extends AbstractTypeConverter {
 
     
     public ABSTypeConverter(ABSServices services) {
@@ -32,6 +31,17 @@ public class ABSTypeConverter extends AbstractTypeConverter {
             return getServices().getTermBuilder().var(((IABSLocationReference)pe).getVariable());
         } else if (pe instanceof IProgramVariable) {
             return getServices().getTermBuilder().var((IProgramVariable)pe);
+        } else if (pe instanceof ABSBinaryOperatorPureExp) {
+            Term left = convertToLogicElement(((ABSBinaryOperatorPureExp) pe).getChildAt(0), ec);
+            Term right = convertToLogicElement(((ABSBinaryOperatorPureExp) pe).getChildAt(1), ec);
+            
+            if (pe instanceof ABSAddExp) {
+                return getServices().getTermBuilder().add(services, left, right);
+            } else if (pe instanceof ABSMultExp) {
+                return getServices().getTermBuilder().mul(services, left, right);                
+            } else if (pe instanceof ABSAndBoolExp) {
+            } else if (pe instanceof ABSMultExp) {
+            }
         }
         return null;
     }
@@ -113,4 +123,14 @@ public class ABSTypeConverter extends AbstractTypeConverter {
         return false;
     }
 
+    @Override
+    public KeYJavaType getBooleanType() {
+        return services.getProgramInfo().getTypeByName("ABS.StdLib.Bool");
+    }
+
+    public KeYJavaType getABSIntType() {
+        return services.getProgramInfo().getTypeByName("ABS.StdLib.Int");
+    }
+
+    
 }

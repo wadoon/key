@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 
-public class ABSVisitorImpl implements ABSVisitor {
+public abstract class ABSVisitorImpl implements ABSVisitor {
 
     private ProgramElement root;
 
@@ -107,6 +107,7 @@ public class ABSVisitorImpl implements ABSVisitor {
         doDefaultAction(x);
     }
 
+    
     @Override
     public void performActionABSStatementBlock(ABSStatementBlock x) {
         doDefaultAction(x);
@@ -117,4 +118,26 @@ public class ABSVisitorImpl implements ABSVisitor {
             ProgramTransformer<ABSServices> x) {
         doDefaultAction(x);
     }
+    
+    @Override
+    public void performActionOnABSAddExp(ABSAddExp x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnABSMultExp(ABSMultExp x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnABSAndBoolExp(ABSAndBoolExp x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnABSOrBoolExp(ABSOrBoolExp x) {
+        doDefaultAction(x);
+    }
+
+    
 }

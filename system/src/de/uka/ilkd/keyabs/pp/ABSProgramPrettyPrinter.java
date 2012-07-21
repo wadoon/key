@@ -9,8 +9,12 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
+import de.uka.ilkd.keyabs.abs.ABSAddExp;
+import de.uka.ilkd.keyabs.abs.ABSAndBoolExp;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
+import de.uka.ilkd.keyabs.abs.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSVisitor;
@@ -45,8 +49,6 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -128,6 +130,46 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             ProgramTransformer<ABSServices> x) {
         // TODO Auto-generated method stub
 
+    }
+
+    
+    @Override
+    public void performActionOnABSAddExp(ABSAddExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "+");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } 
+    }
+
+
+    @Override
+    public void performActionOnABSMultExp(ABSMultExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "*");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } 
+    }
+
+
+    @Override
+    public void performActionOnABSAndBoolExp(ABSAndBoolExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "&");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } 
+    }
+
+
+    @Override
+    public void performActionOnABSOrBoolExp(ABSOrBoolExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "|");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } 
     }
 
 }

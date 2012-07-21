@@ -145,7 +145,7 @@ public class NodeInfo {
        if (firstStatement != null) {
           activeStatement = firstStatement;
           while ((activeStatement instanceof ProgramPrefix)
-                  && !(activeStatement instanceof StatementBlock)) {
+                  && !(activeStatement instanceof StatementContainer)) {
               activeStatement = activeStatement.getFirstElement();
           }
        }

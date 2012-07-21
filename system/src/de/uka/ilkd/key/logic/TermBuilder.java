@@ -1013,6 +1013,18 @@ public final class TermBuilder {
         }
     }
 
+    public Term mul(IServices services, Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Term one = integerLDT.one();
+        if(t1.equals(one)) {
+            return t2;
+        } else if(t2.equals(one)) {
+            return t1;
+        } else {
+            return func(integerLDT.getMul(), t1, t2);
+        }
+    }
+
 
     public Term inInt(Term var,
                       IServices services) {

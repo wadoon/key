@@ -26,10 +26,12 @@ import de.uka.ilkd.key.util.ExtList;
 
 public abstract class AbstractTypeConverter {
 
-    private final IServices services;
+    protected final IServices services;
 
     public abstract AbstractTypeConverter copy(IServices services);
 
+    public abstract KeYJavaType getBooleanType();
+    
     public abstract boolean isBooleanType(Type t);
 
     public abstract boolean isNullType(Type t);
@@ -142,11 +144,6 @@ public abstract class AbstractTypeConverter {
 
     public CharListLDT getCharListLDT() {
         return charListLDT;
-    }
-
-    public KeYJavaType getBooleanType() {
-        return services.getJavaInfo()
-                       .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
     public Sort getPrimitiveSort(Type t) {
