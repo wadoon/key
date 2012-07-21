@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import abs.backend.coreabs.CoreAbsBackend;
 import abs.frontend.ast.ASTNode;
+import abs.frontend.ast.ClassDecl;
 import abs.frontend.ast.DataConstructor;
 import abs.frontend.ast.DataTypeDecl;
 import abs.frontend.ast.FunctionDecl;
@@ -34,10 +35,11 @@ import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 
 public class ABSModelParserInfo {
 
-    private static final Name ABS_BOOLEAN_TYPE_NAME = new Name(
-            "ABS.StdLib.Bool");
-    private static final Name ABS_INT_TYPE_NAME = new Name("ABS.StdLib.Int");
-    private static Sort checkBuiltInType(IServices iServices, Entry<Name, DataTypeDecl> dataType) {
+    public static final Name ABS_BOOLEAN_TYPE_NAME = new Name("ABS.StdLib.Bool");
+    public static final Name ABS_INT_TYPE_NAME = new Name("ABS.StdLib.Int");
+
+    private static Sort checkBuiltInType(IServices iServices,
+            Entry<Name, DataTypeDecl> dataType) {
         Sort dataTypeSort = null;
         if (dataType.getKey().equals(ABS_INT_TYPE_NAME)) {
             dataTypeSort = (Sort) iServices.getNamespaces().sorts()
@@ -48,12 +50,19 @@ public class ABSModelParserInfo {
         }
         return dataTypeSort;
     }
+
     private static String createFullyQualifiedName(InterfaceTypeUse ifdecl) {
         return ifdecl.getModuleDecl().getName() + "." + ifdecl.getName();
     }
+
     private static String createFullyQualifiedName(final TypeDecl interf) {
         return interf.getModule().getName() + "." + interf.getName();
     }
+
+    private String createFullyQualifiedName(ClassDecl classDecl) {
+        return classDecl.getModule().getName() + "." + classDecl.getName();
+    }
+
     private static ImmutableSet<Sort> createListOfExtendedSortsFromTypeDeclaration(
             IServices iServices, final HashMap<Name, KeYJavaType> names2type,
             Entry<Name, InterfaceDecl> interf) {
@@ -74,10 +83,11 @@ public class ABSModelParserInfo {
         return extSorts;
     }
 
+    private HashMap<Name, ClassDecl> classes = new HashMap<Name, ClassDecl>();
     private final HashMap<Name, InterfaceDecl> interfaces = new HashMap<Name, InterfaceDecl>();
-    private final HashMap<Name, DataTypeDecl> datatypes = new HashMap<Name, DataTypeDecl>();
-    private final HashMap<Name,ParametricDataTypeDecl> parametricDatatypes = new HashMap<Name, ParametricDataTypeDecl>();
-    private final HashMap<Name, List<DataConstructor>> dataTypes2dataConstructors = new HashMap<Name, List<DataConstructor>>();
+    private final DataTypeDescriptor datatypes = new DataTypeDescriptor();
+    private final DataTypeDescriptor parametricDatatypes = new DataTypeDescriptor();
+
     private final CoreAbsBackend absBackend;
     private String sourceDirectory;
 
@@ -101,30 +111,28 @@ public class ABSModelParserInfo {
 
     }
 
-    public HashMap<Name, DataTypeDecl> getDatatypes() {
+    public DataTypeDescriptor getDatatypes() {
         return datatypes;
     }
 
-    public HashMap<Name, List<DataConstructor>> getDataTypes2dataConstructors() {
-        return dataTypes2dataConstructors;
+    public DataTypeDescriptor getParametricDatatypes() {
+        return parametricDatatypes;
     }
 
     public HashMap<Name, InterfaceDecl> getInterfaces() {
         return interfaces;
     }
 
-    public HashMap<Name,ParametricDataTypeDecl> getParametricDatatypes() {
-        return parametricDatatypes;
+    public HashMap<Name, ClassDecl> getClasses() {
+        return classes;
     }
 
     private void printTree(ASTNode node) {
-        for (int i = 0; i<node.getNumChild(); i++) {
-            System.out.println(node.value + ":" + node + ":" + node.getClass().getSimpleName());
+        for (int i = 0; i < node.getNumChild(); i++) {
             printTree(node.getChild(i));
         }
     }
-    
-    
+
     public void readABSModel() throws IOException {
         if (!alreadyParsed && compilationUnitsFiles != null) {
             if (absModelDescription != JavaModel.NO_MODEL) {
@@ -132,7 +140,7 @@ public class ABSModelParserInfo {
             } else {
                 absModel = absBackend.getStdLib();
             }
-                        
+
             collectTypesAndFunctionDeclarations(absModel);
             alreadyParsed = true;
         }
@@ -143,7 +151,7 @@ public class ABSModelParserInfo {
         if (absModel == JavaModel.NO_MODEL) {
             compilationUnitsFiles = new String[0];
             return;
-        } 
+        }
         sourceDirectory = absModel.getModelDir();
         File sourceDir = new File(sourceDirectory);
         File[] compilationUnits = sourceDir.listFiles(new FilenameFilter() {
@@ -159,9 +167,10 @@ public class ABSModelParserInfo {
         }
     }
 
-    private void collectConstructors(DataTypeDecl decl, Name dataTypeName) {
+    private void collectConstructors(DataTypeDecl decl, Name dataTypeName,
+            DataTypeDescriptor descr) {
         List<DataConstructor> constructors = decl.getDataConstructors();
-        dataTypes2dataConstructors.put(dataTypeName, constructors);
+        descr.addDataType2Constructors(dataTypeName, constructors);
     }
 
     private void collectTypesAndFunctionDeclarations(ASTNode<?> child) {
@@ -174,17 +183,22 @@ public class ABSModelParserInfo {
                             interf);
                 } else if (currentNode instanceof ParametricDataTypeDecl) {
 
-
                     final ParametricDataTypeDecl dataType = (ParametricDataTypeDecl) currentNode;
-                    final Name dataTypeName = new Name(createFullyQualifiedName(dataType));
+                    final Name dataTypeName = new Name(
+                            createFullyQualifiedName(dataType));
 
                     if (dataType.getNumTypeParameter() > 0) {
-                        System.out.println("===> " + dataType.getClass() + " PARAMETRIC "+dataType.getType());
-                        parametricDatatypes.put(dataTypeName, (ParametricDataTypeDecl)dataType);
+                        parametricDatatypes.addDatatype(dataTypeName, dataType);
+                        collectConstructors(dataType, dataTypeName,
+                                parametricDatatypes);
                     } else {
-                        datatypes.put(dataTypeName, dataType);
+                        datatypes.addDatatype(dataTypeName, dataType);
+                        collectConstructors(dataType, dataTypeName, datatypes);
                     }
-                    collectConstructors(dataType, dataTypeName);
+                } else if (currentNode instanceof ClassDecl) {
+                    classes.put(new Name(
+                            createFullyQualifiedName((ClassDecl) currentNode)),
+                            (ClassDecl) currentNode);
                 } else if (currentNode instanceof FunctionDecl) {
                     FunctionDecl fd = (FunctionDecl) currentNode;
                     /*
@@ -217,7 +231,8 @@ public class ABSModelParserInfo {
 
         assert topSort != null;
 
-        for (Entry<Name, DataTypeDecl> dataType : datatypes.entrySet()) {
+        for (Entry<Name, DataTypeDecl> dataType : datatypes.getDatatypes()
+                .entrySet()) {
             final ABSDatatype absType = new ABSDatatype(dataType.getKey());
             Sort dataTypeSort = (Sort) iServices.getNamespaces().sorts()
                     .lookup(dataType.getKey());
@@ -271,7 +286,7 @@ public class ABSModelParserInfo {
     private Entry<Name, InterfaceDecl>[] sortInterfacesAscendingInNumberOfExtendedTypes() {
         @SuppressWarnings("unchecked")
         Entry<Name, InterfaceDecl>[] interfArray = interfaces.entrySet()
-        .toArray(new Entry[interfaces.size()]);
+                .toArray(new Entry[interfaces.size()]);
 
         Arrays.sort(interfArray, new Comparator<Entry<Name, InterfaceDecl>>() {
             @Override
@@ -286,6 +301,29 @@ public class ABSModelParserInfo {
             }
         });
         return interfArray;
+    }
+
+    public class DataTypeDescriptor {
+
+        private HashMap<Name, DataTypeDecl> datatypes = new HashMap<Name, DataTypeDecl>();
+        private HashMap<Name, List<DataConstructor>> dataTypes2dataConstructors = new HashMap<Name, List<DataConstructor>>();
+
+        public HashMap<Name, DataTypeDecl> getDatatypes() {
+            return datatypes;
+        }
+
+        public void addDatatype(Name name, DataTypeDecl dataDecl) {
+            datatypes.put(name, dataDecl);
+        }
+
+        public HashMap<Name, List<DataConstructor>> getDataTypes2dataConstructors() {
+            return dataTypes2dataConstructors;
+        }
+
+        public void addDataType2Constructors(Name name,
+                List<DataConstructor> constructors) {
+            this.dataTypes2dataConstructors.put(name, constructors);
+        }
     }
 
 }

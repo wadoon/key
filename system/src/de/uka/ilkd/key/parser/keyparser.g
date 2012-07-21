@@ -971,9 +971,9 @@ options {
             }
 
             if (inSchemaMode() || isGlobalDeclTermParser()) {
-                sjb.javaBlock = jr.readBlockWithEmptyContext(s);
+                sjb.javaBlock = jr.readBlockWithEmptyContext(s, getServices());
             }else{
-                sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), s);
+                sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), getServices(), s);
             }
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;

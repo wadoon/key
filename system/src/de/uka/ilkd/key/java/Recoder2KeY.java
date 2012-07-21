@@ -1177,7 +1177,7 @@ public class Recoder2KeY implements JavaReader {
      *            a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readBlockWithEmptyContext(String block) {
+    public JavaBlock readBlockWithEmptyContext(String block, IServices services) {
         return readBlock(block, createEmptyContext());
     }
 
@@ -1190,7 +1190,7 @@ public class Recoder2KeY implements JavaReader {
      *            a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readBlockWithProgramVariables(Namespace varns, String s) {
+    public JavaBlock readBlockWithProgramVariables(Namespace varns, IServices services, String s) {
         Iterator<Named> it = varns.allElements().iterator();
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
         while (it.hasNext()) {

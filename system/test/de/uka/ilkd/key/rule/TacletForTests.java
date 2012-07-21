@@ -233,6 +233,6 @@ public class TacletForTests {
 
     public static ProgramElement parsePrg(String prgString) {
 	Recoder2KeY r2k = new Recoder2KeY(services(), new NamespaceSet());
-	return r2k.readBlockWithEmptyContext(prgString).program();
+	return r2k.readBlockWithEmptyContext(prgString, services()).program();
     }
 }

@@ -688,7 +688,7 @@ public class KeYProgModelInfo{
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readJavaBlock(String block, NamespaceSet nss) {
-        return createRecoder2KeY(nss).readBlockWithEmptyContext(block);
+        return createRecoder2KeY(nss).readBlockWithEmptyContext(block, services);
     }
     
    

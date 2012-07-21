@@ -139,5 +139,16 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
         doDefaultAction(x);
     }
 
+    @Override
+    public void visitABSTypeReference(ABSTypeReference x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnABSVariableDeclarationStatement(
+            ABSVariableDeclarationStatement x) {
+        doDefaultAction(x);
+    }
+
     
 }

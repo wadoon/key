@@ -148,7 +148,7 @@ public class TestRecoder2KeY extends TestCase {
 	for (int i=0; i<jblocks.length; i++) {	    
 	    String keyProg
 		= removeBlanks(c2k.readBlockWithEmptyContext
-			      (jblocks[i]).toString());
+			      (jblocks[i], null).toString());
 	    String recoderProg
 		= removeBlanks(c2k.recoderBlock
 			       (jblocks[i], 

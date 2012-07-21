@@ -200,8 +200,10 @@ public class WindowUserInterface extends AbstractUserInterface {
 	public void notify(NotificationEvent event) {
 	        if (event instanceof GeneralFailureEvent) {
 	            System.out.println(((GeneralFailureEvent)event).getErrorMessage());
-                    if (event instanceof ExceptionFailureEvent)
-	            System.out.println(((ExceptionFailureEvent)event).getException());	
+                    if (event instanceof ExceptionFailureEvent) {
+                        System.out.println(((ExceptionFailureEvent)event).getException());
+                        ((ExceptionFailureEvent)event).getException().printStackTrace();
+                    }
 	        }
 		mainWindow.notify(event);
 	}

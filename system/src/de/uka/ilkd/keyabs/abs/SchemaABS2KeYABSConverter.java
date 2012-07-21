@@ -3,12 +3,18 @@ package de.uka.ilkd.keyabs.abs;
 import abs.frontend.ast.ASTNode;
 import abs.frontend.ast.ExpressionStmt;
 import abs.frontend.ast.IncompleteSyncAccess;
+import abs.frontend.ast.VarDeclStmt;
 import abs.frontend.ast.VarUse;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.keyabs.logic.sort.ABSProgramSVSort;
@@ -18,7 +24,8 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
     
     private final Namespace schemaVariables;
 
-    public SchemaABS2KeYABSConverter(Namespace schemaVariables) {
+    public SchemaABS2KeYABSConverter(Namespace schemaVariables, IServices services) {
+        super(services);
         this.schemaVariables = schemaVariables;
     }
     
@@ -52,6 +59,26 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
     }
 
     
+    public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
+        final String typeName = x.getVarDecl().getType().getQualifiedName();
+        
+        System.out.println("===> " + typeName);
+        
+        KeYJavaType type = lookupType(typeName);
+        
+        TypeReference typeRef;
+        if (type == null) {
+            typeRef = (TypeReference) lookup(typeName);
+        } else {
+            typeRef = new ABSTypeReference(type);
+        }
+        
+        IProgramVariable localVar = lookup(x.getVarDecl().getName());
+        IABSExpression initExp = (IABSExpression) convert(x.getVarDecl().getInitExp());
+        return new ABSVariableDeclarationStatement(typeRef, localVar, initExp);
+    }
+
+    
     @Override
     protected IProgramVariable lookupLocalVariable(String name) {
         return lookup(name);
@@ -61,5 +88,4 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
     protected IProgramVariable lookupFieldVariable(String name) {
         return lookup(name);
     }
-
 }

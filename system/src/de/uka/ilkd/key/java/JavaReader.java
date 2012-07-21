@@ -16,8 +16,8 @@ import de.uka.ilkd.key.logic.Namespace;
 
 public interface JavaReader {
 
-    JavaBlock readBlockWithEmptyContext(String s);
+    JavaBlock readBlockWithEmptyContext(String s, IServices services);
 
-    JavaBlock readBlockWithProgramVariables(Namespace varns, String s);
+    JavaBlock readBlockWithProgramVariables(Namespace varns, IServices services, String s);
 
 }

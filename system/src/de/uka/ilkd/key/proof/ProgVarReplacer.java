@@ -13,16 +13,36 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.SemisequentChangeInfo;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.inst.OperatorInstantiation;
+import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
+import de.uka.ilkd.key.rule.inst.ProgramListInstantiation;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.keyabs.abs.IProgramASTModifyingVisitor;
 
 
 /**
@@ -341,7 +361,7 @@ public final class ProgVarReplacer {
      * replaces in a statement
      */
     public ProgramElement replace(ProgramElement pe) {
-        ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe, 
+        IProgramASTModifyingVisitor pvrv = IProgramVisitorProvider.createProgVarReplaceVisitor(pe, 
                                                                map, 
                                                                false, 
                                                                services);

@@ -13,9 +13,7 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -200,16 +198,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 		    				  t.javaBlock());
 	}
     }
-
-          
-    private ImmutableSet<Term> replaceVariablesInTerms(ImmutableSet<Term> terms) {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();        
-        for (final Term term : terms) {
-            res = res.add(replaceVariablesInTerm(term));
-        }        
-        return res;
-    }
-    
     
     public void performActionOnLocationVariable(LocationVariable x) {
        performActionOnProgramVariable(x);

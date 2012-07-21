@@ -32,6 +32,7 @@ public abstract class ABSProgramSVSort extends AbstractSort implements IProgramS
     public static final IProgramSVSort<ABSServices> ABS_PUREEXPRESSION = new ABSPureExpSV();
     public static final IProgramSVSort<ABSServices> ABS_VARIABLE = new ABSVariableSV();
     public static final IProgramSVSort<ABSServices> ABS_STATEMENT = new ABSStatementSV();
+    public static final IProgramSVSort<ABSServices> ABS_TYPEREF = new ABSTypeReferenceSV();
     
     public ABSProgramSVSort(Name name) {
         super(name, DefaultImmutableSet.<Sort>nil(), false);

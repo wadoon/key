@@ -52,7 +52,7 @@ public final class JavaTools {
             (new CreatingASTVisitor(jb.program(), false, services) {
                 private boolean done = false;
                 
-                public ProgramElement go() {
+                public ProgramElement result() {
                     stack.push(new ExtList());
                     walk(root());
                     ExtList el = stack.peek();
@@ -68,7 +68,8 @@ public final class JavaTools {
                         super.doAction(node);
                     }
                 }
-            }).go();
+
+            }).result();
         
         StatementBlock newSB = newProg instanceof StatementBlock 
                                ? (StatementBlock)newProg

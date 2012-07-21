@@ -8,16 +8,26 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 public final class ABSTypeConverter extends AbstractTypeConverter {
-
+    
+    private HistoryLDT historyLDT;
     
     public ABSTypeConverter(ABSServices services) {
         super(services);
     }
 
+    public void init(LDT ldt) {     
+        if (ldt instanceof HistoryLDT) {
+            historyLDT = (HistoryLDT) ldt;
+        }
+        super.init(ldt);
+    }
+    
     @Override
     public Term convertToLogicElement(ProgramElement pe) {
         return convertToLogicElement(pe, getServices().getProgramInfo().getDefaultExecutionContext());
@@ -132,5 +142,9 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
         return services.getProgramInfo().getTypeByName("ABS.StdLib.Int");
     }
 
-    
+    public HistoryLDT getHistoryLDT() {
+        return historyLDT;
+    }
+
+
 }

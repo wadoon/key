@@ -17,6 +17,8 @@ import de.uka.ilkd.keyabs.abs.ABSMultExp;
 import de.uka.ilkd.keyabs.abs.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
+import de.uka.ilkd.keyabs.abs.ABSTypeReference;
+import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.ABSVisitor;
 import de.uka.ilkd.keyabs.abs.CopyAssignment;
 import de.uka.ilkd.keyabs.abs.ThisExpression;
@@ -156,7 +158,7 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     @Override
     public void performActionOnABSAndBoolExp(ABSAndBoolExp x) {
         try {
-            lp.printABSBinaryOpExp(x, "&");
+            lp.printABSBinaryOpExp(x, "&&");
         } catch (IOException e) {
             e.printStackTrace();
         } 
@@ -166,7 +168,28 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     @Override
     public void performActionOnABSOrBoolExp(ABSOrBoolExp x) {
         try {
-            lp.printABSBinaryOpExp(x, "|");
+            lp.printABSBinaryOpExp(x, "||");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } 
+    }
+
+
+    @Override
+    public void visitABSTypeReference(ABSTypeReference x) {
+        try {
+            lp.printABSTypeReference(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }         
+    }
+
+
+    @Override
+    public void performActionOnABSVariableDeclarationStatement(
+            ABSVariableDeclarationStatement x) {
+        try {
+            lp.printABSVariableDeclarationStatement(x);
         } catch (IOException e) {
             e.printStackTrace();
         } 

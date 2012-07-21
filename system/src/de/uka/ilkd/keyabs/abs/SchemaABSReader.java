@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import abs.backend.coreabs.CoreAbsBackend;
+import abs.frontend.analyser.SemanticError;
 import abs.frontend.ast.ASTNode;
 import abs.frontend.ast.Model;
 import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.SchemaJavaReader;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
@@ -25,15 +27,27 @@ public class SchemaABSReader implements SchemaJavaReader {
     }
     
     @Override
-    public JavaBlock readBlockWithEmptyContext(String s) {
+    public JavaBlock readBlockWithEmptyContext(String s, IServices services) {
         String blockStr = SCHEMA_MODULE + " \n " + s;
         
         CoreAbsBackend absReader = new CoreAbsBackend();
         absReader.setWithStdLib(false);
+        absReader.setAllowIncompleteExpr(true);
         try {
+            System.out.println("ParseInput: "+ blockStr);
+            
             Model m = absReader.parse(File.createTempFile("taclet_", ".keyabs"), blockStr, new StringReader(blockStr));
-            System.out.println(m.getMainBlock());
-            AbstractABS2KeYABSConverter converter = new SchemaABS2KeYABSConverter(schemaVariables);
+            
+            
+            System.out.println(m.getMainBlock() + " Errors: "+m.getErrors().size());
+            
+            for (SemanticError se : m.getErrors()) {
+                System.out.println(se.getHelpMessage() + " : " + se.getFileName() + " : " + se.getMsgString());
+            }
+            
+            AbstractABS2KeYABSConverter converter = new SchemaABS2KeYABSConverter(schemaVariables, services);
+           
+            
             ABSStatementBlock block = converter.convert(m.getMainBlock());
             
             System.out.println("Converted " + block);
@@ -47,14 +61,14 @@ public class SchemaABSReader implements SchemaJavaReader {
     }
 
     @Override
-    public JavaBlock readBlockWithProgramVariables(Namespace varns, String s) {
-        // TODO Auto-generated method stub
-        return null;
+    public void setSVNamespace(Namespace ns) {
+        schemaVariables = ns;
     }
 
     @Override
-    public void setSVNamespace(Namespace ns) {
-        schemaVariables = ns;
+    public JavaBlock readBlockWithProgramVariables(Namespace varns,
+            IServices services, String s) {
+        return null;
     }
 
 }

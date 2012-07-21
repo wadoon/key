@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+import abs.frontend.ast.ConstructorArg;
 import abs.frontend.ast.DataConstructor;
+import abs.frontend.ast.InterfaceDecl;
 import abs.frontend.ast.List;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -27,23 +30,19 @@ import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
 
-public class ABSProblemInitializer extends AbstractProblemInitializer {
+public class ABSProblemInitializer extends AbstractProblemInitializer<ABSServices> {
 
-    public ABSProblemInitializer(ProgressMonitor mon,
-            Profile profile, 
-            boolean registerProof,
-            ProblemInitializerListener listener) {
-        this(mon, profile, 
-                profile.createServices(new KeYRecoderExcHandler()), 
+    public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
+            boolean registerProof, ProblemInitializerListener listener) {
+        this(mon, profile, (ABSServices) profile.createServices(new KeYRecoderExcHandler()),
                 registerProof, listener);
     }
 
     public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
-            IServices services, boolean registerProof,
+            ABSServices services, boolean registerProof,
             ProblemInitializerListener listener) {
         super(mon, profile, services, registerProof, listener);
     }
-
 
     @Override
     protected IKeYFile createKeYFile(Includes in, String name) {
@@ -52,24 +51,26 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
 
     @Override
     protected IKeYFile createTacletBaseKeYFile() {
-        return new ABSKeYFile("taclet base", 
-                profile.getStandardRules().getTacletBase(),
-                progMon);
+        return new ABSKeYFile("taclet base", profile.getStandardRules()
+                .getTacletBase(), progMon);
     }
 
     @Override
     protected void readJava(EnvInput envInput, AbstractInitConfig initConfig)
             throws ProofInputException {
-        
+
         envInput.setInitConfig(initConfig);
 
-        ABSModelParserInfo parserInfo = ((ABSServices)initConfig.getServices()).getProgramInfo().getABSParserInfo();
+        ABSModelParserInfo parserInfo = ((ABSServices) initConfig.getServices())
+                .getProgramInfo().getABSParserInfo();
 
         String absPath = envInput.readJavaPath();
         JavaModel absModelDescription;
         if (absPath != null) {
-            String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());
-            absModelDescription = new JavaModel(absPath, modelTag, new LinkedList<File>(), null);
+            String modelTag = "KeYABS_"
+                    + new Long((new java.util.Date()).getTime());
+            absModelDescription = new JavaModel(absPath, modelTag,
+                    new LinkedList<File>(), null);
         } else {
             absModelDescription = JavaModel.NO_MODEL;
         }
@@ -92,37 +93,84 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
 
         ABSInfo info = (ABSInfo) initConfig.getServices().getProgramInfo();
 
-        System.out.println("Registering Sorts (" + info.getAllKeYJavaTypes().size() + ")" );
-        //register sorts
+        System.out.println("Registering Sorts (" + info.getAllKeYJavaTypes().size() + ")");
+        // register sorts
+
         for (KeYJavaType t : info.getAllKeYJavaTypes()) {
             if (initConfig.sortNS().lookup(t.getSort().name()) == null) {
                 initConfig.sortNS().addSafely(t.getSort());
             } else {
-                System.out.println(getClass() + ": Skipping "+t.getFullName());
+                System.out
+                        .println(getClass() + ": Skipping " + t.getFullName());
             }
-        
         }
 
-
-        System.out.println("Registering Functions");
+        System.out.println("Instantiating Generic Datatypes");
+        //TODO
+        
+        System.out.println("Registering Constructors");
 
         // test code
-        for (List<DataConstructor> constructors  : info.getABSParserInfo().getDataTypes2dataConstructors().values()) {
+        for (List<DataConstructor> constructors : info.getABSParserInfo()
+                .getDatatypes().getDataTypes2dataConstructors().values()) {
             for (DataConstructor c : constructors) {
-                System.out.println("" + c.getName() + ":" + c.getConstructorArgs());
+                Sort[] argSorts = new Sort[c.getConstructorArgList()
+                        .getNumChild()];
 
-                Sort intS = initConfig.getServices().getTypeConverter().getIntegerLDT().targetSort();
+                try {
+                    int count = 0;
+                    for (ConstructorArg arg : c.getConstructorArgs()) {
+                        argSorts[count++] = initConfig
+                                .getServices()
+                                .getProgramInfo()
+                                .getTypeByName(arg.getType().getQualifiedName())
+                                .getSort();
+                    }
+                    if (count == argSorts.length) {
+                        // create unique function symbol
+                        final String fullyQualifiedName = c.getModule()
+                                .getName()
+                                + "."
+                                + c.getDataTypeDecl().getName();
+                        Sort returnSort = initConfig.getServices()
+                                .getProgramInfo()
+                                .getTypeByName(c.getType().getQualifiedName())
+                                .getSort();
+                        Function constructorFct = new Function(
+                                new ProgramElementName(c.getName(),
+                                        fullyQualifiedName), returnSort,
+                                argSorts, null, true);
+                        initConfig.getServices().getNamespaces().functions()
+                                .add(constructorFct);
+                    }
 
-                Sort[] argSorts = new Sort[c.getConstructorArgList().getNumChild()]; 
-                Arrays.fill(argSorts, intS);
-
-                // create unique function symbol
-                Function constructorFct = new Function(new ProgramElementName(c.getName(), 
-                        c.getModule().getName() + "." + c.getDataTypeDecl().getName()), intS, argSorts, null, true);
-                initConfig.getServices().getNamespaces().functions().add(constructorFct);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
+        
+        System.out.println("Register Interface Label Constants");
 
+        for (Name itf : info.getABSParserInfo().getInterfaces().keySet()) {
+                Function interfaceLabel = 
+                        new Function(itf, services.getTypeConverter().getHistoryLDT().getInterfaceLabelSort(),
+                                new Sort[0], null, true);
+                initConfig.getServices().getNamespaces().functions().add(interfaceLabel);
+                    
+        }
+
+        System.out.println("Register Interface Class Constants");
+        
+        for (Name itf : info.getABSParserInfo().getClasses().keySet()) {
+            Function classLabel = 
+                    new Function(itf, services.getTypeConverter().getHistoryLDT().getClassLabelSort(),
+                            new Sort[0], null, true);
+            initConfig.getServices().getNamespaces().functions().add(classLabel);
+                
+    }
+
+    
     }
 
 }

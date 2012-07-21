@@ -17,15 +17,13 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these
@@ -146,8 +144,9 @@ public class LDTInput implements EnvInput {
                         	.prepend(new BooleanLDT(services))
                         	//.prepend(new LocSetLDT(services))
                         	//.prepend(new HeapLDT(services))
-                        	//.prepend(new SeqLDT(services))
+                        	.prepend(new SeqLDT(services))
                         	//.prepend(new CharListLDT(services))
+                        	.prepend(new HistoryLDT(services))
                         	;
 
         initConfig.getServices().getTypeConverter().init(ldts);

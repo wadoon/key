@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.ExtList;
 
-public abstract class ABSModificationVisitor extends ABSVisitorImpl {
+public abstract class ABSModificationVisitor extends ABSVisitorImpl implements IProgramASTModifyingVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
 
@@ -39,6 +39,10 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl {
         super.walk(node);
     }
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.keyabs.abs.IProgramASTModifyingVisitor#result()
+     */
+    @Override
     public ProgramElement result() {
         ExtList result = stack.peek();
         if (result.getFirst() == CHANGED) {

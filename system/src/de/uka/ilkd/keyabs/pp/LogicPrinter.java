@@ -78,11 +78,12 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
-import de.uka.ilkd.keyabs.abs.ABSAddExp;
 import de.uka.ilkd.keyabs.abs.ABSBinaryOperatorPureExp;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
+import de.uka.ilkd.keyabs.abs.ABSTypeReference;
+import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.CopyAssignment;
 import de.uka.ilkd.keyabs.abs.ThisExpression;
 
@@ -1841,13 +1842,14 @@ public final class LogicPrinter implements ILogicPrinter {
             fstStmnt = true;    
             mark(MARK_START_FIRST_STMT);
         }
+        layouter.beginC().ind();
         x.getChildAt(0).visit(programPrettyPrinter);
         
-        layouter.print(" = ");
+        layouter.brk(1).print("=").brk(1);
 
         x.getChildAt(1).visit(programPrettyPrinter);
 
-        layouter.print(";");
+        layouter.print(";").end();
 
         if (fstStmnt) {
             markFirstStatement = false;
@@ -1869,7 +1871,7 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSStatementBlock(ABSStatementBlock x) throws IOException {
-       layouter.print("{").beginC().brk(0);
+       layouter.print("{").beginC(2).ind();
        for (int i = 0; i<x.getStatementCount();i++) {
            boolean fstStmnt = markFirstStatement; 
            if (markFirstStatement) {
@@ -1883,7 +1885,7 @@ public final class LogicPrinter implements ILogicPrinter {
            }  
            layouter.brk(1);
        }
-       layouter.end().print("}");
+       layouter.brk(1, -2).end().print("}");
     }
 
 
@@ -1894,6 +1896,25 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.ind(1,0).print(op).brk(1);
         x.getChildAt(1).visit(programPrettyPrinter);
         layouter.end();
+    }
+
+
+    public void printABSVariableDeclarationStatement(
+            ABSVariableDeclarationStatement x) throws IOException {
+        layouter.beginC().ind();
+        x.getTypeReference().visit(programPrettyPrinter);
+        layouter.brk(1);
+        x.getVariable().visit(programPrettyPrinter);
+        if (x.getInitializer() != null) {
+            layouter.brk(1);
+            x.getInitializer().visit(programPrettyPrinter);
+        }
+        layouter.end();
+    }
+
+
+    public void printABSTypeReference(ABSTypeReference x) throws IOException {
+        layouter.print(x.getName());
     }
 
 }

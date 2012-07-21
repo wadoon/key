@@ -17,11 +17,15 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnProgramMetaConstruct(ProgramTransformer<ABSServices> x);
 
-    void performActionOnABSAddExp(ABSAddExp absAddExp);
+    void performActionOnABSAddExp(ABSAddExp x);
 
-    void performActionOnABSMultExp(ABSMultExp absMultExp);
+    void performActionOnABSMultExp(ABSMultExp x);
 
-    void performActionOnABSAndBoolExp(ABSAndBoolExp absAndBoolExp);
+    void performActionOnABSAndBoolExp(ABSAndBoolExp x);
 
-    void performActionOnABSOrBoolExp(ABSOrBoolExp absOrBoolExp);
+    void performActionOnABSOrBoolExp(ABSOrBoolExp x);
+
+    void visitABSTypeReference(ABSTypeReference x);
+
+    void performActionOnABSVariableDeclarationStatement(ABSVariableDeclarationStatement x);
 }

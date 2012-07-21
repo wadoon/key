@@ -53,7 +53,7 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
         if (down != 0) return;
         final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
 	for (int i = 0; i < jblocks.length; i++) {
-	    test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
+	    test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i], TacletForTests.services());
 	}
     }
     
