@@ -4,11 +4,13 @@ import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 public class ABSTypeConverter extends AbstractTypeConverter {
 
@@ -26,6 +28,10 @@ public class ABSTypeConverter extends AbstractTypeConverter {
     public Term convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
         if (pe instanceof IntLiteral) {
             return getIntegerLDT().translateLiteral((IntLiteral) pe, getServices());
+        } else if (pe instanceof IABSLocationReference) {
+            return getServices().getTermBuilder().var(((IABSLocationReference)pe).getVariable());
+        } else if (pe instanceof IProgramVariable) {
+            return getServices().getTermBuilder().var((IProgramVariable)pe);
         }
         return null;
     }

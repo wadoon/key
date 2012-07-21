@@ -14,22 +14,24 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.logic.sort.programSV.ABSPureExpSV;
-import de.uka.ilkd.keyabs.logic.sort.programSV.ABSVariable;
+import de.uka.ilkd.keyabs.logic.sort.programSV.ABSStatementSV;
+import de.uka.ilkd.keyabs.logic.sort.programSV.ABSVariableSV;
 
 public abstract class ABSProgramSVSort extends AbstractSort implements IProgramSVSort<ABSServices> {
 
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
-    private static final HashMap<Name, IProgramSVSort> name2sort =
-        new HashMap<Name, IProgramSVSort>(60);
+    private static final HashMap<Name, IProgramSVSort<ABSServices>> name2sort =
+        new HashMap<Name, IProgramSVSort<ABSServices>>(60);
   
-    public static HashMap<Name, IProgramSVSort> name2sort() {
+    public static HashMap<Name, IProgramSVSort<ABSServices>> name2sort() {
         return name2sort;
     }
 
-    public static final IProgramSVSort ABS_PUREEXPRESSION = new ABSPureExpSV();
-    public static final IProgramSVSort ABS_VARIABLE = new ABSVariable();
+    public static final IProgramSVSort<ABSServices> ABS_PUREEXPRESSION = new ABSPureExpSV();
+    public static final IProgramSVSort<ABSServices> ABS_VARIABLE = new ABSVariableSV();
+    public static final IProgramSVSort<ABSServices> ABS_STATEMENT = new ABSStatementSV();
     
     public ABSProgramSVSort(Name name) {
         super(name, DefaultImmutableSet.<Sort>nil(), false);

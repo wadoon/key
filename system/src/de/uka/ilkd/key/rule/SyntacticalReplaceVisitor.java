@@ -30,10 +30,10 @@ import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
-import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -59,6 +60,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 
 public final class SyntacticalReplaceVisitor extends Visitor { 	
 
@@ -166,15 +168,16 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	ProgramElement result = null;
 
 	if (jb.program() instanceof ContextStatementBlock) {
-	    trans = new ProgramReplaceVisitor
-		(new StatementBlock(((ContextStatementBlock)jb.program()).getBody()), // TODO
+	   /* trans = IProgramVisitorProvider.createProgramReplaceVisito
+		(new ABSStatementBlock(((ContextStatementBlock)jb.program()).getBody()), // TODO
 		 getServices (),
 		 svInst,
 		 allowPartialReplacement);
 	    trans.start();
-	    result = addContext((StatementBlock)trans.result());
+	    result = addContext((StatementBlock)trans.result());*/
+	    throw new RuntimeException("Not supported");
 	} else {
-	    trans = new ProgramReplaceVisitor(jb.program(),
+	    trans = IProgramVisitorProvider.createProgramReplaceVisitor(jb.program(),
 					      getServices (),
 					      svInst,
 					      allowPartialReplacement);
@@ -182,7 +185,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	    result = trans.result();
 	}
 	return (result==jb.program()) ? 
-            jb : JavaBlock.createJavaBlock((StatementBlock)result);
+            jb : JavaBlock.createJavaBlock((StatementContainer)result);
     }
 
     private Term[] neededSubs(int n) {

@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -343,7 +344,11 @@ public final class TermBuilder {
         return tf.createTerm(v);
     }
     
-    
+
+    public Term var(IProgramVariable v) {
+        return tf.createTerm(v);
+    }
+
     public Term var(ProgramVariable v) { 
 //	if(v.isMember()) {
 //	    throw new TermCreationException(

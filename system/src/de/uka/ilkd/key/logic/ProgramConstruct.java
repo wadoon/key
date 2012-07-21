@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.keyabs.abs.IABSStatement;
 
 /** A type that implement this interface can be used in all java
  * programs instead of an expression or statement. For example class
@@ -32,6 +33,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  */
 public interface ProgramConstruct extends Expression, Statement, ILoopInit, 
     IForUpdates, IGuard, Label, TerminalProgramElement, ExpressionStatement,
-    TypeReference, IProgramVariable, IProgramMethod, Branch, IExecutionContext, MethodName {  
+    TypeReference, IProgramVariable, IProgramMethod, Branch, IExecutionContext, MethodName, IABSStatement {  
 }
     

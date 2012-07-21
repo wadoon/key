@@ -166,9 +166,9 @@ public final class QueryAxiom extends ClassAxiom {
 		                	       TB.var(paramSVs[i])));
 	}
 	final Term post = TB.imp(TB.reachableValue(services, 
-						   TB.var(resultProgSV), 
+						   TB.var((SchemaVariable)resultProgSV), 
 						   target.getReturnType()),
-	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
+	                  	 TB.equals(TB.var(skolemSV), TB.var((SchemaVariable)resultProgSV)));
 	
 	//create java block
     	final ImmutableList<KeYJavaType> sig 

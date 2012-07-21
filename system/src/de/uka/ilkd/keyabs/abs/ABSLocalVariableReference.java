@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 
 public class ABSLocalVariableReference extends ABSVariableReference
-        implements IABSLocationReference {
+                                       implements IABSLocalVariableReference {
 
     public ABSLocalVariableReference(IProgramVariable variable, PositionInfo pos) {
         super(variable, pos);
@@ -22,6 +22,11 @@ public class ABSLocalVariableReference extends ABSVariableReference
 
     public String toString() {
         return getVariable().name().toString();
+    }
+
+    @Override
+    public IProgramVariable getProgramVariable() {
+        return getVariable();
     }
     
 }

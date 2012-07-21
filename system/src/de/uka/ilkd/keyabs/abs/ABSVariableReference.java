@@ -8,7 +8,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 public abstract class ABSVariableReference extends ABSNonTerminalProgramElement 
-                                           implements IABSPureExpression {
+                                           implements IABSPureExpression, IABSLocationReference {
 
     private final IProgramVariable variable;
     

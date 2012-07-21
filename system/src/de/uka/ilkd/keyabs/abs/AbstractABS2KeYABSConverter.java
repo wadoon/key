@@ -7,6 +7,8 @@ import abs.frontend.ast.FieldUse;
 import abs.frontend.ast.VarUse;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public abstract class AbstractABS2KeYABSConverter {
 
@@ -22,10 +24,20 @@ public abstract class AbstractABS2KeYABSConverter {
         } else if (x instanceof VarUse) {
             result = convert((VarUse)x);
         } else {
-            throw new IllegalStateException("Unknown AST element " + x + " : " + x.getClass());
+            result = requestConversion(x);
+            if (result == null)
+                throw new IllegalStateException("Unknown AST element " + x + " : " + x.getClass());
         }
         
         return result;
+    }
+
+    protected ProgramElement requestConversion(ASTNode<?> x) {
+        return null;
+    }
+
+    protected ProgramElement convert(SchemaVariable value) {
+        return (ProgramSV)value;
     }
 
     public ABSStatementBlock convert(Block x) {
