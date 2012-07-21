@@ -31,6 +31,7 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -161,7 +162,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
         if ( svInst.isEmpty() ) {
 	    return jb;
 	}
-	ProgramReplaceVisitor trans;
+	IProgramReplaceVisitor trans;
 	ProgramElement result = null;
 
 	if (jb.program() instanceof ContextStatementBlock) {

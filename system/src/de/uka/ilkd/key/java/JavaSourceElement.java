@@ -14,6 +14,8 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import de.uka.ilkd.key.java.visitor.ProgramVisitor;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -107,6 +109,11 @@ public abstract class JavaSourceElement implements SourceElement {
     }
 
 
+    public void visit(ProgramVisitor v) {
+        visit((Visitor)v);
+    }
+    
+    public abstract void visit(Visitor v);
 
     /**
      *        Pretty printing the source element.

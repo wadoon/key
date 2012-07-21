@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -151,7 +152,7 @@ public class PosTacletApp extends TacletApp {
     }
 
     private static Iterator<SchemaVariable> allVariableSV(Taclet taclet) {
-	TacletVariableSVCollector coll = new TacletVariableSVCollector();
+	AbstractTacletSchemaVariableCollector coll = IProgramVisitorProvider.getInstance().createTacletVariableSVCollector();
 	coll.visit(taclet, true); //__CHANGE__ true or false???
 	return coll.varIterator();
     }

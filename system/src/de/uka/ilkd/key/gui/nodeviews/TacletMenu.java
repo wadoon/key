@@ -13,9 +13,19 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -27,7 +37,11 @@ import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.NameCreationInfo;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -35,9 +49,17 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractTacletSchemaVariableCollector;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.smt.SMTProblem;
@@ -571,9 +593,9 @@ class TacletMenu extends JMenu {
     
     static class TacletAppComparator implements Comparator<TacletApp> {
 
-	private int countFormulaSV(TacletSchemaVariableCollector c) {
+	private int countFormulaSV(AbstractTacletSchemaVariableCollector coll1) {
 	    int formulaSV = 0;
-	    Iterator<SchemaVariable> it = c.varIterator();
+	    Iterator<SchemaVariable> it = coll1.varIterator();
 	    while (it.hasNext()) {
 		SchemaVariable sv = it.next();
 		if (sv instanceof FormulaSV) {
@@ -653,11 +675,11 @@ class TacletMenu extends JMenu {
 	            return 1;
 	        }		    		    		    
 	        // depth are equal. Number of schemavariables decides
-	        TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
+	        AbstractTacletSchemaVariableCollector coll1 = IProgramVisitorProvider.getInstance().createTacletSchemaVariableCollector();
 	        find1.execPostOrder(coll1);
 	        formulaSV1 = countFormulaSV(coll1);
 
-	        TacletSchemaVariableCollector coll2  = new TacletSchemaVariableCollector();
+	        AbstractTacletSchemaVariableCollector coll2  = IProgramVisitorProvider.getInstance().createTacletSchemaVariableCollector();
 	        find2.execPostOrder(coll2);
 	        formulaSV2 = countFormulaSV(coll2);
 	        cmpVar1 += -coll1.size();

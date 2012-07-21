@@ -49,6 +49,7 @@ header {
 
   import de.uka.ilkd.keyabs.abs.*;
   import de.uka.ilkd.keyabs.init.*;
+  import de.uka.ilkd.keyabs.logic.sort.*;
   import de.uka.ilkd.keyabs.proof.*;
 
   import de.uka.ilkd.key.parser.*;
@@ -647,10 +648,10 @@ options {
                 					  mods.rigid());
             } else if(s == Sort.UPDATE) {
                 v = SchemaVariableFactory.createUpdateSV(new Name(name));
-            } else if(s instanceof ProgramSVSort) {
+            } else if(s instanceof IProgramSVSort) {
                 v = SchemaVariableFactory.createProgramSV(
                 		new ProgramElementName(name),
-                		(ProgramSVSort) s,
+                		(IProgramSVSort) s,
                 		mods.list());
             } else {
                 if(makeVariableSV) {
@@ -821,29 +822,25 @@ options {
 	return null;
     }
     
-    private PairOfStringAndJavaBlock getJavaBlock(Token t) throws antlr.SemanticException {
-	/*PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
-        String s=t.getText();
+    private PairOfStringAndJavaBlock getABSBlock(Token t) throws antlr.SemanticException {
+	PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
+        String s = t.getText();
 	int index = s.indexOf("\n");
 	sjb.opName = s.substring(0,index);
 	s = s.substring(index+1);
-	Debug.out("Modal operator name passed to getJavaBlock: ",sjb.opName);
-	Debug.out("Java block passed to getJavaBlock: ", s);
-
+	
         JavaReader jr = javaReader;
 
 	try {
             if (inSchemaMode()) {
-                if(isProblemParser()) // Alt jr==null;
+                jr = new SchemaABSReader();       
+                /* if(isProblemParser()) // Alt jr==null;
                 jr = new SchemaRecoder2KeY(parserConfig.services(), 
-                    parserConfig.namespaces());
+                    parserConfig.namespaces());*/
                 ((SchemaJavaReader)jr).setSVNamespace(variables());
-            } else{
-                if(isProblemParser()) // Alt jr==null;
-                jr = new Recoder2KeY(parserConfig.services(), 
-                    parserConfig.namespaces());
+            } else {
+                jr = new ABSReader();
             }
-
             if (inSchemaMode() || isGlobalDeclTermParser()) {
                 sjb.javaBlock = jr.readBlockWithEmptyContext(s);
             }else{
@@ -863,7 +860,7 @@ options {
                 e.parseException().currentToken.next.beginLine=getLine()-1;
                 e.parseException().currentToken.next.beginColumn=getColumn();
                 throw new JavaParserException(e, t, getFilename(), -1, -1);  // row/columns already in text
-            }       
+            }
             if (e.proofJavaException()!=null
             &&  e.proofJavaException().currentToken != null
             &&  e.proofJavaException().currentToken.next != null) {      
@@ -876,8 +873,7 @@ options {
             }   
             throw new JavaParserException(e, t, getFilename());
         } 
-        return sjb;*/
-        return null;
+        return sjb;
     }
 
     /**
@@ -898,7 +894,7 @@ options {
 	        result = new NullSort(objectSort);
 	        sorts().add(result);
 	    } else {
-  	    	result = (Sort) sorts().lookup(new Name("abs.lang."+name));
+  	    	result = (Sort) sorts().lookup(new Name("Abs.StdLib."+name));
   	    }
 	}
 	return result;
@@ -1392,14 +1388,14 @@ keyjavatype returns [KeYJavaType kjt=null]
    boolean array = false;
 }
 :
-    type = simple_ident_dots (EMPTYBRACKETS {type += "[]"; array=true;})* 
+    type = simple_ident_dots  
     {
         kjt = getProgramInfo().getKeYJavaType(type);
             
-        //expand to "abs.lang"            
+        //expand to "ABS.StdLib"            
         if (kjt == null) {
             try {
-                String guess = "abs.lang." + type;
+                String guess = "ABS.StdLib." + type;
        	        kjt = getProgramInfo().getKeYJavaType(guess);
        	    } catch(Exception e) {
        	        kjt = null;
@@ -1511,7 +1507,7 @@ one_schema_var_decl
        if(nameString != null && !"name".equals(nameString)) {
          semanticError("Unrecognized token '"+nameString+"', expected 'name'");
        }
-       ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
+       IProgramSVSort psv = ABSProgramSVSort.name2sort().get(new Name(id));
        s = (Sort) (parameter != null ? psv.createInstance(parameter) : psv);
        if (s == null) {
          semanticError
@@ -2639,7 +2635,7 @@ modality_dl_term returns [Term a = null]
    :
    modality : MODALITY
      {
-       sjb=getJavaBlock(modality);
+       sjb=getABSBlock(modality);
        Debug.out("op: ", sjb.opName);
        Debug.out("program: ", sjb.javaBlock);
        if(sjb.opName.charAt(0) == '#') {

@@ -11,7 +11,6 @@
  */
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 public interface Label extends TerminalProgramElement {
 
@@ -22,8 +21,6 @@ public interface Label extends TerminalProgramElement {
     SourceElement getLastElement();
 
     void prettyPrint(PrettyPrinter w) throws java.io.IOException;
-
-    void visit(Visitor v);
 
     Position getStartPosition();
 

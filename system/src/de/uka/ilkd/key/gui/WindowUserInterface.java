@@ -8,6 +8,8 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
@@ -196,6 +198,11 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public void notify(NotificationEvent event) {
+	        if (event instanceof GeneralFailureEvent) {
+	            System.out.println(((GeneralFailureEvent)event).getErrorMessage());
+                    if (event instanceof ExceptionFailureEvent)
+	            System.out.println(((ExceptionFailureEvent)event).getException());	
+	        }
 		mainWindow.notify(event);
 	}
 

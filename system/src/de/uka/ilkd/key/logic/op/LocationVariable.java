@@ -47,7 +47,7 @@ public final class LocationVariable extends ProgramVariable
     
 
     @Override
-    public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
+    public void visit(de.uka.ilkd.key.java.visitor.ProgramVisitor v) {
         v.performActionOnLocationVariable(this);
     }
 }

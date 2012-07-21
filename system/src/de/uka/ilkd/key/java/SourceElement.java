@@ -13,7 +13,7 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.java.visitor.ProgramVisitor;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 /**
@@ -76,7 +76,7 @@ public interface SourceElement extends SVSubstitute {
      * perform some action/transformation on this element
      * @param v the Visitor
      */
-    void visit(Visitor v);
+    void visit(ProgramVisitor v);
 
     /**
      * Pretty print.

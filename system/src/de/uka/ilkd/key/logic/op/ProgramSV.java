@@ -36,7 +36,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.java.visitor.ProgramVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -229,7 +229,7 @@ public final class ProgramSV extends AbstractSV
 
     
     @Override
-    public void visit(Visitor v) {
+    public void visit(ProgramVisitor v) {
         v.performActionOnSchemaVariable(this);
     }
 

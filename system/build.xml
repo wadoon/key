@@ -111,7 +111,6 @@
   	
      <javac srcdir= "${src.dir}:${gen.dir}:${test.dir}"
            destdir="${dist.dir}"
-           source="1.6"
      	   deprecation="off"
            debug="on"
            depend="${build.depend}"

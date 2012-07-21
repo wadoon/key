@@ -34,7 +34,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.java.visitor.ProgramVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -158,7 +158,7 @@ public final class ProgramMethod extends ObserverFunction
      * @param v the Visitor
      */
     @Override
-    public void visit(Visitor v) {
+    public void visit(ProgramVisitor v) {
 	v.performActionOnProgramMethod(this);
     }
 

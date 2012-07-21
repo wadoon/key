@@ -1738,7 +1738,7 @@ one_schema_var_decl
        if(nameString != null && !"name".equals(nameString)) {
          semanticError("Unrecognized token '"+nameString+"', expected 'name'");
        }
-       ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
+       IProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
        s = (Sort) (parameter != null ? psv.createInstance(parameter) : psv);
        if (s == null) {
          semanticError

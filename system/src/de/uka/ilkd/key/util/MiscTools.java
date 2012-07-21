@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -75,7 +76,7 @@ public final class MiscTools {
     
     public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe, 
 	    					     	    IServices services) {
-	final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
+	final IReadPVCollector rpvc = IProgramVisitorProvider.getInstance().createReadPVCollector(pe, services);
 	rpvc.start();
 	return rpvc.result();
     }    
@@ -84,7 +85,7 @@ public final class MiscTools {
     public static ImmutableSet<ProgramVariable> getLocalOuts(
 	    					ProgramElement pe, 
 	    			                IServices services) {
-	final WrittenPVCollector wpvc = new WrittenPVCollector(pe, services);
+	final IWrittenPVCollector wpvc = IProgramVisitorProvider.getInstance().createWrittenPVCollector(pe, services);
 	wpvc.start();
 	return wpvc.result();
     }
@@ -448,76 +449,6 @@ public final class MiscTools {
     //inner classes
     //-------------------------------------------------------------------------    
     
-    private static final class ReadPVCollector extends JavaASTVisitor {
-	private ImmutableSet<ProgramVariable> result 
-		= DefaultImmutableSet.<ProgramVariable>nil();
-
-	private ImmutableSet<ProgramVariable> declaredPVs 
-		= DefaultImmutableSet.<ProgramVariable>nil();
-
-	public ReadPVCollector(ProgramElement root, IServices services) {
-	    super(root, services);
-	}
-
-	@Override
-	protected void doDefaultAction(SourceElement node) {
-	    if(node instanceof ProgramVariable) {
-		ProgramVariable pv = (ProgramVariable) node;
-		if(!pv.isMember() && !declaredPVs.contains(pv)) {
-		    result = result.add(pv);
-		}		    
-	    } else if(node instanceof VariableSpecification) {
-		VariableSpecification vs = (VariableSpecification) node;
-		ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
-		if(!pv.isMember()) {
-		    assert !declaredPVs.contains(pv);
-		    result = result.remove(pv);
-		    declaredPVs = declaredPVs.add(pv);
-		}
-	    }
-	}
-
-	public ImmutableSet<ProgramVariable> result() {
-	    return result;
-	}
-    }
-    
-       
-    private static final class WrittenPVCollector extends JavaASTVisitor {
-	private ImmutableSet<ProgramVariable> result 
-		= DefaultImmutableSet.<ProgramVariable>nil();
-
-	private ImmutableSet<ProgramVariable> declaredPVs 
-		= DefaultImmutableSet.<ProgramVariable>nil();
-
-	public WrittenPVCollector(ProgramElement root, IServices services) {
-	    super(root, services);
-	}
-
-	@Override	
-	protected void doDefaultAction(SourceElement node) {
-	    if(node instanceof Assignment) {
-		ProgramElement lhs = ((Assignment) node).getChildAt(0);
-		if(lhs instanceof ProgramVariable) {
-		    ProgramVariable pv = (ProgramVariable) lhs;
-		    if(!pv.isMember() && !declaredPVs.contains(pv)) {
-			result = result.add(pv);
-		    }		    
-		}
-	    } else if(node instanceof VariableSpecification) {
-		VariableSpecification vs = (VariableSpecification) node;
-		ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
-		if(!pv.isMember()) {
-		    assert !declaredPVs.contains(pv);
-		    assert !result.contains(pv);
-		    declaredPVs = declaredPVs.add(pv);
-		}
-	    }
-	}
-
-	public ImmutableSet<ProgramVariable> result() {
-	    return result;
-	}
-    }
+ 
 
 }

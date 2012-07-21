@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -1086,32 +1087,7 @@ public abstract class Taclet implements Rule, Named {
 	while (it.hasNext()) {
 	    Taclet tacletToAdd = it.next(); 
 	    String uniqueTail=""; // we need to name the new taclet uniquely
-/*
-            TacletGoalTemplate replacewithCandidate = null;
-	    Iterator<TacletGoalTemplate> actions = 
-               tacletToAdd.goalTemplates().iterator();
-            while (actions.hasNext()) {
-               replacewithCandidate = actions.next();
-               if (replacewithCandidate instanceof RewriteTacletGoalTemplate)
-                  break;
-            }
-            if ((replacewithCandidate instanceof RewriteTacletGoalTemplate) &&
-                (tacletToAdd instanceof FindTaclet)) {
-                // we have _both_ FIND and REPLACEWITH
-                Term find = ((FindTaclet)tacletToAdd).find();
-                Term replwith = 
-                   ((RewriteTacletGoalTemplate)
-                      replacewithCandidate).replaceWith();
-                      
-                SyntacticalReplaceVisitor visitor = // now instantiate them!
-                   new SyntacticalReplaceVisitor(services, matchCond.getInstantiations ());
-                visitor.visit(find);
-                uniqueTail = "_" + visitor.getTerm();
-                visitor = new SyntacticalReplaceVisitor(services, matchCond.getInstantiations ());
-                visitor.visit(replwith);
-                uniqueTail += "_" + visitor.getTerm();
-	    }
-*/
+
             if ("".equals(uniqueTail)) { // otherwise just number it
                de.uka.ilkd.key.proof.Node n = goal.node();
                uniqueTail = AUTONAME+n.getUniqueTacletNr()+"_"+n.parent().siblingNr();
@@ -1133,8 +1109,7 @@ public abstract class Taclet implements Rule, Named {
 	    SVInstantiations neededInstances = SVInstantiations.
 		EMPTY_SVINSTANTIATIONS.addUpdateList
 		(matchCond.getInstantiations ().getUpdateContext());
-	    final TacletSchemaVariableCollector collector = new
-		TacletSchemaVariableCollector(); 
+	    final AbstractTacletSchemaVariableCollector collector = IProgramVisitorProvider.getInstance().createTacletSchemaVariableCollector(); 
 	    collector.visit(tacletToAdd, true);// true, because
 	                                     // descend into
 					     // addrules
@@ -1289,7 +1264,7 @@ public abstract class Taclet implements Rule, Named {
     protected ImmutableSet<SchemaVariable> getIfVariables () {
 	// should be synchronized
 	if ( ifVariables == null ) {
-	    TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector ();
+	    AbstractTacletSchemaVariableCollector svc = IProgramVisitorProvider.getInstance().createTacletSchemaVariableCollector();;
 	    svc.visit( ifSequent () );
 	    
 	    ifVariables                 = DefaultImmutableSet.<SchemaVariable>nil();

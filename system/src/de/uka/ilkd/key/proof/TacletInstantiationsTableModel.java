@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.*;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.keyabs.logic.sort.ABSProgramSVSort;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
@@ -100,6 +102,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
         while (it.hasNext()) {
             SchemaVariable sv = it.next();
+            
             Object[] column = new Object[2];
             column[0] = sv;
             column[1] = ProofSaver.printAnything(
@@ -118,6 +121,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
             Object[] column = new Object[2];
             SchemaVariable var = varIt.next();
 
+            System.out.println("===>" + var.name());
             if (!tacletApp.taclet ().getIfFindVariables ().contains(var)) {
                 column[0] = var;
 
@@ -326,7 +330,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	Sort svSort = sv.sort();
 	if (svSort == ProgramSVSort.LABEL) {
 	    return VariableNamer.parseName(instantiation);
-	} else if (svSort == ProgramSVSort.VARIABLE ) {
+	} else if (svSort == ProgramSVSort.VARIABLE || svSort == ABSProgramSVSort.ABS_VARIABLE) {
 	    NewVarcond nvc = app.taclet().varDeclaredNew(sv);
 	    if (nvc != null) {
 		KeYJavaType kjt;
@@ -481,7 +485,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                         	    		false);
                         }
 		    }
-		} else if (sv instanceof ProgramSV) {
+		} else if (sv.sort() instanceof IProgramSVSort) {
 		    final ProgramElement pe = parseRow(irow);                    
 		    result = result.addCheckedInstantiation(sv, pe, services, true);
 		} 
@@ -508,7 +512,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                 
 	        sort = null;
                 
-                if (sv instanceof ProgramSV) {
+                if (sv.sort() instanceof IProgramSVSort) {
                     final ProgramElement pe = parseRow(irow);                    
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else{   

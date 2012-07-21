@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -905,7 +906,7 @@ public class TestApplyTaclet extends TestCase{
      * schemavariables have been introduces into a goal sequent)
      */
     public void testTacletVariableCollector () {
-        TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector();
+        AbstractTacletSchemaVariableCollector coll = IProgramVisitorProvider.getInstance().createTacletSchemaVariableCollector();
         Taclet t = TacletForTests.getRules ().lookup ( "testUninstantiatedSVCollector" ).taclet();
         coll.visit(t, false);
         ImmutableSet<SchemaVariable> collSet = DefaultImmutableSet.<SchemaVariable>nil();

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 
 
 /** 
@@ -225,7 +226,7 @@ public abstract class FindTaclet extends Taclet {
      */
     public ImmutableSet<SchemaVariable> getIfFindVariables () {
 	if ( ifFindVariables == null ) {
-	    TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector ();
+	    AbstractTacletSchemaVariableCollector svc = IProgramVisitorProvider.getInstance().createTacletSchemaVariableCollector();;
 	    find ().execPostOrder ( svc );
 	    
 	    ifFindVariables             = getIfVariables ();

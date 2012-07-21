@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -76,6 +78,11 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import de.uka.ilkd.keyabs.abs.ABSFieldReference;
+import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
+import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
+import de.uka.ilkd.keyabs.abs.CopyAssignment;
+import de.uka.ilkd.keyabs.abs.ThisExpression;
 
 
 /**
@@ -126,11 +133,14 @@ public final class LogicPrinter implements ILogicPrinter {
          */
         private boolean need_modPosTable = false;
 
+        
+        
+        
         /** These two remember the range corresponding to the first
          * executable statement in a JavaBlock */
         private int firstStmtStart;
         private Range firstStmtRange;
-
+        
         /** Remembers the start of an update to create a range */
         private final Stack<Integer> updateStarts = new Stack<Integer>();
         
@@ -459,6 +469,8 @@ public final class LogicPrinter implements ILogicPrinter {
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     private boolean createPositionTable = true;
+
+    private ABSProgramPrettyPrinter programPrettyPrinter = new ABSProgramPrettyPrinter(this);
 
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
@@ -804,21 +816,13 @@ public final class LogicPrinter implements ILogicPrinter {
 	public void printJavaBlock(JavaBlock j)
         throws IOException
     {
-        java.io.StringWriter sw = new java.io.StringWriter();
-        prgPrinter.reset();
-        prgPrinter.setWriter(sw);
-        Range r=null;
-        try {
-            j.program().prettyPrint(prgPrinter);
-            r = prgPrinter.getRangeOfFirstExecutableStatement();
-        } catch (java.io.IOException e) {
-            layouter.print("ERROR");
-            System.err.println("Error while printing Java program \n"+e);
-            throw new RuntimeException(
-                               "Error while printing Java program \n"+e);
-        }
+        //Range r=null;
+            markFirstStatement = true;
+            j.program().visit(programPrettyPrinter);
+            markFirstStatement = false;
+            //r = prgPrinter.getRangeOfFirstExecutableStatement();
         // send first executable statement range
-        printMarkingFirstStatement(sw.toString(),r);
+        //printMarkingFirstStatement(sw.toString(),r);
 
     }
 
@@ -944,10 +948,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (pe instanceof ProgramVariable) {
             printProgramVariable((ProgramVariable) pe);
         } else {
-            StringWriter w = new StringWriter();
-            PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
-            pe.prettyPrint(pp);
-            layouter.pre(w.toString());
+            pe.visit(programPrettyPrinter);
         }
     }
 
@@ -1818,4 +1819,59 @@ public final class LogicPrinter implements ILogicPrinter {
             mark(Integer.valueOf(size));
         }
     }
+
+    public void printProgramElementName(ProgramElementName x) throws IOException {
+        layouter.beginC().print(x.getProgramName().toString()).end();        
+    }
+
+
+    public void printLocationVariable(LocationVariable x) throws IOException {
+        layouter.beginC().print(x.name().toString()).end();        
+    }
+
+    
+    private boolean markFirstStatement = false;
+
+    public void printABSCopyAssignment(CopyAssignment x) throws IOException {
+        boolean fstStmnt = markFirstStatement; 
+        if (markFirstStatement) {
+            fstStmnt = true;    
+            mark(MARK_START_FIRST_STMT);
+        }
+        x.getChildAt(0).visit(programPrettyPrinter);
+        
+        layouter.print(" = ");
+
+        x.getChildAt(1).visit(programPrettyPrinter);
+
+        layouter.print(";");
+
+        if (fstStmnt) {
+            markFirstStatement = false;
+            mark(MARK_END_FIRST_STMT);
+        }
+    }
+
+    public void printABSFieldReference(ABSFieldReference x) throws IOException {
+        layouter.beginC().print("this.").print(x.getField().name().toString()).end();        
+    }
+
+    public void printABSLocalVariableReference(ABSLocalVariableReference x) throws IOException {
+        layouter.beginC().print(x.getVariable().name().toString()).end();        
+    }
+
+
+    public void printThisExpression(ThisExpression x) throws IOException {
+        layouter.beginC().print("this").end();
+    }
+
+    public void printABSStatementBlock(ABSStatementBlock x) throws IOException {
+       layouter.print("{").beginC().brk(0);
+       for (int i = 0; i<x.getStatementCount();i++) {
+           x.getChildAt(i).visit(programPrettyPrinter);
+           layouter.brk(1);
+       }
+       layouter.end().print("}");
+    }
+
 }

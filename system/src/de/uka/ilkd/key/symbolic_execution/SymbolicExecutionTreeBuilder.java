@@ -257,7 +257,7 @@ public class SymbolicExecutionTreeBuilder {
          if (succedent.subs().size() == 2) {
             Term updateApplication = succedent.subs().get(1);
             if (updateApplication.subs().size() == 2) {
-               JavaProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
+               ProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
                if (updateContent instanceof StatementBlock) { // try catch inclusive
                   ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
                   if (updateContentBody.size() == 2 && updateContentBody.get(1) instanceof Try) {

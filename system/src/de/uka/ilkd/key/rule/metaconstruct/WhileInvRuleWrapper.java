@@ -10,7 +10,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -34,7 +34,7 @@ public class WhileInvRuleWrapper extends While {
 
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         Term t = unwrap();
-        JavaProgramElement jpe = t.sub(0).javaBlock().program();
+        ProgramElement jpe = t.sub(0).javaBlock().program();
         WhileInvRule wir = (WhileInvRule) t.op();
         return wir.neededInstantiations(jpe, svInst);
     }

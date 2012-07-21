@@ -176,7 +176,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
     
     @Override
-    public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
+    public void visit(de.uka.ilkd.key.java.visitor.ProgramVisitor v) {
 	v.performActionOnProgramVariable(this);
     }
 

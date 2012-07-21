@@ -12,10 +12,19 @@
  */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceData;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
-import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.java.visitor.ProgramVisitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
@@ -102,7 +111,7 @@ public class ProgramElementName extends Name
      * perform some action/transformation on this element
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(ProgramVisitor v) {
 	v.performActionOnProgramElementName(this);
     }
 	

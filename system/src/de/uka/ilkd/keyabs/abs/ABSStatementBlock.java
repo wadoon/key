@@ -1,0 +1,237 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+
+
+package de.uka.ilkd.keyabs.abs;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.util.Debug;
+
+/**
+ *    Statement block.
+ * taken from COMPOST and changed to achieve an immutable structure
+ */
+
+public class ABSStatementBlock extends ABSNonTerminalProgramElement
+    implements StatementContainer, IABSStatement, ProgramPrefix {
+
+    /**
+     *      Body.
+     */
+    private final ImmutableArray<? extends IABSStatement> body;
+
+    
+    /**
+     * contains all program prefix elements below and including itself
+     */
+    private final ImmutableArray<ProgramPrefix> prefixElementArray;
+
+    private PosInProgram firstActiveChildPos = null;
+    
+    
+    public ABSStatementBlock() {
+	body = new ImmutableArray<IABSStatement>();
+        prefixElementArray = new ImmutableArray<ProgramPrefix>(this);
+    }
+
+
+    public ABSStatementBlock(ImmutableArray<? extends IABSStatement> as) {
+	// check for non-null elements (bug fix)
+	Debug.assertDeepNonNull(as, "statement block contructor");
+	body = as;
+        prefixElementArray = computePrefixElements(body);
+    }
+        
+
+    public ABSStatementBlock(IABSStatement as) {
+	this(new ImmutableArray<IABSStatement>(as));
+    }
+
+    public ABSStatementBlock(IABSStatement[] body) {
+	this(new ImmutableArray<IABSStatement>(body));
+    }
+
+    private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends IABSStatement> b) {
+        return computePrefixElements(b,0,this);
+    }
+
+    /** computes the prefix elements for the given array of statment block */
+    public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends IABSStatement> b, 
+            int offset, ProgramPrefix current) {
+        final ProgramPrefix[] pp;
+
+        if (b.size()>0 && b.get(0) instanceof ProgramPrefix) {
+            final ProgramPrefix prefixElement = (ProgramPrefix) b.get(0);
+            
+            final int prefixLength = 
+                ((ProgramPrefix)b.get(0)).getPrefixLength();
+            pp = new ProgramPrefix[prefixLength + 1];            
+            prefixElement.getPrefixElements().arraycopy(offset, pp, 1, prefixLength);            
+        } else {
+            pp = new ProgramPrefix[1];            
+        }                
+        pp[0] = current;
+        return new ImmutableArray<ProgramPrefix>(pp);
+    }
+
+   
+    
+    /**
+     *      Get body.
+     *      @return the statement array wrapper.
+     */
+
+    public ImmutableArray<? extends IABSStatement> getBody() {
+        return body;
+    }
+
+    public boolean isEmpty() {
+	return body.size() == 0;
+    }
+
+
+    /**
+     *      Returns the number of children of this node.
+     *      @return an int giving the number of children of this node
+     */
+    
+    public int getChildCount() {
+        return body.size();
+    }
+    
+    /**
+     *      Returns the child at the specified index in this node's "virtual"
+     *      child array
+     *      @param index an index into this node's "virtual" child array
+     *      @return the program element at the given position
+     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                 of bounds
+     */
+
+    public ProgramElement getChildAt(int index) {
+        if (body != null) {
+            return body.get(index);
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    /**
+     *      Get the number of statements in this container.
+     *      @return the number of statements.
+     */
+
+    public int getStatementCount() {
+        return body.size();
+    }
+
+    /*
+      Return the statement at the specified index in this node's
+      "virtual" statement array.
+      @param index an index for a statement.
+      @return the statement with the given index.
+      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+      of bounds.
+    */
+    @Override
+    public IABSStatement getStatementAt(int index) {
+        if (body != null) {
+            return body.get(index);
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    /**
+     *      Get the number of type declarations in this container.
+     *      @return the number of type declarations.
+     */
+
+    public int getTypeDeclarationCount() {
+        int count = 0;
+        if (body != null) {
+            for (int i = body.size() - 1; i >= 0; i -= 1) {
+                if (body.get(i) instanceof TypeDeclaration) {
+                    count += 1;
+                }
+            }
+        }
+        return count;
+    }
+
+    /*
+      Return the type declaration at the specified index in this node's
+      "virtual" type declaration array.
+      @param index an index for a type declaration.
+      @return the type declaration with the given index.
+      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+      of bounds.
+    */
+
+    public TypeDeclaration getTypeDeclarationAt(int index) {
+        if (body != null) {
+            int s = body.size();
+            for (int i = 0; i < s && index >= 0; i++) {
+                IABSStatement st = body.get(i);
+                if (st instanceof TypeDeclaration) {
+                    if (index == 0) {
+                        return (TypeDeclaration)st;
+                    }
+                    index -= 1;
+                }
+            }
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    public SourceElement getFirstElement() {
+        if (isEmpty()) return this;
+        final SourceElement e = getBody().get(0);
+        return (e instanceof ABSStatementBlock) ? e.getFirstElement() : e;
+    }
+
+    public int getPrefixLength() {        
+        return prefixElementArray.size();
+    }
+
+    public ProgramPrefix getPrefixElementAt(int i) {       
+        return prefixElementArray.get(i);
+    }
+
+    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+        return prefixElementArray;
+    }
+
+    public PosInProgram getFirstActiveChildPos() {
+        if (firstActiveChildPos == null) {
+            firstActiveChildPos = isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(0);
+        }
+        return firstActiveChildPos;
+    }
+
+    @Override
+    public void visit(ABSVisitor v) {
+        v.performActionABSStatementBlock(this);
+    }
+ 
+    public String toString() {
+        StringBuilder sb = new StringBuilder("{\n");
+        for (int i = 0; i<getStatementCount(); i++) {
+            sb.append("\t").append(getStatementAt(i)).append("\n");
+        }
+        return sb.append("}").toString();
+    }
+
+
+}

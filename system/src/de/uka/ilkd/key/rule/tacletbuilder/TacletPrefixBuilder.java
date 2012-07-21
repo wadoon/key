@@ -18,6 +18,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
+import de.uka.ilkd.key.rule.AbstractTacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletPrefix;
@@ -185,7 +187,7 @@ public class TacletPrefixBuilder {
 
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
 	RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
-	TacletSchemaVariableCollector svc=new TacletSchemaVariableCollector();
+	AbstractTacletSchemaVariableCollector svc = IProgramVisitorProvider.getInstance().createTacletSchemaVariableCollector();
 	svc.visit(rwtacletBuilder.ifSequent());
         for (TacletGoalTemplate tacletGoalTemplate : rwtacletBuilder.goalTemplates()) {
             TacletGoalTemplate tmpl = tacletGoalTemplate;

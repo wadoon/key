@@ -20,10 +20,10 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SynchronizedBlock;
@@ -121,8 +121,8 @@ public final class TacletIndex  {
 	Object indexObj;
 	final Term indexTerm = tac.find();
 	if (!indexTerm.javaBlock().isEmpty()) {
-	    final JavaProgramElement prg = indexTerm.javaBlock().program();
-	    indexObj = ((StatementBlock)prg).getStatementAt(0);                
+	    final ProgramElement prg = indexTerm.javaBlock().program();
+	    indexObj = ((StatementContainer)prg).getStatementAt(0);                
             if (!(indexObj instanceof SchemaVariable)) {
 		indexObj=indexObj.getClass();       
 	    } 
@@ -410,7 +410,7 @@ public final class TacletIndex  {
 
 	if (!term.javaBlock().isEmpty()) {
 	    prefixOccurrences.reset();
-	    StatementBlock sb=(StatementBlock)term.javaBlock().program();
+	    StatementContainer sb=(StatementContainer)term.javaBlock().program();
 	    result = getJavaTacletList(map, sb.getStatementAt(0),
 				       prefixOccurrences);
 	} 

@@ -3,6 +3,7 @@ package de.uka.ilkd.keyabs.abs.converter;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -118,11 +119,30 @@ public class ABSModelParserInfo {
         return parametricDatatypes;
     }
 
+    private void printTree(ASTNode node) {
+        for (int i = 0; i<node.getNumChild(); i++) {
+            System.out.println(node.value + ":" + node + ":" + node.getClass().getSimpleName());
+            printTree(node.getChild(i));
+        }
+    }
+    
+    
     public void readABSModel() throws IOException {
         if (!alreadyParsed && compilationUnitsFiles != null) {
             absModel = absBackend.parseFiles(compilationUnitsFiles);
             collectTypesAndFunctionDeclarations(absModel);
             alreadyParsed = true;
+            /*try {
+                absBackend.setWithStdLib(false);
+                Model m = absBackend.parse(File.createTempFile("taclet_", ".keyabs"), "module Pock; { Int i = 0; }", new StringReader("module Pock; { v = 1 + pureExp2; s;}"));
+                System.out.println("================>" + m.getChild(0) + "Errors:" + m.getErrors() + " : " + m.getContextBlock() + " : " + m.getMainBlock());
+                
+                printTree(m);
+                
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }*/
         }
     }
 

@@ -27,7 +27,7 @@ import de.uka.ilkd.key.util.ExtList;
  * This walker is used to transform a program according to the given 
  * SVInstantiations.
  */
-public class ProgramReplaceVisitor extends CreatingASTVisitor {
+public class ProgramReplaceVisitor extends CreatingASTVisitor implements IProgramReplaceVisitor {
 
 
     private ProgramElement result = null;
@@ -56,7 +56,10 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	node.visit(this);
     }
     
-    /** starts the walker*/
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor#start()
+     */
+    @Override
     public void start() {	
 	stack.push(new ExtList());		
 	walk(root());
@@ -68,6 +71,10 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	result = (ProgramElement) (stack.peek()).get(i);
     }
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor#result()
+     */
+    @Override
     public ProgramElement result() { 	
 	return result;
     }
@@ -111,7 +118,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
 
     public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
-	ProgramReplaceVisitor trans = new ProgramReplaceVisitor(x.body(), services,
+	IProgramReplaceVisitor trans = new ProgramReplaceVisitor(x.body(), services,
 								svinsts,
 								allowPartialReplacement);
 	trans.start();

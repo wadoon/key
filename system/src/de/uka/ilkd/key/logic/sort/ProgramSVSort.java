@@ -84,8 +84,8 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
-    private static final HashMap<Name, ProgramSVSort> name2sort =
-        new HashMap<Name, ProgramSVSort>(60);
+    private static final HashMap<Name, IProgramSVSort> name2sort =
+        new HashMap<Name, IProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
     
@@ -327,6 +327,7 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
 
 
     //--------------------------------------------------------------------------
+    
     
     public ProgramSVSort(Name name) {
 	super(name, DefaultImmutableSet.<Sort>nil(), false);
@@ -1522,7 +1523,7 @@ public abstract class ProgramSVSort extends AbstractSort implements IProgramSVSo
 	return elemname.charAt(0)=='<';
     }
 
-    public static HashMap<Name, ProgramSVSort> name2sort() {
+    public static HashMap<Name, IProgramSVSort> name2sort() {
         return name2sort;
     }
    

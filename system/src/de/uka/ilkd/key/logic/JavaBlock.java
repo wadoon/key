@@ -16,19 +16,21 @@ import java.io.StringWriter;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 
 public class JavaBlock {
     
     public static final JavaBlock EMPTY_JAVABLOCK
     	= new JavaBlock(new StatementBlock());
-    private final JavaProgramElement prg;
+    private final ProgramElement prg;
 
 
     /** create a new JavaBlock 
      * @param prg the root JavaProgramElement for this JavaBlock
      */
-    private JavaBlock(JavaProgramElement prg) {
+    private JavaBlock(StatementContainer prg) {
 	this.prg=prg;
     }
 
@@ -36,25 +38,23 @@ public class JavaBlock {
      * @param prg the root StatementBlock for this JavaBlock.
      * TacletIndex relies on <code>prg</code> being indeed a StatementBlock.
      */
-    public static JavaBlock createJavaBlock(StatementBlock prg) {
+    public static JavaBlock createJavaBlock(StatementContainer prg) {
 	assert prg != null;
-	/*if (prg.isEmpty() && ! ) {
-	    return EMPTY_JAVABLOCK;	   
-	} */
+	
 	return new JavaBlock(prg);
     }
     
 
     public boolean isEmpty() {
-	if ((program() instanceof StatementBlock))  {
-	    return ((StatementBlock)program()).isEmpty();
+	if (program() instanceof StatementContainer)  {
+	    return size() == 0;
 	}
 	return this == EMPTY_JAVABLOCK;
     }
     
     public int size() {
-	if ((program() instanceof StatementBlock))  {
-	    return ((StatementBlock)program()).getChildCount();
+	if ((program() instanceof StatementContainer))  {
+	    return ((StatementContainer)program()).getChildCount();
 	}
 	return 0;
     }
@@ -97,7 +97,7 @@ public class JavaBlock {
     /** returns true if the given ProgramElement is equal to the
      * one of the JavaBlock modulo renaming (see comment in SourceElement)
      */ 
-    private boolean equalsModRenaming(JavaProgramElement pe,
+    private boolean equalsModRenaming(ProgramElement pe,
 				     NameAbstractionTable nat) {
 	if (pe == null && program() == null) {
 	    return true;
@@ -110,7 +110,7 @@ public class JavaBlock {
     /** returns the java program 
      * @return the stored JavaProgramElement
      */
-    public JavaProgramElement program() {
+    public ProgramElement program() {
 	return prg;
     }
 

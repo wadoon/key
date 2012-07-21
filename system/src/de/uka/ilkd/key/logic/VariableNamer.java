@@ -33,6 +33,7 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -51,6 +52,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.keyabs.logic.sort.ABSProgramSVSort;
 
 
 /**
@@ -413,7 +415,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         ProgramElementName result = null;
 
         Sort svSort = sv.sort();
-        if(svSort == ProgramSVSort.VARIABLE) {
+        if(svSort == ProgramSVSort.VARIABLE || svSort == ABSProgramSVSort.ABS_VARIABLE) {
             if(basename == null || "".equals(basename)) {
                 basename = DEFAULT_BASENAME;
             }
@@ -553,7 +555,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 	boolean result = true;
 
 	Sort svSort = sv.sort();
-	if(svSort == ProgramSVSort.VARIABLE) {
+	if(svSort == ProgramSVSort.VARIABLE || svSort == ABSProgramSVSort.ABS_VARIABLE) {
 	    result = isUniqueInProgram(name,
 				       getProgramFromPIO(posOfFind),
 				       posOfDeclaration);
@@ -712,7 +714,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     private ProgramElement instantiateExpression(ProgramElement e,
                                                  SVInstantiations svInst,
 						 IServices services) {
-        ProgramReplaceVisitor trans =
+        IProgramReplaceVisitor trans =
 	    new ProgramReplaceVisitor(e, services, svInst, false);
 	trans.start();
 	return trans.result();

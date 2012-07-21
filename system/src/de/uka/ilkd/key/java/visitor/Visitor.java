@@ -164,7 +164,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  * calls the  doActionAt<NodeType> method. Similar to the pretty print
  * mechanism.
  */
-public interface Visitor {
+public interface Visitor extends ProgramVisitor {
 
     void performActionOnAbstractProgramElement
     (AbstractProgramElement x);
