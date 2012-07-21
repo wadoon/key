@@ -780,8 +780,8 @@ options {
 
     private Set progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
-  	  ProgramVariableCollector pvc
-	      = new ProgramVariableCollector(jb.program(), getServices());
+  	  IProgramVariableCollector pvc
+	      = IProgramVisitorProvider.getInstance().createProgramVariableCollector(jb.program(), getServices());
           pvc.start();
           return pvc.result();
         }else 

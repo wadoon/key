@@ -25,7 +25,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  * Walks through a java AST in depth-left-fist-order. 
  * This walker is used collect all LocationVariables and optional function locations.
  */
-public class ProgramVariableCollector extends JavaASTVisitor {
+public class ProgramVariableCollector extends JavaASTVisitor implements IProgramVariableCollector<LocationVariable> {
 
     private final HashSet<LocationVariable> result 
     	= new HashSet<LocationVariable>();

@@ -13,10 +13,11 @@ package de.uka.ilkd.key.proof;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.java.visitor.IProgramVariableCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 
 public class TermProgramVariableCollector extends Visitor {
 
@@ -40,8 +41,8 @@ public class TermProgramVariableCollector extends Visitor {
 	} 
 	
 	if ( !t.javaBlock ().isEmpty() ) {
-	    ProgramVariableCollector pvc
-		= new ProgramVariableCollector ( t.javaBlock ().program (), services );
+	    IProgramVariableCollector pvc
+		= IProgramVisitorProvider.getInstance().createProgramVariableCollector ( t.javaBlock ().program (), services );
 	    pvc.start();
 	    result.addAll ( pvc.result () );
 	}

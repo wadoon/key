@@ -9,8 +9,11 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
+import de.uka.ilkd.key.java.visitor.IProgramVariableCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
+import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.AbstractTacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
@@ -19,6 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.IReadPVCollector;
 import de.uka.ilkd.key.util.IWrittenPVCollector;
 import de.uka.ilkd.keyabs.abs.ABSProgramReplaceVisitor;
+import de.uka.ilkd.keyabs.abs.ABSProgramVariableCollector;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSVariableSpecification;
 import de.uka.ilkd.keyabs.abs.ABSVisitorImpl;
@@ -54,7 +58,21 @@ public class IProgramVisitorProvider {
                 new ABSWrittenPVCollector(root) : new WrittenPVCollector(root, services);
     }
     
+    public static IProgramReplaceVisitor createProgramReplaceVisitor(
+            ProgramElement root, IServices services,
+            SVInstantiations svInst, boolean allowPartialReplacement) {
+        return ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ? 
+                new ABSProgramReplaceVisitor(root, (ABSServices) services, svInst, allowPartialReplacement) : 
+                    new ProgramReplaceVisitor(root, services, svInst, allowPartialReplacement);
+    }    
     
+    
+    public static IProgramVariableCollector<LocationVariable> createProgramVariableCollector(
+            ProgramElement root, IServices services) {
+        return ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ? 
+                new ABSProgramVariableCollector(root, (ABSServices) services) : 
+                    new ProgramVariableCollector(root, services);
+    }
     
     
     private static final class ABSReadPVCollector extends ABSVisitorImpl 
@@ -194,14 +212,5 @@ public class IProgramVisitorProvider {
         public ImmutableSet<ProgramVariable> result() {
             return result;
         }
-    }
-
-
-    public static IProgramReplaceVisitor createProgramReplaceVisitor(
-            ProgramElement root, IServices services,
-            SVInstantiations svInst, boolean allowPartialReplacement) {
-        return ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ? 
-                new ABSProgramReplaceVisitor(root, (ABSServices) services, svInst, allowPartialReplacement) : 
-                    new ProgramReplaceVisitor(root, services, svInst, allowPartialReplacement);
     }
 }

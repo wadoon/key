@@ -59,6 +59,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         return preservesPositionInfo;
     }
     
+    @Override
     protected void walk(ProgramElement node) {
         ExtList l = new ExtList();
         l.add(node.getPositionInfo());

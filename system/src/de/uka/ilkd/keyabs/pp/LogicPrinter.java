@@ -815,16 +815,17 @@ public final class LogicPrinter implements ILogicPrinter {
     @Override
 	public void printJavaBlock(JavaBlock j)
         throws IOException
-    {
-        //Range r=null;
-            markFirstStatement = true;
-            j.program().visit(programPrettyPrinter);
-            markFirstStatement = false;
-            //r = prgPrinter.getRangeOfFirstExecutableStatement();
-        // send first executable statement range
-        //printMarkingFirstStatement(sw.toString(),r);
-
-    }
+        {
+        markFirstStatement = true;
+        if (j.isEmpty()) {
+            if (markFirstStatement) {
+                markFirstStatement = false;
+                mark(MARK_START_FIRST_STMT);
+                mark(MARK_END_FIRST_STMT);
+            }                 
+        }
+        j.program().visit(programPrettyPrinter);
+        }
 
     /* (non-Javadoc)
 	 * @see de.uka.ilkd.keyabs.pp.ILogicPrinter#printLength(de.uka.ilkd.key.logic.Term)
@@ -1868,7 +1869,16 @@ public final class LogicPrinter implements ILogicPrinter {
     public void printABSStatementBlock(ABSStatementBlock x) throws IOException {
        layouter.print("{").beginC().brk(0);
        for (int i = 0; i<x.getStatementCount();i++) {
+           boolean fstStmnt = markFirstStatement; 
+           if (markFirstStatement) {
+               fstStmnt = true;    
+               mark(MARK_START_FIRST_STMT);
+           }
            x.getChildAt(i).visit(programPrettyPrinter);
+           if (fstStmnt) {
+               markFirstStatement = false;
+               mark(MARK_END_FIRST_STMT);
+           }  
            layouter.brk(1);
        }
        layouter.end().print("}");

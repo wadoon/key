@@ -10,17 +10,16 @@
 package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExtList;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to
@@ -49,12 +48,6 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
         this.allowPartialReplacement = allowPartialReplacement;
     }
 
-    /**
-     * the action that is performed just before leaving the node the last time
-     */
-    protected void doAction(ProgramElement node) {
-        node.visit(this);
-    }
 
     /*
      * (non-Javadoc)
@@ -63,31 +56,30 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
      */
     @Override
     public void start() {
+        stack.push(new ExtList());              
         walk(root());
     }
 
+    @Override
     public void performActionOnSchemaVariable(SchemaVariable sv) {
         final Object inst = svinsts.getInstantiation(sv);
         if (inst instanceof ProgramElement) {
-            Debug.out("ProgramReplace SV:", sv);
-            Debug.out("ProgramReplace:", inst);
-            pushChanged((ProgramElement) inst);
+            addNewChild((ProgramElement) inst);
         } else if (inst instanceof ImmutableArray/* <ProgramElement> */) {
             final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>) inst;
             // the assertion ensures the intended instanceof check from above
             assert instArray.size() == 0
                     || instArray.last() instanceof ProgramElement;
-            for (ProgramElement pe : instArray) {
-                pushChanged(pe);
-            }
+            addChildren(instArray);
+            changed();
         } else if (inst instanceof Term
                 && ((Term) inst).op() instanceof ProgramInLogic) {
-            pushChanged(services.getTypeConverter().convertToProgramElement(
+            addNewChild(services.getTypeConverter().convertToProgramElement(
                     (Term) inst));
         } else {
             if (inst == null && allowPartialReplacement
                     && sv instanceof SourceElement) {
-                push((ProgramElement) sv);
+                unchangedProgramElementAction((ProgramElement) sv);
                 return;
             }
             Debug.fail("programreplacevisitor: Instantiation missing "
@@ -102,10 +94,6 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
         trans.start();
         ProgramElement localresult = trans.result();
         localresult = x.transform(localresult, services, svinsts);
-        pushChanged(localresult);
-    }
-
-    public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
-        throw new RuntimeException(getClass() + ": Implementaion missing");
+        addNewChild(localresult);
     }
 }

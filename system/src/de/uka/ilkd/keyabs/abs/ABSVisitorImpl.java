@@ -38,6 +38,7 @@ public class ABSVisitorImpl implements ABSVisitor {
                 }
             }
         }
+        
         // otherwise the node is left, so perform the action
         doAction(node);
     }

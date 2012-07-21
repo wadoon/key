@@ -2,6 +2,7 @@ package de.uka.ilkd.keyabs.abs;
 
 import java.util.Stack;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -11,38 +12,92 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
+import de.uka.ilkd.key.util.ExtList;
 
 public abstract class ABSModificationVisitor extends ABSVisitorImpl {
 
-    // marker that the elements on the stack need to be composed to a new
-    // element
-    private final ProgramElement CHANGED = new ABSProgramElement() {
-        @Override
-        public void visit(ABSVisitor v) {
-        }
-    };
-    private final Stack<ProgramElement> stack = new Stack<ProgramElement>();
+    protected static final Boolean CHANGED = Boolean.TRUE;
 
+    boolean preservesPositionInfo = true;
+
+    /**  */
+    //protected SimpleStackOfExtList stack = new SimpleStackOfExtList();
+    protected Stack<ExtList> stack = new Stack<ExtList>();
+    
     
     public ABSModificationVisitor(ProgramElement root) {
         super(root);
     }
     
-    public ProgramElement result() {
-        if (stack.peek() == CHANGED) {
-            stack.pop();
+    @Override
+    protected void walk(ProgramElement node) {
+        if (node instanceof SchemaVariable) {
+            System.out.println("===>"+node);
         }
-        return stack.pop();
+        ExtList l = new ExtList();
+        stack.push(l);
+        super.walk(node);
+    }
+
+    public ProgramElement result() {
+        ExtList result = stack.peek();
+        if (result.getFirst() == CHANGED) {
+            result.removeFirst();
+        }
+        return (ProgramElement) result.get(0);
     }
     
-    protected void push(ProgramElement pe) {
-        stack.push(pe);
+    /**
+     * called if the program element x is unchanged
+     */
+    protected void unchangedProgramElementAction(ProgramElement x) {
+        ExtList changeList = stack.peek();
+        if (changeList.size() == 0) {
+            addChild(x);
+            return;
+        }
+        if (changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            addChild(x);
+            changed();
+        } else {
+            addChild(x);
+        }
+    }
+    
+    protected void changed() {
+        ExtList list = stack.peek();
+        if (list.isEmpty() || list.getFirst() != CHANGED) {
+            list.addFirst(CHANGED);
+        }
+    }
+
+    protected void addToTopOfStack(ProgramElement x) {
+        if (x != null) {
+            ExtList list = stack.peek();
+            list.add(x);
+        }
+    }
+
+    protected void addChild(ProgramElement x) {
+        stack.pop();
+        addToTopOfStack(x);
+    }
+
+    protected void addChildren(ImmutableArray<ProgramElement> arr) {
+        stack.pop();
+        for (int i = 0, sz = arr.size(); i < sz; i++) {
+            addToTopOfStack(arr.get(i));
+        }
+    }   
+    protected void addNewChild(ProgramElement x) {
+        addChild(x);
+        changed();
     }
 
     @Override
     public void performActionOnProgramElementName(ProgramElementName x) {
-        push(x);
+        addChild(x);
     }
 
     @Override
@@ -52,99 +107,80 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl {
 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
-        push((ProgramSV) x);
+        addChild((ProgramSV) x);
     }
 
     @Override
     public void performActionOnProgramVariable(ProgramVariable x) {
-        push(x);
+        addChild(x);
     }
 
     @Override
     public void performActionOnLocationVariable(LocationVariable x) {
-        push(x);
+        addChild(x);
     }
 
     @Override
     public void performActionOnProgramConstant(ProgramConstant x) {
-        push(x);
+        addChild(x);
     }
 
     @Override
     public void performActionOnABSFieldReference(ABSFieldReference x) {
-        if (changed()) {
-            ProgramElement[] children = pop(x.getChildCount());
-            pushChanged(new ABSFieldReference((IProgramVariable) children[0]));
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSFieldReference((IProgramVariable) children.get(0)));
         } else {
-            push(x);
+            addChild(x);
         }
     }
 
-    protected void pushChanged(ProgramElement x) {
-        push(x);
-        push(CHANGED);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends ProgramElement> void pop(T[] children) {
-        if (changed())
-            stack.pop();
-        for (int i = children.length - 1; i >= 0; i--) {
-            children[i] = (T) stack.pop();
-        }
-    }
-
-    private ProgramElement[] pop(int childCount) {
-        if (changed())
-            stack.pop();
-        ProgramElement[] children = new ProgramElement[childCount];
-        for (int i = childCount - 1; i >= 0; i--) {
-            children[i] = stack.pop();
-        }
-        return children;
-    }
-
-    private boolean changed() {
-        return stack.peek() == CHANGED;
+    private boolean hasChanged() {
+        return !stack.peek().isEmpty() && stack.peek().getFirst() == Boolean.TRUE;
     }
 
     @Override
     public void performActionOnABSLocalVariableReference(
             ABSLocalVariableReference x) {
-        if (changed()) {
-            ProgramElement[] children = pop(x.getChildCount());
-            pushChanged(new ABSLocalVariableReference(
-                    (IProgramVariable) children[0]));
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSLocalVariableReference((IProgramVariable) children.get(0)));
         } else {
-            push(x);
+            addChild(x);
         }
     }
 
     @Override
     public void performActionOnThisExpression(ThisExpression x) {
-        push(x);
+        addChild(x);
     }
 
     @Override
     public void performActionOnCopyAssignment(CopyAssignment x) {
-        if (changed()) {
-            ProgramElement[] children = pop(x.getChildCount());
-            pushChanged(new CopyAssignment((IABSLocationReference) children[0],
-                    (IABSPureExpression) children[1]));
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new CopyAssignment((IABSLocationReference) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
-            push(x);
+            addChild(x);
         }
     }
 
     @Override
     public void performActionABSStatementBlock(ABSStatementBlock x) {
-        if (changed()) {
-            final IABSStatement[] children = new IABSStatement[x
-                    .getChildCount()];
-            pop(children);
-            pushChanged(new ABSStatementBlock(children));
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            final IABSStatement[] body = new IABSStatement[children.size()];
+            for (int i = 0; i<children.size(); i++) {
+                body[i] = (IABSStatement) children.get(i);
+            }
+            unchangedProgramElementAction(new ABSStatementBlock(body));
         } else {
-            push(x);
+            addChild(x);
         }
     }
 }

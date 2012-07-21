@@ -1,6 +1,7 @@
 package de.uka.ilkd.keyabs.init;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
@@ -20,13 +21,13 @@ public class ABSProfile extends AbstractProfile {
 
     private final static StrategyFactory DEFAULT =
             new ABSDLStrategy.Factory();
-	public static final UIConfiguration UNPARSER = new ABSUIConfiguration();
+    public static final UIConfiguration UNPARSER = new ABSUIConfiguration();
 
     public ABSProfile() {
-            super("standardRulesABS.key", ABSProof.class,
-                    DefaultImmutableSet.<GoalChooserBuilder>nil().
-                    add(new DefaultGoalChooserBuilder()).
-                    add(new DepthFirstGoalChooserBuilder()));
+        super("standardRulesABS.key", ABSProof.class,
+                DefaultImmutableSet.<GoalChooserBuilder>nil().
+                add(new DefaultGoalChooserBuilder()).
+                add(new DepthFirstGoalChooserBuilder()));
     }
 
     @Override
@@ -45,12 +46,18 @@ public class ABSProfile extends AbstractProfile {
         return DEFAULT;
     }
 
-    @Override
-	public UIConfiguration getUIConfiguration() {
-		return UNPARSER;
-	}
+    protected ImmutableSet<StrategyFactory> getStrategyFactories() {
+        ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
+        set = set.add(DEFAULT);
+        return set;
+    }
 
-	@Override
+    @Override
+    public UIConfiguration getUIConfiguration() {
+        return UNPARSER;
+    }
+
+    @Override
     public String name() {
         return "ABS Profile";
     }
