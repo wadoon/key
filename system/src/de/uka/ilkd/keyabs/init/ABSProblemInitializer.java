@@ -61,10 +61,18 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
     protected void readJava(EnvInput envInput, AbstractInitConfig initConfig)
             throws ProofInputException {
         
+        envInput.setInitConfig(initConfig);
+
         ABSModelParserInfo parserInfo = ((ABSServices)initConfig.getServices()).getProgramInfo().getABSParserInfo();
 
-        String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());
-        JavaModel absModelDescription = new JavaModel("/Users/bubel/tmp/testabs/", modelTag, new LinkedList<File>(), null);
+        String absPath = envInput.readJavaPath();
+        JavaModel absModelDescription;
+        if (absPath != null) {
+            String modelTag = "KeYABS_" + new Long((new java.util.Date()).getTime());
+            absModelDescription = new JavaModel(absPath, modelTag, new LinkedList<File>(), null);
+        } else {
+            absModelDescription = JavaModel.NO_MODEL;
+        }
 
         parserInfo.setup(absModelDescription);
         try {
@@ -75,10 +83,7 @@ public class ABSProblemInitializer extends AbstractProblemInitializer {
 
         parserInfo.finish(initConfig.getServices());
 
-
-
         initConfig.getProofEnv().setJavaModel(absModelDescription);
-
     }
 
     @Override

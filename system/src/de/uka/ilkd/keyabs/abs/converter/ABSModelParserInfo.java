@@ -3,7 +3,6 @@ package de.uka.ilkd.keyabs.abs.converter;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import abs.frontend.ast.InterfaceDecl;
 import abs.frontend.ast.InterfaceTypeUse;
 import abs.frontend.ast.List;
 import abs.frontend.ast.MethodSig;
-import abs.frontend.ast.Model;
 import abs.frontend.ast.ParametricDataTypeDecl;
 import abs.frontend.ast.TypeDecl;
 import abs.frontend.ast.VarDecl;
@@ -89,7 +87,7 @@ public class ABSModelParserInfo {
 
     private boolean alreadyParsed;
 
-    private Model absModel;
+    private ASTNode absModel;
 
     public ABSModelParserInfo() {
         this.absBackend = new CoreAbsBackend();
@@ -129,25 +127,23 @@ public class ABSModelParserInfo {
     
     public void readABSModel() throws IOException {
         if (!alreadyParsed && compilationUnitsFiles != null) {
-            absModel = absBackend.parseFiles(compilationUnitsFiles);
+            if (absModelDescription != JavaModel.NO_MODEL) {
+                absModel = absBackend.parseFiles(compilationUnitsFiles);
+            } else {
+                absModel = absBackend.getStdLib();
+            }
+                        
             collectTypesAndFunctionDeclarations(absModel);
             alreadyParsed = true;
-            /*try {
-                absBackend.setWithStdLib(false);
-                Model m = absBackend.parse(File.createTempFile("taclet_", ".keyabs"), "module Pock; { Int i = 0; }", new StringReader("module Pock; { v = 1 + pureExp2; s;}"));
-                System.out.println("================>" + m.getChild(0) + "Errors:" + m.getErrors() + " : " + m.getContextBlock() + " : " + m.getMainBlock());
-                
-                printTree(m);
-                
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }*/
         }
     }
 
     public void setup(JavaModel absModel) {
         this.absModelDescription = absModel;
+        if (absModel == JavaModel.NO_MODEL) {
+            compilationUnitsFiles = new String[0];
+            return;
+        } 
         sourceDirectory = absModel.getModelDir();
         File sourceDir = new File(sourceDirectory);
         File[] compilationUnits = sourceDir.listFiles(new FilenameFilter() {
