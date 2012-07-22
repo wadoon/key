@@ -50,6 +50,7 @@ import javax.swing.event.TreeSelectionListener;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -452,9 +453,9 @@ public final class ProofManagementDialog extends JDialog {
     private void findOrStartProof(ProofOblInput po) {
         Proof proof = findPreferablyClosedProof(po);
         if(proof == null) {
-        	UserInterface ui = mediator.getUI();
+            UserInterface ui = mediator.getUI();
             AbstractProblemInitializer pi = 
-            		new ProblemInitializer(ui, mediator.getProfile(), services, true, ui);
+            		new ProblemInitializer(ui, mediator.getProfile(), (Services) services, true, ui);
             try {
                 pi.startProver(initConfig, po, 0);
             } catch(ProofInputException exc) {

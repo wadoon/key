@@ -39,11 +39,11 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
-public final class ProblemInitializer extends AbstractProblemInitializer {
+public final class ProblemInitializer extends AbstractProblemInitializer<Services> {
 
     
     public ProblemInitializer(ProgressMonitor mon,
-	                      Profile profile, IServices services, boolean registerProof,
+	                      Profile profile, Services services, boolean registerProof,
 	                      ProblemInitializerListener listener) {
 	super(mon, profile, services, registerProof, listener);
     }
@@ -53,7 +53,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer {
             boolean registerProof,
             ProblemInitializerListener listener) {
         this(mon, profile, 
-                profile.createServices(new KeYRecoderExcHandler()), 
+                (Services) profile.createServices(new KeYRecoderExcHandler()), 
                 registerProof, listener);
     }
 
