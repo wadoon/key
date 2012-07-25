@@ -1,10 +1,13 @@
 package de.uka.ilkd.keyabs.abs;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import abs.backend.coreabs.CoreAbsBackend;
+import abs.frontend.ast.Model;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.IServices;
@@ -193,4 +196,12 @@ public class ABSInfo implements IProgramInfo {
             buildNameCache();
         }   	
     }
+
+	public CoreAbsBackend getCoreABSBackend() {
+		return absInfo.getABSBackend();
+	}
+
+	public Model parseInContext(String s) throws IOException {
+		return absInfo.parseInContext(s);
+	}
 }

@@ -11,9 +11,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.keyabs.abs.ABSAddExp;
 import de.uka.ilkd.keyabs.abs.ABSAndBoolExp;
+import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
 import de.uka.ilkd.keyabs.abs.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.ABSNullExp;
 import de.uka.ilkd.keyabs.abs.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
@@ -176,7 +178,7 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 
 
     @Override
-    public void visitABSTypeReference(ABSTypeReference x) {
+    public void performActionOnABSTypeReference(ABSTypeReference x) {
         try {
             lp.printABSTypeReference(x);
         } catch (IOException e) {
@@ -194,5 +196,25 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             e.printStackTrace();
         } 
     }
+
+
+	@Override
+	public void performActionOnABSAsyncMethodCall(ABSAsyncMethodCall x) {
+        try {
+            lp.printABSAsyncMethodCall(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } 		
+	}
+
+
+	@Override
+	public void performActionOnABSNullExp(ABSNullExp x) {
+        try {
+            lp.printABSNullExp(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } 		
+	}
 
 }

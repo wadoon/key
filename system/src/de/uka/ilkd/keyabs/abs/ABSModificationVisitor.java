@@ -12,9 +12,12 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.ExtList;
 
-public abstract class ABSModificationVisitor extends ABSVisitorImpl implements IProgramASTModifyingVisitor {
+public abstract class ABSModificationVisitor 
+				 extends ABSVisitorImpl
+				 implements IProgramASTModifyingVisitor, ABSVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
 
@@ -24,12 +27,11 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements I
     //protected SimpleStackOfExtList stack = new SimpleStackOfExtList();
     protected Stack<ExtList> stack = new Stack<ExtList>();
     
-    
     public ABSModificationVisitor(ProgramElement root) {
-        super(root);
+    	super(root);
     }
     
-    @Override
+    //@Override
     protected void walk(ProgramElement node) {
         if (node instanceof SchemaVariable) {
             System.out.println("===>"+node);
@@ -162,6 +164,11 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements I
     }
 
     @Override
+    public void performActionOnABSNullExp(ABSNullExp x) {
+        addChild(x);
+    }
+    
+    @Override
     public void performActionOnCopyAssignment(CopyAssignment x) {
         if (hasChanged()) {
             ExtList children = stack.peek();
@@ -184,6 +191,38 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements I
         }
     }
 
+    @Override
+    public void performActionOnABSMultExp(ABSMultExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSMultExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSOrBoolExp(ABSOrBoolExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSOrBoolExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSAndBoolExp(ABSAndBoolExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSAndBoolExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
     
     @Override
     public void performActionABSStatementBlock(ABSStatementBlock x) {
@@ -199,4 +238,57 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements I
             addChild(x);
         }
     }
+
+	@Override
+	public void performActionOnProgramMetaConstruct(
+			ProgramTransformer<ABSServices> x) {
+		//
+	}
+
+	@Override
+	public void performActionOnABSTypeReference(ABSTypeReference x) {
+		if (hasChanged()) {
+			// should not be called
+            assert false;
+			ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(x);
+        } else {
+            addChild(x);
+        }
+	}
+
+	@Override
+	public void performActionOnABSVariableDeclarationStatement(
+			ABSVariableDeclarationStatement x) {
+		if (hasChanged()) {
+			ExtList children = stack.peek();
+			children.removeFirst();
+			ABSTypeReference typeRef = children.removeFirstOccurrence(ABSTypeReference.class);
+			IProgramVariable var = children.removeFirstOccurrence(IProgramVariable.class);
+			IABSExpression exp = children.removeFirstOccurrence(IABSExpression.class);
+			unchangedProgramElementAction(new ABSVariableDeclarationStatement(typeRef, var, exp));
+		} else {
+			addChild(x);
+		}
+	}
+
+	@Override
+	public void performActionOnABSAsyncMethodCall(ABSAsyncMethodCall x) {
+		if (hasChanged()) {
+			ExtList children = stack.peek();
+			children.removeFirst();
+			IABSPureExpression caller = children.removeFirstOccurrence(IABSPureExpression.class);
+			ProgramElementName methodName = children.removeFirstOccurrence(ProgramElementName.class);
+			
+			IABSPureExpression[] arguments = new IABSPureExpression[children.size()];
+			for (int i = 0; i<children.size(); i++) {
+				arguments[i] = (IABSPureExpression) children.get(i);
+            }
+			unchangedProgramElementAction(new ABSAsyncMethodCall(caller, methodName, arguments));
+		} else {
+			addChild(x);
+		}		
+	}
+
 }

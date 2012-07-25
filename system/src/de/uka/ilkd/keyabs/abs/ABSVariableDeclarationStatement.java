@@ -56,5 +56,9 @@ public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElemen
     public ProgramElement getTypeReference() {
         return type;
     }
+    
+    public String toString() {
+    	return type + " " + var + (exp != null ? " = "+exp : "");
+    }
 
 }

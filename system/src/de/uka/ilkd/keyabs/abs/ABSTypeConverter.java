@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 public final class ABSTypeConverter extends AbstractTypeConverter {
@@ -50,8 +51,11 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
             } else if (pe instanceof ABSMultExp) {
                 return getServices().getTermBuilder().mul(services, left, right);                
             } else if (pe instanceof ABSAndBoolExp) {
-            } else if (pe instanceof ABSMultExp) {
+            	
+            } else if (pe instanceof ABSOrBoolExp) {
             }
+        } else if (pe instanceof ABSNullExp) {
+        	return getServices().getTermBuilder().NULL(getServices());
         }
         return null;
     }
@@ -110,10 +114,13 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
     }
 
     @Override
-    public boolean isIntegerType(Type t2) {
-        // TODO Auto-generated method stub
-        return false;
-    }
+    public boolean isIntegerType(Type t) {
+        Type type = t;
+    	if (t instanceof KeYJavaType) {
+        	return ((KeYJavaType) t).getSort().extendsTrans(getIntegerLDT().targetSort());
+        }
+    	return type instanceof ABSInterfaceType;
+  }
 
     @Override
     public boolean isIntegralType(Type t) {
@@ -129,8 +136,11 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
 
     @Override
     public boolean isReferenceType(Type t) {
-        // TODO Auto-generated method stub
-        return false;
+        Type type = t;
+    	if (t instanceof KeYJavaType) {
+        	type = ((KeYJavaType) t).getJavaType();
+        }
+    	return type instanceof ABSInterfaceType;
     }
 
     @Override

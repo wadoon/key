@@ -12,9 +12,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.keyabs.logic.sort.ABSProgramSVSort;
@@ -60,7 +58,9 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
 
     
     public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
-        final String typeName = x.getVarDecl().getType().getQualifiedName();
+        String typeName;
+       
+        typeName = x.getVarDecl().getAccess().toString();
         
         System.out.println("===> " + typeName);
         

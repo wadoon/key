@@ -84,8 +84,11 @@ public class ABSTypeReference extends ABSNonTerminalProgramElement implements Ty
 
     @Override
     public void visit(ABSVisitor v) {
-        v.visitABSTypeReference(this);
+        v.performActionOnABSTypeReference(this);
     } 
 
+    public String toString() {
+    	return type.getFullName();
+    }
  
 }

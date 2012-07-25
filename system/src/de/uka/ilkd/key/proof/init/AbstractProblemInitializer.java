@@ -354,6 +354,8 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
         // read envInput
         readEnvInput(envInput, initConfig);
 
+
+
         // done
         if (listener != null) {
             listener.progressStopped(this);

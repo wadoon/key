@@ -1,11 +1,15 @@
 package de.uka.ilkd.keyabs.abs.converter;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import abs.backend.coreabs.CoreAbsBackend;
@@ -16,8 +20,8 @@ import abs.frontend.ast.DataTypeDecl;
 import abs.frontend.ast.FunctionDecl;
 import abs.frontend.ast.InterfaceDecl;
 import abs.frontend.ast.InterfaceTypeUse;
-import abs.frontend.ast.List;
 import abs.frontend.ast.MethodSig;
+import abs.frontend.ast.Model;
 import abs.frontend.ast.ParametricDataTypeDecl;
 import abs.frontend.ast.TypeDecl;
 import abs.frontend.ast.VarDecl;
@@ -36,7 +40,7 @@ import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 public class ABSModelParserInfo {
 
     public static final Name ABS_BOOLEAN_TYPE_NAME = new Name("ABS.StdLib.Bool");
-    public static final Name ABS_INT_TYPE_NAME = new Name("ABS.StdLib.Int");
+    public static final Name ABS_INT_TYPE_NAME     = new Name("ABS.StdLib.Int");
 
     private static Sort checkBuiltInType(IServices iServices,
             Entry<Name, DataTypeDecl> dataType) {
@@ -108,9 +112,26 @@ public class ABSModelParserInfo {
         // create KeYJavaTypes and put them in map
         registerAndCreateABSInterfaceType2SortMapping(iServices);
         registerAndCreateABSDataType2SortMapping(iServices);
-
+    }
+    
+    public CoreAbsBackend getABSBackend() {
+    	return absBackend;
     }
 
+    public Model parseInContext(String s) throws IOException {
+    	File f = File.createTempFile("keyabs", ".abs");
+    	FileWriter fw = new FileWriter(f);
+    	fw.write(s);
+    	fw.close();
+    	List<String> files = new ArrayList();
+    	files.addAll(Arrays.asList(compilationUnitsFiles));
+        files.add(f.getAbsolutePath());
+    	for (String cu : files) {
+    		System.out.println(cu);
+    	}
+    	return absBackend.parseFiles(files.toArray(new String[0]));
+    }
+    
     public DataTypeDescriptor getDatatypes() {
         return datatypes;
     }
@@ -169,7 +190,11 @@ public class ABSModelParserInfo {
 
     private void collectConstructors(DataTypeDecl decl, Name dataTypeName,
             DataTypeDescriptor descr) {
-        List<DataConstructor> constructors = decl.getDataConstructors();
+        List<DataConstructor> constructors = new LinkedList<DataConstructor>();
+        for (DataConstructor c : decl.getDataConstructors()) {
+        	constructors.add(c);
+        }
+        
         descr.addDataType2Constructors(dataTypeName, constructors);
     }
 
@@ -226,8 +251,7 @@ public class ABSModelParserInfo {
     }
 
     private void registerAndCreateABSDataType2SortMapping(IServices iServices) {
-        Sort topSort = (Sort) iServices.getNamespaces().sorts()
-                .lookup(new Name("any"));
+        Sort topSort = Sort.ANY;
 
         assert topSort != null;
 
@@ -246,7 +270,8 @@ public class ABSModelParserInfo {
             iServices.getProgramInfo().rec2key().put(absType, abs2sort);
         }
     }
-
+    
+    
     private void registerAndCreateABSInterfaceType2SortMapping(
             IServices iServices) {
         Sort anyInterfaceSort = (Sort) iServices.getNamespaces().sorts()
@@ -254,7 +279,6 @@ public class ABSModelParserInfo {
 
         assert anyInterfaceSort != null;
 
-        @SuppressWarnings("unchecked")
         Entry<Name, InterfaceDecl>[] interfArray = sortInterfacesAscendingInNumberOfExtendedTypes();
 
         final HashMap<Name, KeYJavaType> names2type = new HashMap<Name, KeYJavaType>();
@@ -282,6 +306,9 @@ public class ABSModelParserInfo {
             iServices.getProgramInfo().rec2key().put(absType, abs2sort);
         }
     }
+    
+    
+    
 
     private Entry<Name, InterfaceDecl>[] sortInterfacesAscendingInNumberOfExtendedTypes() {
         @SuppressWarnings("unchecked")

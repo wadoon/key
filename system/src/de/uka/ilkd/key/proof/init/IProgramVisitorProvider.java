@@ -164,14 +164,6 @@ public class IProgramVisitorProvider {
                 if (!pv.isMember() && !declaredPVs.contains(pv)) {
                     result = result.add(pv);
                 }
-            } else if (node instanceof ABSVariableDeclarationStatement) {
-                ProgramVariable pv = (ProgramVariable) ((ABSVariableDeclarationStatement) node)
-                        .getVariable();
-                if (!pv.isMember()) {
-                    assert !declaredPVs.contains(pv);
-                    result = result.remove(pv);
-                    declaredPVs = declaredPVs.add(pv);
-                }
             }
         }
 

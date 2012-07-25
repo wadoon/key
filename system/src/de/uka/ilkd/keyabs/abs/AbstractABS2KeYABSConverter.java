@@ -4,11 +4,17 @@ import abs.frontend.ast.ASTNode;
 import abs.frontend.ast.AddExp;
 import abs.frontend.ast.AndBoolExp;
 import abs.frontend.ast.AssignStmt;
+import abs.frontend.ast.AsyncCall;
 import abs.frontend.ast.Binary;
 import abs.frontend.ast.Block;
+import abs.frontend.ast.ExpressionStmt;
 import abs.frontend.ast.FieldUse;
+import abs.frontend.ast.IncompleteAccess;
 import abs.frontend.ast.MultExp;
+import abs.frontend.ast.NullExp;
 import abs.frontend.ast.OrBoolExp;
+import abs.frontend.ast.PureExp;
+import abs.frontend.ast.ThisExp;
 import abs.frontend.ast.VarDeclStmt;
 import abs.frontend.ast.VarUse;
 import de.uka.ilkd.key.java.Expression;
@@ -44,6 +50,14 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((Binary)x);
         } else if (x instanceof VarDeclStmt) {
             result = convert((VarDeclStmt)x);
+        } else if (x instanceof NullExp) {
+        	result = new ABSNullExp();
+        } else if (x instanceof ThisExp) {
+        	result = new ThisExpression();
+        } else if (x instanceof ExpressionStmt && !(x.getChild(1) instanceof IncompleteAccess)) {
+        	result = convert(((ExpressionStmt)x).getExp());
+        } else if (x instanceof AsyncCall) {
+        	result = convert((AsyncCall)x); 
         }
 
         if (result == null) {
@@ -76,6 +90,21 @@ public abstract class AbstractABS2KeYABSConverter {
 
     protected ProgramElement convert(SchemaVariable value) {
         return (ProgramSV) value;
+    }
+    
+    public ABSAsyncMethodCall convert(AsyncCall x) {
+    	IABSPureExpression callee = (IABSPureExpression) convert(((AsyncCall) x).getCallee());
+    	ProgramElementName methodName = new ProgramElementName(((AsyncCall) x).getMethod());
+    	
+    	IABSPureExpression[] arguments = new IABSPureExpression[x.getMethodSig().getNumParam()];
+    	
+    	int i = 0;
+    	for (PureExp arg : x.getParamList()) {
+    		arguments[i] = (IABSPureExpression) convert(arg);
+    		i++;
+    	}
+    	
+    	return new ABSAsyncMethodCall(callee, methodName, arguments);
     }
 
     public ABSStatementBlock convert(Block x) {
@@ -127,7 +156,10 @@ public abstract class AbstractABS2KeYABSConverter {
     public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
         KeYJavaType type = lookupType(x.getVarDecl().getType().getQualifiedName());
         LocationVariable localVar = new LocationVariable(new ProgramElementName(x.getVarDecl().getName()), type);
-        IABSExpression initExp = (IABSExpression) convert(x.getVarDecl().getInitExp());
+        IABSExpression initExp = null;
+        if (x.getVarDecl().hasInitExp()) {
+        	initExp = (IABSExpression) convert(x.getVarDecl().getInitExp());
+        }
         return new ABSVariableDeclarationStatement(new ABSTypeReference(type), localVar, initExp);
     }
     

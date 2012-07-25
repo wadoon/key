@@ -7,6 +7,7 @@ import java.io.StringReader;
 import abs.backend.coreabs.CoreAbsBackend;
 import abs.frontend.analyser.SemanticError;
 import abs.frontend.ast.Model;
+import abs.frontend.ast.ModuleDecl;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaReader;
@@ -15,7 +16,8 @@ import de.uka.ilkd.key.logic.Namespace;
 
 public class ABSReader implements JavaReader {
 
-    private static final String CONCRETE_MODULE = "module ABS_PARSER_NORMAL_MODULE;";
+	private static final String CONCRETE_MODULE_NAME = "ABS_PARSER_NORMAL_MODULE";
+	private static final String CONCRETE_MODULE = "module " + CONCRETE_MODULE_NAME + ";";
 
     @Override
     public JavaBlock readBlockWithEmptyContext(String s, IServices services) {
@@ -24,22 +26,34 @@ public class ABSReader implements JavaReader {
 
     @Override
     public JavaBlock readBlockWithProgramVariables(Namespace varns, IServices services, String s) {
-        String blockStr = CONCRETE_MODULE + " \n " + s;
+        String blockStr = CONCRETE_MODULE + "\n import * from PingPong; " + s;
 
-        CoreAbsBackend absReader = new CoreAbsBackend();
+        CoreAbsBackend absReader = ((ABSServices)services).getProgramInfo().getCoreABSBackend();//new CoreAbsBackend();
         //absReader.setWithStdLib(true);
         try {
-            Model m = absReader.parse(File.createTempFile("taclet_", ".keyabs"), blockStr, new StringReader(blockStr));
+            Model m = ((ABSServices)services).getProgramInfo().parseInContext(blockStr);
+//            		absReader.parse(File.createTempFile("taclet_", ".keyabs"), blockStr, new StringReader(blockStr));
+                    
+            ModuleDecl module = null;
+            for (ModuleDecl md : m.getModuleDecls()) {
+            	System.out.println(md.getName());
+            	if (md.getName().equals(CONCRETE_MODULE_NAME)) {
+            		module = md;
+            		break;
+            	}
+            	
+            }
             
-            System.out.println(m.getMainBlock() + " Errors: "+m.getErrors());
+            System.out.println(" Errors: "+m.getErrors());
             
             for (SemanticError se : m.getErrors()) {
                 System.out.println(se.getHelpMessage() + " : " + se.getFileName() + " : " + se.getMsgString());
             }
+            System.out.println(module.getBlock() + " Errors: "+m.getErrors());
            
             AbstractABS2KeYABSConverter converter = new ConcreteABS2KeYABSConverter(varns, services);
             
-            ABSStatementBlock block = converter.convert(m.getMainBlock());
+            ABSStatementBlock block = converter.convert(module.getBlock());
 
             System.out.println("Converted " + block);
 

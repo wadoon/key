@@ -20,4 +20,9 @@ public class ABSAndBoolExp extends ABSBinaryOperatorPureExp {
         v.performActionOnABSAndBoolExp(this);
     }
 
+    
+    public String toString() {
+    	return getChildAt(0) + " && " + getChildAt(1);
+    }
+
 }

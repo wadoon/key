@@ -20,4 +20,9 @@ public class ABSMultExp extends ABSBinaryOperatorPureExp {
         v.performActionOnABSMultExp(this);
     }
 
+    public String toString() {
+    	return getChildAt(0) + " * " + getChildAt(1);
+    }
+
+    
 }

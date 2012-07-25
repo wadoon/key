@@ -20,4 +20,9 @@ public class ABSOrBoolExp extends ABSBinaryOperatorPureExp {
         v.performActionOnABSOrBoolExp(this);
     }
 
+    public String toString() {
+    	return getChildAt(0) + " || " + getChildAt(1);
+    }
+
+    
 }

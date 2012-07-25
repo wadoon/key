@@ -3,7 +3,7 @@
  *
  */
 module PingPong;
-
+export *;
 data PingMsg = Fine
              | HelloPing 
              | ByePing 
@@ -22,6 +22,7 @@ interface Ping {
 interface Pong {
     Unit hello(Ping ping);
     Unit pong(PongMsg m);
+    Unit nothing();
 }
 
 class PingImpl(Pong pong) implements Ping {
@@ -50,6 +51,8 @@ class PongImpl implements Pong {
        this.ping = ping;
        ping!ping(HelloPing);
     }
+
+    Unit nothing() { }
 
     Unit pong(PongMsg msg){
        if (msg == HowAreYou)

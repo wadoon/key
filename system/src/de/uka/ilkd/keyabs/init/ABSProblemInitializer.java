@@ -2,19 +2,22 @@ package de.uka.ilkd.keyabs.init;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import abs.frontend.ast.ConstructorArg;
 import abs.frontend.ast.DataConstructor;
-import abs.frontend.ast.InterfaceDecl;
-import abs.frontend.ast.List;
-import de.uka.ilkd.key.java.IServices;
+import abs.frontend.ast.DataTypeDecl;
+import abs.frontend.ast.DataTypeUse;
+import abs.frontend.ast.ParametricDataTypeDecl;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
@@ -29,6 +32,7 @@ import de.uka.ilkd.keyabs.abs.ABSInfo;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
+import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 public class ABSProblemInitializer extends AbstractProblemInitializer<ABSServices> {
 
@@ -106,7 +110,33 @@ public class ABSProblemInitializer extends AbstractProblemInitializer<ABSService
         }
 
         System.out.println("Instantiating Generic Datatypes");
-        //TODO
+        for ( DataTypeDecl d : info.getABSParserInfo().getParametricDatatypes().getDatatypes().values()) {
+        	if (((ParametricDataTypeDecl)d).getNumTypeParameter() > 1) {
+        		System.out.println("Skipping data types with more than one parameter");
+        		continue;
+        	}
+        	//to do: KeYJavaType
+        	
+        	
+        }
+
+
+        System.out.println("Register future types");
+        
+        HistoryLDT historyLDT = services.getTypeConverter().getHistoryLDT();
+        
+        GenericSort depSort = new GenericSort(new Name("T"));
+		SortDependingFunction futGetterProto = SortDependingFunction.createFirstInstance(depSort, 
+        		new Name("get"), depSort, new Sort[]{historyLDT.targetSort()}, false);
+
+		for (KeYJavaType t : info.getAllKeYJavaTypes()) {
+        	SortImpl fut = new SortImpl(new Name("ABS.StdLib.Fut<" + t.getFullName() + ">"), 
+        			historyLDT.getFutureSort());
+			initConfig.sortNS().addSafely(fut);
+			futGetterProto.getInstanceFor(t.getSort(), initConfig.getServices());
+        
+		//TODO at KeYJavaType
+		}
         
         System.out.println("Registering Constructors");
 
@@ -163,13 +193,14 @@ public class ABSProblemInitializer extends AbstractProblemInitializer<ABSService
         System.out.println("Register Interface Class Constants");
         
         for (Name itf : info.getABSParserInfo().getClasses().keySet()) {
-            Function classLabel = 
-                    new Function(itf, services.getTypeConverter().getHistoryLDT().getClassLabelSort(),
+			Function classLabel = 
+                    new Function(itf, historyLDT.getClassLabelSort(),
                             new Sort[0], null, true);
             initConfig.getServices().getNamespaces().functions().add(classLabel);
                 
-    }
-
+        }
+        
+        System.out.println("Register method label");
     
     }
 

@@ -16,68 +16,77 @@ import de.uka.ilkd.key.util.ExtList;
 
 public class HistoryLDT extends LDT {
 
-    private final Sort interfaceLabelSort;
-    private final Sort classLabelSort;
+	private final Sort interfaceLabelSort;
+	private final Sort classLabelSort;
+	private Sort futureSort;
 
-    public HistoryLDT(IServices services) {
-        super(new Name("History"), services);
+	public HistoryLDT(IServices services) {
+		super(new Name("History"), services);
 
-        interfaceLabelSort = (Sort) services.getNamespaces().sorts().lookup(new Name("ItfLabel"));
-        classLabelSort = (Sort) services.getNamespaces().sorts().lookup(new Name("ClassLabel"));
- 
-        
-    }
+		interfaceLabelSort = (Sort) services.getNamespaces().sorts()
+				.lookup(new Name("ItfLabel"));
+		classLabelSort = (Sort) services.getNamespaces().sorts()
+				.lookup(new Name("ClassLabel"));
 
-    @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services,
-            ExecutionContext ec) {
-        return false;
-    }
+		futureSort = (Sort) services.getNamespaces().sorts()
+				.lookup(new Name("Future"));
 
-    @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
-            Services services, ExecutionContext ec) {
-        return false;
-    }
+	}
 
-    @Override
-    public boolean isResponsible(Operator op, Term sub, IServices services,
-            ExecutionContext ec) {
-        return false;
-    }
+	@Override
+	public boolean isResponsible(Operator op, Term[] subs, Services services,
+			ExecutionContext ec) {
+		return false;
+	}
 
-    @Override
-    public Term translateLiteral(Literal lit, IServices services) {
-        return null;
-    }
+	@Override
+	public boolean isResponsible(Operator op, Term left, Term right,
+			Services services, ExecutionContext ec) {
+		return false;
+	}
 
-    @Override
-    public Function getFunctionFor(Operator op, Services services,
-            ExecutionContext ec) {
-        return null;
-    }
+	@Override
+	public boolean isResponsible(Operator op, Term sub, IServices services,
+			ExecutionContext ec) {
+		return false;
+	}
 
-    @Override
-    public boolean hasLiteralFunction(Function f) {
-        return false;
-    }
+	@Override
+	public Term translateLiteral(Literal lit, IServices services) {
+		return null;
+	}
 
-    @Override
-    public Expression translateTerm(Term t, ExtList children) {
-        return null;
-    }
+	@Override
+	public Function getFunctionFor(Operator op, Services services,
+			ExecutionContext ec) {
+		return null;
+	}
 
-    @Override
-    public Type getType(Term t) {
-        return null;
-    }
+	@Override
+	public boolean hasLiteralFunction(Function f) {
+		return false;
+	}
 
-    public Sort getInterfaceLabelSort() {
-        return interfaceLabelSort;
-    }
+	@Override
+	public Expression translateTerm(Term t, ExtList children) {
+		return null;
+	}
 
-    public Sort getClassLabelSort() {
-        return classLabelSort;
-    }
+	@Override
+	public Type getType(Term t) {
+		return null;
+	}
+
+	public Sort getInterfaceLabelSort() {
+		return interfaceLabelSort;
+	}
+
+	public Sort getClassLabelSort() {
+		return classLabelSort;
+	}
+
+	public Sort getFutureSort() {
+		return futureSort;
+	}
 
 }

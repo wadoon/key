@@ -78,9 +78,11 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
 import de.uka.ilkd.keyabs.abs.ABSBinaryOperatorPureExp;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
+import de.uka.ilkd.keyabs.abs.ABSNullExp;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSTypeReference;
 import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
@@ -1842,7 +1844,7 @@ public final class LogicPrinter implements ILogicPrinter {
             fstStmnt = true;    
             mark(MARK_START_FIRST_STMT);
         }
-        layouter.beginC().ind();
+        layouter.beginC(2);
         x.getChildAt(0).visit(programPrettyPrinter);
         
         layouter.brk(1).print("=").brk(1);
@@ -1906,7 +1908,7 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.brk(1);
         x.getVariable().visit(programPrettyPrinter);
         if (x.getInitializer() != null) {
-            layouter.brk(1);
+            layouter.brk(1).print("=").brk(1);
             x.getInitializer().visit(programPrettyPrinter);
         }
         layouter.end();
@@ -1916,5 +1918,23 @@ public final class LogicPrinter implements ILogicPrinter {
     public void printABSTypeReference(ABSTypeReference x) throws IOException {
         layouter.print(x.getName());
     }
+
+
+	public void printABSAsyncMethodCall(ABSAsyncMethodCall x) throws IOException {
+		x.getChildAt(0).visit(programPrettyPrinter);
+		layouter.print("!");
+		x.getChildAt(1).visit(programPrettyPrinter);
+		layouter.beginC(0).print("(");
+		for (int i = 0; i<x.getArgumentCount(); i++) {
+			if (i != 0) layouter.print(",").brk(1);
+			x.getArgumentAt(i).visit(programPrettyPrinter);
+		}
+		layouter.print(")").end();
+	}
+
+
+	public void printABSNullExp(ABSNullExp x) throws IOException {
+		layouter.print("null");
+	}
 
 }

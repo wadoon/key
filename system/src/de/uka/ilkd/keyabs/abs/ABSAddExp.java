@@ -19,5 +19,10 @@ public class ABSAddExp extends ABSBinaryOperatorPureExp {
     public void visit(ABSVisitor v) {
         v.performActionOnABSAddExp(this);
     }
+    
+    public String toString() {
+    	return getChildAt(0) + " + " + getChildAt(1);
+    }
+
 
 }
