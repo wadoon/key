@@ -1938,13 +1938,15 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSDataConstructorExp(ABSDataConstructorExp x) throws IOException {
-	x.getChildAt(0).visit(programPrettyPrinter);
-	layouter.beginC(0).print("(");
-	for (int i = 0; i<x.getArgumentCount(); i++) {
-	    if (i != 0) layouter.print(",").brk(1);
-	    x.getArgumentAt(i).visit(programPrettyPrinter);
-	}
-	layouter.print(")").end();
+        x.getChildAt(0).visit(programPrettyPrinter);
+        if (x.getArgumentCount() > 0) {
+            layouter.beginC(0).print("(");
+            for (int i = 0; i<x.getArgumentCount(); i++) {
+                if (i != 0) layouter.print(",").brk(1);
+                x.getArgumentAt(i).visit(programPrettyPrinter);
+            }
+            layouter.print(")").end();
+        }
     }
 
 

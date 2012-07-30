@@ -11,8 +11,11 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
@@ -53,8 +56,9 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
             } else if (pe instanceof ABSMultExp) {
                 return getServices().getTermBuilder().mul(services, left, right);                
             } else if (pe instanceof ABSAndBoolExp) {
-            	
+                return convertBool2Fml(Junctor.AND, left, right);
             } else if (pe instanceof ABSOrBoolExp) {
+                return convertBool2Fml(Junctor.OR, left, right);
             }
         } else if (pe instanceof ABSNullExp) {
         	return getServices().getTermBuilder().NULL(getServices());
@@ -72,6 +76,14 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
            return services.getTermBuilder().zTerm(services, ((ABSIntLiteral)pe).getValue().toString());
         }
         return null;
+    }
+
+    private Term convertBool2Fml(Junctor op, Term left, Term right) {
+        TermBuilder tb = services.getTermBuilder();
+        Term leftFml = left.sort() == Sort.FORMULA ? left : tb.equals(left, tb.TRUE(services)); 
+        Term rightFml = right.sort() == Sort.FORMULA ? right : tb.equals(right, tb.TRUE(services)); 
+        
+        return tb.ife(tb.tf().createTerm(op, leftFml, rightFml), tb.TRUE(services), tb.FALSE(services));
     }
 
     @Override
