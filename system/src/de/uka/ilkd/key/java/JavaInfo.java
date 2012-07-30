@@ -404,25 +404,25 @@ public final class JavaInfo implements IProgramInfo {
 	}
 	
 	if(result == null) {
-	    final Namespace sorts = services.getNamespaces().sorts();
+	    final Namespace<Sort> sorts = services.getNamespaces().sorts();
 	    final Sort sort;
 	    if(type == PrimitiveType.JAVA_BOOLEAN) {
-		sort = (Sort) sorts.lookup(BooleanLDT.NAME);;
+		sort = sorts.lookup(BooleanLDT.NAME);;
 	    } else if(type == PrimitiveType.JAVA_BYTE
 	              || type == PrimitiveType.JAVA_CHAR 
 	              || type == PrimitiveType.JAVA_INT 
                       || type == PrimitiveType.JAVA_LONG 
 		      || type == PrimitiveType.JAVA_SHORT
 		      || type == PrimitiveType.JAVA_BIGINT) { 
-		 sort = (Sort) sorts.lookup(IntegerLDT.NAME);;
+		 sort = sorts.lookup(IntegerLDT.NAME);;
 	    } else if(type == PrimitiveType.JAVA_FLOAT) {
-		sort = (Sort) sorts.lookup(FloatLDT.NAME);
+		sort = sorts.lookup(FloatLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_DOUBLE) {
-		sort = (Sort) sorts.lookup(DoubleLDT.NAME);
+		sort = sorts.lookup(DoubleLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_LOCSET) {
-                sort = (Sort) sorts.lookup(LocSetLDT.NAME);
+                sort = sorts.lookup(LocSetLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_SEQ) {
-                sort = (Sort) sorts.lookup(SeqLDT.NAME);
+                sort = sorts.lookup(SeqLDT.NAME);
 	    } else {
 		assert false : "unexpected primitive type: " + type;
 	    	sort = null;

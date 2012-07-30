@@ -84,5 +84,5 @@ public interface IMain {
      */
     public abstract void notify(NotificationEvent event);
     
-    public abstract AbstractProblemInitializer createProblemInitializer();
+    public abstract AbstractProblemInitializer<?,?> createProblemInitializer();
 }

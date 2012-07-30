@@ -1,11 +1,11 @@
 package de.uka.ilkd.keyabs.proof.mgt;
 
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.keyabs.init.ABSInitConfig;
 
-public class ABSProofEnvironment extends ProofEnvironment {
+public class ABSProofEnvironment extends ProofEnvironment<ABSInitConfig> {
 
-    public ABSProofEnvironment(AbstractInitConfig initConfig) {
+    public ABSProofEnvironment(ABSInitConfig initConfig) {
         super(initConfig);
     }
 

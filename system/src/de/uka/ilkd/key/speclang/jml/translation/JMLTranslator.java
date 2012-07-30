@@ -34,11 +34,13 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -247,7 +249,7 @@ final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Pair translate(SLTranslationExceptionManager excManager,
+            public Pair<IObserverFunction, Term> translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
                 checkParameters(params, SLExpression.class, Term.class,
@@ -290,8 +292,8 @@ final class JMLTranslator {
                 if (result == null) {
                     result = TB.tt();
                 } else {
-                    Map /* Operator -> Operator */ replaceMap =
-                            new LinkedHashMap();
+                    Map /* Operator -> Operator */<LogicVariable, ProgramVariable> replaceMap =
+                            new LinkedHashMap<LogicVariable, ProgramVariable>();
                     replaceMap.put(eVar, excVar);
                     OpReplacer excVarReplacer = new OpReplacer(replaceMap);
 
@@ -405,7 +407,7 @@ final class JMLTranslator {
                     throw new SLTranslationException(
                             "bounded sum must declare exactly one variable");
                 }
-                LogicVariable qv = (LogicVariable) declVars.head();
+                LogicVariable qv = declVars.head();
                 Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
                 return new SLExpression(resultTerm, 
                         promo.getJavaType() == PrimitiveType.JAVA_BIGINT ?
@@ -450,7 +452,7 @@ final class JMLTranslator {
                     throw new SLTranslationException(
                             "sequence definition must declare exactly one variable");
                 }
-                LogicVariable qv = (LogicVariable) declVars.head();
+                LogicVariable qv = declVars.head();
                 Term resultTerm = TB.seqDef(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
                 final KeYJavaType seqtype =
                         services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
@@ -964,11 +966,11 @@ final class JMLTranslator {
                 
                 // prepare namespaces
                 NamespaceSet namespaces = services.getNamespaces().copy();
-                Namespace programVariables = namespaces.programVariables();
+                Namespace<IProgramVariable> programVariables = namespaces.programVariables();
 
                 if (heapAtPre != null
                     && heapAtPre.op() instanceof ProgramVariable) {
-                    programVariables.add(heapAtPre.op());
+                    programVariables.add((ProgramVariable)heapAtPre.op());
                 }
 
                 if (selfVar != null) {
@@ -1012,7 +1014,7 @@ final class JMLTranslator {
 
                 // strip leading "\dl_"
                 String functName = escape.getText().substring(4);
-                Namespace funcs = services.getNamespaces().functions();
+                Namespace<SortedOperator> funcs = services.getNamespaces().functions();
                 Named symbol = funcs.lookup(new Name(functName));
                 
                 if (symbol != null) {
@@ -1062,7 +1064,7 @@ final class JMLTranslator {
 
                 assert symbol == null;  // no function symbol found
                 
-                Namespace progVars = services.getNamespaces().programVariables();
+                Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
                 symbol = progVars.lookup(new Name(functName));
                 
                 if (symbol == null) {

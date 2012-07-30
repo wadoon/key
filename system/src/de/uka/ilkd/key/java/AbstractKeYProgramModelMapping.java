@@ -16,17 +16,17 @@ public abstract class AbstractKeYProgramModelMapping {
 	 * maps a program element (or something similar, e.g. Type) to the
 	 * KeY-equivalent
 	 */
-	protected HashMap map;
+	protected HashMap<Object, Object> map;
 
 	/** Maps a KeY program element to the Recoder-equivalent */
-	protected HashMap revMap;
+	protected HashMap<Object, Object> revMap;
 
 	protected AbstractKeYProgramModelMapping() {
-		this.map = new HashMap();
-		this.revMap = new HashMap();
+		this.map = new HashMap<Object, Object>();
+		this.revMap = new HashMap<Object, Object>();
 	}
 
-	protected AbstractKeYProgramModelMapping(HashMap map, HashMap revMap,
+	protected AbstractKeYProgramModelMapping(HashMap<Object, Object> map, HashMap<Object, Object> revMap,
 			boolean parsedSpecial) {
 		this.map = map;
 		this.revMap = revMap;
@@ -93,11 +93,11 @@ public abstract class AbstractKeYProgramModelMapping {
 		return map.containsKey(rec);
 	}
 
-	public Set elemsKeY() {
+	public Set<Object> elemsKeY() {
 		return revMap.keySet();
 	}
 
-	public Set elemsRec() {
+	public Set<Object> elemsRec() {
 		return map.keySet();
 	}
 

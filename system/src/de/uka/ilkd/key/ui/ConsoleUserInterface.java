@@ -77,7 +77,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
     @Override
-    public void proofCreated(AbstractProblemInitializer sender,
+    public void proofCreated(AbstractProblemInitializer<?, ?> sender,
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
@@ -196,7 +196,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
    @Override
-   public AbstractProblemInitializer createProblemInitializer() {
+   public AbstractProblemInitializer<?, ?> createProblemInitializer() {
       return new ProblemInitializer(this, mediator.getProfile(), true, this);
    }
 

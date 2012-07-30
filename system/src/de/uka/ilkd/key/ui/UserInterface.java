@@ -8,6 +8,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -96,7 +97,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * </p>
      * @return The instantiated {@link ProblemInitializer}.
      */
-    AbstractProblemInitializer createProblemInitializer();
+    <S extends IServices, IC extends AbstractInitConfig> AbstractProblemInitializer<S, IC> createProblemInitializer();
     
     /**
      * Returns the used {@link KeYMediator}.
@@ -124,7 +125,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return The instantiated {@link Proof}.
      * @throws ProofInputException Occurred Exception.
      */
-    Proof createProof(AbstractInitConfig initConfig, ProofOblInput input) throws ProofInputException;
+    <IC extends AbstractInitConfig> Proof createProof(IC initConfig, ProofOblInput input) throws ProofInputException;
     
     /**
      * Checks if the auto mode of this {@link UserInterface} supports the given {@link Proof}.

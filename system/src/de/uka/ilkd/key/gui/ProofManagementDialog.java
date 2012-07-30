@@ -92,7 +92,7 @@ public final class ProofManagementDialog extends JDialog {
     private JTabbedPane tabbedPane;
     private Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons;
     private ClassTree classTree;
-    private JList proofList;
+    private JList<ProofWrapper> proofList;
     private ContractSelectionPanel contractPanelByMethod;
     private ContractSelectionPanel contractPanelByProof;
     private JButton startButton;
@@ -122,14 +122,14 @@ public final class ProofManagementDialog extends JDialog {
 	});
 	
 	//create proof list
-	proofList = new JList();
+	proofList = new JList<ProofWrapper>();
 	proofList.setCellRenderer(new DefaultListCellRenderer() {
 	    /**
          * 
          */
         private static final long serialVersionUID = -7810888250050777877L;
 
-        public Component getListCellRendererComponent(JList list, 
+        public Component getListCellRendererComponent(JList<?> list, 
 	     					   	  Object value, 
 		     					  int index, 
 		     					  boolean isSelected, 
@@ -411,8 +411,8 @@ public final class ProofManagementDialog extends JDialog {
     
     private void select(Proof p) {
 	for(int i = 0, n = proofList.getModel().getSize(); i < n; i++) {
-	    if(((ProofWrapper) proofList.getModel()
-		                        .getElementAt(i))
+	    if(proofList.getModel()
+		                        .getElementAt(i)
 		                          .proof.equals(p)) {
 		tabbedPane.setSelectedIndex(1);		
 		proofList.setSelectedIndex(i);
@@ -512,7 +512,7 @@ public final class ProofManagementDialog extends JDialog {
 	} else {
 	    if(proofList.getSelectedValue() != null) {
 		final Proof p 
-			= ((ProofWrapper)proofList.getSelectedValue()).proof;
+			= proofList.getSelectedValue().proof;
 		final ImmutableSet<Contract> usedContracts 
 			= p.mgt().getUsedContracts();
 		getActiveContractPanel().setContracts(usedContracts, 
@@ -568,7 +568,7 @@ public final class ProofManagementDialog extends JDialog {
 	classTree.updateUI();
 
 	//proof list
-	DefaultListModel model = new DefaultListModel();
+	DefaultListModel<ProofWrapper> model = new DefaultListModel<ProofWrapper>();
 	for(Proof p : specRepos.getAllProofs()) {
 	    model.add(0, new ProofWrapper(p));
 	}

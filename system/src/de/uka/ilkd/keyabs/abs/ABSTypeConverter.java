@@ -9,7 +9,9 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.LDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
@@ -56,13 +58,25 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
             }
         } else if (pe instanceof ABSNullExp) {
         	return getServices().getTermBuilder().NULL(getServices());
+        } else if (pe instanceof ABSDataConstructorExp) {
+            ABSDataConstructorExp dtCons = (ABSDataConstructorExp)pe;
+            Function cons = (Function) services.getNamespaces().functions().lookup((Name) dtCons.getChildAt(0));
+            Term[] subs = new Term[dtCons.getArgumentCount()];
+            for (int i = 0; i<dtCons.getArgumentCount(); i++) {
+        	subs[i] = convertToLogicElement(dtCons.getArgumentAt(i), ec);
+        	System.out.println(subs[i]);
+            }
+    		System.out.println(dtCons.getChildAt(0) + "::" + dtCons.getArgumentCount() + ":::" +cons );
+            return services.getTermBuilder().func(cons, subs);
+        } else if (pe instanceof ABSIntLiteral) {
+           return services.getTermBuilder().zTerm(services, ((ABSIntLiteral)pe).getValue().toString());
         }
         return null;
     }
 
     @Override
     public ABSTypeConverter copy(IServices services) {
-        final ABSTypeConverter tc = new ABSTypeConverter(getServices());
+        final ABSTypeConverter tc = new ABSTypeConverter((ABSServices) services);
         tc.init(models);
         return tc;
     }

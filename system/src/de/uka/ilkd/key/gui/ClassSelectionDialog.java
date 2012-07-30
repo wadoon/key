@@ -58,7 +58,7 @@ public class ClassSelectionDialog extends JDialog {
         super(new JFrame(), dialogTitle, true);
         
         //create type list
-        classList = new JList();
+        classList = new JList<Object>();
         if(allowMultipleSelection) {
             classList.setSelectionMode(
                                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

@@ -43,8 +43,8 @@ public abstract class SLResolverManager {
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
         
-    private ImmutableList<Namespace> /*ParsableVariable*/
-        localVariablesNamespaces = ImmutableSLList.<Namespace>nil();
+    private ImmutableList<Namespace<ParsableVariable>> /*ParsableVariable*/
+        localVariablesNamespaces = ImmutableSLList.<Namespace<ParsableVariable>>nil();
 
     private Map<ParsableVariable,KeYJavaType> kjts 
 	= new HashMap<ParsableVariable,KeYJavaType>();
@@ -91,7 +91,7 @@ public abstract class SLResolverManager {
      */
     private SLExpression resolveLocal(String name) {
         Name n = new Name(name);
-        for(Namespace ns : localVariablesNamespaces) {
+        for(Namespace<ParsableVariable> ns : localVariablesNamespaces) {
             ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
             if(localVar != null) {
                 Term varTerm = TB.var(localVar);
@@ -110,8 +110,8 @@ public abstract class SLResolverManager {
     private SLExpression resolveImplicit(String name, SLParameters parameters) 
             throws SLTranslationException {
         if(useLocalVarsAsImplicitReceivers) {
-            for(Namespace ns : localVariablesNamespaces) {
-                for(Named n : ns.elements()) {
+            for(Namespace<ParsableVariable> ns : localVariablesNamespaces) {
+                for(ParsableVariable n : ns.elements()) {
                     ParsableVariable localVar = (ParsableVariable) n;
                     SLExpression receiver 
                     	= new SLExpression(TB.var(localVar),
@@ -233,7 +233,7 @@ public abstract class SLResolverManager {
      * Pushes a new, empty namespace onto the stack.
      */
     public void pushLocalVariablesNamespace() {
-        Namespace ns = new Namespace();
+        Namespace<ParsableVariable> ns = new Namespace<ParsableVariable>();
         localVariablesNamespaces = localVariablesNamespaces.prepend(ns);
     }
     

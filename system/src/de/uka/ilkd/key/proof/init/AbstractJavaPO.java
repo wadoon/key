@@ -23,7 +23,9 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -170,7 +172,7 @@ public abstract class AbstractJavaPO implements ProofOblInput {
 
 
     protected final void register(ProgramVariable pv) {
-         Namespace progVarNames = getServices().getNamespaces().programVariables();
+         Namespace<IProgramVariable> progVarNames = getServices().getNamespaces().programVariables();
          if (pv != null && progVarNames.lookup(pv.name()) == null) {
              progVarNames.addSafely(pv);
          }
@@ -185,7 +187,7 @@ public abstract class AbstractJavaPO implements ProofOblInput {
 
 
     protected final void register(Function f) {
-         Namespace functionNames = getServices().getNamespaces().functions();
+         Namespace<SortedOperator> functionNames = getServices().getNamespaces().functions();
          if (f != null && functionNames.lookup(f.name()) == null) {
              assert f.sort() != Sort.UPDATE;
              if (f.sort() == Sort.FORMULA) {

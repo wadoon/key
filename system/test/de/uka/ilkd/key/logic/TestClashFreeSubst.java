@@ -187,17 +187,17 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     private class ToMultiVisitor extends Visitor {
-	private Stack subStack;
+	private Stack<Term> subStack;
 	
 	ToMultiVisitor() {
-	    subStack = new Stack();
+	    subStack = new Stack<Term>();
 	}
 	
 	public void visit(Term visited) {
 	    Operator op = visited.op();
 	    int arity = visited.arity();
 	    if ( op == Quantifier.ALL ) {
-		Term top = (Term) subStack.peek();
+		Term top = subStack.peek();
 		if ( top.op() == Quantifier.ALL )  {
 		    QuantifiableVariable[] bv = 
 			new QuantifiableVariable[visited.varsBoundHere(0).size()
@@ -217,13 +217,13 @@ public class TestClashFreeSubst extends TestCase {
 	    }
 	    Term[] sub = new Term[arity];
 	    for ( int i = arity-1; i>=0; i-- ) {
-		sub[i] = (Term) (subStack.pop());
+		sub[i] = (subStack.pop());
 	    }
 	    subStack.push(tf.createTerm(op, sub, visited.boundVars(), null));
 	}
 
 	Term getResult() {
-	    return (Term) subStack.pop();
+	    return subStack.pop();
 	}
     }
 
@@ -288,7 +288,7 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(0).get(0);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	nss.setVariables(new Namespace<ParsableVariable>(nss.variables(), x1));
 	assertEquals("clash resolution", 
 		     parseTerm("\\exists x1; q(x1,f(x))"),
 		     res);
@@ -311,7 +311,7 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(1).get(0);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	nss.setVariables(new Namespace<ParsableVariable>(nss.variables(), x1));
 	assertEquals("clash resolution in substitution term", 
 		     parseTerm("{\\subst x1; f(f(x))}g(x1,f(x))"),
 		     res);
@@ -345,7 +345,7 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(0).get(1);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	nss.setVariables(new Namespace<ParsableVariable>(nss.variables(), x1));
 	assertEquals("clash resolution in multi term", 
 		     toMulti(parseTerm(
 			       "\\forall y; \\forall x1; \\forall z; q(g(x1,y),g(f(x),z))")),
@@ -362,7 +362,7 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(0).get(2);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	nss.setVariables(new Namespace<ParsableVariable>(nss.variables(), x1));
 	assertEquals("clash resolution in multi term", 
 		     toMulti(parseTerm(
 			       "q(g(x1,y),g(f(x),z))")),
@@ -396,7 +396,7 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(1).get(0);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	nss.setVariables(new Namespace<ParsableVariable>(nss.variables(), x1));
 	assertEquals("substitution",
 		     parseTerm("{\\subst " + x1.name () +
 			       "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," +

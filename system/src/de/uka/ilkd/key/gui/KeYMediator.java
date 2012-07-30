@@ -26,12 +26,16 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.INotationInfo;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
@@ -52,6 +56,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
@@ -61,7 +66,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-
 
 public class KeYMediator {    
 
@@ -137,50 +141,43 @@ public class KeYMediator {
     /** returns the variable namespace 
      * @return the variable namespace 
      */
-    public Namespace var_ns() {
+    public Namespace<ParsableVariable> var_ns() {
 	return getProof().getNamespaces().variables();
     }
     
     /** returns the program variable namespace 
      * @return the program variable namespace 
      */
-    public Namespace progVar_ns() {
+    public Namespace<IProgramVariable> progVar_ns() {
 	return getProof().getNamespaces().programVariables();
     }
 
     /** returns the function namespace 
      * @return the function namespace 
      */
-    public Namespace func_ns() {
+    public Namespace<SortedOperator> func_ns() {
 	return getProof().getNamespaces().functions();
     }
 
     /** returns the sort namespace 
      * @return the sort namespace 
      */
-    public Namespace sort_ns() {
+    public Namespace<Sort> sort_ns() {
 	return getProof().getNamespaces().sorts();
     }
 
     /** returns the heuristics namespace 
-     * @return the heuristics namespace 
+     * @return the heuristics namespace
      */
-    public Namespace heur_ns() {
+    public Namespace<RuleSet> heur_ns() {
 	return getProof().getNamespaces().ruleSets();
     }
 
     /** returns the choice namespace
      * @return the choice namespace 
      */
-    public Namespace choice_ns() {
+    public Namespace<Choice> choice_ns() {
 	return getProof().getNamespaces().choices();
-    }
-
-    /** returns the prog var namespace 
-     * @return the prog var namespace 
-     */
-    public Namespace pv_ns() {
-	return getProof().getNamespaces().programVariables();
     }
 
     /** returns the namespace set

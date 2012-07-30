@@ -14,10 +14,11 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 
 public interface TaskTreeNode extends MutableTreeNode{
 
-    ProofEnvironment getProofEnv();
+    ProofEnvironment<? extends AbstractInitConfig> getProofEnv();
 
     String shortDescr();
 

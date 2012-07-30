@@ -5,11 +5,16 @@ import java.io.Reader;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
@@ -23,10 +28,10 @@ public class ABSDefaultTermParser implements TermParser {
     public Term parse(Reader in, 
                       Sort sort, 
                       IServices services,
-                      Namespace var_ns,
-                      Namespace func_ns, 
-                      Namespace sort_ns,
-                      Namespace progVar_ns, 
+                      Namespace<ParsableVariable> var_ns,
+                      Namespace<SortedOperator> func_ns, 
+                      Namespace<Sort> sort_ns,
+                      Namespace<IProgramVariable> progVar_ns, 
                       AbbrevMap scm)
         throws ParserException
     {
@@ -34,8 +39,8 @@ public class ABSDefaultTermParser implements TermParser {
                      new NamespaceSet(var_ns,
                                       func_ns, 
                                       sort_ns, 
-                                      new Namespace(),
-                                      new Namespace(),
+                                      new Namespace<RuleSet>(),
+                                      new Namespace<Choice>(),
                                       progVar_ns),                   
                      scm);
     }

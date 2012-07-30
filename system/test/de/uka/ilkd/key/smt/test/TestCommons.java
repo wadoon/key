@@ -18,8 +18,7 @@ import java.util.LinkedList;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -43,8 +42,8 @@ class TestCommons extends TestCase {
     /** The set of taclets */
     private Collection<Taclet> taclets= new LinkedList<Taclet>();
     
-    AbstractInitConfig initConfig = null;
-    static protected AbstractProblemInitializer initializer = null;
+    InitConfig initConfig = null;
+    static protected ProblemInitializer initializer = null;
     static protected Profile profile = init();
     
     static Profile init(){

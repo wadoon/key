@@ -2,7 +2,6 @@ package de.uka.ilkd.keyabs.init;
 
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.proof.mgt.ABSProofEnvironment;
 
@@ -26,7 +25,7 @@ public class ABSInitConfig extends AbstractInitConfig {
     }
 
     @Override
-    public ProofEnvironment getProofEnv() {
+    public ABSProofEnvironment getProofEnv() {
         return env;
     }
 

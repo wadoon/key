@@ -188,7 +188,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    public Term parseTerm(String s, Namespace varNS, Namespace functNS)
+    public Term parseTerm(String s, Namespace<ParsableVariable> varNS, Namespace<SortedOperator> functNS)
         throws ParserException
     {
         NamespaceSet copy = nss.copy();
@@ -258,7 +258,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
-    private Term parseRow(int irow, Namespace varNS, Namespace functNS)
+    private Term parseRow(int irow, Namespace<ParsableVariable> varNS, Namespace<SortedOperator> functNS)
         throws SVInstantiationParserException,
                MissingInstantiationException {
 
@@ -517,10 +517,10 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else{   
                     if (isInputAvailable ( irow ) ) {
-                        final Namespace extVarNS =
+                        final Namespace<ParsableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
                         
-                        Namespace functNS =
+                        Namespace<SortedOperator> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
                         
                         final Term instance = parseRow(irow, extVarNS, functNS);

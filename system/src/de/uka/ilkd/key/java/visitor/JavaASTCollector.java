@@ -13,6 +13,7 @@ package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 /** Walks through a java AST in depth-left-fist-order. 
  * You can set the type of nodes you want to collect and then start the
  * walker. The found nodes of the given type are returned as a 
@@ -21,7 +22,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 public class JavaASTCollector extends JavaASTWalker {
 
     /** the type of nodes to be collected */
-    private Class type;
+    private Class<? extends ProgramElement> type;
     /** the list of found elements */
     private ImmutableList<ProgramElement> resultList = 
 	ImmutableSLList.<ProgramElement>nil();
@@ -31,7 +32,7 @@ public class JavaASTCollector extends JavaASTWalker {
      * @param type the Class representing the type of nodes that have
      * to be collected
      */
-    public JavaASTCollector(ProgramElement root, Class type) {
+    public JavaASTCollector(ProgramElement root, Class<? extends ProgramElement> type) {
 	super(root);
 	this.type = type;
     }

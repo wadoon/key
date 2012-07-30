@@ -1,5 +1,7 @@
 package de.uka.ilkd.keyabs.abs;
 
+import java.math.BigInteger;
+
 import abs.frontend.ast.ASTNode;
 import abs.frontend.ast.AddExp;
 import abs.frontend.ast.AndBoolExp;
@@ -7,9 +9,11 @@ import abs.frontend.ast.AssignStmt;
 import abs.frontend.ast.AsyncCall;
 import abs.frontend.ast.Binary;
 import abs.frontend.ast.Block;
+import abs.frontend.ast.DataConstructorExp;
 import abs.frontend.ast.ExpressionStmt;
 import abs.frontend.ast.FieldUse;
 import abs.frontend.ast.IncompleteAccess;
+import abs.frontend.ast.IntLiteral;
 import abs.frontend.ast.MultExp;
 import abs.frontend.ast.NullExp;
 import abs.frontend.ast.OrBoolExp;
@@ -58,7 +62,11 @@ public abstract class AbstractABS2KeYABSConverter {
         	result = convert(((ExpressionStmt)x).getExp());
         } else if (x instanceof AsyncCall) {
         	result = convert((AsyncCall)x); 
-        }
+        } else if (x instanceof DataConstructorExp) {
+            	result = convert((DataConstructorExp)x);
+        } else if (x instanceof IntLiteral) {
+        	result = convert((IntLiteral)x);
+        }	
 
         if (result == null) {
             result = requestConversion(x);
@@ -153,8 +161,26 @@ public abstract class AbstractABS2KeYABSConverter {
                 (IABSPureExpression) convert(x.getChild(1)));
     }
 
+
+    public ABSIntLiteral convert(IntLiteral x) {
+        return new ABSIntLiteral(new BigInteger(x.getContent()));
+    }
+
+    public ABSDataConstructorExp convert(DataConstructorExp x) {
+	ProgramElementName pen = new ProgramElementName(x.getDataConstructor().getName(), 
+		x.getDataConstructor().getDataTypeDecl().getModule().getName() + "." + 
+		x.getDataConstructor().getDataTypeDecl().getName());
+	
+        IABSPureExpression[] args = new IABSPureExpression[x.getNumParam()];
+        for (int i = 0; i<x.getNumParam(); i++) {
+            args[i] = (IABSPureExpression) convert(x.getParam(i));
+        }
+        return new ABSDataConstructorExp(pen, args);
+    }
+
     public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
-        KeYJavaType type = lookupType(x.getVarDecl().getType().getQualifiedName());
+	//KeYJavaType type = lookupType(x.getVarDecl().getAccess().toString());
+	KeYJavaType type = lookupType(x.getVarDecl().getType().getQualifiedName());
         LocationVariable localVar = new LocationVariable(new ProgramElementName(x.getVarDecl().getName()), type);
         IABSExpression initExp = null;
         if (x.getVarDecl().hasInitExp()) {

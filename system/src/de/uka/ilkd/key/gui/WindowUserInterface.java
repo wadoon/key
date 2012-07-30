@@ -77,7 +77,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public void proofCreated(AbstractProblemInitializer sender,
+	public void proofCreated(AbstractProblemInitializer<?, ?> sender,
 	        ProofAggregate proofAggregate) {
 		mainWindow.addProblem(proofAggregate);
 		mainWindow.setStandardStatusLine();
@@ -245,7 +245,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public AbstractProblemInitializer createProblemInitializer() {
+	public AbstractProblemInitializer<?,?> createProblemInitializer() {
 	    return new ProblemInitializer(this, mainWindow.getMediator().getProfile(), true,  this);
 	}
 

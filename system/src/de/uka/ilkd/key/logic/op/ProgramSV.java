@@ -263,7 +263,7 @@ public final class ProgramSV extends AbstractSV
 				 MatchConditions mc, 
 				 IServices services) {
 
-        final IProgramSVSort svSort = (IProgramSVSort)sort();
+        final IProgramSVSort<IServices> svSort = (IProgramSVSort<IServices>)sort();
      
 	if (substitute instanceof Term && svSort.canStandFor((Term)substitute)) {
             return addInstantiation((Term)substitute, mc, services);
@@ -401,7 +401,7 @@ public final class ProgramSV extends AbstractSV
         if (match == null) {           
             return false;
         }
-        return ((IProgramSVSort)sort()).canStandFor(match, ec, services);
+        return ((IProgramSVSort<IServices>)sort()).canStandFor(match, ec, services);
     }
         
 

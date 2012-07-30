@@ -40,7 +40,7 @@ public class ChoiceSelector extends JDialog {
 
 
     /** the JList with the categories of choices*/
-    private JList catList;
+    private JList<?> catList;
     /** the JList with the choices for one category */
     private JList choiceList;
 
@@ -77,14 +77,14 @@ public class ChoiceSelector extends JDialog {
         setIconImage(IconFactory.keyLogo());
 	Object[] cats = category2DefaultChoice.keySet().toArray();
         java.util.Arrays.sort(cats);
-	catList = new JList(cats);
+	catList = new JList<Object>(cats);
 	catList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	catList.setSelectedIndex(0);
 	catList.addListSelectionListener(new ListSelectionListener() {
 	    public void valueChanged(ListSelectionEvent e) {
 		setChoiceList();				
 	    }});
-	choiceList = new JList(category2Choices.
+	choiceList = new JList<Object>(category2Choices.
 				get(cats[0]).toArray());
 	choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]),true);

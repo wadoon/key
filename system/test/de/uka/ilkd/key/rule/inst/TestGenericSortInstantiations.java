@@ -14,16 +14,21 @@ package de.uka.ilkd.key.rule.inst;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.GenericSupersortException;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.GenericSortException;
-import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 public class TestGenericSortInstantiations extends TestCase {
 
@@ -744,7 +749,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	Services services = TacletForTests.services();
 	Sort nullSort = new NullSort(services.getJavaInfo().objectSort());
-	services.getNamespaces().sorts().add(ImmutableSLList.<Named>nil().prepend(A1OBJ)
+	services.getNamespaces().sorts().add(ImmutableSLList.<Sort>nil().prepend(A1OBJ)
 		                                                     .prepend(A2OBJ)
 		                                                     .prepend(A3OBJ)
 		                                                     .prepend(A4OBJ)

@@ -11,7 +11,6 @@ import de.uka.ilkd.key.gui.lemmatagenerator.EnvironmentCreator;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -31,7 +30,7 @@ public abstract class TacletLoader {
         protected final ProgressMonitor monitor;
         protected final ProblemInitializerListener listener;
         protected final Profile    profile;
-        protected ProofEnvironment envForTaclets;
+        protected ProofEnvironment<?> envForTaclets;
   
         public TacletLoader(ProgressMonitor monitor,
                         ProblemInitializerListener listener,
@@ -48,7 +47,7 @@ public abstract class TacletLoader {
         }
 
 
-        public ProofEnvironment getProofEnvForTaclets() {
+        public ProofEnvironment<?> getProofEnvForTaclets() {
                 if(envForTaclets == null){
                         try{
                                 EnvironmentCreator ec = new EnvironmentCreator();
@@ -70,17 +69,17 @@ public abstract class TacletLoader {
                 private final File fileForDefinitions;
                 private final File fileForTaclets;
                 private final Collection<File> filesForAxioms;
-                private final AbstractProblemInitializer problemInitializer;
+                private final AbstractProblemInitializer<?, ?> problemInitializer;
                 
            
            
                public TacletFromFileLoader(ProgressMonitor pm,
                                 ProblemInitializerListener listener,
-                                AbstractProblemInitializer problemInitializer,
+                                AbstractProblemInitializer<?,?> problemInitializer,
                                 Profile profile,
                                 File fileForDefinitions, File fileForTaclets,
                                 Collection<File> filesForAxioms,
-                                ProofEnvironment env) {
+                                ProofEnvironment<?> env) {
                         super(pm,listener,profile);
                         this.fileForDefinitions = fileForDefinitions;
                         this.fileForTaclets = fileForTaclets;
@@ -96,11 +95,11 @@ public abstract class TacletLoader {
                
                public TacletFromFileLoader(ProgressMonitor pm,
                                ProblemInitializerListener listener,
-                               AbstractProblemInitializer problemInitializer,
+                               AbstractProblemInitializer<?,?> problemInitializer,
                                Profile profile,
                                File fileForDefinitions, File fileForTaclets,
                                Collection<File> filesForAxioms,
-                               ProofEnvironment env, AbstractInitConfig config) {
+                               ProofEnvironment<?> env, AbstractInitConfig config) {
                        this(pm,listener,problemInitializer,profile,fileForDefinitions,fileForTaclets,filesForAxioms,env);
                        this.initConfig = config;
                }

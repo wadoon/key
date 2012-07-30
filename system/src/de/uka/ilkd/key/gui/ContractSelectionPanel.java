@@ -74,7 +74,7 @@ class ContractSelectionPanel extends JPanel {
         add(scrollPane);
         
         //create contract list
-        contractList = new JList();
+        contractList = new JList<Object>();
         contractList.setSelectionMode(
                 multipleSelection 
                 ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION 
@@ -95,7 +95,7 @@ class ContractSelectionPanel extends JPanel {
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
             
 	    public Component getListCellRendererComponent(
-                                		    JList list,
+                                		    JList<?> list,
                                 		    Object value,
                                 		    int index,
                                 		    boolean isSelected,

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.SchemaJavaReader;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 public class SchemaABSReader implements SchemaJavaReader {
 
@@ -66,7 +67,7 @@ public class SchemaABSReader implements SchemaJavaReader {
     }
 
     @Override
-    public JavaBlock readBlockWithProgramVariables(Namespace varns,
+    public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns,
             IServices services, String s) {
         return null;
     }

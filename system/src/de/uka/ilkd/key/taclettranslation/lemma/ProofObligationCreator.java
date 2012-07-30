@@ -13,11 +13,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 
 
 /**
@@ -110,16 +109,16 @@ public class ProofObligationCreator {
                         
                         if(term.op() instanceof Function){
                                 if(sort == Sort.FORMULA){
-                                     userDefinedSymbols.addPredicate(term.op());
+                                     userDefinedSymbols.addPredicate((SortedOperator) term.op());
                                 }else{
-                                     userDefinedSymbols.addFunction(term.op());  
+                                     userDefinedSymbols.addFunction((SortedOperator) term.op());  
                                 }                                      
                         }
                         if(term.op() instanceof LogicVariable){
-                                userDefinedSymbols.addVariable(term.op());
+                                userDefinedSymbols.addVariable((LogicVariable) term.op());
                         } 
                         if(term.op() instanceof SchemaVariable){
-                                userDefinedSymbols.addSchemaVariable(term.op());
+                                userDefinedSymbols.addSchemaVariable((SchemaVariable) term.op());
                         }
        
                 }   

@@ -13,13 +13,14 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
@@ -33,15 +34,15 @@ public class UserDefinedSymbols {
                 
         }
         final UserDefinedSymbols parent;
-        final Set<Named> usedExtraFunctions = new TreeSet<Named>(
+        final Set<SortedOperator> usedExtraFunctions = new TreeSet<SortedOperator>(
                         NamedComparator.INSTANCE);
-        final Set<Named> usedExtraPredicates = new TreeSet<Named>(
+        final Set<SortedOperator> usedExtraPredicates = new TreeSet<SortedOperator>(
                         NamedComparator.INSTANCE);
-        final Set<Named> usedExtraSorts = new TreeSet<Named>(
+        final Set<Sort> usedExtraSorts = new TreeSet<Sort>(
                         NamedComparator.INSTANCE);
-        final Set<Named> usedExtraVariables = new TreeSet<Named>(
+        final Set<ParsableVariable> usedExtraVariables = new TreeSet<ParsableVariable>(
                         NamedComparator.INSTANCE);
-        final Set<Named> usedSchemaVariables = new TreeSet<Named>(
+        final Set<SchemaVariable> usedSchemaVariables = new TreeSet<SchemaVariable>(
                         NamedComparator.INSTANCE);
         final ImmutableSet<Taclet> axioms;
         private final NamespaceSet referenceNamespaces;
@@ -63,8 +64,8 @@ public class UserDefinedSymbols {
                 this.referenceNamespaces = parent.referenceNamespaces;
         }
 
-        private void addUserDefiniedSymbol(Named symbol, Set<Named> set,
-                        Namespace excludeNamespace) {
+        private <E extends Named> void addUserDefiniedSymbol(E symbol, Set<E> set,
+                        Namespace<?> excludeNamespace) {
                 if (!contains(symbol, set)){
                         if(symbol instanceof SchemaVariable||excludeNamespace.lookup(symbol.name()) == null){
                                 
@@ -75,7 +76,7 @@ public class UserDefinedSymbols {
                 
         }
 
-        private boolean contains(Named symbol, Set<Named> set) {
+        private boolean contains(Named symbol, Set<? extends Named> set) {
                 if (parent != null && parent.contains(symbol, set)) {
                         return true;
                 }
@@ -83,19 +84,19 @@ public class UserDefinedSymbols {
                 return set.contains(symbol);
         }
 
-        public void addFunction(Named symbol) {
+        public void addFunction(SortedOperator symbol) {
                 addUserDefiniedSymbol(symbol, usedExtraFunctions,
                                 referenceNamespaces.functions());
         }
 
-        public void addPredicate(Named symbol) {
+        public void addPredicate(SortedOperator symbol) {
                 addUserDefiniedSymbol(symbol, usedExtraPredicates,
                                 referenceNamespaces.functions());
         }
         
     
 
-        public void addSort(Named symbol) {
+        public void addSort(Sort symbol) {
                 if (symbol != Sort.FORMULA) {
                         Sort sort = (Sort) symbol;
                         if(!(sort instanceof NullSort)){
@@ -108,29 +109,29 @@ public class UserDefinedSymbols {
                 }
         }
 
-        public void addVariable(Named symbol) {
+        public void addVariable(ParsableVariable symbol) {
                 addUserDefiniedSymbol(symbol, usedExtraVariables,
                                 referenceNamespaces.variables());
         }
 
-        public void addSchemaVariable(Named symbol) {
+        public void addSchemaVariable(SchemaVariable symbol) {
                 addUserDefiniedSymbol(symbol, usedSchemaVariables,
                                 referenceNamespaces.variables());
         }
 
         public void addSymbolsToNamespaces(NamespaceSet namespaces) {
-                addSymbolsToNamespace(namespaces.functions(),
-                                usedExtraFunctions);
-                addSymbolsToNamespace(namespaces.functions(),
-                                usedExtraPredicates);
-                addSymbolsToNamespace(namespaces.sorts(), usedExtraSorts);
-                addSymbolsToNamespace(namespaces.variables(),
-                                usedExtraVariables);
+            this.addSymbolsToNamespace(namespaces.functions(),
+        	    usedExtraFunctions);
+            addSymbolsToNamespace(namespaces.functions(),
+        	    usedExtraPredicates);
+            addSymbolsToNamespace(namespaces.sorts(), usedExtraSorts);
+            addSymbolsToNamespace(namespaces.variables(),
+        	    usedExtraVariables);
         }
 
-        private void addSymbolsToNamespace(Namespace namespace,
-                        Collection<Named> symbols) {
-                for (Named symbol : symbols) {
+        private <E extends Named> void addSymbolsToNamespace(Namespace<E> namespace,
+                        Collection<E> symbols) {
+                for (E symbol : symbols) {
                         namespace.addSafely(symbol);
                 }
         }

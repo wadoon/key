@@ -49,7 +49,7 @@ public final class ExampleChooser extends JDialog {
     
     private static ExampleChooser instance;
     
-    private final JList exampleList;  
+    private final JList<File> exampleList;  
     private final JTextArea descriptionText;    
     private final JButton loadButton;
     private final JButton cancelButton;
@@ -72,7 +72,7 @@ public final class ExampleChooser extends JDialog {
 	getContentPane().add(listPanel);
 	
 	//create example list
-	final DefaultListModel model = new DefaultListModel();
+	final DefaultListModel<File> model = new DefaultListModel<File>();
 	File[] examples = examplesDir.listFiles();
         Arrays.sort(examples, new Comparator<File> () {
             public int compare(File f1, File f2) {
@@ -87,7 +87,7 @@ public final class ExampleChooser extends JDialog {
 		}
 	    }
 	}
-	exampleList = new JList();
+	exampleList = new JList<File>();
 	exampleList.setModel(model);
 	exampleList.addListSelectionListener(
 		new ListSelectionListener() {
@@ -209,7 +209,7 @@ public final class ExampleChooser extends JDialog {
     
     
     private void updateDescription() {
-	final File selectedExample = (File) exampleList.getSelectedValue();
+	final File selectedExample = exampleList.getSelectedValue();
 	final File readme = new File(selectedExample, README_NAME);
 	if(readme.isFile()) {
             final BufferedReader br;

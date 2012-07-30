@@ -726,7 +726,7 @@ public abstract class TacletApp implements RuleApp {
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
 		
-		services.getNamespaces().functions().addSafely(inst.op());
+		services.getNamespaces().functions().addSafely((Function) inst.op());
 	    }
 	}
     }    

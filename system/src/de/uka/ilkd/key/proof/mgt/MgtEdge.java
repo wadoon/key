@@ -16,7 +16,7 @@ public class MgtEdge {
 
     Object from;
     Object to;
-    Map<String,String> attrs = new HashMap();
+    Map<String,String> attrs = new HashMap<String, String>();
     
     public MgtEdge(Object f, Object t, String ... attrString) {
         from = f;

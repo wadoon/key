@@ -15,8 +15,10 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -36,10 +38,10 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public abstract class AbstractProblemInitializer<S extends IServices> {
+public abstract class AbstractProblemInitializer<S extends IServices, IC extends AbstractInitConfig> {
 
     public static interface ProblemInitializerListener {
-        public void proofCreated(AbstractProblemInitializer<?> sender, ProofAggregate proofAggregate);
+        public void proofCreated(AbstractProblemInitializer<?,?> sender, ProofAggregate proofAggregate);
 
         public void progressStarted(Object sender);
 
@@ -55,10 +57,10 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
     }
 
     protected abstract void registerProgramDefinedSymbols(
-            AbstractInitConfig initConfig) throws ProofInputException;
+            IC initConfig) throws ProofInputException;
 
     protected abstract void readJava(EnvInput envInput,
-            AbstractInitConfig initConfig) throws ProofInputException;
+            IC initConfig) throws ProofInputException;
 
     private static AbstractInitConfig baseConfig;
     protected final Profile profile;
@@ -106,7 +108,7 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
     /**
      * Helper for readIncludes().
      */
-    private void readLDTIncludes(Includes in, AbstractInitConfig initConfig)
+    private void readLDTIncludes(Includes in, IC initConfig)
             throws ProofInputException {
         // avoid infinite recursion
         if (in.getLDTIncludes().isEmpty()) {
@@ -142,7 +144,7 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
     /**
      * Helper for readEnvInput().
      */
-    private void readIncludes(EnvInput envInput, AbstractInitConfig initConfig)
+    private void readIncludes(EnvInput envInput, IC initConfig)
             throws ProofInputException {
         envInput.setInitConfig(initConfig);
 
@@ -165,16 +167,16 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
      * 
      * See bug report #1185, #1189
      */
-    private static void cleanupNamespaces(AbstractInitConfig initConfig) {
-        Namespace newVarNS = new Namespace();
-        Namespace newSortNS = new Namespace();
-        Namespace newFuncNS = new Namespace();
-        for (Named n : initConfig.sortNS().allElements()) {
+    private static <IC extends AbstractInitConfig> void cleanupNamespaces(IC initConfig) {
+        Namespace<ParsableVariable> newVarNS = new Namespace<ParsableVariable>();
+        Namespace<Sort> newSortNS = new Namespace<Sort>();
+        Namespace<SortedOperator> newFuncNS = new Namespace<SortedOperator>();
+        for (Sort n : initConfig.sortNS().allElements()) {
             if (!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
             }
         }
-        for (Named n : initConfig.funcNS().allElements()) {
+        for (SortedOperator n : initConfig.funcNS().allElements()) {
             if (!(n instanceof SortDependingFunction && ((SortDependingFunction) n)
                     .getSortDependingOn() instanceof GenericSort)) {
                 newFuncNS.addSafely(n);
@@ -188,7 +190,7 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
     }
 
     public final void readEnvInput(EnvInput envInput,
-            AbstractInitConfig initConfig) throws ProofInputException {
+            IC initConfig) throws ProofInputException {
         if (alreadyParsed.add(envInput)) {
             // read includes
             if (!(envInput instanceof LDTInput)) {
@@ -219,7 +221,7 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
         }
 
         if (term.op() instanceof Function) {
-            namespaces.functions().add(term.op());
+            namespaces.functions().add((Function) term.op());
         } else if (term.op() instanceof ProgramVariable) {
             final ProgramVariable pv = (ProgramVariable) term.op();
             if (namespaces.programVariables().lookup(pv.name()) == null) {
@@ -259,8 +261,8 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
         }
     }
 
-    private AbstractInitConfig determineEnvironment(ProofOblInput po,
-            AbstractInitConfig initConfig) throws ProofInputException {
+    private IC determineEnvironment(ProofOblInput po,
+            IC initConfig) throws ProofInputException {
         ProofEnvironment env = initConfig.getProofEnv();
 
         // TODO: what does this actually do?
@@ -281,7 +283,7 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
     }
 
     private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl,
-            AbstractInitConfig initConfig) throws ProofInputException {
+            IC initConfig) throws ProofInputException {
         // ProofAggregate pl = problem.getPO();
         if (pl == null) {
             throw new ProofInputException("No proof");
@@ -307,7 +309,7 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
     /**
      * Creates an initConfig / a proof environment and reads an EnvInput into it
      */
-    public AbstractInitConfig prepare(EnvInput envInput)
+    public IC prepare(EnvInput envInput)
             throws ProofInputException {
         if (listener != null) {
             listener.progressStarted(this);
@@ -326,18 +328,18 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
             RuleSource tacletBase = profile.getStandardRules().getTacletBase();
             if (tacletBase != null) {
                 IKeYFile tacletBaseFile = createTacletBaseKeYFile();
-                readEnvInput(tacletBaseFile, baseConfig);
+                readEnvInput(tacletBaseFile, (IC) baseConfig);
             }
 
         }
-        return prepare(envInput, baseConfig);
+        return prepare(envInput, (IC) baseConfig);
 
     }
 
-    public AbstractInitConfig prepare(EnvInput envInput,
-            AbstractInitConfig referenceConfig) throws ProofInputException {
+    public IC prepare(EnvInput envInput,
+            IC referenceConfig) throws ProofInputException {
         // create initConfig
-        AbstractInitConfig initConfig = referenceConfig.copy();
+        IC initConfig = (IC) referenceConfig.copy();
 
         // register built in rules
         for (Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
@@ -372,14 +374,14 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
         }
         try {
             // determine environment
-            initConfig = determineEnvironment(po, initConfig);
+            initConfig = determineEnvironment(po, (IC) initConfig);
 
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
             po.readProblem();
             ProofAggregate pa = po.getPO();
             // final work
-            setUpProofHelper(po, pa, initConfig);
+            setUpProofHelper(po, pa, (IC) initConfig);
 
             // done
             if (listener != null) {
@@ -401,7 +403,7 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
         }
     }
 
-    public void startProver(ProofEnvironment env, ProofOblInput po)
+    public void startProver(ProofEnvironment<IC> env, ProofOblInput po)
             throws ProofInputException {
         assert env.getInitConfig().getProofEnv() == env;
         startProver(env.getInitConfig(), po, 0);
@@ -410,7 +412,7 @@ public abstract class AbstractProblemInitializer<S extends IServices> {
     public void startProver(EnvInput envInput, ProofOblInput po)
             throws ProofInputException {
         try {
-            AbstractInitConfig initConfig = prepare(envInput);
+            IC initConfig = prepare(envInput);
             startProver(initConfig, po, 0);
         } catch (ProofInputException e) {
             reportStatus(envInput.name() + " failed");

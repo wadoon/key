@@ -1,8 +1,6 @@
 package de.uka.ilkd.keyabs.abs;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 
 import abs.backend.coreabs.CoreAbsBackend;
 import abs.frontend.analyser.SemanticError;
@@ -13,6 +11,7 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaReader;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 public class ABSReader implements JavaReader {
 
@@ -25,7 +24,7 @@ public class ABSReader implements JavaReader {
     }
 
     @Override
-    public JavaBlock readBlockWithProgramVariables(Namespace varns, IServices services, String s) {
+    public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns, IServices services, String s) {
         String blockStr = CONCRETE_MODULE + "\n import * from PingPong; " + s;
 
         CoreAbsBackend absReader = ((ABSServices)services).getProgramInfo().getCoreABSBackend();//new CoreAbsBackend();

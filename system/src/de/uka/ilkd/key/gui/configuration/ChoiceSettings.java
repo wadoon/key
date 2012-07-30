@@ -10,14 +10,20 @@
 
 package de.uka.ilkd.key.gui.configuration;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 
 public class ChoiceSettings implements Settings {
@@ -90,13 +96,13 @@ public class ChoiceSettings implements Settings {
      * in <code>choiceNS</code> or if entries of <code>category2Choices</code>
      * are no longer present in <code>choiceNS</code>
      * @param remove remove entries not present in <code>choiceNS</code> */
-    public void updateChoices(Namespace choiceNS, boolean remove){
-	Iterator<Named> it = choiceNS.allElements().iterator();
+    public void updateChoices(Namespace<Choice> choiceNS, boolean remove){
+	Iterator<Choice> it = choiceNS.allElements().iterator();
 	HashMap<String,Set<String>> c2C = new HashMap<String, Set<String>>();
 	Choice c;
 	Set<String> soc;
 	while(it.hasNext()){
-	    c=(Choice)it.next();
+	    c=it.next();
 	    if(c2C.containsKey(c.category())){
 		soc=c2C.get(c.category().toString());
 		soc.add(c.name().toString());

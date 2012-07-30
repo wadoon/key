@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
@@ -235,7 +236,7 @@ public class ApplyTacletDialogModel {
 	app = app.prepareUserInstantiation(services);	
     }
 
-    public Namespace programVariables() {
+    public Namespace<IProgramVariable> programVariables() {
         return nss.programVariables();
     }
 

@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
@@ -43,7 +42,7 @@ public abstract class AbstractUserInterface implements UserInterface {
     public AbstractInitConfig load(File file, List<File> classPath, File bootClassPath) throws FileNotFoundException, ProofInputException {
        ProblemLoader loader = new ProblemLoader(file, classPath, bootClassPath, getMediator());
        EnvInput envInput = loader.createEnvInput(file, classPath, bootClassPath);
-       AbstractProblemInitializer init = createProblemInitializer();
+       AbstractProblemInitializer<?, ?> init = createProblemInitializer();
        return init.prepare(envInput);
     }
     
@@ -51,8 +50,8 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public Proof createProof(AbstractInitConfig initConfig, ProofOblInput input) throws ProofInputException {
-       AbstractProblemInitializer init = createProblemInitializer();
+    public <IC extends AbstractInitConfig> Proof createProof(IC initConfig, ProofOblInput input) throws ProofInputException {
+       AbstractProblemInitializer<?, IC> init = (AbstractProblemInitializer<?, IC>) createProblemInitializer();
        return init.startProver(initConfig, input, 0);
     }
 

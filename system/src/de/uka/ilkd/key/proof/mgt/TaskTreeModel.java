@@ -19,6 +19,7 @@ import javax.swing.tree.MutableTreeNode;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 
 
 public class TaskTreeModel extends DefaultTreeModel {
@@ -27,14 +28,14 @@ public class TaskTreeModel extends DefaultTreeModel {
      * 
      */
     private static final long serialVersionUID = -4168248377205879699L;
-    private Map proofToTask = new HashMap();
+    private Map<Proof, TaskTreeNode> proofToTask = new HashMap<Proof, TaskTreeNode>();
 
     public TaskTreeModel() {
 	super(new DefaultMutableTreeNode("Tasks"));
     }
 
     public void addTask(TaskTreeNode p) {	
-	ProofEnvironment env = p.getProofEnv();
+	ProofEnvironment<? extends AbstractInitConfig> env = p.getProofEnv();
 	int size = getChildCount(getRoot());
 	for (int i=0; i<size; i++) {
 	    MutableTreeNode envNode = (MutableTreeNode) getChild(getRoot(), i);
@@ -56,7 +57,7 @@ public class TaskTreeModel extends DefaultTreeModel {
 	    proofToTask.remove(allProofs[i]);
 	    p.decoupleFromEnv();
 	}
-	ProofEnvironment env = p.getProofEnv();
+	ProofEnvironment<? extends AbstractInitConfig> env = p.getProofEnv();
 	if (p.getParent().getChildCount()==1) { // remove env if p is single
             GlobalProofMgt.getInstance().removeEnv(env);
             env = null;

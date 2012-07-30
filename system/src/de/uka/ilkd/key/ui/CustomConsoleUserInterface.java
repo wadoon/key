@@ -65,7 +65,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public void proofCreated(AbstractProblemInitializer sender, ProofAggregate proofAggregate) {
+   public void proofCreated(AbstractProblemInitializer<?,?> sender, ProofAggregate proofAggregate) {
       // Nothing to do
    }
 

@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -167,7 +168,7 @@ public class QueryExpand implements BuiltInRule {
         		   lvTrms[i] = tb.var(instVars[i]);
         		   lvSorts[i] = instVars[i].sort();
         	   }
-        	   ImmutableArray<Sort> imArrlvSorts = new ImmutableArray(lvSorts);
+        	   ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<Sort>(lvSorts);
         	   placeHolderResult    = new Function(new Name(logicResultName), query.sort(), imArrlvSorts);
         	   placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); //I'm not sure about the third parameter!
            }
@@ -226,7 +227,7 @@ public class QueryExpand implements BuiltInRule {
     private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
             ImmutableArray<ParameterDeclaration> paramDecls, IServices services) {
 
-        final Namespace progvarsNS = services.getNamespaces().programVariables();
+        final Namespace<IProgramVariable> progvarsNS = services.getNamespaces().programVariables();
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
         int i = 0;
         for (final ParameterDeclaration pdecl : paramDecls) {
@@ -522,7 +523,7 @@ public class QueryExpand implements BuiltInRule {
         final int arity = term.arity();
         final Term newSubTerms[] = new Term[arity];    
         boolean changedSubTerm = false;
-        int next = (Integer)(it.next());
+        int next = (it.next());
         //System.out.print(next+", ");
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);

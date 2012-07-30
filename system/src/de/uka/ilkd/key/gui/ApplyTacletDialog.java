@@ -36,6 +36,7 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.UIConfiguration;
@@ -104,7 +105,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     }
     
     protected JPanel createInfoPanel() {
-	ImmutableList<Named> vars=model[0].programVariables().elements();
+	ImmutableList<IProgramVariable> vars=model[0].programVariables().elements();
 	JPanel panel = new JPanel(new GridLayout(1,1));
 	panel.setBorder(new TitledBorder("Sequent program variables"));       
 	JScrollPane scroll = new JScrollPane();

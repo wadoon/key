@@ -16,10 +16,10 @@ public class MgtNode {
 
     Object content;
     
-    Set<MgtEdge> in  = new HashSet();
-    Set<MgtEdge> out = new HashSet();
+    Set<MgtEdge> in  = new HashSet<MgtEdge>();
+    Set<MgtEdge> out = new HashSet<MgtEdge>();
 
-    Map<String,String> attrs = new HashMap();
+    Map<String,String> attrs = new HashMap<String, String>();
 
     public MgtNode(Object  o, String ... attrString) {
         content = o;

@@ -22,7 +22,12 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.AbstractSet;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
@@ -104,7 +109,7 @@ public class ExpansionState
 
     private JTree tree;
 
-    private Set paths;
+    private Set<TreePath> paths;
 
     private transient Listener listener;
 
@@ -116,7 +121,7 @@ public class ExpansionState
     {
         tree = t;
         
-        paths = new HashSet();
+        paths = new HashSet<TreePath>();
 
         listener = createListener();
 
@@ -137,7 +142,7 @@ public class ExpansionState
         This is equivalent to using the normal constructor, and then
         calling setPaths(tree, state).
     */
-    public ExpansionState(JTree tree, Collection state)
+    public ExpansionState(JTree tree, Collection<TreePath> state)
     {
         this(tree, state, false);
     }
@@ -177,7 +182,7 @@ public class ExpansionState
             // from below.
 
             if (tree.isExpanded(rootPath))
-                for (Enumeration e = tree.getExpandedDescendants(rootPath); e.hasMoreElements();)
+                for (Enumeration<TreePath> e = tree.getExpandedDescendants(rootPath); e.hasMoreElements();)
                     paths.add(e.nextElement());
         }
     }
@@ -237,7 +242,7 @@ public class ExpansionState
     {
         return new Iterator()
         {
-            Iterator i = paths.iterator();
+            Iterator<TreePath> i = paths.iterator();
 
             public boolean hasNext()
             {
@@ -286,7 +291,7 @@ public class ExpansionState
     }
 
 
-    public Collection state(Collection result)
+    public Collection<TreePath> state(Collection<TreePath> result)
     {
         result.clear();
         result.addAll(paths);
@@ -369,7 +374,7 @@ public class ExpansionState
     */
     public static void expandAll(JTree tree, TreePath path)
     {
-        for (Object o : extremalPaths(tree.getModel(), path, new HashSet())) tree.expandPath((TreePath) o);
+        for (Object o : extremalPaths(tree.getModel(), path, new HashSet<TreePath>())) tree.expandPath((TreePath) o);
     }
 
 
@@ -383,7 +388,7 @@ public class ExpansionState
         The extremal paths are stored in the order in which they appear
         in pre-order in the tree model.
     */
-    private static Collection extremalPaths(TreeModel data, TreePath path, Collection result)
+    private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path, Collection<TreePath> result)
     {
         result.clear();
 
@@ -395,7 +400,7 @@ public class ExpansionState
         return result;
     }
 
-    private static void extremalPathsImpl(TreeModel data, TreePath path, Collection result)
+    private static void extremalPathsImpl(TreeModel data, TreePath path, Collection<TreePath> result)
     {
         Object node = path.getLastPathComponent();
         
@@ -434,7 +439,7 @@ public class ExpansionState
         expand paths. If any TreeWillExpandListeners veto that, the
         result is undefined.
     */
-    public static Collection paths(JTree tree, Collection result)
+    public static Collection<TreePath> paths(JTree tree, Collection<TreePath> result)
     {
         result.clear();
 
@@ -453,7 +458,7 @@ public class ExpansionState
         return result;
     }
 
-    private static void pathsImpl(JTree tree, TreeModel data, TreePath path, Collection result)
+    private static void pathsImpl(JTree tree, TreeModel data, TreePath path, Collection<TreePath> result)
     {
         boolean expanded = tree.isExpanded(path);
 
@@ -638,9 +643,9 @@ public class ExpansionState
         // itself)
         private void removeDescendants(TreePath path)
         {
-            for (Iterator i = paths.iterator(); i.hasNext();)
+            for (Iterator<TreePath> i = paths.iterator(); i.hasNext();)
             {
-                TreePath current = (TreePath)i.next();
+                TreePath current = i.next();
 
                 if (current.isDescendant(path))
                     i.remove();

@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -161,8 +162,8 @@ public final class Goal  {
 	return node().getGlobalProgVars();
     }
     
-    public Namespace createGlobalProgVarNamespace() {
-        final Namespace ns = new Namespace();
+    public Namespace<IProgramVariable> createGlobalProgVarNamespace() {
+        final Namespace<IProgramVariable> ns = new Namespace<IProgramVariable>();
         final Iterator<ProgramVariable> it = getGlobalProgVars().iterator();
         while (it.hasNext()) {
             ns.add(it.next());
@@ -215,9 +216,9 @@ public final class Goal  {
      * adds the global program variables to a new created variable namespace
      * that contains all the elements of the given namespace.
      */
-    public Namespace getVariableNamespace(Namespace exNS) {
-	Namespace newNS = exNS;
-	final Iterator<ProgramVariable> it=getGlobalProgVars().iterator();
+    public Namespace<IProgramVariable> getVariableNamespace(Namespace<IProgramVariable> exNS) {
+	Namespace<IProgramVariable> newNS = exNS;
+	final Iterator<ProgramVariable> it = getGlobalProgVars().iterator();
 	if (it.hasNext()) {
 	    newNS=newNS.extended(it.next());
 	}
@@ -460,8 +461,8 @@ public final class Goal  {
 	node.setGlobalProgVars(getGlobalProgVars().add(pv));
     }
 
-    public void setProgramVariables(Namespace ns) {
-	final Iterator<Named> it=ns.elements().iterator();
+    public void setProgramVariables(Namespace<IProgramVariable> ns) {
+	final Iterator<IProgramVariable> it=ns.elements().iterator();
 	ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
 	while (it.hasNext()) {
 	    s = s.add((ProgramVariable)it.next());

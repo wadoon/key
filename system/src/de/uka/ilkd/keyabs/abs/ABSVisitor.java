@@ -29,8 +29,12 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnABSVariableDeclarationStatement(ABSVariableDeclarationStatement x);
 
-	void performActionOnABSAsyncMethodCall(ABSAsyncMethodCall x);
+    void performActionOnABSAsyncMethodCall(ABSAsyncMethodCall x);
 
-	void performActionOnABSNullExp(ABSNullExp absNullExp);
+    void performActionOnABSNullExp(ABSNullExp x);
+
+    void performActionOnABSDataConstructorExp(ABSDataConstructorExp x);
+
+    void performActionOnABSIntLiteral(ABSIntLiteral x);
 
 }

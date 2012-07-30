@@ -41,7 +41,7 @@ public class Config {
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
     
-    static HashMap map = new HashMap();
+    static HashMap<String, StringBuffer> map = new HashMap<String, StringBuffer>();
 
     /** loads a resource and returns its URL 
      * @param cl the Class used to determine the resource 
@@ -98,7 +98,7 @@ public class Config {
 	StringBuffer path = new StringBuffer();
 	path = readUntil(fr,']');
 
-	StringBuffer result = (StringBuffer) map.get(identifier);
+	StringBuffer result = map.get(identifier);
 	if (map.get(identifier.toString()) == null) {
 	    map.put(identifier.toString(), path);
 	} else {
@@ -163,7 +163,7 @@ public class Config {
 	FileReader fr = null;
 	try {
 	    fr = new FileReader(args[0]);       	
-	    map = new HashMap();
+	    map = new HashMap<String, StringBuffer>();
 	    while (readIdentifier(fr)!=-1) {	    
 	    }
 	    fr.close();

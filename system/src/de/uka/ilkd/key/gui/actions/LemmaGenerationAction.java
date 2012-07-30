@@ -172,7 +172,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final File fileForDefinitions = chooser.getFileForDefinitions();
                 final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
-                final AbstractProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
+                final AbstractProblemInitializer<?, ?> problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
                                 mainWindow.getMediator().getProfile(), false, mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
@@ -249,7 +249,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final File fileForDefinitions = chooser.getFileForDefinitions();
                 final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
-                final AbstractProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
+                final AbstractProblemInitializer<?, ?> problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
                                 proof.env().getInitConfig().getProfile(), false, mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),

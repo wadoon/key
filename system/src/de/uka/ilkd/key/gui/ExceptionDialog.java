@@ -184,7 +184,7 @@ public class ExceptionDialog extends JDialog {
             i ++;
 	 }
 	 
-	 final JList list = new JList(excMessages);
+	 final JList<?> list = new JList<Object>(excMessages);
 	 list.setCellRenderer(new TextAreaRenderer());
  	 list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	 list.setSelectedIndex(0);

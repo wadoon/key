@@ -25,9 +25,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class TestNamespace extends TestCase {
     
-    Namespace ns1;
-    Namespace ns2;
-    Namespace ns3;
+    Namespace<LogicVariable> ns1;
+    Namespace<LogicVariable> ns2;
+    Namespace<LogicVariable> ns3;
     
     Sort s1;
     LogicVariable va;
@@ -48,7 +48,7 @@ public class TestNamespace extends TestCase {
         this.vd = new LogicVariable(new Name("D"),s1);
         this.ve = new LogicVariable(new Name("E"),s1);
         
-	ns1=new Namespace();
+	ns1=new Namespace<LogicVariable>();
 	ns1.add(va);
 	ns1.add(vb);
 	ns2=ns1.extended(vc);

@@ -40,7 +40,7 @@ public abstract class LDT implements Named {
     private final Sort sort;   
     
     /** the namespace of functions this LDT feels responsible for */
-    private final Namespace functions = new Namespace();
+    private final Namespace<Function> functions = new Namespace<Function>();
 
     
     
@@ -100,7 +100,7 @@ public abstract class LDT implements Named {
     /** returns the basic functions of the model
      * @return the basic functions of the model
      */
-    protected final Namespace functions() {
+    protected final Namespace<Function> functions() {
 	return functions;
     }
 

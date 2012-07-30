@@ -16,7 +16,6 @@ import java.util.Vector;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
-import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IKeYFile;
@@ -39,7 +39,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
-public final class ProblemInitializer extends AbstractProblemInitializer<Services> {
+public final class ProblemInitializer extends AbstractProblemInitializer<Services, InitConfig> {
 
     
     public ProblemInitializer(ProgressMonitor mon,
@@ -125,7 +125,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
      * Helper for readEnvInput().
      */
     @Override
-    protected void readJava(EnvInput envInput, AbstractInitConfig initConfig) 
+    protected void readJava(EnvInput envInput, InitConfig initConfig) 
     		throws ProofInputException {
 	//this method must only be called once per init config	
         final Services javaServices = (Services) initConfig.getServices();
@@ -180,10 +180,10 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
     //------------------------------------------------------------------------- 
     
     @Override
-    protected void registerProgramDefinedSymbols(AbstractInitConfig initConfig)
+    protected void registerProgramDefinedSymbols(InitConfig initConfig)
             throws ProofInputException {
         final JavaInfo javaInfo = (JavaInfo) initConfig.getServices().getProgramInfo();
-        final Namespace functions 
+        final Namespace<SortedOperator> functions 
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 
         = initConfig.getServices().getTypeConverter().getHeapLDT();

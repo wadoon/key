@@ -16,10 +16,15 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
@@ -67,7 +72,7 @@ public abstract class AbstractInitConfig {
      * returns the proof environment using this initial configuration
      * @return the ProofEnvironment using this configuration
      */
-    public abstract ProofEnvironment getProofEnv();
+    public abstract <IC extends AbstractInitConfig> ProofEnvironment<IC> getProofEnv();
 
     /**
      * adds entries to the HashMap that maps categories to their
@@ -215,37 +220,37 @@ public abstract class AbstractInitConfig {
 
     /** returns the function namespace of this initial configuration
      */
-    public Namespace funcNS() {
+    public Namespace<SortedOperator> funcNS() {
         return namespaces().functions();
     }
 
     /** returns the sort namespace of this initial configuration
      */
-    public Namespace sortNS() {
+    public Namespace<Sort> sortNS() {
         return namespaces().sorts();
     }
 
     /** returns the heuristics namespace of this initial configuration
      */
-    public Namespace ruleSetNS() {
+    public Namespace<RuleSet> ruleSetNS() {
         return namespaces().ruleSets();
     }
 
     /** returns the variable namespace of this initial configuration
      */
-    public Namespace varNS() {
+    public Namespace<ParsableVariable> varNS() {
         return namespaces().variables();
     }
 
     /** returns the program variable namespace of this initial configuration
      */
-    public Namespace progVarNS() {
+    public Namespace<IProgramVariable> progVarNS() {
         return namespaces().programVariables();
     }
 
     /** returns the choice namespace of this initial configuration
      */
-    public Namespace choiceNS() {
+    public Namespace<Choice> choiceNS() {
         return namespaces().choices();
     }
 
@@ -266,7 +271,7 @@ public abstract class AbstractInitConfig {
     
     protected void initCopy(AbstractInitConfig ic) {
         ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap) category2DefaultChoice.clone());
+        ic.category2DefaultChoice = ((HashMap<String, String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);

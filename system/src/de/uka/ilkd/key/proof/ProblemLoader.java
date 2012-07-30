@@ -107,7 +107,7 @@ public final class ProblemLoader implements Runnable {
     private PosInTerm currIfInstPosInTerm;
 
 
-    AbstractProblemInitializer init;
+    AbstractProblemInitializer<?, ?> init;
     AbstractInitConfig iconfig;
 
     private SwingWorker worker;
@@ -319,7 +319,7 @@ public final class ProblemLoader implements Runnable {
        return status;
    }
 
-   protected AbstractProblemInitializer createProblemInitializer() {
+   protected AbstractProblemInitializer<?, ?> createProblemInitializer() {
        if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile) {
            return new ABSProblemInitializer(ui, mediator.getProfile(), true, ui);
        }
@@ -560,7 +560,7 @@ public final class ProblemLoader implements Runnable {
                     "@ " + pos);
             }
         }
-        ourApp = (IBuiltInRuleApp) ruleApps.iterator().next();
+        ourApp = ruleApps.iterator().next();
         builtinIfInsts = null;
         return ourApp;
     }

@@ -13,9 +13,13 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
@@ -26,11 +30,11 @@ public class TestTriggersSet extends TestCase {
 
 	private Proof proof;
     
-	private Namespace variables = new Namespace();
+	private Namespace<ParsableVariable> variables = new Namespace<ParsableVariable>();
 
-	private Namespace functions = new Namespace();
+	private Namespace<SortedOperator> functions = new Namespace<SortedOperator>();
 
-	private Namespace sorts = new Namespace();
+	private Namespace<Sort> sorts = new Namespace<Sort>();
 
 	//sort 
 	private Sort r;
@@ -194,14 +198,14 @@ public class TestTriggersSet extends TestCase {
 		proof.add(g);
 
 		proof.setNamespaces(new NamespaceSet(variables, functions, sorts,
-				new Namespace(), new Namespace(),new Namespace() ));
+				new Namespace<RuleSet>(), new Namespace<Choice>(),new Namespace<IProgramVariable>() ));
 
 	}
 
 	private Term parseTerm(String termstr) {
 		return TacletForTests.parseTerm(termstr, new NamespaceSet(
-				variables, functions, sorts, new Namespace(),
-				new Namespace(), new Namespace()));
+				variables, functions, sorts, new Namespace<RuleSet>(),
+				new Namespace<Choice>(), new Namespace<IProgramVariable>()));
 	}
 
 	public void testTrigger1(){

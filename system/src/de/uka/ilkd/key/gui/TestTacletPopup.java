@@ -70,9 +70,9 @@ public class TestTacletPopup {
 
     private static final TermBuilder TB = JavaProfile.DF();
 
-    public static Namespace var_ns=new Namespace();
-    public static Namespace func_ns=new Namespace();
-    public static Namespace sort_ns=new Namespace();
+    public static Namespace<ParsableVariable> var_ns=new Namespace<ParsableVariable>();
+    public static Namespace<Function> func_ns=new Namespace<Function>();
+    public static Namespace<Sort> sort_ns=new Namespace<Sort>();
 
     private TestTacletPopup() {}	
 

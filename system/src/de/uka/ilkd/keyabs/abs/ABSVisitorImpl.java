@@ -156,4 +156,14 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
 	public void performActionOnABSNullExp(ABSNullExp x) {
 		doDefaultAction(x);
 	}
+
+	@Override
+	public void performActionOnABSDataConstructorExp(ABSDataConstructorExp x) {
+	    doDefaultAction(x);
+	}
+
+	@Override
+	public void performActionOnABSIntLiteral(ABSIntLiteral x) {
+	    doDefaultAction(x);
+	}
 }

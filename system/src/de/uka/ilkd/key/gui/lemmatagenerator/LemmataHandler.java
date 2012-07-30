@@ -60,7 +60,7 @@ public class LemmataHandler implements TacletFilter {
                 File fileForDefinitions =  options.getPathOfRuleFile() != "" ? new File(options.getPathOfDefinitionFile()) :file;
                 Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
                 
-                final AbstractProblemInitializer problemInitializer = new ProblemInitializer(null, profile, false, new Listener());
+                final AbstractProblemInitializer<?, ?> problemInitializer = new ProblemInitializer(null, profile, false, new Listener());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null,
                                                       new Listener(),
@@ -177,7 +177,7 @@ public class LemmataHandler implements TacletFilter {
         private class Listener implements ProblemInitializerListener {
 
                 @Override
-                public void proofCreated(AbstractProblemInitializer sender,
+                public void proofCreated(AbstractProblemInitializer<?, ?> sender,
                                 ProofAggregate proofAggregate) {
                         println("The proofs have been initialized.");
                 }

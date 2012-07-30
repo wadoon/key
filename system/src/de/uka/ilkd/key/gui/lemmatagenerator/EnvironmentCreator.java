@@ -25,14 +25,14 @@ public class EnvironmentCreator  {
         }
         
         
-        public ProofEnvironment create(String pathForDummyFile,ProgressMonitor monitor,
+        public ProofEnvironment<?> create(String pathForDummyFile,ProgressMonitor monitor,
                           ProblemInitializerListener listener, Profile profile) throws IOException,
         ProofInputException {
                 File dummyFile = createDummyKeYFile(pathForDummyFile);
                 keyFile = new KeYUserProblemFile(
                                 dummyFile.getName(), dummyFile, null);
 
-                final AbstractProblemInitializer pi = new ProblemInitializer(monitor, profile, false, listener );
+                final AbstractProblemInitializer<?,?> pi = new ProblemInitializer(monitor, profile, false, listener );
                
                 return pi.prepare(keyFile).getProofEnv();
         }

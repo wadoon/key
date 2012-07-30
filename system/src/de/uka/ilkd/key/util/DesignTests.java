@@ -85,7 +85,7 @@ public class DesignTests {
      * @param target the LinkedList where to insert the elements of the
      * source
      */
-    private static void copyToList(Object[] source, LinkedList target) {
+    private static void copyToList(Object[] source, LinkedList<Object> target) {
 	for (int i = 0; i<source.length; i++) {
 	    target.add(source[i]);
 	}
@@ -101,7 +101,7 @@ public class DesignTests {
      * <code>topDir</code>
      */
     public static Class[] getAllClasses(File topDir) {
-	LinkedList result = new LinkedList();
+	LinkedList<Object> result = new LinkedList<Object>();
 	copyToList(getClasses(topDir), result);	    
 
 	File[] subDirectories = topDir.listFiles
@@ -116,7 +116,7 @@ public class DesignTests {
 	    for (int i = 0; i<subDirectories.length; i++) {
 		copyToList(getAllClasses(subDirectories[i]), result);
 	    }
-	    return (Class[])result.toArray(new Class[result.size()]);
+	    return result.toArray(new Class[result.size()]);
 	}
     }
 
@@ -134,8 +134,8 @@ public class DesignTests {
     /**
      * subclass of Term must be private or package private
      */
-    public LinkedList testTermSubclassVisibility() {
-	LinkedList badClasses = new LinkedList();
+    public LinkedList<Class> testTermSubclassVisibility() {
+	LinkedList<Class> badClasses = new LinkedList<Class>();
 	for (int i = 0; i<allClasses.length; i++) {
  	    if (allClasses[i] != de.uka.ilkd.key.logic.Term.class &&
 		(de.uka.ilkd.key.logic.Term.class).
@@ -155,8 +155,8 @@ public class DesignTests {
     }
 
     /** does not test if GUI is used within methods */
-    public LinkedList testGuiSep() {
-        LinkedList badClasses = new LinkedList();
+    public LinkedList<Class> testGuiSep() {
+        LinkedList<Class> badClasses = new LinkedList<Class>();
         for (int i = 0; i<allClasses.length; i++) {
             if (de.uka.ilkd.key.rule.Rule.class.isAssignableFrom(allClasses[i]) ||
                     allClasses[i].getPackage().getName().contains("key.rule") ||

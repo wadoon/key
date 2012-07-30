@@ -72,6 +72,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
@@ -1190,8 +1191,8 @@ public class Recoder2KeY implements JavaReader {
      *            a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readBlockWithProgramVariables(Namespace varns, IServices services, String s) {
-        Iterator<Named> it = varns.allElements().iterator();
+    public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns, IServices services, String s) {
+        Iterator<IProgramVariable> it = varns.allElements().iterator();
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
         while (it.hasNext()) {
             Named n = it.next();

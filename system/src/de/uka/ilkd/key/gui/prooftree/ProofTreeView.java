@@ -257,7 +257,7 @@ public class ProofTreeView extends JPanel {
 	if (delegateModel != null) {
             expansionState.disconnect(delegateView);
             delegateModel.storeExpansionState(
-                expansionState.state(new HashSet()));
+                expansionState.state(new HashSet<TreePath>()));
             delegateModel.storeSelection(delegateView.getSelectionPath());
 	    delegateModel.unregister();
             delegateModel.removeTreeModelListener(proofTreeSearchPanel);
