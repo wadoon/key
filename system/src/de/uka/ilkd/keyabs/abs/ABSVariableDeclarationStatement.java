@@ -3,7 +3,6 @@ package de.uka.ilkd.keyabs.abs;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
