@@ -2,7 +2,6 @@ package de.uka.ilkd.keyabs.abs;
 
 import java.io.IOException;
 
-import abs.backend.coreabs.CoreAbsBackend;
 import abs.frontend.analyser.SemanticError;
 import abs.frontend.ast.Model;
 import abs.frontend.ast.ModuleDecl;
@@ -26,21 +25,14 @@ public class ABSReader implements JavaReader {
     @Override
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns, IServices services, String s) {
         String blockStr = CONCRETE_MODULE + "\n import * from PingPong; " + s;
-
-        CoreAbsBackend absReader = ((ABSServices)services).getProgramInfo().getCoreABSBackend();//new CoreAbsBackend();
-        //absReader.setWithStdLib(true);
         try {
-            Model m = ((ABSServices)services).getProgramInfo().parseInContext(blockStr);
-//            		absReader.parse(File.createTempFile("taclet_", ".keyabs"), blockStr, new StringReader(blockStr));
-                    
+            Model m = ((ABSServices)services).getProgramInfo().parseInContext(blockStr);                    
             ModuleDecl module = null;
             for (ModuleDecl md : m.getModuleDecls()) {
-            	System.out.println(md.getName());
             	if (md.getName().equals(CONCRETE_MODULE_NAME)) {
             		module = md;
             		break;
             	}
-            	
             }
             
             System.out.println(" Errors: "+m.getErrors());
@@ -58,9 +50,9 @@ public class ABSReader implements JavaReader {
 
             return JavaBlock.createJavaBlock(block);
         } catch (IOException e) {
-            throw new ConvertException("Failed to parser schema block of taclet.", e);
+            throw new ConvertException("Failed to parse ABS block.", e);
         } catch (Exception e) {
-            throw new ConvertException("Failed to parser schema block of taclet.", e);
+            throw new ConvertException("Failed to parse ABS block.", e);
         }
     }
 

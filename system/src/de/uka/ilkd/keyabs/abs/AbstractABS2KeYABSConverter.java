@@ -21,10 +21,12 @@ import abs.frontend.ast.PureExp;
 import abs.frontend.ast.ThisExp;
 import abs.frontend.ast.VarDeclStmt;
 import abs.frontend.ast.VarUse;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -34,11 +36,18 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public abstract class AbstractABS2KeYABSConverter {
 
     private final IServices services;
+    
+    protected Namespace<IProgramVariable> pv = new Namespace<IProgramVariable>();
 
     public AbstractABS2KeYABSConverter(IServices services) {
         this.services = services;
     }
 
+    public AbstractABS2KeYABSConverter(IServices services, Namespace<IProgramVariable> pv) {
+        this.services = services;
+        this.pv = pv;
+    }
+    
     public ProgramElement convert(ASTNode<?> x) {
         ProgramElement result = null;
 
@@ -117,10 +126,11 @@ public abstract class AbstractABS2KeYABSConverter {
 
     public ABSStatementBlock convert(Block x) {
         IABSStatement[] bodyStmnts = new IABSStatement[x.getNumStmt()];
+        pv = pv.extended(ImmutableSLList.<IProgramVariable>nil());
         for (int i = 0; i < x.getNumStmt(); i++) {
             bodyStmnts[i] = (IABSStatement) convert(x.getStmt(i));
         }
-
+        pv = pv.parent();
         return new ABSStatementBlock(bodyStmnts);
     }
 
@@ -138,6 +148,9 @@ public abstract class AbstractABS2KeYABSConverter {
 
     public Expression convert(VarUse varUse) {
         IProgramVariable var = lookupLocalVariable(varUse.getName());
+        
+        System.out.println(varUse.getName() + "<<<<>>>>>" + var);
+        
         return new ABSLocalVariableReference(var);
     }
 
@@ -161,7 +174,6 @@ public abstract class AbstractABS2KeYABSConverter {
                 (IABSPureExpression) convert(x.getChild(1)));
     }
 
-
     public ABSIntLiteral convert(IntLiteral x) {
         return new ABSIntLiteral(new BigInteger(x.getContent()));
     }
@@ -182,6 +194,7 @@ public abstract class AbstractABS2KeYABSConverter {
 	//KeYJavaType type = lookupType(x.getVarDecl().getAccess().toString());
 	KeYJavaType type = lookupType(x.getVarDecl().getType().getQualifiedName());
         LocationVariable localVar = new LocationVariable(new ProgramElementName(x.getVarDecl().getName()), type);
+        pv.add(localVar);
         IABSExpression initExp = null;
         if (x.getVarDecl().hasInitExp()) {
         	initExp = (IABSExpression) convert(x.getVarDecl().getInitExp());

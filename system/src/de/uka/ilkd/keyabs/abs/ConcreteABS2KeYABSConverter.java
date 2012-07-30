@@ -7,21 +7,18 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 public class ConcreteABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
 
-    private final Namespace progVars;
-    
-    public ConcreteABS2KeYABSConverter(Namespace varns, IServices services) {
-        super(services);
-        this.progVars = varns;
+    public ConcreteABS2KeYABSConverter(Namespace<IProgramVariable> varns, IServices services) {
+        super(services, varns);
     }
 
     @Override
     protected IProgramVariable lookupLocalVariable(String name) {
-        return (IProgramVariable) progVars.lookup(new Name(name));
+        return pv.lookup(new Name(name));
     }
 
     @Override
     protected IProgramVariable lookupFieldVariable(String name) {
-        return (IProgramVariable) progVars.lookup(new Name(name));
+        return pv.lookup(new Name(name));
     }
 
  

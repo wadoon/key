@@ -20,9 +20,9 @@ import de.uka.ilkd.keyabs.logic.sort.ABSProgramSVSort;
 public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
 
     
-    private final Namespace schemaVariables;
+    private final Namespace<IProgramVariable> schemaVariables;
 
-    public SchemaABS2KeYABSConverter(Namespace schemaVariables, IServices services) {
+    public SchemaABS2KeYABSConverter(Namespace<IProgramVariable> schemaVariables, IServices services) {
         super(services);
         this.schemaVariables = schemaVariables;
     }
@@ -42,7 +42,7 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
     }
     
     IProgramVariable lookup(String name) {
-        return (IProgramVariable) schemaVariables.lookup(new Name(name));
+        return schemaVariables.lookup(new Name(name));
     }
 
     public Expression convert(VarUse varUse) {
@@ -61,9 +61,7 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         String typeName;
        
         typeName = x.getVarDecl().getAccess().toString();
-        
-        System.out.println("===> " + typeName);
-        
+                
         KeYJavaType type = lookupType(typeName);
         
         TypeReference typeRef;

@@ -1385,11 +1385,12 @@ oneof_sorts returns [Sort[] oneOfSorts = null]
 keyjavatype returns [KeYJavaType kjt=null]
 { 
    String type = null;
+   String id = "";
    boolean array = false;
 }
 :
-    type = simple_ident_dots  
-    {
+    type = simple_ident_dots  (LESS id = simple_ident_dots GREATER { /* type += "<" + id + ">"; */})?
+    {   
         kjt = getProgramInfo().getKeYJavaType(type);
             
         //expand to "ABS.StdLib"            
