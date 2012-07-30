@@ -9,16 +9,9 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
-import de.uka.ilkd.keyabs.abs.ABSAddExp;
-import de.uka.ilkd.keyabs.abs.ABSAndBoolExp;
 import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
-import de.uka.ilkd.keyabs.abs.ABSDataConstructorExp;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
-import de.uka.ilkd.keyabs.abs.ABSIntLiteral;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
-import de.uka.ilkd.keyabs.abs.ABSMultExp;
-import de.uka.ilkd.keyabs.abs.ABSNullExp;
-import de.uka.ilkd.keyabs.abs.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSTypeReference;
@@ -26,6 +19,19 @@ import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.ABSVisitor;
 import de.uka.ilkd.keyabs.abs.CopyAssignment;
 import de.uka.ilkd.keyabs.abs.ThisExpression;
+import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
+import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 
 public class ABSProgramPrettyPrinter implements ABSVisitor {
 
@@ -236,6 +242,67 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 	    lp.printABSIntLiteral(x);
 	} catch (IOException e) {
 	    e.printStackTrace();
-	}     }
+	}     
+    }
+
+
+    @Override
+    public void performActionOnABSEqExp(ABSEqExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "==");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }     
+    }
+
+
+    @Override
+    public void performActionOnABSNotEqExp(ABSNotEqExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "!=");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }     
+    }
+
+    @Override
+    public void performActionOnABSGTExp(ABSGTExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, ">");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }     
+    }
+
+    @Override
+    public void performActionOnABSGEQExp(ABSGEQExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, ">=");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }     
+    }
+
+
+    @Override
+    public void performActionOnABSLTExp(ABSLTExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "<");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }     
+    }
+
+
+    @Override
+    public void performActionOnABSLEQExp(ABSLEQExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "<=");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }     
+    }
+
+
 
 }

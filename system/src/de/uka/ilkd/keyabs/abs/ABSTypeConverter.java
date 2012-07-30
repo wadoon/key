@@ -17,6 +17,20 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
+import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
+import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 public final class ABSTypeConverter extends AbstractTypeConverter {
@@ -47,33 +61,48 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
             return getServices().getTermBuilder().var(((IABSLocationReference)pe).getVariable());
         } else if (pe instanceof IProgramVariable) {
             return getServices().getTermBuilder().var((IProgramVariable)pe);
-        } else if (pe instanceof ABSBinaryOperatorPureExp) {
-            Term left = convertToLogicElement(((ABSBinaryOperatorPureExp) pe).getChildAt(0), ec);
-            Term right = convertToLogicElement(((ABSBinaryOperatorPureExp) pe).getChildAt(1), ec);
-            
-            if (pe instanceof ABSAddExp) {
-                return getServices().getTermBuilder().add(services, left, right);
-            } else if (pe instanceof ABSMultExp) {
-                return getServices().getTermBuilder().mul(services, left, right);                
-            } else if (pe instanceof ABSAndBoolExp) {
-                return convertBool2Fml(Junctor.AND, left, right);
-            } else if (pe instanceof ABSOrBoolExp) {
-                return convertBool2Fml(Junctor.OR, left, right);
+        } else {
+            final TermBuilder tb = services.getTermBuilder();
+            if (pe instanceof ABSBinaryOperatorPureExp) {
+                Term left = convertToLogicElement(((ABSBinaryOperatorPureExp) pe).getChildAt(0), ec);
+                Term right = convertToLogicElement(((ABSBinaryOperatorPureExp) pe).getChildAt(1), ec);
+                
+                if (pe instanceof ABSAddExp) {
+                    return getServices().getTermBuilder().add(services, left, right);
+                } else if (pe instanceof ABSMultExp) {
+                    return getServices().getTermBuilder().mul(services, left, right);                
+                } else if (pe instanceof ABSAndBoolExp) {
+                    return convertBool2Fml(Junctor.AND, left, right);
+                } else if (pe instanceof ABSOrBoolExp) {
+                    return convertBool2Fml(Junctor.OR, left, right);
+                } else if (pe instanceof ABSEqExp) {
+                    return tb.equals(left, right);
+                } else if (pe instanceof ABSNotEqExp) {
+                    return tb.not(tb.equals(left, right));
+                } else if (pe instanceof ABSGEQExp) {
+                    return tb.geq(left, right, services);
+                } else if (pe instanceof ABSGTExp) {
+                    return tb.gt(left, right, services);
+                } else if (pe instanceof ABSLEQExp) {
+                    return tb.leq(left, right, services);
+                } else if (pe instanceof ABSLTExp) {
+                    return tb.lt(left, right, services);
+                }
+            } else if (pe instanceof ABSNullExp) {
+            	return getServices().getTermBuilder().NULL(getServices());
+            } else if (pe instanceof ABSDataConstructorExp) {
+                ABSDataConstructorExp dtCons = (ABSDataConstructorExp)pe;
+                Function cons = (Function) services.getNamespaces().functions().lookup((Name) dtCons.getChildAt(0));
+                Term[] subs = new Term[dtCons.getArgumentCount()];
+                for (int i = 0; i<dtCons.getArgumentCount(); i++) {
+            	subs[i] = convertToLogicElement(dtCons.getArgumentAt(i), ec);
+            	System.out.println(subs[i]);
+                }
+            	System.out.println(dtCons.getChildAt(0) + "::" + dtCons.getArgumentCount() + ":::" +cons );
+                return tb.func(cons, subs);
+            } else if (pe instanceof ABSIntLiteral) {
+               return tb.zTerm(services, ((ABSIntLiteral)pe).getValue().toString());
             }
-        } else if (pe instanceof ABSNullExp) {
-        	return getServices().getTermBuilder().NULL(getServices());
-        } else if (pe instanceof ABSDataConstructorExp) {
-            ABSDataConstructorExp dtCons = (ABSDataConstructorExp)pe;
-            Function cons = (Function) services.getNamespaces().functions().lookup((Name) dtCons.getChildAt(0));
-            Term[] subs = new Term[dtCons.getArgumentCount()];
-            for (int i = 0; i<dtCons.getArgumentCount(); i++) {
-        	subs[i] = convertToLogicElement(dtCons.getArgumentAt(i), ec);
-        	System.out.println(subs[i]);
-            }
-    		System.out.println(dtCons.getChildAt(0) + "::" + dtCons.getArgumentCount() + ":::" +cons );
-            return services.getTermBuilder().func(cons, subs);
-        } else if (pe instanceof ABSIntLiteral) {
-           return services.getTermBuilder().zTerm(services, ((ABSIntLiteral)pe).getValue().toString());
         }
         return null;
     }

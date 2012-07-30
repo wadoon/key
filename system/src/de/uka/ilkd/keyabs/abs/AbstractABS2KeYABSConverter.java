@@ -10,11 +10,17 @@ import abs.frontend.ast.AsyncCall;
 import abs.frontend.ast.Binary;
 import abs.frontend.ast.Block;
 import abs.frontend.ast.DataConstructorExp;
+import abs.frontend.ast.EqExp;
 import abs.frontend.ast.ExpressionStmt;
 import abs.frontend.ast.FieldUse;
+import abs.frontend.ast.GTEQExp;
+import abs.frontend.ast.GTExp;
 import abs.frontend.ast.IncompleteAccess;
 import abs.frontend.ast.IntLiteral;
+import abs.frontend.ast.LTEQExp;
+import abs.frontend.ast.LTExp;
 import abs.frontend.ast.MultExp;
+import abs.frontend.ast.NotEqExp;
 import abs.frontend.ast.NullExp;
 import abs.frontend.ast.OrBoolExp;
 import abs.frontend.ast.PureExp;
@@ -32,6 +38,19 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
+import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 
 public abstract class AbstractABS2KeYABSConverter {
 
@@ -97,7 +116,19 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((AndBoolExp) x);
         } else if (x instanceof OrBoolExp) {
             result = convert((OrBoolExp) x);
-        }
+        } else if (x instanceof EqExp) {
+            result = convert((EqExp) x);
+        } else if (x instanceof NotEqExp) {
+            result = convert((NotEqExp) x);
+        } else if (x instanceof GTEQExp) {
+            result = convert((GTEQExp) x);
+        } else if (x instanceof GTExp) {
+            result = convert((GTExp) x);
+        } else if (x instanceof LTEQExp) {
+            result = convert((LTEQExp) x);
+        } else if (x instanceof LTExp) {
+            result = convert((LTExp) x);
+        } 
         return result;
     }
 
@@ -174,6 +205,38 @@ public abstract class AbstractABS2KeYABSConverter {
                 (IABSPureExpression) convert(x.getChild(1)));
     }
 
+    
+    public ABSEqExp convert(EqExp x) {
+        return new ABSEqExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)));
+    }
+    
+    public ABSNotEqExp convert(NotEqExp x) {
+        return new ABSNotEqExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)));
+    }
+    
+    public ABSGTExp convert(GTExp x) {
+        return new ABSGTExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)));
+    }
+
+    public ABSGEQExp convert(GTEQExp x) {
+        return new ABSGEQExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)));
+    }
+
+    public ABSLTExp convert(LTExp x) {
+        return new ABSLTExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)));
+    }
+
+    public ABSLEQExp convert(LTEQExp x) {
+        return new ABSLEQExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)));
+    }
+
+    
     public ABSIntLiteral convert(IntLiteral x) {
         return new ABSIntLiteral(new BigInteger(x.getContent()));
     }

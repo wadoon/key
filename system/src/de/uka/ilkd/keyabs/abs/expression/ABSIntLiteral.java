@@ -1,10 +1,14 @@
-package de.uka.ilkd.keyabs.abs;
+package de.uka.ilkd.keyabs.abs.expression;
 
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.keyabs.abs.ABSProgramElement;
+import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.abs.ABSVisitor;
+import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 
 public class ABSIntLiteral extends ABSProgramElement implements IABSPureExpression {
 

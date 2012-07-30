@@ -79,17 +79,17 @@ import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
-import de.uka.ilkd.keyabs.abs.ABSBinaryOperatorPureExp;
-import de.uka.ilkd.keyabs.abs.ABSDataConstructorExp;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
-import de.uka.ilkd.keyabs.abs.ABSIntLiteral;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
-import de.uka.ilkd.keyabs.abs.ABSNullExp;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSTypeReference;
 import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.CopyAssignment;
 import de.uka.ilkd.keyabs.abs.ThisExpression;
+import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
+import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
 
 
 /**

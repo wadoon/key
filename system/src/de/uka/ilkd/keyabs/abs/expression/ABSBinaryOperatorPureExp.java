@@ -1,4 +1,7 @@
-package de.uka.ilkd.keyabs.abs;
+package de.uka.ilkd.keyabs.abs.expression;
+
+import de.uka.ilkd.keyabs.abs.ABSNonTerminalProgramElement;
+import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 
 
 public abstract class ABSBinaryOperatorPureExp extends ABSNonTerminalProgramElement implements IABSPureExpression {
@@ -27,5 +30,12 @@ public abstract class ABSBinaryOperatorPureExp extends ABSNonTerminalProgramElem
         }
     }
     
-    
+    public IABSPureExpression getLeft() {
+        return left;
+    }
+
+    public IABSPureExpression getRight() {
+        return right;
+    }
+
 }

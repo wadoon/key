@@ -14,6 +14,19 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
+import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 
 public abstract class ABSModificationVisitor 
 extends ABSVisitorImpl
@@ -311,6 +324,72 @@ implements IProgramASTModifyingVisitor, ABSVisitor {
     @Override
     public void performActionOnABSIntLiteral(ABSIntLiteral x) {
 	addChild(x);
+    }
+
+    @Override
+    public void performActionOnABSEqExp(ABSEqExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSEqExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSNotEqExp(ABSNotEqExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSNotEqExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSGEQExp(ABSGEQExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSGEQExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSLTExp(ABSLTExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSLTExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSLEQExp(ABSLEQExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSLEQExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSGTExp(ABSGTExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            unchangedProgramElementAction(new ABSGTExp((IABSPureExpression) children.get(0), (IABSPureExpression) children.get(1)));
+        } else {
+            addChild(x);
+        }
     }
 
 }
