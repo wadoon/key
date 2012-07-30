@@ -3,6 +3,8 @@ package de.uka.ilkd.keyabs.abs.expression;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.keyabs.abs.ABSProgramElement;
@@ -33,6 +35,23 @@ public class ABSIntLiteral extends ABSProgramElement implements IABSPureExpressi
 
     public BigInteger getValue() {
 	return number;
+    }
+    
+    
+    /** tests if equals
+     */
+    public boolean equalsModRenaming
+        ( SourceElement o, NameAbstractionTable nat) {
+        if (!(o instanceof ABSIntLiteral)) {
+            return false;
+        }
+        return ((ABSIntLiteral)o).getValue().equals(getValue()); 
+    }
+    
+    public int hashCode(){
+        int result = 17;
+        result = 37 * result + getValue().hashCode();
+        return result;
     }
 
     @Override

@@ -1,6 +1,9 @@
 package de.uka.ilkd.keyabs.abs;
 
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
@@ -38,6 +41,40 @@ public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElemen
             throw new IndexOutOfBoundsException();
         }
 
+    }
+    
+    /** equals modulo renaming is described in the corresponding
+     * comment in class SourceElement. The variables declared in the
+     * local variable declaration have to be added to the
+     * NameAbstractionTable.
+     */
+     public boolean equalsModRenaming(SourceElement se, 
+                                     NameAbstractionTable nat) {
+        if (!(se instanceof ABSVariableDeclarationStatement)) {
+            return false;
+        }                
+        ABSVariableDeclarationStatement vs = (ABSVariableDeclarationStatement)se;
+        nat.add(var, vs.var);  
+        if (vs.getChildCount()!=getChildCount()) {
+            return false;
+        }       
+        for (int i = 0, cc = getChildCount(); i<cc; i++) {
+            if (!getChildAt(i).equalsModRenaming
+                (vs.getChildAt(i), nat)) {
+                return false;
+            }
+        }
+        return true;
+    }
+     
+    public int hashCode() {
+        int result = 17;
+        result = 37 * result + ((type==null) ? 0 : type.hashCode());
+        result = 37 * result + getChildCount();
+        for (int i = 0, cc = getChildCount(); i<cc; i++) {
+                result = 37 * result + getChildAt(i).hashCode();
+        }
+        return result;
     }
 
     @Override

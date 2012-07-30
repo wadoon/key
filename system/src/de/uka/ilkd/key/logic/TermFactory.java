@@ -68,13 +68,20 @@ public final class TermFactory {
 	    throw new TermCreationException("null-Operator at TermFactory");
 	}
 	
+	if (javaBlock != null) System.out.println(">>>>>>>>" + javaBlock.program());
+	
 	final Term newTerm 
 		= new TermImpl(op, subs, boundVars, javaBlock).checked();
 	Term term = cache.get(newTerm);
-	if(term == null) {
+
+        if (term != null) System.out.println(">>>>>>>>1" + term.javaBlock().program() + ">>>>>");
+
+	if(term == null || !term.equalsModRenaming(newTerm)) {
 	    term = newTerm;
 	    cache.put(term, term);
 	}
+
+	       System.out.println(">>>>>>>>2" + term.javaBlock().program());
 
 	return term;
     } 

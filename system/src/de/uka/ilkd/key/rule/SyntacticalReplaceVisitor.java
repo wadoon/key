@@ -368,6 +368,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                 }
             }
             
+
+            
            // instantiate bound variables            
            final ImmutableArray<QuantifiableVariable> boundVars = 
                instantiateBoundVariables(visited);
@@ -385,6 +387,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
         	 || operatorInst
                  || (!subStack.empty() && subStack.peek() == newMarker)) {
         	Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
+                System.out.println(visited.javaBlock().program()+"::"+jb.program() + ":::"+newTerm.javaBlock().program());
+
                 pushNew(resolveSubst(newTerm));
             } else {
                 final Term t = resolveSubst(visited);

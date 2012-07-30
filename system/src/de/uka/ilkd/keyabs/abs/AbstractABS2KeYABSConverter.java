@@ -15,6 +15,7 @@ import abs.frontend.ast.ExpressionStmt;
 import abs.frontend.ast.FieldUse;
 import abs.frontend.ast.GTEQExp;
 import abs.frontend.ast.GTExp;
+import abs.frontend.ast.IfStmt;
 import abs.frontend.ast.IncompleteAccess;
 import abs.frontend.ast.IntLiteral;
 import abs.frontend.ast.LTEQExp;
@@ -94,7 +95,9 @@ public abstract class AbstractABS2KeYABSConverter {
             	result = convert((DataConstructorExp)x);
         } else if (x instanceof IntLiteral) {
         	result = convert((IntLiteral)x);
-        }	
+        } else if (x instanceof IfStmt) {
+            result = convert((IfStmt) x);
+        }
 
         if (result == null) {
             result = requestConversion(x);
@@ -128,7 +131,7 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((LTEQExp) x);
         } else if (x instanceof LTExp) {
             result = convert((LTExp) x);
-        } 
+        }
         return result;
     }
 
@@ -168,20 +171,28 @@ public abstract class AbstractABS2KeYABSConverter {
     public CopyAssignment convert(AssignStmt x) {
         IABSLocationReference lhs = (IABSLocationReference) convert(x.getVar());
         IABSPureExpression rhs = (IABSPureExpression) convert(x.getValue());
-
         return new CopyAssignment(lhs, rhs);
     }
 
+    public ABSIfStatement convert(IfStmt x) {
+        IABSPureExpression cond = (IABSPureExpression) convert(x.getCondition());
+        IABSStatement _then = (IABSStatement) convert(x.getThen());
+        
+        System.out.println("Has else " + x.hasElse());
+        
+        IABSStatement _else = x.hasElse() ? (IABSStatement) convert(x.getElse()) : null;
+        
+        return new ABSIfStatement(cond, _then, _else);
+        
+    }
+    
     public ABSFieldReference convert(FieldUse fieldUse) {
         IProgramVariable var = lookupFieldVariable(fieldUse.getName());
         return new ABSFieldReference(var);
     }
 
     public Expression convert(VarUse varUse) {
-        IProgramVariable var = lookupLocalVariable(varUse.getName());
-        
-        System.out.println(varUse.getName() + "<<<<>>>>>" + var);
-        
+        IProgramVariable var = lookupLocalVariable(varUse.getName());        
         return new ABSLocalVariableReference(var);
     }
 

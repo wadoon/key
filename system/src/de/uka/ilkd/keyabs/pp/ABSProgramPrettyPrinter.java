@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
+import de.uka.ilkd.keyabs.abs.ABSIfStatement;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
@@ -48,7 +49,6 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 	try {
 	    lp.printProgramElementName(x);
 	} catch (IOException e) {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
     }
@@ -301,6 +301,16 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
         } catch (IOException e) {
             e.printStackTrace();
         }     
+    }
+
+
+    @Override
+    public void performActionOnABSIfStatement(ABSIfStatement x) {
+        try {
+            lp.printABSIfStatement(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }             
     }
 
 

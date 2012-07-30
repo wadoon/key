@@ -884,6 +884,7 @@ public abstract class Taclet implements Rule, Named {
                                       mc.getInstantiations());
 	
 	term.execPostOrder(srVisitor);
+	
 	return srVisitor.getTerm();
     }
     
@@ -930,6 +931,7 @@ public abstract class Taclet implements Rule, Named {
 	
         Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), 
                     services, matchCond);
+        
         
         if (!svInst.getUpdateContext().isEmpty()) {
             instantiatedFormula = TB.applySequential(svInst.getUpdateContext(), 
