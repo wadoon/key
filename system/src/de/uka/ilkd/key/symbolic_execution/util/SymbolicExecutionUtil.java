@@ -12,6 +12,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -864,7 +865,7 @@ public final class SymbolicExecutionUtil {
                   JavaBlock block = sub.javaBlock();
                   if (block != null) {
                      ProgramElement element = block.program();
-                     if (element instanceof StatementBlock) {
+                     if (element instanceof IStatementBlock) {
                         StatementBlock b = (StatementBlock)block.program();
                         ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
                         result = JavaUtil.count(prefix, new IFilter<ProgramPrefix>() {

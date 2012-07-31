@@ -6,14 +6,17 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.visitor.IProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
 import de.uka.ilkd.key.java.visitor.IProgramVariableCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
+import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -24,6 +27,7 @@ import de.uka.ilkd.key.rule.TacletVariableSVCollector;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.IReadPVCollector;
 import de.uka.ilkd.key.util.IWrittenPVCollector;
+import de.uka.ilkd.keyabs.abs.ABSProgramContextAdder;
 import de.uka.ilkd.keyabs.abs.ABSProgramReplaceVisitor;
 import de.uka.ilkd.keyabs.abs.ABSProgramVariableCollector;
 import de.uka.ilkd.keyabs.abs.ABSServices;
@@ -216,4 +220,8 @@ public class IProgramVisitorProvider {
         return ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ? new ABSProgVarReplacer(pe, map, false) :
             new ProgVarReplaceVisitor(pe, map, false, services);
     }
+
+	public static <E extends IStatementBlock> IProgramContextAdder<E> createProgramContextAdder() {
+		 return (IProgramContextAdder<E>) (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ? ABSProgramContextAdder.INSTANCE : ProgramContextAdder.INSTANCE); 
+	}
 }

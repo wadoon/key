@@ -26,7 +26,7 @@ public final class JavaTools {
         SourceElement result = jb.program().getFirstElement();
         while((result instanceof ProgramPrefix 
         	 || result instanceof CatchAllStatement)
-              && !(result instanceof StatementBlock 
+              && !(result instanceof IStatementBlock 
                    && ((StatementBlock)result).isEmpty())) {
             if(result instanceof LabeledStatement) {
                 result = ((LabeledStatement)result).getChildAt(1);
@@ -71,7 +71,7 @@ public final class JavaTools {
 
             }).result();
         
-        StatementBlock newSB = newProg instanceof StatementBlock 
+        StatementBlock newSB = newProg instanceof IStatementBlock 
                                ? (StatementBlock)newProg
                                : new StatementBlock(newProg);              
         return JavaBlock.createJavaBlock(newSB);

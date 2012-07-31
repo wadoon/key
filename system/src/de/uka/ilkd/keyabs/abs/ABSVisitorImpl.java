@@ -220,4 +220,10 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     public void performActionOnABSIfStatement(ABSIfStatement x) {
         doDefaultAction(x);
     }
+    
+	@Override
+	public void performActionOnABSContextStatementBlock(
+			ABSContextStatementBlock x) {
+		doDefaultAction(x);
+	}
 }

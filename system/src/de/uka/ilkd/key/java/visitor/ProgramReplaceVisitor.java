@@ -10,9 +10,11 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -128,6 +130,16 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor implements IProgra
 	changed();
     }
 
+    public void performActionOnContextStatementBlock(ContextStatementBlock x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new StatementBlock(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    
     public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
 	result = x.getConcreteProgramElement(services);
 	addChild(result);

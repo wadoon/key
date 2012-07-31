@@ -61,7 +61,7 @@ public class RecoderExample {
      * "if-then-while" statement
      * @param prg the Statementblock to be transformed
      */
-    public StatementBlock transform(StatementBlock prg) {
+    public StatementBlock transform(IStatementBlock prg) {
 	ExtList newBody=new ExtList();
 	
 	ImmutableArray<? extends Statement> body=prg.getBody();
@@ -87,7 +87,7 @@ public class RecoderExample {
 	System.out.println("Read Original:\n"+block);
 	System.out.println("Transforming...");
 	System.out.println("Transformed:\n"+(JavaBlock.createJavaBlock(
-            ex.transform((StatementBlock)block.program()))));
+            ex.transform((IStatementBlock)block.program()))));
 	System.out.println("The original is left untouched:\n"+block);		
     }
 

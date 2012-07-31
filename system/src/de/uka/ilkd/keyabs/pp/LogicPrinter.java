@@ -79,6 +79,7 @@ import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
+import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSIfStatement;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
@@ -1990,7 +1991,12 @@ public final class LogicPrinter implements ILogicPrinter {
 
     public void printABSStatementBlock(ABSStatementBlock x) throws IOException {
         layouter.print("{").beginC(2).ind();
-        for (int i = 0; i < x.getStatementCount(); i++) {
+        printStatementList(x);
+        layouter.print("}").end();
+    }
+
+	private void printStatementList(ABSStatementBlock x) {
+		for (int i = 0; i < x.getStatementCount(); i++) {
             boolean fstStmnt = markFirstStatement;
             if (markFirstStatement) {
                 fstStmnt = true;
@@ -2002,8 +2008,7 @@ public final class LogicPrinter implements ILogicPrinter {
                 mark(MARK_END_FIRST_STMT);
             }
         }
-        layouter.print("}").end();
-    }
+	}
 
     public void printABSBinaryOpExp(ABSBinaryOperatorPureExp x, String op)
             throws IOException {
@@ -2081,5 +2086,11 @@ public final class LogicPrinter implements ILogicPrinter {
         }
         layouter.end();
     }
+
+	public void printABSContextStatementBlock(ABSContextStatementBlock x) throws IOException {
+        layouter.print("{..").beginC(2).ind();
+        printStatementList(x);
+        layouter.print("...}").end();
+	}
 
 }

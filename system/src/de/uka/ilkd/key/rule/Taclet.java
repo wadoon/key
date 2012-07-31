@@ -18,7 +18,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.IContextStatementBlock;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
@@ -521,7 +521,7 @@ public abstract class Taclet implements Rule, Named {
 		return null; //FAILED
 	    }
             if (template.javaBlock().program()
-                    instanceof ContextStatementBlock) {
+                    instanceof IContextStatementBlock) {
                 // we must match empty context blocks too
                 matchCond = template.javaBlock().program().
                     match(new SourceData(term.javaBlock().program(), -1, services), matchCond);

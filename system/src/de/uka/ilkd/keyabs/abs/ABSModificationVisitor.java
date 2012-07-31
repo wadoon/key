@@ -155,7 +155,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         }
     }
 
-    private boolean hasChanged() {
+    protected boolean hasChanged() {
         return !stack.peek().isEmpty()
                 && stack.peek().getFirst() == Boolean.TRUE;
     }
@@ -263,6 +263,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         }
     }
 
+    
+    
     @Override
     public void performActionOnProgramMetaConstruct(
             ProgramTransformer<ABSServices> x) {
@@ -440,5 +442,21 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             addChild(x);
         }
     }
+
+	@Override
+	public void performActionOnABSContextStatementBlock(
+			ABSContextStatementBlock x) {
+		   if (hasChanged()) {
+	            ExtList children = stack.peek();
+	            children.removeFirst();
+	            final IABSStatement[] body = new IABSStatement[children.size()];
+	            for (int i = 0; i < children.size(); i++) {
+	                body[i] = (IABSStatement) children.get(i);
+	            }
+	            unchangedProgramElementAction(new ABSContextStatementBlock(body));
+	        } else {
+	            addChild(x);
+	        }
+	}
 
 }

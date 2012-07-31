@@ -30,88 +30,82 @@ import de.uka.ilkd.key.util.LRUCache;
  * create terms. 
  */
 public final class TermFactory {
-    
-    /** 
-     * The only instance of TermFactory. 
-     */
-    public static final TermFactory DEFAULT = new TermFactory();    
 
-    private static final Map<Term, Term> cache 
-    	= Collections.synchronizedMap(new LRUCache<Term, Term>(20000));
+	/** 
+	 * The only instance of TermFactory. 
+	 */
+	public static final TermFactory DEFAULT = new TermFactory();    
 
-    private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
-    
-    
+	private static final Map<Term, Term> cache 
+	= Collections.synchronizedMap(new LRUCache<Term, Term>(20000));
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------
-    
-    private TermFactory() {
-    }
-    
-    
-    
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
-    
-    /**
-     * Master method for term creation. Should be the only place where terms 
-     * are created in the entire system.
-     */
-    public Term createTerm(Operator op, 
-	    		   ImmutableArray<Term> subs, 
-	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock) {
-	if(op == null) {
-	    throw new TermCreationException("null-Operator at TermFactory");
+	private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
+
+
+
+	//-------------------------------------------------------------------------
+	//constructors
+	//-------------------------------------------------------------------------
+
+	private TermFactory() {
 	}
-	
-	if (javaBlock != null) System.out.println(">>>>>>>>" + javaBlock.program());
-	
-	final Term newTerm 
+
+
+
+	//-------------------------------------------------------------------------
+	//public interface
+	//-------------------------------------------------------------------------
+
+	/**
+	 * Master method for term creation. Should be the only place where terms 
+	 * are created in the entire system.
+	 */
+	public Term createTerm(Operator op, 
+			ImmutableArray<Term> subs, 
+			ImmutableArray<QuantifiableVariable> boundVars,
+			JavaBlock javaBlock) {
+		if(op == null) {
+			throw new TermCreationException("null-Operator at TermFactory");
+		}
+
+		final Term newTerm 
 		= new TermImpl(op, subs, boundVars, javaBlock).checked();
-	Term term = cache.get(newTerm);
+		Term term = cache.get(newTerm);
 
-        if (term != null) System.out.println(">>>>>>>>1" + term.javaBlock().program() + ">>>>>");
+		if(term == null || !term.equalsModRenaming(newTerm)) {
+			term = newTerm;
+			cache.put(term, term);
+		}
 
-	if(term == null || !term.equalsModRenaming(newTerm)) {
-	    term = newTerm;
-	    cache.put(term, term);
+		return term;
+	} 
+
+
+	public Term createTerm(Operator op,
+			Term[] subs, 
+			ImmutableArray<QuantifiableVariable> boundVars,
+			JavaBlock javaBlock) {
+		return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock);
 	}
 
-	       System.out.println(">>>>>>>>2" + term.javaBlock().program());
 
-	return term;
-    } 
-    
-    
-    public Term createTerm(Operator op,
-	    		   Term[] subs, 
-	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock) {
-	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock);
-    }
-    
-    
-    public Term createTerm(Operator op, Term[] subs) {
-	return createTerm(op, subs, null, null);
-    }
-    
-    
-    public Term createTerm(Operator op, Term sub) {
-	return createTerm(op, new ImmutableArray<Term>(sub), null, null);
-    }    
-    
-    
-    public Term createTerm(Operator op, Term sub1, Term sub2) {
-	return createTerm(op, new Term[]{sub1, sub2}, null, null);
-    }    
-    
-    
-    public Term createTerm(Operator op) {
-	return createTerm(op, NO_SUBTERMS, null, null);
-    }
+	public Term createTerm(Operator op, Term[] subs) {
+		return createTerm(op, subs, null, null);
+	}
+
+
+	public Term createTerm(Operator op, Term sub) {
+		return createTerm(op, new ImmutableArray<Term>(sub), null, null);
+	}    
+
+
+	public Term createTerm(Operator op, Term sub1, Term sub2) {
+		return createTerm(op, new Term[]{sub1, sub2}, null, null);
+	}    
+
+
+	public Term createTerm(Operator op) {
+		return createTerm(op, NO_SUBTERMS, null, null);
+	}
 
 }

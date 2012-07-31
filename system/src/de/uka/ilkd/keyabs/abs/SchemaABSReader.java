@@ -29,13 +29,24 @@ public class SchemaABSReader implements SchemaJavaReader {
     
     @Override
     public JavaBlock readBlockWithEmptyContext(String s, IServices services) {
-        String blockStr = SCHEMA_MODULE + " \n " + s;
+    	String blockStr = s;
+        boolean isContextBlock = false;
+        if (blockStr.startsWith("{..") && blockStr.endsWith("...}")) {
+        	isContextBlock = true;
+        	blockStr = blockStr.replace("{..", "{");
+        	blockStr = blockStr.replace("...}", "}");
+        }
+    	
+    	blockStr = SCHEMA_MODULE + " \n " + blockStr;
+
         
+
         CoreAbsBackend absReader = new CoreAbsBackend();
         absReader.setWithStdLib(false);
         absReader.setAllowIncompleteExpr(true);
         try {
             System.out.println("ParseInput: "+ blockStr);
+            
             
             Model m = absReader.parse(File.createTempFile("taclet_", ".keyabs"), blockStr, new StringReader(blockStr));
             
@@ -50,6 +61,10 @@ public class SchemaABSReader implements SchemaJavaReader {
            
             
             ABSStatementBlock block = converter.convert(m.getMainBlock());
+            
+            if (isContextBlock) {
+            	block = new ABSContextStatementBlock(block.getBody());
+            }
             
             System.out.println("Converted " + block);
             

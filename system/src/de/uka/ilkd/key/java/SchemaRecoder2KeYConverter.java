@@ -258,7 +258,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * translate Context statement blocks
      */
-    public ContextStatementBlock convert(
+    public IContextStatementBlock convert(
             de.uka.ilkd.key.java.recoderext.ContextStatementBlock csb) {
         ExtList children = collectChildren(csb);
         return new ContextStatementBlock(children,

@@ -193,7 +193,7 @@ public class SwitchToIf extends ProgramTransformer<Services> {
 	    return new If(((If)p).getExpression(),(Then)recChangeBreaks(((If)p).getThen(),b),
 			  (Else) recChangeBreaks(((If)p).getElse(),b));
 	}
-	if(p instanceof StatementBlock){
+	if(p instanceof IStatementBlock){
 	    Statement[] s= new Statement[((StatementBlock)p).getStatementCount()];
 	    for(int i=0; i<((StatementBlock)p).getStatementCount(); i++){
 		s[i]=(Statement)recChangeBreaks(((StatementBlock)p).getStatementAt(i), b);

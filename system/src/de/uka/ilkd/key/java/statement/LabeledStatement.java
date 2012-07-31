@@ -89,9 +89,9 @@ public class LabeledStatement extends JavaStatement
 
 
     private ImmutableArray<ProgramPrefix> computePrefix(Statement b) {
-        if (b instanceof StatementBlock) {
+        if (b instanceof IStatementBlock) {
             return StatementBlock.computePrefixElements
-            (((StatementBlock)b).getBody(), 0, this);
+            (((IStatementBlock)b).getBody(), 0, this);
         } else if (b instanceof ProgramPrefix) {
             return StatementBlock.
                 computePrefixElements(new ImmutableArray<Statement>(b), 
@@ -263,7 +263,7 @@ public class LabeledStatement extends JavaStatement
     
     public PosInProgram getFirstActiveChildPos() {
         if (firstActiveChildPos == null) {                   
-            firstActiveChildPos = body instanceof StatementBlock ? 
+            firstActiveChildPos = body instanceof IStatementBlock ? 
                     (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
                         PosInProgram.TOP.down(1).down(0))
                         : PosInProgram.TOP.down(1);

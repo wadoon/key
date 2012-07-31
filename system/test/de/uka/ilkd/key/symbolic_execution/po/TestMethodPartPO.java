@@ -7,10 +7,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -246,8 +246,8 @@ public class TestMethodPartPO extends AbstractSymbolicExecutionTestCase {
       Term updateApplication = succedent.subs().get(1);
       assertEquals(2, updateApplication.subs().size());
       ProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
-      assertTrue(updateContent instanceof StatementBlock);
-      ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
+      assertTrue(updateContent instanceof IStatementBlock);
+      ImmutableArray<? extends Statement> updateContentBody = ((IStatementBlock)updateContent).getBody();
       assertEquals(2, updateContentBody.size());
       assertTrue(updateContentBody.get(1) instanceof Try);
       Try tryStatement = (Try)updateContentBody.get(1);

@@ -90,7 +90,7 @@ public class Try extends BranchStatement
     }
 
 
-    private ImmutableArray<ProgramPrefix> computePrefix(StatementBlock b) {
+    private ImmutableArray<ProgramPrefix> computePrefix(IStatementBlock b) {
         return StatementBlock.
         computePrefixElements(b.getBody(), 0, this);                
     }

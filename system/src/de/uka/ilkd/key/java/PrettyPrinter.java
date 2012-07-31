@@ -1802,7 +1802,7 @@ public class PrettyPrinter {
             write(";");
             //w.writeElement(1, body);
         } else {
-	    if (x.getBody() instanceof StatementBlock) {
+	    if (x.getBody() instanceof IStatementBlock) {
                     writeElement(1, 0, x.getBody());
                 } else {
                     writeElement(1, +1, 0, x.getBody());
@@ -1867,7 +1867,7 @@ public class PrettyPrinter {
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
             write(";");
         } else {
-            if (x.getBody() instanceof StatementBlock) {
+            if (x.getBody() instanceof IStatementBlock) {
                 writeElement(1, 0, x.getBody());
             } else {
                 writeElement(1, +1, 0, x.getBody());
@@ -1930,7 +1930,7 @@ public class PrettyPrinter {
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
             write(";");
         } else {
-            if (x.getBody() instanceof StatementBlock) {
+            if (x.getBody() instanceof IStatementBlock) {
                 writeElement(1, 0, x.getBody());
             } else {
                 writeElement(1, +1, 0, x.getBody());
@@ -1965,7 +1965,7 @@ public class PrettyPrinter {
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
             write(";");
         } else {
-	    if (x.getBody() instanceof StatementBlock) {
+	    if (x.getBody() instanceof IStatementBlock) {
 		writeElement(0, 0, x.getBody());
 	    } else {
 		writeElement(1, +1, 0, x.getBody());
@@ -2000,7 +2000,7 @@ public class PrettyPrinter {
         noSemicolons = false;
         
         if (x.getThen() != null) {
-	    if (x.getThen().getBody() instanceof StatementBlock) {
+	    if (x.getThen().getBody() instanceof IStatementBlock) {
 		writeElement(1, 0, x.getThen());
 	    } else {
 		writeElement(1, +1, 0, x.getThen());
@@ -2842,7 +2842,7 @@ public class PrettyPrinter {
         writeInternalIndentation(x);
         write("else ");
         if (x.getBody() != null) {
-	    if (x.getBody() instanceof StatementBlock) {
+	    if (x.getBody() instanceof IStatementBlock) {
 		writeElement(1, 0, x.getBody());
 	    } else {
 		writeElement(1, +1, 0, x.getBody());

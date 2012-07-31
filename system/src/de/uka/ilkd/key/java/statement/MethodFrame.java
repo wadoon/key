@@ -12,6 +12,7 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -92,7 +93,7 @@ public class MethodFrame extends JavaStatement implements
     }
    
 
-    private ImmutableArray<ProgramPrefix> computePrefix(StatementBlock b) {
+    private ImmutableArray<ProgramPrefix> computePrefix(IStatementBlock b) {
             return StatementBlock.
             computePrefixElements(b.getBody(), 0, this);                
     }

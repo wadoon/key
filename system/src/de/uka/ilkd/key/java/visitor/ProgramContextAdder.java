@@ -26,23 +26,24 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
  * A context given as {@link ContextStatementBlockInstantiation} is wrapped 
  * around a given {@link ProgramElement}. 
  */
-public class ProgramContextAdder {
+public class ProgramContextAdder implements IProgramContextAdder<StatementBlock> {
     
     /**
      * singleton instance of the program context adder
      */
-    public final static ProgramContextAdder INSTANCE = new ProgramContextAdder();
+    public final static IProgramContextAdder<StatementBlock> INSTANCE = new ProgramContextAdder();
 
     /**
      * an empty private constructor to ensure the singleton property
      */
     private ProgramContextAdder() {}
     
-    /**
-     * wraps the context around the statements found in the putIn block   
-     */
-    public JavaNonTerminalProgramElement start
-	(JavaNonTerminalProgramElement   context,
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.visitor.IProgramContextAdder#start(de.uka.ilkd.key.java.NonTerminalProgramElement, de.uka.ilkd.key.java.StatementBlock, de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation)
+	 */
+    @Override
+	public NonTerminalProgramElement start
+	(NonTerminalProgramElement   context,
 	 StatementBlock                  putIn, 
 	 ContextStatementBlockInstantiation ct) {
 
@@ -53,15 +54,15 @@ public class ProgramContextAdder {
 		    ct.suffix());
     }
 
-    protected JavaNonTerminalProgramElement wrap
-	(JavaNonTerminalProgramElement      context,
+    protected NonTerminalProgramElement wrap
+	(NonTerminalProgramElement      context,
 	 StatementBlock                     putIn, 
 	 IntIterator                        prefixPos,
 	 int                                prefixDepth,
 	 PosInProgram                       prefix,
          PosInProgram                       suffix) {
 
-	JavaNonTerminalProgramElement body = null;
+	NonTerminalProgramElement body = null;
 
 	ProgramElement next = prefixPos.hasNext() ? context.getChildAt(prefixPos.next()) : null;
 
@@ -75,13 +76,13 @@ public class ProgramContextAdder {
 	    } 
 	    return body;
 	} else {    
-	    body = wrap((JavaNonTerminalProgramElement)next, 
+	    body = wrap((NonTerminalProgramElement)next, 
 			putIn, 
 			prefixPos,
 			prefixDepth,
                         prefix,
 			suffix);
-	    if (context instanceof StatementBlock) {	   
+	    if (context instanceof IStatementBlock) {	   
 		return createStatementBlockWrapper((StatementBlock)context,
 						   body); 
 	    } else if (context instanceof Try) {
@@ -104,7 +105,7 @@ public class ProgramContextAdder {
      * inserts the content of the statement block <code>putIn</code> and
      * adds succeeding children of the innermost non terminal element
      * (usually statement block) in the context.
-     * @param wrapper the JavaNonTerminalProgramElement with the context
+     * @param wrapper the NonTerminalProgramElement with the context
      *   that has to be wrapped around the content of <code>putIn</code>
      * @param putIn the StatementBlock with content that has to be
      * wrapped by the elements hidden in the context 
@@ -121,7 +122,7 @@ public class ProgramContextAdder {
      * part has to be done elsewhere.
      */
     private final StatementBlock createWrapperBody
-    (JavaNonTerminalProgramElement wrapper,
+    (NonTerminalProgramElement wrapper,
             StatementBlock putIn, PosInProgram suffix) {
 
         final int putInLength   = putIn.getChildCount();
@@ -171,9 +172,9 @@ public class ProgramContextAdder {
      * @return the resulting statement block
      */
     protected StatementBlock createStatementBlockWrapper
-	(StatementBlock wrapper, JavaNonTerminalProgramElement replacement) {
+	(StatementBlock wrapper, NonTerminalProgramElement replacement) {
 	int childrenCount = wrapper.getStatementCount();
-	if (childrenCount <= 1 && replacement instanceof StatementBlock) {
+	if (childrenCount <= 1 && replacement instanceof IStatementBlock) {
 	    return (StatementBlock) replacement;
 	} else {	    
 	    Statement[] body = new Statement[childrenCount > 0 ?
@@ -201,9 +202,9 @@ public class ProgramContextAdder {
     }
 
     protected LabeledStatement createLabeledStatementWrapper
-	(LabeledStatement old, JavaNonTerminalProgramElement body) {
+	(LabeledStatement old, NonTerminalProgramElement body) {
 	return new LabeledStatement(old.getLabel(),
-				    body instanceof StatementBlock 
+				    body instanceof IStatementBlock 
 				    && body.getChildCount() == 1 && 
 				    !(body.getChildAt(0) 
 				      instanceof LocalVariableDeclaration) ? 

@@ -10,6 +10,7 @@
 package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
@@ -59,6 +60,18 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
         stack.push(new ExtList());              
         walk(root());
     }
+    
+	@Override
+	public void performActionOnABSContextStatementBlock(
+			ABSContextStatementBlock x) {
+		ExtList children = stack.peek();
+		if (hasChanged()) { children.removeFirst(); }
+		final IABSStatement[] body = new IABSStatement[children.size()];
+		for (int i = 0; i < children.size(); i++) {
+			body[i] = (IABSStatement) children.get(i);
+		}
+		addNewChild(new ABSStatementBlock(body));
+	}
 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable sv) {
@@ -98,4 +111,8 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
         localresult = x.transform(localresult, services, svinsts);
         addNewChild(localresult);
     }
+    
+    public void performActionOnContextStatementBlock(ContextStatementBlock x) {
+    }
+
 }

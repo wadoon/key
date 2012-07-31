@@ -11,13 +11,13 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -258,14 +258,14 @@ public class SymbolicExecutionTreeBuilder {
             Term updateApplication = succedent.subs().get(1);
             if (updateApplication.subs().size() == 2) {
                ProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
-               if (updateContent instanceof StatementBlock) { // try catch inclusive
-                  ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
+               if (updateContent instanceof IStatementBlock) { // try catch inclusive
+                  ImmutableArray<? extends Statement> updateContentBody = ((IStatementBlock)updateContent).getBody();
                   if (updateContentBody.size() == 2 && updateContentBody.get(1) instanceof Try) {
                      Try tryStatement = (Try)updateContentBody.get(1);
                      if (tryStatement.getBranchCount() == 1 && tryStatement.getBranchList().get(0) instanceof Catch) {
                         Catch catchStatement = (Catch)tryStatement.getBranchList().get(0);
-                        if (catchStatement.getBody() instanceof StatementBlock) {
-                           StatementBlock  catchBlock = (StatementBlock)catchStatement.getBody();
+                        if (catchStatement.getBody() instanceof IStatementBlock) {
+                           IStatementBlock  catchBlock = (IStatementBlock)catchStatement.getBody();
                            if (catchBlock.getBody().size() == 1 && catchBlock.getBody().get(0) instanceof Assignment) {
                               Assignment assignment = (Assignment)catchBlock.getBody().get(0);
                               if (assignment.getFirstElement() instanceof IProgramVariable) {

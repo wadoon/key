@@ -218,7 +218,7 @@ public abstract class KeYJavaASTFactory {
      * @param stmnt array of Statement those have to be inserted
      * @param b the Statementblock where to insert
      */
-    public static StatementBlock insertStatementInBlock(StatementBlock stmnt, 
+    public static IStatementBlock insertStatementInBlock(StatementBlock stmnt, 
 							StatementBlock b) {
 	Statement[] stmnts = new Statement[stmnt.getStatementCount()];
 	for (int i=0; i<stmnt.getStatementCount(); i++)

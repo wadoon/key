@@ -1857,7 +1857,7 @@ public class Recoder2KeYConverter {
      * @param block the recoder.java.StatementBlock to be converted
      * @return the converted StatementBlock
      */
-    public StatementBlock convert(recoder.java.StatementBlock block) {
+    public IStatementBlock convert(recoder.java.StatementBlock block) {
         ExtList children = collectChildrenAndComments(block);
         
         // remove local classes

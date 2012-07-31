@@ -13,6 +13,7 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Label;
@@ -214,7 +215,16 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor
         };
         def.doAction(x);
     }
-    
+
+    public void performActionOnContextStatementBlock(ContextStatementBlock x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new ContextStatementBlock(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
     
     protected void performActionOnLoopInvariant(LoopStatement oldLoop, 
                                                 LoopStatement newLoop) {

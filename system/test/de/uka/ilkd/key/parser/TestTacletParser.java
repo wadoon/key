@@ -25,6 +25,7 @@ import java.io.StringWriter;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.IContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -427,7 +428,7 @@ public class TestTacletParser extends TestCase {
 	     " \\replacewith (\\<{..  ...}\\>post)}"); 
 	Term find=taclet.find();
 	JavaBlock jb=find.javaBlock();
-	ContextStatementBlock ct=(ContextStatementBlock)jb.program();
+	IContextStatementBlock ct=(IContextStatementBlock)jb.program();
     }
 
     public void testSchemaJava10() {

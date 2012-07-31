@@ -8,21 +8,21 @@
 //
 //
 
-package de.uka.ilkd.key.java;
+package de.uka.ilkd.keyabs.abs;
 
-import java.io.IOException;
-
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.IContextStatementBlock;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /** 
  * In the DL-formulae description of Taclets the program part can have
@@ -33,56 +33,23 @@ import de.uka.ilkd.key.util.ExtList;
  * class.
  */
 
-public class ContextStatementBlock extends StatementBlock implements IContextStatementBlock {
+public class ABSContextStatementBlock extends ABSStatementBlock implements IContextStatementBlock {
 
-    /** 
-     * the last execution context of the context term 
-     */
-    private IExecutionContext executionContext;
 
-    /** creates a ContextStatementBlock 
-     * @param children the body of the context term
-     */
-    public ContextStatementBlock(ExtList children) {
-	super(children);
-    }
-
-    /** creates a ContextStatementBlock 
-     * @param children the body of the context term
-     * @param executionContext the required execution context
-     */
-    public ContextStatementBlock(ExtList children, 
-		       IExecutionContext executionContext) {
-	super(children);
-	this.executionContext = executionContext;
-    }
-
-    public ContextStatementBlock(Statement s, 
-               IExecutionContext executionContext) {
+    public ABSContextStatementBlock(IABSStatement s) {
         super(s);
-        this.executionContext = executionContext;
     }
     
-    public ContextStatementBlock(Statement[] body, 
-               IExecutionContext executionContext) {
+    public ABSContextStatementBlock(IABSStatement[] body) {
         super(body);
-        this.executionContext = executionContext;
     }
 
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.IContextStatementBlock#requiresExplicitExecutionContextMatch()
-	 */
-    @Override
+    public ABSContextStatementBlock(ImmutableArray<? extends IABSStatement> body) {
+    	super(body);
+    }
+
 	public boolean requiresExplicitExecutionContextMatch() {
-	return executionContext != null;
-    }
-
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.IContextStatementBlock#getExecutionContext()
-	 */
-    @Override
-	public IExecutionContext getExecutionContext() {
-	return executionContext;
+    	return false;
     }
 
     /**
@@ -92,7 +59,6 @@ public class ContextStatementBlock extends StatementBlock implements IContextSta
 
     public int getChildCount() {
 	int count = 0;
-	if (executionContext != null) count++;
 	count += super.getChildCount();
         return count;
     }
@@ -106,12 +72,6 @@ public class ContextStatementBlock extends StatementBlock implements IContextSta
      * of bounds
      */
     public ProgramElement getChildAt(int index) {
-	if (executionContext != null) {
-	    if (index == 0) {
-		return executionContext;
-	    } 
-	    index--;
-	}
 	return super.getChildAt(index);
     }
 
@@ -119,35 +79,17 @@ public class ContextStatementBlock extends StatementBlock implements IContextSta
      * perform some action/transformation on this element
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
-	v.performActionOnContextStatementBlock(this);
-    }
-
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-	w.printContextStatementBlock(this);
+    public void visit(ABSVisitor v) {
+    	v.performActionOnABSContextStatementBlock(this);
     }
     
     /* toString */
     public String toString() {
-	StringBuffer result = new StringBuffer();
-	result.append("..");
-	result.append(super.toString());
-	result.append("\n");
-	result.append("...");
+	StringBuilder result = new StringBuilder();
+	result.append("{.. \n");
+	printBody(result);
+	result.append("...}");
 	return result.toString();
-    }
-    
-    
-
-    public int getTypeDeclarationCount() {
-        throw new UnsupportedOperationException(getClass()+
-            ": We are not quite a StatementBlock");
-    }
-
-    public de.uka.ilkd.key.java.declaration.TypeDeclaration 
-                                            getTypeDeclarationAt(int index) {
-        throw new UnsupportedOperationException(getClass()+
-            ": We are not quite a StatementBlock");
     }
 
     /**
@@ -202,12 +144,6 @@ public class ContextStatementBlock extends StatementBlock implements IContextSta
             int start = -1;
             
             if (relPos != PosInProgram.TOP) {                
-                if (firstActiveStatement instanceof MethodFrame) {
-                    lastExecutionContext = (ExecutionContext) 
-                        ((MethodFrame)firstActiveStatement).
-                        getExecutionContext();
-                }              
-         
                 start = relPos.get(relPos.depth()-1);                                                    
                 if (relPos.depth()>1) {
                     firstActiveStatement = (ProgramPrefix)
@@ -219,16 +155,9 @@ public class ContextStatementBlock extends StatementBlock implements IContextSta
         } else {
             prefix = null;
         }
-        matchCond = matchInnerExecutionContext(matchCond, services, 
-                lastExecutionContext, prefix, pos, src);                
-        
-        if (matchCond == null) {
-            return null;
-        }          
-        
+                
         // matching children
-        matchCond = matchChildren(newSource, matchCond, 
-                executionContext == null ? 0 : 1);                
+        matchCond = matchChildren(newSource, matchCond, 0); 
         
         if (matchCond == null) {
             return null;
@@ -283,60 +212,6 @@ public class ContextStatementBlock extends StatementBlock implements IContextSta
     }
 
     /**
-     * matches the inner most execution context in prefix, used to resolve references in
-     * succeeding matchings
-     * @param matchCond the MatchCond the matchonditions already found 
-     * @param services the Services
-     * @param lastExecutionContext the ExecutionContext if already found 
-     * @param prefix the oute rmost prefixelement of the original source
-     * @param pos an int as the number of prefix elements to disappear in the context
-     * @param src the original source
-     * @return the inner most execution context
-     */
-    private MatchConditions matchInnerExecutionContext(MatchConditions matchCond, 
-            final IServices services, ExecutionContext lastExecutionContext, 
-            final ProgramPrefix prefix, int pos, final ProgramElement src) {
-        
-        // partial context instantiation
-        
-        ExecutionContext innerContext = lastExecutionContext;
-        
-        if (innerContext == null) {
-            innerContext = services.getProgramInfo().getDefaultExecutionContext();
-            if (prefix != null) {            
-                for (int i = pos - 1; i>=0; i--) {
-                    final ProgramPrefix prefixEl = prefix.getPrefixElementAt(i);                                   
-                    if (prefixEl instanceof MethodFrame) {
-                        innerContext = (ExecutionContext) 
-                        ((MethodFrame)prefixEl).getExecutionContext();
-                        break;
-                    } 
-                }                
-            }
-        }
-        
-        if (executionContext != null) {
-            matchCond = executionContext.match(new SourceData(innerContext, -1, 
-                    services), matchCond);
-            if (matchCond == null) {
-                Debug.out("Program match. ExecutionContext mismatch.");
-                return null;
-            }
-            Debug.out("Program match. ExecutionContext matched.");
-        }
-      
-        matchCond = 
-            matchCond.setInstantiations(matchCond.getInstantiations().
-                    add(null, 
-                	null, 
-                	innerContext, 
-                	src,
-                	services));
-        
-        return matchCond;
-    }
-
-    /**
      * computes the PosInProgram of the first element, which is not part of the prefix
      * @param prefix the ProgramPrefix the outer most prefix element of the source
      * @param pos the number of elements to disappear in the context
@@ -365,4 +240,9 @@ public class ContextStatementBlock extends StatementBlock implements IContextSta
         }
         return prefixEnd;
     }
+
+	@Override
+	public IExecutionContext getExecutionContext() {
+		return null;
+	}
 }

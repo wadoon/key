@@ -28,7 +28,7 @@ import de.uka.ilkd.key.util.ExtList;
 
 public class StatementBlock extends JavaStatement
     implements StatementContainer, TypeDeclarationContainer,
-               VariableScope, TypeScope, ProgramPrefix {
+               VariableScope, TypeScope, ProgramPrefix, IStatementBlock {
 
     /**
      *      Body.
@@ -105,12 +105,12 @@ public class StatementBlock extends JavaStatement
 
    
     
-    /**
-     *      Get body.
-     *      @return the statement array wrapper.
-     */
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IStatementBlock#getBody()
+	 */
 
-    public ImmutableArray<? extends Statement> getBody() {
+    @Override
+	public ImmutableArray<? extends Statement> getBody() {
         return body;
     }
 
@@ -144,12 +144,12 @@ public class StatementBlock extends JavaStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
-     */
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IStatementBlock#getStatementCount()
+	 */
 
-    public int getStatementCount() {
+    @Override
+	public int getStatementCount() {
         return body.size();
     }
 
@@ -162,7 +162,11 @@ public class StatementBlock extends JavaStatement
       of bounds.
     */
 
-    public Statement getStatementAt(int index) {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.java.IStatementBlock#getStatementAt(int)
+	 */
+    @Override
+	public Statement getStatementAt(int index) {
         if (body != null) {
             return body.get(index);
         }

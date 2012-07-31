@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
+import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSIfStatement;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
@@ -312,6 +313,17 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             e.printStackTrace();
         }             
     }
+
+
+	@Override
+	public void performActionOnABSContextStatementBlock(
+			ABSContextStatementBlock x) {
+		 try {
+	            lp.printABSContextStatementBlock(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }     
+	}
 
 
 
