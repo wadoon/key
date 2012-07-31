@@ -19,9 +19,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SemisequentChangeInfo;
@@ -327,10 +326,10 @@ public final class ProgVarReplacer {
         final JavaBlock jb = t.javaBlock();
         JavaBlock newJb = jb;
         if (!jb.isEmpty()) {
-            Statement s = (Statement)jb.program();
-            Statement newS = (Statement)replace(s);
+            IStatementBlock s = (IStatementBlock)jb.program();
+            IStatementBlock newS = (IStatementBlock)replace(s);
             if(newS != s) {
-                newJb = JavaBlock.createJavaBlock((StatementBlock)newS);
+                newJb = JavaBlock.createJavaBlock((IStatementBlock)newS);
             }
         }
 

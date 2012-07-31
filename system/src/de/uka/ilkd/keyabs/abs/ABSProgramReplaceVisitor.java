@@ -76,8 +76,6 @@ IProgramReplaceVisitor {
     public void performActionOnSchemaVariable(SchemaVariable sv) {
         final Object inst = svinsts.getInstantiation(sv);
         if (inst instanceof ProgramElement) {
-            System.out.println(sv + " --> " + inst);
-
             addNewChild((ProgramElement) inst);
         } else if (inst instanceof ImmutableArray/* <ProgramElement> */) {
             final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>) inst;
