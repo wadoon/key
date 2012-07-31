@@ -121,7 +121,6 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
             Object[] column = new Object[2];
             SchemaVariable var = varIt.next();
 
-            System.out.println("===>" + var.name());
             if (!tacletApp.taclet ().getIfFindVariables ().contains(var)) {
                 column[0] = var;
 
