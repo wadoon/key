@@ -10,7 +10,6 @@
 package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
@@ -27,7 +26,7 @@ import de.uka.ilkd.key.util.ExtList;
  * transform a program according to the given SVInstantiations.
  */
 public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
-        IProgramReplaceVisitor {
+IProgramReplaceVisitor {
 
     private SVInstantiations svinsts;
 
@@ -60,25 +59,25 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
         stack.push(new ExtList());              
         walk(root());
     }
-    
-	@Override
-	public void performActionOnABSContextStatementBlock(
-			ABSContextStatementBlock x) {
-		ExtList children = stack.peek();
-		if (hasChanged()) { children.removeFirst(); }
-		final IABSStatement[] body = new IABSStatement[children.size()];
-		for (int i = 0; i < children.size(); i++) {
-			body[i] = (IABSStatement) children.get(i);
-		}
-		addNewChild(new ABSStatementBlock(body));
-	}
+
+    @Override
+    public void performActionOnABSContextStatementBlock(
+            ABSContextStatementBlock x) {
+        ExtList children = stack.peek();
+        if (hasChanged()) { children.removeFirst(); }
+        final IABSStatement[] body = new IABSStatement[children.size()];
+        for (int i = 0; i < children.size(); i++) {
+            body[i] = (IABSStatement) children.get(i);
+        }
+        addNewChild(new ABSStatementBlock(body));
+    }
 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable sv) {
         final Object inst = svinsts.getInstantiation(sv);
         if (inst instanceof ProgramElement) {
             System.out.println(sv + " --> " + inst);
-            
+
             addNewChild((ProgramElement) inst);
         } else if (inst instanceof ImmutableArray/* <ProgramElement> */) {
             final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>) inst;
@@ -94,7 +93,7 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
         } else {
             if (inst == null && allowPartialReplacement
                     && sv instanceof SourceElement) {
-                unchangedProgramElementAction((ProgramElement) sv);
+                addNewChild((ProgramElement) sv);
                 return;
             }
             Debug.fail("programreplacevisitor: Instantiation missing "
@@ -111,8 +110,4 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
         localresult = x.transform(localresult, services, svinsts);
         addNewChild(localresult);
     }
-    
-    public void performActionOnContextStatementBlock(ContextStatementBlock x) {
-    }
-
 }

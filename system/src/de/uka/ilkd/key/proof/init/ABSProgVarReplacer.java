@@ -97,11 +97,10 @@ public class ABSProgVarReplacer extends ABSModificationVisitor {
 
     public void performActionOnProgramVariable(ProgramVariable pv) {
         ProgramElement newPV = replaceMap.get(pv);
-        if (newPV!=null) {
-            addChild(newPV);
-            changed();
+        if (newPV != null) {
+            addNewChild(newPV);
         } else {
-            doDefaultAction(pv);
+            addChild(pv);
         }
     }
 
