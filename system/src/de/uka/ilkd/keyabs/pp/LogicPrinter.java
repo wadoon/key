@@ -208,7 +208,7 @@ public final class LogicPrinter implements ILogicPrinter {
             } else if (o == MARK_END_FIRST_STMT) {
                 firstStmtRange = new Range(firstStmtStart, count() - pos);
                 ((ModalityPositionTable) posTbl)
-                        .setFirstStatementRange(firstStmtRange);
+                .setFirstStatementRange(firstStmtRange);
             } else if (o == MARK_START_UPDATE) {
                 updateStarts.push(count());
             } else if (o == MARK_END_UPDATE) {
@@ -918,10 +918,10 @@ public final class LogicPrinter implements ILogicPrinter {
 
         mark(MARK_MODPOSTBL);
         startTerm(phi.arity());
-        layouter.print(left);
+        layouter.beginC(2).ind().print(left);
         printJavaBlock(jb);
+        layouter.ind(0,-2).print(right).end();
 
-        layouter.print(right + " ");
         if (phi.arity() == 1) {
             maybeParens(phi.sub(0), ass);
         } else if (phi.arity() > 1) {
@@ -1052,7 +1052,7 @@ public final class LogicPrinter implements ILogicPrinter {
     @Override
     public void printQuantifierTerm(String name,
             ImmutableArray<QuantifiableVariable> vars, Term phi, int ass)
-            throws IOException {
+                    throws IOException {
         layouter.beginC(2);
         layouter.print(name).print(" ");
         printVariables(vars);
@@ -1086,7 +1086,7 @@ public final class LogicPrinter implements ILogicPrinter {
     @Override
     public void printSemisequent(
             ImmutableList<SequentPrintFilterEntry> p_formulas)
-            throws IOException {
+                    throws IOException {
         Iterator<SequentPrintFilterEntry> it = p_formulas.iterator();
         SequentPrintFilterEntry entry;
         int size = p_formulas.size();
@@ -1374,7 +1374,7 @@ public final class LogicPrinter implements ILogicPrinter {
     @Override
     public void printTermContinuingBlock(Term t) throws IOException {
         notationInfo.getNotation(t.op(), services)
-                .printContinuingBlock(t, this);
+        .printContinuingBlock(t, this);
     }
 
     /*
@@ -1443,7 +1443,7 @@ public final class LogicPrinter implements ILogicPrinter {
             throw new RuntimeException("IO Exception in pretty printer:\n" + e);
         }
         return new StringBuffer(((PosTableStringBackend) backend).getString())
-                .append("\n");
+        .append("\n");
     }
 
     /*
@@ -1705,7 +1705,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (tgt.name() != null) {
             if (tgt.name().length() > 0) {
                 layouter.brk().beginC(2).print("\"" + tgt.name() + "\"")
-                        .print(":");
+                .print(":");
             }
 
         }
@@ -1945,7 +1945,7 @@ public final class LogicPrinter implements ILogicPrinter {
 
     public void printProgramElementName(ProgramElementName x)
             throws IOException {
-        layouter.beginC().print(x.getProgramName().toString()).end();
+        layouter.print(x.getProgramName().toString());
     }
 
     public void printLocationVariable(LocationVariable x) throws IOException {
@@ -1976,13 +1976,12 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSFieldReference(ABSFieldReference x) throws IOException {
-        layouter.beginC().print("this.").print(x.getField().name().toString())
-                .end();
+        layouter.print("this.").print(x.getField().name().toString());
     }
 
     public void printABSLocalVariableReference(ABSLocalVariableReference x)
             throws IOException {
-        layouter.beginC().print(x.getVariable().name().toString()).end();
+        layouter.print(x.getVariable().name().toString());
     }
 
     public void printThisExpression(ThisExpression x) throws IOException {
@@ -1990,13 +1989,13 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSStatementBlock(ABSStatementBlock x) throws IOException {
-        layouter.print("{").beginC(2).ind();
+        layouter.print("{").beginC(2).brk().ind();
         printStatementList(x);
-        layouter.print("}").end();
+        layouter.brk(1, -2).end().print("}");
     }
 
-	private void printStatementList(ABSStatementBlock x) {
-		for (int i = 0; i < x.getStatementCount(); i++) {
+    private void printStatementList(ABSStatementBlock x) throws IOException {
+        for (int i = 0; i < x.getStatementCount(); i++) {
             boolean fstStmnt = markFirstStatement;
             if (markFirstStatement) {
                 fstStmnt = true;
@@ -2007,8 +2006,9 @@ public final class LogicPrinter implements ILogicPrinter {
                 markFirstStatement = false;
                 mark(MARK_END_FIRST_STMT);
             }
+            if (i < x.getStatementCount() - 1) layouter.brk(1);
         }
-	}
+    }
 
     public void printABSBinaryOpExp(ABSBinaryOperatorPureExp x, String op)
             throws IOException {
@@ -2021,7 +2021,7 @@ public final class LogicPrinter implements ILogicPrinter {
 
     public void printABSVariableDeclarationStatement(
             ABSVariableDeclarationStatement x) throws IOException {
-        layouter.beginC(2).brk(1);
+        layouter.beginC();
         x.getTypeReference().visit(programPrettyPrinter);
         layouter.brk(1);
         x.getVariable().visit(programPrettyPrinter);
@@ -2029,7 +2029,7 @@ public final class LogicPrinter implements ILogicPrinter {
             layouter.brk(1).print("=").brk(1);
             x.getInitializer().visit(programPrettyPrinter);
         }
-        layouter.print(";").brk(1, -2).end();
+        layouter.print(";").end();
     }
 
     public void printABSTypeReference(ABSTypeReference x) throws IOException {
@@ -2087,10 +2087,14 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.end();
     }
 
-	public void printABSContextStatementBlock(ABSContextStatementBlock x) throws IOException {
-        layouter.print("{..").beginC(2).ind();
+    public void printABSContextStatementBlock(ABSContextStatementBlock x) throws IOException {
+        layouter.print("{").beginC(2).brk().ind();
         printStatementList(x);
-        layouter.print("...}").end();
-	}
+        layouter.brk(1, -2).end().print("}");
+
+        layouter.print("{..").beginC(2).brk().ind();
+        printStatementList(x);
+        layouter.brk(1, -2).end().print("...}");
+    }
 
 }

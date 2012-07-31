@@ -1,10 +1,13 @@
 package de.uka.ilkd.keyabs.abs;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 public class ABSAsyncMethodCall extends ABSNonTerminalProgramElement implements
-IABSMethodReference {
+IABSMethodReference, IABSExpression, IABSStatement {
 
     private final IABSPureExpression caller;
     private final ProgramElementName methodName;
@@ -60,5 +63,11 @@ IABSMethodReference {
 
         sb.append(")");
         return sb.toString();
+    }
+
+
+    @Override
+    public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {
+        return null;
     }
 }
