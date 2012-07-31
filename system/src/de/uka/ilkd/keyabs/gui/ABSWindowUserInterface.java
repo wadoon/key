@@ -16,7 +16,8 @@ public class ABSWindowUserInterface extends WindowUserInterface {
     @Override
     public ABSProblemInitializer createProblemInitializer() {
         final Profile profile = getMediator().getProfile();
-        return new ABSProblemInitializer(this, profile, 
-                (ABSServices) profile.createServices(new KeYRecoderExcHandler()), true, this);
+        return new ABSProblemInitializer(this, profile,
+                (ABSServices) profile
+                        .createServices(new KeYRecoderExcHandler()), true, this);
     }
 }

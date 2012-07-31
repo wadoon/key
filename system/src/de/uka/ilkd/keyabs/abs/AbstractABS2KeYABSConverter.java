@@ -19,18 +19,19 @@ import de.uka.ilkd.keyabs.abs.expression.*;
 public abstract class AbstractABS2KeYABSConverter {
 
     private final IServices services;
-    
+
     protected Namespace<IProgramVariable> pv = new Namespace<IProgramVariable>();
 
     public AbstractABS2KeYABSConverter(IServices services) {
         this.services = services;
     }
 
-    public AbstractABS2KeYABSConverter(IServices services, Namespace<IProgramVariable> pv) {
+    public AbstractABS2KeYABSConverter(IServices services,
+            Namespace<IProgramVariable> pv) {
         this.services = services;
         this.pv = pv;
     }
-    
+
     public ProgramElement convert(ASTNode<?> x) {
         ProgramElement result = null;
 
@@ -43,25 +44,26 @@ public abstract class AbstractABS2KeYABSConverter {
         } else if (x instanceof VarUse) {
             result = convert((VarUse) x);
         } else if (x instanceof Binary) {
-            result = convert((Binary)x);
+            result = convert((Binary) x);
         } else if (x instanceof VarDeclStmt) {
-            result = convert((VarDeclStmt)x);
+            result = convert((VarDeclStmt) x);
         } else if (x instanceof NullExp) {
-        	result = new ABSNullExp();
+            result = new ABSNullExp();
         } else if (x instanceof ThisExp) {
-        	result = new ThisExpression();
-        } else if (x instanceof ExpressionStmt && !(x.getChild(1) instanceof IncompleteAccess)) {
-        	result = convert(((ExpressionStmt)x).getExp());
+            result = new ThisExpression();
+        } else if (x instanceof ExpressionStmt
+                && !(x.getChild(1) instanceof IncompleteAccess)) {
+            result = convert(((ExpressionStmt) x).getExp());
         } else if (x instanceof AsyncCall) {
-        	result = convert((AsyncCall)x); 
+            result = convert((AsyncCall) x);
         } else if (x instanceof DataConstructorExp) {
-            	result = convert((DataConstructorExp)x);
+            result = convert((DataConstructorExp) x);
         } else if (x instanceof IntLiteral) {
-        	result = convert((IntLiteral)x);
+            result = convert((IntLiteral) x);
         } else if (x instanceof IfStmt) {
             result = convert((IfStmt) x);
         } else if (x instanceof MinusExp) {
-            result = convert((MinusExp)x);
+            result = convert((MinusExp) x);
         }
 
         if (result == null) {
@@ -107,25 +109,25 @@ public abstract class AbstractABS2KeYABSConverter {
     protected ProgramElement convert(SchemaVariable value) {
         return (ProgramSV) value;
     }
-    
+
     public ABSAsyncMethodCall convert(AsyncCall x) {
-    	IABSPureExpression callee = (IABSPureExpression) convert(x.getCallee());
-    	ProgramElementName methodName = new ProgramElementName(x.getMethod());
-    	
-    	IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
-    	
-    	int i = 0;
-    	for (PureExp arg : x.getParamList()) {
-    		arguments[i] = (IABSPureExpression) convert(arg);
-    		i++;
-    	}
-    	
-    	return new ABSAsyncMethodCall(callee, methodName, arguments);
+        IABSPureExpression callee = (IABSPureExpression) convert(x.getCallee());
+        ProgramElementName methodName = new ProgramElementName(x.getMethod());
+
+        IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
+
+        int i = 0;
+        for (PureExp arg : x.getParamList()) {
+            arguments[i] = (IABSPureExpression) convert(arg);
+            i++;
+        }
+
+        return new ABSAsyncMethodCall(callee, methodName, arguments);
     }
 
     public ABSStatementBlock convert(Block x) {
         IABSStatement[] bodyStmnts = new IABSStatement[x.getNumStmt()];
-        pv = pv.extended(ImmutableSLList.<IProgramVariable>nil());
+        pv = pv.extended(ImmutableSLList.<IProgramVariable> nil());
         for (int i = 0; i < x.getNumStmt(); i++) {
             bodyStmnts[i] = (IABSStatement) convert(x.getStmt(i));
         }
@@ -142,22 +144,23 @@ public abstract class AbstractABS2KeYABSConverter {
     public ABSIfStatement convert(IfStmt x) {
         IABSPureExpression cond = (IABSPureExpression) convert(x.getCondition());
         IABSStatement _then = (IABSStatement) convert(x.getThen());
-        
+
         System.out.println("Has else " + x.hasElse());
-        
-        IABSStatement _else = x.hasElse() ? (IABSStatement) convert(x.getElse()) : null;
-        
+
+        IABSStatement _else = x.hasElse() ? (IABSStatement) convert(x.getElse())
+                : null;
+
         return new ABSIfStatement(cond, _then, _else);
-        
+
     }
-    
+
     public ABSFieldReference convert(FieldUse fieldUse) {
         IProgramVariable var = lookupFieldVariable(fieldUse.getName());
         return new ABSFieldReference(var);
     }
 
     public Expression convert(VarUse varUse) {
-        IProgramVariable var = lookupLocalVariable(varUse.getName());        
+        IProgramVariable var = lookupLocalVariable(varUse.getName());
         return new ABSLocalVariableReference(var);
     }
 
@@ -181,17 +184,16 @@ public abstract class AbstractABS2KeYABSConverter {
                 (IABSPureExpression) convert(x.getChild(1)));
     }
 
-    
     public ABSEqExp convert(EqExp x) {
         return new ABSEqExp((IABSPureExpression) convert(x.getChild(0)),
                 (IABSPureExpression) convert(x.getChild(1)));
     }
-    
+
     public ABSNotEqExp convert(NotEqExp x) {
         return new ABSNotEqExp((IABSPureExpression) convert(x.getChild(0)),
                 (IABSPureExpression) convert(x.getChild(1)));
     }
-    
+
     public ABSGTExp convert(GTExp x) {
         return new ABSGTExp((IABSPureExpression) convert(x.getChild(0)),
                 (IABSPureExpression) convert(x.getChild(1)));
@@ -212,42 +214,46 @@ public abstract class AbstractABS2KeYABSConverter {
                 (IABSPureExpression) convert(x.getChild(1)));
     }
 
-    
     public ABSIntLiteral convert(IntLiteral x) {
         return new ABSIntLiteral(new BigInteger(x.getContent()));
     }
 
     public IABSPureExpression convert(MinusExp x) {
         if (x.getChild(0) instanceof IntLiteral) {
-            return new ABSIntLiteral(new BigInteger("-"+((IntLiteral)x.getChild(0)).getContent()));
+            return new ABSIntLiteral(new BigInteger("-"
+                    + ((IntLiteral) x.getChild(0)).getContent()));
         }
         return new ABSMinusExp((IABSPureExpression) convert(x.getChild(0)));
     }
-    
+
     public ABSDataConstructorExp convert(DataConstructorExp x) {
-	ProgramElementName pen = new ProgramElementName(x.getDataConstructor().getName(), 
-		x.getDataConstructor().getDataTypeDecl().getModule().getName() + "." + 
-		x.getDataConstructor().getDataTypeDecl().getName());
-	
+        ProgramElementName pen = new ProgramElementName(x.getDataConstructor()
+                .getName(), x.getDataConstructor().getDataTypeDecl()
+                .getModule().getName()
+                + "." + x.getDataConstructor().getDataTypeDecl().getName());
+
         IABSPureExpression[] args = new IABSPureExpression[x.getNumParam()];
-        for (int i = 0; i<x.getNumParam(); i++) {
+        for (int i = 0; i < x.getNumParam(); i++) {
             args[i] = (IABSPureExpression) convert(x.getParam(i));
         }
         return new ABSDataConstructorExp(pen, args);
     }
 
     public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
-	//KeYJavaType type = lookupType(x.getVarDecl().getAccess().toString());
-	KeYJavaType type = lookupType(x.getVarDecl().getType().getQualifiedName());
-        LocationVariable localVar = new LocationVariable(new ProgramElementName(x.getVarDecl().getName()), type);
+        // KeYJavaType type = lookupType(x.getVarDecl().getAccess().toString());
+        KeYJavaType type = lookupType(x.getVarDecl().getType()
+                .getQualifiedName());
+        LocationVariable localVar = new LocationVariable(
+                new ProgramElementName(x.getVarDecl().getName()), type);
         pv.add(localVar);
         IABSExpression initExp = null;
         if (x.getVarDecl().hasInitExp()) {
-        	initExp = (IABSExpression) convert(x.getVarDecl().getInitExp());
+            initExp = (IABSExpression) convert(x.getVarDecl().getInitExp());
         }
-        return new ABSVariableDeclarationStatement(new ABSTypeReference(type), localVar, initExp);
+        return new ABSVariableDeclarationStatement(new ABSTypeReference(type),
+                localVar, initExp);
     }
-    
+
     protected KeYJavaType lookupType(String qualifiedName) {
         return services.getProgramInfo().getKeYJavaType(qualifiedName);
     }

@@ -10,26 +10,24 @@ import de.uka.ilkd.keyabs.abs.expression.*;
 
 public class ABSProgramPrettyPrinter implements ABSVisitor {
 
-
     private LogicPrinter lp;
 
     public ABSProgramPrettyPrinter(LogicPrinter lp) {
-	this.lp = lp;
+        this.lp = lp;
     }
-
 
     @Override
     public void performActionOnProgramElementName(ProgramElementName x) {
-	try {
-	    lp.printProgramElementName(x);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
+        try {
+            lp.printProgramElementName(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void performActionOnProgramMethod(IProgramMethod x) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
@@ -39,21 +37,21 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 
     @Override
     public void performActionOnProgramVariable(ProgramVariable x) {
-	try {
-	    lp.printProgramVariable(x);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
+        try {
+            lp.printProgramVariable(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void performActionOnLocationVariable(LocationVariable x) {
-	try {
-	    lp.printLocationVariable(x);
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        try {
+            lp.printLocationVariable(x);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -62,163 +60,152 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 
     @Override
     public void performActionOnABSFieldReference(ABSFieldReference x) {
-	try {
-	    lp.printABSFieldReference(x);
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        try {
+            lp.printABSFieldReference(x);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void performActionOnABSLocalVariableReference(
-	    ABSLocalVariableReference x) {
-	try {
-	    lp.printABSLocalVariableReference(x);
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+            ABSLocalVariableReference x) {
+        try {
+            lp.printABSLocalVariableReference(x);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void performActionOnThisExpression(ThisExpression x) {
-	try {
-	    lp.printThisExpression(x);
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        try {
+            lp.printThisExpression(x);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void performActionOnCopyAssignment(CopyAssignment x) {
-	try {
-	    lp.printABSCopyAssignment(x);
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        try {
+            lp.printABSCopyAssignment(x);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void performActionABSStatementBlock(ABSStatementBlock x) {
-	try {
-	    lp.printABSStatementBlock(x);
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        try {
+            lp.printABSStatementBlock(x);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void performActionOnProgramMetaConstruct(
-	    ProgramTransformer<ABSServices> x) {
-	// TODO Auto-generated method stub
+            ProgramTransformer<ABSServices> x) {
+        // TODO Auto-generated method stub
 
     }
-
 
     @Override
     public void performActionOnABSAddExp(ABSAddExp x) {
-	try {
-	    lp.printABSBinaryOpExp(x, "+");
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} 
+        try {
+            lp.printABSBinaryOpExp(x, "+");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSMultExp(ABSMultExp x) {
-	try {
-	    lp.printABSBinaryOpExp(x, "*");
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} 
+        try {
+            lp.printABSBinaryOpExp(x, "*");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSAndBoolExp(ABSAndBoolExp x) {
-	try {
-	    lp.printABSBinaryOpExp(x, "&&");
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} 
+        try {
+            lp.printABSBinaryOpExp(x, "&&");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSOrBoolExp(ABSOrBoolExp x) {
-	try {
-	    lp.printABSBinaryOpExp(x, "||");
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} 
+        try {
+            lp.printABSBinaryOpExp(x, "||");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSTypeReference(ABSTypeReference x) {
-	try {
-	    lp.printABSTypeReference(x);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}         
+        try {
+            lp.printABSTypeReference(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSVariableDeclarationStatement(
-	    ABSVariableDeclarationStatement x) {
-	try {
-	    lp.printABSVariableDeclarationStatement(x);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} 
+            ABSVariableDeclarationStatement x) {
+        try {
+            lp.printABSVariableDeclarationStatement(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSAsyncMethodCall(ABSAsyncMethodCall x) {
-	try {
-	    lp.printABSAsyncMethodCall(x);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} 		
+        try {
+            lp.printABSAsyncMethodCall(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSNullExp(ABSNullExp x) {
-	try {
-	    lp.printABSNullExp(x);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} 		
+        try {
+            lp.printABSNullExp(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSDataConstructorExp(ABSDataConstructorExp x) {
-	try {
-	    lp.printABSDataConstructorExp(x);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} 	
+        try {
+            lp.printABSDataConstructorExp(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSIntLiteral(ABSIntLiteral x) {
-	try {
-	    lp.printABSIntLiteral(x);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}     
+        try {
+            lp.printABSIntLiteral(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void performActionOnABSEqExp(ABSEqExp x) {
@@ -226,9 +213,8 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSBinaryOpExp(x, "==");
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
-
 
     @Override
     public void performActionOnABSNotEqExp(ABSNotEqExp x) {
@@ -236,7 +222,7 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSBinaryOpExp(x, "!=");
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
 
     @Override
@@ -245,7 +231,7 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSBinaryOpExp(x, ">");
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
 
     @Override
@@ -254,9 +240,8 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSBinaryOpExp(x, ">=");
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
-
 
     @Override
     public void performActionOnABSLTExp(ABSLTExp x) {
@@ -264,9 +249,8 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSBinaryOpExp(x, "<");
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
-
 
     @Override
     public void performActionOnABSLEQExp(ABSLEQExp x) {
@@ -274,9 +258,8 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSBinaryOpExp(x, "<=");
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
-
 
     @Override
     public void performActionOnABSIfStatement(ABSIfStatement x) {
@@ -284,9 +267,8 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSIfStatement(x);
         } catch (IOException e) {
             e.printStackTrace();
-        }             
+        }
     }
-
 
     @Override
     public void performActionOnABSContextStatementBlock(
@@ -295,9 +277,8 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSContextStatementBlock(x);
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
-
 
     @Override
     public void performActionOnABSMinusExp(ABSMinusExp x) {
@@ -305,9 +286,7 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             lp.printABSMinusExp(x);
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
-
-
 
 }

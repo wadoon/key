@@ -15,28 +15,29 @@ import de.uka.ilkd.keyabs.logic.sort.ABSProgramSVSort;
 
 public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
 
-    
     private final Namespace<IProgramVariable> schemaVariables;
 
-    public SchemaABS2KeYABSConverter(Namespace<IProgramVariable> schemaVariables, IServices services) {
+    public SchemaABS2KeYABSConverter(
+            Namespace<IProgramVariable> schemaVariables, IServices services) {
         super(services);
         this.schemaVariables = schemaVariables;
     }
-    
+
     @Override
     protected ProgramElement requestConversion(ASTNode<?> x) {
         IProgramVariable result = null;
         if (x instanceof ExpressionStmt) {
-            if (((ExpressionStmt)x).getNumChild() == 2) {
+            if (((ExpressionStmt) x).getNumChild() == 2) {
                 if (x.getChild(1) instanceof IncompleteSyncAccess) {
-                    final String name =((VarUse)((IncompleteSyncAccess)x.getChild(1)).getChild(0)).getName();
+                    final String name = ((VarUse) ((IncompleteSyncAccess) x
+                            .getChild(1)).getChild(0)).getName();
                     result = lookup(name);
                 }
             }
         }
         return result;
     }
-    
+
     IProgramVariable lookup(String name) {
         return schemaVariables.lookup(new Name(name));
     }
@@ -44,37 +45,36 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
     @Override
     public Expression convert(VarUse varUse) {
         IProgramVariable var = lookupLocalVariable(varUse.getName());
-        
+
         if (var instanceof SchemaVariable) {
             if (var.sort() == ABSProgramSVSort.ABS_PUREEXPRESSION) {
                 return (ProgramSV) var;
             }
-        }        
+        }
         return new ABSLocalVariableReference(var);
     }
 
-    
     @Override
     public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
         String typeName;
-       
+
         typeName = x.getVarDecl().getAccess().toString();
-                
+
         KeYJavaType type = lookupType(typeName);
-        
+
         TypeReference typeRef;
         if (type == null) {
             typeRef = (TypeReference) lookup(typeName);
         } else {
             typeRef = new ABSTypeReference(type);
         }
-        
+
         IProgramVariable localVar = lookup(x.getVarDecl().getName());
-        IABSExpression initExp = (IABSExpression) convert(x.getVarDecl().getInitExp());
+        IABSExpression initExp = (IABSExpression) convert(x.getVarDecl()
+                .getInitExp());
         return new ABSVariableDeclarationStatement(typeRef, localVar, initExp);
     }
 
-    
     @Override
     protected IProgramVariable lookupLocalVariable(String name) {
         return lookup(name);

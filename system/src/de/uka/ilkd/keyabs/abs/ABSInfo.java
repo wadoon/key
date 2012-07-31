@@ -39,13 +39,11 @@ public class ABSInfo implements IProgramInfo {
      */
     private final HashMap<String, KeYJavaType> name2sortABSPair = new HashMap<String, KeYJavaType>();
 
-
     public ABSInfo(ABSServices services) {
         this(services, new KeYABSMapping());
     }
 
-    public ABSInfo(ABSServices services,
-            KeYABSMapping program2key) {
+    public ABSInfo(ABSServices services, KeYABSMapping program2key) {
         this(services, program2key, new ABSModelParserInfo());
     }
 
@@ -194,14 +192,14 @@ public class ABSInfo implements IProgramInfo {
     private void ensureValidCache() {
         if (name2sortABSPair.size() != rec2key().size()) {
             buildNameCache();
-        }   	
+        }
     }
 
-	public CoreAbsBackend getCoreABSBackend() {
-		return absInfo.getABSBackend();
-	}
+    public CoreAbsBackend getCoreABSBackend() {
+        return absInfo.getABSBackend();
+    }
 
-	public Model parseInContext(String s) throws IOException {
-		return absInfo.parseInContext(s);
-	}
+    public Model parseInContext(String s) throws IOException {
+        return absInfo.parseInContext(s);
+    }
 }

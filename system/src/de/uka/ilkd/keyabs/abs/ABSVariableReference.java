@@ -7,12 +7,11 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
-public abstract class ABSVariableReference extends ABSNonTerminalProgramElement 
-                                           implements IABSPureExpression, IABSLocationReference {
+public abstract class ABSVariableReference extends ABSNonTerminalProgramElement
+        implements IABSPureExpression, IABSLocationReference {
 
     private final IProgramVariable variable;
-    
-    
+
     public ABSVariableReference(IProgramVariable variable, PositionInfo pos) {
         super(pos);
         this.variable = variable;
@@ -22,7 +21,6 @@ public abstract class ABSVariableReference extends ABSNonTerminalProgramElement
     public IProgramVariable getVariable() {
         return variable;
     }
-    
 
     @Override
     public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {
@@ -36,7 +34,8 @@ public abstract class ABSVariableReference extends ABSNonTerminalProgramElement
 
     @Override
     public ProgramElement getChildAt(int index) {
-        if (index != 0) throw new IndexOutOfBoundsException();
+        if (index != 0)
+            throw new IndexOutOfBoundsException();
         return variable;
     }
 }

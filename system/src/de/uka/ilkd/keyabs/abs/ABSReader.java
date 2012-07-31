@@ -14,8 +14,9 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 public class ABSReader implements JavaReader {
 
-	private static final String CONCRETE_MODULE_NAME = "ABS_PARSER_NORMAL_MODULE";
-	private static final String CONCRETE_MODULE = "module " + CONCRETE_MODULE_NAME + ";";
+    private static final String CONCRETE_MODULE_NAME = "ABS_PARSER_NORMAL_MODULE";
+    private static final String CONCRETE_MODULE = "module "
+            + CONCRETE_MODULE_NAME + ";";
 
     @Override
     public JavaBlock readBlockWithEmptyContext(String s, IServices services) {
@@ -23,27 +24,31 @@ public class ABSReader implements JavaReader {
     }
 
     @Override
-    public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns, IServices services, String s) {
+    public JavaBlock readBlockWithProgramVariables(
+            Namespace<IProgramVariable> varns, IServices services, String s) {
         String blockStr = CONCRETE_MODULE + "\n import * from PingPong; " + s;
         try {
-            Model m = ((ABSServices)services).getProgramInfo().parseInContext(blockStr);                    
+            Model m = ((ABSServices) services).getProgramInfo().parseInContext(
+                    blockStr);
             ModuleDecl module = null;
             for (ModuleDecl md : m.getModuleDecls()) {
-            	if (md.getName().equals(CONCRETE_MODULE_NAME)) {
-            		module = md;
-            		break;
-            	}
+                if (md.getName().equals(CONCRETE_MODULE_NAME)) {
+                    module = md;
+                    break;
+                }
             }
-            
-            System.out.println(" Errors: "+m.getErrors());
-            
+
+            System.out.println(" Errors: " + m.getErrors());
+
             for (SemanticError se : m.getErrors()) {
-                System.out.println(se.getHelpMessage() + " : " + se.getFileName() + " : " + se.getMsgString());
+                System.out.println(se.getHelpMessage() + " : "
+                        + se.getFileName() + " : " + se.getMsgString());
             }
-            System.out.println(module.getBlock() + " Errors: "+m.getErrors());
-           
-            AbstractABS2KeYABSConverter converter = new ConcreteABS2KeYABSConverter(varns, services);
-            
+            System.out.println(module.getBlock() + " Errors: " + m.getErrors());
+
+            AbstractABS2KeYABSConverter converter = new ConcreteABS2KeYABSConverter(
+                    varns, services);
+
             ABSStatementBlock block = converter.convert(module.getBlock());
 
             System.out.println("Converted " + block);

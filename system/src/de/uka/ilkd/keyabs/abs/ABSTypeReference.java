@@ -8,22 +8,21 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-public class ABSTypeReference extends ABSNonTerminalProgramElement implements TypeReference {
+public class ABSTypeReference extends ABSNonTerminalProgramElement implements
+        TypeReference {
 
     private final KeYJavaType type;
     private final ProgramElementName typeName;
-        
-    
+
     public ABSTypeReference(KeYJavaType type) {
         this.typeName = new ProgramElementName(type.getName());
         this.type = type;
     }
-        
+
     @Override
     public int getChildCount() {
         return 1;
     }
-    
 
     @Override
     public ProgramElement getChildAt(int index) {
@@ -86,11 +85,11 @@ public class ABSTypeReference extends ABSNonTerminalProgramElement implements Ty
     @Override
     public void visit(ABSVisitor v) {
         v.performActionOnABSTypeReference(this);
-    } 
+    }
 
     @Override
     public String toString() {
-    	return type.getFullName();
+        return type.getFullName();
     }
- 
+
 }

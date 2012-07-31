@@ -5,10 +5,11 @@ import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 
-public class CopyAssignment extends ABSNonTerminalProgramElement
-                            implements IABSStatement, ExpressionContainer {
+public class CopyAssignment extends ABSNonTerminalProgramElement implements
+        IABSStatement, ExpressionContainer {
 
-    public CopyAssignment(IABSLocationReference lhs, IABSPureExpression rhs, PositionInfo pos) {
+    public CopyAssignment(IABSLocationReference lhs, IABSPureExpression rhs,
+            PositionInfo pos) {
         super(pos);
         this.lhs = lhs;
         this.rhs = rhs;
@@ -20,46 +21,49 @@ public class CopyAssignment extends ABSNonTerminalProgramElement
 
     private final IABSLocationReference lhs;
     private final IABSPureExpression rhs;
-    
-    
+
     @Override
     public int getChildCount() {
         return 2;
     }
-    
+
     @Override
     public ProgramElement getChildAt(int index) {
-        switch(index) {
-        case 0 : return lhs;
-        case 1 : return rhs;
+        switch (index) {
+        case 0:
+            return lhs;
+        case 1:
+            return rhs;
         default:
             throw new IndexOutOfBoundsException();
         }
     }
-    
+
     @Override
     public int getExpressionCount() {
         return 2;
     }
+
     @Override
     public Expression getExpressionAt(int index) {
-        switch(index) {
-        case 0 : return lhs;
-        case 1 : return rhs;
+        switch (index) {
+        case 0:
+            return lhs;
+        case 1:
+            return rhs;
         default:
             throw new IndexOutOfBoundsException();
         }
     }
+
     @Override
     public void visit(ABSVisitor v) {
         v.performActionOnCopyAssignment(this);
     }
-    
-    
+
     @Override
     public String toString() {
         return lhs + " = " + rhs + "; \n";
     }
-   
 
 }

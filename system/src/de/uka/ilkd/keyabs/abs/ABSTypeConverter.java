@@ -21,44 +21,51 @@ import de.uka.ilkd.keyabs.abs.expression.*;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 public final class ABSTypeConverter extends AbstractTypeConverter {
-    
+
     private HistoryLDT historyLDT;
-    
+
     public ABSTypeConverter(ABSServices services) {
         super(services);
     }
 
     @Override
-    public void init(LDT ldt) {     
+    public void init(LDT ldt) {
         if (ldt instanceof HistoryLDT) {
             historyLDT = (HistoryLDT) ldt;
         }
         super.init(ldt);
     }
-    
+
     @Override
     public Term convertToLogicElement(ProgramElement pe) {
-        return convertToLogicElement(pe, getServices().getProgramInfo().getDefaultExecutionContext());
+        return convertToLogicElement(pe, getServices().getProgramInfo()
+                .getDefaultExecutionContext());
     }
 
     @Override
     public Term convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
         if (pe instanceof IntLiteral) {
-            return getIntegerLDT().translateLiteral((IntLiteral) pe, getServices());
+            return getIntegerLDT().translateLiteral((IntLiteral) pe,
+                    getServices());
         } else if (pe instanceof IABSLocationReference) {
-            return getServices().getTermBuilder().var(((IABSLocationReference)pe).getVariable());
+            return getServices().getTermBuilder().var(
+                    ((IABSLocationReference) pe).getVariable());
         } else if (pe instanceof IProgramVariable) {
-            return getServices().getTermBuilder().var((IProgramVariable)pe);
+            return getServices().getTermBuilder().var((IProgramVariable) pe);
         } else {
             final TermBuilder tb = services.getTermBuilder();
             if (pe instanceof ABSBinaryOperatorPureExp) {
-                Term left = convertToLogicElement(((ABSBinaryOperatorPureExp) pe).getChildAt(0), ec);
-                Term right = convertToLogicElement(((ABSBinaryOperatorPureExp) pe).getChildAt(1), ec);
-                
+                Term left = convertToLogicElement(
+                        ((ABSBinaryOperatorPureExp) pe).getChildAt(0), ec);
+                Term right = convertToLogicElement(
+                        ((ABSBinaryOperatorPureExp) pe).getChildAt(1), ec);
+
                 if (pe instanceof ABSAddExp) {
-                    return getServices().getTermBuilder().add(services, left, right);
+                    return getServices().getTermBuilder().add(services, left,
+                            right);
                 } else if (pe instanceof ABSMultExp) {
-                    return getServices().getTermBuilder().mul(services, left, right);                
+                    return getServices().getTermBuilder().mul(services, left,
+                            right);
                 } else if (pe instanceof ABSAndBoolExp) {
                     return convertBool2Fml(Junctor.AND, left, right);
                 } else if (pe instanceof ABSOrBoolExp) {
@@ -77,19 +84,25 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
                     return tb.lt(left, right, services);
                 }
             } else if (pe instanceof ABSNullExp) {
-            	return getServices().getTermBuilder().NULL(getServices());
+                return getServices().getTermBuilder().NULL(getServices());
             } else if (pe instanceof ABSDataConstructorExp) {
-                ABSDataConstructorExp dtCons = (ABSDataConstructorExp)pe;
-                Function cons = (Function) services.getNamespaces().functions().lookup((Name) dtCons.getChildAt(0));
+                ABSDataConstructorExp dtCons = (ABSDataConstructorExp) pe;
+                Function cons = (Function) services.getNamespaces().functions()
+                        .lookup((Name) dtCons.getChildAt(0));
                 Term[] subs = new Term[dtCons.getArgumentCount()];
-                for (int i = 0; i<dtCons.getArgumentCount(); i++) {
+                for (int i = 0; i < dtCons.getArgumentCount(); i++) {
                     subs[i] = convertToLogicElement(dtCons.getArgumentAt(i), ec);
                 }
                 return tb.func(cons, subs);
             } else if (pe instanceof ABSIntLiteral) {
-               return tb.zTerm(services, ((ABSIntLiteral)pe).getValue().toString());
+                return tb.zTerm(services, ((ABSIntLiteral) pe).getValue()
+                        .toString());
             } else if (pe instanceof ABSMinusExp) {
-                return tb.mul(services, tb.zTerm(services, "-1"), convertToLogicElement(((ABSMinusExp) pe).getChildAt(0), ec));
+                return tb.mul(
+                        services,
+                        tb.zTerm(services, "-1"),
+                        convertToLogicElement(((ABSMinusExp) pe).getChildAt(0),
+                                ec));
             }
         }
         return null;
@@ -97,10 +110,13 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
 
     private Term convertBool2Fml(Junctor op, Term left, Term right) {
         TermBuilder tb = services.getTermBuilder();
-        Term leftFml = left.sort() == Sort.FORMULA ? left : tb.equals(left, tb.TRUE(services)); 
-        Term rightFml = right.sort() == Sort.FORMULA ? right : tb.equals(right, tb.TRUE(services)); 
-        
-        return tb.ife(tb.tf().createTerm(op, leftFml, rightFml), tb.TRUE(services), tb.FALSE(services));
+        Term leftFml = left.sort() == Sort.FORMULA ? left : tb.equals(left,
+                tb.TRUE(services));
+        Term rightFml = right.sort() == Sort.FORMULA ? right : tb.equals(right,
+                tb.TRUE(services));
+
+        return tb.ife(tb.tf().createTerm(op, leftFml, rightFml),
+                tb.TRUE(services), tb.FALSE(services));
     }
 
     @Override
@@ -160,11 +176,12 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
     @Override
     public boolean isIntegerType(Type t) {
         Type type = t;
-    	if (t instanceof KeYJavaType) {
-        	return ((KeYJavaType) t).getSort().extendsTrans(getIntegerLDT().targetSort());
+        if (t instanceof KeYJavaType) {
+            return ((KeYJavaType) t).getSort().extendsTrans(
+                    getIntegerLDT().targetSort());
         }
-    	return type instanceof ABSInterfaceType;
-  }
+        return type instanceof ABSInterfaceType;
+    }
 
     @Override
     public boolean isIntegralType(Type t) {
@@ -181,10 +198,10 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
     @Override
     public boolean isReferenceType(Type t) {
         Type type = t;
-    	if (t instanceof KeYJavaType) {
-        	type = ((KeYJavaType) t).getJavaType();
+        if (t instanceof KeYJavaType) {
+            type = ((KeYJavaType) t).getJavaType();
         }
-    	return type instanceof ABSInterfaceType;
+        return type instanceof ABSInterfaceType;
     }
 
     @Override
@@ -199,6 +216,5 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
     public HistoryLDT getHistoryLDT() {
         return historyLDT;
     }
-
 
 }

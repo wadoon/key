@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.ExtList;
  * transform a program according to the given SVInstantiations.
  */
 public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
-IProgramReplaceVisitor {
+        IProgramReplaceVisitor {
 
     private SVInstantiations svinsts;
 
@@ -48,7 +48,6 @@ IProgramReplaceVisitor {
         this.allowPartialReplacement = allowPartialReplacement;
     }
 
-
     /*
      * (non-Javadoc)
      * 
@@ -56,7 +55,7 @@ IProgramReplaceVisitor {
      */
     @Override
     public void start() {
-        stack.push(new ExtList());              
+        stack.push(new ExtList());
         walk(root());
     }
 
@@ -64,7 +63,9 @@ IProgramReplaceVisitor {
     public void performActionOnABSContextStatementBlock(
             ABSContextStatementBlock x) {
         ExtList children = stack.peek();
-        if (hasChanged()) { children.removeFirst(); }
+        if (hasChanged()) {
+            children.removeFirst();
+        }
         final IABSStatement[] body = new IABSStatement[children.size()];
         for (int i = 0; i < children.size(); i++) {
             body[i] = (IABSStatement) children.get(i);
@@ -100,7 +101,8 @@ IProgramReplaceVisitor {
     }
 
     @Override
-    public void performActionOnProgramMetaConstruct(ProgramTransformer<ABSServices> x) {
+    public void performActionOnProgramMetaConstruct(
+            ProgramTransformer<ABSServices> x) {
         IProgramReplaceVisitor trans = new ABSProgramReplaceVisitor(x.body(),
                 services, svinsts, allowPartialReplacement);
         trans.start();

@@ -25,42 +25,36 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
 
     private Term problemTerm = null;
     private String problemHeader = "";
-    
+
     private ABSKeYParser lastParser;
-    
-    
-    //-------------------------------------------------------------------------
-    //constructors
-    //------------------------------------------------------------------------- 
-    
-    /** 
-     * Creates a new representation of a KeYUserFile with the given name,
-     * a rule source representing the physical source of the input, and
-     * a graphical representation to call back in order to report the progress
-     * while reading.
+
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Creates a new representation of a KeYUserFile with the given name, a rule
+     * source representing the physical source of the input, and a graphical
+     * representation to call back in order to report the progress while
+     * reading.
      */
-    public ABSKeYUserProblemFile(String name, 
-                              File file, 
-                              ProgressMonitor monitor) {
+    public ABSKeYUserProblemFile(String name, File file, ProgressMonitor monitor) {
         super(name, file, monitor);
     }
-    
-    
-    
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
-        
+
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
+
     @Override
-    public boolean equals(Object o){
-        if(!(o instanceof ABSKeYUserProblemFile)) {
+    public boolean equals(Object o) {
+        if (!(o instanceof ABSKeYUserProblemFile)) {
             return false;
         }
         final ABSKeYUserProblemFile kf = (ABSKeYUserProblemFile) o;
         return kf.file.file().getAbsolutePath()
-                             .equals(file.file().getAbsolutePath());
-    }    
-
+                .equals(file.file().getAbsolutePath());
+    }
 
     @Override
     public ProofAggregate getPO() throws ProofInputException {
@@ -68,116 +62,104 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
         String name = name();
         ProofSettings settings = getPreferences();
         return ProofAggregate.createProofAggregate(
-                new Proof(name, 
-                          problemTerm, 
-                          problemHeader,
-                          initConfig.createTacletIndex(), 
-                          initConfig.createBuiltInRuleIndex(),
-                          initConfig.getServices(), 
-                          settings), 
-                name);
+                new Proof(name, problemTerm, problemHeader, initConfig
+                        .createTacletIndex(), initConfig
+                        .createBuiltInRuleIndex(), initConfig.getServices(),
+                        settings), name);
     }
 
-    
     @Override
     public int hashCode() {
         return file.file().getAbsolutePath().hashCode();
     }
-    
-    
+
     @Override
     public boolean implies(ProofOblInput po) {
         return equals(po);
     }
-    
-    
+
     @Override
     public void read() throws ProofInputException {
-        if(initConfig == null) {
+        if (initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
-        }       
-        
-        //read activated choices
+        }
+
+        // read activated choices
         try {
             ProofSettings settings = getPreferences();
-            
-            ParserConfig<ABSServices> pc = new ParserConfig<ABSServices>
-                (initConfig.getServices(), 
-                 initConfig.namespaces());
-            ABSKeYParser problemParser = new ABSKeYParser
-                (ParserMode.PROBLEM, new ABSKeYLexer(getNewStream(),
-                        initConfig.getServices().getExceptionHandler()), 
-                        file.toString(), pc, pc, null, null);    
-            problemParser.parseWith();            
-        
-            settings.getChoiceSettings()
-                    .updateWith(problemParser.getActivatedChoices());           
-            
+
+            ParserConfig<ABSServices> pc = new ParserConfig<ABSServices>(
+                    initConfig.getServices(), initConfig.namespaces());
+            ABSKeYParser problemParser = new ABSKeYParser(ParserMode.PROBLEM,
+                    new ABSKeYLexer(getNewStream(), initConfig.getServices()
+                            .getExceptionHandler()), file.toString(), pc, pc,
+                    null, null);
+            problemParser.parseWith();
+
+            settings.getChoiceSettings().updateWith(
+                    problemParser.getActivatedChoices());
+
             initConfig.setActivatedChoices(settings.getChoiceSettings()
-                                                   .getDefaultChoicesAsSet());
-        
+                    .getDefaultChoicesAsSet());
+
         } catch (antlr.ANTLRException e) {
-            throw new ProofInputException(e);      
+            throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
-        }        
-        
-        //read in-code specifications
-        
-        /* SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
-                                               readClassPath(), 
-                                               readBootClassPath());
-        slEnvInput.setInitConfig(initConfig);
-        slEnvInput.read();*/
-                
-        //read key file itself
-        super.read();        
+        }
+
+        // read in-code specifications
+
+        /*
+         * SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(),
+         * readClassPath(), readBootClassPath());
+         * slEnvInput.setInitConfig(initConfig); slEnvInput.read();
+         */
+
+        // read key file itself
+        super.read();
     }
-        
-    
+
     @Override
     public void readProblem() throws ProofInputException {
         if (initConfig == null) {
-            throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
+            throw new IllegalStateException(
+                    "KeYUserProblemFile: InitConfig not set.");
         }
-        
-        try {
-            CountingBufferedReader cinp = 
-                new CountingBufferedReader
-                    (getNewStream(),monitor,getNumberOfChars()/100);
-            DeclPicker lexer = new DeclPicker(new ABSKeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
-            
-            final ParserConfig<ABSServices> normalConfig 
-                = new ParserConfig<ABSServices>(initConfig.getServices(), initConfig.namespaces());
-            final ParserConfig<ABSServices> schemaConfig 
-                = new ParserConfig<ABSServices>(initConfig.getServices(), initConfig.namespaces());
-            
-            ABSKeYParser problemParser 
-                    = new ABSKeYParser(ParserMode.PROBLEM, 
-                                    lexer, 
-                                    file.toString(), 
-                                    schemaConfig, 
-                                    normalConfig,
-                                    initConfig.getTaclet2Builder(),
-                                    initConfig.getTaclets()); 
-            problemTerm = problemParser.parseProblem();
-            String searchS = "\\problem";            
 
-            if(problemTerm == null) {
-               boolean chooseDLContract = problemParser.getChooseContract() != null;
-               if(chooseDLContract)
-                 searchS = "\\chooseContract";
-               else {
-                   cinp.close();
-                   throw new ProofInputException("No \\problem or \\chooseContract in the input file!");
-               }
+        try {
+            CountingBufferedReader cinp = new CountingBufferedReader(
+                    getNewStream(), monitor, getNumberOfChars() / 100);
+            DeclPicker lexer = new DeclPicker(new ABSKeYLexer(cinp, initConfig
+                    .getServices().getExceptionHandler()));
+
+            final ParserConfig<ABSServices> normalConfig = new ParserConfig<ABSServices>(
+                    initConfig.getServices(), initConfig.namespaces());
+            final ParserConfig<ABSServices> schemaConfig = new ParserConfig<ABSServices>(
+                    initConfig.getServices(), initConfig.namespaces());
+
+            ABSKeYParser problemParser = new ABSKeYParser(ParserMode.PROBLEM,
+                    lexer, file.toString(), schemaConfig, normalConfig,
+                    initConfig.getTaclet2Builder(), initConfig.getTaclets());
+            problemTerm = problemParser.parseProblem();
+            String searchS = "\\problem";
+
+            if (problemTerm == null) {
+                boolean chooseDLContract = problemParser.getChooseContract() != null;
+                if (chooseDLContract)
+                    searchS = "\\chooseContract";
+                else {
+                    cinp.close();
+                    throw new ProofInputException(
+                            "No \\problem or \\chooseContract in the input file!");
+                }
             }
 
             problemHeader = lexer.getText();
-            if(problemHeader != null && 
-               problemHeader.lastIndexOf(searchS) != -1){
-                problemHeader = problemHeader.substring(
-                    0, problemHeader.lastIndexOf(searchS));
+            if (problemHeader != null
+                    && problemHeader.lastIndexOf(searchS) != -1) {
+                problemHeader = problemHeader.substring(0,
+                        problemHeader.lastIndexOf(searchS));
             }
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
@@ -189,18 +171,17 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
             throw new ProofInputException(e);
         }
     }
-    
-    
-    /** 
+
+    /**
      * Reads a saved proof of a .key file.
      */
     public void readProof(IProofFileParser prl) throws ProofInputException {
-        if(lastParser == null) {
+        if (lastParser == null) {
             readProblem();
         }
         try {
             lastParser.proof(prl);
-        } catch(antlr.ANTLRException e) {
+        } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);
         }
     }

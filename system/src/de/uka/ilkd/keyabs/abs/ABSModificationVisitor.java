@@ -23,7 +23,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
     public ABSModificationVisitor(ProgramElement root) {
         super(root);
     }
-    
+
     /** starts the walker */
     @Override
     public void start() {
@@ -120,7 +120,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             ExtList children = stack.peek();
             children.removeFirst();
             addNewChild(new ABSFieldReference(
-            (IProgramVariable) children.get(0)));
+                    (IProgramVariable) children.get(0)));
         } else {
             addChild(x);
         }
@@ -138,7 +138,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             ExtList children = stack.peek();
             children.removeFirst();
             addNewChild(new ABSLocalVariableReference(
-            (IProgramVariable) children.get(0)));
+                    (IProgramVariable) children.get(0)));
         } else {
             addChild(x);
         }
@@ -160,8 +160,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             ExtList children = stack.peek();
             children.removeFirst();
             addNewChild(new CopyAssignment(
-            (IABSLocationReference) children.get(0),
-            (IABSPureExpression) children.get(1)));
+                    (IABSLocationReference) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -172,9 +172,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSAddExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSAddExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -185,9 +184,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSMultExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSMultExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -198,9 +196,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSOrBoolExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSOrBoolExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -211,9 +208,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSAndBoolExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSAndBoolExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -234,8 +230,6 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         }
     }
 
-    
-    
     @Override
     public void performActionOnProgramMetaConstruct(
             ProgramTransformer<ABSServices> x) {
@@ -267,8 +261,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
                     .removeFirstOccurrence(IProgramVariable.class);
             IABSExpression exp = children
                     .removeFirstOccurrence(IABSExpression.class);
-            addNewChild(new ABSVariableDeclarationStatement(
-            typeRef, var, exp));
+            addNewChild(new ABSVariableDeclarationStatement(typeRef, var, exp));
         } else {
             addChild(x);
         }
@@ -289,8 +282,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             for (int i = 0; i < children.size(); i++) {
                 arguments[i] = (IABSPureExpression) children.get(i);
             }
-            addNewChild(new ABSAsyncMethodCall(caller,
-            methodName, arguments));
+            addNewChild(new ABSAsyncMethodCall(caller, methodName, arguments));
         } else {
             addChild(x);
         }
@@ -309,8 +301,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             for (int i = 0; i < children.size(); i++) {
                 arguments[i] = (IABSPureExpression) children.get(i);
             }
-            addNewChild(new ABSDataConstructorExp(
-            constructor, arguments));
+            addNewChild(new ABSDataConstructorExp(constructor, arguments));
         } else {
             addChild(x);
         }
@@ -326,9 +317,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSEqExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSEqExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -339,9 +329,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSNotEqExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSNotEqExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -352,9 +341,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSGEQExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSGEQExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -365,9 +353,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSLTExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSLTExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -378,9 +365,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSLEQExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSLEQExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -391,9 +377,8 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSGTExp(
-            (IABSPureExpression) children.get(0),
-            (IABSPureExpression) children.get(1)));
+            addNewChild(new ABSGTExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
@@ -405,38 +390,37 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             ExtList children = stack.peek();
             children.removeFirst();
             addNewChild(new ABSIfStatement(
-            (IABSPureExpression) children.get(0),
-            (IABSStatement) children.get(1),
-            children.size() >= 3 ? (IABSStatement) children.get(2)
-                    : null));
+                    (IABSPureExpression) children.get(0),
+                    (IABSStatement) children.get(1),
+                    children.size() >= 3 ? (IABSStatement) children.get(2)
+                            : null));
         } else {
             addChild(x);
         }
     }
 
-	@Override
-	public void performActionOnABSContextStatementBlock(
-			ABSContextStatementBlock x) {
-		   if (hasChanged()) {
-	            ExtList children = stack.peek();
-	            children.removeFirst();
-	            final IABSStatement[] body = new IABSStatement[children.size()];
-	            for (int i = 0; i < children.size(); i++) {
-	                body[i] = (IABSStatement) children.get(i);
-	            }
-	            addNewChild(new ABSContextStatementBlock(body));
-	        } else {
-	            addChild(x);
-	        }
-	}
+    @Override
+    public void performActionOnABSContextStatementBlock(
+            ABSContextStatementBlock x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            final IABSStatement[] body = new IABSStatement[children.size()];
+            for (int i = 0; i < children.size(); i++) {
+                body[i] = (IABSStatement) children.get(i);
+            }
+            addNewChild(new ABSContextStatementBlock(body));
+        } else {
+            addChild(x);
+        }
+    }
 
     @Override
     public void performActionOnABSMinusExp(ABSMinusExp x) {
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new ABSMinusExp(
-            (IABSPureExpression) children.get(0)));
+            addNewChild(new ABSMinusExp((IABSPureExpression) children.get(0)));
         } else {
             addChild(x);
         }

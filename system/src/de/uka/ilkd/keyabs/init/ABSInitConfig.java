@@ -11,15 +11,15 @@ public class ABSInitConfig extends AbstractInitConfig {
     private ABSProofEnvironment env;
 
     public ABSInitConfig(ABSServices services, Profile profile) {
-        super(profile);        
+        super(profile);
         this.services = services;
         this.env = new ABSProofEnvironment(this);
     }
 
     @Override
     public ABSInitConfig copy() {
-        ABSInitConfig ic =  
-                new ABSInitConfig(services.copyPreservesLDTInformation(), profile);
+        ABSInitConfig ic = new ABSInitConfig(
+                services.copyPreservesLDTInformation(), profile);
         super.initCopy(ic);
         return ic;
     }
@@ -33,6 +33,5 @@ public class ABSInitConfig extends AbstractInitConfig {
     public ABSServices getServices() {
         return services;
     }
-    
 
 }

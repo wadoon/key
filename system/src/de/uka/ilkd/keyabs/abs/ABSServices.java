@@ -20,17 +20,18 @@ public class ABSServices extends AbstractServices {
     /**
      * specification repository
      */
-    private ABSSpecificationRepository specRepos = new ABSSpecificationRepository(this);
-    
-    public ABSServices () {
+    private ABSSpecificationRepository specRepos = new ABSSpecificationRepository(
+            this);
+
+    public ABSServices() {
         this(null, new KeYABSMapping());
     }
-    
-    public ABSServices (KeYABSMapping map) {
+
+    public ABSServices(KeYABSMapping map) {
         this(null, map);
     }
 
-    public ABSServices (KeYExceptionHandler handler) {
+    public ABSServices(KeYExceptionHandler handler) {
         this(handler, new KeYABSMapping());
     }
 
@@ -39,7 +40,7 @@ public class ABSServices extends AbstractServices {
         setTypeConverter(new ABSTypeConverter(this));
         this.info = new ABSInfo(this, program2key);
     }
-    
+
     @Override
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
@@ -108,11 +109,11 @@ public class ABSServices extends AbstractServices {
     }
 
     @Override
-	public UIConfiguration getUIConfiguration() {
-		return ABSProfile.UNPARSER;
-	}
+    public UIConfiguration getUIConfiguration() {
+        return ABSProfile.UNPARSER;
+    }
 
-	@Override
+    @Override
     public void saveNameRecorder(Node n) {
         n.setNameRecorder(nameRecorder);
         nameRecorder = new NameRecorder();

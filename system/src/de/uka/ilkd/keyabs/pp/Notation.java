@@ -24,11 +24,11 @@ import de.uka.ilkd.key.pp.INotation;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * Encapsulate the concrete syntax used to print a term. The {@link
- * NotationInfo} class associates a Notation with every {@link
- * de.uka.ilkd.key.logic.op.Operator}. The various inner classes of this class
- * represent different kinds of concrete syntax, like prefix, infix, postfix,
- * function style, attribute style, etc.
+ * Encapsulate the concrete syntax used to print a term. The
+ * {@link NotationInfo} class associates a Notation with every
+ * {@link de.uka.ilkd.key.logic.op.Operator}. The various inner classes of this
+ * class represent different kinds of concrete syntax, like prefix, infix,
+ * postfix, function style, attribute style, etc.
  */
 public abstract class Notation implements INotation {
 
@@ -37,38 +37,38 @@ public abstract class Notation implements INotation {
      */
     public static final class CastFunction extends Notation {
 
-	final String pre, post;
+        final String pre, post;
 
-	final int ass;
+        final int ass;
 
-	public CastFunction(String pre, String post, int prio, int ass) {
-	    super(prio);
-	    this.pre = pre;
-	    this.post = post;
-	    this.ass = ass;
-	}
+        public CastFunction(String pre, String post, int prio, int ass) {
+            super(prio);
+            this.pre = pre;
+            this.post = post;
+            this.ass = ass;
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printCast(pre, post, t, ass);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printCast(pre, post, t, ass);
+        }
     }
 
     /**
      * The standard concrete syntax for constants like true and false.
      */
     public static final class Constant extends Notation {
-	private final String name;
+        private final String name;
 
-	public Constant(String name, int prio) {
-	    super(prio);
-	    this.name = name;
-	}
+        public Constant(String name, int prio) {
+            super(prio);
+            this.name = name;
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printConstant(name);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printConstant(name);
+        }
     }
 
     /**
@@ -76,14 +76,14 @@ public abstract class Notation implements INotation {
      */
     public static final class ElementaryUpdateNotation extends Notation {
 
-	public ElementaryUpdateNotation() {
-	    super(150);
-	}
+        public ElementaryUpdateNotation() {
+            super(150);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printElementaryUpdate(":=", t, 0);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printElementaryUpdate(":=", t, 0);
+        }
     }
 
     /**
@@ -92,19 +92,19 @@ public abstract class Notation implements INotation {
     public static final class ElementOfNotation extends Notation {
         private String symbol;
 
-	public ElementOfNotation() {
-	    super(130);
-	}
-	
-	    public ElementOfNotation(String symbol){
-	        this();
-	        this.symbol = symbol;
-	    }
+        public ElementOfNotation() {
+            super(130);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printElementOf(t, symbol);
-	}
+        public ElementOfNotation(String symbol) {
+            this();
+            this.symbol = symbol;
+        }
+
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printElementOf(t, symbol);
+        }
     }
 
     /**
@@ -112,65 +112,64 @@ public abstract class Notation implements INotation {
      */
     public static final class FunctionNotation extends Notation {
 
-	public FunctionNotation() {
-	    super(130);
-	}
+        public FunctionNotation() {
+            super(130);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printFunctionTerm(t.op().name().toString(), t);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printFunctionTerm(t.op().name().toString(), t);
+        }
     }
 
-    
-    
     /**
      * The standard concrete syntax for conditional terms
      * <code>if (phi) (t1) (t2)</code>.
      */
     public static final class IfThenElse extends Notation {
 
-	private final String keyword;
+        private final String keyword;
 
-	public IfThenElse(int priority, String keyw) {
-	    super(priority);
-	    keyword = keyw;
-	}
+        public IfThenElse(int priority, String keyw) {
+            super(priority);
+            keyword = keyw;
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printIfThenElseTerm(t, keyword);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printIfThenElseTerm(t, keyword);
+        }
     }
 
     /**
      * The standard concrete syntax for infix operators.
      */
     public static final class Infix extends Notation {
-	private final String name;
-	private final int assLeft, assRight;
+        private final String name;
+        private final int assLeft, assRight;
 
-	public Infix(String name, int prio, int assLeft, int assRight) {
-	    super(prio);
-	    this.name = name;
-	    this.assLeft = assLeft;
-	    this.assRight = assRight;
-	}
+        public Infix(String name, int prio, int assLeft, int assRight) {
+            super(prio);
+            this.name = name;
+            this.assLeft = assLeft;
+            this.assRight = assRight;
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printInfixTerm(t.sub(0), assLeft, name, t.sub(1), assRight);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printInfixTerm(t.sub(0), assLeft, name, t.sub(1), assRight);
+        }
 
-	/**
+        /**
          * Print a term without beginning a new block. This calls the
          * {@link LogicPrinter#printTermContinuingBlock(Term)} method.
          */
-	@Override
-    public void printContinuingBlock(Term t, ILogicPrinter sp)
-		throws IOException {
-	    sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t.sub(1), assRight);
-	}
+        @Override
+        public void printContinuingBlock(Term t, ILogicPrinter sp)
+                throws IOException {
+            sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t.sub(1),
+                    assRight);
+        }
 
     }
 
@@ -178,470 +177,445 @@ public abstract class Notation implements INotation {
      * The standard concrete syntax for length.
      */
     public static final class LengthNotation extends Notation {
-	public LengthNotation() {
-	    super(130);
-	}
+        public LengthNotation() {
+            super(130);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printLength(t);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printLength(t);
+        }
     }
-    
 
-    
     /**
      * The standard concrete syntax for DL modalities box and diamond.
      */
     public static final class ModalityNotation extends Notation {
-	private final String left, right;
+        private final String left, right;
 
-	private final int ass;
+        private final int ass;
 
-	public ModalityNotation(String left, String right, int prio, int ass) {
-	    super(prio);
-	    this.left = left;
-	    this.right = right;
-	    this.ass = ass;
-	}
+        public ModalityNotation(String left, String right, int prio, int ass) {
+            super(prio);
+            this.left = left;
+            this.right = right;
+            this.ass = ass;
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    assert t.op() instanceof Modality;
-	    assert t.javaBlock() != null;
-	    sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            assert t.op() instanceof Modality;
+            assert t.javaBlock() != null;
+            sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
+        }
     }
-    
 
     /**
-     * The concrete syntax for DL modalities represented with a
-     * SchemaVariable.
+     * The concrete syntax for DL modalities represented with a SchemaVariable.
      */
     public static final class ModalSVNotation extends Notation {
-	private final int ass;
+        private final int ass;
 
-	public ModalSVNotation(int prio, int ass) {
-	    super(prio);
-	    this.ass = ass;
-	}
+        public ModalSVNotation(int prio, int ass) {
+            super(prio);
+            this.ass = ass;
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printModalityTerm("\\modality{" + t.op().name().toString()
-			+ "}", t.javaBlock(), "\\endmodality", t, ass);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printModalityTerm(
+                    "\\modality{" + t.op().name().toString() + "}",
+                    t.javaBlock(), "\\endmodality", t, ass);
+        }
     }
-    
 
     /**
-     * The standard concrete syntax for parallel updates 
+     * The standard concrete syntax for parallel updates
      */
     public static final class ParallelUpdateNotation extends Notation {
 
-	public ParallelUpdateNotation() {
-	    super(100);
-	}
+        public ParallelUpdateNotation() {
+            super(100);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    assert t.op() == UpdateJunctor.PARALLEL_UPDATE;
-	    
-	    sp.printParallelUpdate("||", t, 10);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            assert t.op() == UpdateJunctor.PARALLEL_UPDATE;
+
+            sp.printParallelUpdate("||", t, 10);
+        }
     }
 
-    
     /**
      * The standard concrete syntax for prefix operators.
      */
     public static final class Prefix extends Notation {
-	private final String name;
-	private final int ass;
+        private final String name;
+        private final int ass;
 
-	public Prefix(String name, int prio, int ass) {
-	    super(prio);
-	    this.name = name;
-	    this.ass = ass;
-	}
+        public Prefix(String name, int prio, int ass) {
+            super(prio);
+            this.name = name;
+            this.ass = ass;
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printPrefixTerm(name, t.sub(0), ass);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printPrefixTerm(name, t.sub(0), ass);
+        }
 
     }
-    
-    
+
     /**
      * The standard concrete syntax for quantifiers.
      */
     public static final class Quantifier extends Notation {
-	private final String name;
-	private final int ass;
+        private final String name;
+        private final int ass;
 
-	public Quantifier(String name, int prio, int ass) {
-	    super(prio);
-	    this.name = name;
-	    this.ass = ass;
-	}
+        public Quantifier(String name, int prio, int ass) {
+            super(prio);
+            this.name = name;
+            this.ass = ass;
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
+        }
 
-    }    
-    
-    
+    }
+
     public static final class SchemaVariableNotation extends VariableNotation {
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    // logger.debug("SSV: " + t+ " [" + t.op() + "]");
-	    Debug.assertTrue(t.op() instanceof SchemaVariable);
-	    Object o = sp.getInstantiations().getInstantiation(
-		    (SchemaVariable) (t.op()));
-	    if (o == null) {
-		// logger.debug("Instantiation of " + t+ " [" + t.op() + "]" + "
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            // logger.debug("SSV: " + t+ " [" + t.op() + "]");
+            Debug.assertTrue(t.op() instanceof SchemaVariable);
+            Object o = sp.getInstantiations().getInstantiation(
+                    (SchemaVariable) (t.op()));
+            if (o == null) {
+                // logger.debug("Instantiation of " + t+ " [" + t.op() + "]" + "
                 // not known.");
-		sp.printConstant(t.op().name().toString());
-	    } else {
-		if (o instanceof ProgramElement) {
-		    // logger.debug(t.toString() + " [" + t.op() + "]" + "
-                        // is a ProgramElement.");
-		    sp.printProgramElement((ProgramElement) o);
-		} else {
-		    // logger.debug("Instantiation of " + t+ " [" + t.op() +
-                        // "]" + " known.");
-		    if (o instanceof ImmutableList) {
-            @SuppressWarnings("unchecked")
-            final Iterator<Object> it = ((ImmutableList<Object>) o)
-				.iterator();
-			sp.getLayouter().print("{");
-			while (it.hasNext()) {
-			    final Object next = it.next();
-			    if (next instanceof Term) {
-				sp.printTerm((Term) o);
-			    } else {
-				sp.printConstant(o.toString());
-			    }
-			    if (it.hasNext()) {
-				sp.getLayouter().print(",");
-			    }
-			}
-			sp.getLayouter().print("}");
-		    } else {
-			Debug.assertTrue(o instanceof Term);
-			sp.printTerm((Term) o);
-		    }
-		}
-	    }
-	}
-    }    
-    
-    
+                sp.printConstant(t.op().name().toString());
+            } else {
+                if (o instanceof ProgramElement) {
+                    // logger.debug(t.toString() + " [" + t.op() + "]" + "
+                    // is a ProgramElement.");
+                    sp.printProgramElement((ProgramElement) o);
+                } else {
+                    // logger.debug("Instantiation of " + t+ " [" + t.op() +
+                    // "]" + " known.");
+                    if (o instanceof ImmutableList) {
+                        @SuppressWarnings("unchecked")
+                        final Iterator<Object> it = ((ImmutableList<Object>) o)
+                                .iterator();
+                        sp.getLayouter().print("{");
+                        while (it.hasNext()) {
+                            final Object next = it.next();
+                            if (next instanceof Term) {
+                                sp.printTerm((Term) o);
+                            } else {
+                                sp.printConstant(o.toString());
+                            }
+                            if (it.hasNext()) {
+                                sp.getLayouter().print(",");
+                            }
+                        }
+                        sp.getLayouter().print("}");
+                    } else {
+                        Debug.assertTrue(o instanceof Term);
+                        sp.printTerm((Term) o);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * The standard concrete syntax for select.
      */
     public static final class SelectNotation extends Notation {
-	public SelectNotation() {
-	    super(140);
-	}
+        public SelectNotation() {
+            super(140);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printSelect(t);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printSelect(t);
+        }
     }
 
-    
     /**
      * The standard concrete syntax for singleton sets.
      */
     public static final class SingletonNotation extends Notation {
 
-	public SingletonNotation() {
-	    super(130);
-	}
+        public SingletonNotation() {
+            super(130);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printSingleton(t);
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printSingleton(t);
+        }
     }
 
-    
     /**
-      * The standard concrete syntax for substitution terms.
-      */
+     * The standard concrete syntax for substitution terms.
+     */
     public static final class Subst extends Notation {
-	public Subst() {
-	    super(120);
-	}
+        public Subst() {
+            super(120);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    QuantifiableVariable v = instQV(t, sp, 1);
-	    final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
-		    .op() == Equality.EQUALS ? 75 : 60) : 110);
-	    sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
-		    assTarget);
-	}
-	
-	private QuantifiableVariable instQV(Term t, ILogicPrinter sp, int subTerm) {
-	    QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            QuantifiableVariable v = instQV(t, sp, 1);
+            final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75
+                    : 60)
+                    : 110);
+            sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
+                    assTarget);
+        }
 
-	    if (v instanceof SchemaVariable) {
-		Object object = (sp.getInstantiations()
-			.getInstantiation((SchemaVariable) v));
-		if (object != null) {
-		    Debug.assertTrue(object instanceof Term);
-		    Debug
-		    .assertTrue(((Term) object).op() instanceof QuantifiableVariable);
-		    v = (QuantifiableVariable) (((Term) object).op());
-		}
-	    }
-	    return v;
-	}
+        private QuantifiableVariable instQV(Term t, ILogicPrinter sp,
+                int subTerm) {
+            QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
+
+            if (v instanceof SchemaVariable) {
+                Object object = (sp.getInstantiations()
+                        .getInstantiation((SchemaVariable) v));
+                if (object != null) {
+                    Debug.assertTrue(object instanceof Term);
+                    Debug.assertTrue(((Term) object).op() instanceof QuantifiableVariable);
+                    v = (QuantifiableVariable) (((Term) object).op());
+                }
+            }
+            return v;
+        }
     }
-    
-    
+
     /**
      * The standard concrete syntax for update application.
      */
     public static final class UpdateApplicationNotation extends Notation {
 
-	public UpdateApplicationNotation() {
-	    super(115);
-	}
+        public UpdateApplicationNotation() {
+            super(115);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    assert t.op() == UpdateApplication.UPDATE_APPLICATION;
-	    final Operator targetOp = UpdateApplication.getTarget(t).op();
-	    final int assTarget 
-	    = (t.sort() == Sort.FORMULA 
-		    ? (targetOp.arity() == 1 ? 60 : 85) 
-			    : 110);
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            assert t.op() == UpdateApplication.UPDATE_APPLICATION;
+            final Operator targetOp = UpdateApplication.getTarget(t).op();
+            final int assTarget = (t.sort() == Sort.FORMULA ? (targetOp.arity() == 1 ? 60
+                    : 85)
+                    : 110);
 
-	    sp.printUpdateApplicationTerm("{", "}", t, assTarget);
-	}
+            sp.printUpdateApplicationTerm("{", "}", t, assTarget);
+        }
     }
-    
-    
+
     /**
      * The standard concrete syntax for all kinds of variables.
      */
     public static class VariableNotation extends Notation {
-	public VariableNotation() {
-	    super(1000);
-	}
+        public VariableNotation() {
+            super(1000);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    if (t.op() instanceof ProgramVariable) {
-		sp
-			.printConstant(t.op().name().toString().replaceAll(
-				"::", "."));
-	    } else {
-		Debug.out("Unknown variable type");
-		sp.printConstant(t.op().name().toString());
-	    }
-	}
-    }       
-    
-    
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            if (t.op() instanceof ProgramVariable) {
+                sp.printConstant(t.op().name().toString().replaceAll("::", "."));
+            } else {
+                Debug.out("Unknown variable type");
+                sp.printConstant(t.op().name().toString());
+            }
+        }
+    }
+
     /**
      * The standard concrete syntax for the character literal indicator `C'.
      */
     static final class CharLiteral extends Notation {
-	private static String printCharTerm(Term t) {
+        private static String printCharTerm(Term t) {
 
-	    char charVal = 0;
-	    int intVal = 0;
+            char charVal = 0;
+            int intVal = 0;
 
-	    String result = NumLiteral.printNumberTerm(t.sub(0));
+            String result = NumLiteral.printNumberTerm(t.sub(0));
 
-	    if (result == null) {
-		return null;
-	    }
+            if (result == null) {
+                return null;
+            }
 
-	    try {
-		intVal = Integer.parseInt(result);
-		charVal = (char) intVal;
-		if (intVal - charVal != 0)
-		    throw new NumberFormatException(); // overflow!
+            try {
+                intVal = Integer.parseInt(result);
+                charVal = (char) intVal;
+                if (intVal - charVal != 0)
+                    throw new NumberFormatException(); // overflow!
 
-	    } catch (NumberFormatException ex) {
-		System.out.println("Oops. " + result + " is not of type char");
-		return null;
-	    }
+            } catch (NumberFormatException ex) {
+                System.out.println("Oops. " + result + " is not of type char");
+                return null;
+            }
 
-	    return ("'" + Character.valueOf(charVal)).toString() + "'";
-	}
+            return ("'" + Character.valueOf(charVal)).toString() + "'";
+        }
 
-	public CharLiteral() {
-	    super(1000);
-	}
+        public CharLiteral() {
+            super(1000);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    final String charString = printCharTerm(t);
-	    if (charString != null) {
-		sp.printConstant(charString);
-	    } else {
-		sp.printFunctionTerm(t.op().name().toString(), t);
-	    }
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            final String charString = printCharTerm(t);
+            if (charString != null) {
+                sp.printConstant(charString);
+            } else {
+                sp.printFunctionTerm(t.op().name().toString(), t);
+            }
+        }
     }
-    
-    
-    
+
     /**
-     * The standard concrete syntax for the number literal indicator `Z'.
-     * This is only used in the `Pretty&amp;Untrue' syntax.
+     * The standard concrete syntax for the number literal indicator `Z'. This
+     * is only used in the `Pretty&amp;Untrue' syntax.
      */
     static final class NumLiteral extends Notation {
-	public static String printNumberTerm(Term numberTerm) {
-	    Term t = numberTerm;
+        public static String printNumberTerm(Term numberTerm) {
+            Term t = numberTerm;
 
-	    // skip number symbol /as this method may be called
-	    // e.g. by char literal we do not fail if the first is
-	    // not the number symbol
-	    if (t.op().name().equals(IntegerLDT.NUMBERS_NAME)) {
-		t = t.sub(0);
-	    }
+            // skip number symbol /as this method may be called
+            // e.g. by char literal we do not fail if the first is
+            // not the number symbol
+            if (t.op().name().equals(IntegerLDT.NUMBERS_NAME)) {
+                t = t.sub(0);
+            }
 
-	    final StringBuffer number = new StringBuffer();
-	    int offset = 0;
+            final StringBuffer number = new StringBuffer();
+            int offset = 0;
 
-	    if (t.op().name().toString().equals(
-		    IntegerLDT.NEGATIVE_LITERAL_STRING)) {
-		number.append("-");
-		t = t.sub(0);
-		offset = 1;
-	    }
+            if (t.op().name().toString()
+                    .equals(IntegerLDT.NEGATIVE_LITERAL_STRING)) {
+                number.append("-");
+                t = t.sub(0);
+                offset = 1;
+            }
 
-	    do {
-		final String opName = t.op().name() + "";
+            do {
+                final String opName = t.op().name() + "";
 
-		if (t.arity() != 1
-			|| (opName.length() != 1 || !Character.isDigit(opName
-				.charAt(0)))) {
-		    return null; // not a number
-		} else {
-		    number.insert(offset, opName);
-		}
-		t = t.sub(0);
-	    } while (t.arity() != 0);
+                if (t.arity() != 1
+                        || (opName.length() != 1 || !Character.isDigit(opName
+                                .charAt(0)))) {
+                    return null; // not a number
+                } else {
+                    number.insert(offset, opName);
+                }
+                t = t.sub(0);
+            } while (t.arity() != 0);
 
-	    return number.toString();
-	}
+            return number.toString();
+        }
 
-	public NumLiteral() {
-	    super(120);
-	}
+        public NumLiteral() {
+            super(120);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    final String number = printNumberTerm(t);
-	    if (number != null) {
-		sp.printConstant(number);
-	    } else {
-		sp.printFunctionTerm(t.op().name().toString(), t);
-	    }
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            final String number = printNumberTerm(t);
+            if (number != null) {
+                sp.printConstant(number);
+            } else {
+                sp.printFunctionTerm(t.op().name().toString(), t);
+            }
+        }
     }
-    
+
     /**
      * The standard concrete syntax for observer function terms.
      */
     static final class ObserverNotation extends Notation {
 
-	public ObserverNotation() {
-	    super(130);
-	}
+        public ObserverNotation() {
+            super(130);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printObserver(t);
-	}
-    }      
-    
-    
-    
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printObserver(t);
+        }
+    }
+
     /**
      * The standard concrete syntax for set comprehension.
      */
-    
-    
+
     /**
-     * The standard concrete syntax for the string literal indicator `cat'
-     * or `epsilon'.
+     * The standard concrete syntax for the string literal indicator `cat' or
+     * `epsilon'.
      */
     static final class StringLiteral extends Notation {
 
-	public static String printStringTerm(Term t) {
-	    String result = "\"";
-	    Term term = t;
-	    while (term.op().arity() != 0) {
-		result = result
-			+ CharLiteral.printCharTerm(term.sub(0)).charAt(1);
-		term = term.sub(1);
-	    }
-	    return (result + "\"");
-	}
+        public static String printStringTerm(Term t) {
+            String result = "\"";
+            Term term = t;
+            while (term.op().arity() != 0) {
+                result = result
+                        + CharLiteral.printCharTerm(term.sub(0)).charAt(1);
+                term = term.sub(1);
+            }
+            return (result + "\"");
+        }
 
-	public StringLiteral() {
-	    super(1000);
-	}
+        public StringLiteral() {
+            super(1000);
+        }
 
-	@Override
-    public void print(Term t, ILogicPrinter sp) throws IOException {
-	    sp.printConstant(printStringTerm(t));
-	}
+        @Override
+        public void print(Term t, ILogicPrinter sp) throws IOException {
+            sp.printConstant(printStringTerm(t));
+        }
     }
 
-    
     /**
-     * The priority of this operator in the given concrete syntax. This is
-     * used to determine whether parentheses are required around a subterm.
+     * The priority of this operator in the given concrete syntax. This is used
+     * to determine whether parentheses are required around a subterm.
      */
     private final int priority;
 
-    
     /** Create a Notation with a given priority. */
     protected Notation(int priority) {
-	this.priority = priority;
+        this.priority = priority;
     }
 
-    
     /** get the priority of the term */
     @Override
     public final int getPriority() {
-	return priority;
+        return priority;
     }
-    
 
     /**
-     * Print a term to a {@link LogicPrinter}. Concrete subclasses override
-     * this to call one of the <code>printXYZTerm</code> of
-     * {@link LogicPrinter}, which do the layout.
+     * Print a term to a {@link LogicPrinter}. Concrete subclasses override this
+     * to call one of the <code>printXYZTerm</code> of {@link LogicPrinter},
+     * which do the layout.
      */
     @Override
     public abstract void print(Term t, ILogicPrinter sp) throws IOException;
-    
 
     /**
      * Print a term without beginning a new block. See
-     * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea
-     * behind this. The standard implementation just delegates to
+     * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea behind
+     * this. The standard implementation just delegates to
      * {@link #print(Term,LogicPrinter)}
      */
     @Override
     public void printContinuingBlock(Term t, ILogicPrinter sp)
-	    throws IOException {
-	print(t, sp);
+            throws IOException {
+        print(t, sp);
     }
 }

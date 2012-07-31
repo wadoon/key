@@ -139,7 +139,8 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     }
 
     @Override
-    public void performActionOnABSVariableDeclarationStatement(ABSVariableDeclarationStatement x) {
+    public void performActionOnABSVariableDeclarationStatement(
+            ABSVariableDeclarationStatement x) {
         doDefaultAction(x);
     }
 
@@ -148,7 +149,7 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
         doDefaultAction(x);
     }
 
-    @Override 
+    @Override
     public void performActionOnABSNullExp(ABSNullExp x) {
         doDefaultAction(x);
     }
@@ -205,12 +206,13 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     }
 
     @Override
-    public void performActionOnABSContextStatementBlock(ABSContextStatementBlock x) {
+    public void performActionOnABSContextStatementBlock(
+            ABSContextStatementBlock x) {
         doDefaultAction(x);
     }
 
     @Override
     public void performActionOnABSMinusExp(ABSMinusExp x) {
-        doDefaultAction(x);        
+        doDefaultAction(x);
     }
 }

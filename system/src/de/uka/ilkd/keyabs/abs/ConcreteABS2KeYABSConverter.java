@@ -7,7 +7,8 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 public class ConcreteABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
 
-    public ConcreteABS2KeYABSConverter(Namespace<IProgramVariable> varns, IServices services) {
+    public ConcreteABS2KeYABSConverter(Namespace<IProgramVariable> varns,
+            IServices services) {
         super(services, varns);
     }
 
@@ -21,5 +22,4 @@ public class ConcreteABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         return pv.lookup(new Name(name));
     }
 
- 
 }

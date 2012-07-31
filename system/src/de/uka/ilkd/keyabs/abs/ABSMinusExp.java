@@ -14,7 +14,7 @@ public class ABSMinusExp extends ABSNonTerminalProgramElement implements
     }
 
     private final IABSPureExpression exp;
-    
+
     @Override
     public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {
         return exp.getKeYJavaType(services, ec);
@@ -37,8 +37,7 @@ public class ABSMinusExp extends ABSNonTerminalProgramElement implements
     public void visit(ABSVisitor v) {
         v.performActionOnABSMinusExp(this);
     }
-    
-    
+
     @Override
     public String toString() {
         return "-1*(" + exp.toString() + ")";

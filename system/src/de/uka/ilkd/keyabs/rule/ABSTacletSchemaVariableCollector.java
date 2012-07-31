@@ -13,8 +13,8 @@ public class ABSTacletSchemaVariableCollector extends
     @Override
     protected ImmutableList<SchemaVariable> collectSVInProgram(Term t,
             ImmutableList<SchemaVariable> vars) {
-        ABSProgramSVCollector prgSVColl = new ABSProgramSVCollector(
-                t.javaBlock().program(), vars, instantiations);
+        ABSProgramSVCollector prgSVColl = new ABSProgramSVCollector(t
+                .javaBlock().program(), vars, instantiations);
         prgSVColl.start();
         return prgSVColl.getSchemaVariables();
     }
@@ -23,12 +23,12 @@ public class ABSTacletSchemaVariableCollector extends
     protected ImmutableList<SchemaVariable> collectSVInProgram(JavaBlock jb,
             ImmutableList<SchemaVariable> vars) {
 
-        ABSProgramSVCollector prgSVColl = new ABSProgramSVCollector(jb.program(),
-                vars, instantiations);
+        ABSProgramSVCollector prgSVColl = new ABSProgramSVCollector(
+                jb.program(), vars, instantiations);
         prgSVColl.start();
         return prgSVColl.getSchemaVariables();
     }
-    
+
     @Override
     public void visit(Term t) {
         super.visit(t);

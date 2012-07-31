@@ -21,85 +21,75 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
-
-/** 
- * <p> 
- * Stores the mapping from operators to {@link Notation}s.  Each 
- * {@link Notation} represents the concrete syntax for some 
- * {@link de.uka.ilkd.key.logic.op.Operator}.  The {@link LogicPrinter}
- * asks the NotationInfo to find out which Notation to use for a given term.
+/**
  * <p>
- * The Notation associated with an operator might change.  New Notations can
- * be added.
+ * Stores the mapping from operators to {@link Notation}s. Each {@link Notation}
+ * represents the concrete syntax for some
+ * {@link de.uka.ilkd.key.logic.op.Operator}. The {@link LogicPrinter} asks the
+ * NotationInfo to find out which Notation to use for a given term.
+ * <p>
+ * The Notation associated with an operator might change. New Notations can be
+ * added.
  * 
  * <p>
- * The next lines describe a general rule how to determine priorities and 
+ * The next lines describe a general rule how to determine priorities and
  * associativities:
  * 
- *  One thing we need to know from the pretty printer:
- *  Given a term <tt>t</tt> containg <tt>s</tt> as proper subterm. 
- *  Then <tt>s</tt> is printed in parentheses when the priority of the
- *  top level symbol of <tt>s</tt> is strict less than the associativity of the 
- *  position where <tt>s</tt> occurs. For example:
- *  <p>
- *   Let the priority of <tt>AND</tt> be <tt>30</tt> and the associativities for each 
- * of its subterms be 40; <tt>OR</tt>s priority is <tt>20</tt> and the associativites are 
- * both <tt>30</tt> then 
- *     <ul> <li> formula <tt>(p & q) | r</tt> is pretty printed as <tt>p & q | r</tt>
- *         as the priority of & is 30 which is (greater or) equal than the 
- *         associativity of <tt>OR</tt>s left subterm which is 30.</li>
- *         <li> In contrast the formula <tt>p & (q | r)</tt> is pretty printed as 
- *         <tt>p & (q | r)</tt> as the priority of <tt>OR</tt> is 20 which is less than 
- *         the associativity of <tt>AND</tt>s left subterm, which is 40.</li>
- *     </ul> 
- *         
- * A general rule to determine the correct priority and associativity is to use: 
- *  
- *  Grammar rules whose derivation delivers a syntactical correct logic term should follow 
- *  a standard numbering scheme, which is used as indicator for priorities and associativites, 
- *  e.g. 
- *   by simply reading the grammar rule 
- *          <blockquote><tt>term60 ::= term70 (IMP term70)?</tt></blockquote> 
- *   we get the priority of <tt>IMP</tt>, which is <tt>60</tt>. The associativities 
- *   of <tt>IMP</tt>s subterms are not much more difficult to determine, namely    
- *   the left subterm has associativity <tt>70</tt> and in this case its the same 
- *   for the right subterm (<tt>70</tt>).
- *  <p>
- *  There are exceptional cases for
- *  <ul>
- *  <li> <em>infix function</em> symbols that are left associative e.g. 
- *  <code>-, +</code>
- *     <blockquote> 
- *         <tt> term90 ::= term100 (PLUS term100)* </tt>
- *     </blockquote>           
- * then the associative for the right subterm is increased by <tt>1</tt>, 
- * i.e. here we have a priority of <tt>90</tt> for <tt>PLUS</tt> as infix operator, 
- * a left associativity of <tt>100</tt> <em>and</em> a right associativity of <tt>101</tt>
- * </li>
- * <li> update and substituition terms: for them their associativity is 
- * determined dynamically by the pretty printer depending if it is applied on a 
- * formula or term. In principal there should be two different
- * rules in the parser as then we could reuse the general rule from above, but 
- * there are technical reasons which causes this exception.
- * </li>
- * <li> some very few rules do not follow the usual parser design 
- * e.g. like
- *     <blockquote><tt>R_PRIO ::= SubRule_ASS1 | SubRule_ASS2 </tt></blockquote>
- *   where
- *      <blockquote><tt>SubRule_ASS2 ::= OP SubRule_ASS1</tt></blockquote> 
- * Most of these few rules could in general be rewritten to fit the usual scheme
- * e.g. as
- * <blockquote><tt> R_PRIO ::= (OP)? SubRule_ASS1</tt></blockquote> 
- * using the priorities and associativities of the so rewritten rules 
- * (instead of rewriting them actually) is a way to cope with them.   
- * </li>
+ * One thing we need to know from the pretty printer: Given a term <tt>t</tt>
+ * containg <tt>s</tt> as proper subterm. Then <tt>s</tt> is printed in
+ * parentheses when the priority of the top level symbol of <tt>s</tt> is strict
+ * less than the associativity of the position where <tt>s</tt> occurs. For
+ * example:
+ * <p>
+ * Let the priority of <tt>AND</tt> be <tt>30</tt> and the associativities for
+ * each of its subterms be 40; <tt>OR</tt>s priority is <tt>20</tt> and the
+ * associativites are both <tt>30</tt> then
+ * <ul>
+ * <li>formula <tt>(p & q) | r</tt> is pretty printed as <tt>p & q | r</tt> as
+ * the priority of & is 30 which is (greater or) equal than the associativity of
+ * <tt>OR</tt>s left subterm which is 30.</li>
+ * <li>In contrast the formula <tt>p & (q | r)</tt> is pretty printed as
+ * <tt>p & (q | r)</tt> as the priority of <tt>OR</tt> is 20 which is less than
+ * the associativity of <tt>AND</tt>s left subterm, which is 40.</li>
+ * </ul>
+ * 
+ * A general rule to determine the correct priority and associativity is to use:
+ * 
+ * Grammar rules whose derivation delivers a syntactical correct logic term
+ * should follow a standard numbering scheme, which is used as indicator for
+ * priorities and associativites, e.g. by simply reading the grammar rule
+ * <blockquote><tt>term60 ::= term70 (IMP term70)?</tt></blockquote> we get the
+ * priority of <tt>IMP</tt>, which is <tt>60</tt>. The associativities of
+ * <tt>IMP</tt>s subterms are not much more difficult to determine, namely the
+ * left subterm has associativity <tt>70</tt> and in this case its the same for
+ * the right subterm (<tt>70</tt>).
+ * <p>
+ * There are exceptional cases for
+ * <ul>
+ * <li> <em>infix function</em> symbols that are left associative e.g.
+ * <code>-, +</code> <blockquote> <tt> term90 ::= term100 (PLUS term100)* </tt>
+ * </blockquote> then the associative for the right subterm is increased by
+ * <tt>1</tt>, i.e. here we have a priority of <tt>90</tt> for <tt>PLUS</tt> as
+ * infix operator, a left associativity of <tt>100</tt> <em>and</em> a right
+ * associativity of <tt>101</tt></li>
+ * <li>update and substituition terms: for them their associativity is
+ * determined dynamically by the pretty printer depending if it is applied on a
+ * formula or term. In principal there should be two different rules in the
+ * parser as then we could reuse the general rule from above, but there are
+ * technical reasons which causes this exception.</li>
+ * <li>some very few rules do not follow the usual parser design e.g. like
+ * <blockquote><tt>R_PRIO ::= SubRule_ASS1 | SubRule_ASS2 </tt></blockquote>
+ * where <blockquote><tt>SubRule_ASS2 ::= OP SubRule_ASS1</tt></blockquote> Most
+ * of these few rules could in general be rewritten to fit the usual scheme e.g.
+ * as <blockquote><tt> R_PRIO ::= (OP)? SubRule_ASS1</tt></blockquote> using the
+ * priorities and associativities of the so rewritten rules (instead of
+ * rewriting them actually) is a way to cope with them.</li>
  * </ul>
  */
 public final class NotationInfo implements INotationInfo {
-    
 
-
-    // Priorities of operators (roughly corresponding to the grammatical structure in the parser.
+    // Priorities of operators (roughly corresponding to the grammatical
+    // structure in the parser.
     static final int PRIORITY_TOP = 0;
     static final int PRIORITY_EQUIVALENCE = 20;
     static final int PRIORITY_IMP = 30;
@@ -119,268 +109,322 @@ public final class NotationInfo implements INotationInfo {
     static final int PRIORITY_ATOM = 130;
     static final int PRIORITY_BOTTOM = 140;
 
-
     public static boolean PRETTY_SYNTAX = true;
     /**
-     * Whether the very fancy notation is enabled
-     * in which Unicode characters for logical operators
-     * are printed.
+     * Whether the very fancy notation is enabled in which Unicode characters
+     * for logical operators are printed.
      */
     public static boolean UNICODE_ENABLED = false;
-        
-    
-    /** This maps operators and classes of operators to {@link
-     * Notation}s.  The idea is that we first look whether the operator has
-     * a Notation registered.  Otherwise, we see if there is one for the
-     * <em>class</em> of the operator.
+
+    /**
+     * This maps operators and classes of operators to {@link Notation}s. The
+     * idea is that we first look whether the operator has a Notation
+     * registered. Otherwise, we see if there is one for the <em>class</em> of
+     * the operator.
      */
     private HashMap<Object, Notation> notationTable;
 
     /**
-     * Caches for the different kinds of notations.
-     * If a cache is yet unused, a shallow clone
-     * of the current notation table is produced and assigned to it.
+     * Caches for the different kinds of notations. If a cache is yet unused, a
+     * shallow clone of the current notation table is produced and assigned to
+     * it.
      */
     private HashMap<Object, Notation> defaultNotationCache = null;
     private HashMap<Object, Notation> fancyNotationCache = null;
     private HashMap<Object, Notation> veryFancyNotationCache = null;
-    
-   
-    
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------    
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
 
     public NotationInfo() {
-    	createDefaultNotationTable();
+        createDefaultNotationTable();
     }
-    
-    
-    
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------     
-    
-        
+
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
+
     @Override
-	public AbbrevMap getAbbrevMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-        
-    
-    /** Get the Notation for a given Operator.  
-     * If no notation is registered, a Function notation is returned.
+    public AbbrevMap getAbbrevMap() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * Get the Notation for a given Operator. If no notation is registered, a
+     * Function notation is returned.
      */
     @Override
     public Notation getNotation(Operator op, IServices services) {
         Notation result = notationTable.get(op);
-        if(result != null) {
+        if (result != null) {
             return result;
         }
 
         result = notationTable.get(op.getClass());
-        if(result != null) {
+        if (result != null) {
             return result;
         }
 
-        if(op instanceof SchemaVariable) {
+        if (op instanceof SchemaVariable) {
             result = notationTable.get(SchemaVariable.class);
-            if(result != null) {
+            if (result != null) {
                 return result;
             }
         }
-        
-        if(op instanceof IProgramMethod) {
-           result = notationTable.get(IProgramMethod.class);
-           if(result != null) {
-               return result;
-           }
+
+        if (op instanceof IProgramMethod) {
+            result = notationTable.get(IProgramMethod.class);
+            if (result != null) {
+                return result;
+            }
         }
 
-        if(op instanceof IObserverFunction) {
-           result = notationTable.get(IObserverFunction.class);
-           if(result != null) {
-               return result;
-           }
+        if (op instanceof IObserverFunction) {
+            result = notationTable.get(IObserverFunction.class);
+            if (result != null) {
+                return result;
+            }
         }
 
-        if(op instanceof SortDependingFunction) {
-            result = notationTable.get(((SortDependingFunction)op).getKind());
-            if(result != null) {
+        if (op instanceof SortDependingFunction) {
+            result = notationTable.get(((SortDependingFunction) op).getKind());
+            if (result != null) {
                 return result;
             }
         }
 
         return new Notation.FunctionNotation();
     }
-    
+
     @Override
     public void refresh(IServices services) {
-	createDefaultNotationTable();
-	assert defaultNotationCache != null;
-	if(PRETTY_SYNTAX && services != null) {
-	    addFancyNotations(services);
-	    if (UNICODE_ENABLED)
-	        addVeryFancyNotations(services);
-	}
+        createDefaultNotationTable();
+        assert defaultNotationCache != null;
+        if (PRETTY_SYNTAX && services != null) {
+            addFancyNotations(services);
+            if (UNICODE_ENABLED)
+                addVeryFancyNotations(services);
+        }
     }
 
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
-    
     @Override
-	public void setAbbrevMap(AbbrevMap am) {
-		// TODO Auto-generated method stub
-		
-	}    
-        
-       
+    public void setAbbrevMap(AbbrevMap am) {
+        // TODO Auto-generated method stub
+
+    }
+
     /**
-     * Adds notations that can only be defined when a services object is 
+     * Adds notations that can only be defined when a services object is
      * available.
      */
     @SuppressWarnings("unchecked")
     private void addFancyNotations(IServices services) {
-        if (fancyNotationCache != null){
+        if (fancyNotationCache != null) {
             notationTable = fancyNotationCache;
             return;
         }
-        fancyNotationCache = (HashMap<Object,Notation>) defaultNotationCache.clone();
-    HashMap<Object,Notation> tbl = fancyNotationCache; 
-     
-	//arithmetic operators
-	final IntegerLDT integerLDT 
-		= services.getTypeConverter().getIntegerLDT();	
-	tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
-	tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
-	tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
-	tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
-	tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
-	tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
-	tbl.put(integerLDT.getSub(), new Notation.Infix("-", PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
-	tbl.put(integerLDT.getAdd(), new Notation.Infix("+", PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
-	tbl.put(integerLDT.getMul(), new Notation.Infix("*", PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
-	tbl.put(integerLDT.getDiv(), new Notation.Infix("/", PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
-	tbl.put(integerLDT.getMod(), new Notation.Infix("%", PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
-	tbl.put(integerLDT.getNeg(),new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
-	tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
-        	
-/*	//heap operators
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	if (heapLDT != null) {
-	    tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
-	    tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
-	    tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
-	    tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
-	}
-	
-        //set operators
-        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-        if (setLDT != null) {
-	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
-	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
-	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
-	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        }
-        
-	//string operators
-	final CharListLDT charListLDT 
-		= services.getTypeConverter().getCharListLDT();
-	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",PRIORITY_CAST,PRIORITY_ATOM,PRIORITY_ATOM));
-	tbl.put(charListLDT.getClCons(), new CharListNotation());
-	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
+        fancyNotationCache = (HashMap<Object, Notation>) defaultNotationCache
+                .clone();
+        HashMap<Object, Notation> tbl = fancyNotationCache;
 
-	*/
-	this.notationTable = tbl;
-    }
+        // arithmetic operators
+        final IntegerLDT integerLDT = services.getTypeConverter()
+                .getIntegerLDT();
+        tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
+        tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
+        tbl.put(integerLDT.getLessThan(), new Notation.Infix("<",
+                PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ",
+                PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=",
+                PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(">=",
+                PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(integerLDT.getSub(), new Notation.Infix("-",
+                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK,
+                PRIORITY_BELOW_ARITH_WEAK));
+        tbl.put(integerLDT.getAdd(), new Notation.Infix("+",
+                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK,
+                PRIORITY_BELOW_ARITH_WEAK));
+        tbl.put(integerLDT.getMul(), new Notation.Infix("*",
+                PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG,
+                PRIORITY_BELOW_ARITH_STRONG));
+        tbl.put(integerLDT.getDiv(), new Notation.Infix("/",
+                PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG,
+                PRIORITY_BELOW_ARITH_STRONG));
+        tbl.put(integerLDT.getMod(), new Notation.Infix("%",
+                PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG,
+                PRIORITY_BELOW_ARITH_STRONG));
+        tbl.put(integerLDT.getNeg(), new Notation.Prefix("-", PRIORITY_BOTTOM,
+                PRIORITY_ATOM));
+        tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-",
+                PRIORITY_BOTTOM, PRIORITY_ATOM));
 
-
-
-	/**
-     * Add notations with Unicode symbols.
-     * @param services
-     */
-    @SuppressWarnings("unchecked")
-    private void addVeryFancyNotations(IServices services){
-        if (veryFancyNotationCache != null){
-            notationTable = veryFancyNotationCache;
-            return;
-        }
-        veryFancyNotationCache = (HashMap<Object, Notation>) fancyNotationCache.clone();
-        HashMap<Object,Notation> tbl = veryFancyNotationCache;
-        
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
-        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-        tbl.put(Junctor.TRUE ,new Notation.Constant(""+UnicodeHelper.TOP, PRIORITY_ATOM));
-        tbl.put(Junctor.FALSE,new Notation.Constant(""+UnicodeHelper.BOT, PRIORITY_ATOM));
-        tbl.put(Junctor.NOT,new Notation.Prefix(""+UnicodeHelper.NEG ,PRIORITY_NEGATION,PRIORITY_NEGATION));
-        tbl.put(Junctor.AND,new Notation.Infix(""+UnicodeHelper.AND  ,PRIORITY_AND,PRIORITY_AND,PRIORITY_MODALITY));
-        tbl.put(Junctor.OR, new Notation.Infix(""+UnicodeHelper.OR  ,PRIORITY_OR,PRIORITY_OR,PRIORITY_AND));
-        tbl.put(Junctor.IMP,new Notation.Infix(""+UnicodeHelper.IMP ,PRIORITY_IMP,PRIORITY_OR,PRIORITY_IMP));
-        tbl.put(Equality.EQV,new Notation.Infix(""+UnicodeHelper.EQV,PRIORITY_EQUIVALENCE,PRIORITY_EQUIVALENCE,PRIORITY_IMP));
-        tbl.put(Quantifier.ALL,new Notation.Quantifier(""+UnicodeHelper.FORALL, PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-        tbl.put(Quantifier.EX, new Notation.Quantifier(""+UnicodeHelper.EXISTS, PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-        tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix(""+UnicodeHelper.LEQ, PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
-        tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(""+UnicodeHelper.GEQ, PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
-        tbl.put(setLDT.getEmpty(), new Notation.Constant(""+UnicodeHelper.EMPTY, PRIORITY_ATOM));
-        tbl.put(setLDT.getUnion(), new Notation.Infix(""+UnicodeHelper.UNION, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(setLDT.getIntersect(), new Notation.Infix(""+UnicodeHelper.INTERSECT, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
-        tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        /*
+         * //heap operators final HeapLDT heapLDT =
+         * services.getTypeConverter().getHeapLDT(); if (heapLDT != null) {
+         * tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+         * tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
+         * tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
+         * tbl.put(heapLDT.getLength(), new Notation.LengthNotation()); }
+         * 
+         * //set operators final LocSetLDT setLDT =
+         * services.getTypeConverter().getLocSetLDT(); if (setLDT != null) {
+         * tbl.put(setLDT.getEmpty(), new Notation.Constant("{}",
+         * PRIORITY_ATOM)); tbl.put(setLDT.getSingleton(), new
+         * Notation.SingletonNotation()); tbl.put(setLDT.getUnion(), new
+         * Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+         * tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap",
+         * PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+         * tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus",
+         * PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+         * tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
+         * tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset",
+         * PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP)); }
+         * 
+         * //string operators final CharListLDT charListLDT =
+         * services.getTypeConverter().getCharListLDT();
+         * tbl.put(charListLDT.getClConcat(), new
+         * Notation.Infix("+",PRIORITY_CAST,PRIORITY_ATOM,PRIORITY_ATOM));
+         * tbl.put(charListLDT.getClCons(), new CharListNotation());
+         * tbl.put(charListLDT.getClEmpty(), new
+         * Notation.Constant("\"\"",PRIORITY_BOTTOM));
+         */
         this.notationTable = tbl;
     }
 
+    /**
+     * Add notations with Unicode symbols.
+     * 
+     * @param services
+     */
+    @SuppressWarnings("unchecked")
+    private void addVeryFancyNotations(IServices services) {
+        if (veryFancyNotationCache != null) {
+            notationTable = veryFancyNotationCache;
+            return;
+        }
+        veryFancyNotationCache = (HashMap<Object, Notation>) fancyNotationCache
+                .clone();
+        HashMap<Object, Notation> tbl = veryFancyNotationCache;
 
+        final IntegerLDT integerLDT = services.getTypeConverter()
+                .getIntegerLDT();
+        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        tbl.put(Junctor.TRUE, new Notation.Constant("" + UnicodeHelper.TOP,
+                PRIORITY_ATOM));
+        tbl.put(Junctor.FALSE, new Notation.Constant("" + UnicodeHelper.BOT,
+                PRIORITY_ATOM));
+        tbl.put(Junctor.NOT, new Notation.Prefix("" + UnicodeHelper.NEG,
+                PRIORITY_NEGATION, PRIORITY_NEGATION));
+        tbl.put(Junctor.AND, new Notation.Infix("" + UnicodeHelper.AND,
+                PRIORITY_AND, PRIORITY_AND, PRIORITY_MODALITY));
+        tbl.put(Junctor.OR, new Notation.Infix("" + UnicodeHelper.OR,
+                PRIORITY_OR, PRIORITY_OR, PRIORITY_AND));
+        tbl.put(Junctor.IMP, new Notation.Infix("" + UnicodeHelper.IMP,
+                PRIORITY_IMP, PRIORITY_OR, PRIORITY_IMP));
+        tbl.put(Equality.EQV, new Notation.Infix("" + UnicodeHelper.EQV,
+                PRIORITY_EQUIVALENCE, PRIORITY_EQUIVALENCE, PRIORITY_IMP));
+        tbl.put(Quantifier.ALL, new Notation.Quantifier(""
+                + UnicodeHelper.FORALL, PRIORITY_QUANTIFIER,
+                PRIORITY_QUANTIFIER));
+        tbl.put(Quantifier.EX, new Notation.Quantifier(""
+                + UnicodeHelper.EXISTS, PRIORITY_QUANTIFIER,
+                PRIORITY_QUANTIFIER));
+        tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix(""
+                + UnicodeHelper.LEQ, PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK,
+                PRIORITY_ARITH_WEAK));
+        tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(""
+                + UnicodeHelper.GEQ, PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK,
+                PRIORITY_ARITH_WEAK));
+        tbl.put(setLDT.getEmpty(), new Notation.Constant(""
+                + UnicodeHelper.EMPTY, PRIORITY_ATOM));
+        tbl.put(setLDT.getUnion(), new Notation.Infix("" + UnicodeHelper.UNION,
+                PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getIntersect(), new Notation.Infix(""
+                + UnicodeHelper.INTERSECT, PRIORITY_ATOM, PRIORITY_TOP,
+                PRIORITY_TOP));
+        tbl.put(setLDT.getSetMinus(), new Notation.Infix(""
+                + UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP,
+                PRIORITY_TOP));
+        tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" "
+                + UnicodeHelper.IN + " "));
+        tbl.put(setLDT.getSubset(), new Notation.Infix(""
+                + UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP,
+                PRIORITY_TOP));
+        this.notationTable = tbl;
+    }
 
-	/** Register the standard set of notations (that can be defined without
-     * a services object).
+    /**
+     * Register the standard set of notations (that can be defined without a
+     * services object).
      */
     private void createDefaultNotationTable() {
-        if (defaultNotationCache != null){
+        if (defaultNotationCache != null) {
             notationTable = defaultNotationCache;
             return;
         }
-    defaultNotationCache = new HashMap<Object,Notation>();
-    HashMap<Object,Notation> tbl = defaultNotationCache;
-	
-	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));
-	tbl.put(Junctor.FALSE,new Notation.Constant("false", PRIORITY_ATOM));
-	tbl.put(Junctor.NOT,new Notation.Prefix("!" ,PRIORITY_NEGATION,PRIORITY_NEGATION));
-	tbl.put(Junctor.AND,new Notation.Infix("&"  ,PRIORITY_AND,PRIORITY_AND,PRIORITY_MODALITY));
-	tbl.put(Junctor.OR, new Notation.Infix("|"  ,PRIORITY_OR,PRIORITY_OR,PRIORITY_AND));
-	tbl.put(Junctor.IMP,new Notation.Infix("->" ,PRIORITY_IMP,PRIORITY_OR,PRIORITY_IMP));
-	tbl.put(Equality.EQV,new Notation.Infix("<->",PRIORITY_EQUIVALENCE,PRIORITY_EQUIVALENCE,PRIORITY_IMP));
-	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.TOUT,new Notation.ModalityNotation("\\[[","\\]]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.DIA_TRANSACTION,new Notation.ModalityNotation("\\diamond_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.BOX_TRANSACTION,new Notation.ModalityNotation("\\box_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(Modality.TOUT_TRANSACTION,new Notation.ModalityNotation("\\throughout_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
-	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
-	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
-	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());	
-	
-	tbl.put(Function.class, new Notation.FunctionNotation());               
-	tbl.put(LogicVariable.class, new Notation.VariableNotation());
-	tbl.put(LocationVariable.class, new Notation.VariableNotation());
+        defaultNotationCache = new HashMap<Object, Notation>();
+        HashMap<Object, Notation> tbl = defaultNotationCache;
+
+        tbl.put(Junctor.TRUE, new Notation.Constant("true", PRIORITY_ATOM));
+        tbl.put(Junctor.FALSE, new Notation.Constant("false", PRIORITY_ATOM));
+        tbl.put(Junctor.NOT, new Notation.Prefix("!", PRIORITY_NEGATION,
+                PRIORITY_NEGATION));
+        tbl.put(Junctor.AND, new Notation.Infix("&", PRIORITY_AND,
+                PRIORITY_AND, PRIORITY_MODALITY));
+        tbl.put(Junctor.OR, new Notation.Infix("|", PRIORITY_OR, PRIORITY_OR,
+                PRIORITY_AND));
+        tbl.put(Junctor.IMP, new Notation.Infix("->", PRIORITY_IMP,
+                PRIORITY_OR, PRIORITY_IMP));
+        tbl.put(Equality.EQV, new Notation.Infix("<->", PRIORITY_EQUIVALENCE,
+                PRIORITY_EQUIVALENCE, PRIORITY_IMP));
+        tbl.put(Quantifier.ALL, new Notation.Quantifier("\\forall",
+                PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+        tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists",
+                PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+        tbl.put(Modality.DIA, new Notation.ModalityNotation("\\<", "\\>",
+                PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.BOX, new Notation.ModalityNotation("\\[", "\\]",
+                PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.TOUT, new Notation.ModalityNotation("\\[[", "\\]]",
+                PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.DIA_TRANSACTION, new Notation.ModalityNotation(
+                "\\diamond_transaction", "\\endmodality", PRIORITY_MODALITY,
+                PRIORITY_POST_MODALITY));
+        tbl.put(Modality.BOX_TRANSACTION, new Notation.ModalityNotation(
+                "\\box_transaction", "\\endmodality", PRIORITY_MODALITY,
+                PRIORITY_POST_MODALITY));
+        tbl.put(Modality.TOUT_TRANSACTION, new Notation.ModalityNotation(
+                "\\throughout_transaction", "\\endmodality", PRIORITY_MODALITY,
+                PRIORITY_POST_MODALITY));
+        tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM,
+                "\\if"));
+        tbl.put(WarySubstOp.SUBST, new Notation.Subst());
+        tbl.put(UpdateApplication.UPDATE_APPLICATION,
+                new Notation.UpdateApplicationNotation());
+        tbl.put(UpdateJunctor.PARALLEL_UPDATE,
+                new Notation.ParallelUpdateNotation());
+
+        tbl.put(Function.class, new Notation.FunctionNotation());
+        tbl.put(LogicVariable.class, new Notation.VariableNotation());
+        tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
-	tbl.put(Equality.class, new Notation.Infix("=", PRIORITY_EQUAL, PRIORITY_COMPARISON, PRIORITY_COMPARISON)); 
-	tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
-	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
-	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
-	
-	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
-	this.notationTable = tbl;
+        tbl.put(Equality.class, new Notation.Infix("=", PRIORITY_EQUAL,
+                PRIORITY_COMPARISON, PRIORITY_COMPARISON));
+        tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
+        tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(
+                PRIORITY_MODALITY, PRIORITY_MODALITY));
+        tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
+
+        tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(", ")",
+                PRIORITY_CAST, PRIORITY_BOTTOM));
+        this.notationTable = tbl;
     }
 }

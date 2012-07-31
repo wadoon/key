@@ -19,60 +19,63 @@ public class SchemaABSReader implements SchemaJavaReader {
 
     private static final String SCHEMA_MODULE = "module SCHEMA_TACLET_READ_MODULE;";
     private Namespace schemaVariables = new Namespace();;
-    
+
     private void printTree(ASTNode node) {
-        for (int i = 0; i<node.getNumChild(); i++) {
-            System.out.println(node.value + ":" + node + ":" + node.getClass().getSimpleName());
+        for (int i = 0; i < node.getNumChild(); i++) {
+            System.out.println(node.value + ":" + node + ":"
+                    + node.getClass().getSimpleName());
             printTree(node.getChild(i));
         }
     }
-    
+
     @Override
     public JavaBlock readBlockWithEmptyContext(String s, IServices services) {
-    	String blockStr = s;
+        String blockStr = s;
         boolean isContextBlock = false;
         if (blockStr.startsWith("{..") && blockStr.endsWith("...}")) {
-        	isContextBlock = true;
-        	blockStr = blockStr.replace("{..", "{");
-        	blockStr = blockStr.replace("...}", "}");
+            isContextBlock = true;
+            blockStr = blockStr.replace("{..", "{");
+            blockStr = blockStr.replace("...}", "}");
         }
-    	
-    	blockStr = SCHEMA_MODULE + " \n " + blockStr;
 
-        
+        blockStr = SCHEMA_MODULE + " \n " + blockStr;
 
         CoreAbsBackend absReader = new CoreAbsBackend();
         absReader.setWithStdLib(false);
         absReader.setAllowIncompleteExpr(true);
         try {
-            System.out.println("ParseInput: "+ blockStr);
-            
-            
-            Model m = absReader.parse(File.createTempFile("taclet_", ".keyabs"), blockStr, new StringReader(blockStr));
-            
-            
-            System.out.println(m.getMainBlock() + " Errors: "+m.getErrors().size());
-            
+            System.out.println("ParseInput: " + blockStr);
+
+            Model m = absReader.parse(
+                    File.createTempFile("taclet_", ".keyabs"), blockStr,
+                    new StringReader(blockStr));
+
+            System.out.println(m.getMainBlock() + " Errors: "
+                    + m.getErrors().size());
+
             for (SemanticError se : m.getErrors()) {
-                System.out.println(se.getHelpMessage() + " : " + se.getFileName() + " : " + se.getMsgString());
+                System.out.println(se.getHelpMessage() + " : "
+                        + se.getFileName() + " : " + se.getMsgString());
             }
-            
-            AbstractABS2KeYABSConverter converter = new SchemaABS2KeYABSConverter(schemaVariables, services);
-           
-            
+
+            AbstractABS2KeYABSConverter converter = new SchemaABS2KeYABSConverter(
+                    schemaVariables, services);
+
             ABSStatementBlock block = converter.convert(m.getMainBlock());
-            
+
             if (isContextBlock) {
-            	block = new ABSContextStatementBlock(block.getBody());
+                block = new ABSContextStatementBlock(block.getBody());
             }
-            
+
             System.out.println("Converted " + block);
-            
+
             return JavaBlock.createJavaBlock(block);
         } catch (IOException e) {
-            throw new ConvertException("Failed to parser schema block of taclet.", e);
+            throw new ConvertException(
+                    "Failed to parser schema block of taclet.", e);
         } catch (Exception e) {
-            throw new ConvertException("Failed to parser schema block of taclet.", e);
+            throw new ConvertException(
+                    "Failed to parser schema block of taclet.", e);
         }
     }
 
@@ -82,8 +85,8 @@ public class SchemaABSReader implements SchemaJavaReader {
     }
 
     @Override
-    public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns,
-            IServices services, String s) {
+    public JavaBlock readBlockWithProgramVariables(
+            Namespace<IProgramVariable> varns, IServices services, String s) {
         return null;
     }
 

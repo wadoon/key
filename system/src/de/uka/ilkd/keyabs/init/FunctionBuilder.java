@@ -21,101 +21,106 @@ import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 public class FunctionBuilder {
 
     public void createAndRegisterABSFunctions(ABSInitConfig initConfig) {
-	
-	final ABSServices services = initConfig.getServices();
-	final ABSInfo info = services.getProgramInfo();
-	final HistoryLDT historyLDT = services.getTypeConverter().getHistoryLDT();
 
-	final Namespace<SortedOperator> funcNS = initConfig.getServices()
-		.getNamespaces().functions();
-	Collection<List<DataConstructor>> dataType2ConstructorMap = info.getABSParserInfo()
-		.getDatatypes().getDataTypes2dataConstructors().values();
-	
-	createConstructorFunctions(info, funcNS, dataType2ConstructorMap);
+        final ABSServices services = initConfig.getServices();
+        final ABSInfo info = services.getProgramInfo();
+        final HistoryLDT historyLDT = services.getTypeConverter()
+                .getHistoryLDT();
 
-	createConstructorFunctions(info, funcNS, info.getABSParserInfo().getParametricDatatypes().getDataTypes2dataConstructors().values());
+        final Namespace<SortedOperator> funcNS = initConfig.getServices()
+                .getNamespaces().functions();
+        Collection<List<DataConstructor>> dataType2ConstructorMap = info
+                .getABSParserInfo().getDatatypes()
+                .getDataTypes2dataConstructors().values();
 
-	System.out.println("Register Interface Label Constants");
+        createConstructorFunctions(info, funcNS, dataType2ConstructorMap);
 
-	for (Name itf : info.getABSParserInfo().getInterfaces().keySet()) {
-	    Function interfaceLabel = new Function(itf,
-		    services.getTypeConverter().getHistoryLDT()
-			    .getInterfaceLabelSort(), new Sort[0], null, true);
-	    funcNS.add(interfaceLabel);
-	}
+        createConstructorFunctions(info, funcNS, info.getABSParserInfo()
+                .getParametricDatatypes().getDataTypes2dataConstructors()
+                .values());
 
-	System.out.println("Register Class Label Constants");
+        System.out.println("Register Interface Label Constants");
 
-	for (Name className : info.getABSParserInfo().getClasses().keySet()) {
-	    Function classLabel = new Function(className,
-		    historyLDT.getClassLabelSort(), new Sort[0], null, true);
-	    funcNS.add(classLabel);
-	}
+        for (Name itf : info.getABSParserInfo().getInterfaces().keySet()) {
+            Function interfaceLabel = new Function(itf,
+                    services.getTypeConverter().getHistoryLDT()
+                            .getInterfaceLabelSort(), new Sort[0], null, true);
+            funcNS.add(interfaceLabel);
+        }
 
-	System.out.println("Register Method Label Constants");
-	//TODO
-	
-	//Register ABS functions
+        System.out.println("Register Class Label Constants");
 
-	System.out.println("Register future getters");
+        for (Name className : info.getABSParserInfo().getClasses().keySet()) {
+            Function classLabel = new Function(className,
+                    historyLDT.getClassLabelSort(), new Sort[0], null, true);
+            funcNS.add(classLabel);
+        }
 
-	GenericSort depSort = new GenericSort(new Name("T"));
-	SortDependingFunction futGetterProto = SortDependingFunction
-		.createFirstInstance(depSort, new Name("get"), depSort,
-			new Sort[] { historyLDT.targetSort() }, false);
+        System.out.println("Register Method Label Constants");
+        // TODO
 
-	for (KeYJavaType t : info.getAllKeYJavaTypes()) {
-	    if (t.getSort().extendsTrans(historyLDT.getFutureSort())) {
-		futGetterProto.getInstanceFor(t.getSort(), initConfig.getServices());
-	    }
-	}
+        // Register ABS functions
 
-	
-	
-	
+        System.out.println("Register future getters");
+
+        GenericSort depSort = new GenericSort(new Name("T"));
+        SortDependingFunction futGetterProto = SortDependingFunction
+                .createFirstInstance(depSort, new Name("get"), depSort,
+                        new Sort[] { historyLDT.targetSort() }, false);
+
+        for (KeYJavaType t : info.getAllKeYJavaTypes()) {
+            if (t.getSort().extendsTrans(historyLDT.getFutureSort())) {
+                futGetterProto.getInstanceFor(t.getSort(),
+                        initConfig.getServices());
+            }
+        }
+
     }
 
     private void createConstructorFunctions(final ABSInfo info,
-	    final Namespace<SortedOperator> funcNS,
-	    Collection<List<DataConstructor>> dataType2ConstructorMap) {
-	for (final List<DataConstructor> constructors : dataType2ConstructorMap) {
-	    for (DataConstructor c : constructors) {
-		final Sort[] argSorts = new Sort[c.getConstructorArgList().getNumChild()];
+            final Namespace<SortedOperator> funcNS,
+            Collection<List<DataConstructor>> dataType2ConstructorMap) {
+        for (final List<DataConstructor> constructors : dataType2ConstructorMap) {
+            for (DataConstructor c : constructors) {
+                final Sort[] argSorts = new Sort[c.getConstructorArgList()
+                        .getNumChild()];
 
-		try {
-		    int count = 0;
-		    for (ConstructorArg arg : c.getConstructorArgs()) {
-			if (arg.getType().isTypeParameter()) {
-			    argSorts[count++] = Sort.ANY;
-			} else {
-			    argSorts[count++] = info.getTypeByName(
-				arg.getType().getQualifiedName()).getSort();
-			}
-		    }
-		    if (count == argSorts.length) {
-			// create unique function symbol
-			final String fullyQualifiedName = c.getModule()
-				.getName()
-				+ "."
-				+ c.getDataTypeDecl().getName();
-			
-			System.out.println(c.getType().getQualifiedName() + "<====");
-			
-			Sort returnSort = info.getTypeByName(c.getType().getQualifiedName()).getSort();
-			Function constructorFct = new Function(
-				new ProgramElementName(c.getName(),
-					fullyQualifiedName), returnSort,
-				argSorts, null, true);
+                try {
+                    int count = 0;
+                    for (ConstructorArg arg : c.getConstructorArgs()) {
+                        if (arg.getType().isTypeParameter()) {
+                            argSorts[count++] = Sort.ANY;
+                        } else {
+                            argSorts[count++] = info.getTypeByName(
+                                    arg.getType().getQualifiedName()).getSort();
+                        }
+                    }
+                    if (count == argSorts.length) {
+                        // create unique function symbol
+                        final String fullyQualifiedName = c.getModule()
+                                .getName()
+                                + "."
+                                + c.getDataTypeDecl().getName();
 
-			System.out.println(constructorFct + "<====");
+                        System.out.println(c.getType().getQualifiedName()
+                                + "<====");
 
-			funcNS.add(constructorFct);
-		    }
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-	    }
-	}
+                        Sort returnSort = info.getTypeByName(
+                                c.getType().getQualifiedName()).getSort();
+                        Function constructorFct = new Function(
+                                new ProgramElementName(c.getName(),
+                                        fullyQualifiedName), returnSort,
+                                argSorts, null, true);
+
+                        System.out.println(constructorFct + "<====");
+
+                        funcNS.add(constructorFct);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }

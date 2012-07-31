@@ -159,7 +159,7 @@ public final class LogicPrinter implements ILogicPrinter {
             } else if (o == MARK_END_FIRST_STMT) {
                 firstStmtRange = new Range(firstStmtStart, count() - pos);
                 ((ModalityPositionTable) posTbl)
-                .setFirstStatementRange(firstStmtRange);
+                        .setFirstStatementRange(firstStmtRange);
             } else if (o == MARK_START_UPDATE) {
                 updateStarts.push(count());
             } else if (o == MARK_END_UPDATE) {
@@ -872,7 +872,7 @@ public final class LogicPrinter implements ILogicPrinter {
         startTerm(phi.arity());
         layouter.beginC(2).ind().print(left);
         printJavaBlock(jb);
-        layouter.ind(0,-2).print(right).end();
+        layouter.ind(0, -2).print(right).end();
 
         if (phi.arity() == 1) {
             maybeParens(phi.sub(0), ass);
@@ -1004,7 +1004,7 @@ public final class LogicPrinter implements ILogicPrinter {
     @Override
     public void printQuantifierTerm(String name,
             ImmutableArray<QuantifiableVariable> vars, Term phi, int ass)
-                    throws IOException {
+            throws IOException {
         layouter.beginC(2);
         layouter.print(name).print(" ");
         printVariables(vars);
@@ -1038,7 +1038,7 @@ public final class LogicPrinter implements ILogicPrinter {
     @Override
     public void printSemisequent(
             ImmutableList<SequentPrintFilterEntry> p_formulas)
-                    throws IOException {
+            throws IOException {
         Iterator<SequentPrintFilterEntry> it = p_formulas.iterator();
         SequentPrintFilterEntry entry;
         int size = p_formulas.size();
@@ -1326,7 +1326,7 @@ public final class LogicPrinter implements ILogicPrinter {
     @Override
     public void printTermContinuingBlock(Term t) throws IOException {
         notationInfo.getNotation(t.op(), services)
-        .printContinuingBlock(t, this);
+                .printContinuingBlock(t, this);
     }
 
     /*
@@ -1395,7 +1395,7 @@ public final class LogicPrinter implements ILogicPrinter {
             throw new RuntimeException("IO Exception in pretty printer:\n" + e);
         }
         return new StringBuffer(((PosTableStringBackend) backend).getString())
-        .append("\n");
+                .append("\n");
     }
 
     /*
@@ -1657,7 +1657,7 @@ public final class LogicPrinter implements ILogicPrinter {
         if (tgt.name() != null) {
             if (tgt.name().length() > 0) {
                 layouter.brk().beginC(2).print("\"" + tgt.name() + "\"")
-                .print(":");
+                        .print(":");
             }
 
         }
@@ -1958,7 +1958,8 @@ public final class LogicPrinter implements ILogicPrinter {
                 markFirstStatement = false;
                 mark(MARK_END_FIRST_STMT);
             }
-            if (i < x.getStatementCount() - 1) layouter.brk(1);
+            if (i < x.getStatementCount() - 1)
+                layouter.brk(1);
         }
     }
 
@@ -2027,19 +2028,20 @@ public final class LogicPrinter implements ILogicPrinter {
     public void printABSIfStatement(ABSIfStatement x) throws IOException {
         layouter.beginC(2).print("if").ind(1, 0).print("(");
         x.getCondition().visit(programPrettyPrinter);
-        layouter.print(")").brk(1,0);
+        layouter.print(")").brk(1, 0);
         x.getThenBranch().visit(programPrettyPrinter);
         if (x.getElseBranch() != null) {
             layouter.brk(1, -2);
-            layouter.print("else").brk(1,0);
+            layouter.print("else").brk(1, 0);
             x.getElseBranch().visit(programPrettyPrinter);
         } else {
-            layouter.brk(1,-2);
+            layouter.brk(1, -2);
         }
         layouter.end();
     }
 
-    public void printABSContextStatementBlock(ABSContextStatementBlock x) throws IOException {
+    public void printABSContextStatementBlock(ABSContextStatementBlock x)
+            throws IOException {
         layouter.print("{").beginC(2).brk().ind();
         printStatementList(x);
         layouter.brk(1, -2).end().print("}");

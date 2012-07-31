@@ -18,77 +18,76 @@ import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
 
 public class ABSProblemInitializer extends
-	AbstractProblemInitializer<ABSServices, ABSInitConfig> {
+        AbstractProblemInitializer<ABSServices, ABSInitConfig> {
 
     public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
-	    boolean registerProof, ProblemInitializerListener listener) {
-	this(mon, profile, (ABSServices) profile
-		.createServices(new KeYRecoderExcHandler()), registerProof,
-		listener);
+            boolean registerProof, ProblemInitializerListener listener) {
+        this(mon, profile, (ABSServices) profile
+                .createServices(new KeYRecoderExcHandler()), registerProof,
+                listener);
     }
 
     public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
-	    ABSServices services, boolean registerProof,
-	    ProblemInitializerListener listener) {
-	super(mon, profile, services, registerProof, listener);
+            ABSServices services, boolean registerProof,
+            ProblemInitializerListener listener) {
+        super(mon, profile, services, registerProof, listener);
     }
 
     @Override
     protected IKeYFile createKeYFile(Includes in, String name) {
-	return new ABSKeYFile(name, in.get(name), progMon);
+        return new ABSKeYFile(name, in.get(name), progMon);
     }
 
     @Override
     protected IKeYFile createTacletBaseKeYFile() {
-	return new ABSKeYFile("taclet base", profile.getStandardRules()
-		.getTacletBase(), progMon);
+        return new ABSKeYFile("taclet base", profile.getStandardRules()
+                .getTacletBase(), progMon);
     }
 
     @Override
     protected void readJava(EnvInput envInput, ABSInitConfig initConfig)
-	    throws ProofInputException {
+            throws ProofInputException {
 
-	envInput.setInitConfig(initConfig);
+        envInput.setInitConfig(initConfig);
 
-	ABSModelParserInfo parserInfo = initConfig.getServices()
-		.getProgramInfo().getABSParserInfo();
+        ABSModelParserInfo parserInfo = initConfig.getServices()
+                .getProgramInfo().getABSParserInfo();
 
-	String absPath = envInput.readJavaPath();
-	JavaModel absModelDescription;
-	if (absPath != null) {
-	    String modelTag = "KeYABS_"
-		    + new Long((new java.util.Date()).getTime());
-	    absModelDescription = new JavaModel(absPath, modelTag,
-		    new LinkedList<File>(), null);
-	} else {
-	    absModelDescription = JavaModel.NO_MODEL;
-	}
+        String absPath = envInput.readJavaPath();
+        JavaModel absModelDescription;
+        if (absPath != null) {
+            String modelTag = "KeYABS_"
+                    + new Long((new java.util.Date()).getTime());
+            absModelDescription = new JavaModel(absPath, modelTag,
+                    new LinkedList<File>(), null);
+        } else {
+            absModelDescription = JavaModel.NO_MODEL;
+        }
 
-	parserInfo.setup(absModelDescription);
-	try {
-	    parserInfo.readABSModel();
-	} catch (IOException e) {
-	    throw new ProofInputException(e);
-	}
+        parserInfo.setup(absModelDescription);
+        try {
+            parserInfo.readABSModel();
+        } catch (IOException e) {
+            throw new ProofInputException(e);
+        }
 
-	initConfig.getProofEnv().setJavaModel(absModelDescription);
+        initConfig.getProofEnv().setJavaModel(absModelDescription);
     }
 
     @Override
     protected void registerProgramDefinedSymbols(ABSInitConfig initConfig)
-	    throws ProofInputException {
+            throws ProofInputException {
 
-	// create and register program defined sorts
-	final SortBuilder sb = new SortBuilder();
-	sb.createAndRegisterSorts(initConfig);
+        // create and register program defined sorts
+        final SortBuilder sb = new SortBuilder();
+        sb.createAndRegisterSorts(initConfig);
 
-	// create and register program defined or implied function symbols
-	final FunctionBuilder fb = new FunctionBuilder();
-	fb.createAndRegisterABSFunctions(initConfig);
+        // create and register program defined or implied function symbols
+        final FunctionBuilder fb = new FunctionBuilder();
+        fb.createAndRegisterABSFunctions(initConfig);
 
-	// create and register rules for function definitions
-	//TODO
-	
+        // create and register rules for function definitions
+        // TODO
 
     }
 

@@ -23,15 +23,14 @@ import de.uka.ilkd.keyabs.strategy.ABSDLStrategy;
 
 public class ABSProfile extends AbstractProfile {
 
-    private final static StrategyFactory DEFAULT =
-            new ABSDLStrategy.Factory();
+    private final static StrategyFactory DEFAULT = new ABSDLStrategy.Factory();
     public static final UIConfiguration UNPARSER = new ABSUIConfiguration();
 
     public ABSProfile() {
-        super("standardRulesABS.key", ABSProof.class,
-                DefaultImmutableSet.<GoalChooserBuilder>nil().
-                add(new DefaultGoalChooserBuilder()).
-                add(new DepthFirstGoalChooserBuilder()));
+        super("standardRulesABS.key", ABSProof.class, DefaultImmutableSet
+                .<GoalChooserBuilder> nil()
+                .add(new DefaultGoalChooserBuilder())
+                .add(new DepthFirstGoalChooserBuilder()));
     }
 
     @Override
@@ -56,31 +55,31 @@ public class ABSProfile extends AbstractProfile {
         set = set.add(DEFAULT);
         return set;
     }
-    
+
     /**
      * <p>
-     * Returns the {@link OneStepSimplifier} instance which should be used
-     * in this {@link JavaProfile}. It is added to the build in rules via
+     * Returns the {@link OneStepSimplifier} instance which should be used in
+     * this {@link JavaProfile}. It is added to the build in rules via
      * {@link #initBuiltInRules()}.
      * </p>
      * <p>
-     * Sub profiles may exchange the {@link OneStepSimplifier} instance,
-     * for instance for site proofs used in the symbolic execution tree extraction.
-     * </p> 
+     * Sub profiles may exchange the {@link OneStepSimplifier} instance, for
+     * instance for site proofs used in the symbolic execution tree extraction.
+     * </p>
+     * 
      * @return The {@link OneStepSimplifier} instance to use.
      */
     protected OneStepSimplifier getInitialOneStepSimpilifier() {
-       return OneStepSimplifier.INSTANCE;
+        return OneStepSimplifier.INSTANCE;
     }
-    
+
     @Override
-    protected ImmutableList<BuiltInRule> initBuiltInRules() {       
+    protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
-        
+
         builtInRules = builtInRules.prepend(getInitialOneStepSimpilifier());
         return builtInRules;
     }
-
 
     @Override
     public UIConfiguration getUIConfiguration() {

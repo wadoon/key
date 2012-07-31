@@ -3,9 +3,8 @@ package de.uka.ilkd.keyabs.abs;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
-
-public class ABSLocalVariableReference extends ABSVariableReference
-                                       implements IABSLocalVariableReference {
+public class ABSLocalVariableReference extends ABSVariableReference implements
+        IABSLocalVariableReference {
 
     public ABSLocalVariableReference(IProgramVariable variable, PositionInfo pos) {
         super(variable, pos);
@@ -29,5 +28,5 @@ public class ABSLocalVariableReference extends ABSVariableReference
     public IProgramVariable getProgramVariable() {
         return getVariable();
     }
-    
+
 }

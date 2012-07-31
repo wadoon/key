@@ -8,7 +8,6 @@
 //
 //
 
-
 package de.uka.ilkd.keyabs.abs;
 
 import java.io.IOException;
@@ -20,150 +19,148 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- *  Top level implementation of a Java {@link ProgramElement}.
- * taken from COMPOST and changed to achieve an immutable structure
+ * Top level implementation of a Java {@link ProgramElement}. taken from COMPOST
+ * and changed to achieve an immutable structure
  */
-public abstract class ABSProgramElement extends ABSSourceElement
-                                         implements ProgramElement {
+public abstract class ABSProgramElement extends ABSSourceElement implements
+        ProgramElement {
 
     private final static Comment[] NO_COMMENTS = new Comment[0];
 
     private final Comment[] comments;
-    
 
     public ABSProgramElement() {
-	comments = NO_COMMENTS;
+        comments = NO_COMMENTS;
     }
 
-    
     /**
-     * Java program element. 
-     * @param list ExtList with comments
+     * Java program element.
+     * 
+     * @param list
+     *            ExtList with comments
      */
     public ABSProgramElement(ExtList list) {
         super(list);
         comments = extractComments(list);
     }
-    
 
     /**
      * creates a java program element with the given position information
-     * @param pos the PositionInfo where the Java program element occurs in 
-     * the source
+     * 
+     * @param pos
+     *            the PositionInfo where the Java program element occurs in the
+     *            source
      */
     public ABSProgramElement(PositionInfo pos) {
-        super(pos);     
+        super(pos);
         comments = NO_COMMENTS;
     }
 
-    
     public ABSProgramElement(ExtList children, PositionInfo pos) {
         super(children, pos);
         comments = extractComments(children);
     }
 
-    
     /**
      * collects comments contained in the given list
-     * @param list the ExtList with children and comments of this node
+     * 
+     * @param list
+     *            the ExtList with children and comments of this node
      */
     private static Comment[] extractComments(ExtList list) {
         final Comment[] c = list.collect(Comment.class);
         return c == null ? NO_COMMENTS : c;
     }
 
-    
     /**
-     *      Get comments.
-     *      @return the comments.
+     * Get comments.
+     * 
+     * @return the comments.
      */
-    @Override    
+    @Override
     public Comment[] getComments() {
         return comments;
     }
 
-
-
-    @Override    
+    @Override
     public void prettyPrint(PrettyPrinter w) throws IOException {
     }
 
-    
     /**
-     *      Prints main content of current node and all syntactical children.
-     *      Hook method of prettyPrint; defaults to do nothing.
+     * Prints main content of current node and all syntactical children. Hook
+     * method of prettyPrint; defaults to do nothing.
      */
-    protected void prettyPrintMain(PrettyPrinter w) throws IOException {}
+    protected void prettyPrintMain(PrettyPrinter w) throws IOException {
+    }
 
-
-
-    /** commented in interface SourceElement. The default equals
-     * method compares  two elements by testing if they have the 
-     * same type and calling the default equals method.
+    /**
+     * commented in interface SourceElement. The default equals method compares
+     * two elements by testing if they have the same type and calling the
+     * default equals method.
      */
-    @Override    
-    public boolean equalsModRenaming(SourceElement se, 
-				     NameAbstractionTable nat) {
-    	return (this.getClass() == se.getClass());
+    @Override
+    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
+        return (this.getClass() == se.getClass());
     }
-    
-    
-    @Override    
-    public int hashCode(){
-    	int result = 17;
-    	result = 37 * result + this.getClass().hashCode();
-    	return result;
-    }
-    
-    
-    @Override    
-    public boolean equals(Object o){
-    	if(o == this) return true;
-    	if (!(o instanceof ABSProgramElement))
-    		return false;    
- 
-        return equalsModRenaming((ABSProgramElement)o,
-                                 NameAbstractionTableDisabled.INSTANCE);
-    }
-    
 
-    /** this is the default implementation of the signature, which is
-     *  used to determine program similarity.
-     * @param ec TODO
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 37 * result + this.getClass().hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof ABSProgramElement))
+            return false;
+
+        return equalsModRenaming((ABSProgramElement) o,
+                NameAbstractionTableDisabled.INSTANCE);
+    }
+
+    /**
+     * this is the default implementation of the signature, which is used to
+     * determine program similarity.
+     * 
+     * @param ec
+     *            TODO
      */
     public String reuseSignature(IServices services, ExecutionContext ec) {
-       final String s = getClass().toString();
-       return s.substring(s.lastIndexOf('.')+1, s.length());
+        final String s = getClass().toString();
+        return s.substring(s.lastIndexOf('.') + 1, s.length());
     }
-    
-    
-    /** this class is used by method call. As in this case we do not
-     * want to abstract from  names
+
+    /**
+     * this class is used by method call. As in this case we do not want to
+     * abstract from names
      */
     static class NameAbstractionTableDisabled extends NameAbstractionTable {
-	
-	
-    public static final NameAbstractionTableDisabled INSTANCE = new NameAbstractionTableDisabled();
-    	
-	@Override
-    public void add(SourceElement pe1, SourceElement pe2) {}
 
-	@Override
-    public boolean sameAbstractName(SourceElement pe1, 
-	                                SourceElement pe2) {
-	    return pe1.equals ( pe2 );
-	}
+        public static final NameAbstractionTableDisabled INSTANCE = new NameAbstractionTableDisabled();
+
+        @Override
+        public void add(SourceElement pe1, SourceElement pe2) {
+        }
+
+        @Override
+        public boolean sameAbstractName(SourceElement pe1, SourceElement pe2) {
+            return pe1.equals(pe2);
+        }
     }
 
-    
-    @Override    
+    @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         Debug.out("Program match start (template, source)", this, src);
 
         if (src.getClass() != getClass()) {
-            Debug.out("Program match failed. Incompatible AST nodes (template, source)", this, src);
-            Debug.out("Incompatible AST nodes (template, source)", 
+            Debug.out(
+                    "Program match failed. Incompatible AST nodes (template, source)",
+                    this, src);
+            Debug.out("Incompatible AST nodes (template, source)",
                     this.getClass(), src.getClass());
             return null;
         }

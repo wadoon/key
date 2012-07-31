@@ -56,20 +56,21 @@ public class ABSIfStatement extends ABSNonTerminalProgramElement implements
         }
         throw new IndexOutOfBoundsException();
     }
-    
-    
+
     @Override
     public String toString() {
-        return "if" + "(" + condition + ") { " + thenBranch + " }\n" + "else {" + elseBranch + "}"; 
+        return "if" + "(" + condition + ") { " + thenBranch + " }\n" + "else {"
+                + elseBranch + "}";
     }
 
     public IABSPureExpression getCondition() {
         return condition;
     }
-    
+
     public IABSStatement getThenBranch() {
         return thenBranch;
     }
+
     public IABSStatement getElseBranch() {
         return elseBranch;
     }

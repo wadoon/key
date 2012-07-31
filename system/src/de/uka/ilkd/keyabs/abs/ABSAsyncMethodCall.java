@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 public class ABSAsyncMethodCall extends ABSNonTerminalProgramElement implements
-IABSMethodReference, IABSExpression, IABSStatement {
+        IABSMethodReference, IABSExpression, IABSStatement {
 
     private final IABSPureExpression caller;
     private final ProgramElementName methodName;
@@ -21,7 +21,6 @@ IABSMethodReference, IABSExpression, IABSStatement {
         this.arguments = arguments == null ? new IABSPureExpression[0]
                 : arguments;
     }
-
 
     @Override
     public int getChildCount() {
@@ -65,7 +64,6 @@ IABSMethodReference, IABSExpression, IABSStatement {
         sb.append(")");
         return sb.toString();
     }
-
 
     @Override
     public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {

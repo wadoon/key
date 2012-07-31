@@ -6,8 +6,8 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
-public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElement
-        implements IABSStatement {
+public class ABSVariableDeclarationStatement extends
+        ABSNonTerminalProgramElement implements IABSStatement {
 
     private final TypeReference type;
     private final IProgramVariable var;
@@ -16,8 +16,8 @@ public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElemen
     public ABSVariableDeclarationStatement(TypeReference type,
             IProgramVariable var, IABSExpression initExp) {
         this.type = type;
-        this.var  = var;
-        this.exp  = initExp;
+        this.var = var;
+        this.exp = initExp;
     }
 
     @Override
@@ -41,39 +41,37 @@ public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElemen
         }
 
     }
-    
-    /** equals modulo renaming is described in the corresponding
-     * comment in class SourceElement. The variables declared in the
-     * local variable declaration have to be added to the
-     * NameAbstractionTable.
+
+    /**
+     * equals modulo renaming is described in the corresponding comment in class
+     * SourceElement. The variables declared in the local variable declaration
+     * have to be added to the NameAbstractionTable.
      */
-     @Override
-    public boolean equalsModRenaming(SourceElement se, 
-                                     NameAbstractionTable nat) {
+    @Override
+    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
         if (!(se instanceof ABSVariableDeclarationStatement)) {
             return false;
-        }                
-        ABSVariableDeclarationStatement vs = (ABSVariableDeclarationStatement)se;
-        nat.add(var, vs.var);  
-        if (vs.getChildCount()!=getChildCount()) {
+        }
+        ABSVariableDeclarationStatement vs = (ABSVariableDeclarationStatement) se;
+        nat.add(var, vs.var);
+        if (vs.getChildCount() != getChildCount()) {
             return false;
-        }       
-        for (int i = 0, cc = getChildCount(); i<cc; i++) {
-            if (!getChildAt(i).equalsModRenaming
-                (vs.getChildAt(i), nat)) {
+        }
+        for (int i = 0, cc = getChildCount(); i < cc; i++) {
+            if (!getChildAt(i).equalsModRenaming(vs.getChildAt(i), nat)) {
                 return false;
             }
         }
         return true;
     }
-     
+
     @Override
     public int hashCode() {
         int result = 17;
-        result = 37 * result + ((type==null) ? 0 : type.hashCode());
+        result = 37 * result + ((type == null) ? 0 : type.hashCode());
         result = 37 * result + getChildCount();
-        for (int i = 0, cc = getChildCount(); i<cc; i++) {
-                result = 37 * result + getChildAt(i).hashCode();
+        for (int i = 0, cc = getChildCount(); i < cc; i++) {
+            result = 37 * result + getChildAt(i).hashCode();
         }
         return result;
     }
@@ -94,10 +92,10 @@ public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElemen
     public ProgramElement getTypeReference() {
         return type;
     }
-    
+
     @Override
     public String toString() {
-    	return type + " " + var + (exp != null ? " = "+exp : "");
+        return type + " " + var + (exp != null ? " = " + exp : "");
     }
 
 }
