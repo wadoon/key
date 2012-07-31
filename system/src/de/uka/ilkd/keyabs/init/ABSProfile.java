@@ -1,6 +1,7 @@
 package de.uka.ilkd.keyabs.init;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.pp.UIConfiguration;
@@ -9,7 +10,14 @@ import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.keyabs.abs.ABSServices;
@@ -51,6 +59,30 @@ public class ABSProfile extends AbstractProfile {
         set = set.add(DEFAULT);
         return set;
     }
+    
+    /**
+     * <p>
+     * Returns the {@link OneStepSimplifier} instance which should be used
+     * in this {@link JavaProfile}. It is added to the build in rules via
+     * {@link #initBuiltInRules()}.
+     * </p>
+     * <p>
+     * Sub profiles may exchange the {@link OneStepSimplifier} instance,
+     * for instance for site proofs used in the symbolic execution tree extraction.
+     * </p> 
+     * @return The {@link OneStepSimplifier} instance to use.
+     */
+    protected OneStepSimplifier getInitialOneStepSimpilifier() {
+       return OneStepSimplifier.INSTANCE;
+    }
+    
+    protected ImmutableList<BuiltInRule> initBuiltInRules() {       
+        ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
+        
+        builtInRules = builtInRules.prepend(getInitialOneStepSimpilifier());
+        return builtInRules;
+    }
+
 
     @Override
     public UIConfiguration getUIConfiguration() {
