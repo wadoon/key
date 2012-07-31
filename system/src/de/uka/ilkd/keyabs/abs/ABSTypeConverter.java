@@ -95,13 +95,13 @@ public final class ABSTypeConverter extends AbstractTypeConverter {
                 Function cons = (Function) services.getNamespaces().functions().lookup((Name) dtCons.getChildAt(0));
                 Term[] subs = new Term[dtCons.getArgumentCount()];
                 for (int i = 0; i<dtCons.getArgumentCount(); i++) {
-            	subs[i] = convertToLogicElement(dtCons.getArgumentAt(i), ec);
-            	System.out.println(subs[i]);
+                    subs[i] = convertToLogicElement(dtCons.getArgumentAt(i), ec);
                 }
-            	System.out.println(dtCons.getChildAt(0) + "::" + dtCons.getArgumentCount() + ":::" +cons );
                 return tb.func(cons, subs);
             } else if (pe instanceof ABSIntLiteral) {
                return tb.zTerm(services, ((ABSIntLiteral)pe).getValue().toString());
+            } else if (pe instanceof ABSMinusExp) {
+                return tb.mul(services, tb.zTerm(services, "-1"), convertToLogicElement(((ABSMinusExp) pe).getChildAt(0), ec));
             }
         }
         return null;

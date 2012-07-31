@@ -83,6 +83,7 @@ import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSIfStatement;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
+import de.uka.ilkd.keyabs.abs.ABSMinusExp;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSTypeReference;
 import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
@@ -2095,6 +2096,12 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.print("{..").beginC(2).brk().ind();
         printStatementList(x);
         layouter.brk(1, -2).end().print("...}");
+    }
+
+    public void printABSMinusExp(ABSMinusExp x) throws IOException {
+        layouter.print("-(");
+        x.getChildAt(0).visit(programPrettyPrinter);
+        layouter.print(")");
     }
 
 }

@@ -20,6 +20,7 @@ import abs.frontend.ast.IncompleteAccess;
 import abs.frontend.ast.IntLiteral;
 import abs.frontend.ast.LTEQExp;
 import abs.frontend.ast.LTExp;
+import abs.frontend.ast.MinusExp;
 import abs.frontend.ast.MultExp;
 import abs.frontend.ast.NotEqExp;
 import abs.frontend.ast.NullExp;
@@ -97,6 +98,8 @@ public abstract class AbstractABS2KeYABSConverter {
         	result = convert((IntLiteral)x);
         } else if (x instanceof IfStmt) {
             result = convert((IfStmt) x);
+        } else if (x instanceof MinusExp) {
+            result = convert((MinusExp)x);
         }
 
         if (result == null) {
@@ -252,6 +255,13 @@ public abstract class AbstractABS2KeYABSConverter {
         return new ABSIntLiteral(new BigInteger(x.getContent()));
     }
 
+    public IABSPureExpression convert(MinusExp x) {
+        if (x.getChild(0) instanceof IntLiteral) {
+            return new ABSIntLiteral(new BigInteger("-"+((IntLiteral)x.getChild(0)).getContent()));
+        }
+        return new ABSMinusExp((IABSPureExpression) convert(x.getChild(0)));
+    }
+    
     public ABSDataConstructorExp convert(DataConstructorExp x) {
 	ProgramElementName pen = new ProgramElementName(x.getDataConstructor().getName(), 
 		x.getDataConstructor().getDataTypeDecl().getModule().getName() + "." + 

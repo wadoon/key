@@ -14,6 +14,7 @@ import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSIfStatement;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
+import de.uka.ilkd.keyabs.abs.ABSMinusExp;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSTypeReference;
@@ -315,15 +316,25 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     }
 
 
-	@Override
-	public void performActionOnABSContextStatementBlock(
-			ABSContextStatementBlock x) {
-		 try {
-	            lp.printABSContextStatementBlock(x);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }     
-	}
+    @Override
+    public void performActionOnABSContextStatementBlock(
+            ABSContextStatementBlock x) {
+        try {
+            lp.printABSContextStatementBlock(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }     
+    }
+
+
+    @Override
+    public void performActionOnABSMinusExp(ABSMinusExp x) {
+        try {
+            lp.printABSMinusExp(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }     
+    }
 
 
 

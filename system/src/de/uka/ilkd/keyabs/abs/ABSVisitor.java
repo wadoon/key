@@ -64,6 +64,8 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnABSIfStatement(ABSIfStatement absIfStatement);
 
-	void performActionOnABSContextStatementBlock(ABSContextStatementBlock x);
+    void performActionOnABSContextStatementBlock(ABSContextStatementBlock x);
+
+    void performActionOnABSMinusExp(ABSMinusExp x);
 
 }
