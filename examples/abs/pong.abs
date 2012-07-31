@@ -17,11 +17,14 @@ data PongMsg = NoMsg
 
 interface Ping {
     Unit ping(PingMsg m);
+    Unit nothing(Int i);
+    Unit nothing();
 }
 
 interface Pong {
     Unit hello(Ping ping);
     Unit pong(PongMsg m);
+    Unit nothing(Int i);
     Unit nothing();
 }
 
@@ -29,6 +32,9 @@ class PingImpl(Pong pong) implements Ping {
     Unit run(){
       pong!hello(this); 
     }
+
+    Unit nothing(Int i) { }
+    Unit nothing() { }
 
     Unit ping(PingMsg msg){
       PongMsg reply = case msg {
@@ -52,6 +58,7 @@ class PongImpl implements Pong {
        ping!ping(HelloPing);
     }
 
+    Unit nothing(Int i) { }
     Unit nothing() { }
 
     Unit pong(PongMsg msg){

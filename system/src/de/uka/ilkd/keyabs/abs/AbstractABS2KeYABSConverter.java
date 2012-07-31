@@ -144,10 +144,10 @@ public abstract class AbstractABS2KeYABSConverter {
     }
     
     public ABSAsyncMethodCall convert(AsyncCall x) {
-    	IABSPureExpression callee = (IABSPureExpression) convert(((AsyncCall) x).getCallee());
-    	ProgramElementName methodName = new ProgramElementName(((AsyncCall) x).getMethod());
+    	IABSPureExpression callee = (IABSPureExpression) convert(x.getCallee());
+    	ProgramElementName methodName = new ProgramElementName(x.getMethod());
     	
-    	IABSPureExpression[] arguments = new IABSPureExpression[x.getMethodSig().getNumParam()];
+    	IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
     	
     	int i = 0;
     	for (PureExp arg : x.getParamList()) {
