@@ -23,6 +23,7 @@ public class ABSTypeReference extends ABSNonTerminalProgramElement implements Ty
     public int getChildCount() {
         return 1;
     }
+    
 
     @Override
     public ProgramElement getChildAt(int index) {
