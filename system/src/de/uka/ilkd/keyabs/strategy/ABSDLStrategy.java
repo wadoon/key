@@ -16,99 +16,19 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
-import de.uka.ilkd.key.strategy.IntroducedSymbolBy;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.feature.AgeFeature;
-import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
-import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
-import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
-import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
-import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
-import de.uka.ilkd.key.strategy.feature.DirectlyBelowSymbolFeature;
-import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
-import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
-import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
-import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
-import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
-import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
-import de.uka.ilkd.key.strategy.feature.NotBelowBinderFeature;
-import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
-import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
-import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
-import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
-import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
-import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.ScaleFeature;
-import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
-import de.uka.ilkd.key.strategy.feature.SumFeature;
-import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
-import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
-import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
-import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
-import de.uka.ilkd.key.strategy.termProjection.DividePolynomialsProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
-import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
-import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
-import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
-import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
+import de.uka.ilkd.key.strategy.termProjection.*;
+import de.uka.ilkd.key.strategy.termfeature.*;
+import de.uka.ilkd.key.strategy.termgenerator.*;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -122,11 +42,13 @@ public class ABSDLStrategy extends AbstractFeatureStrategy {
         public Factory () {
         }
 
+        @Override
         public Strategy create ( Proof p_proof, 
                 StrategyProperties strategyProperties) {     
             return new ABSDLStrategy ( p_proof, strategyProperties );
         }
         
+        @Override
         public Name name () {
             return new Name(ABSDLStrategy);
         }
@@ -476,6 +398,7 @@ public class ABSDLStrategy extends AbstractFeatureStrategy {
 	 *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
 	 *         shall not be applied at all (it is discarded by the strategy).
 	 */
+    @Override
     public final RuleAppCost computeCost (RuleApp app,
                                           PosInOccurrence pio,
                                           Goal goal) {
@@ -493,6 +416,7 @@ public class ABSDLStrategy extends AbstractFeatureStrategy {
      * 
      * @return true iff the rule should be applied, false otherwise
      */
+    @Override
     public final boolean isApprovedApp (RuleApp app,
                                         PosInOccurrence pio,
                                         Goal goal) {
@@ -504,6 +428,7 @@ public class ABSDLStrategy extends AbstractFeatureStrategy {
         return !( approvalF.compute ( app, pio, goal ) instanceof TopRuleAppCost );
     }
 
+    @Override
     public Name name () {
         return new Name(ABSDLStrategy);
     }
@@ -2619,6 +2544,7 @@ public class ABSDLStrategy extends AbstractFeatureStrategy {
         return instantiationDispatcher;
     }
 
+    @Override
     protected final RuleAppCost instantiateApp(RuleApp app,
                                                PosInOccurrence pio,
                                                Goal goal) {

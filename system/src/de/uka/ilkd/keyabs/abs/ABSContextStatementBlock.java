@@ -48,7 +48,8 @@ public class ABSContextStatementBlock extends ABSStatementBlock implements ICont
     	super(body);
     }
 
-	public boolean requiresExplicitExecutionContextMatch() {
+	@Override
+    public boolean requiresExplicitExecutionContextMatch() {
     	return false;
     }
 
@@ -57,6 +58,7 @@ public class ABSContextStatementBlock extends ABSStatementBlock implements ICont
      * @return an int giving the number of children of this node
     */
 
+    @Override
     public int getChildCount() {
 	int count = 0;
 	count += super.getChildCount();
@@ -71,6 +73,7 @@ public class ABSContextStatementBlock extends ABSStatementBlock implements ICont
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
      * of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
 	return super.getChildAt(index);
     }
@@ -79,11 +82,13 @@ public class ABSContextStatementBlock extends ABSStatementBlock implements ICont
      * perform some action/transformation on this element
      * @param v the Visitor
      */
+    @Override
     public void visit(ABSVisitor v) {
     	v.performActionOnABSContextStatementBlock(this);
     }
     
     /* toString */
+    @Override
     public String toString() {
 	StringBuilder result = new StringBuilder();
 	result.append("{.. \n");
@@ -96,11 +101,13 @@ public class ABSContextStatementBlock extends ABSStatementBlock implements ICont
      * overrides the check of the superclass as unmatched elements will disappear in 
      * the suffix of this ContextStatementBlock
      */
+    @Override
     public boolean compatibleBlockSize(int pos, int max) {
         return true;
     }        
     
     
+    @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         SourceData newSource = source;
         

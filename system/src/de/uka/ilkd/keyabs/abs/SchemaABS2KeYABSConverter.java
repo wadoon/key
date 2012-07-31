@@ -1,10 +1,6 @@
 package de.uka.ilkd.keyabs.abs;
 
-import abs.frontend.ast.ASTNode;
-import abs.frontend.ast.ExpressionStmt;
-import abs.frontend.ast.IncompleteSyncAccess;
-import abs.frontend.ast.VarDeclStmt;
-import abs.frontend.ast.VarUse;
+import abs.frontend.ast.*;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -45,6 +41,7 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         return schemaVariables.lookup(new Name(name));
     }
 
+    @Override
     public Expression convert(VarUse varUse) {
         IProgramVariable var = lookupLocalVariable(varUse.getName());
         
@@ -57,6 +54,7 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
     }
 
     
+    @Override
     public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
         String typeName;
        

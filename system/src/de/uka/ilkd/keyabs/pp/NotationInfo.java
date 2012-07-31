@@ -15,25 +15,7 @@ import java.util.HashMap;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.INotationInfo;
@@ -191,6 +173,7 @@ public final class NotationInfo implements INotationInfo {
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
+    @Override
     public Notation getNotation(Operator op, IServices services) {
         Notation result = notationTable.get(op);
         if(result != null) {
@@ -233,6 +216,7 @@ public final class NotationInfo implements INotationInfo {
         return new Notation.FunctionNotation();
     }
     
+    @Override
     public void refresh(IServices services) {
 	createDefaultNotationTable();
 	assert defaultNotationCache != null;

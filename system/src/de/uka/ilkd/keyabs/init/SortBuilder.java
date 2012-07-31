@@ -1,17 +1,9 @@
 package de.uka.ilkd.keyabs.init;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
-import abs.frontend.ast.DataTypeDecl;
-import abs.frontend.ast.InterfaceDecl;
-import abs.frontend.ast.InterfaceTypeUse;
-import abs.frontend.ast.ParametricDataTypeDecl;
-import abs.frontend.ast.TypeDecl;
-import abs.frontend.ast.TypeUse;
+import abs.frontend.ast.*;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;

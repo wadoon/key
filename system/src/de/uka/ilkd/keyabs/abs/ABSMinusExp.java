@@ -39,6 +39,7 @@ public class ABSMinusExp extends ABSNonTerminalProgramElement implements
     }
     
     
+    @Override
     public String toString() {
         return "-1*(" + exp.toString() + ")";
     }

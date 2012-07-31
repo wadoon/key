@@ -13,6 +13,7 @@ public class ABSWindowUserInterface extends WindowUserInterface {
         super(mainWindow);
     }
 
+    @Override
     public ABSProblemInitializer createProblemInitializer() {
         final Profile profile = getMediator().getProfile();
         return new ABSProblemInitializer(this, profile, 

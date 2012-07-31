@@ -56,6 +56,7 @@ public class CopyAssignment extends ABSNonTerminalProgramElement
     }
     
     
+    @Override
     public String toString() {
         return lhs + " = " + rhs + "; \n";
     }

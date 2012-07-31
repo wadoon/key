@@ -98,6 +98,7 @@ public abstract class ABSSourceElement implements SourceElement {
      *        @see #getStartPosition()
      */
 
+    @Override
     public SourceElement getFirstElement() {
         return this;
     }
@@ -113,6 +114,7 @@ public abstract class ABSSourceElement implements SourceElement {
      *        @see #getEndPosition() 
      */
 
+    @Override
     public SourceElement getLastElement() {
         return this;
     }
@@ -132,6 +134,7 @@ public abstract class ABSSourceElement implements SourceElement {
        call the corresponding method of <CODE>getFirstElement()</CODE>.
        @return the start position of the primary token.
      */
+    @Override
     public Position getStartPosition(){
 	return posInfo.getStartPosition();
     }
@@ -142,6 +145,7 @@ public abstract class ABSSourceElement implements SourceElement {
        call the corresponding method of <CODE>getLastElement()</CODE>.
        @return the end position of the primary token.
      */
+    @Override
     public Position getEndPosition(){
 	return posInfo.getEndPosition();
     }
@@ -153,11 +157,13 @@ public abstract class ABSSourceElement implements SourceElement {
        call the corresponding method of <CODE>getFirstElement()</CODE>.
        @return the relative position of the primary token.
      */
+    @Override
     public Position getRelativePosition(){
 	return posInfo.getRelativePosition();
     }
     
 
+    @Override
     public PositionInfo getPositionInfo() {
         return posInfo;
     }

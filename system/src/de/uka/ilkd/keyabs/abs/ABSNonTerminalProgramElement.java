@@ -12,12 +12,7 @@
 package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -77,6 +72,7 @@ public abstract class ABSNonTerminalProgramElement
      * method implementation in ProgramElement by descending down to
      * the children.
      */
+    @Override
     public boolean equalsModRenaming(SourceElement se, 
 				     NameAbstractionTable nat) {
 	if (this.getClass() != se.getClass()) {

@@ -94,7 +94,8 @@ implements StatementContainer, IABSStatement, ProgramPrefix, IStatementBlock {
 	 *      @return the statement array wrapper.
 	 */
 
-	public ImmutableArray<? extends IABSStatement> getBody() {
+	@Override
+    public ImmutableArray<? extends IABSStatement> getBody() {
 		return body;
 	}
 
@@ -108,7 +109,8 @@ implements StatementContainer, IABSStatement, ProgramPrefix, IStatementBlock {
 	 *      @return an int giving the number of children of this node
 	 */
 
-	public int getChildCount() {
+	@Override
+    public int getChildCount() {
 		return body.size();
 	}
 
@@ -121,7 +123,8 @@ implements StatementContainer, IABSStatement, ProgramPrefix, IStatementBlock {
 	 *                 of bounds
 	 */
 
-	public ProgramElement getChildAt(int index) {
+	@Override
+    public ProgramElement getChildAt(int index) {
 		if (body != null) {
 			return body.get(index);
 		}
@@ -133,7 +136,8 @@ implements StatementContainer, IABSStatement, ProgramPrefix, IStatementBlock {
 	 *      @return the number of statements.
 	 */
 
-	public int getStatementCount() {
+	@Override
+    public int getStatementCount() {
 		return body.size();
 	}
 
@@ -153,25 +157,30 @@ implements StatementContainer, IABSStatement, ProgramPrefix, IStatementBlock {
 		throw new ArrayIndexOutOfBoundsException();
 	}
 
-	public SourceElement getFirstElement() {
+	@Override
+    public SourceElement getFirstElement() {
 		if (isEmpty()) return this;
 		final SourceElement e = getBody().get(0);
 		return (e instanceof ABSStatementBlock) ? e.getFirstElement() : e;
 	}
 
-	public int getPrefixLength() {        
+	@Override
+    public int getPrefixLength() {        
 		return prefixElementArray.size();
 	}
 
-	public ProgramPrefix getPrefixElementAt(int i) {       
+	@Override
+    public ProgramPrefix getPrefixElementAt(int i) {       
 		return prefixElementArray.get(i);
 	}
 
-	public ImmutableArray<ProgramPrefix> getPrefixElements() {
+	@Override
+    public ImmutableArray<ProgramPrefix> getPrefixElements() {
 		return prefixElementArray;
 	}
 
-	public PosInProgram getFirstActiveChildPos() {
+	@Override
+    public PosInProgram getFirstActiveChildPos() {
 		if (firstActiveChildPos == null) {
 			firstActiveChildPos = isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(0);
 		}
@@ -183,7 +192,8 @@ implements StatementContainer, IABSStatement, ProgramPrefix, IStatementBlock {
 		v.performActionABSStatementBlock(this);
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		StringBuilder sb = new StringBuilder("{\n");
 		printBody(sb);
 		return sb.append("}").toString();

@@ -88,6 +88,7 @@ public class ABSTypeReference extends ABSNonTerminalProgramElement implements Ty
         v.performActionOnABSTypeReference(this);
     } 
 
+    @Override
     public String toString() {
     	return type.getFullName();
     }

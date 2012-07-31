@@ -47,7 +47,8 @@ public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElemen
      * local variable declaration have to be added to the
      * NameAbstractionTable.
      */
-     public boolean equalsModRenaming(SourceElement se, 
+     @Override
+    public boolean equalsModRenaming(SourceElement se, 
                                      NameAbstractionTable nat) {
         if (!(se instanceof ABSVariableDeclarationStatement)) {
             return false;
@@ -66,6 +67,7 @@ public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElemen
         return true;
     }
      
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + ((type==null) ? 0 : type.hashCode());
@@ -93,6 +95,7 @@ public class ABSVariableDeclarationStatement extends ABSNonTerminalProgramElemen
         return type;
     }
     
+    @Override
     public String toString() {
     	return type + " " + var + (exp != null ? " = "+exp : "");
     }

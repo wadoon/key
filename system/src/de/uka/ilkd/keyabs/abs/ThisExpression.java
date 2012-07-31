@@ -25,6 +25,7 @@ public class ThisExpression extends ABSProgramElement
      * method implementation in ProgramElement by descending down to
      * the children.
      */
+    @Override
     public boolean equalsModRenaming(SourceElement se, 
                                      NameAbstractionTable nat) {
         return this.equals(se);

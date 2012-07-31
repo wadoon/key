@@ -14,10 +14,6 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.keyabs.abs.ABSServices;
@@ -54,6 +50,7 @@ public class ABSProfile extends AbstractProfile {
         return DEFAULT;
     }
 
+    @Override
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
         set = set.add(DEFAULT);
@@ -76,6 +73,7 @@ public class ABSProfile extends AbstractProfile {
        return OneStepSimplifier.INSTANCE;
     }
     
+    @Override
     protected ImmutableList<BuiltInRule> initBuiltInRules() {       
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
         

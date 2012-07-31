@@ -23,7 +23,8 @@ implements	IProgramVariableCollector<LocationVariable> {
 	}
 
 
-	public HashSet<LocationVariable> result() { 
+	@Override
+    public HashSet<LocationVariable> result() { 
 		return result;
 	}    
 

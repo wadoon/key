@@ -13,14 +13,7 @@ package de.uka.ilkd.keyabs.abs;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
@@ -152,9 +145,11 @@ public abstract class ABSProgramElement extends ABSSourceElement
 	
     public static final NameAbstractionTableDisabled INSTANCE = new NameAbstractionTableDisabled();
     	
-	public void add(SourceElement pe1, SourceElement pe2) {}
+	@Override
+    public void add(SourceElement pe1, SourceElement pe2) {}
 
-	public boolean sameAbstractName(SourceElement pe1, 
+	@Override
+    public boolean sameAbstractName(SourceElement pe1, 
 	                                SourceElement pe2) {
 	    return pe1.equals ( pe2 );
 	}

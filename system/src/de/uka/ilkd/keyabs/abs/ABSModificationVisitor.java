@@ -5,28 +5,10 @@ import java.util.Stack;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
-import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.*;
 
 public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         IProgramASTModifyingVisitor, ABSVisitor {

@@ -20,6 +20,7 @@ public class ABSLocalVariableReference extends ABSVariableReference
         v.performActionOnABSLocalVariableReference(this);
     }
 
+    @Override
     public String toString() {
         return getVariable().name().toString();
     }

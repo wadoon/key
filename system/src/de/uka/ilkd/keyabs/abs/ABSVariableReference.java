@@ -18,6 +18,7 @@ public abstract class ABSVariableReference extends ABSNonTerminalProgramElement
         this.variable = variable;
     }
 
+    @Override
     public IProgramVariable getVariable() {
         return variable;
     }
