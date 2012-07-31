@@ -51,6 +51,7 @@ import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 
 /**
  * manages all applicable Taclets (more precisely: Taclets with
@@ -643,6 +644,7 @@ public final class TacletIndex  {
 	 * the classes that represent prefix elements of a java block
 	 */
 	static final Class[] prefixClasses = new Class[]{
+		ABSStatementBlock.class,
 	    StatementBlock.class,
 	    LabeledStatement.class,
 	    Try.class,	    
