@@ -10,7 +10,7 @@ import de.uka.ilkd.key.parser.DeclPicker;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
-import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -194,7 +194,7 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
     /** 
      * Reads a saved proof of a .key file.
      */
-    public void readProof(ProblemLoader prl) throws ProofInputException {
+    public void readProof(IProofFileParser prl) throws ProofInputException {
         if(lastParser == null) {
             readProblem();
         }

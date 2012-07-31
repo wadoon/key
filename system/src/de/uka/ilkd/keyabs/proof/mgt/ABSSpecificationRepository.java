@@ -268,4 +268,10 @@ public class ABSSpecificationRepository implements ISpecificationRepository {
         
     }
 
+	@Override
+	public ProofOblInput getProofOblInput(Proof proof) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

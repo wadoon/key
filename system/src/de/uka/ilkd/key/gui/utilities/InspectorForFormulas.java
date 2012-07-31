@@ -4,7 +4,7 @@ import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.DefaultProofFileParser;
 
 /**
  * Inspects whether a given string can be translated into a formula. 
@@ -42,7 +42,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
     }
     
     public static Term translate(IServices services, String toBeChecked){       
-        return ProblemLoader.parseTerm(toBeChecked, services, services.getNamespaces().variables(), 
+        return DefaultProofFileParser.parseTerm(toBeChecked, services, services.getNamespaces().variables(), 
                 services.getNamespaces().programVariables());
     }
 

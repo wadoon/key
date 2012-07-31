@@ -17,12 +17,16 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.keyabs.init.ABSProfile;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 
@@ -119,37 +123,48 @@ public class LDTInput implements EnvInput {
      */
     @Override
     public void read() throws ProofInputException {
-	if (initConfig==null) {
-	    throw new IllegalStateException("LDTInput: InitConfig not set.");
-	}
-		
-	for (int i=0; i<keyFiles.length; i++) {
-	    keyFiles[i].readSorts();	    
-	}
-	for (int i=0; i<keyFiles.length; i++) {
-	    keyFiles[i].readFuncAndPred();
-	}
-	for (int i=0; i<keyFiles.length; i++) {
-	    if (listener != null) {
-		listener.reportStatus("Reading " + keyFiles[i].name(), 
-				   keyFiles[i].getNumberOfChars());
-	    }
-	    keyFiles[i].readRulesAndProblem();
-	}
+    	if (initConfig==null) {
+    		throw new IllegalStateException("LDTInput: InitConfig not set.");
+    	}
 
-	//create LDT objects
-        IServices services = initConfig.getServices();
-        ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
-                        	.prepend(new IntegerLDT(services))
-                        	.prepend(new BooleanLDT(services))
-                        	//.prepend(new LocSetLDT(services))
-                        	//.prepend(new HeapLDT(services))
-                        	.prepend(new SeqLDT(services))
-                        	//.prepend(new CharListLDT(services))
-                        	.prepend(new HistoryLDT(services))
-                        	;
+    	for (int i=0; i<keyFiles.length; i++) {
+    		keyFiles[i].readSorts();	    
+    	}
+    	for (int i=0; i<keyFiles.length; i++) {
+    		keyFiles[i].readFuncAndPred();
+    	}
+    	for (int i=0; i<keyFiles.length; i++) {
+    		if (listener != null) {
+    			listener.reportStatus("Reading " + keyFiles[i].name(), 
+    					keyFiles[i].getNumberOfChars());
+    		}
+    		keyFiles[i].readRulesAndProblem();
+    	}
 
-        initConfig.getServices().getTypeConverter().init(ldts);
+    	//create LDT objects
+    	IServices services = initConfig.getServices();
+    	ImmutableList<LDT> ldts;
+    	if (initConfig.getProfile() instanceof ABSProfile) {
+    		ldts = ImmutableSLList.<LDT>nil()
+    				.prepend(new IntegerLDT(services))
+    				.prepend(new BooleanLDT(services))
+    				//.prepend(new LocSetLDT(services))
+    				//.prepend(new HeapLDT(services))
+    				.prepend(new SeqLDT(services))
+    				//.prepend(new CharListLDT(services))
+    				.prepend(new HistoryLDT(services))
+    				;
+    	} else {
+    		ldts = ImmutableSLList.<LDT>nil()
+    				.prepend(new IntegerLDT(services))
+    				.prepend(new BooleanLDT(services))
+    				.prepend(new LocSetLDT(services))
+    				.prepend(new HeapLDT(services))
+    				.prepend(new SeqLDT(services))
+    				.prepend(new CharListLDT(services))
+    				;
+    	}
+    	initConfig.getServices().getTypeConverter().init(ldts);
     }
   
     

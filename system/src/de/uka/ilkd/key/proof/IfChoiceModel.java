@@ -91,7 +91,7 @@ public class IfChoiceModel extends DefaultComboBoxModel {
      * @return the term encoded in 's' 
      */
     public Term parseFormula(String s) throws antlr.ANTLRException {
-	return ProblemLoader.parseTerm(s, services, nss.variables(), nss.programVariables(), scm);
+	return DefaultProofFileParser.parseTerm(s, services, nss.variables(), nss.programVariables());
     }
 
 

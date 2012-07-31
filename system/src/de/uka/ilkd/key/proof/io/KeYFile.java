@@ -60,6 +60,8 @@ public class KeYFile implements IKeYFile {
     
     private String chooseContract = null;
 
+    private String proofObligation = null;
+    
     // when parsing the key file store the classPaths here
     private ImmutableList<String> classPaths;
     
@@ -80,9 +82,7 @@ public class KeYFile implements IKeYFile {
                    ProgressMonitor monitor) {
         assert name != null;
         assert file != null;
-        
-        try { throw null; } catch (Exception e) {e.printStackTrace();}
-        
+                
         this.name = name;
         this.file = file;
         this.monitor = monitor;
@@ -332,6 +332,7 @@ public class KeYFile implements IKeYFile {
                 specRepos.addContracts(problemParser.getContracts());
                 specRepos.addClassInvariants(problemParser.getInvariants());
                 chooseContract = problemParser.getChooseContract();
+                proofObligation = problemParser.getProofObligation();
                 Debug.out("Read KeY file   ", file);
             } finally {
                 cinp.close();
@@ -455,6 +456,11 @@ public class KeYFile implements IKeYFile {
     @Override
     public String chooseContract() {
         return chooseContract;
+    }
+    
+    
+    public String getProofObligation() {
+        return proofObligation;
     }
 
     

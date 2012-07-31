@@ -705,8 +705,6 @@ public final class TermBuilder {
     
     
     public Term elementary(IServices services, Term lhs, Term rhs) {
-        System.out.println(lhs.op().getClass() + ":" + lhs.op().name());
-        
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	if(lhs.op() instanceof UpdateableOperator) {
 	    assert lhs.arity() == 0 : "uh oh: " + lhs;

@@ -6,7 +6,6 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.WriterBackend;
-import de.uka.ilkd.keyabs.pp.LogicPrinter;
 
 public class JavaUIConfiguration extends UIConfiguration {
 

@@ -148,7 +148,8 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
          Node methodReturnNode = findMethodReturnNode(getProofNode());
          if (methodReturnNode != null) {
             // Start site proof to extract the value of the result variable.
-            de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput sequentToProve = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
+            de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput sequentToProve = 
+            		SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
                                                                                                                                                                                      mbs.getBodySourceAsTypeReference(),
                                                                                                                                                                                      mbs.getProgramMethod((Services) getServices()),
                                                                                                                                                                                      mbs.getDesignatedContext(), 

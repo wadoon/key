@@ -12,6 +12,7 @@ package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -131,12 +132,15 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor implements IProgra
     }
 
     public void performActionOnContextStatementBlock(ContextStatementBlock x) {
-        DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new StatementBlock(changeList);
-            }
-        };
-        def.doAction(x);
+    	ExtList changeList = stack.peek();
+    	if (changeList.getFirst() == CHANGED) {
+    		changeList.removeFirst();
+    		if (!preservesPositionInfo) {
+    			changeList.removeFirstOccurrence(PositionInfo.class);
+    		}
+    	}
+    	addChild(new StatementBlock(changeList));
+    	changed();
     }
 
     

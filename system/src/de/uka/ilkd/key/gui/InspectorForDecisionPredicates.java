@@ -9,8 +9,8 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.DefaultProofFileParser;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 
@@ -69,7 +69,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
     }
     
     public static Term translate(IServices services, String toBeChecked){       
-        return ProblemLoader.parseTerm(toBeChecked, services, services.getNamespaces().variables(), 
+        return DefaultProofFileParser.parseTerm(toBeChecked, services, services.getNamespaces().variables(), 
                 services.getNamespaces().programVariables());
     }
 

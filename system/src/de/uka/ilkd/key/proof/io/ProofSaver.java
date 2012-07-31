@@ -13,8 +13,11 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -22,6 +25,7 @@ import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -36,7 +40,8 @@ import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -98,15 +103,17 @@ public class ProofSaver {
    public String writeSettings(ProofSettings ps){
     	return new String ("\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n");
    }
+   
    public String save() throws IOException {
+      return save(new FileOutputStream(filename));
+   }
+   
+   public String save(OutputStream out) throws IOException {
       String errorMsg = null;
-      FileOutputStream fos = null;
       PrintWriter ps = null;
       
       try {
-          
-          fos = new FileOutputStream(filename);
-          ps = new PrintWriter(fos, true);
+          ps = new PrintWriter(out, true);
           printer = createLogicPrinter(proof.getServices(), false);
           
           //settings
@@ -117,14 +124,19 @@ public class ProofSaver {
           header = makePathsRelative(header);
           ps.print(header);
 
-          //\problem or \chooseContract
-          final ContractPO po = proof.getServices()
-          			     .getSpecificationRepository()
-          			     .getPOForProof(proof);
-          if(po != null) {
-              ps.println("\\chooseContract \"" 
-        	         + proof.name()
-        	         + "\";\n");
+          //\problem or \proofObligation
+          ProofOblInput po = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+          if(po instanceof IPersistablePO) {
+              Properties properties = new Properties();
+              ((IPersistablePO)po).fillSaveProperties(properties);
+              StringWriter writer = new StringWriter();
+              try {
+                 properties.store(writer, "Proof Obligation Settings");
+                 ps.println("\\proofObligation \"" +escapeCharacters(writer.toString()) + "\";\n");
+              }
+              finally {
+                writer.close();
+              }
           } else {
               Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");
@@ -152,7 +164,7 @@ public class ProofSaver {
           e.printStackTrace();
       } finally {
           //try {
-	      if (fos != null) fos.close();
+	      if (out != null) out.close();
 	      if (ps != null) {
 		  ps.flush();
 		  ps.close();

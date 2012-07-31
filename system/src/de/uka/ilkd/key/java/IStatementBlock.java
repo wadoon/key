@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.logic.ProgramPrefix;
 
-public interface IStatementBlock extends NonTerminalProgramElement {
+public interface IStatementBlock extends NonTerminalProgramElement, ProgramPrefix {
 
 	/**
 	 *      Get body.

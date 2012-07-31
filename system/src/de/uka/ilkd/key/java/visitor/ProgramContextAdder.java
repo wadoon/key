@@ -42,12 +42,12 @@ public class ProgramContextAdder implements IProgramContextAdder<StatementBlock>
 	 * @see de.uka.ilkd.key.java.visitor.IProgramContextAdder#start(de.uka.ilkd.key.java.NonTerminalProgramElement, de.uka.ilkd.key.java.StatementBlock, de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation)
 	 */
     @Override
-	public NonTerminalProgramElement start
+	public StatementBlock start
 	(NonTerminalProgramElement   context,
 	 StatementBlock                  putIn, 
 	 ContextStatementBlockInstantiation ct) {
 
-        return wrap(context, putIn, 
+        return (StatementBlock) wrap(context, putIn, 
 		    ct.prefix().iterator(), 
 		    ct.prefix().depth(),
                     ct.prefix(),

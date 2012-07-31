@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -25,6 +26,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.keyabs.init.ABSProblemInitializer;
+import de.uka.ilkd.keyabs.init.ABSProfile;
 
 /**
  * This class is the starting point for the extraction of a unified
@@ -246,6 +249,9 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public AbstractProblemInitializer<?,?> createProblemInitializer() {
+		if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile) {
+	           return new ABSProblemInitializer(this, mainWindow.getMediator().getProfile(), true, this);
+		}
 	    return new ProblemInitializer(this, mainWindow.getMediator().getProfile(), true,  this);
 	}
 
@@ -261,7 +267,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public AbstractInitConfig load(File file, List<File> classPath, File bootClassPath) throws FileNotFoundException, ProofInputException {
+   public AbstractInitConfig load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }

@@ -565,8 +565,6 @@ public abstract class Taclet implements Rule, Named {
         
         if ( ignoreUpdates
              && sourceOp instanceof UpdateApplication
-//             &&  !( templateOp instanceof SchemaVariable )
-//                  || templateOp instanceof ModalOperatorSV  
              && !(templateOp instanceof UpdateApplication) ) {
 	    // updates can be ignored
             Term update = UpdateApplication.getUpdate(term);

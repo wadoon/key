@@ -1,18 +1,19 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.IStatementBlock;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -42,6 +43,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -54,7 +56,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -69,13 +71,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
@@ -90,6 +85,21 @@ import de.uka.ilkd.key.util.ProofStarter;
  * @author Martin Hentschel
  */
 public final class SymbolicExecutionUtil {
+   /**
+    * Key for the choice option "runtimeExceptions".
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS = "runtimeExceptions";
+  
+   /**
+    * Value in choice option "runtimeExceptions" to ban exceptions.
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN = "runtimeExceptions:ban";
+   
+   /**
+    * Value in choice option "runtimeExceptions" to allow exceptions.
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW = "runtimeExceptions:allow";
+
    /**
     * Forbid instances.
     */
@@ -116,7 +126,7 @@ public final class SymbolicExecutionUtil {
          Term goalImplication = sequentToImplication(goal.sequent());
          goalImplications = goalImplications.append(goalImplication);
       }
-      return JavaProfile.DF().or(goalImplications);
+      return TermBuilder.DF.or(goalImplications);
    }
    
    /**
@@ -129,12 +139,12 @@ public final class SymbolicExecutionUtil {
          ImmutableList<Term> antecedents = listSemisequentTerms(sequent.antecedent());
          ImmutableList<Term> succedents = listSemisequentTerms(sequent.succedent());
          // Construct branch condition from created antecedent and succedent terms as new implication 
-         Term left = JavaProfile.DF().and(antecedents);
-         Term right = JavaProfile.DF().or(succedents);
-         return JavaProfile.DF().imp(left, right);
+         Term left = TermBuilder.DF.and(antecedents);
+         Term right = TermBuilder.DF.or(succedents);
+         return TermBuilder.DF.imp(left, right);
       }
       else {
-         return JavaProfile.DF().tt();
+         return TermBuilder.DF.tt();
       }
    }
    
@@ -152,32 +162,6 @@ public final class SymbolicExecutionUtil {
       }
       return terms;
    }
-
-   /**
-    * Creates a new default contract for the given {@link IProgramMethod}.
-    * If a precondition is defined in JML syntax it is added to the generated
-    * contract. If no one is defined the generated contract requires nothing.
-    * @param services The {@link Services} to use.
-    * @param pm The {@link IProgramMethod} to create a default contract for.
-    * @param precondition An optional precondition to use.
-    * @return The created {@link Contract}.
-    * @throws SLTranslationException Occurred Exception.
-    */
-   public static FunctionalOperationContract createDefaultContract(IServices services, 
-                                                                   IProgramMethod pm,
-                                                                   String precondition) throws SLTranslationException {
-      // Create TextualJMLSpecCase
-      ImmutableList<String> mods = ImmutableSLList.nil();
-      mods = mods.append("public");
-      TextualJMLSpecCase textualSpecCase = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-      if (precondition != null && !precondition.isEmpty()) {
-         textualSpecCase.addRequires(new PositionedString(precondition));
-      }
-      // Create contract
-      JMLSpecFactory factory = new JMLSpecFactory((Services) services);
-      ImmutableSet<Contract> contracts = factory.createJMLOperationContracts(pm, textualSpecCase);
-      return (FunctionalOperationContract)contracts.iterator().next();
-   }
    
    /**
     * Creates a copy of the {@link ProofEnvironment} of the given {@link Proof}
@@ -191,7 +175,7 @@ public final class SymbolicExecutionUtil {
       assert source != null;
       // Get required source instances
       ProofEnvironment sourceEnv = source.env();
-      AbstractInitConfig sourceInitConfig = sourceEnv.getInitConfig();
+      InitConfig sourceInitConfig = (InitConfig) sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile() {
@@ -206,7 +190,7 @@ public final class SymbolicExecutionUtil {
          }
       };
       // Create new InitConfig and initialize it with value from initial one.
-      AbstractInitConfig initConfig = profile.createInitConfig(source.getServices().copy(), profile);
+      InitConfig initConfig = new InitConfig((Services) source.getServices().copy(), profile);
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
@@ -242,7 +226,7 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
-   public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(IServices services,
+   public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(Services services,
                                                                                      TypeReference contextObjectType,
                                                                                      IProgramMethod contextMethod,
                                                                                      ReferencePrefix contextObject,
@@ -264,7 +248,7 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
-   public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(IServices services,
+   public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(Services services,
                                                                                      IExecutionContext context,
                                                                                      Node node,
                                                                                      IProgramVariable variable) {
@@ -277,16 +261,16 @@ public final class SymbolicExecutionUtil {
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(JavaProfile.DF().newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = JavaProfile.DF().func(newPredicate, JavaProfile.DF().var((ProgramVariable)variable));
+      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
-      Term modalityTerm = JavaProfile.DF().dia(newJavaBlock, newTerm);
+      Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = JavaProfile.DF().goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = JavaProfile.DF().applySequential(originalUpdates, modalityTerm);
+      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -304,22 +288,22 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
-   public static SiteProofVariableValueInput createExtractVariableValueSequent(IServices services,
+   public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
                                                                                Node node,
                                                                                IProgramVariable variable) {
       // Make sure that correct parameters are given
       assert node != null;
       assert variable instanceof ProgramVariable;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(JavaProfile.DF().newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = JavaProfile.DF().func(newPredicate, JavaProfile.DF().var((ProgramVariable)variable));
+      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = JavaProfile.DF().goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = JavaProfile.DF().applySequential(originalUpdates, newTerm);
+      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -337,21 +321,21 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
-   public static SiteProofVariableValueInput createExtractTermSequent(IServices services,
+   public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
                                                                       Term term) {
       // Make sure that correct parameters are given
       assert node != null;
       assert term != null;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(JavaProfile.DF().newName(services, "ResultPredicate")), Sort.FORMULA, term.sort());
+      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, term.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = JavaProfile.DF().func(newPredicate, term);
+      Term newTerm = TermBuilder.DF.func(newPredicate, term);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = JavaProfile.DF().goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = JavaProfile.DF().applySequential(originalUpdates, newTerm);
+      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -473,7 +457,7 @@ public final class SymbolicExecutionUtil {
     * @param term The {@link Term} to check.
     * @return {@code true} is heap update, {@code false} is something else.
     */
-   public static boolean isHeapUpdate(IServices services, Term term) {
+   public static boolean isHeapUpdate(Services services, Term term) {
       boolean heapUpdate = false;
       if (term != null) {
          ImmutableArray<Term> subs = term.subs();
@@ -497,10 +481,28 @@ public final class SymbolicExecutionUtil {
    public static IExecutionVariable[] createExecutionVariables(IExecutionStateNode<?> node) {
       if (node != null) {
          Node proofNode = node.getProofNode();
-         List<IProgramVariable> variables = collectAllElementaryUpdateTerms(proofNode);
+         List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
+         // Add self variable
          IProgramVariable selfVar = findSelfTerm(proofNode);
          if (selfVar != null) {
-            variables.add(0, selfVar);
+            variables.add(selfVar);
+         }
+         // Add method parameters
+         Node callNode = findMethodCallNode(node.getProofNode());
+         if (callNode != null && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
+            MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
+            for (Expression e : mbs.getArguments()) {
+               if (e instanceof IProgramVariable) {
+                  variables.add((IProgramVariable)e);
+               }
+            }
+         }
+         // Collect variables from updates
+         List<IProgramVariable> variablesFromUpdates = collectAllElementaryUpdateTerms(proofNode);
+         for (IProgramVariable variable : variablesFromUpdates) {
+            if (!variables.contains(variable)) {
+               variables.add(variable);
+            }
          }
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
@@ -522,7 +524,7 @@ public final class SymbolicExecutionUtil {
     */
    public static List<IProgramVariable> collectAllElementaryUpdateTerms(Node node) {
       if (node != null) {
-         IServices services = node.proof().getServices();
+         Services services = (Services) node.proof().getServices();
          List<IProgramVariable> result = new LinkedList<IProgramVariable>();
          for (SequentFormula sf : node.sequent().antecedent()) {
             internalCollectAllElementaryUpdateTerms(services, result, sf.formula());
@@ -545,7 +547,7 @@ public final class SymbolicExecutionUtil {
     * @param result The result {@link List} to fill.
     * @param term The current term to analyze.
     */
-   private static void internalCollectAllElementaryUpdateTerms(IServices services, List<IProgramVariable> result, Term term) {
+   private static void internalCollectAllElementaryUpdateTerms(Services services, List<IProgramVariable> result, Term term) {
       if (term != null) {
          if (term.op() instanceof ElementaryUpdate) {
             if (SymbolicExecutionUtil.isHeapUpdate(services, term)) {
@@ -577,8 +579,7 @@ public final class SymbolicExecutionUtil {
     * @param result The result {@link List} to fill.
     * @param term The current term to analyze.
     */
-   private static void internalCollectStaticProgramVariablesOnHeap(IServices iservices, Set<IProgramVariable> result, Term term) {
-      Services services = (Services)iservices;
+   private static void internalCollectStaticProgramVariablesOnHeap(Services services, Set<IProgramVariable> result, Term term) {
       final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
       try {
          if (term.op() == heapLDT.getStore()) {
@@ -615,7 +616,7 @@ public final class SymbolicExecutionUtil {
     */
    public static IProgramVariable findSelfTerm(Node node) {
       JavaBlock jb = node.getAppliedRuleApp().posInOccurrence().subTerm().javaBlock();
-      IServices services = node.proof().getServices();
+      Services services = (Services) node.proof().getServices();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
       if (context instanceof ExecutionContext) {
          ReferencePrefix prefix = ((ExecutionContext)context).getRuntimeInstance();
@@ -841,7 +842,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
       Term term = ruleApp.posInOccurrence().constrainedFormula().formula();
-      term = JavaProfile.DF().goBelowUpdates(term);
+      term = TermBuilder.DF.goBelowUpdates(term);
       JavaBlock block = term.javaBlock();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
       return context != null && context.getMethodContext() != null && context.getMethodContext().isImplicit();
@@ -865,7 +866,7 @@ public final class SymbolicExecutionUtil {
                   JavaBlock block = sub.javaBlock();
                   if (block != null) {
                      ProgramElement element = block.program();
-                     if (element instanceof IStatementBlock) {
+                     if (element instanceof StatementBlock) {
                         StatementBlock b = (StatementBlock)block.program();
                         ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
                         result = JavaUtil.count(prefix, new IFilter<ProgramPrefix>() {
@@ -945,6 +946,45 @@ public final class SymbolicExecutionUtil {
     * @param node The {@link Node} to start search in.
     * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
     */
+   public static Node findMethodCallNode(Node node) {
+      if (node != null && node.getAppliedRuleApp() != null) {
+         // Get current program method
+         Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+         term = TermBuilder.DF.goBelowUpdates(term);
+         Services services = (Services) node.proof().getServices();
+         MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
+         if (mf != null) {
+            // Find call node
+            Node parent = node.parent();
+            Node result = null;
+            while (parent != null && result == null) {
+               SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
+               if (activeStatement instanceof MethodBodyStatement && 
+                   ((MethodBodyStatement)activeStatement).getProgramMethod(services) == mf.getProgramMethod()) {
+                  result = parent;
+               }
+               else {
+                  parent = parent.parent();
+               }
+            }
+            return result;
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches for the given {@link Node} the parent node
+    * which also represents a symbolic execution tree node
+    * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
+    * @param node The {@link Node} to start search in.
+    * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
+    */
    public static Node findParentSetNode(Node node) {
       if (node != null) {
          Node parent = node.parent();
@@ -979,19 +1019,19 @@ public final class SymbolicExecutionUtil {
       int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
       TacletGoalTemplate goalTemplate = app.taclet().goalTemplates().take(childIndex).head();
       // Apply instantiations of schema variables to sequent of goal template
-      IServices services = node.proof().getServices();
+      Services services = (Services) node.proof().getServices();
       SVInstantiations instantiations = app.instantiations();
       ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
       ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
       // Construct branch condition from created antecedent and succedent terms as new implication 
-      Term left = JavaProfile.DF().and(antecedents);
-      Term right = JavaProfile.DF().or(succedents);
-      Term implication = JavaProfile.DF().imp(left, right);
+      Term left = TermBuilder.DF.and(antecedents);
+      Term right = TermBuilder.DF.or(succedents);
+      Term implication = TermBuilder.DF.imp(left, right);
       Term result;
       // Check if an update context is available
       if (!instantiations.getUpdateContext().isEmpty()) {
          // Append update context because otherwise the formula is evaluated in wrong state
-         result = JavaProfile.DF().applySequential(instantiations.getUpdateContext(), implication);
+         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
          // Simplify branch condition
          result = SymbolicExecutionUtil.simplify(node.proof(), result);
       }
@@ -1009,7 +1049,7 @@ public final class SymbolicExecutionUtil {
     * @param semisequent The {@link Semisequent} to apply instantiations on.
     * @return The list of created {@link Term}s in which schema variables are replaced with the instantiation.
     */
-   private static ImmutableList<Term> listSemisequentTerms(IServices services, 
+   private static ImmutableList<Term> listSemisequentTerms(Services services, 
                                                            SVInstantiations svInst, 
                                                            Semisequent semisequent) {
       ImmutableList<Term> terms = ImmutableSLList.nil();
@@ -1019,5 +1059,42 @@ public final class SymbolicExecutionUtil {
          terms = terms.append(visitor.getTerm());
       }
       return terms;
+   }
+
+   /**
+    * Returns the default choice value.
+    * <b>Attention: </b> This method returns {@code null} if it is called before
+    * a proof is instantiated the first time. It can be checked via
+    * {@link #isChoiceSettingInitialised()}.
+    * @param key The choice key.
+    * @return The choice value.
+    */
+   public static String getChoiceSetting(String key) {
+      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      return settings.get(key);
+   }
+   
+   /**
+    * Sets the default choice value.
+    * <b>Attention: </b> Settings should not be changed before the first proof
+    * is instantiated in KeY. Otherwise the default settings are not loaded.
+    * If default settings are defined can be checked via {@link #isChoiceSettingInitialised()}.
+    * @param key The choice key to modify.
+    * @param value The new choice value to set.
+    */
+   public static void setChoiceSetting(String key, String value) {
+      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      HashMap<String, String> clone = new HashMap<String, String>();
+      clone.putAll(settings);
+      clone.put(key, value);
+      ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+   }
+
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
    }
 }

@@ -29,7 +29,6 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -127,7 +126,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 		this ( null, metavariableInst );
 	}
 
-	private NonTerminalProgramElement addContext(StatementContainer pe) {
+	private IStatementBlock addContext(IStatementBlock pe) {
 		final ContextInstantiationEntry cie = 
 				svInst.getContextInstantiation();
 		if (cie == null) {
@@ -162,26 +161,19 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 			return jb;
 		}
 		IProgramReplaceVisitor trans;
-		ProgramElement result = null;
+		IStatementBlock result;
 
-		if (jb.program() instanceof IContextStatementBlock) {
-			trans = IProgramVisitorProvider.createProgramReplaceVisitor
-					       (jb.program(), 
-							getServices (),
-							svInst,
-							allowPartialReplacement);
-			trans.start();
-			result = addContext((StatementContainer)trans.result());
-		} else {
-			trans = IProgramVisitorProvider.createProgramReplaceVisitor(jb.program(),
+		trans = IProgramVisitorProvider.createProgramReplaceVisitor
+			       (jb.program(), 
 					getServices (),
 					svInst,
 					allowPartialReplacement);
-			trans.start();
-			result = trans.result();
+		trans.start();
+		result = (IStatementBlock)trans.result();
+		if (jb.program() instanceof IContextStatementBlock) {	
+			result = (IStatementBlock) addContext(result);
 		}
-		return (result==jb.program()) ? 
-				jb : JavaBlock.createJavaBlock((StatementContainer)result);
+		return (result==jb.program()) ? jb : JavaBlock.createJavaBlock(result);
 	}
 
 	private Term[] neededSubs(int n) {

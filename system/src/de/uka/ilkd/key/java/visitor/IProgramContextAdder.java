@@ -9,7 +9,7 @@ public interface IProgramContextAdder<S extends IStatementBlock> {
 	/**
 	 * wraps the context around the statements found in the putIn block   
 	 */
-	public abstract NonTerminalProgramElement start(
+	public abstract IStatementBlock start(
 			NonTerminalProgramElement context, S putIn,
 			ContextStatementBlockInstantiation ct);
 

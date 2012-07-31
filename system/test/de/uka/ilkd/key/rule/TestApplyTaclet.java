@@ -13,26 +13,34 @@ package de.uka.ilkd.key.rule;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
+import de.uka.ilkd.key.proof.BuiltInRuleIndex;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IHTacletFilter;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 
 
 /** 
@@ -1001,7 +1009,7 @@ public class TestApplyTaclet extends TestCase{
      */
     public void testRemoveEmptyBlock() {
         NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_removeEmptyBlock" );
-
+        
         TacletIndex tacletIndex = new TacletIndex ();
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[23].root(), tacletIndex );
@@ -1009,7 +1017,7 @@ public class TestApplyTaclet extends TestCase{
             = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
                                   PosInTerm.TOP_LEVEL,
                                   false);
-
+        
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
             getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);    
 

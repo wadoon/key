@@ -37,11 +37,11 @@ public class ABSProgramContextAdder implements IProgramContextAdder<ABSStatement
 	/**
 	 * wraps the context around the statements found in the putIn block
 	 */
-	public NonTerminalProgramElement start(
+	public ABSStatementBlock start(
 			NonTerminalProgramElement context, ABSStatementBlock putIn,
 			ContextStatementBlockInstantiation ct) {
 
-		return wrap(context, putIn, ct.prefix().iterator(),
+		return (ABSStatementBlock) wrap(context, putIn, ct.prefix().iterator(),
 				ct.prefix().depth(), ct.prefix(), ct.suffix());
 	}
 

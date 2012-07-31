@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -123,9 +124,9 @@ public final class TacletIndex  {
 	final Term indexTerm = tac.find();
 	if (!indexTerm.javaBlock().isEmpty()) {
 	    final ProgramElement prg = indexTerm.javaBlock().program();
-	    indexObj = ((StatementContainer)prg).getStatementAt(0);                
-            if (!(indexObj instanceof SchemaVariable)) {
-		indexObj=indexObj.getClass();       
+	    indexObj = ((IStatementBlock)prg).getStatementAt(0);                
+	    if (!(indexObj instanceof SchemaVariable)) {
+	    	indexObj=indexObj.getClass();       
 	    } 
 	} else {
 	    indexObj = indexTerm.op();
@@ -411,11 +412,12 @@ public final class TacletIndex  {
 
 	if (!term.javaBlock().isEmpty()) {
 	    prefixOccurrences.reset();
-	    StatementContainer sb=(StatementContainer)term.javaBlock().program();
+	    IStatementBlock sb= (IStatementBlock) term.javaBlock().program();
 	    result = getJavaTacletList(map, sb.getStatementAt(0),
 				       prefixOccurrences);
 	} 
 
+	
 	if ( !term.javaBlock().isEmpty() ||
 	     term.op () instanceof ProgramVariable ) {
 	    ImmutableList<NoPosTacletApp> schemaList=map.get(DEFAULT_PROGSV_KEY);
@@ -665,7 +667,7 @@ public final class TacletIndex  {
 	 * fields to indicate the position of the next relevant child (the next
 	 * possible prefix element or real statement
 	 */
-	static final int[] nextChild = new int[]{0,1,0,1,1};
+	static final int[] nextChild = new int[]{0,0,1,0,1,1};
 
 
 

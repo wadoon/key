@@ -13,7 +13,7 @@ package de.uka.ilkd.key.logic;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.IStatementBlock;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -24,13 +24,13 @@ public class JavaBlock {
     
     public static final JavaBlock EMPTY_JAVABLOCK
     	= new JavaBlock(new StatementBlock());
-    private final ProgramElement prg;
+    private final IStatementBlock prg;
 
 
     /** create a new JavaBlock 
      * @param prg the root JavaProgramElement for this JavaBlock
      */
-    private JavaBlock(StatementContainer prg) {
+    private JavaBlock(IStatementBlock prg) {
 	this.prg=prg;
     }
 
@@ -38,7 +38,7 @@ public class JavaBlock {
      * @param prg the root StatementBlock for this JavaBlock.
      * TacletIndex relies on <code>prg</code> being indeed a StatementBlock.
      */
-    public static JavaBlock createJavaBlock(StatementContainer prg) {
+    public static JavaBlock createJavaBlock(IStatementBlock prg) {
 	assert prg != null;
 	
 	return new JavaBlock(prg);

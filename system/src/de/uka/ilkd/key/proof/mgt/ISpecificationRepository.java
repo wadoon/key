@@ -150,6 +150,8 @@ public interface ISpecificationRepository {
      * Unregisters the passed proof.
      */
     public abstract void removeProof(Proof proof);
+    
+    public ProofOblInput getProofOblInput(Proof proof);
 
     public abstract Contract combineOperationContracts(
             ImmutableSet<FunctionalOperationContract> contracts);

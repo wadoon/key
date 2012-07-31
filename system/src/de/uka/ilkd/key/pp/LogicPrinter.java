@@ -51,16 +51,6 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.ILogicPrinter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.ModalityPositionTable;
-import de.uka.ilkd.key.pp.Notation;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.PositionTable;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -119,7 +109,7 @@ public final class LogicPrinter implements ILogicPrinter {
     private ProgramPrinter prgPrinter;
 
     /** Contains information on the concrete syntax of operators. */
-    private final NotationInfo notationInfo;
+    private final INotationInfo notationInfo;
 
     /** the services object */
     private final IServices services;
@@ -196,7 +186,7 @@ public final class LogicPrinter implements ILogicPrinter {
                     (simulates the behaviour of the former PureSequentPrinter)
      */
     LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
+                        INotationInfo notationInfo,
                         Backend backend, 
                         IServices services,
                         boolean purePrint) {
@@ -222,7 +212,7 @@ public final class LogicPrinter implements ILogicPrinter {
      * @param services     The IServices object
      */
     LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
+                        INotationInfo notationInfo,
                         IServices services) {
 	this(prgPrinter, 
              notationInfo, 
@@ -243,7 +233,7 @@ public final class LogicPrinter implements ILogicPrinter {
      * @param services     the IServices object               
      */
     LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo, 
+    					INotationInfo notationInfo, 
                         IServices services,
                         boolean purePrint) {
 	this(prgPrinter, 
@@ -259,7 +249,7 @@ public final class LogicPrinter implements ILogicPrinter {
     /**
      * @return the notationInfo associated with this LogicPrinter
      */
-    public NotationInfo getNotationInfo(){
+    public INotationInfo getNotationInfo(){
         return notationInfo;
     }
     /**

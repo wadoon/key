@@ -35,6 +35,7 @@ import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -225,5 +226,25 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
                   profile.getStandardRules().getTacletBase(),
               progMon);
     }
-
+    
+    
+    public void startProver(ProofEnvironment<InitConfig> env, ProofOblInput po) 
+    		throws ProofInputException {
+	assert env.getInitConfig().getProofEnv() == env;
+        startProver(env.getInitConfig(), po, 0);
+    }
+    
+    
+    public void startProver(EnvInput envInput, ProofOblInput po) 
+    		throws ProofInputException {
+	try {
+	    InitConfig initConfig = prepare(envInput);
+	    startProver(initConfig, po, 0);
+	} catch(ProofInputException e) {
+	    reportStatus(envInput.name() + " failed");
+	    throw e;
+	}
+    }
+    
+   
 }

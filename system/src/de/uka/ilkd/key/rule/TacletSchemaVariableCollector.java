@@ -62,6 +62,7 @@ public class TacletSchemaVariableCollector extends
         if (t.op() instanceof WhileInvRule) {
             varList = collectSVInProgram(t, varList);
         }
+        super.visit(t);
     }
 
     @Override

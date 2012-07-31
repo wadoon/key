@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.EnvInput;
@@ -420,7 +420,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
         }
     }
 
-    public void tryReadProof(ProblemLoader prl, KeYUserProblemFile kupf)
+    public void tryReadProof(IProofFileParser prl, KeYUserProblemFile kupf)
             throws ProofInputException {
         reportStatus("Loading proof", kupf.getNumberOfChars());
         kupf.readProof(prl);
