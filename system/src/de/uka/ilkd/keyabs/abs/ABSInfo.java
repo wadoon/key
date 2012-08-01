@@ -47,7 +47,7 @@ public class ABSInfo implements IProgramInfo {
         this(services, program2key, new ABSModelParserInfo());
     }
 
-    private ABSInfo(ABSServices services, KeYABSMapping program2key,
+    ABSInfo(ABSServices services, KeYABSMapping program2key,
             ABSModelParserInfo absInfo) {
         this.services = services;
         this.program2key = program2key;

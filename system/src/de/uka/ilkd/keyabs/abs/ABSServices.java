@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.ABSProfile;
 import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
 
@@ -27,8 +28,8 @@ public class ABSServices extends AbstractServices {
         this(null, new KeYABSMapping());
     }
 
-    public ABSServices(KeYABSMapping map) {
-        this(null, map);
+    public ABSServices(KeYABSMapping map, ABSInfo info) {
+        this(null, map, info.getABSParserInfo());
     }
 
     public ABSServices(KeYExceptionHandler handler) {
@@ -41,6 +42,12 @@ public class ABSServices extends AbstractServices {
         this.info = new ABSInfo(this, program2key);
     }
 
+    private ABSServices(KeYExceptionHandler handler, KeYABSMapping program2key, ABSModelParserInfo parserInfo) {
+        super(handler);
+        setTypeConverter(new ABSTypeConverter(this));
+        this.info = new ABSInfo(this, program2key, parserInfo);
+    }
+
     @Override
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
@@ -48,7 +55,7 @@ public class ABSServices extends AbstractServices {
 
     @Override
     public ABSServices copy() {
-        ABSServices s = new ABSServices(getProgramInfo().rec2key().copy());
+        ABSServices s = new ABSServices(getProgramInfo().rec2key().copy(), info);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setExceptionHandler(getExceptionHandler());
@@ -68,7 +75,7 @@ public class ABSServices extends AbstractServices {
 
     @Override
     public ABSServices copyProofSpecific(Proof p_proof) {
-        ABSServices s = new ABSServices(getProgramInfo().rec2key());
+        ABSServices s = new ABSServices(getProgramInfo().rec2key(), info);
         s.proof = proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));

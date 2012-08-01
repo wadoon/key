@@ -20,7 +20,7 @@ public class ABSReader implements JavaReader {
 
     @Override
     public JavaBlock readBlockWithEmptyContext(String s, IServices services) {
-        return null;
+        return readBlockWithProgramVariables(services.getNamespaces().programVariables(), services, s);
     }
 
     @Override
@@ -55,9 +55,11 @@ public class ABSReader implements JavaReader {
 
             return JavaBlock.createJavaBlock(block);
         } catch (IOException e) {
-            throw new ConvertException("Failed to parse ABS block.", e);
+            e.printStackTrace();
+            throw new ConvertException("Failed to parse ABS block. \n" + e.getMessage(), e);
         } catch (Exception e) {
-            throw new ConvertException("Failed to parse ABS block.", e);
+            e.printStackTrace();
+            throw new ConvertException("Failed to parse ABS block.\n " + e.getMessage(), e);
         }
     }
 
