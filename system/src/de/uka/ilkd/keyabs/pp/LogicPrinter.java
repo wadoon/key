@@ -2023,18 +2023,19 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSIfStatement(ABSIfStatement x) throws IOException {
-        layouter.beginC(2).print("if").ind(1, 0).print("(");
+        layouter.print("if (").beginC(2);
         x.getCondition().visit(programPrettyPrinter);
-        layouter.print(")").brk(1, 0);
+        layouter.print(")").brk(1, 2);
         x.getThenBranch().visit(programPrettyPrinter);
+        
         if (x.getElseBranch() != null) {
             layouter.brk(1, -2);
-            layouter.print("else").brk(1, 0);
+            layouter.print("else").brk(1, 2);
             x.getElseBranch().visit(programPrettyPrinter);
         } else {
             layouter.brk(1, -2);
         }
-        layouter.end();
+        layouter.brk(0, -2).end();
     }
 
     public void printABSContextStatementBlock(ABSContextStatementBlock x)

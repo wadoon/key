@@ -4,27 +4,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 import abs.backend.coreabs.CoreAbsBackend;
-import abs.frontend.ast.ASTNode;
-import abs.frontend.ast.ClassDecl;
-import abs.frontend.ast.DataConstructor;
-import abs.frontend.ast.DataTypeDecl;
-import abs.frontend.ast.FunctionDecl;
-import abs.frontend.ast.InterfaceDecl;
-import abs.frontend.ast.InterfaceTypeUse;
-import abs.frontend.ast.MethodSig;
-import abs.frontend.ast.Model;
-import abs.frontend.ast.ParametricDataTypeDecl;
-import abs.frontend.ast.VarDecl;
+import abs.frontend.ast.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.keyabs.init.ABSProblemInitializer;
 import de.uka.ilkd.keyabs.init.SortBuilder;
 
 /**
@@ -37,11 +23,6 @@ import de.uka.ilkd.keyabs.init.SortBuilder;
  *
  */
 public class ABSModelParserInfo {
-
-
-    private static String createFullyQualifiedName(InterfaceTypeUse ifdecl) {
-        return ifdecl.getModuleDecl().getName() + "." + ifdecl.getName();
-    }
 
 
     private String createFullyQualifiedName(ClassDecl classDecl) {
@@ -189,8 +170,7 @@ public class ABSModelParserInfo {
                 ASTNode<?> currentNode = child.getChild(i);
                 if (currentNode instanceof InterfaceDecl) {
                     final InterfaceDecl interf = (InterfaceDecl) currentNode;
-                    interfaces.put(new Name(SortBuilder.createFullyQualifiedName(interf)),
-                            interf);
+                    interfaces.put(new Name(SortBuilder.createFullyQualifiedName(interf)), interf);
                 } else if (currentNode instanceof ParametricDataTypeDecl) {
 
                     final ParametricDataTypeDecl dataType = (ParametricDataTypeDecl) currentNode;
@@ -218,16 +198,19 @@ public class ABSModelParserInfo {
                      */
                 } else if (currentNode instanceof MethodSig) {
                     MethodSig msig = (MethodSig) currentNode;
-                    // System.out.println("Method" + msig.getName());
+                    //System.out.println("Method " + msig.getName() + " ");
                 } else if (currentNode instanceof VarDecl) {
                     VarDecl vd = (VarDecl) currentNode;
                     /*
                      * System.out.println("Local Var " + vd.getName() + " " +
                      * vd.getType() + " " + vd.getInitExp());
                      */
-                } else {
-                    collectTypesAndFunctionDeclarations(currentNode);
+                } else if (currentNode instanceof FieldDecl) {
+                    
                 }
+                //else {
+                    collectTypesAndFunctionDeclarations(currentNode);
+                //}
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -144,9 +144,6 @@ public abstract class AbstractABS2KeYABSConverter {
     public ABSIfStatement convert(IfStmt x) {
         IABSPureExpression cond = (IABSPureExpression) convert(x.getCondition());
         IABSStatement _then = (IABSStatement) convert(x.getThen());
-
-        System.out.println("Has else " + x.hasElse());
-
         IABSStatement _else = x.hasElse() ? (IABSStatement) convert(x.getElse())
                 : null;
 

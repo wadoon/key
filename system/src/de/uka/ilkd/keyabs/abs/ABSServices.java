@@ -21,22 +21,23 @@ public class ABSServices extends AbstractServices {
     /**
      * specification repository
      */
-    private ABSSpecificationRepository specRepos = new ABSSpecificationRepository(
-            this);
+    private ABSSpecificationRepository specRepos = 
+            new ABSSpecificationRepository(this);
 
     public ABSServices() {
         this(null, new KeYABSMapping());
-    }
-
-    public ABSServices(KeYABSMapping map, ABSInfo info) {
-        this(null, map, info.getABSParserInfo());
     }
 
     public ABSServices(KeYExceptionHandler handler) {
         this(handler, new KeYABSMapping());
     }
 
-    public ABSServices(KeYExceptionHandler handler, KeYABSMapping program2key) {
+
+    private ABSServices(KeYABSMapping map, ABSInfo info) {
+        this(null, map, info.getABSParserInfo());
+    }
+
+    private ABSServices(KeYExceptionHandler handler, KeYABSMapping program2key) {
         super(handler);
         setTypeConverter(new ABSTypeConverter(this));
         this.info = new ABSInfo(this, program2key);

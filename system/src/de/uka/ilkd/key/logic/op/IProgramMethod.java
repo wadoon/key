@@ -72,6 +72,4 @@ public interface IProgramMethod extends IObserverFunction, SourceElement, Progra
 
    public abstract ImmutableArray<ParameterDeclaration> getParameters();
 
-   // Methods from OberverFunction, TODO Create interface for ObersverFunction
-   public ImmutableArray<KeYJavaType> getParamTypes();
 }

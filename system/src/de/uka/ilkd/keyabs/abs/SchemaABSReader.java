@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 public class SchemaABSReader implements SchemaJavaReader {
 
     private static final String SCHEMA_MODULE = "module SCHEMA_TACLET_READ_MODULE;";
-    private Namespace schemaVariables = new Namespace();;
+    private Namespace<IProgramVariable> schemaVariables = new Namespace<IProgramVariable>();;
 
     private void printTree(ASTNode node) {
         for (int i = 0; i < node.getNumChild(); i++) {
@@ -44,20 +44,21 @@ public class SchemaABSReader implements SchemaJavaReader {
         absReader.setWithStdLib(false);
         absReader.setAllowIncompleteExpr(true);
         try {
-            System.out.println("ParseInput: " + blockStr);
-
             Model m = absReader.parse(
                     File.createTempFile("taclet_", ".keyabs"), blockStr,
                     new StringReader(blockStr));
 
-            System.out.println(m.getMainBlock() + " Errors: "
-                    + m.getErrors().size());
 
-            for (SemanticError se : m.getErrors()) {
-                System.out.println(se.getHelpMessage() + " : "
-                        + se.getFileName() + " : " + se.getMsgString());
+            if (m.getErrors().size() > 0) {
+                System.out.println("ParseInput: " + blockStr);
+                System.out.println(m.getMainBlock() + " Errors: " + m.getErrors().size());
+
+                for (SemanticError se : m.getErrors()) {
+                    System.out.println(se.getHelpMessage() + " : "
+                            + se.getFileName() + " : " + se.getMsgString());
+                }
             }
-
+                
             AbstractABS2KeYABSConverter converter = new SchemaABS2KeYABSConverter(
                     schemaVariables, services);
 

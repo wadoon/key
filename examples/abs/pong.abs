@@ -33,6 +33,8 @@ class PingImpl(Pong pong) implements Ping {
       pong!hello(this); 
     }
 
+
+    Unit myOwn() { }
     Unit nothing(Int i) { }
     Unit nothing() { }
 
@@ -42,7 +44,8 @@ class PingImpl(Pong pong) implements Ping {
          Fine => ByePong; 
          ByePing => NoMsg;
       };
-      
+
+
       if (reply != NoMsg) {
          Fut<Unit> fu = pong!pong(reply);
          fu.get;
