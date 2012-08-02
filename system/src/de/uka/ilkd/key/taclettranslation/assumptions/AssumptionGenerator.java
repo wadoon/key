@@ -70,7 +70,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                 // // variables
                 // // and do not quantify the variables.
 
-                Term term = SkeletonGenerator.FindTacletTranslator.translate(t);
+                Term term = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(t);
 
                 // rebuild the term to exchange schema variables with logic
                 // varibales.

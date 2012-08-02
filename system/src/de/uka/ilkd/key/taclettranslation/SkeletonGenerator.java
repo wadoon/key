@@ -21,7 +21,8 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 
 public interface SkeletonGenerator{
-    public final static SkeletonGenerator FindTacletTranslator = new FindTacletTranslator(); 
+    public final static SkeletonGenerator DEFAULT_TACLET_TRANSLATOR =
+            new DefaultTacletTranslator(); 
     
     /**
      * Override this method to introduce a translating mechanism for taclets.
