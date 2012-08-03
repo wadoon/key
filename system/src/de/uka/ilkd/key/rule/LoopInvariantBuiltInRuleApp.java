@@ -6,13 +6,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.statement.While;
@@ -20,8 +14,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -70,7 +64,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	if (rawInv == null) return null;
     	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
     	Term var = rawInv.getInternalVariant();
-        final TermBuilder tb = TermBuilder.DF;
+        final TermBuilder tb = JavaProfile.DF();
     	boolean skipIndex = false;
     	boolean skipValues = false;
     	
@@ -83,19 +77,18 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	skipIndex = !(guardStatement instanceof LessThan);
     	Expression loopIndex = skipIndex? null: (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	skipIndex = skipIndex || !( loopIndex instanceof ProgramVariable);
-		final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
-    	
-		// try to retrieve a sequence of values
-    	final TermBuilder tb = JavaProfile.DF();
-		Statement body = loop.getBody();
-		skipValues = !(body instanceof StatementBlock);
-		StatementBlock block = skipValues? null: ((StatementBlock)body);
-		Statement last = (skipValues || block.getStatementCount() < 2) ? null: block.getStatementAt(1); // get the second statement
-		skipValues = skipValues || !(last instanceof CopyAssignment);
-		CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
-		ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
-		skipValues = skipValues || !(lhs instanceof ProgramVariable);
-		final Term valuesVar = skipValues? null: tb.var((ProgramVariable)lhs);
+    	final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
+
+    	// try to retrieve a sequence of values
+    	Statement body = loop.getBody();
+    	skipValues = !(body instanceof StatementBlock);
+    	StatementBlock block = skipValues? null: ((StatementBlock)body);
+    	Statement last = (skipValues || block.getStatementCount() < 2) ? null: block.getStatementAt(1); // get the second statement
+    	skipValues = skipValues || !(last instanceof CopyAssignment);
+    	CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
+    	ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
+    	skipValues = skipValues || !(lhs instanceof ProgramVariable);
+    	final Term valuesVar = skipValues? null: tb.var((ProgramVariable)lhs);
     	
     	// set up replacement visitors
     	final class IndexTermReplacementVisitor extends Visitor {

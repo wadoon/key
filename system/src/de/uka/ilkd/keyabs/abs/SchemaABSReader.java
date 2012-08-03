@@ -14,6 +14,10 @@ import de.uka.ilkd.key.java.SchemaJavaReader;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
+import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
+import de.uka.ilkd.keyabs.abs.AbstractABS2KeYABSConverter;
+import de.uka.ilkd.keyabs.abs.SchemaABS2KeYABSConverter;
 
 public class SchemaABSReader implements SchemaJavaReader {
 
