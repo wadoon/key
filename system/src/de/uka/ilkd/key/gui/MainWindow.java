@@ -43,6 +43,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -51,6 +52,7 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -114,10 +116,10 @@ public final class MainWindow extends JFrame  {
     private GoalList goalList;
     
     /** the mediator is stored here */
-    private KeYMediator mediator;
+    private KeYMediator<?, ?> mediator;
     
     /** the user interface which direct all notifications to this window */ 
-    private UserInterface userInterface;
+    private UserInterface<?,?> userInterface;
     
     /** the status line */
     private MainStatusLine statusLine;
@@ -210,7 +212,7 @@ public final class MainWindow extends JFrame  {
      * @param title
      *            the frame's title
      */
-    private void initialize(String title, UserInterface ui) {
+    private <S extends IServices, IC extends AbstractInitConfig<S,IC>> void initialize(String title, UserInterface<S, IC> ui) {
         setTitle(title);
         setLaF();
         setIconImage(IconFactory.keyLogo());
@@ -219,8 +221,7 @@ public final class MainWindow extends JFrame  {
         guiListener = new MainGUIListener();
         
         userInterface = ui;
-        
-        setMediator(new KeYMediator(userInterface));
+        setMediator(new KeYMediator<S, IC>(ui));
         
         initNotification();
         layoutMain();
@@ -265,7 +266,7 @@ public final class MainWindow extends JFrame  {
      * @param m
      *            the KeYMediator
      */
-    private void setMediator(KeYMediator m) {
+    private void setMediator(KeYMediator<?, ?> m) {
         assert mediator == null;
 	// This was an incomplete replacement method. It would call first
 	// "unregisterMediatorListeners();"
@@ -293,8 +294,8 @@ public final class MainWindow extends JFrame  {
      * 
      * @return the mediator
      */
-    public KeYMediator getMediator() {
-        return mediator;
+    public <S extends IServices, IC extends AbstractInitConfig<S,IC>> KeYMediator<S, IC> getMediator() {
+        return (KeYMediator<S, IC>) mediator;
     }
     
     public void setVisible(boolean v){
@@ -1718,7 +1719,7 @@ public final class MainWindow extends JFrame  {
 	return recentFiles;
     }
 
-    public UserInterface getUserInterface() {
+    public UserInterface<?, ?> getUserInterface() {
         return userInterface;
     }
     

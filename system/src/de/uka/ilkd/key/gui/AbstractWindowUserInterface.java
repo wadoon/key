@@ -33,7 +33,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
 
     public void loadProblem(File file, List<File> classPath, File bootClassPath) {
     	mainWindow.addRecentFile(file.getAbsolutePath());
-    	this.loadProblem(file, classPath, bootClassPath, mainWindow.getMediator());
+    	this.loadProblem(file, classPath, bootClassPath, mainWindow.<S, IC>getMediator());
     }
 
     @Override
