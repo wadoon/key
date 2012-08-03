@@ -10,14 +10,10 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SimpleExceptionDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.FileChooser;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
@@ -173,8 +169,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final File fileForDefinitions = chooser.getFileForDefinitions();
                 final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
-                final AbstractProblemInitializer<?, ?> problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
-                                mainWindow.getMediator().getProfile(), false, mainWindow.getUserInterface());
+                final AbstractProblemInitializer<?, ?> problemInitializer = 
+                        mainWindow.getMediator().getUI().createProblemInitializer(false);
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),
@@ -250,8 +246,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final File fileForDefinitions = chooser.getFileForDefinitions();
                 final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
-                final AbstractProblemInitializer<?, ?> problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
-                                (Profile<Services, InitConfig>) proof.env().getInitConfig().getProfile(), false, mainWindow.getUserInterface());
+                final AbstractProblemInitializer<?, ?> problemInitializer = 
+                        mainWindow.getMediator().getUI().createProblemInitializer(false);
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),

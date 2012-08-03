@@ -51,7 +51,7 @@ public abstract class AbstractUserInterface<S extends IServices, IC extends Abst
      */
     @Override
     public Proof createProof(IC initConfig, ProofOblInput input) throws ProofInputException {
-       AbstractProblemInitializer<?, IC> init = createProblemInitializer();
+       AbstractProblemInitializer<?, IC> init = createProblemInitializer(true);
        return init.startProver(initConfig, input, 0);
     }
 

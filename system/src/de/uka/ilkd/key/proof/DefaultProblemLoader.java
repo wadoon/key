@@ -165,7 +165,7 @@ public class DefaultProblemLoader<S extends IServices, IC extends AbstractInitCo
     * @return The {@link ProblemInitializer} to use.
     */
    protected AbstractProblemInitializer<S, IC> createProblemInitializer() {
-       return mediator.getUI().createProblemInitializer();
+       return mediator.getUI().createProblemInitializer(true);
    }
    
    /**

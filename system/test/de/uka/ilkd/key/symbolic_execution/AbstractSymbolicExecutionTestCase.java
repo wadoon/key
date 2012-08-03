@@ -837,7 +837,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * Waits until the auto mode has stopped.
     * @param ui The {@link UserInterface} to wait for.
     */
-   protected void waitForAutoMode(UserInterface ui) {
+   protected void waitForAutoMode(UserInterface<?,?> ui) {
       assertNotNull(ui);
       AutoModeFinishListener listener = new AutoModeFinishListener();
       ui.getMediator().addAutoModeListener(listener);

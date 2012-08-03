@@ -92,7 +92,7 @@ public interface UserInterface<S extends IServices, IC extends AbstractInitConfi
      * </p>
      * @return The instantiated {@link ProblemInitializer}.
      */
-    AbstractProblemInitializer<S, IC> createProblemInitializer();
+    AbstractProblemInitializer<S, IC> createProblemInitializer(boolean registerProof);
     
     /**
      * Returns the used {@link KeYMediator}.

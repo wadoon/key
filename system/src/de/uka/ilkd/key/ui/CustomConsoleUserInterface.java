@@ -32,7 +32,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  * </p>
  * @author Martin Hentschel
  */
-public class CustomConsoleUserInterface extends ConsoleUserInterface<Services, InitConfig> {
+public class CustomConsoleUserInterface extends ConsoleUserInterface {
    /**
     * Constructor.
     * @param verbose Verbose?
@@ -58,7 +58,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface<Services, I
     * @param proof The proof to start auto mode for.
     */
    public void startProof(Proof proof) {
-      KeYMediator mediator = getMediator();
+      KeYMediator<Services, InitConfig> mediator = getMediator();
       mediator.setProof(proof);
       mediator.startAutoMode();
    }

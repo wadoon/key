@@ -14,9 +14,9 @@ public class ABSWindowUserInterface extends AbstractWindowUserInterface<ABSServi
     }
 
     @Override
-    public ABSProblemInitializer createProblemInitializer() {
+    public ABSProblemInitializer createProblemInitializer(boolean registerProof) {
         return new ABSProblemInitializer(this, getMediator().getProfile(),
                 getMediator().getProfile()
-                        .createServices(new KeYRecoderExcHandler()), true, this);
+                        .createServices(new KeYRecoderExcHandler()), registerProof, this);
     }
 }

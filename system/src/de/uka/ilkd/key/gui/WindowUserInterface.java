@@ -27,7 +27,7 @@ public class WindowUserInterface extends AbstractWindowUserInterface<Services, I
     }
 
     @Override
-    public ProblemInitializer createProblemInitializer() {
-        return new ProblemInitializer(this, mainWindow.getMediator().getProfile(), true,  this);
+    public ProblemInitializer createProblemInitializer(boolean registerProof) {
+        return new ProblemInitializer(this, mainWindow.getMediator().getProfile(), registerProof,  this);
     }
 }
