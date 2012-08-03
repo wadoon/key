@@ -8,28 +8,16 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.IKeYFile;
-import de.uka.ilkd.key.proof.io.LDTInput;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
-import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -40,8 +28,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 public abstract class AbstractProblemInitializer<S extends IServices, IC extends AbstractInitConfig> {
 
-    public static interface ProblemInitializerListener {
-        public void proofCreated(AbstractProblemInitializer<?,?> sender, ProofAggregate proofAggregate);
+    public static interface ProblemInitializerListener<S extends IServices, IC extends AbstractInitConfig> {
+        public void proofCreated(AbstractProblemInitializer<S, IC> sender, ProofAggregate proofAggregate);
 
         public void progressStarted(Object sender);
 
@@ -67,12 +55,12 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
     protected final S services;
     protected final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
-    protected final ProblemInitializerListener listener;
+    protected final ProblemInitializerListener<S, IC> listener;
     protected final boolean registerProof;
 
     public AbstractProblemInitializer(ProgressMonitor mon, Profile profile,
             S services, boolean registerProof,
-            ProblemInitializerListener listener) {
+            ProblemInitializerListener<S, IC> listener) {
         this.profile = profile;
         this.services = services;
         this.progMon = mon;
@@ -155,7 +143,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
 
         // read normal includes
         for (String fileName : in.getIncludes()) {
-            IKeYFile keyFile = createKeYFile(in, fileName);
+            final IKeYFile keyFile = createKeYFile(in, fileName);
             readEnvInput(keyFile, initConfig);
         }
     }
@@ -168,9 +156,9 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
      * See bug report #1185, #1189
      */
     private static <IC extends AbstractInitConfig> void cleanupNamespaces(IC initConfig) {
-        Namespace<ParsableVariable> newVarNS = new Namespace<ParsableVariable>();
-        Namespace<Sort> newSortNS = new Namespace<Sort>();
-        Namespace<SortedOperator> newFuncNS = new Namespace<SortedOperator>();
+        final Namespace<ParsableVariable> newVarNS = new Namespace<ParsableVariable>();
+        final Namespace<Sort> newSortNS = new Namespace<Sort>();
+        final Namespace<SortedOperator> newFuncNS = new Namespace<SortedOperator>();
         for (Sort n : initConfig.sortNS().allElements()) {
             if (!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
@@ -263,7 +251,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
 
     private IC determineEnvironment(ProofOblInput po,
             IC initConfig) throws ProofInputException {
-        ProofEnvironment env = initConfig.getProofEnv();
+        ProofEnvironment<IC> env = initConfig.getProofEnv();
 
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(
@@ -366,22 +354,21 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
         return initConfig;
     }
 
-    public Proof startProver(AbstractInitConfig initConfig, ProofOblInput po,
-            int proofNum) throws ProofInputException {
+    public Proof startProver(IC initConfig, ProofOblInput po,  int proofNum) throws ProofInputException {
         assert initConfig != null;
         if (listener != null) {
             listener.progressStarted(this);
         }
         try {
             // determine environment
-            initConfig = determineEnvironment(po, (IC) initConfig);
+            initConfig = determineEnvironment(po, initConfig);
 
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
             po.readProblem();
             ProofAggregate pa = po.getPO();
             // final work
-            setUpProofHelper(po, pa, (IC) initConfig);
+            setUpProofHelper(po, pa, initConfig);
 
             // done
             if (listener != null) {

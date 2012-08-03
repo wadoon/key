@@ -129,7 +129,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
     protected void readJava(EnvInput envInput, InitConfig initConfig) 
     		throws ProofInputException {
 	//this method must only be called once per init config	
-        final Services javaServices = (Services) initConfig.getServices();
+        final Services javaServices = initConfig.getServices();
         assert !javaServices
         .getJavaInfo()
         .rec2key()
@@ -143,7 +143,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
 	final File bootClassPath = envInput.readBootClassPath();
 	
 	//create Recoder2KeY, set classpath
-	final Recoder2KeY r2k = new Recoder2KeY((Services) javaServices, 
+	final Recoder2KeY r2k = new Recoder2KeY(javaServices, 
                                                 initConfig.namespaces());
 	r2k.setClassPath(bootClassPath, classPath);
 
@@ -183,7 +183,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
     @Override
     protected void registerProgramDefinedSymbols(InitConfig initConfig)
             throws ProofInputException {
-        final JavaInfo javaInfo = (JavaInfo) initConfig.getServices().getProgramInfo();
+        final JavaInfo javaInfo = initConfig.getServices().getProgramInfo();
         final Namespace<SortedOperator> functions 
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 

@@ -17,11 +17,16 @@ import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
 
+
+/**
+ * 
+ * @author Richard Bubel
+ */
 public class ABSProblemInitializer extends
         AbstractProblemInitializer<ABSServices, ABSInitConfig> {
 
     public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
-            boolean registerProof, ProblemInitializerListener listener) {
+            boolean registerProof, ProblemInitializerListener<ABSServices, ABSInitConfig> listener) {
         this(mon, profile, (ABSServices) profile
                 .createServices(new KeYRecoderExcHandler()), registerProof,
                 listener);
@@ -29,7 +34,7 @@ public class ABSProblemInitializer extends
 
     public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
             ABSServices services, boolean registerProof,
-            ProblemInitializerListener listener) {
+            ProblemInitializerListener<ABSServices, ABSInitConfig> listener) {
         super(mon, profile, services, registerProof, listener);
     }
 

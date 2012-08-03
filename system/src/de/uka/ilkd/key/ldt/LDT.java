@@ -49,7 +49,7 @@ public abstract class LDT implements Named {
     //-------------------------------------------------------------------------
     
     protected LDT(Name name, IServices services) {
-	sort = (Sort) services.getNamespaces().sorts().lookup(name);
+	sort = services.getNamespaces().sorts().lookup(name);
 	assert sort != null;
         this.name = name;
     }

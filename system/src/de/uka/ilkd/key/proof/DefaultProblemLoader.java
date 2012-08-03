@@ -10,23 +10,13 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.ui.UserInterface;
-import de.uka.ilkd.keyabs.init.ABSProblemInitializer;
 import de.uka.ilkd.keyabs.init.ABSProfile;
 import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
 
@@ -45,7 +35,7 @@ import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
  * </p>
  * @author Martin Hentschel
  */
-public class DefaultProblemLoader {
+public class DefaultProblemLoader<S extends IServices, IC extends AbstractInitConfig> {
    /**
     * The file or folder to load.
     */
@@ -64,7 +54,7 @@ public class DefaultProblemLoader {
    /**
     * The {@link KeYMediator} to use.
     */
-   private KeYMediator mediator;
+   private KeYMediator<S, IC> mediator;
    
    /**
     * The instantiated {@link EnvInput} which describes the file to load.
@@ -74,12 +64,12 @@ public class DefaultProblemLoader {
    /**
     * The instantiated {@link ProblemInitializer} used during the loading process.
     */
-   private  AbstractProblemInitializer<?,?> problemInitializer;
+   private  AbstractProblemInitializer<S, IC> problemInitializer;
    
    /**
     * The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
     */
-   private AbstractInitConfig initConfig;
+   private IC initConfig;
    
    /**
     * The instantiate proof or {@code null} if no proof was instantiated during loading process.
@@ -93,7 +83,7 @@ public class DefaultProblemLoader {
     * @param bootClassPath An optional boot class path.
     * @param mediator The {@link KeYMediator} to use.
     */
-   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
+   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator<S, IC> mediator) {
       assert mediator != null;
       this.file = file;
       this.classPath = classPath;
@@ -174,17 +164,8 @@ public class DefaultProblemLoader {
     * Instantiates the {@link ProblemInitializer} to use.
     * @return The {@link ProblemInitializer} to use.
     */
-   protected AbstractProblemInitializer<?,?> createProblemInitializer() {
-      UserInterface ui = mediator.getUI();
-     
-      if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile) {
-          return new ABSProblemInitializer(ui, ProofSettings.DEFAULT_SETTINGS.getProfile() , true, ui);
-      }
-      return new ProblemInitializer(ui, 
-                                    mediator.getProfile(), 
-                                    new Services(mediator.getExceptionHandler()), 
-                                    true, 
-                                    ui);
+   protected AbstractProblemInitializer<S, IC> createProblemInitializer() {
+       return mediator.getUI().createProblemInitializer();
    }
    
    /**
@@ -192,7 +173,7 @@ public class DefaultProblemLoader {
     * @return The created {@link InitConfig}.
     * @throws ProofInputException Occurred Exception.
     */
-   protected AbstractInitConfig createInitConfig() throws ProofInputException {
+   protected IC createInitConfig() throws ProofInputException {
       return problemInitializer.prepare(envInput);
    }
    
@@ -325,7 +306,7 @@ public class DefaultProblemLoader {
     * Returns the {@link KeYMediator} to use.
     * @return The {@link KeYMediator} to use.
     */
-   public KeYMediator getMediator() {
+   public KeYMediator<S, IC> getMediator() {
       return mediator;
    }
 
@@ -341,7 +322,7 @@ public class DefaultProblemLoader {
     * Returns the instantiated {@link ProblemInitializer} used during the loading process.
     * @return The instantiated {@link ProblemInitializer} used during the loading process.
     */
-   public AbstractProblemInitializer<?,?> getProblemInitializer() {
+   public AbstractProblemInitializer<S,IC> getProblemInitializer() {
       return problemInitializer;
    }
 
@@ -349,7 +330,7 @@ public class DefaultProblemLoader {
     * Returns the instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
     * @return The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
     */
-   public AbstractInitConfig getInitConfig() {
+   public IC getInitConfig() {
       return initConfig;
    }
 

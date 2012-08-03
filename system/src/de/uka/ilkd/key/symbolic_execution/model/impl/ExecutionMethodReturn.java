@@ -151,7 +151,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
             de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput sequentToProve = 
             		SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
                                                                                                                                                                                      mbs.getBodySourceAsTypeReference(),
-                                                                                                                                                                                     mbs.getProgramMethod((Services) getServices()),
+                                                                                                                                                                                     mbs.getProgramMethod(getServices()),
                                                                                                                                                                                      mbs.getDesignatedContext(), 
                                                                                                                                                                                      methodReturnNode, 
                                                                                                                                                                                      resultVar);

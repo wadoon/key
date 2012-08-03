@@ -12,11 +12,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
@@ -38,11 +34,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-import de.uka.ilkd.key.gui.ApplyTacletDialog;
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -107,7 +99,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
     private Sequent seq;
 
     // the mediator
-    private KeYMediator mediator;
+    private KeYMediator<?,?> mediator;
 
     // the mouse/mouseMotion listener
     protected SequentViewListener listener;
@@ -135,7 +127,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
      * @param mediator the KeYMediator allowing access to the
      *  current system status
      */
-    public SequentView(KeYMediator mediator) {
+    public SequentView(KeYMediator<?,?> mediator) {
 	/* setting this to text/html causes the position tables to go wrong */
 	super("text/plain","");
 	setMediator(mediator);
@@ -495,7 +487,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
      * @param mediator the KeYMediator used to communicate with other
      * components 
      */
-    private void setMediator(KeYMediator mediator) {
+    private void setMediator(KeYMediator<?,?> mediator) {
         Debug.assertTrue(mediator != null, "Mediator must be set");
         this.mediator = mediator;
     }
@@ -541,7 +533,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
     /** returns the mediator of this view
      * @return the KeYMediator
      */
-    public KeYMediator mediator() {
+    public KeYMediator<?,?> mediator() {
 	return mediator;
     }
 

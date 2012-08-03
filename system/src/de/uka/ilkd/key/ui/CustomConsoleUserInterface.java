@@ -2,9 +2,11 @@ package de.uka.ilkd.key.ui;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.InitConfig;
 
 /**
  * <p>
@@ -30,7 +32,7 @@ import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
  * </p>
  * @author Martin Hentschel
  */
-public class CustomConsoleUserInterface extends ConsoleUserInterface {
+public class CustomConsoleUserInterface extends ConsoleUserInterface<Services, InitConfig> {
    /**
     * Constructor.
     * @param verbose Verbose?
@@ -65,7 +67,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public void proofCreated(AbstractProblemInitializer<?,?> sender, ProofAggregate proofAggregate) {
+   public void proofCreated(AbstractProblemInitializer<Services, InitConfig> sender, ProofAggregate proofAggregate) {
       // Nothing to do
    }
 

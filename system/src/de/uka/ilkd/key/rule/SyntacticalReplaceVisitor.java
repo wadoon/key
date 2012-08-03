@@ -137,7 +137,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 		if (cie.prefix() != null) {
 			return IProgramVisitorProvider.createProgramContextAdder().start
 					((NonTerminalProgramElement)cie.contextProgram(), 
-							(IStatementBlock) pe,
+							pe,
 							(ContextStatementBlockInstantiation)cie.getInstantiation());
 		} 
 
@@ -171,7 +171,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 		trans.start();
 		result = (IStatementBlock)trans.result();
 		if (jb.program() instanceof IContextStatementBlock) {	
-			result = (IStatementBlock) addContext(result);
+			result = addContext(result);
 		}
 		return (result==jb.program()) ? jb : JavaBlock.createJavaBlock(result);
 	}

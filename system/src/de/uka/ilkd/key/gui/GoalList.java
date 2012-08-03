@@ -21,14 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JList;
-import javax.swing.JPopupMenu;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -40,11 +33,7 @@ import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.UIConfiguration;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.util.Debug;
 
 public class GoalList extends JList<Goal> {
@@ -56,7 +45,7 @@ public class GoalList extends JList<Goal> {
     private final static ImageIcon keyIcon = IconFactory.keyHole(20,20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
 
-    private KeYMediator mediator;   
+    private KeYMediator<?,?> mediator;   
 
     /** the model used by this view */
     private final SelectingGoalListModel selectingListModel;
@@ -86,8 +75,8 @@ public class GoalList extends JList<Goal> {
         private static final long serialVersionUID = -2035187175105625072L;
 
         DisableSingleGoal() {
-            if (getSelectedValue() instanceof Goal) {                
-                final Goal g = (Goal) getSelectedValue();
+            if (getSelectedValue() != null) {                
+                final Goal g = getSelectedValue();
                 putValue(NAME, g.isAutomatic() ? "Interactive Goal" : "Automatic Goal");
                 putValue(SHORT_DESCRIPTION,  g.isAutomatic() ? "No automatic rules " +
                 		"will be applied when goal is set to interactive." : 
@@ -137,8 +126,8 @@ public class GoalList extends JList<Goal> {
         private static final long serialVersionUID = 4077876260098617901L;
 
         DisableOtherGoals() {
-            if (getSelectedValue() instanceof Goal) {                
-                final Goal g = (Goal) getSelectedValue();
+            if (getSelectedValue() != null) {                
+                final Goal g = getSelectedValue();
                 putValue(NAME, g.isAutomatic() ? "Set Other Goals Interactive" : "Set Other Goals Automatic");
                 putValue(SHORT_DESCRIPTION,  g.isAutomatic() ? "No automatic rules " +
                                 "will be applied on all other goals." : 
@@ -195,7 +184,7 @@ public class GoalList extends JList<Goal> {
     }
     
 
-    public GoalList(KeYMediator mediator){
+    public GoalList(KeYMediator<?,?> mediator){
 	interactiveListener = new GoalListInteractiveListener();
 	selectionListener   = new GoalListSelectionListener();
 	guiListener         = new GoalListGUIListener();
@@ -240,7 +229,7 @@ public class GoalList extends JList<Goal> {
     }
     
     /** set the KeYMediator */
-    private void setMediator(KeYMediator m) {
+    private void setMediator(KeYMediator<?,?> m) {
 	if (mediator != null) {
 	    unregister();
 	}
@@ -277,13 +266,13 @@ public class GoalList extends JList<Goal> {
 	super.removeNotify ();
     }
 
-    private KeYMediator mediator() {
+    private KeYMediator<?,?> mediator() {
 	return mediator;
     }
 
     
     private void goalChosen() {
-	Goal goal = (Goal)getSelectedValue();
+	Goal goal = getSelectedValue();
 	if (goal != null) {
 	    mediator().goalChosen(goal);
 	}
@@ -343,11 +332,6 @@ public class GoalList extends JList<Goal> {
 
         /** focused node has changed */
         public void selectedNodeChanged(KeYSelectionEvent e) {
-            selectSelectedGoal();
-        }
-
-        /** focused goal has changed */
-        public void selectedGoalChanged(KeYSelectionEvent e) {
             selectSelectedGoal();
         }
 
@@ -650,7 +634,7 @@ public class GoalList extends JList<Goal> {
             int ind = delegatePosToMappingPos ( delegateBegin );
             
             for ( int i = delegateBegin; i < delegateEnd; ++i ) {
-                final Goal goal = (Goal)delegate.getElementAt ( i );
+                final Goal goal = delegate.getElementAt ( i );
                 if ( !isHiddenGoal ( goal ) )
                     entries.add ( ind++, Integer.valueOf ( i ) );
             }

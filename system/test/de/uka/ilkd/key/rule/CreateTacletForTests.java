@@ -270,8 +270,8 @@ public class CreateTacletForTests extends TestCase {
 		   "}\n"
 		   );
 
-	sort1 = (Sort)nss.sorts().lookup(new Name("testSort1"));
-	nat = (Sort)nss.sorts().lookup(new Name("Nat"));
+	sort1 = nss.sorts().lookup(new Name("testSort1"));
+	nat = nss.sorts().lookup(new Name("Nat"));
 
 	b = (SchemaVariable)nss.variables().lookup(new Name("b"));
 

@@ -11,11 +11,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
@@ -125,7 +121,7 @@ public abstract class AbstractInitConfig {
         }
     
         for (final String s : c2DC.values()) {
-            final Choice c = (Choice) choiceNS().lookup(new Name(s));
+            final Choice c = choiceNS().lookup(new Name(s));
             if(c!=null){
                 activatedChoices = activatedChoices.add(c);
             }

@@ -209,7 +209,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          else {
             Term parentTerm = parentVariable.createSelectTerm();
             if (programVariable != null) {
-               if (((JavaInfo)getServices().getJavaInfo()).getArrayLength() == getProgramVariable()) {
+               if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
                   // Special handling for length attribute of arrays
                   Function function = getServices().getTypeConverter().getHeapLDT().getLength();
                   return JavaProfile.DF().func(function, parentTerm);
@@ -304,7 +304,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             // Normal value
             ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
             for (Field field : fields) {
-               ImmutableList<ProgramVariable> vars = ((Services)getServices()).getJavaInfo().getAllAttributes(field.getFullName(), keyType);
+               ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
                for (ProgramVariable var : vars) {
                   if (!var.isImplicit() && !var.isStatic()) {
                      children.add(new ExecutionVariable(getMediator(), getProofNode(), this, field.getProgramVariable()));

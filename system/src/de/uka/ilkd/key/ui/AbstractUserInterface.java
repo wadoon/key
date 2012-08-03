@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
@@ -16,10 +17,10 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
-public abstract class AbstractUserInterface implements UserInterface {
+public abstract class AbstractUserInterface<S extends IServices, IC extends AbstractInitConfig> implements UserInterface<S, IC> {
 
 	public void loadProblem(File file, List<File> classPath,
-	        File bootClassPath, KeYMediator mediator) {
+	        File bootClassPath, KeYMediator<S, IC> mediator) {
 		final ProblemLoader pl = new ProblemLoader(file, classPath,
 		        bootClassPath, mediator);
 		pl.addTaskListener(this);
@@ -28,8 +29,8 @@ public abstract class AbstractUserInterface implements UserInterface {
 
     @Override
 	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-		if (app instanceof IBuiltInRuleApp) {
-			app = ((IBuiltInRuleApp)app).tryToInstantiate(goal);
+		if (app != null) {
+			app = app.tryToInstantiate(goal);
 		}
 		// cannot complete that app
 		return app.complete() ? app : null;
@@ -40,7 +41,7 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     @Override
     public AbstractInitConfig load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
-       DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, getMediator());
+       DefaultProblemLoader<S, IC> loader = new DefaultProblemLoader<S, IC>(file, classPath, bootClassPath, getMediator());
        loader.load();
        return loader.getInitConfig();
     }
@@ -49,8 +50,8 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public <IC extends AbstractInitConfig> Proof createProof(IC initConfig, ProofOblInput input) throws ProofInputException {
-       AbstractProblemInitializer<?, IC> init = (AbstractProblemInitializer<?, IC>) createProblemInitializer();
+    public Proof createProof(IC initConfig, ProofOblInput input) throws ProofInputException {
+       AbstractProblemInitializer<?, IC> init = createProblemInitializer();
        return init.startProver(initConfig, input, 0);
     }
 

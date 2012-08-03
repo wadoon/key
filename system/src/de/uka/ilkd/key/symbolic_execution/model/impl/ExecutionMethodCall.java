@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -46,7 +45,7 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     */
    @Override
    public IProgramMethod getProgramMethod() {
-      return getActiveStatement().getProgramMethod((Services) getServices());
+      return getActiveStatement().getProgramMethod(getServices());
    }
 
    /**

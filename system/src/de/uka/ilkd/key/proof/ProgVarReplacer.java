@@ -329,7 +329,7 @@ public final class ProgVarReplacer {
             IStatementBlock s = (IStatementBlock)jb.program();
             IStatementBlock newS = (IStatementBlock)replace(s);
             if(newS != s) {
-                newJb = JavaBlock.createJavaBlock((IStatementBlock)newS);
+                newJb = JavaBlock.createJavaBlock(newS);
             }
         }
 

@@ -82,7 +82,7 @@ public class ABSProgramReplaceVisitor extends ABSModificationVisitor implements
             final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>) inst;
             // the assertion ensures the intended instanceof check from above
             assert instArray.size() == 0
-                    || instArray.last() instanceof ProgramElement;
+                    || instArray.last() != null;
             addChildren(instArray);
             changed();
         } else if (inst instanceof Term

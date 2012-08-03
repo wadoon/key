@@ -23,12 +23,12 @@ public class HistoryLDT extends LDT {
 	public HistoryLDT(IServices services) {
 		super(new Name("History"), services);
 
-		interfaceLabelSort = (Sort) services.getNamespaces().sorts()
+		interfaceLabelSort = services.getNamespaces().sorts()
 				.lookup(new Name("ItfLabel"));
-		classLabelSort = (Sort) services.getNamespaces().sorts()
+		classLabelSort = services.getNamespaces().sorts()
 				.lookup(new Name("ClassLabel"));
 
-		futureSort = (Sort) services.getNamespaces().sorts()
+		futureSort = services.getNamespaces().sorts()
 				.lookup(new Name("Future"));
 
 	}

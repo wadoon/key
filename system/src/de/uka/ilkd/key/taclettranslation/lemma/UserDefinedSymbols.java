@@ -98,7 +98,7 @@ public class UserDefinedSymbols {
 
         public void addSort(Sort symbol) {
                 if (symbol != Sort.FORMULA) {
-                        Sort sort = (Sort) symbol;
+                        Sort sort = symbol;
                         if(!(sort instanceof NullSort)){
                                 for(Sort parentSort : sort.extendsSorts()){
                                         addSort(parentSort);

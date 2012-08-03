@@ -89,7 +89,7 @@ public class TestTacletParser extends TestCase {
     //
     
     Operator lookup_var(String name) {
-	return (Operator)nss.variables().lookup(new Name(name));
+	return nss.variables().lookup(new Name(name));
     }
     
 

@@ -162,7 +162,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 		
 		if (!app.complete()) {
 		    app = app.setIfInsts(bir.ifInsts());	        
-			app = (AbstractBuiltInRuleApp) ((IBuiltInRuleApp)app).tryToInstantiate(goal);
+			app = app.tryToInstantiate(goal);
 		}
 
 		return app.complete() ? app : null;

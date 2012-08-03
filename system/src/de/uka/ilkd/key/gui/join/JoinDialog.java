@@ -400,7 +400,7 @@ public class JoinDialog extends StdDialog{
         
         public ContentItem getSelectedItem(){
         	int index = getChoiceList().getSelectedIndex();
-        	return ((ContentItem)getChoiceList().getModel().getElementAt(index));
+        	return (getChoiceList().getModel().getElementAt(index));
         }
     
     }

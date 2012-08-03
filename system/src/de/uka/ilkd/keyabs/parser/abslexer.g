@@ -245,6 +245,11 @@ tokens {
       modPairs.put("\\throughout_transaction","\\endmodality");
    }
 
+   public void recover( RecognitionException ex, BitSet tokenSet ) throws CharStreamException {
+     consume();
+     consumeUntil( tokenSet );
+   }
+
    private void matchAndTransformModality(int beginIndex) throws antlr.RecognitionException {
       if(!modalityEnd.equals((String)modPairs.get(modalityBegin)))
           throw new RecognitionException("Unknown modality " +
@@ -742,7 +747,7 @@ options {
 IDENT
 options {
     testLiterals = true;
-    paraphrase = "an identifer";
+    paraphrase = "an identifier";
 }
 
 :  ( (LETTER | '_' | '#' | '$') (IDCHAR)* 

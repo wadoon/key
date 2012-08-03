@@ -250,7 +250,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  (Sort) services.getNamespaces().sorts().lookup(new Name(
+                                  services.getNamespaces().sorts().lookup(new Name(
                 "int")));
         Term expected =
                 TB.all(i,
@@ -285,7 +285,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  (Sort) services.getNamespaces().sorts().lookup(new Name(
+                                  services.getNamespaces().sorts().lookup(new Name(
                 "int")));
         Term expected =
                 TB.ex(i,
@@ -318,7 +318,7 @@ public class TestJMLTranslator extends TestCase {
         Function q = (Function) nss.functions().lookup(new Name("bsum"));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  (Sort) nss.sorts().lookup(new Name("int")));
+                                  nss.sorts().lookup(new Name("int")));
         Term expected =
                 TB.bsum(i,
                         TB.zTerm(services, "0"),

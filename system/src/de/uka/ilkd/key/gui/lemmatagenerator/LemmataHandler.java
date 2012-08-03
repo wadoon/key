@@ -177,7 +177,7 @@ public class LemmataHandler implements TacletFilter {
         private class Listener implements ProblemInitializerListener {
 
                 @Override
-                public void proofCreated(AbstractProblemInitializer<?, ?> sender,
+                public void proofCreated(AbstractProblemInitializer sender,
                                 ProofAggregate proofAggregate) {
                         println("The proofs have been initialized.");
                 }
@@ -213,6 +213,7 @@ public class LemmataHandler implements TacletFilter {
                                 Exception e) {
                         printException(e);
                 }
+
 
         }
 

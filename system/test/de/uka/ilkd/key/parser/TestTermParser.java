@@ -128,7 +128,7 @@ public class TestTermParser extends TestCase {
     }
 
     Sort lookup_sort(String name) {
-	return (Sort)nss.sorts().lookup(new Name(name));
+	return nss.sorts().lookup(new Name(name));
     }
     
     Function lookup_func(String name) {

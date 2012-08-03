@@ -7,29 +7,26 @@ import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 
-public class ConsoleUserInterface extends AbstractUserInterface {
+public class ConsoleUserInterface<S extends IServices, IC extends AbstractInitConfig> extends AbstractUserInterface<S, IC> {
 
     private final BatchMode batchMode;
     private final boolean verbose;
 	private ProofStarter ps;
-	private KeYMediator mediator;
+	private KeYMediator<S, IC> mediator;
 
     public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
     	this.batchMode = batchMode;
         this.verbose = verbose;
-        this.mediator  = new KeYMediator(this);
+        this.mediator  = new KeYMediator<S, IC>(this);
     }
 
     public void taskFinished(TaskFinishedInfo info) {
@@ -77,7 +74,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
     @Override
-    public void proofCreated(AbstractProblemInitializer<?, ?> sender,
+    public void proofCreated(AbstractProblemInitializer<S, IC> sender,
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
@@ -196,15 +193,16 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
    @Override
-   public AbstractProblemInitializer<?, ?> createProblemInitializer() {
-      return new ProblemInitializer(this, mediator.getProfile(), true, this);
+   public AbstractProblemInitializer<S, IC> createProblemInitializer() {
+       //TODO ABS and Java ConsoleUI
+      return (AbstractProblemInitializer<S, IC>) new ProblemInitializer(this, mediator.getProfile(), true, this);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public KeYMediator getMediator() {
+   public KeYMediator<S, IC> getMediator() {
      return mediator;
    }
 

@@ -166,9 +166,9 @@ public class Recoder2KeYTypeConverter {
             }
             addKeYJavaType(t, s);
         } else if (t instanceof recoder.abstraction.NullType) {
-            s = (Sort) namespaces.sorts().lookup(NullSort.NAME);
+            s = namespaces.sorts().lookup(NullSort.NAME);
             if(s == null) {
-        	Sort objectSort = (Sort)namespaces.sorts().lookup(new Name("java.lang.Object"));
+        	Sort objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
         	assert objectSort != null;
         	s = new NullSort(objectSort);
             }
@@ -177,7 +177,7 @@ public class Recoder2KeYTypeConverter {
             recoder.abstraction.ParameterizedType pt = (recoder.abstraction.ParameterizedType) t;
             return getKeYJavaType(pt.getGenericType());
         } else if (t instanceof recoder.abstraction.ClassType) {
-            s = (Sort) namespaces.sorts().lookup(new Name(t.getFullName()));
+            s = namespaces.sorts().lookup(new Name(t.getFullName()));
             if(s == null) {
                 recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
                 if (ct.isInterface()) {

@@ -12,17 +12,12 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
+public interface UserInterface<S extends IServices, IC extends AbstractInitConfig> extends ProblemInitializerListener<S, IC>, ProverTaskListener, ProgressMonitor {
 
     /**
      * these methods are called immediately before automode is started to ensure that
@@ -97,13 +92,13 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * </p>
      * @return The instantiated {@link ProblemInitializer}.
      */
-    <S extends IServices, IC extends AbstractInitConfig> AbstractProblemInitializer<S, IC> createProblemInitializer();
+    AbstractProblemInitializer<S, IC> createProblemInitializer();
     
     /**
      * Returns the used {@link KeYMediator}.
      * @return The used {@link KeYMediator}.
      */
-    KeYMediator getMediator();
+    KeYMediator<S, IC> getMediator();
     
     /**
      * Opens a java file in this {@link UserInterface} and returns the instantiated {@link InitConfig}
@@ -125,7 +120,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return The instantiated {@link Proof}.
      * @throws ProofInputException Occurred Exception.
      */
-    <IC extends AbstractInitConfig> Proof createProof(IC initConfig, ProofOblInput input) throws ProofInputException;
+    Proof createProof(IC initConfig, ProofOblInput input) throws ProofInputException;
     
     /**
      * Checks if the auto mode of this {@link UserInterface} supports the given {@link Proof}.

@@ -103,7 +103,7 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     Sort lookup_sort(String name) {
-	Sort s = (Sort)nss.sorts().lookup(new Name(name));
+	Sort s = nss.sorts().lookup(new Name(name));
  	if ( s == null ) {
 	    throw new RuntimeException("Sort named "+name+" not found");
 	}

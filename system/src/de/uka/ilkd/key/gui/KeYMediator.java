@@ -26,39 +26,22 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.TacletFilter;
-import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -67,10 +50,10 @@ import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
-public class KeYMediator {    
+public class KeYMediator<S extends IServices, IC extends AbstractInitConfig> {    
 
 	/** The user interface */
-    private UserInterface ui;
+    private UserInterface<S, IC> ui;
 
     private InteractiveProver interactiveProver;
 
@@ -102,7 +85,7 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
-    public KeYMediator(UserInterface ui) {
+    public KeYMediator(UserInterface<S, IC> ui) {
 	this.ui             = ui;
 	notationInfo        = ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration().createDefaultNotationInfo();
 	proofListener       = new KeYMediatorProofListener();
@@ -577,7 +560,7 @@ public class KeYMediator {
     /** returns the user interface
      * @return the user interface 
      */
-    public UserInterface getUI() {
+    public UserInterface<S, IC> getUI() {
         return ui;
     }
 

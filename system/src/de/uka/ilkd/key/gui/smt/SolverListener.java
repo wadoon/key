@@ -177,8 +177,7 @@ public class SolverListener implements SolverLauncherListener {
                 for (SMTProblem problem : smtProblems) {
                         if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
                         	IBuiltInRuleApp app = 
-                        			( (RuleAppSMT) 
-                        					(RuleAppSMT.rule.createApp( null ) )).
+                        			(RuleAppSMT.rule.createApp( null ) ).
                         					     setTitle( getTitle(problem) );
                         	problem.getGoal().apply(app);
                         }
@@ -357,7 +356,7 @@ public class SolverListener implements SolverLauncherListener {
                 long startTime = problem.solver.getStartTime();
                 long currentTime = System.currentTimeMillis();
                 long temp = (startTime - currentTime) / 100;
-                return Math.max((float) temp / 10.0f, 0);
+                return Math.max(temp / 10.0f, 0);
         }
 
  

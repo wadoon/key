@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -29,7 +28,6 @@ import javax.swing.JPopupMenu;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
@@ -40,6 +38,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
  * <p>
@@ -331,8 +330,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         // if in replaceWithMode only apps that contain at least one replacewith
         // are collected. Otherwise only those without a replacewith.
-        for (final TacletApp app : seqView.mediator()
-                .getFindTaclet(findPos)) {
+        for (final TacletApp app : seqView.mediator().getFindTaclet(findPos)) {
             if (filter.satisfiesFilterCondition(app.taclet())) {
                 allTacletsAtFindPosition = allTacletsAtFindPosition
                         .prepend(app);
@@ -504,8 +502,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         if (app == null) {
             return;
         }
-        final KeYMediator mediator = seqView.mediator();
-        mediator.applyInteractive(app, mediator.getSelectedGoal());
+        seqView.mediator().applyInteractive(app, seqView.mediator().getSelectedGoal());
     }
 
     /**

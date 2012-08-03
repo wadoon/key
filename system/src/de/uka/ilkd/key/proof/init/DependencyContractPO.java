@@ -59,7 +59,7 @@ public final class DependencyContractPO extends AbstractJavaPO
     
     @Override
     protected Services getServices() {
-        return (Services)super.getServices();
+        return super.getServices();
     }
 
     @Override

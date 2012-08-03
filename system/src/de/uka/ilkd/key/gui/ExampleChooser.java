@@ -263,7 +263,7 @@ public final class ExampleChooser extends JDialog {
 	
 	//return result
 	final File result = instance.success 
-        		    ? new File((File)instance.exampleList
+        		    ? new File(instance.exampleList
         			                     .getSelectedValue(), 
         			       KEY_FILE_NAME) 
         	            : null;	

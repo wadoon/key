@@ -245,7 +245,7 @@ public class TestDeclParser extends TestCase {
 		   "\\functions {\n" +
 		   "  aSort[][] f(aSort);\n" +
 		   "}\n");
-	Sort aSort = (Sort)nss.sorts().lookup(new Name("aSort"));
+	Sort aSort = nss.sorts().lookup(new Name("aSort"));
 	Sort objectSort = serv.getJavaInfo().objectSort();
 	Sort cloneableSort = serv.getJavaInfo().cloneableSort();
         Sort serializableSort = serv.getJavaInfo().serializableSort();
@@ -276,8 +276,8 @@ public class TestDeclParser extends TestCase {
 		   "  list cons(elem,list);\n" +
 		   "}\n");
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
 
         Sort objectSort = serv.getJavaInfo().objectSort();
         Sort cloneableSort = serv.getJavaInfo().cloneableSort();
@@ -335,8 +335,8 @@ public class TestDeclParser extends TestCase {
 		   "  maybe;\n" +
 		   "}\n");
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
 
 
 	assertEquals("find isEmpty predicate", new Name("isEmpty"),
@@ -377,8 +377,8 @@ public class TestDeclParser extends TestCase {
 		   "}\n");
 	
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
 
 	assertEquals("find SV x", new Name("x"),
 		     nss.variables().lookup(new Name("x")).name()); 
