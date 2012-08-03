@@ -14,7 +14,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 
-
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -64,7 +63,7 @@ public class ProofSettings {
 
     
     /** profile */
-    private Profile profile;
+    private Profile<?,?> profile;
 
     private final static int STRATEGY_SETTINGS = 0;
     private final static int GENERAL_SETTINGS  = 1;
@@ -119,13 +118,13 @@ public class ProofSettings {
     }
     
     
-    public void setProfile(Profile profile) {
+    public void setProfile(Profile<?, ?> profile) {
         this.profile = profile;
         profile.updateSettings(this);
         ensureInitialized();
     }
 
-    public Profile getProfile() {                
+    public Profile<?, ?> getProfile() {                
         if (profile == null) {
             //the following line should be removed
             setProfile(new JavaProfile());

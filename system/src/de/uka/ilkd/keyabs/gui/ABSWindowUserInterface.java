@@ -2,7 +2,6 @@ package de.uka.ilkd.keyabs.gui;
 
 import de.uka.ilkd.key.gui.AbstractWindowUserInterface;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.init.ABSInitConfig;
@@ -16,9 +15,8 @@ public class ABSWindowUserInterface extends AbstractWindowUserInterface<ABSServi
 
     @Override
     public ABSProblemInitializer createProblemInitializer() {
-        final Profile profile = getMediator().getProfile();
-        return new ABSProblemInitializer(this, profile,
-                (ABSServices) profile
+        return new ABSProblemInitializer(this, getMediator().getProfile(),
+                getMediator().getProfile()
                         .createServices(new KeYRecoderExcHandler()), true, this);
     }
 }

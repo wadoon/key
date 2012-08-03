@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
  * This includes sorts, functions, heuristics, and variables namespaces,
  * information on the underlying java model, and a set of rules.
  */
-public class InitConfig extends AbstractInitConfig {
+public class InitConfig extends AbstractInitConfig<Services, InitConfig> {
 
     /**
      * the services class allowing to access information about the underlying
@@ -31,7 +31,7 @@ public class InitConfig extends AbstractInitConfig {
     /**
      * the proof environment this init config belongs to
      */
-    protected final ProofEnvironment env;
+    protected final ProofEnvironment<InitConfig> env;
 
 
 
@@ -39,10 +39,10 @@ public class InitConfig extends AbstractInitConfig {
     //constructors
     //-------------------------------------------------------------------------
 
-    public InitConfig(Services services, Profile profile) {
+    public InitConfig(Services services, Profile<Services, InitConfig> profile) {
 	super(profile);
         this.services  = services;
-	this.env       = new ProofEnvironment(this);
+	this.env       = new ProofEnvironment<InitConfig>(this);
 		
     }
 
@@ -62,7 +62,7 @@ public class InitConfig extends AbstractInitConfig {
      * @return the ProofEnvironment using this configuration
      */
     @Override
-    public ProofEnvironment getProofEnv() {
+    public ProofEnvironment<InitConfig> getProofEnv() {
         assert env.getInitConfig() == this;
         return env;
     }

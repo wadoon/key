@@ -8,15 +8,13 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 
-public class ConsoleUserInterface<S extends IServices, IC extends AbstractInitConfig> extends AbstractUserInterface<S, IC> {
+public class ConsoleUserInterface<S extends IServices, IC extends AbstractInitConfig<S,IC>> extends AbstractUserInterface<S, IC> {
 
     private final BatchMode batchMode;
     private final boolean verbose;
@@ -195,7 +193,7 @@ public class ConsoleUserInterface<S extends IServices, IC extends AbstractInitCo
    @Override
    public AbstractProblemInitializer<S, IC> createProblemInitializer() {
        //TODO ABS and Java ConsoleUI
-      return (AbstractProblemInitializer<S, IC>) new ProblemInitializer(this, mediator.getProfile(), true, this);
+      return null;//(AbstractProblemInitializer<S, IC>) new ProblemInitializer(this, mediator.getProfile(), true, this);
    }
 
    /**

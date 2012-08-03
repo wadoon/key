@@ -1,11 +1,6 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
 
@@ -35,7 +30,7 @@ public class TacletSoundnessPOLoader {
          * proof obligations and once for adding them to the already existing proof obligation. This is necessary 
          * in order to omit name clashes.  
          */
-        private final AbstractInitConfig originalConfig;
+        private final AbstractInitConfig<?,?> originalConfig;
        
         private LinkedList<LoaderListener> listeners = new LinkedList<LoaderListener>();
         private ProofAggregate resultingProof;
@@ -296,7 +291,7 @@ public class TacletSoundnessPOLoader {
                 return originalConfig == null;
         }
 
-        private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
+        private ProofAggregate createProof(ProofEnvironment<?> proofEnvForTaclets,
                         ImmutableSet<Taclet> taclets,
                         KeYUserProblemFile keyFile, ImmutableSet<Taclet> axioms) {
                 removeTaclets(proofEnvForTaclets.getInitConfig(),taclets);

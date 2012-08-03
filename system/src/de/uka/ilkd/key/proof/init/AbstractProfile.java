@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
@@ -29,7 +30,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
 
-public abstract class AbstractProfile implements Profile {
+public abstract class AbstractProfile<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements Profile<S, IC> {
 
     private final RuleCollection       standardRules;
 
@@ -77,6 +78,7 @@ public abstract class AbstractProfile implements Profile {
                 add(new SymbolicExecutionGoalChooserBuilder()));
     }
 
+    @Override
     public RuleCollection getStandardRules() {
         return standardRules;
     }
@@ -103,14 +105,17 @@ public abstract class AbstractProfile implements Profile {
     }
 
 
+    @Override
     public ImmutableSet<StrategyFactory> supportedStrategies() {
         return strategies;
     }
 
+    @Override
     public boolean supportsStrategyFactory(Name strategy) {
         return getStrategyFactory(strategy) != null;
     }
 
+    @Override
     public StrategyFactory getStrategyFactory(Name n) {
         Iterator<StrategyFactory> it = getStrategyFactories().iterator();
         while (it.hasNext()) {
@@ -126,6 +131,7 @@ public abstract class AbstractProfile implements Profile {
      * returns the names of the supported goal chooser
      * builders
      */
+    @Override
      public ImmutableSet<String> supportedGoalChoosers() {
          return supportedGC;
      }
@@ -135,6 +141,7 @@ public abstract class AbstractProfile implements Profile {
       * @return this implementation returns a new instance of
       * {@link DefaultGoalChooserBuilder}
       */
+    @Override
      public GoalChooserBuilder getDefaultGoalChooserBuilder() {
          return new DefaultGoalChooserBuilder();
      }
@@ -144,6 +151,7 @@ public abstract class AbstractProfile implements Profile {
       * @throws IllegalArgumentException if a goal chooser of the given name is not
       *  supported
       */
+    @Override
      public void setSelectedGoalChooserBuilder(String name) {
 
          this.prototype = lookupGC(name);
@@ -162,7 +170,7 @@ public abstract class AbstractProfile implements Profile {
       * @return a new instance of the builder or <code>null</code> if the
       * demanded chooser is not supported
       */
-     public GoalChooserBuilder lookupGC(String name) {
+     protected GoalChooserBuilder lookupGC(String name) {
         final Iterator<GoalChooserBuilder> it  = supportedGCB.iterator();
         while (it.hasNext()) {
             final GoalChooserBuilder supprotedGCB = it.next();
@@ -176,6 +184,7 @@ public abstract class AbstractProfile implements Profile {
     /**
       * returns a copy of the selected goal chooser builder
       */
+     @Override
      public GoalChooserBuilder getSelectedGoalChooserBuilder(){
         return prototype.copy();
      }
@@ -185,6 +194,7 @@ public abstract class AbstractProfile implements Profile {
       * justification
       * @return the justification for the standard rules
       */
+     @Override
      public RuleJustification getJustification(Rule r) {
          return AxiomJustification.INSTANCE;
      }
@@ -192,6 +202,7 @@ public abstract class AbstractProfile implements Profile {
      /**
       * sets the given settings to some default depending on the profile
       */
+     @Override
      public void updateSettings(ProofSettings settings) {
 	 //settings.getSMTSettings().updateSMTRules(this);
      }

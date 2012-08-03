@@ -25,14 +25,14 @@ import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
 public class ABSProblemInitializer extends
         AbstractProblemInitializer<ABSServices, ABSInitConfig> {
 
-    public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
+    public ABSProblemInitializer(ProgressMonitor mon, Profile<ABSServices, ABSInitConfig> profile,
             boolean registerProof, ProblemInitializerListener<ABSServices, ABSInitConfig> listener) {
         this(mon, profile, (ABSServices) profile
                 .createServices(new KeYRecoderExcHandler()), registerProof,
                 listener);
     }
 
-    public ABSProblemInitializer(ProgressMonitor mon, Profile profile,
+    public ABSProblemInitializer(ProgressMonitor mon, Profile<ABSServices, ABSInitConfig> profile,
             ABSServices services, boolean registerProof,
             ProblemInitializerListener<ABSServices, ABSInitConfig> listener) {
         super(mon, profile, services, registerProof, listener);

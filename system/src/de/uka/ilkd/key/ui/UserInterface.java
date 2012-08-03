@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerL
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface<S extends IServices, IC extends AbstractInitConfig> extends ProblemInitializerListener<S, IC>, ProverTaskListener, ProgressMonitor {
+public interface UserInterface<S extends IServices, IC extends AbstractInitConfig<S, IC>> extends ProblemInitializerListener<S, IC>, ProverTaskListener, ProgressMonitor {
 
     /**
      * these methods are called immediately before automode is started to ensure that
@@ -110,7 +110,7 @@ public interface UserInterface<S extends IServices, IC extends AbstractInitConfi
      * @throws IOException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    AbstractInitConfig load(File file, List<File> classPaths, File bootClassPath) throws IOException, ProofInputException;
+    IC load(File file, List<File> classPaths, File bootClassPath) throws IOException, ProofInputException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given

@@ -40,7 +40,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  *    </ul>
  * etc.
  */
-public interface Profile {
+public interface Profile<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
 
     /** returns the rule source containg all taclets for this profile */
     RuleCollection getStandardRules();
@@ -121,15 +121,14 @@ public interface Profile {
     /**
      * create a new services object
      */
-    IServices createServices(KeYExceptionHandler handler);
+    S createServices(KeYExceptionHandler handler);
 
     /**
      * Initialization
      * @param services
-     * @param profile
      * @return
      */
-    AbstractInitConfig createInitConfig(IServices services, Profile profile);
+    IC createInitConfig(S services);
 
 
 

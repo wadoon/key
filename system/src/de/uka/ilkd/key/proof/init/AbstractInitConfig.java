@@ -24,11 +24,11 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
-public abstract class AbstractInitConfig {
+public abstract class AbstractInitConfig<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
 
-    protected final Profile profile;
+    protected final Profile<S, IC> profile;
 
-    public AbstractInitConfig(Profile profile) {
+    public AbstractInitConfig(Profile<S,IC> profile) {
         this.profile = profile;
     }
 
@@ -55,10 +55,11 @@ public abstract class AbstractInitConfig {
     /** HashMap for quick lookups taclet name->taclet */
     private HashMap<Name, Named> quickTacletMap;
     private String originalKeYFileName;
+    
     private ProofSettings settings;
 
     
-    public Profile getProfile() {
+    public Profile<S, IC> getProfile() {
         return profile;
     }
 
@@ -68,7 +69,7 @@ public abstract class AbstractInitConfig {
      * returns the proof environment using this initial configuration
      * @return the ProofEnvironment using this configuration
      */
-    public abstract <IC extends AbstractInitConfig> ProofEnvironment<IC> getProofEnv();
+    public abstract ProofEnvironment<IC> getProofEnv();
 
     /**
      * adds entries to the HashMap that maps categories to their
@@ -258,20 +259,23 @@ public abstract class AbstractInitConfig {
         return settings;
     }
 
-    
+    public void setOriginalKeYFileName(String originalKeYFileName) {
+        this.originalKeYFileName = originalKeYFileName;
+    }
+
     /** returns a copy of this initial configuration copying the namespaces,
      * the contained JavaInfo while using the immutable set of taclets in the
      * copy
      */
-    public abstract AbstractInitConfig copy();
+    public abstract IC copy();
     
-    protected void initCopy(AbstractInitConfig ic) {
+    protected void initCopy(IC ic) {
         ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap<String, String>) category2DefaultChoice.clone());
+        ic.addCategory2DefaultChoices(category2DefaultChoice);
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
-        ic.originalKeYFileName = originalKeYFileName;
+        ic.setOriginalKeYFileName(originalKeYFileName);
     }
 
     public String toString() {

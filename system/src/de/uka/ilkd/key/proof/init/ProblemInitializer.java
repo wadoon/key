@@ -44,22 +44,22 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
 
     
     public ProblemInitializer(ProgressMonitor mon,
-	                      Profile profile, Services services, boolean registerProof,
-	                      ProblemInitializerListener listener) {
+	                      Profile<Services, InitConfig>  profile, Services services, boolean registerProof,
+	                      ProblemInitializerListener<Services, InitConfig>  listener) {
 	super(mon, profile, services, registerProof, listener);
     }
 
     public ProblemInitializer(ProgressMonitor mon,
-            Profile profile, 
+            Profile<Services, InitConfig>  profile, 
             boolean registerProof,
-            ProblemInitializerListener listener) {
+            ProblemInitializerListener<Services, InitConfig>  listener) {
         this(mon, profile, 
                 (Services) profile.createServices(new KeYRecoderExcHandler()), 
                 registerProof, listener);
     }
 
     
-    public ProblemInitializer(Profile profile) {
+    public ProblemInitializer(Profile<Services, InitConfig>  profile) {
 	this(null, profile, false, null);
     }
     

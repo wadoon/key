@@ -86,7 +86,7 @@ public class Proof implements Named {
     private AbbrevMap abbreviations = new AbbrevMap();
 
     /** the environment of the proof with specs and java model*/
-    private ProofEnvironment proofEnv;
+    private ProofEnvironment<?> proofEnv;
     
     /** the environment of the proof with specs and java model*/
     private ProofCorrectnessMgt localMgt;
@@ -202,7 +202,7 @@ public class Proof implements Named {
                     p.getActiveStrategy().name().toString(), 
                     getSettings().getStrategySettings().getActiveStrategyProperties());
         
-        AbstractInitConfig ic = p.env().getInitConfig();
+        AbstractInitConfig<?,?> ic = p.env().getInitConfig();
         Node rootNode = new Node(this, p.root.sequent());
         setRoot(rootNode);
 	Goal firstGoal = new Goal(rootNode, 
@@ -339,12 +339,12 @@ public class Proof implements Named {
     }
 
     
-    public void setProofEnv(ProofEnvironment env) {
+    public void setProofEnv(ProofEnvironment<?> env) {
 	proofEnv=env;
     }
     
 
-    public ProofEnvironment env() {
+    public ProofEnvironment<?> env() {
 	return proofEnv;
     }
 

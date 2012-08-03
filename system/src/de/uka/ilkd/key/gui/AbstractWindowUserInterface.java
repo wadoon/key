@@ -22,7 +22,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
-public abstract class AbstractWindowUserInterface<S extends IServices, IC extends AbstractInitConfig> extends AbstractUserInterface<S, IC> {
+public abstract class AbstractWindowUserInterface<S extends IServices, IC extends AbstractInitConfig<S, IC>> extends AbstractUserInterface<S, IC> {
 
     protected MainWindow mainWindow;
     protected LinkedList<InteractiveRuleApplicationCompletion> completions = new LinkedList<InteractiveRuleApplicationCompletion>();
@@ -231,7 +231,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
         * {@inheritDoc}
         */
     @Override
-    public AbstractInitConfig load(File file, List<File> classPath, File bootClassPath)
+    public IC load(File file, List<File> classPath, File bootClassPath)
             throws IOException, ProofInputException {
                   if (file != null) {
                      mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());

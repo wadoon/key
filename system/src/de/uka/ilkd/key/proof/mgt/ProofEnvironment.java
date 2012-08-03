@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.Taclet;
  * environment is equal, there is an InitConfig contained to be used
  * to start proofs of this environment.
  */
-public class ProofEnvironment<IC extends AbstractInitConfig> {
+public class ProofEnvironment<IC extends AbstractInitConfig<?,IC>> {
 
     private JavaModel jModel;
     private RuleConfig ruleConfig;
@@ -170,7 +170,7 @@ public class ProofEnvironment<IC extends AbstractInitConfig> {
  	    return false;
  	}
  	@SuppressWarnings("unchecked")
-	ProofEnvironment<AbstractInitConfig> pe = (ProofEnvironment<AbstractInitConfig>) cmp;
+	ProofEnvironment<IC> pe = (ProofEnvironment<IC>) cmp;
  	return pe.getJavaModel().equals(getJavaModel()) &&
 	    pe.getRuleConfig().equals(getRuleConfig()) &&
 	    pe.getNumber() == (getNumber());

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
-public abstract class AbstractUserInterface<S extends IServices, IC extends AbstractInitConfig> implements UserInterface<S, IC> {
+public abstract class AbstractUserInterface<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements UserInterface<S, IC> {
 
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator<S, IC> mediator) {
@@ -40,7 +40,7 @@ public abstract class AbstractUserInterface<S extends IServices, IC extends Abst
      * {@inheritDoc}
      */
     @Override
-    public AbstractInitConfig load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
+    public IC load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
        DefaultProblemLoader<S, IC> loader = new DefaultProblemLoader<S, IC>(file, classPath, bootClassPath, getMediator());
        loader.load();
        return loader.getInitConfig();

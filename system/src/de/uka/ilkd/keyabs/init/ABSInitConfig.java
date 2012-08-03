@@ -5,12 +5,12 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.proof.mgt.ABSProofEnvironment;
 
-public class ABSInitConfig extends AbstractInitConfig {
+public class ABSInitConfig extends AbstractInitConfig<ABSServices, ABSInitConfig>  {
 
     private ABSServices services;
     private ABSProofEnvironment env;
 
-    public ABSInitConfig(ABSServices services, Profile profile) {
+    public ABSInitConfig(ABSServices services, Profile<ABSServices, ABSInitConfig> profile) {
         super(profile);
         this.services = services;
         this.env = new ABSProofEnvironment(this);

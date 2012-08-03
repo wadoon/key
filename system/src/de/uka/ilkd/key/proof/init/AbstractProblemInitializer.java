@@ -26,9 +26,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public abstract class AbstractProblemInitializer<S extends IServices, IC extends AbstractInitConfig> {
+public abstract class AbstractProblemInitializer<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
 
-    public static interface ProblemInitializerListener<S extends IServices, IC extends AbstractInitConfig> {
+    public static interface ProblemInitializerListener<S extends IServices, IC extends AbstractInitConfig<S,IC>> {
         public void proofCreated(AbstractProblemInitializer<S, IC> sender, ProofAggregate proofAggregate);
 
         public void progressStarted(Object sender);
@@ -51,14 +51,14 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
             IC initConfig) throws ProofInputException;
 
     private static AbstractInitConfig baseConfig;
-    protected final Profile profile;
+    protected final Profile<S, IC> profile;
     protected final S services;
     protected final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     protected final ProblemInitializerListener<S, IC> listener;
     protected final boolean registerProof;
 
-    public AbstractProblemInitializer(ProgressMonitor mon, Profile profile,
+    public AbstractProblemInitializer(ProgressMonitor mon, Profile<S, IC> profile,
             S services, boolean registerProof,
             ProblemInitializerListener<S, IC> listener) {
         this.profile = profile;
@@ -155,7 +155,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
      * 
      * See bug report #1185, #1189
      */
-    private static <IC extends AbstractInitConfig> void cleanupNamespaces(IC initConfig) {
+    private static <IC extends AbstractInitConfig<?, IC>> void cleanupNamespaces(IC initConfig) {
         final Namespace<ParsableVariable> newVarNS = new Namespace<ParsableVariable>();
         final Namespace<Sort> newSortNS = new Namespace<Sort>();
         final Namespace<SortedOperator> newFuncNS = new Namespace<SortedOperator>();
@@ -311,7 +311,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
             // createBaseConfig implemented by the subclasses to avoid the cast
             // in
             // createInitConfig
-            baseConfig = profile.createInitConfig(services, profile);
+            baseConfig = profile.createInitConfig(services);
 
             RuleSource tacletBase = profile.getStandardRules().getTacletBase();
             if (tacletBase != null) {

@@ -35,7 +35,7 @@ import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
  * </p>
  * @author Martin Hentschel
  */
-public class DefaultProblemLoader<S extends IServices, IC extends AbstractInitConfig> {
+public class DefaultProblemLoader<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
    /**
     * The file or folder to load.
     */

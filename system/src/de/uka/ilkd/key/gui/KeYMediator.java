@@ -38,7 +38,6 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.rule.*;
@@ -50,7 +49,7 @@ import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
-public class KeYMediator<S extends IServices, IC extends AbstractInitConfig> {    
+public class KeYMediator<S extends IServices, IC extends AbstractInitConfig<S, IC>> {    
 
 	/** The user interface */
     private UserInterface<S, IC> ui;
@@ -696,7 +695,7 @@ public class KeYMediator<S extends IServices, IC extends AbstractInitConfig> {
     private int goalsClosedByAutoMode=0;
 
 
-    private Profile profile;
+    private Profile<S, IC> profile;
 
     public void closedAGoal() { 
 	    goalsClosedByAutoMode++;
@@ -855,12 +854,10 @@ public class KeYMediator<S extends IServices, IC extends AbstractInitConfig> {
     }
 
     /** return the chosen profile */
-    public Profile getProfile() {  
+    public Profile<S, IC> getProfile() {  
         if (profile == null) {               
-            profile = ProofSettings.DEFAULT_SETTINGS.getProfile();   
-            if (profile == null) {
-                profile = new JavaProfile();
-            }
+            profile = (Profile<S, IC>) ProofSettings.DEFAULT_SETTINGS.getProfile();   
+            assert profile != null;
         }
         return profile;
     }
