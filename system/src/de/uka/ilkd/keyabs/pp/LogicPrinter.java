@@ -1445,45 +1445,6 @@ public final class LogicPrinter implements ILogicPrinter {
         printSequent(seq, filter);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.uka.ilkd.keyabs.pp.ILogicPrinter#printModalityTerm(java.lang.String,
-     * de.uka.ilkd.key.logic.JavaBlock, java.lang.String,
-     * de.uka.ilkd.key.logic.Term, int)
-     */
-
-    /**
-     * Print a string marking a range as first statement. The range
-     * <code>r</code> indicates the `first statement' character range in string
-     * <code>s</code>. This is sent to the layouter by decomposing
-     * <code>s</code> into parts and using the appropriate
-     * {@link de.uka.ilkd.key.util.pp.Layouter#mark(Object)} calls. This solves
-     * the problem that the material in <code>s</code> might be further
-     * indented.
-     * 
-     * @param s
-     *            the string containing a program
-     * @param r
-     *            the range of the first statement
-     */
-    private void printMarkingFirstStatement(String s, Range r)
-            throws IOException {
-
-        int iEnd = r.end() <= s.length() ? r.end() : s.length();
-        int iStart = r.start() <= iEnd ? r.start() : iEnd;
-        String start = s.substring(0, iStart);
-        String firstStmt = s.substring(iStart, iEnd);
-        String end = s.substring(iEnd);
-        layouter.beginC(0);
-        printVerbatim(start);
-        mark(MARK_START_FIRST_STMT);
-        printVerbatim(firstStmt);
-        mark(MARK_END_FIRST_STMT);
-        printVerbatim(end);
-        layouter.end();
-    }
 
     private void printNewVarDepOnCond(NewDependingOn on) throws IOException {
         layouter.beginC(0);
@@ -1517,23 +1478,6 @@ public final class LogicPrinter implements ILogicPrinter {
             markEndSub();
         } else {
             maybeParens(t.sub(1), ass);
-        }
-    }
-
-    /**
-     * Print a string containing newlines to the layouter. This is like
-     * {@link de.uka.ilkd.key.util.pp.Layouter#pre(String)}, but no block is
-     * opened.
-     */
-    private void printVerbatim(String s) throws IOException {
-        StringTokenizer st = new StringTokenizer(s, "\n", true);
-        while (st.hasMoreTokens()) {
-            String line = st.nextToken();
-            if ("\n".equals(line)) {
-                layouter.nl();
-            } else {
-                layouter.print(line);
-            }
         }
     }
 
@@ -1815,7 +1759,7 @@ public final class LogicPrinter implements ILogicPrinter {
         Iterator<NewVarcond> itVarsNew = taclet.varsNew().iterator();
         Iterator<NewDependingOn> itVarsNewDepOn = taclet.varsNewDependingOn();
         Iterator<NotFreeIn> itVarsNotFreeIn = taclet.varsNotFreeIn();
-        Iterator<VariableCondition> itVC = taclet.getVariableConditions();
+        Iterator<VariableCondition<ABSServices>> itVC = taclet.getVariableConditions();
 
         if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext() || itVC.hasNext()
                 || itVarsNewDepOn.hasNext()) {
@@ -1851,7 +1795,7 @@ public final class LogicPrinter implements ILogicPrinter {
         }
     }
 
-    protected void printVariableCondition(VariableCondition sv)
+    protected void printVariableCondition(VariableCondition<ABSServices> sv)
             throws IOException {
         layouter.print(sv.toString());
     }
@@ -1862,7 +1806,6 @@ public final class LogicPrinter implements ILogicPrinter {
         for (int j = 0; j != size; j++) {
             final QuantifiableVariable v = vars.get(j);
             if (v instanceof LogicVariable) {
-                Term t = TermFactory.DEFAULT.createTerm(v);
                 layouter.print(v.sort().name() + " " + v.name());
             } else {
                 layouter.print(v.name().toString());
@@ -1939,8 +1882,7 @@ public final class LogicPrinter implements ILogicPrinter {
                 mark(MARK_START_FIRST_STMT);
             }
             x.getChildAt(i).visit(programPrettyPrinter);
-            if (fstStmnt) {
-                mark(MARK_END_FIRST_STMT);
+            if (fstStmnt) {                mark(MARK_END_FIRST_STMT);
             }
             if (i < x.getStatementCount() - 1)
                 layouter.brk(1);
