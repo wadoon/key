@@ -45,7 +45,7 @@ public class ABSModelParserInfo {
 
     private boolean alreadyParsed;
 
-    private ASTNode absModel;
+    private ASTNode<?> absModel;
 
     public ABSModelParserInfo() {
         this.absBackend = new CoreAbsBackend();
@@ -157,7 +157,7 @@ public class ABSModelParserInfo {
     private void collectConstructors(DataTypeDecl decl, Name dataTypeName,
             DataTypeDescriptor descr) {
         final List<DataConstructor> constructors = new LinkedList<DataConstructor>();
-        for (DataConstructor c : decl.getDataConstructors()) {
+        for (final DataConstructor c : decl.getDataConstructors()) {
         	constructors.add(c);
         }
         
@@ -171,8 +171,8 @@ public class ABSModelParserInfo {
                 if (currentNode instanceof InterfaceDecl) {
                     final InterfaceDecl interf = (InterfaceDecl) currentNode;
                     interfaces.put(new Name(SortBuilder.createFullyQualifiedName(interf)), interf);
+                    collectTypesAndFunctionDeclarations(currentNode);
                 } else if (currentNode instanceof ParametricDataTypeDecl) {
-
                     final ParametricDataTypeDecl dataType = (ParametricDataTypeDecl) currentNode;
                     final Name dataTypeName = new Name(SortBuilder.createFullyQualifiedName(dataType));
 
@@ -184,10 +184,12 @@ public class ABSModelParserInfo {
                         datatypes.addDatatype(dataTypeName, dataType);
                         collectConstructors(dataType, dataTypeName, datatypes);
                     }
+                    collectTypesAndFunctionDeclarations(currentNode);
                 } else if (currentNode instanceof ClassDecl) {
                     classes.put(new Name(
                             createFullyQualifiedName((ClassDecl) currentNode)),
                             (ClassDecl) currentNode);
+                    collectTypesAndFunctionDeclarations(currentNode);
                 } else if (currentNode instanceof FunctionDecl) {
                     FunctionDecl fd = (FunctionDecl) currentNode;
                     /*
@@ -198,7 +200,9 @@ public class ABSModelParserInfo {
                      */
                 } else if (currentNode instanceof MethodSig) {
                     MethodSig msig = (MethodSig) currentNode;
-                    //System.out.println("Method " + msig.getName() + " ");
+                    addMethodSignature(msig);
+                    
+                    System.out.println("Method " + msig.getName() + " declared in " + msig.getContextDecl().getName());
                 } else if (currentNode instanceof VarDecl) {
                     VarDecl vd = (VarDecl) currentNode;
                     /*
@@ -207,10 +211,13 @@ public class ABSModelParserInfo {
                      */
                 } else if (currentNode instanceof FieldDecl) {
                     
-                }
-                //else {
+                } else if (currentNode instanceof MethodImpl) { 
+                    MethodImpl mImpl = (MethodImpl)currentNode;
+                    
+                } else { 
                     collectTypesAndFunctionDeclarations(currentNode);
-                //}
+            
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -222,6 +229,17 @@ public class ABSModelParserInfo {
  
     
     
+
+    private void addMethodSignature(MethodSig msig) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+
+
+
+
 
     public class DataTypeDescriptor {
 
