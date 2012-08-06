@@ -17,10 +17,7 @@ import java.util.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -1904,11 +1901,6 @@ public final class LogicPrinter implements ILogicPrinter {
     private boolean markFirstStatement = false;
 
     public void printABSCopyAssignment(CopyAssignment x) throws IOException {
-        boolean fstStmnt = markFirstStatement;
-        if (markFirstStatement) {
-            fstStmnt = true;
-            mark(MARK_START_FIRST_STMT);
-        }
         layouter.beginC(2);
         x.getChildAt(0).visit(programPrettyPrinter);
 
@@ -1917,11 +1909,6 @@ public final class LogicPrinter implements ILogicPrinter {
         x.getChildAt(1).visit(programPrettyPrinter);
 
         layouter.print(";").end();
-
-        if (fstStmnt) {
-            markFirstStatement = false;
-            mark(MARK_END_FIRST_STMT);
-        }
     }
 
     public void printABSFieldReference(ABSFieldReference x) throws IOException {
@@ -1945,14 +1932,14 @@ public final class LogicPrinter implements ILogicPrinter {
 
     private void printStatementList(ABSStatementBlock x) throws IOException {
         for (int i = 0; i < x.getStatementCount(); i++) {
-            boolean fstStmnt = markFirstStatement;
-            if (markFirstStatement) {
-                fstStmnt = true;
+            boolean fstStmnt = markFirstStatement && (!(x.getChildAt(i) instanceof ProgramPrefix) ||
+                       (!(x.getChildAt(i) instanceof NonTerminalProgramElement) || ((NonTerminalProgramElement)x).getChildCount() == 0));
+            if (fstStmnt) {
+                markFirstStatement = false;
                 mark(MARK_START_FIRST_STMT);
             }
             x.getChildAt(i).visit(programPrettyPrinter);
             if (fstStmnt) {
-                markFirstStatement = false;
                 mark(MARK_END_FIRST_STMT);
             }
             if (i < x.getStatementCount() - 1)
