@@ -1759,7 +1759,7 @@ public final class LogicPrinter implements ILogicPrinter {
         Iterator<NewVarcond> itVarsNew = taclet.varsNew().iterator();
         Iterator<NewDependingOn> itVarsNewDepOn = taclet.varsNewDependingOn();
         Iterator<NotFreeIn> itVarsNotFreeIn = taclet.varsNotFreeIn();
-        Iterator<VariableCondition<ABSServices>> itVC = taclet.getVariableConditions();
+        Iterator<VariableCondition> itVC = taclet.getVariableConditions();
 
         if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext() || itVC.hasNext()
                 || itVarsNewDepOn.hasNext()) {
