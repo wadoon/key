@@ -33,7 +33,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
 
     public void loadProblem(File file, List<File> classPath, File bootClassPath) {
     	mainWindow.addRecentFile(file.getAbsolutePath());
-    	this.loadProblem(file, classPath, bootClassPath, mainWindow.<S, IC>getMediator());
+    	this.loadProblem(file, classPath, bootClassPath, getMediator());
     }
 
     @Override
@@ -43,13 +43,12 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
 
     @Override
     public void progressStarted(Object sender) {
-    	mainWindow.getMediator().stopInterface(
-    	        true);
+    	getMediator().stopInterface(true);
     }
 
     @Override
     public void progressStopped(Object sender) {
-    	mainWindow.getMediator().startInterface(
+    	getMediator().startInterface(
     	        true);
     }
 
@@ -94,7 +93,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
     			if (g == null) {
     				g = proof.openGoals().head();
     			}
-    			mainWindow.getMediator().goalChosen(
+    			getMediator().goalChosen(
     			        g);
     			if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
     				// iff Stop on non-closeable Goal is selected a little
@@ -187,7 +186,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
     @Override
     public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
     	new TacletMatchCompletionDialog(mainWindow, models, goal,
-    	        mainWindow.getMediator());
+    	        getMediator());
     }
 
     @Override
@@ -205,7 +204,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
 
     @Override
     public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-        if (mainWindow.getMediator().autoMode()) {
+        if (getMediator().autoMode()) {
             return super.completeBuiltInRuleApp(app, goal, forced);
         }
     

@@ -44,6 +44,7 @@ import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -53,6 +54,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -65,12 +67,14 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.util.UnicodeHelper;
+import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.gui.ABSWindowUserInterface;
+import de.uka.ilkd.keyabs.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.init.ABSProfile;
 
 
 @SuppressWarnings("serial")
-public final class MainWindow extends JFrame  {
+public final class MainWindow<S extends IServices, IC extends AbstractInitConfig<S,IC>>  extends JFrame  {
 
     /**
      * The maximum number of recent files displayed.
@@ -181,7 +185,7 @@ public final class MainWindow extends JFrame  {
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
     
-    public static MainWindow instance = null;    
+    public static MainWindow<?,?> instance = null;    
     
 //    private ProverTaskListener taskListener;
     
@@ -212,7 +216,7 @@ public final class MainWindow extends JFrame  {
      * @param title
      *            the frame's title
      */
-    private <S extends IServices, IC extends AbstractInitConfig<S,IC>> void initialize(String title, UserInterface<S, IC> ui) {
+    private void initialize(String title, UserInterface<S, IC> ui) {
         setTitle(title);
         setLaF();
         setIconImage(IconFactory.keyLogo());
@@ -1532,14 +1536,16 @@ public final class MainWindow extends JFrame  {
      * This action is responsible for the invocation of an SMT solver
      * For example the toolbar button is paramtrized with an instance of this action
      */
-    private final class SMTInvokeAction extends AbstractAction {
+    private final static class SMTInvokeAction extends AbstractAction {
 	SolverTypeCollection solverUnion;
+        private KeYMediator<?,?> mediator;
 	
 	public SMTInvokeAction(SolverTypeCollection solverUnion) {
 	    this.solverUnion = solverUnion;
 	    if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
 		putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
 	    } 
+	    this.mediator = MainWindow.getInstance().getMediator();
 	}
 	
 	public boolean isEnabled() {
@@ -1550,7 +1556,7 @@ public final class MainWindow extends JFrame  {
 	  
 	public void actionPerformed(ActionEvent e) {
 	    if (!mediator.ensureProofLoaded() || solverUnion ==SolverTypeCollection.EMPTY_COLLECTION){
-            MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
+            MainWindow.getInstance().popupWarning("No proof loaded or no solvers selected.", "Oops...");
 	    	return;
 	    }
 	    final Proof proof = mediator.getProof();
@@ -1630,7 +1636,7 @@ public final class MainWindow extends JFrame  {
      * @return the instance of Main
      * @throws IllegalStateException 
      */
-    public static MainWindow getInstance() throws IllegalStateException {
+    public static <S extends IServices, IC extends AbstractInitConfig<S,IC>> MainWindow<S,IC> getInstance() throws IllegalStateException {
         return getInstance(true);
     }
 
@@ -1650,24 +1656,26 @@ public final class MainWindow extends JFrame  {
      * @return the instance of Main
      * @throws Exception 
      */
-    public static MainWindow getInstance(final boolean visible) throws IllegalStateException {
+    public static <S extends IServices, IC extends AbstractInitConfig<S,IC>> MainWindow<S,IC> getInstance(final boolean visible) throws IllegalStateException {
         
         if(instance == null) {
             // TODO Come up with a better exception class
-            throw new IllegalStateException("There is no GUI main window. Sorry.");
+            throw new IllegalStateException(    "There is no GUI main window. Sorry.");
         }        
-        return instance;
+        return (MainWindow<S, IC>) instance;
     }
 
+    @SuppressWarnings("unchecked")
     public static void createInstance(String title) {
 	assert instance == null : "Attempt to create a second mainwindow";
 	if(instance == null) {
-	    instance = new MainWindow();	  
-	    Profile profile = ProofSettings.DEFAULT_SETTINGS.getProfile();	    
+	    Profile<?,?> profile = ProofSettings.DEFAULT_SETTINGS.getProfile();	    
 	    if (profile instanceof JavaProfile) {
-	        instance.initialize(title, new WindowUserInterface(instance));
+	        instance = new MainWindow<Services,InitConfig>();    
+	        ((MainWindow<Services,InitConfig>)instance).initialize(title, new WindowUserInterface(instance));
 	    } else if (profile instanceof ABSProfile) {
-                instance.initialize(title, new ABSWindowUserInterface(instance));	        
+	        instance = new MainWindow<ABSServices,ABSInitConfig>();    
+                ((MainWindow<ABSServices,ABSInitConfig>)instance).initialize(title, new ABSWindowUserInterface(instance));	        
 	    } else {	   
 	        throw new UnsupportedOperationException("The chosen profile " + profile.name() + " does not support a GUI" );
 	    }
