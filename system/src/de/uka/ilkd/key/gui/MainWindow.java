@@ -120,7 +120,7 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
     private GoalList goalList;
     
     /** the mediator is stored here */
-    private KeYMediator<?, ?> mediator;
+    private KeYMediator<S, IC> mediator;
     
     /** the user interface which direct all notifications to this window */ 
     private UserInterface<?,?> userInterface;
@@ -270,7 +270,7 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
      * @param m
      *            the KeYMediator
      */
-    private void setMediator(KeYMediator<?, ?> m) {
+    private void setMediator(KeYMediator<S, IC> m) {
         assert mediator == null;
 	// This was an incomplete replacement method. It would call first
 	// "unregisterMediatorListeners();"
@@ -298,8 +298,8 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
      * 
      * @return the mediator
      */
-    public <S extends IServices, IC extends AbstractInitConfig<S,IC>> KeYMediator<S, IC> getMediator() {
-        return (KeYMediator<S, IC>) mediator;
+    public KeYMediator<S, IC> getMediator() {
+        return mediator;
     }
     
     public void setVisible(boolean v){
@@ -508,7 +508,7 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
 	    
 	    public void stateChanged(ChangeEvent e) {
 		ComplexButton but = (ComplexButton) e.getSource();
-		if(but.getSelectedItem() instanceof SMTInvokeAction){
+		if(but.getSelectedItem() instanceof MainWindow.SMTInvokeAction){
 		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem(); 
 		    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(action.solverUnion);
 		}
@@ -847,7 +847,7 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
 	   }
 	   
 	   private void updateDPSelectionMenu(Collection<SolverTypeCollection> unions){
-		SMTInvokeAction actions[] = new SMTInvokeAction[unions.size()];
+	       MainWindow.SMTInvokeAction actions[] = new MainWindow.SMTInvokeAction[unions.size()];
 	        
 		int i=0; 
 		for(SolverTypeCollection union : unions){
@@ -865,8 +865,8 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
 		boolean found = activeAction != null;
 		if(!found){
 		    Object item = smtComponent.getTopItem();
-		    if(item instanceof SMTInvokeAction){
-			active = ((SMTInvokeAction)item).solverUnion;
+		    if(item instanceof MainWindow.SMTInvokeAction){
+			active = ((MainWindow.SMTInvokeAction)item).solverUnion;
 			ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(active);
 		    }else{
 			activeAction = null;
@@ -1534,18 +1534,16 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
     
     /**
      * This action is responsible for the invocation of an SMT solver
-     * For example the toolbar button is paramtrized with an instance of this action
+     * For example the toolbar button is parameterized with an instance of this action
      */
-    private final static class SMTInvokeAction extends AbstractAction {
+    private final class SMTInvokeAction extends AbstractAction {
 	SolverTypeCollection solverUnion;
-        private KeYMediator<?,?> mediator;
 	
 	public SMTInvokeAction(SolverTypeCollection solverUnion) {
 	    this.solverUnion = solverUnion;
 	    if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
 		putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
 	    } 
-	    this.mediator = MainWindow.getInstance().getMediator();
 	}
 	
 	public boolean isEnabled() {
@@ -1555,8 +1553,8 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
 	}
 	  
 	public void actionPerformed(ActionEvent e) {
-	    if (!mediator.ensureProofLoaded() || solverUnion ==SolverTypeCollection.EMPTY_COLLECTION){
-            MainWindow.getInstance().popupWarning("No proof loaded or no solvers selected.", "Oops...");
+	    if (!mediator.ensureProofLoaded() || solverUnion == SolverTypeCollection.EMPTY_COLLECTION){
+                popupWarning("No proof loaded or no solvers selected.", "Oops...");
 	    	return;
 	    }
 	    final Proof proof = mediator.getProof();
@@ -1589,11 +1587,11 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
 
 	@Override
 	public boolean equals(Object obj) {
-	    if(!(obj instanceof SMTInvokeAction)){
+	    if(!(obj instanceof MainWindow.SMTInvokeAction)){
 		return false;
 	    }
 	    
-	    return this.solverUnion.equals(((SMTInvokeAction)obj).solverUnion);
+	    return this.solverUnion.equals(((MainWindow.SMTInvokeAction)obj).solverUnion);
 	}
 
     @Override
@@ -1636,7 +1634,7 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
      * @return the instance of Main
      * @throws IllegalStateException 
      */
-    public static <S extends IServices, IC extends AbstractInitConfig<S,IC>> MainWindow<S,IC> getInstance() throws IllegalStateException {
+    public static MainWindow<?,?> getInstance() throws IllegalStateException {
         return getInstance(true);
     }
 
@@ -1656,13 +1654,13 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
      * @return the instance of Main
      * @throws Exception 
      */
-    public static <S extends IServices, IC extends AbstractInitConfig<S,IC>> MainWindow<S,IC> getInstance(final boolean visible) throws IllegalStateException {
+    public static MainWindow<?,?> getInstance(final boolean visible) throws IllegalStateException {
         
         if(instance == null) {
             // TODO Come up with a better exception class
             throw new IllegalStateException(    "There is no GUI main window. Sorry.");
         }        
-        return (MainWindow<S, IC>) instance;
+        return instance;
     }
 
     @SuppressWarnings("unchecked")

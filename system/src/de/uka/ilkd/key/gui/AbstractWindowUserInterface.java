@@ -24,16 +24,20 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 public abstract class AbstractWindowUserInterface<S extends IServices, IC extends AbstractInitConfig<S, IC>> extends AbstractUserInterface<S, IC> {
 
-    protected MainWindow mainWindow;
+    protected MainWindow<S, IC> mainWindow;
     protected LinkedList<InteractiveRuleApplicationCompletion> completions = new LinkedList<InteractiveRuleApplicationCompletion>();
 
-    public AbstractWindowUserInterface(MainWindow mainWindow) {
+    public AbstractWindowUserInterface(MainWindow<S,IC> mainWindow) {
         this.mainWindow = mainWindow;
     }
 
     public void loadProblem(File file, List<File> classPath, File bootClassPath) {
     	mainWindow.addRecentFile(file.getAbsolutePath());
     	this.loadProblem(file, classPath, bootClassPath, getMediator());
+    }
+    
+    public MainWindow<S, IC> getMainWindow() {
+        return mainWindow;
     }
 
     @Override
@@ -192,7 +196,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
     @Override
     public boolean confirmTaskRemoval(String string) {
     	int answer = JOptionPane.showConfirmDialog(
-    	        MainWindow.getInstance(), string, "Abandon Proof",
+    	        getMainWindow(), string, "Abandon Proof",
     	        JOptionPane.YES_NO_OPTION);
     	return answer == JOptionPane.YES_OPTION;
     }

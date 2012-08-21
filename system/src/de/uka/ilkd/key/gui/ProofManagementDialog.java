@@ -57,11 +57,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.speclang.Contract;
@@ -85,7 +81,7 @@ public final class ProofManagementDialog extends JDialog {
     private static ProofManagementDialog instance;
     private static boolean startedProof;
 
-    private AbstractInitConfig initConfig;
+    private AbstractInitConfig<?,?> initConfig;
     private IServices services;
     private ISpecificationRepository specRepos;
 
@@ -97,7 +93,7 @@ public final class ProofManagementDialog extends JDialog {
     private ContractSelectionPanel contractPanelByProof;
     private JButton startButton;
     private JButton cancelButton;
-	private KeYMediator mediator;
+    private KeYMediator<?,?> mediator;
         
 
     //-------------------------------------------------------------------------
@@ -297,8 +293,8 @@ public final class ProofManagementDialog extends JDialog {
     //-------------------------------------------------------------------------
     
     private static void showInstance(
-    					 KeYMediator mediator,
-    					AbstractInitConfig initConfig,
+    					 KeYMediator<?,?> mediator,
+    					AbstractInitConfig<?,?> initConfig,
 	    			     KeYJavaType selectedKJT,
 	    			     IObserverFunction selectedTarget,
 	    			     Proof selectedProof) {
@@ -455,7 +451,7 @@ public final class ProofManagementDialog extends JDialog {
         if(proof == null) {
             UserInterface ui = mediator.getUI();
             AbstractProblemInitializer pi = 
-            		new ProblemInitializer(ui, mediator.getProfile(), (Services) services, true, ui);
+            		new ProblemInitializer(ui, (Profile<Services, InitConfig>) mediator.getProfile(), (Services) services, true, ui);
             try {
                 pi.startProver(initConfig, po, 0);
             } catch(ProofInputException exc) {

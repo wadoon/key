@@ -101,7 +101,7 @@ class SequentViewListener extends MouseInputAdapter
                 final String info = getTermInfo();
                
                 if (info == null) {
-                	MainWindow.getInstance().setStandardStatusLine();
+                        MainWindow.getInstance().setStandardStatusLine();
                 } else {                    
                 	MainWindow.getInstance().setStatusLine(info);
                 }

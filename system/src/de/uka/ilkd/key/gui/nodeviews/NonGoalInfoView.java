@@ -27,38 +27,16 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.pp.ILogicPrinter;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.UIConfiguration;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -73,6 +51,7 @@ public class NonGoalInfoView extends JTextArea {
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener 
     	= new ConfigChangeAdapter(this);
+    private KeYMediator<?, ?> mediator;
     
     
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {        
@@ -159,15 +138,17 @@ public class NonGoalInfoView extends JTextArea {
     }    
     
     
-    public NonGoalInfoView (Node node, KeYMediator mediator) {
-	filter = new IdentitySequentPrintFilter( node.sequent () );
+    public NonGoalInfoView (Node node, KeYMediator<?,?> mediator) {
+        this.mediator = mediator;
+        
+        filter = new IdentitySequentPrintFilter( node.sequent () );
 	
-   ILogicPrinter printer = mediator.getServices().
-		   getUIConfiguration().createLogicPrinter(mediator.getNotationInfo(),
-				   mediator.getServices());
-   String s = computeText(mediator, node, filter, printer);
-   posTable = printer.getPositionTable();
-
+	ILogicPrinter printer = mediator.getServices().
+	        getUIConfiguration().createLogicPrinter(mediator.getNotationInfo(),
+	                mediator.getServices());
+	String s = computeText(mediator, node, filter, printer);
+	posTable = printer.getPositionTable();
+       
 	Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
 	updateUI();
@@ -291,12 +272,12 @@ public class NonGoalInfoView extends JTextArea {
         try{
             unregisterListener();
         } catch (Throwable e) {
-            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            mediator.notify(new GeneralFailureEvent(e.getMessage()));
         }finally{
                 try {
                     super.finalize();
                 } catch (Throwable e) {
-                    MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                    mediator.notify(new GeneralFailureEvent(e.getMessage()));
                 }
         }
     }

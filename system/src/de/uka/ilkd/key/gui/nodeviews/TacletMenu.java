@@ -61,7 +61,7 @@ class TacletMenu extends JMenu {
     private static final long serialVersionUID = -4659105575090816693L;
     private PosInSequent pos;
     private SequentView sequentView;
-    private KeYMediator mediator;
+    private KeYMediator<?,?> mediator;
 
 
     private TacletAppComparator comp = new TacletAppComparator();

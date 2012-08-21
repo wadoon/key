@@ -242,12 +242,12 @@ public class SequentView extends JEditorPane implements Autoscroll {
         try{
             Config.DEFAULT.removeConfigChangeListener(configChangeListener);
         } catch (Throwable e) {
-            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            mediator.notify(new GeneralFailureEvent(e.getMessage()));
         }finally{
             try {
                 super.finalize();
             } catch (Throwable e) {
-                MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                mediator.notify(new GeneralFailureEvent(e.getMessage()));
             }
         }
     }

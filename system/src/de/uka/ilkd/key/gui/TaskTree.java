@@ -12,7 +12,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -32,12 +31,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.EnvNode;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.util.Debug;
 
 public class TaskTree extends JPanel {
@@ -50,7 +44,7 @@ public class TaskTree extends JPanel {
     private JTree delegateView;
 
     /** the KeYMediator */
-    private KeYMediator mediator;
+    private KeYMediator<?,?> mediator;
     
     /** listener for mouse events of this gui component */
     private MouseListener mouseListener = new TaskTreeMouseListener();
@@ -62,7 +56,7 @@ public class TaskTree extends JPanel {
     /** the list model to be used */
     private TaskTreeModel model = new TaskTreeModel();
 
-    public TaskTree(KeYMediator mediator) {
+    public TaskTree(KeYMediator<?,?> mediator) {
 	super();
 	this.mediator = mediator;
 	mediator.addKeYSelectionListener(new TaskTreeSelectionListener());

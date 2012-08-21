@@ -761,13 +761,9 @@ public class InvariantConfigurator {
                 // might throw parserException
                 
                 result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(heap.toString())), Sort.ANY, services, services.getNamespaces(),
-                getAbbrevMap());
+                        services.getProof().abbreviations());
 
                 return result;
-            }
-
-            private AbbrevMap getAbbrevMap() {
-                return MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap();
             }
 
             protected Term parseModifies(LocationVariable heap) throws Exception {
@@ -777,7 +773,7 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[MOD_IDX].get(heap.toString())), Sort.ANY,
-                        services, services.getNamespaces(), getAbbrevMap());
+                        services, services.getNamespaces(), services.getProof().abbreviations());
                 return result;
             }
 
@@ -788,7 +784,7 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[VAR_IDX].get(DEFAULT)), Sort.ANY,
-                        services, services.getNamespaces(), getAbbrevMap());
+                        services, services.getNamespaces(), services.getProof().abbreviations());
                 return result;
             }
 
