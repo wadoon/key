@@ -1844,10 +1844,10 @@ public final class LogicPrinter implements ILogicPrinter {
     private boolean markFirstStatement = false;
 
     public void printABSCopyAssignment(CopyAssignment x) throws IOException {
-        layouter.beginC(2);
+        layouter.beginI(2);
         x.getChildAt(0).visit(programPrettyPrinter);
 
-        layouter.brk(1).print("=").brk(1);
+        layouter.end().print(" = ").beginI(2);
 
         x.getChildAt(1).visit(programPrettyPrinter);
 
@@ -1868,12 +1868,14 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSStatementBlock(ABSStatementBlock x) throws IOException {
-        layouter.print("{").beginC(2).brk().ind();
+        layouter.print("{").beginC(2).ind();
         printStatementList(x);
-        layouter.brk(1, -2).end().print("}");
+        layouter.brk(0,-2).end().print("}");
     }
 
     private void printStatementList(ABSStatementBlock x) throws IOException {
+        if (x.getStatementCount() <= 0) return;
+        layouter.print(" ");
         for (int i = 0; i < x.getStatementCount(); i++) {
             boolean fstStmnt = markFirstStatement && (!(x.getChildAt(i) instanceof ProgramPrefix) ||
                        (!(x.getChildAt(i) instanceof NonTerminalProgramElement) || ((NonTerminalProgramElement)x).getChildCount() == 0));
@@ -1882,11 +1884,14 @@ public final class LogicPrinter implements ILogicPrinter {
                 mark(MARK_START_FIRST_STMT);
             }
             x.getChildAt(i).visit(programPrettyPrinter);
-            if (fstStmnt) {                mark(MARK_END_FIRST_STMT);
+            if (fstStmnt) {               
+                mark(MARK_END_FIRST_STMT);
             }
-            if (i < x.getStatementCount() - 1)
+            if (i < x.getStatementCount() - 1) {
                 layouter.brk(1);
+            }
         }
+        layouter.print(" ");
     }
 
     public void printABSBinaryOpExp(ABSBinaryOperatorPureExp x, String op)
@@ -1952,30 +1957,23 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSIfStatement(ABSIfStatement x) throws IOException {
-        layouter.print("if (").beginC(2);
+        layouter.beginC(0).print("if (");
         x.getCondition().visit(programPrettyPrinter);
         layouter.print(")").brk(1, 2);
         x.getThenBranch().visit(programPrettyPrinter);
-        
+        layouter.brk(1);
         if (x.getElseBranch() != null) {
-            layouter.brk(1, -2);
             layouter.print("else").brk(1, 2);
             x.getElseBranch().visit(programPrettyPrinter);
-        } else {
-            layouter.brk(1, -2);
-        }
-        layouter.brk(0, -2).end();
+        } 
+        layouter.ind().end();
     }
 
     public void printABSContextStatementBlock(ABSContextStatementBlock x)
             throws IOException {
-        layouter.print("{").beginC(2).brk().ind();
+        layouter.print("{..").beginC(2).brk(1);
         printStatementList(x);
-        layouter.brk(1, -2).end().print("}");
-
-        layouter.print("{..").beginC(2).brk().ind();
-        printStatementList(x);
-        layouter.brk(1, -2).end().print("...}");
+        layouter.end().print("...}");
     }
 
     public void printABSMinusExp(ABSMinusExp x) throws IOException {

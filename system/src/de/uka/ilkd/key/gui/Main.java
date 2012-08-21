@@ -9,7 +9,6 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
@@ -68,12 +67,12 @@ public class Main {
         // does no harm on non macs
         //System.setProperty("apple.laf.useScreenMenuBar","true");
 
-        UserInterface userInterface = evaluateOptions(args);
+        UserInterface<?,?> userInterface = evaluateOptions(args);
 
         loadCommandLineFile(userInterface);        
     }
     
-    public static void loadCommandLineFile(UserInterface ui) {
+    public static void loadCommandLineFile(UserInterface<?,?> ui) {
         if (Main.getFileNameOnStartUp() != null) {
             ui.loadProblem(new File(Main.getFileNameOnStartUp()));
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
@@ -90,8 +89,8 @@ public class Main {
        return "KeY " + KeYResourceManager.getManager().getVersion();
     }
 
-    public static UserInterface evaluateOptions(String[] opt) {
-        UserInterface ui = null;
+    public static UserInterface<?, ?> evaluateOptions(String[] opt) {
+        UserInterface<?, ?> ui = null;
     	int index = 0;
         //ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
     	ProofSettings.DEFAULT_SETTINGS.setProfile(new ABSProfile());
@@ -167,7 +166,7 @@ public class Main {
         	GuiUtilities.invokeAndWait(new Runnable() {
         		public void run() {
         			MainWindow.createInstance(getMainWindowTitle());  
-        			MainWindow key = MainWindow.getInstance();
+        			MainWindow<?, ?> key = MainWindow.getInstance();
         			key.setVisible(true);
         		}
         	});    
