@@ -63,7 +63,7 @@ public abstract class AbstractInitConfig<S extends IServices, IC extends Abstrac
         return profile;
     }
 
-    public abstract IServices getServices();
+    public abstract S getServices();
 
     /**
      * returns the proof environment using this initial configuration

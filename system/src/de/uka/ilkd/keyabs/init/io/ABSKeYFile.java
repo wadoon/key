@@ -41,7 +41,7 @@ import de.uka.ilkd.keyabs.parser.ABSKeYParser;
 /** 
  * Represents an input from a .key file producing an environment.
  */
-public class ABSKeYFile implements IKeYFile {
+public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
     
     private final String name;
     
@@ -169,7 +169,7 @@ public class ABSKeYFile implements IKeYFile {
     
     
     @Override
-    public void setInitConfig(AbstractInitConfig conf) {
+    public void setInitConfig(AbstractInitConfig<ABSServices, ABSInitConfig> conf) {
         this.initConfig = (ABSInitConfig) conf;
     }
 

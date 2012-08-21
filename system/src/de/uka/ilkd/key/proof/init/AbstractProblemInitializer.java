@@ -16,8 +16,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.io.*;
-import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
+import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.IKeYFile;
+import de.uka.ilkd.key.proof.io.LDTInput;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -47,14 +49,14 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
     protected abstract void registerProgramDefinedSymbols(
             IC initConfig) throws ProofInputException;
 
-    protected abstract void readJava(EnvInput envInput,
+    protected abstract void readJava(EnvInput<S, IC> envInput,
             IC initConfig) throws ProofInputException;
 
-    private static AbstractInitConfig baseConfig;
+    private static AbstractInitConfig<?,?> baseConfig;
     protected final Profile<S, IC> profile;
     protected final S services;
     protected final ProgressMonitor progMon;
-    private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
+    private final HashSet<EnvInput<S, IC>> alreadyParsed = new LinkedHashSet<EnvInput<S, IC>>();
     protected final ProblemInitializerListener<S, IC> listener;
     protected final boolean registerProof;
 
@@ -92,6 +94,8 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
             listener.reportStatus(this, status, progressMax);
         }
     }
+    
+    protected abstract LDTInput<S, IC> createLDTInput(IKeYFile<S, IC>[] keyFile);
 
     /**
      * Helper for readIncludes().
@@ -104,35 +108,28 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
         }
 
         // collect all ldt includes into a single LDTInput
-        IKeYFile[] keyFile = new IKeYFile[in.getLDTIncludes().size()];
+        @SuppressWarnings("unchecked")
+        IKeYFile<S, IC>[] keyFile = new IKeYFile[in.getLDTIncludes().size()];
 
         int i = 0;
         for (String name : in.getLDTIncludes()) {
             keyFile[i++] = createKeYFile(in, name);
         }
 
-        LDTInput ldtInp = new LDTInput(keyFile, new LDTInputListener() {
-            @Override
-            public void reportStatus(String status, int progress) {
-                if (listener != null) {
-                    listener.reportStatus(AbstractProblemInitializer.this,
-                            status, progress);
-                }
-            }
-        });
+        LDTInput<S, IC> ldtInp = createLDTInput(keyFile);
 
         // read the LDTInput
         readEnvInput(ldtInp, initConfig);
     }
 
-    protected abstract IKeYFile createKeYFile(Includes in, String name);
+    protected abstract IKeYFile<S, IC> createKeYFile(Includes in, String name);
 
-    protected abstract IKeYFile createTacletBaseKeYFile();
+    protected abstract IKeYFile<S, IC> createTacletBaseKeYFile();
 
     /**
      * Helper for readEnvInput().
      */
-    private void readIncludes(EnvInput envInput, IC initConfig)
+    private void readIncludes(EnvInput<S, IC> envInput, IC initConfig)
             throws ProofInputException {
         envInput.setInitConfig(initConfig);
 
@@ -143,7 +140,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
 
         // read normal includes
         for (String fileName : in.getIncludes()) {
-            final IKeYFile keyFile = createKeYFile(in, fileName);
+            final IKeYFile<S, IC> keyFile = createKeYFile(in, fileName);
             readEnvInput(keyFile, initConfig);
         }
     }
@@ -177,7 +174,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
         initConfig.getServices().getNamespaces().setFunctions(newFuncNS);
     }
 
-    public final void readEnvInput(EnvInput envInput,
+    public final void readEnvInput(EnvInput<S, IC> envInput,
             IC initConfig) throws ProofInputException {
         if (alreadyParsed.add(envInput)) {
             // read includes
@@ -297,7 +294,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
     /**
      * Creates an initConfig / a proof environment and reads an EnvInput into it
      */
-    public IC prepare(EnvInput envInput)
+    public IC prepare(EnvInput<S, IC> envInput)
             throws ProofInputException {
         if (listener != null) {
             listener.progressStarted(this);
@@ -315,7 +312,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
 
             RuleSource tacletBase = profile.getStandardRules().getTacletBase();
             if (tacletBase != null) {
-                IKeYFile tacletBaseFile = createTacletBaseKeYFile();
+                IKeYFile<S, IC> tacletBaseFile = createTacletBaseKeYFile();
                 readEnvInput(tacletBaseFile, (IC) baseConfig);
             }
 
@@ -324,7 +321,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
 
     }
 
-    public IC prepare(EnvInput envInput,
+    public IC prepare(EnvInput<S, IC> envInput,
             IC referenceConfig) throws ProofInputException {
         // create initConfig
         IC initConfig = (IC) referenceConfig.copy();
@@ -396,7 +393,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
         startProver(env.getInitConfig(), po, 0);
     }
 
-    public void startProver(EnvInput envInput, ProofOblInput po)
+    public void startProver(EnvInput<S, IC> envInput, ProofOblInput po)
             throws ProofInputException {
         try {
             IC initConfig = prepare(envInput);

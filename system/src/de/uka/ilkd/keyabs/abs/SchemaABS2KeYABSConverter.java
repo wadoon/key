@@ -70,8 +70,8 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         }
 
         IProgramVariable localVar = lookup(x.getVarDecl().getName());
-        IABSExpression initExp = (IABSExpression) convert(x.getVarDecl()
-                .getInitExp());
+        IABSExpression initExp = 
+                x.getVarDecl().hasInitExp() ? (IABSExpression) convert(x.getVarDecl().getInitExp()) : null;
         return new ABSVariableDeclarationStatement(typeRef, localVar, initExp);
     }
 

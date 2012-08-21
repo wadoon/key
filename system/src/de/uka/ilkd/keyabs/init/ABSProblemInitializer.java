@@ -11,11 +11,13 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IKeYFile;
+import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
+import de.uka.ilkd.keyabs.proof.io.ABSLDTInput;
 
 
 /**
@@ -39,18 +41,18 @@ public class ABSProblemInitializer extends
     }
 
     @Override
-    protected IKeYFile createKeYFile(Includes in, String name) {
+    protected IKeYFile<ABSServices, ABSInitConfig> createKeYFile(Includes in, String name) {
         return new ABSKeYFile(name, in.get(name), progMon);
     }
 
     @Override
-    protected IKeYFile createTacletBaseKeYFile() {
+    protected IKeYFile<ABSServices, ABSInitConfig> createTacletBaseKeYFile() {
         return new ABSKeYFile("taclet base", profile.getStandardRules()
                 .getTacletBase(), progMon);
     }
 
     @Override
-    protected void readJava(EnvInput envInput, ABSInitConfig initConfig)
+    protected void readJava(EnvInput<ABSServices, ABSInitConfig> envInput, ABSInitConfig initConfig)
             throws ProofInputException {
 
         envInput.setInitConfig(initConfig);
@@ -95,5 +97,18 @@ public class ABSProblemInitializer extends
         // TODO
 
     }
-
+    
+    
+    @Override
+    protected ABSLDTInput createLDTInput(IKeYFile<ABSServices, ABSInitConfig>[] keyFile) {
+        return new ABSLDTInput(keyFile, new LDTInputListener() {
+            @Override
+            public void reportStatus(String status, int progress) {
+                if (listener != null) {
+                    listener.reportStatus(ABSProblemInitializer.this,
+                            status, progress);
+                }
+            }
+        });
+    }
 }

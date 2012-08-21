@@ -32,9 +32,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.IKeYFile;
-import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.io.*;
+import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -244,6 +243,19 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
 	    reportStatus(envInput.name() + " failed");
 	    throw e;
 	}
+    }
+
+    @Override
+    protected JavaLDTInput createLDTInput(IKeYFile<Services, InitConfig>[] keyFile) {
+        return new JavaLDTInput(keyFile, new LDTInputListener() {
+            @Override
+            public void reportStatus(String status, int progress) {
+                if (listener != null) {
+                    listener.reportStatus(ProblemInitializer.this,
+                            status, progress);
+                }
+            }
+        });
     }
     
    

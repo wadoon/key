@@ -14,20 +14,11 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.keyabs.init.ABSProfile;
-import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these
@@ -36,17 +27,17 @@ import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
  * declarations and third the rules. This procedure makes it possible to
  * use all declared sorts in all rules.
  */
-public class LDTInput implements EnvInput {
+public abstract class LDTInput<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements EnvInput<S, IC> {
     public interface LDTInputListener {
 	public void reportStatus(String status, int progress);
     }
     
     private static final String NAME = "language data types";
 
-    private final IKeYFile[] keyFiles;
+    private final IKeYFile<S, IC>[] keyFiles;
     private final LDTInputListener listener;
 
-    private AbstractInitConfig initConfig = null;
+    private AbstractInitConfig<S, IC> initConfig = null;
 
 
     /** creates a representation of the LDT files to be used as input
@@ -54,12 +45,11 @@ public class LDTInput implements EnvInput {
      * @param keyFiles an array containing the LDT .key files
      * @param main the main class used to report the progress of reading
      */
-    public LDTInput(IKeYFile[] keyFiles, LDTInputListener listener) {
+    protected LDTInput(IKeYFile<S, IC>[] keyFiles, LDTInputListener listener) {
 	this.keyFiles = keyFiles;
 	this.listener=listener;
     }
         
-    
     @Override
     public String name() {
 	return NAME;
@@ -77,7 +67,7 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public void setInitConfig(AbstractInitConfig conf) {
+    public void setInitConfig(AbstractInitConfig<S, IC> conf) {
 	this.initConfig=conf;
 	for(int i = 0; i < keyFiles.length; i++) {
 	    keyFiles[i].setInitConfig(conf);
@@ -115,6 +105,8 @@ public class LDTInput implements EnvInput {
     }
 
 
+    protected abstract ImmutableList<LDT> createLDTList(S services);
+    
     /** reads all LDTs, i.e., all associated .key files with respect to
      * the given modification strategy. Reading is done in a special order: first
      * all sort declarations then all function and predicate declarations and
@@ -140,31 +132,7 @@ public class LDTInput implements EnvInput {
     		}
     		keyFiles[i].readRulesAndProblem();
     	}
-
-    	//create LDT objects
-    	IServices services = initConfig.getServices();
-    	ImmutableList<LDT> ldts;
-    	if (initConfig.getProfile() instanceof ABSProfile) {
-    		ldts = ImmutableSLList.<LDT>nil()
-    				.prepend(new IntegerLDT(services))
-    				.prepend(new BooleanLDT(services))
-    				//.prepend(new LocSetLDT(services))
-    				//.prepend(new HeapLDT(services))
-    				.prepend(new SeqLDT(services))
-    				//.prepend(new CharListLDT(services))
-    				.prepend(new HistoryLDT(services))
-    				;
-    	} else {
-    		ldts = ImmutableSLList.<LDT>nil()
-    				.prepend(new IntegerLDT(services))
-    				.prepend(new BooleanLDT(services))
-    				.prepend(new LocSetLDT(services))
-    				.prepend(new HeapLDT(services))
-    				.prepend(new SeqLDT(services))
-    				.prepend(new CharListLDT(services))
-    				;
-    	}
-    	initConfig.getServices().getTypeConverter().init(ldts);
+    	initConfig.getServices().getTypeConverter().init(createLDTList(initConfig.getServices()));
     }
   
     
@@ -174,7 +142,7 @@ public class LDTInput implements EnvInput {
 	    return false;
 	}
 
-	LDTInput li = (LDTInput) o;
+	LDTInput<?, ?> li = (LDTInput<?, ?>) o;
 	if(keyFiles.length != li.keyFiles.length){
 	    return false;
 	}
