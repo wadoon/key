@@ -14,7 +14,7 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.JavaDLTermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -33,7 +33,7 @@ import de.uka.ilkd.key.util.Pair;
 public abstract class ClassAxiom implements SpecificationElement {
         
 
-    protected static final TermBuilder TB = JavaProfile.DF();
+    protected static final JavaDLTermBuilder TB = JavaProfile.DF();
     protected String displayName;
     
     /**

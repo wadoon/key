@@ -102,7 +102,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
-    protected static final TermBuilder TB = JavaProfile.DF();
+    protected static final JavaDLTermBuilder TB = JavaProfile.DF();
     
     
     private static Sort[] createMetaSortArray(int arity) {

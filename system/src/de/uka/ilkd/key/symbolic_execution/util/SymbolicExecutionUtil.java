@@ -1,61 +1,25 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
-import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -63,12 +27,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -123,10 +82,10 @@ public final class SymbolicExecutionUtil {
       ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
       ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
       for (Goal goal : openGoals) {
-         Term goalImplication = sequentToImplication(goal.sequent());
+         Term goalImplication = sequentToImplication(goal.sequent(), parentProof.getServices());
          goalImplications = goalImplications.append(goalImplication);
       }
-      return TermBuilder.DF.or(goalImplications);
+      return parentProof.getServices().getTermBuilder().or(goalImplications);
    }
    
    /**
@@ -134,17 +93,18 @@ public final class SymbolicExecutionUtil {
     * @param sequent The {@link Sequent} to convert.
     * @return The created implication.
     */
-   public static Term sequentToImplication(Sequent sequent) {
-      if (sequent != null) {
+   public static Term sequentToImplication(Sequent sequent, IServices services) {
+       TermBuilder TB = services.getTermBuilder();
+       if (sequent != null) {
          ImmutableList<Term> antecedents = listSemisequentTerms(sequent.antecedent());
          ImmutableList<Term> succedents = listSemisequentTerms(sequent.succedent());
          // Construct branch condition from created antecedent and succedent terms as new implication 
-         Term left = TermBuilder.DF.and(antecedents);
-         Term right = TermBuilder.DF.or(succedents);
-         return TermBuilder.DF.imp(left, right);
+         Term left = TB.and(antecedents);
+         Term right = TB.or(succedents);
+         return TB.imp(left, right);
       }
       else {
-         return TermBuilder.DF.tt();
+         return TB.tt();
       }
    }
    
@@ -256,21 +216,22 @@ public final class SymbolicExecutionUtil {
       assert context != null;
       assert node != null;
       assert variable instanceof ProgramVariable;
+      TermBuilder DF = services.getTermBuilder();
       // Create method frame which will be executed in site proof
       Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(DF.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
+      Term newTerm = DF.func(newPredicate, DF.var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
-      Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
+      Term modalityTerm = DF.dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
+      Term newSuccedentToProve = DF.applySequential(originalUpdates, modalityTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -291,19 +252,20 @@ public final class SymbolicExecutionUtil {
    public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
                                                                                Node node,
                                                                                IProgramVariable variable) {
+      TermBuilder TB = services.getTermBuilder();
       // Make sure that correct parameters are given
       assert node != null;
       assert variable instanceof ProgramVariable;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(TB.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
+      Term newTerm = TB.func(newPredicate, TB.var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TB.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
+      Term newSuccedentToProve = TB.applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -324,18 +286,19 @@ public final class SymbolicExecutionUtil {
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
                                                                       Term term) {
+      TermBuilder TB = services.getTermBuilder();
       // Make sure that correct parameters are given
       assert node != null;
       assert term != null;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, term.sort());
+      Function newPredicate = new Function(new Name(TB.newName(services, "ResultPredicate")), Sort.FORMULA, term.sort());
       // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, term);
+      Term newTerm = TB.func(newPredicate, term);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TB.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
+      Term newSuccedentToProve = TB.applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -842,7 +805,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
       Term term = ruleApp.posInOccurrence().constrainedFormula().formula();
-      term = TermBuilder.DF.goBelowUpdates(term);
+      term = node.proof().getServices().getTermBuilder().goBelowUpdates(term);
       JavaBlock block = term.javaBlock();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
       return context != null && context.getMethodContext() != null && context.getMethodContext().isImplicit();
@@ -950,7 +913,7 @@ public final class SymbolicExecutionUtil {
       if (node != null && node.getAppliedRuleApp() != null) {
          // Get current program method
          Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-         term = TermBuilder.DF.goBelowUpdates(term);
+         term =  node.proof().getServices().getTermBuilder().goBelowUpdates(term);
          Services services = (Services) node.proof().getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
          if (mf != null) {
@@ -1024,14 +987,15 @@ public final class SymbolicExecutionUtil {
       ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
       ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
       // Construct branch condition from created antecedent and succedent terms as new implication 
-      Term left = TermBuilder.DF.and(antecedents);
-      Term right = TermBuilder.DF.or(succedents);
-      Term implication = TermBuilder.DF.imp(left, right);
+      TermBuilder TB = node.proof().getServices().getTermBuilder();
+      Term left = TB.and(antecedents);
+      Term right = TB.or(succedents);
+      Term implication = TB.imp(left, right);
       Term result;
       // Check if an update context is available
       if (!instantiations.getUpdateContext().isEmpty()) {
          // Append update context because otherwise the formula is evaluated in wrong state
-         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
+         result = TB.applySequential(instantiations.getUpdateContext(), implication);
          // Simplify branch condition
          result = SymbolicExecutionUtil.simplify(node.proof(), result);
       }

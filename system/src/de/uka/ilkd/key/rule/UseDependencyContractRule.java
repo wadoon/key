@@ -23,13 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -52,7 +46,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                                             = new UseDependencyContractRule();    
 
     private static final Name NAME = new Name("Use Dependency Contract");
-    private static final TermBuilder TB = JavaProfile.DF();
+    private static final JavaDLTermBuilder TB = JavaProfile.DF();
     
             
 

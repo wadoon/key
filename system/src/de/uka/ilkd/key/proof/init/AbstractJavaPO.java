@@ -17,19 +17,14 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IProgramInfo;
-import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaDLTermBuilder;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -50,9 +45,9 @@ import de.uka.ilkd.key.util.Pair;
 public abstract class AbstractJavaPO implements IPersistablePO {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
-    protected static final TermBuilder TB = JavaProfile.DF();
-    protected final AbstractInitConfig initConfig;
-    private final IServices services;
+    protected static final JavaDLTermBuilder TB = JavaProfile.DF();
+    protected final InitConfig initConfig;
+    private final Services services;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
     protected final String name;
@@ -66,7 +61,7 @@ public abstract class AbstractJavaPO implements IPersistablePO {
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-    public AbstractJavaPO(AbstractInitConfig initConfig,
+    public AbstractJavaPO(InitConfig initConfig,
                       	  String name) {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();

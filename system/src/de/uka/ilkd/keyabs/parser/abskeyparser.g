@@ -2063,7 +2063,7 @@ elementary_update_term returns[Term result=null]
         (
             ASSIGN a=equivalence_term
             {
-                result = TermBuilder.DF.elementary(getServices(), result, a);
+                result = getServices().getTermBuilder().elementary(getServices(), result, a);
             }
         )?
    ; exception
@@ -2531,7 +2531,7 @@ substitutionterm returns [Term result = null]
      }
    RBRACE
    ( a2 = term110 | a2 = unary_formula ) {
-      result = TermBuilder.DF.subst ( op, v, a1, a2 );
+      result = getServices().getTermBuilder().subst ( op, v, a1, a2 );
       if(!isGlobalDeclTermParser())
         unbindVars(orig);
    }
@@ -2735,7 +2735,7 @@ funcpredvarterm returns [Term a = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = TermBuilder.DF.wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
+	        a = getServices().getTermBuilder().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {

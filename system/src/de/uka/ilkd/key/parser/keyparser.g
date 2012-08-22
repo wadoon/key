@@ -833,9 +833,9 @@ options {
                 || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError("Cannot use schema variable " + sv + " as an attribute"); 
             }
-            result = TermBuilder.DF.select(getServices(), 
+            result = JavaProfile.DF().select(getServices(), 
                                            sv.sort(), 
-                                           TermBuilder.DF.getBaseHeap(getServices()), 
+                                           JavaProfile.DF().getBaseHeap(getServices()), 
                                            prefix, 
                                            tf.createTerm(attribute));
         } else {
@@ -843,7 +843,7 @@ options {
             if(pv instanceof ProgramConstant) {
                 result = tf.createTerm(pv);
             } else if(pv == getServices().getJavaInfo().getArrayLength()) {
-                result = TermBuilder.DF.dotLength(getServices(), result);
+                result = JavaProfile.DF().dotLength(getServices(), result);
             } else {
             	Function fieldSymbol 
             		= getServices().getTypeConverter()
@@ -851,9 +851,9 @@ options {
             		               .getFieldSymbolForPV((LocationVariable)pv, 
             		                                    getServices());        
             	if (pv.isStatic()){
-                    result = TermBuilder.DF.staticDot(getServices(), pv.sort(), fieldSymbol);
+                    result = JavaProfile.DF().staticDot(getServices(), pv.sort(), fieldSymbol);
             	} else {            
-                    result = TermBuilder.DF.dot(getServices(), pv.sort(), result, fieldSymbol);                
+                    result = JavaProfile.DF().dot(getServices(), pv.sort(), result, fieldSymbol);                
             	}
             }
         }
@@ -2326,7 +2326,7 @@ elementary_update_term returns[Term result=null]
         (
             ASSIGN a=equivalence_term
             {
-                result = TermBuilder.DF.elementary(getServices(), result, a);
+                result = JavaProfile.DF().elementary(getServices(), result, a);
             }
         )?
    ; exception
@@ -2832,7 +2832,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
   	LBRACKET 
 	(   STAR {
            	rangeFrom = toZNotation("0", functions());
-           	Term lt = TermBuilder.DF.dotLength(getServices(), arrayReference);
+           	Term lt = JavaProfile.DF().dotLength(getServices(), arrayReference);
            	Term one = toZNotation("1", functions());
   	   		rangeTo = tf.createTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
@@ -2858,7 +2858,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		Term guardTerm = tf.createTerm(Junctor.AND, fromTerm, toTerm);
 		quantifiedArrayGuard = tf.createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm);
 		}
-            result = TermBuilder.DF.dotArr(getServices(), result, indexTerm); 
+            result = JavaProfile.DF().dotArr(getServices(), result, indexTerm); 
     }            
     ;exception
         catch [TermCreationException ex] {
@@ -3042,7 +3042,7 @@ substitutionterm returns [Term result = null]
      }
    RBRACE
    ( a2 = term110 | a2 = unary_formula ) {
-      result = TermBuilder.DF.subst ( op, v, a1, a2 );
+      result = JavaProfile.DF().subst ( op, v, a1, a2 );
       if(!isGlobalDeclTermParser())
         unbindVars(orig);
    }
@@ -3246,7 +3246,7 @@ funcpredvarterm returns [Term a = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = TermBuilder.DF.wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
+	        a = JavaProfile.DF().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {

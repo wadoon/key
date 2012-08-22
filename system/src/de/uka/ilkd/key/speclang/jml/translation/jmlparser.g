@@ -47,7 +47,7 @@ options {
 }
 
 {
-    private static final TermBuilder TB = TermBuilder.DF;
+    private JavaDLTermBuilder TB;
 
     private Services services;
     private JavaInfo javaInfo;
@@ -86,6 +86,7 @@ options {
 
 	// save parameters
 	this.services       = services;
+	this.TB             = services.getTermBuilder();
 	this.javaInfo       = services.getJavaInfo();
 	containerType  =   specInClass;
 	this.intLDT         = services.getTypeConverter().getIntegerLDT();

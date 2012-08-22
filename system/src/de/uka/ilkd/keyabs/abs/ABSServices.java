@@ -2,7 +2,6 @@ package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.java.AbstractServices;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.parser.ABSDefaultTermParser;
 import de.uka.ilkd.key.parser.TermParser;
 import de.uka.ilkd.key.pp.UIConfiguration;
@@ -12,6 +11,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.init.ABSProfile;
+import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
 
 public class ABSServices extends AbstractServices {
@@ -102,8 +102,8 @@ public class ABSServices extends AbstractServices {
     }
 
     @Override
-    public TermBuilder getTermBuilder() {
-        return TermBuilder.DF;
+    public ABSTermBuilder getTermBuilder() {
+        return ABSTermBuilder.TB;
     }
 
     @Override

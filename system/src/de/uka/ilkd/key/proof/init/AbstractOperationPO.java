@@ -96,7 +96,7 @@ public abstract class AbstractOperationPO extends AbstractJavaPO {
     * @param initConfig The {@link InitConfig} to use.
     * @param name The name to use.
     */
-   public AbstractOperationPO(AbstractInitConfig initConfig, String name) {
+   public AbstractOperationPO(InitConfig initConfig, String name) {
       this(initConfig, name, false);
    }
 
@@ -106,7 +106,7 @@ public abstract class AbstractOperationPO extends AbstractJavaPO {
     * @param name he name to use.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
     */
-   public AbstractOperationPO(AbstractInitConfig initConfig, 
+   public AbstractOperationPO(InitConfig initConfig, 
                               String name, 
                               boolean addUninterpretedPredicate) {
       super(initConfig, name);

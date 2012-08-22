@@ -13,7 +13,7 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.JavaDLTermBuilder;
 import de.uka.ilkd.key.pp.JavaUIConfiguration;
 import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.Proof;
@@ -33,7 +33,7 @@ public class JavaProfile extends AbstractProfile<Services, InitConfig> {
 
     private final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
-	public static final UIConfiguration UNPARSER = new JavaUIConfiguration();
+    public static final UIConfiguration UNPARSER = new JavaUIConfiguration();
 
 
     protected JavaProfile(String standardRules) {
@@ -121,8 +121,8 @@ public class JavaProfile extends AbstractProfile<Services, InitConfig> {
         return new InitConfig(services, this);
     }
 
-    public static TermBuilder DF() {
-        return TermBuilder.DF;
+    public static JavaDLTermBuilder DF() {
+        return JavaDLTermBuilder.DF;
     }
 
 	@Override

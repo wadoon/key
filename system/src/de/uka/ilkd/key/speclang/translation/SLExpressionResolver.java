@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.JavaDLTermBuilder;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
 /**
@@ -30,7 +30,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
  */
 public abstract class SLExpressionResolver {
     
-    protected static final TermBuilder TB = JavaProfile.DF();        
+    protected static final JavaDLTermBuilder TB = JavaProfile.DF();        
 
     protected final JavaInfo javaInfo;
     protected final IServices services;
