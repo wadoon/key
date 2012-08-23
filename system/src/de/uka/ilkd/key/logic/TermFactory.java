@@ -78,8 +78,7 @@ public final class TermFactory {
 		}
 
 		return term;
-	} 
-
+	}
 
 	public Term createTerm(Operator op,
 			Term[] subs, 

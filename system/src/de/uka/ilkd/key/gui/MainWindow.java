@@ -1670,10 +1670,10 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
 	    Profile<?,?> profile = ProofSettings.DEFAULT_SETTINGS.getProfile();	    
 	    if (profile instanceof JavaProfile) {
 	        instance = new MainWindow<Services,InitConfig>();    
-	        ((MainWindow<Services,InitConfig>)instance).initialize(title, new WindowUserInterface(instance));
+	        ((MainWindow<Services,InitConfig>)instance).initialize(title, new WindowUserInterface((MainWindow<Services, InitConfig>) instance));
 	    } else if (profile instanceof ABSProfile) {
 	        instance = new MainWindow<ABSServices,ABSInitConfig>();    
-                ((MainWindow<ABSServices,ABSInitConfig>)instance).initialize(title, new ABSWindowUserInterface(instance));	        
+                ((MainWindow<ABSServices,ABSInitConfig>)instance).initialize(title, new ABSWindowUserInterface((MainWindow<ABSServices, ABSInitConfig>) instance));	        
 	    } else {	   
 	        throw new UnsupportedOperationException("The chosen profile " + profile.name() + " does not support a GUI" );
 	    }

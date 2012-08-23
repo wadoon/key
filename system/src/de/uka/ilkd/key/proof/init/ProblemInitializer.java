@@ -125,7 +125,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
      * Helper for readEnvInput().
      */
     @Override
-    protected void readJava(EnvInput envInput, InitConfig initConfig) 
+    protected void readJava(EnvInput<Services, InitConfig> envInput, InitConfig initConfig) 
     		throws ProofInputException {
 	//this method must only be called once per init config	
         final Services javaServices = initConfig.getServices();
@@ -215,12 +215,12 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
     }
 
     @Override
-    protected IKeYFile createKeYFile(Includes in, String name) {
+    protected IKeYFile<Services, InitConfig> createKeYFile(Includes in, String name) {
         return new KeYFile(name, in.get(name), progMon);
     }
 
     @Override
-    protected IKeYFile createTacletBaseKeYFile() {
+    protected IKeYFile<Services, InitConfig> createTacletBaseKeYFile() {
         return new KeYFile("taclet base", 
                   profile.getStandardRules().getTacletBase(),
               progMon);
@@ -234,7 +234,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
     }
     
     
-    public void startProver(EnvInput envInput, ProofOblInput po) 
+    public void startProver(EnvInput<Services, InitConfig> envInput, ProofOblInput po) 
     		throws ProofInputException {
 	try {
 	    InitConfig initConfig = prepare(envInput);

@@ -2,23 +2,18 @@ package de.uka.ilkd.key.proof;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.keyabs.init.ABSProfile;
-import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
 
 /**
  * <p>
@@ -35,31 +30,31 @@ import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
  * </p>
  * @author Martin Hentschel
  */
-public class DefaultProblemLoader<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
+public abstract class DefaultProblemLoader<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
    /**
     * The file or folder to load.
     */
-   private File file;
+   protected File file;
    
    /**
     * The optional class path entries to use.
     */
-   private List<File> classPath;
+   protected List<File> classPath;
    
    /**
     * An optional boot class path.
     */
-   private File bootClassPath;
+   protected File bootClassPath;
 
    /**
     * The {@link KeYMediator} to use.
     */
-   private KeYMediator<S, IC> mediator;
+   protected KeYMediator<S, IC> mediator;
    
    /**
     * The instantiated {@link EnvInput} which describes the file to load.
     */
-   private EnvInput envInput;
+   private EnvInput<S, IC> envInput;
    
    /**
     * The instantiated {@link ProblemInitializer} used during the loading process.
@@ -118,47 +113,7 @@ public class DefaultProblemLoader<S extends IServices, IC extends AbstractInitCo
     * @return The created {@link EnvInput}.
     * @throws IOException Occurred Exception.
     */
-   protected EnvInput createEnvInput() throws IOException {
-
-      final String filename = file.getName();
-
-      if (filename.endsWith(".java")) {
-         // java file, probably enriched by specifications
-         if (file.getParentFile() == null) {
-            return new SLEnvInput(".", classPath, bootClassPath);
-         }
-         else {
-            return new SLEnvInput(file.getParentFile().getAbsolutePath(),
-                  classPath, bootClassPath);
-         }
-      }
-      else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
-    	  if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile) {
-              return new ABSKeYUserProblemFile(filename, file, mediator.getUI());
-          }
-    	  // KeY problem specification or saved proof
-         return new KeYUserProblemFile(filename, file, mediator.getUI());
-
-      }
-      else if (file.isDirectory()) {
-         // directory containing java sources, probably enriched
-         // by specifications
-         return new SLEnvInput(file.getPath(), classPath, bootClassPath);
-      }
-      else {
-         if (filename.lastIndexOf('.') != -1) {
-            throw new IllegalArgumentException("Unsupported file extension \'"
-                  + filename.substring(filename.lastIndexOf('.'))
-                  + "\' of read-in file " + filename
-                  + ". Allowed extensions are: .key, .proof, .java or "
-                  + "complete directories.");
-         }
-         else {
-            throw new FileNotFoundException("File or directory\n\t " + filename
-                  + "\n not found.");
-         }
-      }
-   }
+   protected abstract EnvInput<S, IC> createEnvInput() throws IOException;
    
    /**
     * Instantiates the {@link ProblemInitializer} to use.
@@ -314,7 +269,7 @@ public class DefaultProblemLoader<S extends IServices, IC extends AbstractInitCo
     * Returns the instantiated {@link EnvInput} which describes the file to load.
     * @return The instantiated {@link EnvInput} which describes the file to load.
     */
-   public EnvInput getEnvInput() {
+   public EnvInput<S, IC> getEnvInput() {
       return envInput;
    }
    

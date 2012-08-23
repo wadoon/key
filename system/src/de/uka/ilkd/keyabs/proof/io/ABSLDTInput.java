@@ -30,6 +30,4 @@ public class ABSLDTInput extends LDTInput<ABSServices, ABSInitConfig> {
                             .prepend(new HistoryLDT(services))
                             ;
     }
-    
-
 }

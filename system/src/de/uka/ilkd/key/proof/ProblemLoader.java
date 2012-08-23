@@ -11,72 +11,16 @@
 package de.uka.ilkd.key.proof;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.io.IOException;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProofManagementDialog;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.SwingWorker;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.IKeYFile;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.keyabs.init.ABSProblemInitializer;
-import de.uka.ilkd.keyabs.init.ABSProfile;
-import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
 
 /**
  * This class extends the functionality of the {@link DefaultProblemLoader}.
@@ -85,12 +29,67 @@ import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
  * a proof configured by the opened file.
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends DefaultProblemLoader implements Runnable {
+public final class ProblemLoader<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements Runnable {
+    
+    
+    private final DefaultProblemLoader<S, IC> loader;
+    
+    public int hashCode() {
+        return loader.hashCode();
+    }
+
+    public String load() throws ProofInputException, IOException {
+        return loader.load();
+    }
+
+    public boolean equals(Object obj) {
+        return loader.equals(obj);
+    }
+
+    public String toString() {
+        return loader.toString();
+    }
+
+    public File getFile() {
+        return loader.getFile();
+    }
+
+    public List<File> getClassPath() {
+        return loader.getClassPath();
+    }
+
+    public File getBootClassPath() {
+        return loader.getBootClassPath();
+    }
+
+    public KeYMediator<S, IC> getMediator() {
+        return loader.getMediator();
+    }
+
+    public EnvInput<S, IC> getEnvInput() {
+        return loader.getEnvInput();
+    }
+
+    public AbstractProblemInitializer<S, IC> getProblemInitializer() {
+        return loader.getProblemInitializer();
+    }
+
+    public IC getInitConfig() {
+        return loader.getInitConfig();
+    }
+
+    public Proof getProof() {
+        return loader.getProof();
+    }
+
     private SwingWorker worker;
     private ProverTaskListener ptl;
     
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
-        super(file, classPath, bootClassPath, mediator);
+    
+    
+    public ProblemLoader(DefaultProblemLoader<S, IC> loader) {
+        //super(file, classPath, bootClassPath, mediator);
+        this.loader = loader;
     }
 
     public void addTaskListener(ProverTaskListener ptl) {
@@ -171,7 +170,6 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
        return getMediator().getExceptionHandler();
    }
    
-   @Override
    protected String selectProofObligation() {
       ProofManagementDialog.showInstance(getMediator(), getInitConfig());
       if (ProofManagementDialog.startedProof()) {

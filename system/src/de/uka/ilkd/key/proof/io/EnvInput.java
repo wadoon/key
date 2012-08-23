@@ -40,7 +40,13 @@ public interface EnvInput<S extends IServices, IC extends AbstractInitConfig<S,I
      * Sets the initial configuration the read environment input should be
      * added to. Must be called before calling any of the read* methods.
      */
-    void setInitConfig(AbstractInitConfig<S, IC> initConfig);
+    void setInitConfig(IC initConfig);
+
+    /**
+     * returns the initial configuration of the read environment
+     */
+    IC getInitConfig();
+
 
     /**
      * Reads the include section and returns an Includes object.

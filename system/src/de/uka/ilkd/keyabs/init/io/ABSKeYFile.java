@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.IKeYFile;
@@ -169,8 +168,8 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
     
     
     @Override
-    public void setInitConfig(AbstractInitConfig<ABSServices, ABSInitConfig> conf) {
-        this.initConfig = (ABSInitConfig) conf;
+    public void setInitConfig(ABSInitConfig conf) {
+        this.initConfig = conf;
     }
 
     
@@ -469,5 +468,11 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
             return -1;
         }
 	return externalForm.hashCode();
+    }
+
+
+    @Override
+    public ABSInitConfig getInitConfig() {
+        return initConfig;
     }
 }

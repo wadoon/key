@@ -113,7 +113,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
     		        info.getClosedGoals(), info.getProof().openGoals().size());
     	} else if (info.getSource() instanceof ProblemLoader) {
     		if (!"".equals(info.getResult())) {
-    			final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
+    			final KeYExceptionHandler exceptionHandler = ((ProblemLoader<S,IC>) info
     			        .getSource()).getExceptionHandler();
     			ExceptionDialog.showDialog(
     			        mainWindow, exceptionHandler.getExceptions());

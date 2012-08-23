@@ -21,8 +21,8 @@ public abstract class AbstractUserInterface<S extends IServices, IC extends Abst
 
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator<S, IC> mediator) {
-		final ProblemLoader pl = new ProblemLoader(file, classPath,
-		        bootClassPath, mediator);
+		final ProblemLoader<S,IC> pl = new ProblemLoader<S,IC>(createDefaultProblemLoader(file, classPath,
+		        bootClassPath, mediator));
 		pl.addTaskListener(this);
 		pl.run();
 	}
@@ -41,7 +41,7 @@ public abstract class AbstractUserInterface<S extends IServices, IC extends Abst
      */
     @Override
     public IC load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
-       DefaultProblemLoader<S, IC> loader = new DefaultProblemLoader<S, IC>(file, classPath, bootClassPath, getMediator());
+       DefaultProblemLoader<S, IC> loader = createDefaultProblemLoader(file, classPath, bootClassPath, getMediator());
        loader.load();
        return loader.getInitConfig();
     }

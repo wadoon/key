@@ -27,8 +27,8 @@ import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -39,7 +39,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 /** 
  * Represents an input from a .key file producing an environment.
  */
-public class KeYFile implements IKeYFile {
+public class KeYFile implements IKeYFile<Services, InitConfig> {
     
     private final String name;
     
@@ -56,7 +56,7 @@ public class KeYFile implements IKeYFile {
     
     private InputStream input;
     
-    protected AbstractInitConfig initConfig;
+    protected InitConfig initConfig;
     
     private String chooseContract = null;
 
@@ -170,7 +170,7 @@ public class KeYFile implements IKeYFile {
     
     
     @Override
-        public void setInitConfig(AbstractInitConfig conf) {
+    public void setInitConfig(InitConfig conf) {
         this.initConfig=conf;
     }
 
@@ -179,7 +179,7 @@ public class KeYFile implements IKeYFile {
     public Includes readIncludes() throws ProofInputException {
         if (includes == null) {
             try {
-                ParserConfig pc = new ParserConfig
+                ParserConfig<Services> pc = new ParserConfig<Services>
                 (new Services(), 
                         new NamespaceSet());
                 // FIXME: there is no exception handler here, thus, when parsing errors are ecountered
@@ -302,10 +302,10 @@ public class KeYFile implements IKeYFile {
 	try {
             Debug.out("Reading KeY file", file);
                    
-            final ParserConfig normalConfig 
-                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces());                       
-            final ParserConfig schemaConfig 
-                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+            final ParserConfig<Services> normalConfig 
+                    = new ParserConfig<Services>(initConfig.getServices(), initConfig.namespaces());                       
+            final ParserConfig<Services> schemaConfig 
+                    = new ParserConfig<Services>(initConfig.getServices(), initConfig.namespaces());
 
             CountingBufferedReader cinp = 
                     new CountingBufferedReader
@@ -401,10 +401,10 @@ public class KeYFile implements IKeYFile {
     @Override
     public void readRulesAndProblem() 
             throws ProofInputException {
-        final ParserConfig schemaConfig = 
-	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
-        final ParserConfig normalConfig = 
-	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+        final ParserConfig<Services> schemaConfig = 
+	    new ParserConfig<Services>(initConfig.getServices(), initConfig.namespaces());
+        final ParserConfig<Services> normalConfig = 
+	    new ParserConfig<Services>(initConfig.getServices(), initConfig.namespaces());
         
         try {
             final CountingBufferedReader cinp = new CountingBufferedReader
@@ -488,5 +488,11 @@ public class KeYFile implements IKeYFile {
             return -1;
         }
 	return externalForm.hashCode();
+    }
+
+
+    @Override
+    public InitConfig getInitConfig() {
+        return initConfig;
     }
 }

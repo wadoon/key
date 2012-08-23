@@ -15,6 +15,7 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -30,7 +31,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
  */
 public class HelperClassForTests {
     
-    private static final Profile profile = new JavaProfile() {
+    private static final Profile<Services, InitConfig> profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
 	    public RuleCollection getStandardRules() {
                 return new RuleCollection(
@@ -47,8 +48,8 @@ public class HelperClassForTests {
         return parse(file, profile);
     }
     
-    public ProofAggregate parse(File file, Profile profile) {
-        AbstractProblemInitializer<?, ?> pi = null;
+    public ProofAggregate parse(File file, Profile<Services, InitConfig> profile) {
+        AbstractProblemInitializer<Services, InitConfig> pi = null;
         ProofAggregate result = null;
        
         try {	    
@@ -72,10 +73,10 @@ public class HelperClassForTests {
     }
        
     
-    public ProofAggregate parseThrowException(File file, Profile profile) throws ProofInputException{
+    public ProofAggregate parseThrowException(File file, Profile<Services, InitConfig> profile) throws ProofInputException{
 	KeYUserProblemFile po 
 		= new KeYUserProblemFile("UpdatetermTest", file, null); 
-        AbstractProblemInitializer<?, ?> pi = new ProblemInitializer(profile);
+        AbstractProblemInitializer<Services, InitConfig> pi = new ProblemInitializer(profile);
         pi.startProver(po, po);
         return po.getPO();        
     }

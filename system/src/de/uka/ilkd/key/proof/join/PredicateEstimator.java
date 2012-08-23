@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.DefaultProofFileParser;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 

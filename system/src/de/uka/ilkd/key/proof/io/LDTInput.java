@@ -37,7 +37,7 @@ public abstract class LDTInput<S extends IServices, IC extends AbstractInitConfi
     private final IKeYFile<S, IC>[] keyFiles;
     private final LDTInputListener listener;
 
-    private AbstractInitConfig<S, IC> initConfig = null;
+    private IC initConfig = null;
 
 
     /** creates a representation of the LDT files to be used as input
@@ -49,6 +49,13 @@ public abstract class LDTInput<S extends IServices, IC extends AbstractInitConfi
 	this.keyFiles = keyFiles;
 	this.listener=listener;
     }
+    
+    @Override
+    public IC getInitConfig() {
+        return initConfig;
+    }
+    
+
         
     @Override
     public String name() {
@@ -67,7 +74,7 @@ public abstract class LDTInput<S extends IServices, IC extends AbstractInitConfi
 
 
     @Override
-    public void setInitConfig(AbstractInitConfig<S, IC> conf) {
+    public void setInitConfig(IC conf) {
 	this.initConfig=conf;
 	for(int i = 0; i < keyFiles.length; i++) {
 	    keyFiles[i].setInitConfig(conf);

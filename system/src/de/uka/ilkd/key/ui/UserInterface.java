@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
@@ -81,6 +82,10 @@ public interface UserInterface<S extends IServices, IC extends AbstractInitConfi
      */
     IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);    
 
+    
+    DefaultProblemLoader<S, IC> createDefaultProblemLoader(File file, List<File> classPath,
+            File bootClassPath, KeYMediator<S, IC> mediator);
+    
     /**
      * <p>
      * Creates a new {@link ProblemInitializer} instance which is configured

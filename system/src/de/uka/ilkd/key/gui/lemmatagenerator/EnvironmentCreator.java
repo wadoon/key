@@ -4,20 +4,23 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.init.ABSProblemInitializer;
+import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
 
-public class EnvironmentCreator  {
+public class EnvironmentCreator<S extends IServices, IC extends AbstractInitConfig<S,IC>>  {
         
-        private KeYUserProblemFile keyFile;
+        private IKeYFile<S,IC> keyFile;
         
-        public KeYUserProblemFile getKeyFile() {
+        public IKeYFile<S, IC> getKeyFile() {
                 if(keyFile == null){
                         throw new IllegalStateException("You must call the method create before");
                 }
@@ -25,14 +28,22 @@ public class EnvironmentCreator  {
         }
         
         
-        public ProofEnvironment<?> create(String pathForDummyFile,ProgressMonitor monitor,
-                          ProblemInitializerListener listener, Profile profile) throws IOException,
+        public ProofEnvironment<IC> create(String pathForDummyFile,ProgressMonitor monitor,
+                          ProblemInitializerListener<S,IC> listener, Profile<S,IC> profile) throws IOException,
         ProofInputException {
                 File dummyFile = createDummyKeYFile(pathForDummyFile);
-                keyFile = new KeYUserProblemFile(
-                                dummyFile.getName(), dummyFile, null);
+                keyFile = (IKeYFile<S, IC>) (profile instanceof JavaProfile ? 
+                             new KeYUserProblemFile(
+                                dummyFile.getName(), dummyFile, null) :
+                             new ABSKeYUserProblemFile(
+                                dummyFile.getName(), dummyFile, null));
 
-                final AbstractProblemInitializer<?,?> pi = new ProblemInitializer(monitor, profile, false, listener );
+                final AbstractProblemInitializer<S, IC> pi = 
+                        (AbstractProblemInitializer<S, IC>) (profile instanceof JavaProfile ?
+                        new ProblemInitializer(monitor, (Profile<Services, InitConfig>)profile, false, 
+                                (ProblemInitializerListener<Services, InitConfig>)listener) :
+                            new ABSProblemInitializer(monitor, (Profile<ABSServices, ABSInitConfig>) profile, false, 
+                                    (ProblemInitializerListener<ABSServices, ABSInitConfig>)listener ));
                
                 return pi.prepare(keyFile).getProofEnv();
         }
