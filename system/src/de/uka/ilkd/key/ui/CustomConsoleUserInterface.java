@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 
 /**
  * <p>
@@ -58,7 +58,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
     * @param proof The proof to start auto mode for.
     */
    public void startProof(Proof proof) {
-      KeYMediator<Services, InitConfig> mediator = getMediator();
+      KeYMediator<Services, JavaDLInitConfig> mediator = getMediator();
       mediator.setProof(proof);
       mediator.startAutoMode();
    }
@@ -67,7 +67,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public void proofCreated(AbstractProblemInitializer<Services, InitConfig> sender, ProofAggregate proofAggregate) {
+   public void proofCreated(AbstractProblemInitializer<Services, JavaDLInitConfig> sender, ProofAggregate proofAggregate) {
       // Nothing to do
    }
 

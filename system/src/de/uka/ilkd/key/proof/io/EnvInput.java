@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
  * obligation. Environment means the initial configuration of a prover
  * containing namespaces and Java model.
  */
-public interface EnvInput<S extends IServices, IC extends AbstractInitConfig<S,IC>> {
+public interface EnvInput<S extends IServices, IC extends InitConfig<S,IC>> {
 
     /**
      * Returns the name of this input.

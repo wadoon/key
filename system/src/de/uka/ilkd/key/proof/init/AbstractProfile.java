@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
 
-public abstract class AbstractProfile<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements Profile<S, IC> {
+public abstract class AbstractProfile<S extends IServices, IC extends InitConfig<S, IC>> implements Profile<S, IC> {
 
     private final RuleCollection       standardRules;
 

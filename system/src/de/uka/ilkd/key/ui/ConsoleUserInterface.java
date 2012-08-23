@@ -7,10 +7,10 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.DefaultJavaDLProblemLoader;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 
-public class ConsoleUserInterface extends AbstractConsoleUserInterface<Services, InitConfig> {
+public class ConsoleUserInterface extends AbstractConsoleUserInterface<Services, JavaDLInitConfig> {
 
     public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
         super(batchMode, verbose);
@@ -22,9 +22,9 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface<Services,
     }
 
     @Override
-    public DefaultProblemLoader<Services, InitConfig> createDefaultProblemLoader(
+    public DefaultProblemLoader<Services, JavaDLInitConfig> createDefaultProblemLoader(
             File file, List<File> classPath, File bootClassPath,
-            KeYMediator<Services, InitConfig> mediator) {
+            KeYMediator<Services, JavaDLInitConfig> mediator) {
         return new DefaultJavaDLProblemLoader(file, classPath, bootClassPath, mediator);
     }
     

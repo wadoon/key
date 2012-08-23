@@ -27,9 +27,9 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.DependencyContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.DependencyContractPO;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
@@ -380,9 +380,9 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public ProofOblInput createProofObl(AbstractInitConfig initConfig,
+    public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract) {
-	return new DependencyContractPO((InitConfig) initConfig,
+	return new DependencyContractPO((JavaDLInitConfig) initConfig,
 	        (DependencyContract) contract);
     }
 

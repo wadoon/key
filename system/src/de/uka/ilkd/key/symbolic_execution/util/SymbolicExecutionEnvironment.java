@@ -3,7 +3,6 @@ package de.uka.ilkd.key.symbolic_execution.util;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -18,7 +17,7 @@ import de.uka.ilkd.key.ui.UserInterface;
  * via an {@link SymbolicExecutionTreeBuilder}.
  * @author Martin Hentschel
  */
-public class SymbolicExecutionEnvironment<U extends UserInterface> {
+public class SymbolicExecutionEnvironment<S extends IServices, IC extends InitConfig<S,IC>, U extends UserInterface<S, IC>> {
    /**
     * The {@link UserInterface} in which the {@link Proof} is loaded.
     */
@@ -27,7 +26,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> {
    /**
     * The loaded project.
     */
-   private InitConfig initConfig;
+   private IC initConfig;
    
    /**
     * The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
@@ -41,7 +40,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> {
     * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
     */
    public SymbolicExecutionEnvironment(U ui,
-                                       InitConfig initConfig, 
+                                       IC initConfig, 
                                        SymbolicExecutionTreeBuilder builder) {
       this.ui = ui;
       this.initConfig = initConfig;
@@ -60,7 +59,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> {
     * Returns the loaded project.
     * @return The loaded project.
     */
-   public AbstractInitConfig getInitConfig() {
+   public IC getInitConfig() {
       return initConfig;
    }
 
@@ -68,7 +67,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> {
     * Returns the {@link Services} of {@link #getInitConfig()}.
     * @return The {@link Services} of {@link #getInitConfig()}.
     */
-   public IServices getServices() {
+   public S getServices() {
       return initConfig.getServices();
    }
 

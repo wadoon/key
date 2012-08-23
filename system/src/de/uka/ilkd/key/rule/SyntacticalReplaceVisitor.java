@@ -163,7 +163,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 		IProgramReplaceVisitor trans;
 		IStatementBlock result;
 
-		trans = IProgramVisitorProvider.createProgramReplaceVisitor
+		trans = IProgramVisitorProvider.getInstance().createProgramReplaceVisitor
 			       (jb.program(), 
 					getServices (),
 					svInst,

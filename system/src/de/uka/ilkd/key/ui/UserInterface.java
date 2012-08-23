@@ -18,7 +18,7 @@ import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerL
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface<S extends IServices, IC extends AbstractInitConfig<S, IC>> extends ProblemInitializerListener<S, IC>, ProverTaskListener, ProgressMonitor {
+public interface UserInterface<S extends IServices, IC extends InitConfig<S, IC>> extends ProblemInitializerListener<S, IC>, ProverTaskListener, ProgressMonitor {
 
     /**
      * these methods are called immediately before automode is started to ensure that
@@ -106,12 +106,12 @@ public interface UserInterface<S extends IServices, IC extends AbstractInitConfi
     KeYMediator<S, IC> getMediator();
     
     /**
-     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link InitConfig}
+     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link JavaDLInitConfig}
      * which can be used to instantiated proofs programmatically.
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
-     * @return The opened {@link InitConfig}.
+     * @return The opened {@link JavaDLInitConfig}.
      * @throws IOException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
@@ -119,8 +119,8 @@ public interface UserInterface<S extends IServices, IC extends AbstractInitConfi
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
-     * {@link ProofOblInput} based on the {@link InitConfig}.
-     * @param initConfig The {@link InitConfig} which provides the source code.
+     * {@link ProofOblInput} based on the {@link JavaDLInitConfig}.
+     * @param initConfig The {@link JavaDLInitConfig} which provides the source code.
      * @param input The description of the {@link Proof} to instantiate.
      * @return The instantiated {@link Proof}.
      * @throws ProofInputException Occurred Exception.

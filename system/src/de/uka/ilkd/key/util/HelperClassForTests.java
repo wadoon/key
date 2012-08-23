@@ -31,7 +31,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
  */
 public class HelperClassForTests {
     
-    private static final Profile<Services, InitConfig> profile = new JavaProfile() {
+    private static final Profile<Services, JavaDLInitConfig> profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
 	    public RuleCollection getStandardRules() {
                 return new RuleCollection(
@@ -48,8 +48,8 @@ public class HelperClassForTests {
         return parse(file, profile);
     }
     
-    public ProofAggregate parse(File file, Profile<Services, InitConfig> profile) {
-        AbstractProblemInitializer<Services, InitConfig> pi = null;
+    public ProofAggregate parse(File file, Profile<Services, JavaDLInitConfig> profile) {
+        AbstractProblemInitializer<Services, JavaDLInitConfig> pi = null;
         ProofAggregate result = null;
        
         try {	    
@@ -73,10 +73,10 @@ public class HelperClassForTests {
     }
        
     
-    public ProofAggregate parseThrowException(File file, Profile<Services, InitConfig> profile) throws ProofInputException{
+    public ProofAggregate parseThrowException(File file, Profile<Services, JavaDLInitConfig> profile) throws ProofInputException{
 	KeYUserProblemFile po 
 		= new KeYUserProblemFile("UpdatetermTest", file, null); 
-        AbstractProblemInitializer<Services, InitConfig> pi = new ProblemInitializer(profile);
+        AbstractProblemInitializer<Services, JavaDLInitConfig> pi = new ProblemInitializer(profile);
         pi.startProver(po, po);
         return po.getPO();        
     }

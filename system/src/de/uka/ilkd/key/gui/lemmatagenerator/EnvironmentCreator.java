@@ -16,7 +16,7 @@ import de.uka.ilkd.keyabs.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.init.ABSProblemInitializer;
 import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
 
-public class EnvironmentCreator<S extends IServices, IC extends AbstractInitConfig<S,IC>>  {
+public class EnvironmentCreator<S extends IServices, IC extends InitConfig<S,IC>>  {
         
         private IKeYFile<S,IC> keyFile;
         
@@ -40,8 +40,8 @@ public class EnvironmentCreator<S extends IServices, IC extends AbstractInitConf
 
                 final AbstractProblemInitializer<S, IC> pi = 
                         (AbstractProblemInitializer<S, IC>) (profile instanceof JavaProfile ?
-                        new ProblemInitializer(monitor, (Profile<Services, InitConfig>)profile, false, 
-                                (ProblemInitializerListener<Services, InitConfig>)listener) :
+                        new ProblemInitializer(monitor, (Profile<Services, JavaDLInitConfig>)profile, false, 
+                                (ProblemInitializerListener<Services, JavaDLInitConfig>)listener) :
                             new ABSProblemInitializer(monitor, (Profile<ABSServices, ABSInitConfig>) profile, false, 
                                     (ProblemInitializerListener<ABSServices, ABSInitConfig>)listener ));
                

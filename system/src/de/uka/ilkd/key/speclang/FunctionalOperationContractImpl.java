@@ -43,9 +43,9 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
@@ -845,9 +845,9 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 
 
     @Override
-    public ProofOblInput createProofObl(AbstractInitConfig initConfig,
+    public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract) {
-	return new FunctionalOperationContractPO((InitConfig) initConfig,
+	return new FunctionalOperationContractPO((JavaDLInitConfig) initConfig,
 	        (FunctionalOperationContract) contract);
     }
 

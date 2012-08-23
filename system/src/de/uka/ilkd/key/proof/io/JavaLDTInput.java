@@ -4,11 +4,11 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 
-public class JavaLDTInput extends LDTInput<Services, InitConfig> {
+public class JavaLDTInput extends LDTInput<Services, JavaDLInitConfig> {
 
-    public JavaLDTInput(IKeYFile<Services, InitConfig>[] keyFiles, LDTInputListener listener) {
+    public JavaLDTInput(IKeYFile<Services, JavaDLInitConfig>[] keyFiles, LDTInputListener listener) {
         super(keyFiles, listener);
     }
 

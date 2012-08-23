@@ -29,7 +29,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  * This profile sets up KeY for verification of JavaCard programs.
  *
  */
-public class JavaProfile extends AbstractProfile<Services, InitConfig> {
+public class JavaProfile extends AbstractProfile<Services, JavaDLInitConfig> {
 
     private final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
@@ -117,8 +117,8 @@ public class JavaProfile extends AbstractProfile<Services, InitConfig> {
     }
 
     @Override
-    public InitConfig createInitConfig(Services services) {
-        return new InitConfig(services, this);
+    public JavaDLInitConfig createInitConfig(Services services) {
+        return new JavaDLInitConfig(services, this);
     }
 
     public static JavaDLTermBuilder DF() {

@@ -39,26 +39,26 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
-public final class ProblemInitializer extends AbstractProblemInitializer<Services, InitConfig> {
+public final class ProblemInitializer extends AbstractProblemInitializer<Services, JavaDLInitConfig> {
 
     
     public ProblemInitializer(ProgressMonitor mon,
-	                      Profile<Services, InitConfig>  profile, Services services, boolean registerProof,
-	                      ProblemInitializerListener<Services, InitConfig>  listener) {
+	                      Profile<Services, JavaDLInitConfig>  profile, Services services, boolean registerProof,
+	                      ProblemInitializerListener<Services, JavaDLInitConfig>  listener) {
 	super(mon, profile, services, registerProof, listener);
     }
 
     public ProblemInitializer(ProgressMonitor mon,
-            Profile<Services, InitConfig>  profile, 
+            Profile<Services, JavaDLInitConfig>  profile, 
             boolean registerProof,
-            ProblemInitializerListener<Services, InitConfig>  listener) {
+            ProblemInitializerListener<Services, JavaDLInitConfig>  listener) {
         this(mon, profile, 
                 (Services) profile.createServices(new KeYRecoderExcHandler()), 
                 registerProof, listener);
     }
 
     
-    public ProblemInitializer(Profile<Services, InitConfig>  profile) {
+    public ProblemInitializer(Profile<Services, JavaDLInitConfig>  profile) {
 	this(null, profile, false, null);
     }
     
@@ -125,7 +125,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
      * Helper for readEnvInput().
      */
     @Override
-    protected void readJava(EnvInput<Services, InitConfig> envInput, InitConfig initConfig) 
+    protected void readJava(EnvInput<Services, JavaDLInitConfig> envInput, JavaDLInitConfig initConfig) 
     		throws ProofInputException {
 	//this method must only be called once per init config	
         final Services javaServices = initConfig.getServices();
@@ -180,7 +180,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
     //------------------------------------------------------------------------- 
     
     @Override
-    protected void registerProgramDefinedSymbols(InitConfig initConfig)
+    protected void registerProgramDefinedSymbols(JavaDLInitConfig initConfig)
             throws ProofInputException {
         final JavaInfo javaInfo = initConfig.getServices().getProgramInfo();
         final Namespace<SortedOperator> functions 
@@ -215,29 +215,29 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
     }
 
     @Override
-    protected IKeYFile<Services, InitConfig> createKeYFile(Includes in, String name) {
+    protected IKeYFile<Services, JavaDLInitConfig> createKeYFile(Includes in, String name) {
         return new KeYFile(name, in.get(name), progMon);
     }
 
     @Override
-    protected IKeYFile<Services, InitConfig> createTacletBaseKeYFile() {
+    protected IKeYFile<Services, JavaDLInitConfig> createTacletBaseKeYFile() {
         return new KeYFile("taclet base", 
                   profile.getStandardRules().getTacletBase(),
               progMon);
     }
     
     
-    public void startProver(ProofEnvironment<InitConfig> env, ProofOblInput po) 
+    public void startProver(ProofEnvironment<JavaDLInitConfig> env, ProofOblInput po) 
     		throws ProofInputException {
 	assert env.getInitConfig().getProofEnv() == env;
         startProver(env.getInitConfig(), po, 0);
     }
     
     
-    public void startProver(EnvInput<Services, InitConfig> envInput, ProofOblInput po) 
+    public void startProver(EnvInput<Services, JavaDLInitConfig> envInput, ProofOblInput po) 
     		throws ProofInputException {
 	try {
-	    InitConfig initConfig = prepare(envInput);
+	    JavaDLInitConfig initConfig = prepare(envInput);
 	    startProver(initConfig, po, 0);
 	} catch(ProofInputException e) {
 	    reportStatus(envInput.name() + " failed");
@@ -246,7 +246,7 @@ public final class ProblemInitializer extends AbstractProblemInitializer<Service
     }
 
     @Override
-    protected JavaLDTInput createLDTInput(IKeYFile<Services, InitConfig>[] keyFile) {
+    protected JavaLDTInput createLDTInput(IKeYFile<Services, JavaDLInitConfig>[] keyFile) {
         return new JavaLDTInput(keyFile, new LDTInputListener() {
             @Override
             public void reportStatus(String status, int progress) {

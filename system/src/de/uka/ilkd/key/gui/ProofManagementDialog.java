@@ -81,7 +81,7 @@ public final class ProofManagementDialog extends JDialog {
     private static ProofManagementDialog instance;
     private static boolean startedProof;
 
-    private AbstractInitConfig<?,?> initConfig;
+    private InitConfig<?,?> initConfig;
     private IServices services;
     private ISpecificationRepository specRepos;
 
@@ -100,7 +100,7 @@ public final class ProofManagementDialog extends JDialog {
     //constructors
     //-------------------------------------------------------------------------
 
-    private ProofManagementDialog(KeYMediator mediator, AbstractInitConfig initConfig, String title) {
+    private ProofManagementDialog(KeYMediator mediator, InitConfig initConfig, String title) {
 	super(MainWindow.getInstance(), title, true);
 	this.initConfig = initConfig;
 	this.services   = initConfig.getServices();
@@ -294,7 +294,7 @@ public final class ProofManagementDialog extends JDialog {
     
     private static void showInstance(
     					 KeYMediator<?,?> mediator,
-    					AbstractInitConfig<?,?> initConfig,
+    					InitConfig<?,?> initConfig,
 	    			     KeYJavaType selectedKJT,
 	    			     IObserverFunction selectedTarget,
 	    			     Proof selectedProof) {
@@ -451,7 +451,7 @@ public final class ProofManagementDialog extends JDialog {
         if(proof == null) {
             UserInterface ui = mediator.getUI();
             AbstractProblemInitializer pi = 
-            		new ProblemInitializer(ui, (Profile<Services, InitConfig>) mediator.getProfile(), (Services) services, true, ui);
+            		new ProblemInitializer(ui, (Profile<Services, JavaDLInitConfig>) mediator.getProfile(), (Services) services, true, ui);
             try {
                 pi.startProver(initConfig, po, 0);
             } catch(ProofInputException exc) {
@@ -599,7 +599,7 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Shows the dialog and selects the passed method.
      */
-    public static void showInstance(KeYMediator mediator, AbstractInitConfig initConfig,
+    public static void showInstance(KeYMediator mediator, InitConfig initConfig,
 	    		            KeYJavaType selectedKJT,
 	    			    IObserverFunction selectedTarget) {
 	showInstance(mediator, initConfig, selectedKJT, selectedTarget, null);
@@ -609,7 +609,7 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Shows the dialog and selects the passed proof.
      */
-    public static void showInstance(KeYMediator mediator, AbstractInitConfig initConfig, 
+    public static void showInstance(KeYMediator mediator, InitConfig initConfig, 
 	    			    Proof selectedProof) {
 	showInstance(mediator, initConfig, null, null, selectedProof);
     }
@@ -618,7 +618,7 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Shows the dialog.
      */
-    public static void showInstance(KeYMediator mediator, AbstractInitConfig initConfig) {
+    public static void showInstance(KeYMediator mediator, InitConfig initConfig) {
 	showInstance(mediator, initConfig, null, null, null);
     }    
     

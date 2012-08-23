@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
@@ -91,14 +91,14 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    
    /**
     * Constructor.
-    * @param initConfig The {@link InitConfig} to use.
+    * @param initConfig The {@link JavaDLInitConfig} to use.
     * @param name The name to use.
     * @param pm The {@link IProgramMethod} to execute code parts from.
     * @param precondition An optional precondition to use.
     * @param startPosition The start position.
     * @param endPosition The end position.
     */
-   public ProgramMethodSubsetPO(InitConfig initConfig, 
+   public ProgramMethodSubsetPO(JavaDLInitConfig initConfig, 
                        String name, 
                        IProgramMethod pm, 
                        String precondition,
@@ -113,7 +113,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    
    /**
     * Constructor.
-    * @param initConfig The {@link InitConfig} to use.
+    * @param initConfig The {@link JavaDLInitConfig} to use.
     * @param name The name to use.
     * @param pm The {@link IProgramMethod} to execute code parts from.
     * @param precondition An optional precondition to use.
@@ -121,7 +121,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * @param endPosition The end position.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
     */
-   public ProgramMethodSubsetPO(InitConfig initConfig, 
+   public ProgramMethodSubsetPO(JavaDLInitConfig initConfig, 
                        String name, 
                        IProgramMethod pm, 
                        String precondition,
@@ -318,12 +318,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
 
    /**
     * Instantiates a new proof obligation with the given settings.
-    * @param initConfig The already load {@link InitConfig}.
+    * @param initConfig The already load {@link JavaDLInitConfig}.
     * @param properties The settings of the proof obligation to instantiate.
     * @return The instantiated proof obligation.
     * @throws IOException Occurred Exception.
     */
-   public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+   public static LoadedPOContainer loadFrom(JavaDLInitConfig initConfig, Properties properties) throws IOException {
       return new LoadedPOContainer(new ProgramMethodSubsetPO(initConfig,
                                                              getName(properties), 
                                                              getProgramMethod(initConfig, properties), 

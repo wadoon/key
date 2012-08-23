@@ -30,7 +30,7 @@ import de.uka.ilkd.key.speclang.Contract;
  * </p>
  * @author Martin Hentschel
  */
-public abstract class DefaultProblemLoader<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
+public abstract class DefaultProblemLoader<S extends IServices, IC extends InitConfig<S, IC>> {
    /**
     * The file or folder to load.
     */
@@ -62,7 +62,7 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends Abstr
    private  AbstractProblemInitializer<S, IC> problemInitializer;
    
    /**
-    * The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
+    * The instantiated {@link JavaDLInitConfig} which provides access to the loaded source elements and specifications.
     */
    private IC initConfig;
    
@@ -124,8 +124,8 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends Abstr
    }
    
    /**
-    * Creates the {@link InitConfig}.
-    * @return The created {@link InitConfig}.
+    * Creates the {@link JavaDLInitConfig}.
+    * @return The created {@link JavaDLInitConfig}.
     * @throws ProofInputException Occurred Exception.
     */
    protected IC createInitConfig() throws ProofInputException {
@@ -191,7 +191,7 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends Abstr
          try {
             // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
             Class<?> poClassInstance = Class.forName(poClass);
-            Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
+            Method loadMethod = poClassInstance.getMethod("loadFrom", JavaDLInitConfig.class, Properties.class);
             return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
          }
          catch (Exception e) {
@@ -282,8 +282,8 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends Abstr
    }
 
    /**
-    * Returns the instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
-    * @return The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
+    * Returns the instantiated {@link JavaDLInitConfig} which provides access to the loaded source elements and specifications.
+    * @return The instantiated {@link JavaDLInitConfig} which provides access to the loaded source elements and specifications.
     */
    public IC getInitConfig() {
       return initConfig;

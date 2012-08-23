@@ -13,7 +13,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -22,7 +22,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
-public abstract class AbstractWindowUserInterface<S extends IServices, IC extends AbstractInitConfig<S, IC>> extends AbstractUserInterface<S, IC> {
+public abstract class AbstractWindowUserInterface<S extends IServices, IC extends InitConfig<S, IC>> extends AbstractUserInterface<S, IC> {
 
     protected MainWindow<S, IC> mainWindow;
     protected LinkedList<InteractiveRuleApplicationCompletion> completions = new LinkedList<InteractiveRuleApplicationCompletion>();

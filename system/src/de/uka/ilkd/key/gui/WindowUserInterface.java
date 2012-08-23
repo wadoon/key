@@ -8,7 +8,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.DefaultJavaDLProblemLoader;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 
 /**
@@ -22,9 +22,9 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
  * @author mattias ulbrich
  */
 
-public class WindowUserInterface extends AbstractWindowUserInterface<Services, InitConfig> {
+public class WindowUserInterface extends AbstractWindowUserInterface<Services, JavaDLInitConfig> {
 
-    public WindowUserInterface(MainWindow<Services, InitConfig> mainWindow) {
+    public WindowUserInterface(MainWindow<Services, JavaDLInitConfig> mainWindow) {
         super(mainWindow);
         completions.add(new FunctionalOperationContractCompletion());
         completions.add(new DependencyContractCompletion());
@@ -37,9 +37,9 @@ public class WindowUserInterface extends AbstractWindowUserInterface<Services, I
     }
 
     @Override
-    public DefaultProblemLoader<Services, InitConfig> createDefaultProblemLoader(
+    public DefaultProblemLoader<Services, JavaDLInitConfig> createDefaultProblemLoader(
             File file, List<File> classPath, File bootClassPath,
-            KeYMediator<Services, InitConfig> mediator) {
+            KeYMediator<Services, JavaDLInitConfig> mediator) {
         return new DefaultJavaDLProblemLoader(file, classPath, bootClassPath, mediator);
     }
 }

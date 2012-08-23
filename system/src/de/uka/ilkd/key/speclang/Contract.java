@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 
@@ -121,7 +121,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns a proof obligation to the passed contract and initConfig.
      */
-    public ProofOblInput createProofObl(AbstractInitConfig initConfig,
+    public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract);
     
     /**

@@ -68,7 +68,7 @@ public class IProgramVisitorProvider {
                 root) : new WrittenPVCollector(root, services);
     }
 
-    public static IProgramReplaceVisitor createProgramReplaceVisitor(
+    public IProgramReplaceVisitor createProgramReplaceVisitor(
             ProgramElement root, IServices services, SVInstantiations svInst,
             boolean allowPartialReplacement) {
         return ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ? new ABSProgramReplaceVisitor(
@@ -77,7 +77,7 @@ public class IProgramVisitorProvider {
                         allowPartialReplacement);
     }
 
-    public static IProgramVariableCollector<LocationVariable> createProgramVariableCollector(
+    public IProgramVariableCollector<LocationVariable> createProgramVariableCollector(
             ProgramElement root, IServices services) {
         return ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ? new ABSProgramVariableCollector(
                 root, (ABSServices) services) : new ProgramVariableCollector(

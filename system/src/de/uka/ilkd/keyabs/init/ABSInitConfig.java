@@ -1,11 +1,11 @@
 package de.uka.ilkd.keyabs.init;
 
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.proof.mgt.ABSProofEnvironment;
 
-public class ABSInitConfig extends AbstractInitConfig<ABSServices, ABSInitConfig>  {
+public class ABSInitConfig extends InitConfig<ABSServices, ABSInitConfig>  {
 
     private ABSServices services;
     private ABSProofEnvironment env;

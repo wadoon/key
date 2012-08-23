@@ -16,7 +16,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
@@ -27,7 +27,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
  * declarations and third the rules. This procedure makes it possible to
  * use all declared sorts in all rules.
  */
-public abstract class LDTInput<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements EnvInput<S, IC> {
+public abstract class LDTInput<S extends IServices, IC extends InitConfig<S, IC>> implements EnvInput<S, IC> {
     public interface LDTInputListener {
 	public void reportStatus(String status, int progress);
     }

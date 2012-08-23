@@ -29,7 +29,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  * a proof configured by the opened file.
  * @author Martin Hentschel
  */
-public final class ProblemLoader<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements Runnable {
+public final class ProblemLoader<S extends IServices, IC extends InitConfig<S, IC>> implements Runnable {
     
     
     private final DefaultProblemLoader<S, IC> loader;

@@ -19,7 +19,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
 
-public abstract class TacletLoader<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
+public abstract class TacletLoader<S extends IServices, IC extends InitConfig<S, IC>> {
         
         public abstract ImmutableSet<Taclet> loadAxioms();
         public abstract ImmutableSet<Taclet> loadTaclets();
@@ -63,7 +63,7 @@ public abstract class TacletLoader<S extends IServices, IC extends AbstractInitC
         }
         
         
-        public static class TacletFromFileLoader<S extends IServices, IC extends AbstractInitConfig<S, IC>> extends TacletLoader<S,IC>{
+        public static class TacletFromFileLoader<S extends IServices, IC extends InitConfig<S, IC>> extends TacletLoader<S,IC>{
                 private IC initConfig;
                 private final File fileForDefinitions;
                 private final File fileForTaclets;

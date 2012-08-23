@@ -38,7 +38,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
@@ -51,7 +51,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 /** 
  * EnvInput for standalone specification language front ends.
  */
-public final class SLEnvInput extends AbstractEnvInput<Services, InitConfig> {
+public final class SLEnvInput extends AbstractEnvInput<Services, JavaDLInitConfig> {
     
             
     //-------------------------------------------------------------------------
@@ -209,7 +209,7 @@ public final class SLEnvInput extends AbstractEnvInput<Services, InitConfig> {
      * directory; if found, read specifications from this file.
      */
     private void createDLLibrarySpecs() throws ProofInputException {
-        InitConfig initConfig = getInitConfig();
+        JavaDLInitConfig initConfig = getInitConfig();
         final Set<KeYJavaType> allKJTs 
 		= initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();			
 	
@@ -237,7 +237,7 @@ public final class SLEnvInput extends AbstractEnvInput<Services, InitConfig> {
     private void createSpecs(SpecExtractor specExtractor) 
             throws ProofInputException {
         
-        final InitConfig initConfig = getInitConfig();
+        final JavaDLInitConfig initConfig = getInitConfig();
         
         final IProgramInfo javaInfo 
             = initConfig.getServices().getProgramInfo();

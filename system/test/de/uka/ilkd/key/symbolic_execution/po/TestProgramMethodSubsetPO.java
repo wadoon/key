@@ -7,6 +7,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -213,7 +215,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                          Position endPosition,
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, startPosition, endPosition, false);
+      SymbolicExecutionEnvironment<Services, JavaDLInitConfig, CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, startPosition, endPosition, false);
       // Extract and test try content
       String tryContent = getTryContent(env.getProof());
       assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));

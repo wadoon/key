@@ -11,13 +11,13 @@ import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
-public abstract class AbstractUserInterface<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements UserInterface<S, IC> {
+public abstract class AbstractUserInterface<S extends IServices, IC extends InitConfig<S, IC>> implements UserInterface<S, IC> {
 
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator<S, IC> mediator) {

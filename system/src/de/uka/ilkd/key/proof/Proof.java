@@ -34,7 +34,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
@@ -202,7 +202,7 @@ public class Proof implements Named {
                     p.getActiveStrategy().name().toString(), 
                     getSettings().getStrategySettings().getActiveStrategyProperties());
         
-        AbstractInitConfig<?,?> ic = p.env().getInitConfig();
+        InitConfig<?,?> ic = p.env().getInitConfig();
         Node rootNode = new Node(this, p.root.sequent());
         setRoot(rootNode);
 	Goal firstGoal = new Goal(rootNode, 

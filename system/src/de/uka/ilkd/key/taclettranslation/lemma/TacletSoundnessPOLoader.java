@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -20,7 +20,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
-public class TacletSoundnessPOLoader<S extends IServices, IC extends AbstractInitConfig<S,IC>> {
+public class TacletSoundnessPOLoader<S extends IServices, IC extends InitConfig<S,IC>> {
 
         private final boolean loadAsLemmata;
         

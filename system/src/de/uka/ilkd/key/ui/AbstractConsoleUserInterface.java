@@ -9,13 +9,13 @@ import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 
-public abstract class AbstractConsoleUserInterface<S extends IServices, IC extends AbstractInitConfig<S,IC>> extends AbstractUserInterface<S, IC> {
+public abstract class AbstractConsoleUserInterface<S extends IServices, IC extends InitConfig<S,IC>> extends AbstractUserInterface<S, IC> {
 
     private final BatchMode batchMode;
     private final boolean verbose;

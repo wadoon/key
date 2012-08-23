@@ -28,7 +28,7 @@ import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -39,7 +39,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 /** 
  * Represents an input from a .key file producing an environment.
  */
-public class KeYFile implements IKeYFile<Services, InitConfig> {
+public class KeYFile implements IKeYFile<Services, JavaDLInitConfig> {
     
     private final String name;
     
@@ -56,7 +56,7 @@ public class KeYFile implements IKeYFile<Services, InitConfig> {
     
     private InputStream input;
     
-    protected InitConfig initConfig;
+    protected JavaDLInitConfig initConfig;
     
     private String chooseContract = null;
 
@@ -170,7 +170,7 @@ public class KeYFile implements IKeYFile<Services, InitConfig> {
     
     
     @Override
-    public void setInitConfig(InitConfig conf) {
+    public void setInitConfig(JavaDLInitConfig conf) {
         this.initConfig=conf;
     }
 
@@ -492,7 +492,7 @@ public class KeYFile implements IKeYFile<Services, InitConfig> {
 
 
     @Override
-    public InitConfig getInitConfig() {
+    public JavaDLInitConfig getInitConfig() {
         return initConfig;
     }
 }

@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -135,7 +135,7 @@ public final class SymbolicExecutionUtil {
       assert source != null;
       // Get required source instances
       ProofEnvironment sourceEnv = source.env();
-      InitConfig sourceInitConfig = (InitConfig) sourceEnv.getInitConfig();
+      JavaDLInitConfig sourceInitConfig = (JavaDLInitConfig) sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile() {
@@ -150,7 +150,7 @@ public final class SymbolicExecutionUtil {
          }
       };
       // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig((Services) source.getServices().copy(), profile);
+      JavaDLInitConfig initConfig = new JavaDLInitConfig((Services) source.getServices().copy(), profile);
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());

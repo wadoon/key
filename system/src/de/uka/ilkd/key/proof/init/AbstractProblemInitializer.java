@@ -28,9 +28,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public abstract class AbstractProblemInitializer<S extends IServices, IC extends AbstractInitConfig<S, IC>> {
+public abstract class AbstractProblemInitializer<S extends IServices, IC extends InitConfig<S, IC>> {
 
-    public static interface ProblemInitializerListener<S extends IServices, IC extends AbstractInitConfig<S,IC>> {
+    public static interface ProblemInitializerListener<S extends IServices, IC extends InitConfig<S,IC>> {
         public void proofCreated(AbstractProblemInitializer<S, IC> sender, ProofAggregate proofAggregate);
 
         public void progressStarted(Object sender);
@@ -52,7 +52,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
     protected abstract void readJava(EnvInput<S, IC> envInput,
             IC initConfig) throws ProofInputException;
 
-    private static AbstractInitConfig<?,?> baseConfig;
+    private static InitConfig<?,?> baseConfig;
     protected final Profile<S, IC> profile;
     protected final S services;
     protected final ProgressMonitor progMon;
@@ -152,7 +152,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
      * 
      * See bug report #1185, #1189
      */
-    private static <IC extends AbstractInitConfig<?, IC>> void cleanupNamespaces(IC initConfig) {
+    private static <IC extends InitConfig<?, IC>> void cleanupNamespaces(IC initConfig) {
         final Namespace<ParsableVariable> newVarNS = new Namespace<ParsableVariable>();
         final Namespace<Sort> newSortNS = new Namespace<Sort>();
         final Namespace<SortedOperator> newFuncNS = new Namespace<SortedOperator>();

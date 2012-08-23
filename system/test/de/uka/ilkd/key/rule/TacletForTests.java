@@ -77,8 +77,8 @@ public class TacletForTests {
 	try {	    
 	    if (!file.equals(lastFile)) {
 		KeYFileForTests envInput = new KeYFileForTests("Test", file);	
-		AbstractProblemInitializer<Services, InitConfig> pi = new ProblemInitializer(profile); 
-		AbstractInitConfig<Services, InitConfig> ic = pi.prepare(envInput);
+		AbstractProblemInitializer<Services, JavaDLInitConfig> pi = new ProblemInitializer(profile); 
+		InitConfig<Services, JavaDLInitConfig> ic = pi.prepare(envInput);
               	nss      = ic.namespaces(); 
                 rules    = ic.createTacletIndex();
                 services = (Services) ic.getServices();

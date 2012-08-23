@@ -21,7 +21,7 @@ import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.Taclet;
  * environment is equal, there is an InitConfig contained to be used
  * to start proofs of this environment.
  */
-public class ProofEnvironment<IC extends AbstractInitConfig<?,IC>> {
+public class ProofEnvironment<IC extends InitConfig<?,IC>> {
 
     private JavaModel jModel;
     private RuleConfig ruleConfig;

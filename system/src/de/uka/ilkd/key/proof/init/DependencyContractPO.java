@@ -43,7 +43,7 @@ public final class DependencyContractPO extends AbstractJavaPO
     //constructors
     //-------------------------------------------------------------------------
     
-    public DependencyContractPO(InitConfig initConfig, 
+    public DependencyContractPO(JavaDLInitConfig initConfig, 
 	    			DependencyContract contract) {
     	super(initConfig, contract.getName());
     	assert !(contract instanceof FunctionalOperationContract);
@@ -260,12 +260,12 @@ public final class DependencyContractPO extends AbstractJavaPO
     
     /**
      * Instantiates a new proof obligation with the given settings.
-     * @param initConfig The already load {@link InitConfig}.
+     * @param initConfig The already load {@link JavaDLInitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+    public static LoadedPOContainer loadFrom(JavaDLInitConfig initConfig, Properties properties) throws IOException {
        String contractName = properties.getProperty("contract");
        int proofNum = 0;
        String baseContractName = null;

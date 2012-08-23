@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -66,12 +66,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
    
    /**
     * Constructor.
-    * @param initConfig The {@link InitConfig} to use.
+    * @param initConfig The {@link JavaDLInitConfig} to use.
     * @param name The name to use.
     * @param pm The {@link IProgramMethod} to execute code parts from.
     * @param precondition An optional precondition to use.
     */
-   public ProgramMethodPO(InitConfig initConfig, 
+   public ProgramMethodPO(JavaDLInitConfig initConfig, 
                   String name, 
                   IProgramMethod pm, 
                   String precondition) {
@@ -83,13 +83,13 @@ public class ProgramMethodPO extends AbstractOperationPO {
    
    /**
     * Constructor.
-    * @param initConfig The {@link InitConfig} to use.
+    * @param initConfig The {@link JavaDLInitConfig} to use.
     * @param name The name to use.
     * @param pm The {@link IProgramMethod} to execute code parts from.
     * @param precondition An optional precondition to use.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
     */
-   public ProgramMethodPO(InitConfig initConfig, 
+   public ProgramMethodPO(JavaDLInitConfig initConfig, 
                        String name, 
                        IProgramMethod pm, 
                        String precondition,
@@ -307,12 +307,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
 
    /**
     * Instantiates a new proof obligation with the given settings.
-    * @param initConfig The already load {@link InitConfig}.
+    * @param initConfig The already load {@link JavaDLInitConfig}.
     * @param properties The settings of the proof obligation to instantiate.
     * @return The instantiated proof obligation.
     * @throws IOException Occurred Exception.
     */
-   public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+   public static LoadedPOContainer loadFrom(JavaDLInitConfig initConfig, Properties properties) throws IOException {
       return new LoadedPOContainer(new ProgramMethodPO(initConfig, 
                                                        getName(properties), 
                                                        getProgramMethod(initConfig, properties), 
@@ -322,12 +322,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
    
    /**
     * Searches the {@link IProgramMethod} defined by the given {@link Properties}.
-    * @param initConfig The already load {@link InitConfig}.
+    * @param initConfig The already load {@link JavaDLInitConfig}.
     * @param properties The settings of the proof obligation to instantiate.
     * @return The found {@link IProgramMethod}.
     * @throws IOException Occurred Exception if it was not possible to find the {@link IProgramMethod}.
     */
-   public static IProgramMethod getProgramMethod(InitConfig initConfig, Properties properties) throws IOException {
+   public static IProgramMethod getProgramMethod(JavaDLInitConfig initConfig, Properties properties) throws IOException {
       // Get container class and method signature
       String value = properties.getProperty("method");
       if (value == null) {

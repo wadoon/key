@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
@@ -23,7 +23,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 /**
  * A simple EnvInput which includes default rules and a Java path.
  */
-public abstract class AbstractEnvInput<S extends IServices, IC extends AbstractInitConfig<S, IC>> implements EnvInput<S,IC> {
+public abstract class AbstractEnvInput<S extends IServices, IC extends InitConfig<S, IC>> implements EnvInput<S,IC> {
 
     protected final String name;
     protected final String javaPath;    

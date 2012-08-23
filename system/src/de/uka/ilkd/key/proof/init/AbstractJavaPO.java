@@ -46,7 +46,7 @@ public abstract class AbstractJavaPO implements IPersistablePO {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
     protected static final JavaDLTermBuilder TB = JavaProfile.DF();
-    protected final InitConfig initConfig;
+    protected final JavaDLInitConfig initConfig;
     private final Services services;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
@@ -61,7 +61,7 @@ public abstract class AbstractJavaPO implements IPersistablePO {
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-    public AbstractJavaPO(InitConfig initConfig,
+    public AbstractJavaPO(JavaDLInitConfig initConfig,
                       	  String name) {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();

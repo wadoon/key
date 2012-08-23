@@ -73,10 +73,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     /**
      * Constructor.
-     * @param initConfig The {@link InitConfig} to use.
+     * @param initConfig The {@link JavaDLInitConfig} to use.
      * @param contract The {@link FunctionalOperationContractPO} to prove.
      */
-    public FunctionalOperationContractPO(InitConfig initConfig,
+    public FunctionalOperationContractPO(JavaDLInitConfig initConfig,
                                          FunctionalOperationContract contract) {
         super(initConfig, contract.getName());
         this.contract = contract;
@@ -84,11 +84,11 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     /**
      * Constructor.
-     * @param initConfig The {@link InitConfig} to use.
+     * @param initConfig The {@link JavaDLInitConfig} to use.
      * @param contract The {@link FunctionalOperationContractPO} to prove.
      * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
      */
-    public FunctionalOperationContractPO(InitConfig initConfig,
+    public FunctionalOperationContractPO(JavaDLInitConfig initConfig,
                                          FunctionalOperationContract contract,
                                          boolean addUninterpretedPredicate) {
         super(initConfig, contract.getName(), addUninterpretedPredicate);
@@ -331,12 +331,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     
     /**
      * Instantiates a new proof obligation with the given settings.
-     * @param initConfig The already load {@link InitConfig}.
+     * @param initConfig The already load {@link JavaDLInitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+    public static LoadedPOContainer loadFrom(JavaDLInitConfig initConfig, Properties properties) throws IOException {
        String contractName = properties.getProperty("contract");
        int proofNum = 0;
        String baseContractName = null;

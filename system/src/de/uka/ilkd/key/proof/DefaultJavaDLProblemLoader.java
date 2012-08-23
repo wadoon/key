@@ -7,31 +7,31 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 
 public class DefaultJavaDLProblemLoader extends
-        DefaultProblemLoader<Services, InitConfig> {
+        DefaultProblemLoader<Services, JavaDLInitConfig> {
 
     public DefaultJavaDLProblemLoader(File file, List<File> classPath,
-            File bootClassPath, KeYMediator<Services, InitConfig> mediator) {
+            File bootClassPath, KeYMediator<Services, JavaDLInitConfig> mediator) {
         super(file, classPath, bootClassPath, mediator);
     }
 
     @Override
-    protected EnvInput<Services, InitConfig> createEnvInput() throws IOException {
+    protected EnvInput<Services, JavaDLInitConfig> createEnvInput() throws IOException {
     
           final String filename = file.getName();
     
           if (filename.endsWith(".java")) {
              // java file, probably enriched by specifications
              if (file.getParentFile() == null) {
-                return (EnvInput<Services, InitConfig>) new SLEnvInput(".", classPath, bootClassPath);
+                return (EnvInput<Services, JavaDLInitConfig>) new SLEnvInput(".", classPath, bootClassPath);
              }
              else {
-                return (EnvInput<Services, InitConfig>) new SLEnvInput(file.getParentFile().getAbsolutePath(),
+                return (EnvInput<Services, JavaDLInitConfig>) new SLEnvInput(file.getParentFile().getAbsolutePath(),
                       classPath, bootClassPath);
              }
           }
@@ -42,7 +42,7 @@ public class DefaultJavaDLProblemLoader extends
           else if (file.isDirectory()) {
              // directory containing java sources, probably enriched
              // by specifications
-             return (EnvInput<Services, InitConfig>) new SLEnvInput(file.getPath(), classPath, bootClassPath);
+             return (EnvInput<Services, JavaDLInitConfig>) new SLEnvInput(file.getPath(), classPath, bootClassPath);
           }
           else {
              if (filename.lastIndexOf('.') != -1) {

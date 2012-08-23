@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.proof.io;
 
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
-public interface IKeYFile<S extends IServices, IC extends AbstractInitConfig<S, IC>> extends EnvInput<S, IC> {
+public interface IKeYFile<S extends IServices, IC extends InitConfig<S, IC>> extends EnvInput<S, IC> {
 
     /** reads the sorts declaration of the .key file only, 
      * modifying the sort namespace

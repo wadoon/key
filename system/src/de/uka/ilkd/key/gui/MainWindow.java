@@ -53,8 +53,8 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -74,7 +74,7 @@ import de.uka.ilkd.keyabs.init.ABSProfile;
 
 
 @SuppressWarnings("serial")
-public final class MainWindow<S extends IServices, IC extends AbstractInitConfig<S,IC>>  extends JFrame  {
+public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>>  extends JFrame  {
 
     /**
      * The maximum number of recent files displayed.
@@ -1669,8 +1669,8 @@ public final class MainWindow<S extends IServices, IC extends AbstractInitConfig
 	if(instance == null) {
 	    Profile<?,?> profile = ProofSettings.DEFAULT_SETTINGS.getProfile();	    
 	    if (profile instanceof JavaProfile) {
-	        instance = new MainWindow<Services,InitConfig>();    
-	        ((MainWindow<Services,InitConfig>)instance).initialize(title, new WindowUserInterface((MainWindow<Services, InitConfig>) instance));
+	        instance = new MainWindow<Services,JavaDLInitConfig>();    
+	        ((MainWindow<Services,JavaDLInitConfig>)instance).initialize(title, new WindowUserInterface((MainWindow<Services, JavaDLInitConfig>) instance));
 	    } else if (profile instanceof ABSProfile) {
 	        instance = new MainWindow<ABSServices,ABSInitConfig>();    
                 ((MainWindow<ABSServices,ABSInitConfig>)instance).initialize(title, new ABSWindowUserInterface((MainWindow<ABSServices, ABSInitConfig>) instance));	        

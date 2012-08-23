@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -62,7 +62,7 @@ public class ProofStarter {
         
         private Proof createProof(String proofName) {
             
-            final AbstractInitConfig initConfig = env.getInitConfig();
+            final InitConfig initConfig = env.getInitConfig();
             
             return new Proof(proofName,
                     seq,

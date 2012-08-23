@@ -6,6 +6,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -31,7 +33,7 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
       String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/stepOverOnTwoBranches/oracle/StepOverOnTwoBranches";
       String oracleFileExtension = ".xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false);
+      SymbolicExecutionEnvironment<Services, JavaDLInitConfig, CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false);
       // Make sure that initial tree is valid
       int oracleIndex = 0;
       assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);

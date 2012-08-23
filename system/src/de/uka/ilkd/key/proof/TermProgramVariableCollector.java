@@ -41,8 +41,8 @@ public class TermProgramVariableCollector extends Visitor {
 	} 
 	
 	if ( !t.javaBlock ().isEmpty() ) {
-	    IProgramVariableCollector pvc
-		= IProgramVisitorProvider.getInstance().createProgramVariableCollector ( t.javaBlock ().program (), services );
+	    IProgramVariableCollector<LocationVariable> pvc
+		= IProgramVisitorProvider.getInstance().<LocationVariable>createProgramVariableCollector( t.javaBlock ().program (), services );
 	    pvc.start();
 	    result.addAll ( pvc.result () );
 	}

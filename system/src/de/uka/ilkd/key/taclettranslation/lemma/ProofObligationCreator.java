@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractInitConfig;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
@@ -42,7 +42,7 @@ public class ProofObligationCreator {
          * @return A proof aggregate containing the proofs created by this method.
          */
         public ProofAggregate create(ImmutableSet<Taclet> taclets,
-                AbstractInitConfig initConfig, ImmutableSet<Taclet> axioms,
+                InitConfig initConfig, ImmutableSet<Taclet> axioms,
                         Collection<LoaderListener> listeners) {
                 initConfig.setTaclets(initConfig.getTaclets().union(axioms));
                 ProofAggregate[] singleProofs = new ProofAggregate[taclets
@@ -127,7 +127,7 @@ public class ProofObligationCreator {
   
 
         private ProofAggregate create(Taclet taclet,
-                AbstractInitConfig initConfig, UserDefinedSymbols symbolsForAxioms) {
+                InitConfig initConfig, UserDefinedSymbols symbolsForAxioms) {
                 LemmaGenerator generator = new DefaultLemmaGenerator();
                 TacletFormula formula = generator.translate(taclet,
                                 initConfig.getServices());
