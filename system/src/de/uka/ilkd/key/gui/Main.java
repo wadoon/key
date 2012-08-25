@@ -65,7 +65,7 @@ public class Main {
         "GNU General Public License\n");
 
         // does no harm on non macs
-        //System.setProperty("apple.laf.useScreenMenuBar","true");
+        System.setProperty("apple.laf.useScreenMenuBar","true");
 
         UserInterface<?,?> userInterface = evaluateOptions(args);
 

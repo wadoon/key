@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.parser.ABSDefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.keyabs.abs.ABSServices;
 
 public class ABSTermBuilder extends TermBuilder {
     
@@ -31,4 +32,9 @@ public class ABSTermBuilder extends TermBuilder {
         return term;
     }
 
+    @Override 
+    public Term NULL(IServices services) {
+    	return func(((ABSServices)services).getTypeConverter().getHistoryLDT().getNull());
+    }
+    
 }

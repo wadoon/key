@@ -18,8 +18,10 @@ public class HistoryLDT extends LDT {
 
 	private final Sort interfaceLabelSort;
 	private final Sort classLabelSort;
-	private Sort futureSort;
+	private final Sort futureSort;
 
+	private final Function nullConstant;
+	
 	public HistoryLDT(IServices services) {
 		super(new Name("History"), services);
 
@@ -30,6 +32,8 @@ public class HistoryLDT extends LDT {
 
 		futureSort = services.getNamespaces().sorts()
 				.lookup(new Name("Future"));
+				
+		nullConstant = (Function) services.getNamespaces().functions().lookup(new Name("null")); 
 
 	}
 
@@ -87,6 +91,10 @@ public class HistoryLDT extends LDT {
 
 	public Sort getFutureSort() {
 		return futureSort;
+	}
+	
+	public Function getNull() {
+		return nullConstant;
 	}
 
 }

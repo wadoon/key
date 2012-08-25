@@ -79,8 +79,6 @@
 
   </target>
 
-  <taskdef classpathref="jcoverage" resource="tasks.properties"/>
-
   <target name="test" depends="compile">
      <exec executable="${basedir}/../bin/runTests">
     </exec>
