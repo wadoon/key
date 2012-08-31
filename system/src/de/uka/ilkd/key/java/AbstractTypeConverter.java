@@ -24,11 +24,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
-public abstract class AbstractTypeConverter {
+public abstract class AbstractTypeConverter<S extends IServices> {
 
-    protected final IServices services;
+    protected final S services;
 
-    public abstract AbstractTypeConverter copy(IServices services);
+    public abstract AbstractTypeConverter<S> copy(S services);
 
     public abstract KeYJavaType getBooleanType();
     
@@ -68,7 +68,7 @@ public abstract class AbstractTypeConverter {
     protected CharListLDT charListLDT;
     protected ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
-    protected AbstractTypeConverter(IServices services) {
+    protected AbstractTypeConverter(S services) {
         this.services = services;
     }
 
@@ -104,7 +104,7 @@ public abstract class AbstractTypeConverter {
         }
     }
 
-    public IServices getServices() {
+    public S getServices() {
         return services;
     }
 

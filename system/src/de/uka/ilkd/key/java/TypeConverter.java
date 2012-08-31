@@ -11,14 +11,53 @@ package de.uka.ilkd.key.java;
 
 
 import recoder.service.ConstantEvaluator;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.NullType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.literal.LongLiteral;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
+import de.uka.ilkd.key.java.expression.operator.BinaryNot;
+import de.uka.ilkd.key.java.expression.operator.BinaryOr;
+import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
+import de.uka.ilkd.key.java.expression.operator.Conditional;
+import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
+import de.uka.ilkd.key.java.expression.operator.Divide;
+import de.uka.ilkd.key.java.expression.operator.Equals;
+import de.uka.ilkd.key.java.expression.operator.Instanceof;
+import de.uka.ilkd.key.java.expression.operator.Minus;
+import de.uka.ilkd.key.java.expression.operator.Modulo;
+import de.uka.ilkd.key.java.expression.operator.Negative;
+import de.uka.ilkd.key.java.expression.operator.Plus;
+import de.uka.ilkd.key.java.expression.operator.PostDecrement;
+import de.uka.ilkd.key.java.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.expression.operator.PreDecrement;
+import de.uka.ilkd.key.java.expression.operator.PreIncrement;
+import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
+import de.uka.ilkd.key.java.expression.operator.ShiftRight;
+import de.uka.ilkd.key.java.expression.operator.Times;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ArrayReference;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.MetaClassReference;
+import de.uka.ilkd.key.java.reference.PackageReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.JavaDLTermBuilder;
 import de.uka.ilkd.key.logic.Term;
@@ -31,7 +70,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.Debug;
 
 
-public final class TypeConverter extends AbstractTypeConverter {
+public final class TypeConverter extends AbstractTypeConverter<Services> {
     
     private static final JavaDLTermBuilder TB = JavaProfile.DF();
 
@@ -775,7 +814,7 @@ public final class TypeConverter extends AbstractTypeConverter {
     
 
     @Override
-    public TypeConverter copy(IServices services) {
+    public TypeConverter copy(Services services) {
 	final TypeConverter tc = new TypeConverter((Services) services);
 	tc.init(models);
 	return tc;

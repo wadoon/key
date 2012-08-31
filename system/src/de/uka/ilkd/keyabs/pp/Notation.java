@@ -11,13 +11,18 @@
 package de.uka.ilkd.keyabs.pp;
 
 import java.io.IOException;
-import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.INotation;
@@ -306,20 +311,19 @@ public abstract class Notation implements INotation {
                 } else {
                     // logger.debug("Instantiation of " + t+ " [" + t.op() +
                     // "]" + " known.");
-                    if (o instanceof ImmutableList) {
-                        @SuppressWarnings("unchecked")
-                        final Iterator<Object> it = ((ImmutableList<Object>) o)
-                                .iterator();
+                    if (o instanceof Iterable) {
                         sp.getLayouter().print("{");
-                        while (it.hasNext()) {
-                            final Object next = it.next();
+                        boolean sep = false;
+                        for (Object next : (Iterable)o) {
+                            if (sep) {
+                                sp.getLayouter().print(",");
+                            } else {
+                        	sep = true;
+                            }
                             if (next instanceof Term) {
                                 sp.printTerm((Term) o);
                             } else {
                                 sp.printConstant(o.toString());
-                            }
-                            if (it.hasNext()) {
-                                sp.getLayouter().print(",");
                             }
                         }
                         sp.getLayouter().print("}");
