@@ -34,7 +34,7 @@ public abstract class ABSProgramSVSort extends AbstractSort implements IProgramS
     public static final IProgramSVSort<ABSServices> ABS_STATEMENT = new ABSStatementSV();
     public static final IProgramSVSort<ABSServices> ABS_TYPEREF = new ABSTypeReferenceSV();
     public static final IProgramSVSort<ABSServices> ABS_INTERFACE_TYPEREF = new ABSInterfaceTypeReferenceSV();
-
+    public static final IProgramSVSort<ABSServices> ABS_METHODNAME = new ABSMethodNameSV();
     
     
     public ABSProgramSVSort(Name name) {

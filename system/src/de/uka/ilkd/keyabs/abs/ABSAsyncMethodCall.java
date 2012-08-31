@@ -4,17 +4,17 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.java.reference.MethodName;
 
 public class ABSAsyncMethodCall extends ABSNonTerminalProgramElement implements
         IABSMethodReference, IABSExpression, IABSStatement {
 
     private final IABSPureExpression caller;
-    private final ProgramElementName methodName;
+    private final MethodName methodName;
     private final IABSPureExpression[] arguments;
 
     public ABSAsyncMethodCall(IABSPureExpression caller,
-            ProgramElementName methodName, IABSPureExpression[] arguments) {
+            MethodName methodName, IABSPureExpression[] arguments) {
         super();
         this.caller = caller;
         this.methodName = methodName;

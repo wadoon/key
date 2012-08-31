@@ -1,13 +1,21 @@
 package de.uka.ilkd.keyabs.abs;
 
-import abs.frontend.ast.*;
+import abs.frontend.ast.ASTNode;
+import abs.frontend.ast.AsyncCall;
+import abs.frontend.ast.ExpressionStmt;
+import abs.frontend.ast.IncompleteSyncAccess;
+import abs.frontend.ast.PureExp;
+import abs.frontend.ast.VarDeclStmt;
+import abs.frontend.ast.VarUse;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -38,6 +46,26 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         return result;
     }
 
+    public ABSAsyncMethodCall convert(AsyncCall x) {
+        IABSPureExpression callee = (IABSPureExpression) convert(x.getCallee());
+        
+        
+        IProgramVariable methodNameSV = lookup(x.getMethod());
+        
+        MethodName methodName = (MethodName) (methodNameSV != null ? methodNameSV : new ProgramElementName(x.getMethod()));
+
+        IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
+
+        int i = 0;
+        for (PureExp arg : x.getParamList()) {
+            arguments[i] = (IABSPureExpression) convert(arg);
+            i++;
+        }
+
+        return new ABSAsyncMethodCall(callee, methodName, arguments);
+    }
+
+    
     IProgramVariable lookup(String name) {
         return schemaVariables.lookup(new Name(name));
     }
