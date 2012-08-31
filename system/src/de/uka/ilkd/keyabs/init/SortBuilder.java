@@ -21,6 +21,7 @@ import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 public class SortBuilder {
 
     // type names of the integer and boolean type in ABS
+    public static final Name ABS_ANY_INTERFACE_SORT_NAME = new Name("ABSAnyInterface");
     public static final Name ABS_BOOLEAN_TYPE_NAME = new Name("ABS.StdLib.Bool");
     public static final Name ABS_INT_TYPE_NAME = new Name("ABS.StdLib.Int");
 
@@ -72,7 +73,7 @@ public class SortBuilder {
 
         // get super sort of all interface sorts
         final Namespace<Sort> sorts = services.getNamespaces().sorts();
-        final Sort anyInterfaceSort = sorts.lookup(new Name("ABSAnyInterface"));
+        final Sort anyInterfaceSort = sorts.lookup(ABS_ANY_INTERFACE_SORT_NAME);
         assert anyInterfaceSort != null;
 
         Sort topSort = Sort.ANY;

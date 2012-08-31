@@ -886,7 +886,7 @@ options {
 	if (result == null) {
 	    if(name.equals(NullSort.NAME.toString())) {
 	        Sort objectSort 
-	        	= (Sort) sorts().lookup(new Name("ABSAnyInterface"));
+	        	= (Sort) sorts().lookup(SortBuilder.ABS_ANY_INTERFACE_SORT_NAME);
 	        if(objectSort == null) {
 	            semanticError("Null sort cannot be used before "
 	                          + "ABSAnyInterface is declared");

@@ -14,13 +14,13 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
+import de.uka.ilkd.keyabs.init.SortBuilder;
 
 public class ABSInfo implements IProgramInfo {
 
@@ -165,7 +165,7 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public boolean isReferenceSort(Sort sort) {
-        return sort.extendsTrans(services.getNamespaces().sorts().lookup(new Name("ABSAnyInterface")));
+        return sort.extendsTrans(services.getNamespaces().sorts().lookup(SortBuilder.ABS_ANY_INTERFACE_SORT_NAME));
     }
 
     @Override
