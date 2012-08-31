@@ -102,19 +102,19 @@ public class FunctionBuilder {
                                 + "."
                                 + c.getDataTypeDecl().getName();
 
-                        System.out.println(c.getType().getQualifiedName()
-                                + "<====");
+                        final ProgramElementName funcName = new ProgramElementName(c.getName(),
+                                fullyQualifiedName);
+                        
+                        if (funcNS.lookup(funcName) == null) { 
+                            Sort returnSort = info.getTypeByName(
+                        	    c.getType().getQualifiedName()).getSort();
+                            Function constructorFct = new Function(
+                        	    new ProgramElementName(c.getName(),
+                        		    fullyQualifiedName), returnSort,
+                        		    argSorts, null, true);
 
-                        Sort returnSort = info.getTypeByName(
-                                c.getType().getQualifiedName()).getSort();
-                        Function constructorFct = new Function(
-                                new ProgramElementName(c.getName(),
-                                        fullyQualifiedName), returnSort,
-                                argSorts, null, true);
-
-                        System.out.println(constructorFct + "<====");
-
-                        funcNS.add(constructorFct);
+                            funcNS.add(constructorFct);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
