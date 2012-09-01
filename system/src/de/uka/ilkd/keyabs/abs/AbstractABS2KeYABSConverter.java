@@ -62,6 +62,8 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((IntLiteral) x);
         } else if (x instanceof IfStmt) {
             result = convert((IfStmt) x);
+        } else if (x instanceof WhileStmt) {
+            result = convert((WhileStmt) x);
         } else if (x instanceof MinusExp) {
             result = convert((MinusExp) x);
         }
@@ -148,6 +150,13 @@ public abstract class AbstractABS2KeYABSConverter {
                 : null;
 
         return new ABSIfStatement(cond, _then, _else);
+    }
+
+    public ABSWhileStatement convert(WhileStmt x) {
+        IABSPureExpression cond = (IABSPureExpression) convert(x.getCondition());
+        IABSStatement body = (IABSStatement) convert(x.getBody());
+
+        return new ABSWhileStatement(cond, body);
 
     }
 

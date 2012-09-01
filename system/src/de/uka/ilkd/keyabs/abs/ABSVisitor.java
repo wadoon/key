@@ -57,4 +57,6 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnABSMinusExp(ABSMinusExp x);
 
+    void performActionOnABSWhileStatement(ABSWhileStatement x);
+
 }

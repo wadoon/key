@@ -400,6 +400,20 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
     }
 
     @Override
+    public void performActionOnABSWhileStatement(ABSWhileStatement x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSWhileStatement(
+                    (IABSPureExpression) children.get(0),
+                    (IABSStatement) children.get(1)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    
+    @Override
     public void performActionOnABSContextStatementBlock(
             ABSContextStatementBlock x) {
         if (hasChanged()) {

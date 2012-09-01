@@ -1982,4 +1982,13 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.print(")");
     }
 
+    public void printABSWhileStatement(ABSWhileStatement x) throws IOException {
+	 layouter.beginC(0).print("while (");
+	 x.getCondition().visit(programPrettyPrinter);
+	 layouter.print(")").brk(1, 2);
+	 x.getBody().visit(programPrettyPrinter);
+	 layouter.brk(1);
+	 layouter.ind().end();
+    }
+
 }

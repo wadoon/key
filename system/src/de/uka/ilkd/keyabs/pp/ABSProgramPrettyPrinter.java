@@ -271,6 +271,16 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     }
 
     @Override
+    public void performActionOnABSWhileStatement(ABSWhileStatement x) {
+        try {
+            lp.printABSWhileStatement(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
+    @Override
     public void performActionOnABSContextStatementBlock(
             ABSContextStatementBlock x) {
         try {

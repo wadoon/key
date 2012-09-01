@@ -3,9 +3,11 @@ package de.uka.ilkd.keyabs.abs;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementContainer;
 
 public class ABSIfStatement extends ABSNonTerminalProgramElement implements
-        IABSStatement, ExpressionContainer {
+        IABSStatement, ExpressionContainer, StatementContainer {
 
     public ABSIfStatement(IABSPureExpression condition,
             IABSStatement thenBranch, IABSStatement elseBranch) {
@@ -73,6 +75,16 @@ public class ABSIfStatement extends ABSNonTerminalProgramElement implements
 
     public IABSStatement getElseBranch() {
         return elseBranch;
+    }
+
+    @Override
+    public int getStatementCount() {
+	return elseBranch == null ? 1 : 2;
+    }
+
+    @Override
+    public Statement getStatementAt(int index) {
+	return index == 0 ? thenBranch : elseBranch;
     }
 
 }
