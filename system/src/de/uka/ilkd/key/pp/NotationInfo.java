@@ -38,6 +38,7 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.UnicodeHelper;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 
 /** 
@@ -261,12 +262,12 @@ public final class NotationInfo implements INotationInfo {
 	tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
         	
 	//heap operators
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	if (heapLDT != null) {
+	final IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	if (heapLDT != null && heapLDT instanceof HeapLDT) {
 	    tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
 	    tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	    tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
-	    tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
+	    tbl.put(((HeapLDT)heapLDT).getLength(), new Notation.LengthNotation());
 	}
 	
         //set operators

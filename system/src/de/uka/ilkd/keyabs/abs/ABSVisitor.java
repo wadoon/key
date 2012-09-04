@@ -59,4 +59,8 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnABSWhileStatement(ABSWhileStatement x);
 
+    void performActionOnABSAwaitStatement(ABSAwaitStatement x);
+
+    void performActionOnABSAwaitClaimStatement(ABSAwaitClaimStatement x);
+
 }

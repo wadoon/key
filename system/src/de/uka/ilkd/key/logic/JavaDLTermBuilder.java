@@ -5,14 +5,20 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.AbstractTypeConverter;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -21,7 +27,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 
-public class JavaDLTermBuilder extends TermBuilder {
+public class JavaDLTermBuilder extends TermBuilder<Services> {
 
     public static JavaDLTermBuilder DF = new JavaDLTermBuilder();
     
@@ -169,18 +175,18 @@ public class JavaDLTermBuilder extends TermBuilder {
                                                    "java.lang.Exception"));
     }
 
-    public Term inInt(Term var, IServices services) {
+    public Term inInt(Term var, Services services) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
                 new Name("inInt"));
         return func(f, var);
     }
 
-    public Term staticDot(IServices services, Sort asSort, Term f) {
+    public Term staticDot(Services services, Sort asSort, Term f) {
         return dot(services, asSort, NULL(services), f);
     }
 
-    public Term staticDot(IServices services, Sort asSort, Function f) {
+    public Term staticDot(Services services, Sort asSort, Function f) {
         final Sort fieldSort 
         	= services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort
@@ -188,11 +194,11 @@ public class JavaDLTermBuilder extends TermBuilder {
                : func(f, getBaseHeap(services));
     }
 
-    public Term arr(IServices services, Term idx) {
+    public Term arr(Services services, Term idx) {
         return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
-    public Term dotArr(IServices services, Term ref, Term idx) {
+    public Term dotArr(Services services, Term ref, Term idx) {
         if(ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
                     "term without providing an " +
@@ -216,13 +222,13 @@ public class JavaDLTermBuilder extends TermBuilder {
         	      arr(services, idx));
     }
 
-    public Term dotLength(IServices services, Term a) {
-        final AbstractTypeConverter tc = services.getTypeConverter();
+    public Term dotLength(Services services, Term a) {
+        final TypeConverter tc = services.getTypeConverter();
         return func(tc.getHeapLDT().getLength(), a); 
     }
 
-    public Term created(IServices services, Term h, Term o) {
-        final AbstractTypeConverter tc = services.getTypeConverter();	
+    public Term created(Services services, Term h, Term o) {
+        final TypeConverter tc = services.getTypeConverter();	
         return equals(select(services,
         	              tc.getBooleanLDT().targetSort(),
         		      h,
@@ -231,12 +237,12 @@ public class JavaDLTermBuilder extends TermBuilder {
         	       TRUE(services));
     }
 
-    public Term created(IServices services, Term o) {
+    public Term created(Services services, Term o) {
         return created(services, getBaseHeap(services), o);
     }
 
-    public Term initialized(IServices services, Term o) {
-        final AbstractTypeConverter tc = services.getTypeConverter();	
+    public Term initialized(Services services, Term o) {
+        final TypeConverter tc = services.getTypeConverter();	
         return equals(dot(services,
         	          tc.getBooleanLDT().targetSort(),
         	          o,
@@ -244,8 +250,8 @@ public class JavaDLTermBuilder extends TermBuilder {
         	      TRUE(services));
     }
 
-    public Term classPrepared(IServices services, Sort classSort) {
-        final AbstractTypeConverter tc = services.getTypeConverter();	
+    public Term classPrepared(Services services, Sort classSort) {
+        final TypeConverter tc = services.getTypeConverter();	
         return equals(staticDot(services,
         	                tc.getBooleanLDT().targetSort(),
         	                tc.getHeapLDT().getClassPrepared(classSort, 
@@ -253,8 +259,8 @@ public class JavaDLTermBuilder extends TermBuilder {
         	      TRUE(services));	
     }
 
-    public Term classInitialized(IServices services, Sort classSort) {
-        final AbstractTypeConverter tc = services.getTypeConverter();	
+    public Term classInitialized(Services services, Sort classSort) {
+        final TypeConverter tc = services.getTypeConverter();	
         return equals(staticDot(services,
         	                tc.getBooleanLDT().targetSort(),
         	                tc.getHeapLDT().getClassInitialized(classSort, 
@@ -262,8 +268,8 @@ public class JavaDLTermBuilder extends TermBuilder {
         	      TRUE(services));
     }
 
-    public Term classInitializationInProgress(IServices services, Sort classSort) {
-        final AbstractTypeConverter tc = services.getTypeConverter();	
+    public Term classInitializationInProgress(Services services, Sort classSort) {
+        final TypeConverter tc = services.getTypeConverter();	
         return equals(staticDot(services,
         	                tc.getBooleanLDT().targetSort(),
         	                tc.getHeapLDT()
@@ -272,14 +278,20 @@ public class JavaDLTermBuilder extends TermBuilder {
         	      TRUE(services));
     }
 
-    public Term classErroneous(IServices services, Sort classSort) {
-        final AbstractTypeConverter tc = services.getTypeConverter();	
+    public Term classErroneous(Services services, Sort classSort) {
+        final TypeConverter tc = services.getTypeConverter();	
         return equals(staticDot(services,
         	                tc.getBooleanLDT().targetSort(),
         	                tc.getHeapLDT().getClassErroneous(classSort, 
         	        	 			          services)),
         	      TRUE(services));
     }
+
+    public Term create(Services services, Term h, Term o) {
+        return func(services.getTypeConverter().getHeapLDT().getCreate(), 
+        	     new Term[]{h, o});
+    }
+
 
     public Term reachableValue(Services services, Term h, Term t,
             KeYJavaType kjt) {
@@ -405,5 +417,32 @@ public class JavaDLTermBuilder extends TermBuilder {
     public Term staticInv(Services services, KeYJavaType t) {
         return func(services.getJavaInfo().getStaticInv(t), getBaseHeap(services));
     }
+    
+    public Term arrayStore(Services services, Term o, Term i, Term v) {
+        return store(services, 
+                getBaseHeap(services), 
+        	     o, 
+        	     func(services.getTypeConverter().getHeapLDT().getArr(), i),
+        	     v);
+    }        
+    
+    public Term NULL(Services services) {
+        return func(services.getTypeConverter().getHeapLDT().getNull());
+    }
+
+    public Term staticFieldStore(Services services, Function f, Term v) {
+	return fieldStore(services, NULL(services), f, v);
+    }
+
+    public Term wellFormed(LocationVariable heap, Services services) {
+        return wellFormed(var(heap), services);
+    }
+    
+
+    public Term wellFormed(Term heap, Services services) {
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), 
+        	    heap);
+    }
+
 
 }

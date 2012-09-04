@@ -3,8 +3,13 @@ package de.uka.ilkd.keyabs.init;
 import java.util.Collection;
 import java.util.List;
 
+import abs.frontend.ast.ClassDecl;
 import abs.frontend.ast.ConstructorArg;
 import abs.frontend.ast.DataConstructor;
+import abs.frontend.ast.FieldDecl;
+import abs.frontend.ast.InterfaceDecl;
+import abs.frontend.ast.MethodSig;
+import abs.frontend.ast.ParamDecl;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -57,8 +62,28 @@ public class FunctionBuilder {
         }
 
         System.out.println("Register Method Label Constants");
-        // TODO
+        for (InterfaceDecl itfDecl : info.getABSParserInfo().getInterfaces().values()) {
+            for (MethodSig  msig : itfDecl.getBodys()) {
+        	Name methodName = createNameFor(msig, itfDecl);
+        	Function methodLabel = new Function(methodName,
+        		historyLDT.getMethodLabelSort(), new Sort[0], null, true);
+        	funcNS.add(methodLabel);
+                System.out.println("Register Method Label Constant " + methodLabel);
+            }
+        }
 
+        System.out.println("Register Fields ");
+        for (ClassDecl clDecl : info.getABSParserInfo().getClasses().values()) {
+            for (FieldDecl  field : clDecl.getFields()) {
+        	Name fieldName = new ProgramElementName(field.getName(), clDecl.qualifiedName());
+        	Function methodLabel = new Function(fieldName,
+        		historyLDT.getMethodLabelSort(), new Sort[0], null, true);
+        	funcNS.add(methodLabel);
+                System.out.println("Register Method Label Constant " + methodLabel);
+            }
+        }
+
+        
         // Register ABS functions
 
         System.out.println("Register future getters");
@@ -75,6 +100,16 @@ public class FunctionBuilder {
             }
         }
 
+    }
+
+    public static Name createNameFor(MethodSig msig, InterfaceDecl itfDecl) {
+	String base = msig.getName();
+	
+	for (ParamDecl p : msig.getParamList()) {
+	    base += "#" + p.getType().getQualifiedName();
+	}
+	
+	return new ProgramElementName(base, itfDecl.qualifiedName());
     }
 
     private void createConstructorFunctions(final ABSInfo info,

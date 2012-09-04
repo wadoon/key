@@ -10,7 +10,9 @@ import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
+import de.uka.ilkd.keyabs.logic.ldt.LocSetLDT;
 
 public class ABSLDTInput extends LDTInput<ABSServices, ABSInitConfig> {
 
@@ -23,10 +25,9 @@ public class ABSLDTInput extends LDTInput<ABSServices, ABSInitConfig> {
         return ImmutableSLList.<LDT>nil()
                             .prepend(new IntegerLDT(services))
                             .prepend(new BooleanLDT(services))
-                            //.prepend(new LocSetLDT(services))
-                            //.prepend(new HeapLDT(services))
+                            .prepend(new LocSetLDT(services))
+                            .prepend(new HeapLDT(services))
                             .prepend(new SeqLDT(services))
-                            //.prepend(new CharListLDT(services))
                             .prepend(new HistoryLDT(services))
                             ;
     }

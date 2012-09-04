@@ -13,7 +13,7 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 
 public final class DropEffectlessStoresCondition implements VariableCondition {
@@ -84,8 +85,8 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     
     
     private static Term dropEffectlessStores(Term t, IServices services) {
-	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	assert t.sort() == heapLDT.targetSort();
+	IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	assert t.sort() == ((LDT)heapLDT).targetSort();
 	return dropEffectlessStoresHelper(
 				t, 
 				services, 

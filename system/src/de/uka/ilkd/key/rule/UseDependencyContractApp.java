@@ -6,6 +6,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -52,7 +53,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 		assert this.step == null;
 		final List<PosInOccurrence> steps = 
 				UseDependencyContractRule.
-				 getSteps(this.posInOccurrence(), seq, services);                
+				 getSteps(this.posInOccurrence(), seq, (Services) services);                
 		PosInOccurrence l_step = 
 				UseDependencyContractRule.findStepInIfInsts(steps, this, services);
 		assert l_step != null;/* 

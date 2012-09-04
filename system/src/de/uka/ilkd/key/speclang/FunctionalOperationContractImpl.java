@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -43,11 +45,12 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -231,7 +234,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    		      ProgramVariable resultVar, 
 	    		      ProgramVariable excVar,
 	    		      Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    		      IServices services) {
+	    		      Services services) {
 	final Map<ProgramVariable, ProgramVariable> result = new LinkedHashMap<ProgramVariable, ProgramVariable>();
 	
         //self
@@ -286,13 +289,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    		      Term resultTerm, 
 	    		      Term excTerm,
                               Map<LocationVariable,Term> atPres,
-	    		      IServices services) {
+	    		      Services services) {
 	final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
 	
 	//heap
 	assert heapTerm != null;
-	assert heapTerm.sort().equals(services.getTypeConverter()
-		                              .getHeapLDT()
+	assert heapTerm.sort().equals(((LDT)services.getTypeConverter()
+		                              .getHeapLDT())
 		                              .targetSort());
 	result.put(TB.getBaseHeap(services), heapTerm);
 	
@@ -391,7 +394,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                              null, 
                                              null,
                                              atPreVars, 
-                                             services);
+                                             (Services) services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPres.get(heap));
     }
@@ -432,7 +435,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 					     null, 
 					     null,
                                              atPres, 
-					     services);
+					     (Services) services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPres.get(heap));
     }    
@@ -469,7 +472,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                              null,
                                              null,
                                              null,
-                                             services);
+                                             (Services) services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalMby);
     }
@@ -491,7 +494,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 					     null, 
 					     null, 
                                              null,
-					     services);
+					     (Services) services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalMby);
     }    
@@ -500,7 +503,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     @Override
     public String getHTMLText(IServices services) {
-    final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+    final IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
     final LocationVariable baseHeap = heapLDT.getHeap();
 	final StringBuffer sig = new StringBuffer();
 	if(originalResultVar != null) {
@@ -585,7 +588,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     public String proofToString(IServices services) {
 	assert toBeSaved;
 	final StringBuffer sb = new StringBuffer();
-    final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+    final IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
     final LocationVariable baseHeap = heapLDT.getHeap();
 	sb.append(baseName).append(" {\n");
 	
@@ -690,7 +693,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                        	     resultVar, 
                                        	     excVar, 
                                        	     atPreVars,
-                                       	     services);
+                                       	     (Services) services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPosts.get(heap));
     }
@@ -738,7 +741,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                              resultTerm, 
                                              excTerm, 
                                        	     atPres,
-                                       	     services);
+                                       	     (Services) services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPosts.get(heap));
     }    
@@ -780,7 +783,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                              null, 
                                              null,
                                              null,
-                                             services);
+                                             (Services) services);
 	final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(mod);
     }
@@ -807,7 +810,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                              null, 
                                              null,
                                              null, 
-                                             services);
+                                             (Services) services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(mod);
     }

@@ -216,7 +216,7 @@ public final class SymbolicExecutionUtil {
       assert context != null;
       assert node != null;
       assert variable instanceof ProgramVariable;
-      TermBuilder DF = services.getTermBuilder();
+      TermBuilder<Services> DF = services.getTermBuilder();
       // Create method frame which will be executed in site proof
       Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
@@ -252,7 +252,7 @@ public final class SymbolicExecutionUtil {
    public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
                                                                                Node node,
                                                                                IProgramVariable variable) {
-      TermBuilder TB = services.getTermBuilder();
+      TermBuilder<Services> TB = services.getTermBuilder();
       // Make sure that correct parameters are given
       assert node != null;
       assert variable instanceof ProgramVariable;
@@ -286,7 +286,7 @@ public final class SymbolicExecutionUtil {
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
                                                                       Term term) {
-      TermBuilder TB = services.getTermBuilder();
+      TermBuilder<Services> TB = services.getTermBuilder();
       // Make sure that correct parameters are given
       assert node != null;
       assert term != null;

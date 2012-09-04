@@ -66,6 +66,8 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((WhileStmt) x);
         } else if (x instanceof MinusExp) {
             result = convert((MinusExp) x);
+        } else if (x instanceof AwaitStmt) {
+            result = convert((AwaitStmt) x);            
         }
 
         if (result == null) {
@@ -160,6 +162,23 @@ public abstract class AbstractABS2KeYABSConverter {
 
     }
 
+    public ABSAwaitStatement convert(AwaitStmt x) {
+	
+	IABSPureExpression cond;
+	boolean claim = false;
+	if (x.getGuard() instanceof ExpGuard) {
+	    cond = (IABSPureExpression) convert(((ExpGuard)x.getGuard()).getPureExp());
+	} else if (x.getGuard() instanceof ClaimGuard) {
+	    cond = (IABSPureExpression) convert(((ClaimGuard)x.getGuard()).getVar());
+	    claim = true;
+	} else {
+	    throw new RuntimeException("Guards of type " + x.getClass() + "(" + x.getGuard() + 
+		    ") are not yet supported.");
+	}
+        return claim ? new ABSAwaitClaimStatement(cond) : new ABSAwaitStatement(cond);
+    }
+
+    
     public ABSFieldReference convert(FieldUse fieldUse) {
         IProgramVariable var = lookupFieldVariable(fieldUse.getName());
         return new ABSFieldReference(var);

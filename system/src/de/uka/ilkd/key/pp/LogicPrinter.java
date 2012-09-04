@@ -51,7 +51,6 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NewDependingOn;
@@ -71,6 +70,7 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 
 /**
@@ -112,7 +112,7 @@ public final class LogicPrinter implements ILogicPrinter {
     private final INotationInfo notationInfo;
 
     /** the services object */
-    private final IServices services;
+    private final Services services;
 
     /** This chooses the layout. */
     private Layouter layouter;
@@ -143,7 +143,7 @@ public final class LogicPrinter implements ILogicPrinter {
         return p.result().toString();
     }
     
-    public static String quickPrintSemisequent(Semisequent s, IServices services) {
+    public static String quickPrintSemisequent(Semisequent s, Services services) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services);
@@ -194,7 +194,7 @@ public final class LogicPrinter implements ILogicPrinter {
 	this.layouter     = new Layouter(backend,2);
 	this.prgPrinter   = prgPrinter;
 	this.notationInfo = notationInfo;
-	this.services     = services;
+	this.services     = (Services)services;
 	this.pure         = purePrint;
 	if(services != null) {
 	    notationInfo.refresh(services);
@@ -1003,7 +1003,7 @@ public final class LogicPrinter implements ILogicPrinter {
             //heap not printed
             markEndSub();
 
-            if(objectTerm.equals(JavaProfile.DF().NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL(services))
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
         	String className 
@@ -1082,7 +1082,7 @@ public final class LogicPrinter implements ILogicPrinter {
     public void printObserver(Term t) throws IOException {
 	assert t.op() instanceof IObserverFunction;
 	assert t.boundVars().isEmpty();
-	final HeapLDT heapLDT = services == null 
+	final IHeapLDT heapLDT = services == null 
 			        ? null 
 			        : services.getTypeConverter().getHeapLDT();	
 	if(NotationInfo.PRETTY_SYNTAX

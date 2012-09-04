@@ -204,7 +204,17 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     public void performActionOnABSIfStatement(ABSIfStatement x) {
         doDefaultAction(x);
     }
-    
+
+    @Override
+    public void performActionOnABSAwaitStatement(ABSAwaitStatement x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnABSAwaitClaimStatement(ABSAwaitClaimStatement x) {
+        doDefaultAction(x);
+    }
+
     @Override
     public void performActionOnABSWhileStatement(ABSWhileStatement x) {
         doDefaultAction(x);

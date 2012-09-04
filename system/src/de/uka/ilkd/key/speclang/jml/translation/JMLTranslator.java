@@ -130,7 +130,7 @@ final class JMLTranslator {
 
 
     public JMLTranslator(SLTranslationExceptionManager excManager,
-                         IServices services) {
+                         Services services) {
         this.excManager = excManager;
         this.services = services;
         
@@ -576,7 +576,7 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class,
                                 SLExpression.class);
-                final IServices services = (IServices) params[0];
+                final Services services = (Services) params[0];
                 final Term seq = ((SLExpression) params[1]).getTerm();
                 final Term idx = ((SLExpression) params[2]).getTerm();
                 return new SLExpression(TB.seqGet(services, Sort.ANY, seq, idx));
@@ -634,7 +634,7 @@ final class JMLTranslator {
                 final SLExpression e1 = (SLExpression) params[1];
                 final SLExpression e2 = (SLExpression) params[2];
                 final SLExpression e3 = (SLExpression) params[3];
-                final IServices services = (IServices) params[4];
+                final Services services = (Services) params[4];
                 final LogicVariable stepsLV = e3 == null
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTypeConverter().getIntegerLDT().targetSort())
@@ -1084,7 +1084,7 @@ final class JMLTranslator {
                 checkParameters(params, Services.class, SLExpression.class,
                                 String.class, Token.class, SLExpression.class,
                                 SLExpression.class);
-                IServices services = (IServices) params[0];
+                Services services = (Services) params[0];
                 SLExpression receiver = (SLExpression) params[1];
                 String fullyQualifiedName = (String) params[2];
                 Token lbrack = (Token) params[3];
@@ -1134,7 +1134,7 @@ final class JMLTranslator {
                 }
             }
 
-            private SLExpression translateArrayReference(IServices services,
+            private SLExpression translateArrayReference(Services services,
                                                          SLExpression receiver,
                                                          SLExpression rangeFrom,
                                                          SLExpression rangeTo) {
@@ -1166,7 +1166,7 @@ final class JMLTranslator {
             }
 
 
-            private SLExpression translateSequenceReference(IServices services,
+            private SLExpression translateSequenceReference(Services services,
                                                             SLExpression receiver,
                                                             SLExpression rangeFrom,
                                                             SLExpression rangeTo)
@@ -1233,7 +1233,7 @@ final class JMLTranslator {
                 checkParameters(params, ImmutableList.class, Services.class);
                 ImmutableList<SLExpression> exprList =
                         (ImmutableList<SLExpression>) params[0];
-                IServices services = (IServices) params[1];
+                Services services = (Services) params[1];
 
                 ImmutableList<Term> singletons = ImmutableSLList.<Term>nil();
                 for (SLExpression expr : exprList) {

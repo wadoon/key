@@ -523,7 +523,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         Modality md = (Modality)JavaProfile.DF().goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
         boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
-        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext = HeapContext.getModHeaps((Services) goal.proof().getServices(), transaction);
 
 	//prepare heapBefore_method
 

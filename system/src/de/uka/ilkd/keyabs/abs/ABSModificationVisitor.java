@@ -385,6 +385,28 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
     }
 
     @Override
+    public void performActionOnABSAwaitStatement(ABSAwaitStatement x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSAwaitStatement((IABSPureExpression) children.get(0)));
+        } else {
+            addChild(x);
+        }
+    }
+    
+    @Override
+    public void performActionOnABSAwaitClaimStatement(ABSAwaitClaimStatement x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSAwaitClaimStatement((IABSPureExpression) children.get(0)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
     public void performActionOnABSIfStatement(ABSIfStatement x) {
         if (hasChanged()) {
             ExtList children = stack.peek();

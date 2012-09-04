@@ -58,6 +58,7 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.VariableReference;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.JavaDLTermBuilder;
 import de.uka.ilkd.key.logic.Term;
@@ -194,13 +195,16 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
                     getServices().getJavaInfo().getAttribute(
                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
             final Function fieldSymbol
-            	= heapLDT.getFieldSymbolForPV(inst, getServices());
+            	= getHeapLDT().getFieldSymbolForPV(inst, getServices());
             result = TB.dot(getServices(), inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
         return result;      
     }
 
+    public HeapLDT getHeapLDT() {
+	return (HeapLDT)super.getHeapLDT();
+    }
     
     public Term convertVariableReference(VariableReference fr,
 					 ExecutionContext ec) {	       
@@ -213,12 +217,12 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
 	    return TB.dotLength(getServices(), convertReferencePrefix(prefix, ec));
 	} else if(var.isStatic()) {
 	    final Function fieldSymbol 
-	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, getServices());
+	    	= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, getServices());
 	    return TB.staticDot(getServices(), var.sort(), fieldSymbol);
 	} else if(prefix == null) {
 	    if(var.isMember()) {
 		final Function fieldSymbol 
-			= heapLDT.getFieldSymbolForPV((LocationVariable)var, 
+			= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, 
 						      getServices());
 		return TB.dot(getServices(), 
 			      var.sort(), 
@@ -230,7 +234,7 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
 	    }
 	} else if (!(prefix instanceof PackageReference) ) {
 	    final Function fieldSymbol 
-	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, getServices());
+	    	= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, getServices());
 	    return TB.dot(getServices(), var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
 	} 
 	Debug.out("typeconverter: Not supported reference type (fr, class):",

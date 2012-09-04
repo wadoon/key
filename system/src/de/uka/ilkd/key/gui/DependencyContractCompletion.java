@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.ILogicPrinter;
@@ -33,7 +34,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         cApp = cApp.tryToInstantiateContract(services);
 
         final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(
-                cApp.posInOccurrence(), goal.sequent(), services);
+                cApp.posInOccurrence(), goal.sequent(), (Services) services);
         PosInOccurrence step = letUserChooseStep(steps, forced, services);
         if (step == null) {
             return null;

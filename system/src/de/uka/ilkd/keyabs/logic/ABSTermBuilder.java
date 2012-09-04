@@ -6,12 +6,13 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.parser.ABSDefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 
-public class ABSTermBuilder extends TermBuilder {
+public class ABSTermBuilder extends TermBuilder<ABSServices> {
     
     public static ABSTermBuilder TB = new ABSTermBuilder();
     
@@ -33,8 +34,12 @@ public class ABSTermBuilder extends TermBuilder {
     }
 
     @Override 
-    public Term NULL(IServices services) {
+    public Term NULL(ABSServices services) {
     	return func(((ABSServices)services).getTypeConverter().getHistoryLDT().getNull());
+    }
+
+    public Term wellFormed(LocationVariable heap, ABSServices services) {
+	return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), var(heap));
     }
     
 }

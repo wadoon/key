@@ -110,6 +110,27 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     }
 
     @Override
+    public void performActionOnABSAwaitStatement(ABSAwaitStatement x) {
+        try {
+            lp.printABSAwaitStatement(x);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void performActionOnABSAwaitClaimStatement(ABSAwaitClaimStatement x) {
+        try {
+            lp.printABSAwaitStatement(x);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    
+    @Override
     public void performActionOnProgramMetaConstruct(
             ProgramTransformer<ABSServices> x) {
         // TODO Auto-generated method stub

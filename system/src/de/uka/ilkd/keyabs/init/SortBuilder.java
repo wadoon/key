@@ -24,16 +24,20 @@ public class SortBuilder {
     public static final Name ABS_ANY_INTERFACE_SORT_NAME = new Name("ABSAnyInterface");
     public static final Name ABS_BOOLEAN_TYPE_NAME = new Name("ABS.StdLib.Bool");
     public static final Name ABS_INT_TYPE_NAME = new Name("ABS.StdLib.Int");
+    public static final Name ABS_FUTURE_TYPE_NAME = new Name("ABS.StdLib.Fut");
 
-    private static Sort checkBuiltInType(IServices services,
-            Entry<Name, DataTypeDecl> dataType) {
+    private static Sort checkBuiltInType(ABSServices services,
+            Name dataType) {
         Sort dataTypeSort = null;
-        if (dataType.getKey().equals(ABS_INT_TYPE_NAME)) {
+        if (dataType.equals(ABS_INT_TYPE_NAME)) {
             dataTypeSort = services.getTypeConverter().getIntegerLDT()
                     .targetSort();
-        } else if (dataType.getKey().equals(ABS_BOOLEAN_TYPE_NAME)) {
+        } else if (dataType.equals(ABS_BOOLEAN_TYPE_NAME)) {
             dataTypeSort = services.getTypeConverter().getBooleanLDT()
                     .targetSort();
+        } else if (dataType.equals(ABS_FUTURE_TYPE_NAME)) {
+            dataTypeSort = services.getTypeConverter().getHistoryLDT()
+                    .getFutureSort();
         }
         return dataTypeSort;
     }
@@ -83,13 +87,13 @@ public class SortBuilder {
         for (Entry<Name, DataTypeDecl> dataType : info.getABSParserInfo()
                 .getDatatypes().getDatatypes().entrySet()) {
             final ABSDatatype absType = new ABSDatatype(dataType.getKey());
-            Sort dataTypeSort = sorts.lookup(dataType.getKey());
+            Sort dataTypeSort = checkBuiltInType(services, dataType.getKey());
             if (dataTypeSort == null) {
-                dataTypeSort = checkBuiltInType(services, dataType);
+                dataTypeSort = sorts.lookup(dataType.getKey());
                 if (dataTypeSort == null) {
                     dataTypeSort = new SortImpl(dataType.getKey(), topSort);
                 }
-            }
+            } 
             final KeYJavaType abs2sort = new KeYJavaType(absType, dataTypeSort);
             services.getProgramInfo().rec2key().put(absType, abs2sort);
         }
@@ -107,7 +111,7 @@ public class SortBuilder {
                 if (itf.getValue().getExtendedInterfaceUseList().getNumChild() == 0) {
                     interfaceSort = new SortImpl(itf.getKey(), anyInterfaceSort);
                 } else {
-                    ImmutableSet<Sort> extSorts = createListOfExtendedSortsFromTypeDeclaration(
+                    final ImmutableSet<Sort> extSorts = createListOfExtendedSortsFromTypeDeclaration(
                             services, names2type, itf);
                     interfaceSort = new SortImpl(itf.getKey(), extSorts, true);
                 }
@@ -123,17 +127,22 @@ public class SortBuilder {
                 .getDatatypes().values()) {
 
             // create base data type first
-            Name baseName = new Name(createFullyQualifiedName(d));
-            ABSDatatype type = new ABSDatatype(baseName);
-            Sort dtSort = new SortImpl(baseName);
-            initConfig.sortNS().addSafely(dtSort);
-            KeYJavaType abs2sort = new KeYJavaType(type, dtSort);
-            services.getProgramInfo().rec2key().put(type, abs2sort);
+            final Name baseName = new Name(createFullyQualifiedName(d));
+            final ABSDatatype type = new ABSDatatype(baseName);
+            Sort dataTypeSort = initConfig.sortNS().lookup(baseName);
+            if (dataTypeSort == null) {
+                dataTypeSort = checkBuiltInType(services, baseName);
+                if (dataTypeSort == null) {
+                    dataTypeSort = new SortImpl(baseName, topSort);
+                    initConfig.sortNS().addSafely(dataTypeSort);
+                }
+                final KeYJavaType abs2sort = new KeYJavaType(type, dataTypeSort);
+                services.getProgramInfo().rec2key().put(type, abs2sort);
+            }
 
-            // create instantiated datatype
+            // create instantiated data type
             /*
-             * for (KeYJavaType s :
-             * initConfig.getServices().getProgramInfo().getAllKeYJavaTypes()) {
+             * for (KeYJavaType s : initConfig.getServices().getProgramInfo().getAllKeYJavaTypes()) {
              * final Name name = new Name(baseName + "<" + s.getFullName() +
              * ">"); type = new ABSDatatype(name); dtSort = new SortImpl(name);
              * initConfig.sortNS().addSafely(dtSort); abs2sort = new

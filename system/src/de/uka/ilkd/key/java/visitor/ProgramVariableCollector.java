@@ -15,11 +15,11 @@ import java.util.Map;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 /** 
  * Walks through a java AST in depth-left-fist-order. 
@@ -44,7 +44,7 @@ public class ProgramVariableCollector extends JavaASTVisitor implements IProgram
     }
     
     protected void collectHeapVariables() {
-       HeapLDT ldt = services.getTypeConverter().getHeapLDT();
+       IHeapLDT ldt = services.getTypeConverter().getHeapLDT();
        for(LocationVariable heap: ldt.getAllHeaps()) {
           result.add(heap);
        }

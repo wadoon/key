@@ -13,6 +13,7 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,7 +57,7 @@ public final class DependencyContractFeature extends BinaryFeature {
 	final List<PosInOccurrence> steps 
 		= UseDependencyContractRule.getSteps(pos, 
 				goal.sequent(), 
-				goal.proof().getServices());
+				(Services) goal.proof().getServices());
 	if(steps.isEmpty()) {
 	    return false;
 	}

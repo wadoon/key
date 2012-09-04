@@ -15,18 +15,42 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 
 /**
@@ -37,7 +61,7 @@ import de.uka.ilkd.key.util.Pair;
  * want to be sure that the term looks exactly as you built it, you
  * will have to use the TermFactory.</p>
  */
-public abstract class TermBuilder {
+public abstract class TermBuilder<S extends IServices> {
         
     private static final TermFactory tf = TermFactory.DEFAULT;    
     private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE); 
@@ -523,8 +547,8 @@ public abstract class TermBuilder {
     }
     
     
-    public Term elementary(IServices services, Term lhs, Term rhs) {
-	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+    public Term elementary(S services, Term lhs, Term rhs) {
+	IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	if(lhs.op() instanceof UpdateableOperator) {
 	    assert lhs.arity() == 0 : "uh oh: " + lhs;
 	    return elementary(services, (UpdateableOperator)lhs.op(), rhs);
@@ -546,12 +570,12 @@ public abstract class TermBuilder {
     }    
 
 
-    public Term elementary(IServices services, Term heapTerm) {
+    public Term elementary(S services, Term heapTerm) {
         return elementary(services, getBaseHeap(services), heapTerm);
     }
 
 
-    public Term elementary(IServices services, LocationVariable heap) {
+    public Term elementary(S services, LocationVariable heap) {
         return elementary(services, var(heap));
     }
 
@@ -590,7 +614,7 @@ public abstract class TermBuilder {
     }
     
     
-    public Term parallel(IServices services, Term[] lhss, Term[] values) {
+    public Term parallel(S services, Term[] lhss, Term[] values) {
 	if(lhss.length != values.length) {
 	    throw new TermCreationException(
 		    "Tried to create parallel update with " 
@@ -604,7 +628,7 @@ public abstract class TermBuilder {
     }
     
     
-    public Term parallel(IServices services,
+    public Term parallel(S services,
                          Iterable<Term> lhss,
                          Iterable<Term> values) {
         ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
@@ -663,7 +687,7 @@ public abstract class TermBuilder {
     }
     
     
-    public Term applyElementary(IServices services,
+    public Term applyElementary(S services,
 	                        Term loc,
 	                        Term value,
 	                        Term target) {
@@ -671,14 +695,14 @@ public abstract class TermBuilder {
     }
 
 
-    public Term applyElementary(IServices services,
+    public Term applyElementary(S services,
 	                        Term heap,
 	                        Term target) {
 	return apply(elementary(services, heap), target);
     }
 
 
-    public ImmutableList<Term> applyElementary(IServices services,
+    public ImmutableList<Term> applyElementary(S services,
 	                        Term heap,
 	                        Iterable<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
@@ -699,7 +723,7 @@ public abstract class TermBuilder {
     }
     
     
-    public Term applyParallel(IServices services, 
+    public Term applyParallel(S services, 
 	                      Term[] lhss, 
 	                      Term[] values, 
 	                      Term target) {
@@ -750,25 +774,25 @@ public abstract class TermBuilder {
     //integer operators     
     //-------------------------------------------------------------------------
     
-    public Term geq(Term t1, Term t2, IServices services) {
+    public Term geq(Term t1, Term t2, S services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getGreaterOrEquals(), t1, t2);
     }
     
     
-    public Term gt(Term t1, Term t2, IServices services) {
+    public Term gt(Term t1, Term t2, S services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getGreaterThan(), t1, t2);
     }
     
     
-    public Term lt(Term t1, Term t2, IServices services) {
+    public Term lt(Term t1, Term t2, S services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getLessThan(), t1, t2);
     }    
     
     
-    public Term leq(Term t1, Term t2, IServices services) {
+    public Term leq(Term t1, Term t2, S services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getLessOrEquals(), t1, t2);
     }    
@@ -1063,20 +1087,8 @@ public abstract class TermBuilder {
     //heap operators    
     //-------------------------------------------------------------------------
     
-    public Term NULL(IServices services) {
-        return func(services.getTypeConverter().getHeapLDT().getNull());
-    }
-
-    public Term wellFormed(Term heap, IServices services) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), 
-        	    heap);
-    }
     
 
-    public Term wellFormed(LocationVariable heap, IServices services) {
-        return wellFormed(var(heap), services);
-    }
-    
     
     public Term select(IServices services, Sort asSort, Term h, Term o, Term f) {
 	return func(services.getTypeConverter().getHeapLDT().getSelect(
@@ -1109,38 +1121,23 @@ public abstract class TermBuilder {
     }
 
 
-    public Term create(IServices services, Term h, Term o) {
-        return func(services.getTypeConverter().getHeapLDT().getCreate(), 
-        	     new Term[]{h, o});
-    }
-
     
-    public Term anon(IServices services, Term h1, Term s, Term h2) {
+    public Term anon(S services, Term h1, Term s, Term h2) {
 	return func(services.getTypeConverter().getHeapLDT().getAnon(), 
 		    new Term[]{h1, s, h2});
     }
     
                
-    public Term fieldStore(IServices services, Term o, Function f, Term v) {
+    public Term fieldStore(S services, Term o, Function f, Term v) {
         return store(services, getBaseHeap(services), o, func(f), v);
     }
     
     
-    public Term staticFieldStore(IServices services, Function f, Term v) {
-	return fieldStore(services, NULL(services), f, v);
-    }
+    public abstract Term NULL(S services);
     
     
-    public Term arrayStore(IServices services, Term o, Term i, Term v) {
-        return store(services, 
-                getBaseHeap(services), 
-        	     o, 
-        	     func(services.getTypeConverter().getHeapLDT().getArr(), i),
-        	     v);
-    }        
     
-    
-    public Term anonUpd(LocationVariable heap, IServices services, Term mod, Term anonHeap) {
+    public Term anonUpd(LocationVariable heap, S services, Term mod, Term anonHeap) {
 	return elementary(services,
 		          heap,
 		          anon(services, 
@@ -1150,10 +1147,10 @@ public abstract class TermBuilder {
     }
     
         
-    public Term forallHeaps(IServices services, Term t) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+    public Term forallHeaps(S services, Term t) {
+	final IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final LogicVariable heapLV 
-		= new LogicVariable(new Name("h"), heapLDT.targetSort());
+		= new LogicVariable(new Name("h"), ((LDT)heapLDT).targetSort());
 	final Map<LocationVariable, LogicVariable> map
 		= new HashMap<LocationVariable, LogicVariable>();
 	map.put(heapLDT.getHeap(), heapLV);
@@ -1168,13 +1165,13 @@ public abstract class TermBuilder {
     //reachability operators    
     //-------------------------------------------------------------------------
     
-    public Term acc(IServices services, Term h, Term s, Term o1, Term o2) {
+    public Term acc(S services, Term h, Term s, Term o1, Term o2) {
 	return func(services.getTypeConverter().getHeapLDT().getAcc(), 
 		    new Term[]{h, s, o1, o2});
     }
     
     
-    public Term reach(IServices services, 
+    public Term reach(S services, 
 	    	      Term h, 
 	    	      Term s, 
 	    	      Term o1, 
@@ -1189,7 +1186,7 @@ public abstract class TermBuilder {
     //sequence operators    
     //-------------------------------------------------------------------------
     
-    public Term seqGet(IServices services, Sort asSort, Term s, Term idx) {
+    public Term seqGet(S services, Sort asSort, Term s, Term idx) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort, 
 		    						      services), 
 		    s,
@@ -1197,41 +1194,41 @@ public abstract class TermBuilder {
     }
     
     
-    public Term seqLen(IServices services, Term s) {
+    public Term seqLen(S services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
     }
     
     /** Function representing the least index of an element x in a sequence s (or underspecified) */
-    public Term indexOf(IServices services, Term s, Term x){
+    public Term indexOf(S services, Term s, Term x){
 	return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
     }
     
     
-    public Term seqEmpty(IServices services) {
+    public Term seqEmpty(S services) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
     }
     
     
-    public Term seqSingleton(IServices services, Term x) {
+    public Term seqSingleton(S services, Term x) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), 
 		    x);
     }
     
     
-    public Term seqConcat(IServices services, Term s, Term s2) {
+    public Term seqConcat(S services, Term s, Term s2) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqConcat(), 
 		    s, 
 		    s2);
     }
     
     
-    public Term seqSub(IServices services, Term s, Term from, Term to) {
+    public Term seqSub(S services, Term s, Term from, Term to) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqSub(), 
 		    new Term[]{s, from, to});
     }
     
     
-    public Term seqReverse(IServices services, Term s) {
+    public Term seqReverse(S services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
 
@@ -1241,7 +1238,7 @@ public abstract class TermBuilder {
     
 
     
-    public ImmutableSet<Term> unionToSet(Term s, IServices services) {
+    public ImmutableSet<Term> unionToSet(Term s, S services) {
     final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
     assert s.sort().equals(setLDT.targetSort());
     final Function union = setLDT.getUnion();

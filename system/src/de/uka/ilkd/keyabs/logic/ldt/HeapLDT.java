@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.ldt;
+package de.uka.ilkd.keyabs.logic.ldt;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -32,7 +33,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 
 /**
@@ -47,8 +47,7 @@ public final class HeapLDT extends LDT implements IHeapLDT {
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
     public static final Name BASE_HEAP_NAME = new Name("heap");
-    public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
-    public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME, SAVED_HEAP_NAME };
+    public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME };
 
 
     
@@ -58,29 +57,13 @@ public final class HeapLDT extends LDT implements IHeapLDT {
     //select/store
     private final SortDependingFunction select;
     private final Function store;
-    private final Function create;
     private final Function anon;
     private final Function memset;
     
-    //fields
-    private final Function arr;
-    private final Function created;
-    private final Function initialized;
-    private final SortDependingFunction classPrepared;
-    private final SortDependingFunction classInitialized;
-    private final SortDependingFunction classInitializationInProgress;
-    private final SortDependingFunction classErroneous;
-    
-    //length
-    private final Function length;
-    
-    //null
-    private final Function nullFunc;
-    
     //predicates
     private final Map<Sort,Function> wellFormed;    
-    private final Function acc;
-    private final Function reach;
+    //private final Function acc;
+    //private final Function reach;
     
     //heap pv
     private final ImmutableArray<LocationVariable> heaps;
@@ -99,24 +82,12 @@ public final class HeapLDT extends LDT implements IHeapLDT {
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
         select            = addSortDependingFunction(services, SELECT_NAME.toString());
         store             = addFunction(services, "store");
-        create            = addFunction(services, "create");
         anon              = addFunction(services, "anon");
         memset            = addFunction(services, "memset");
-        arr               = addFunction(services, "arr");
-        created           = addFunction(services, "java.lang.Object::<created>");
-        initialized       = addFunction(services, "java.lang.Object::<initialized>");
-        classPrepared     = addSortDependingFunction(services, "<classPrepared>");
-        classInitialized  = addSortDependingFunction(services, "<classInitialized>");
-        classInitializationInProgress  
-                          = addSortDependingFunction(services, "<classInitializationInProgress>");
-        classErroneous    = addSortDependingFunction(services, "<classErroneous>");
-        length            = addFunction(services, "length");        
-        nullFunc          = addFunction(services, "null");
-        acc               = addFunction(services, "acc");
-        reach             = addFunction(services, "reach");
+       // acc               = addFunction(services, "acc");
+       // reach             = addFunction(services, "reach");
         heaps = new ImmutableArray<LocationVariable>(new LocationVariable[]{
-                (LocationVariable) progVars.lookup(BASE_HEAP_NAME),
-                (LocationVariable) progVars.lookup(SAVED_HEAP_NAME)
+                (LocationVariable) progVars.lookup(BASE_HEAP_NAME)
         });
         wellFormed = new LinkedHashMap<Sort,Function>();
         wellFormed.put((Sort)sorts.lookup(new Name("Heap")), addFunction(services, "wellFormed"));
@@ -180,27 +151,28 @@ public final class HeapLDT extends LDT implements IHeapLDT {
     }
     
     
-    /**
-     * Returns the sort "Field".
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.keyabs.logic.ldt.IHeapLDT#getFieldSort()
      */
+    @Override
     public Sort getFieldSort() {
 	return fieldSort;
     }
     
     
-    /**
-     * Returns the select function for the given sort.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.keyabs.logic.ldt.IHeapLDT#getSelect(de.uka.ilkd.key.logic.sort.Sort, de.uka.ilkd.key.java.IServices)
      */
+    @Override
     public Function getSelect(Sort instanceSort, IServices services) {
 	return select.getInstanceFor(instanceSort, services);
     }
     
     
-    /**
-     * If the passed operator is an instance of "select", this method returns
-     * the sort of the function (identical to its return type); otherwise, 
-     * returns null.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.keyabs.logic.ldt.IHeapLDT#getSortOfSelect(de.uka.ilkd.key.logic.op.Operator)
      */
+    @Override
     public Sort getSortOfSelect(Operator op) {
 	if(op instanceof SortDependingFunction 
            && ((SortDependingFunction)op).isSimilar(select)) {
@@ -211,16 +183,19 @@ public final class HeapLDT extends LDT implements IHeapLDT {
     }
     
     
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.keyabs.logic.ldt.IHeapLDT#getStore()
+     */
+    @Override
     public Function getStore() {
 	return store;
     }
 
 
-    public Function getCreate() {
-	return create;
-    }
-    
-
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.keyabs.logic.ldt.IHeapLDT#getAnon()
+     */
+    @Override
     public Function getAnon() {
 	return anon;
     }    
@@ -228,80 +203,35 @@ public final class HeapLDT extends LDT implements IHeapLDT {
     
     public Function getMemset() {
 	return memset;
-    }     
-    
-    
-    public Function getArr() {
-	return arr;
-    }
-    
-    
-    public Function getCreated() {
-	return created;
-    }
-    
-    
-    public Function getInitialized() {
-	return initialized;
-    }
-    
+    }         
         
-    public Function getClassPrepared(Sort instanceSort, IServices services) {
-	return classPrepared.getInstanceFor(instanceSort, services);
-    }
-    
-    
-    public Function getClassInitialized(Sort instanceSort, IServices services) {
-	return classInitialized.getInstanceFor(instanceSort, services);
-    }
-    
-    
-    public Function getClassInitializationInProgress(Sort instanceSort, 
-	    					     IServices services) {
-	return classInitializationInProgress.getInstanceFor(instanceSort, 
-							    services);
-    }
-    
-    
-    public Function getClassErroneous(Sort instanceSort, IServices services) {
-	return classErroneous.getInstanceFor(instanceSort, services);
-    }
-    
-    
-    public Function getLength() {
-	return length;
-    }    
-    
-    
-    public Function getNull() {
-	return nullFunc;
-    }
-    
-    
     public Function getWellFormed(Sort sort) {
 	return wellFormed.get(sort);
     }
     
     
-    public Function getAcc() {
+  /*  public Function getAcc() {
 	return acc;
     }
     
     
     public Function getReach() {
 	return reach;
-    }
+    }*/
     
     
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.keyabs.logic.ldt.IHeapLDT#getHeap()
+     */
+    @Override
     public LocationVariable getHeap() {
 	return heaps.get(0);
     }
-    
-    public LocationVariable getSavedHeap() {
-        return heaps.get(1);
-    }
-
-    
+        
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.keyabs.logic.ldt.IHeapLDT#getAllHeaps()
+     */
+    @Override
     public ImmutableArray<LocationVariable> getAllHeaps() {
         return heaps;
     }
@@ -448,6 +378,21 @@ public final class HeapLDT extends LDT implements IHeapLDT {
 	assert false;
 	return null;
     }
+
+
+    @Override
+    public Function getReach() {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+
+    @Override
+    public Function getAcc() {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
 
 
 }

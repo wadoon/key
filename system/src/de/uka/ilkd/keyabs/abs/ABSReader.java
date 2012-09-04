@@ -18,6 +18,10 @@ public class ABSReader implements JavaReader {
     private static final String CONCRETE_MODULE = "module "
             + CONCRETE_MODULE_NAME + ";";
 
+    public ABSReader() {
+	
+    }
+    
     @Override
     public JavaBlock readBlockWithEmptyContext(String s, IServices services) {
         return readBlockWithProgramVariables(services.getNamespaces().programVariables(), services, s);
@@ -26,7 +30,7 @@ public class ABSReader implements JavaReader {
     @Override
     public JavaBlock readBlockWithProgramVariables(
             Namespace<IProgramVariable> varns, IServices services, String s) {
-        String blockStr = CONCRETE_MODULE + "\n import * from PingPong; " + s;
+        String blockStr = CONCRETE_MODULE + "\n import * from MyModule; " + s;
         try {
             Model m = ((ABSServices) services).getProgramInfo().parseInContext(
                     blockStr);
@@ -38,20 +42,20 @@ public class ABSReader implements JavaReader {
                 }
             }
 
-            System.out.println(" Errors: " + m.getErrors());
+           /* System.out.println(" Errors: " + m.getErrors());
 
             for (SemanticError se : m.getErrors()) {
                 System.out.println(se.getHelpMessage() + " : "
                         + se.getFileName() + " : " + se.getMsgString());
             }
             System.out.println(module.getBlock() + " Errors: " + m.getErrors());
-
+            */
             AbstractABS2KeYABSConverter converter = new ConcreteABS2KeYABSConverter(
                     varns, services);
 
             ABSStatementBlock block = converter.convert(module.getBlock());
 
-            System.out.println("Converted " + block);
+            //System.out.println("Converted " + block);
 
             return JavaBlock.createJavaBlock(block);
         } catch (IOException e) {

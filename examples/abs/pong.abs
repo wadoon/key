@@ -1,79 +1,23 @@
 /*
- * PingPong.abs -- PingPong example
  *
  */
-module PingPong;
+module MyModule;
 export *;
-data PingMsg = Fine
-             | HelloPing 
-             | ByePing 
-             ;
 
-data PongMsg = NoMsg 
-         | Hello(Ping)
-         | HowAreYou
-         | ByePong
-         ;
-
-interface Ping {
-    Unit ping(PingMsg m);
-    Unit nothing(Int i);
-    Unit nothing();
+interface Variable {
+    Unit send(Int i);
 }
 
-interface Pong {
-    Unit hello(Ping ping);
-    Unit pong(PongMsg m);
-    Unit nothing(Int i);
-    Unit nothing();
-}
 
-class PingImpl(Pong pong) implements Ping {
-    Unit run(){
-      pong!hello(this); 
+class VariableImpl implements Variable {
+    Int value;
+
+
+    Unit send(Int i) {
+    	this.value = i;
     }
 
 
-    Unit myOwn() { }
-    Unit nothing(Int i) { }
-    Unit nothing() { }
-
-    Unit ping(PingMsg msg){
-      PongMsg reply = case msg {
-         HelloPing => HowAreYou;
-         Fine => ByePong; 
-         ByePing => NoMsg;
-      };
-
-
-      if (reply != NoMsg) {
-         Fut<Unit> fu = pong!pong(reply);
-         fu.get;
-      }
-     }
-} 
-
-class PongImpl implements Pong {
-    Ping ping;
-
-    Unit hello(Ping ping) {
-       this.ping = ping;
-       ping!ping(HelloPing);
-    }
-
-    Unit nothing(Int i) { }
-    Unit nothing() { }
-
-    Unit pong(PongMsg msg){
-       if (msg == HowAreYou)
-           ping!ping(Fine);
-       else
-           ping!ping(ByePing);
-    } 
-
 }
 
-{
-    Pong pong = new cog PongImpl(); 
-    new cog PingImpl(pong); 
-}
+{ }

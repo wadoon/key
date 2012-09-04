@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -92,7 +93,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         Term atPreUpdate = null;
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
-        for(LocationVariable heap : HeapContext.getModHeaps(services,transaction)) {
+        for(LocationVariable heap : HeapContext.getModHeaps((Services) services,transaction)) {
           final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
           final Term u = TB.elementary(services,
             l,
@@ -120,7 +121,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
-                for(LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
+                for(LocationVariable heap : HeapContext.getModHeaps((Services) services, transaction)) {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
                   newMods.put(heap, m);

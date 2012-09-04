@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -15,9 +14,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
@@ -35,6 +32,7 @@ import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
+import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
@@ -68,10 +66,10 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 	    ABSTermBuilder TB = getServices().getTermBuilder();
 	    if (pe instanceof IABSLocationReference) {
 		return TB.var(((IABSLocationReference) pe).getVariable());
-	    } else if (pe instanceof MethodName) {
+	    } /*else if (pe instanceof MethodName) {
 		return TB.func((Function) getServices().getNamespaces()
 			.functions().lookup((Name) pe));
-	    } else if (pe instanceof IProgramVariable) {
+	    }*/ else if (pe instanceof IProgramVariable) {
 		return TB.var((IProgramVariable) pe);
 	    } else {
 		final TermBuilder tb = services.getTermBuilder();
@@ -231,6 +229,10 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 
     public HistoryLDT getHistoryLDT() {
 	return historyLDT;
+    }
+
+    public HeapLDT getHeapLDT() {
+	return (HeapLDT) heapLDT;
     }
 
 }

@@ -77,7 +77,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     	                services);
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
-        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        heapContext = HeapContext.getModHeaps((Services) goal.proof().getServices(), transaction);
     	return setContract(services.getSpecificationRepository()
     	                .combineOperationContracts(
     	                		contracts));

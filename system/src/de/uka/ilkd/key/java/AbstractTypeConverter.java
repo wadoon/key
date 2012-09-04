@@ -12,7 +12,6 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 public abstract class AbstractTypeConverter<S extends IServices> {
 
@@ -59,7 +59,7 @@ public abstract class AbstractTypeConverter<S extends IServices> {
     protected IntegerLDT integerLDT;
     protected BooleanLDT booleanLDT;
     protected LocSetLDT locSetLDT;
-    protected HeapLDT heapLDT;
+    protected IHeapLDT heapLDT;
     protected SeqLDT seqLDT;
     @SuppressWarnings("unused")
     private FloatLDT floatLDT;
@@ -82,8 +82,8 @@ public abstract class AbstractTypeConverter<S extends IServices> {
             this.booleanLDT = (BooleanLDT) ldt;
         } else if (ldt instanceof LocSetLDT) {
             this.locSetLDT = (LocSetLDT) ldt;
-        } else if (ldt instanceof HeapLDT) {
-            this.heapLDT = (HeapLDT) ldt;
+        } else if (ldt instanceof IHeapLDT) {
+            this.heapLDT = (IHeapLDT) ldt;
         } else if (ldt instanceof SeqLDT) {
             this.seqLDT = (SeqLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
@@ -134,7 +134,7 @@ public abstract class AbstractTypeConverter<S extends IServices> {
         return locSetLDT;
     }
 
-    public HeapLDT getHeapLDT() {
+    public IHeapLDT getHeapLDT() {
         return heapLDT;
     }
 
@@ -188,7 +188,7 @@ public abstract class AbstractTypeConverter<S extends IServices> {
      */
     public Expression convertToProgramElement(Term term) {
         assert term != null;
-        if (term.op() == heapLDT.getNull()) {
+        if (term.equals(services.getTermBuilder().NULL(services))) {
             return NullLiteral.NULL;
         } else if (term.op() instanceof Function) {
             for(LDT model : models) {

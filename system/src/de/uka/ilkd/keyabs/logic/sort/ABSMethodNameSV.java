@@ -34,7 +34,7 @@ public class ABSMethodNameSV extends ABSProgramSVSort {
     public IProgramSVSort<ABSServices> createInstance(String parameter) {
 	return new ABSMethodNameSV(new ProgramElementName(parameter));
     }
-
+    
     public String declarationString() {
 	return name().toString();
     }

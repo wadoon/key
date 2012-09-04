@@ -106,7 +106,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }    
     
     
-    private boolean hasRawSteps(Term heapTerm, Sequent seq, IServices services) {
+    private boolean hasRawSteps(Term heapTerm, Sequent seq, Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
@@ -131,7 +131,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     private static void getRawSteps(Term heapTerm, 
 	    		     Sequent seq, 
-	    		     IServices services, 
+	    		     Services services, 
 	    		     List<Term> result) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
@@ -154,7 +154,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     private static PosInOccurrence getFreshLocsStep(PosInOccurrence heapPos, 
 	    				     Sequent seq, 
-	    				     IServices services) {
+	    				     Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 	final Term heapTerm = heapPos.subTerm();
@@ -186,7 +186,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     		 getChangedLocsForStep(Term heapTerm, 
 	                       	       Term stepHeap, 
 	                       	       Sequent seq,
-	                       	       IServices services) {
+	                       	       Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
@@ -282,7 +282,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     public static List<PosInOccurrence> getSteps(PosInOccurrence pos,
 	    				  Sequent seq,
-	    				  IServices services) {
+	    				  Services services) {
 	final Term focus = pos.subTerm();
 	assert focus.op() instanceof IObserverFunction;
 	
@@ -378,7 +378,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	//heap term of observer must be store-term (or anon, create, 
 	//memset, ...)
 	final IServices services = goal.proof().getServices();
-	if(!hasRawSteps(focus.sub(0), goal.sequent(), services)) {
+	if(!hasRawSteps(focus.sub(0), goal.sequent(), (Services) services)) {
 	    return false;
 	}
 
@@ -408,8 +408,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     @Override    
     public ImmutableList<Goal> apply(Goal goal,
-	    			     IServices services,
+	    			     IServices iServices,
 	    			     RuleApp ruleApp) {		
+	Services services = (Services) iServices;
 	//collect information
 	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 	final PosInOccurrence pio = ruleApp.posInOccurrence();	

@@ -31,7 +31,6 @@ import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -49,7 +48,6 @@ import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -57,6 +55,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 public final class SyntacticalReplaceVisitor extends Visitor { 	
 
@@ -247,7 +246,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 			newLhs = originalLhs;
 		} else {
 			Term termInst = toTerm(lhsInst);
-			HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+			IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 			if(termInst.op() instanceof UpdateableOperator) {
 				newLhs = (UpdateableOperator)termInst.op();
 			} else if(heapLDT.getSortOfSelect(termInst.op()) != null
@@ -366,7 +365,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 			if(visitedOp instanceof ElementaryUpdate 
 					&& elementaryUpdateLhs != null) {
 				assert neededsubs.length == 1;
-				Term newTerm = JavaProfile.DF().elementary(services, 
+				Term newTerm = services.getTermBuilder().elementary(services, 
 						elementaryUpdateLhs, 
 						neededsubs[0]);
 				pushNew(newTerm);

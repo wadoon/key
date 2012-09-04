@@ -22,7 +22,6 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -48,6 +47,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 /**
  * This abstract class provides a stubb for translation of KeY-Formulas to other
@@ -516,8 +516,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         private ArrayList<StringBuffer> getSortHierarchyPredicates(
                         IServices services, SMTSettings settings) {
-                Function nullOp = services.getTypeConverter().getHeapLDT()
-                                .getNull();
+                Function nullOp = (Function) services.getTermBuilder().NULL(services).op();
                 SortHierarchy sh = this.buildSortHierarchy(services, settings);
                 ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
                 LinkedList<SortWrapper> list = sh.getSorts();
@@ -1869,10 +1868,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         return this.translateLogicalTrue();
                 } else if (op == Junctor.FALSE) {
                         return this.translateLogicalFalse();
-                } else if (op == services.getTypeConverter().getHeapLDT()
-                                .getNull()) {
-                        Function nullOp = services.getTypeConverter()
-                                        .getHeapLDT().getNull();
+                } else if (op == services.getTermBuilder().NULL(services).op()) {
+                        Function nullOp = (Function) services.getTermBuilder().NULL(services).op();
 
                         addFunction(nullOp, new ArrayList<Sort>(),
                                         nullOp.sort());
@@ -2638,7 +2635,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
 
                 for (Sort sort : tempSorts) {
-                        HeapLDT ldt = services.getTypeConverter().getHeapLDT();
+                        IHeapLDT ldt = services.getTypeConverter().getHeapLDT();
                         if (ldt.getHeap().sort() != sort
                                         && ldt.getFieldSort() != sort
                                         && services.getProgramInfo().nullSort() != sort) {
