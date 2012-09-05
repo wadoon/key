@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -272,7 +272,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	assert pm != null;
 	assert mod != null;
 	
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final AbstractHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(methodHeapFunc);

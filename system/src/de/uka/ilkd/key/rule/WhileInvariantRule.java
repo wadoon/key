@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -142,7 +142,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    			While loop, 
 	    			Term mod,
 	    			Services services) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final AbstractHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap.name()+"_loop"));
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());

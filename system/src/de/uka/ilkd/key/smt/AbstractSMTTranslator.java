@@ -516,7 +516,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         private ArrayList<StringBuffer> getSortHierarchyPredicates(
                         IServices services, SMTSettings settings) {
-                Function nullOp = (Function) services.getTermBuilder().NULL(services).op();
+                Function nullOp = (Function) services.getTypeConverter().getHeapLDT().getNull();
                 SortHierarchy sh = this.buildSortHierarchy(services, settings);
                 ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
                 LinkedList<SortWrapper> list = sh.getSorts();
@@ -1868,8 +1868,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         return this.translateLogicalTrue();
                 } else if (op == Junctor.FALSE) {
                         return this.translateLogicalFalse();
-                } else if (op == services.getTermBuilder().NULL(services).op()) {
-                        Function nullOp = (Function) services.getTermBuilder().NULL(services).op();
+                } else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
+                        Function nullOp = (Function) services.getTypeConverter().getHeapLDT().getNull();
 
                         addFunction(nullOp, new ArrayList<Sort>(),
                                         nullOp.sort());

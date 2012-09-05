@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -98,7 +98,7 @@ public final class QueryAxiom extends ClassAxiom {
     public ImmutableSet<Taclet> getTaclets(
 	    		ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, 
 	    		Services services) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final AbstractHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	
 	//create schema variables
 	final SchemaVariable heapSV 

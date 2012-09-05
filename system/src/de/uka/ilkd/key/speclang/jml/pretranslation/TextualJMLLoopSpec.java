@@ -38,7 +38,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
-        for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
+        for(Name heap : HeapLDT.getAllValidHeapNames()) {
           assignables.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
           invariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());          
         }
@@ -93,13 +93,13 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         StringBuffer sb = new StringBuffer();
         Iterator<PositionedString> it;
         
-        for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
+        for(Name heap : HeapLDT.getAllValidHeapNames()) {
           it = invariants.get(heap.toString()).iterator();
           while(it.hasNext()) {
             sb.append("invariant<"+heap+">: " + it.next() + "\n");
           }
         }
-        for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
+        for(Name heap : HeapLDT.getAllValidHeapNames()) {
           it = assignables.get(heap.toString()).iterator();
           while(it.hasNext()) {
             sb.append("assignable<"+heap+">: " + it.next() + "\n");

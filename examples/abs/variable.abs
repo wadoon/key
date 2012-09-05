@@ -1,0 +1,19 @@
+/*
+ *
+ */
+module MyModule;
+export *;
+
+interface Variable {
+    Unit send(Int i);
+}
+
+class VariableImpl implements Variable {
+    Int value;
+
+    Unit send(Int i) {
+    	this.value = i;
+    }
+}
+
+{ }

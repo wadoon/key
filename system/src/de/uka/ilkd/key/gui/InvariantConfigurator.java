@@ -451,7 +451,7 @@ public class InvariantConfigurator {
 
                 JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
-                for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
+                for(Name h : HeapLDT.getAllValidHeapNames() ) {
                    String k = h.toString();
                    String title = String.format("Invariant%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
                    String errorMessage = invMsgs == null? "OK" : invMsgs.get(k);
@@ -492,7 +492,7 @@ public class InvariantConfigurator {
                 Map<String,Color> modColors = new LinkedHashMap<String,Color>();
                 Map<String,String> varMsgs = new LinkedHashMap<String,String>();
                 Map<String,Color> varColors = new LinkedHashMap<String,Color>();
-                for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
+                for(Name h : HeapLDT.getAllValidHeapNames() ) {
                    String k = h.toString();
                    setOK(invMsgs, invColors, k);
                    setOK(modMsgs, modColors, k);

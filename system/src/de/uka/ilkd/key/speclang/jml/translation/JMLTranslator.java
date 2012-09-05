@@ -22,8 +22,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -1242,7 +1242,7 @@ final class JMLTranslator {
                         LocSetLDT locSetLDT =
                                 services.getTypeConverter().getLocSetLDT();
                         if (!t.equals(locSetLDT.getSingleton())) {
-                            HeapLDT heapLDT =
+                            AbstractHeapLDT heapLDT =
                                     services.getTypeConverter().getHeapLDT();
                             if (heapLDT.getSortOfSelect(t.op()) != null) {
                                 final Term objTerm = t.sub(1);

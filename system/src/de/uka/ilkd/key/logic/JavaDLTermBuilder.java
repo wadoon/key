@@ -426,9 +426,6 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
         	     v);
     }        
     
-    public Term NULL(Services services) {
-        return func(services.getTypeConverter().getHeapLDT().getNull());
-    }
 
     public Term staticFieldStore(Services services, Function f, Term v) {
 	return fieldStore(services, NULL(services), f, v);
@@ -439,10 +436,6 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
     }
     
 
-    public Term wellFormed(Term heap, Services services) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), 
-        	    heap);
-    }
 
 
 }

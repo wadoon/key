@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.logic.JavaDLTermBuilder;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
@@ -270,7 +270,7 @@ public final class DLSpecFactory {
 	    }
 	}
 	
-	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	AbstractHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	//heapAtPre variable may be omitted
 	if(heapAtPreVar == null) {
 	    heapAtPreVar = TB.heapAtPreVar(services, heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);

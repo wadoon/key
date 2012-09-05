@@ -33,11 +33,6 @@ public class ABSTermBuilder extends TermBuilder<ABSServices> {
         return term;
     }
 
-    @Override 
-    public Term NULL(ABSServices services) {
-    	return func(((ABSServices)services).getTypeConverter().getHistoryLDT().getNull());
-    }
-
     public Term wellFormed(LocationVariable heap, ABSServices services) {
 	return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), var(heap));
     }

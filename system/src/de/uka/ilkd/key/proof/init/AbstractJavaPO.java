@@ -19,7 +19,7 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.logic.JavaDLTermBuilder;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -48,7 +48,7 @@ public abstract class AbstractJavaPO implements IPersistablePO {
     protected static final JavaDLTermBuilder TB = JavaProfile.DF();
     protected final JavaDLInitConfig initConfig;
     private final Services services;
-    protected final HeapLDT heapLDT;
+    protected final AbstractHeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
     protected final String name;
     protected ImmutableSet<NoPosTacletApp> taclets;

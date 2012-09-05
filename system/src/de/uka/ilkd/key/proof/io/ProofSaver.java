@@ -25,7 +25,6 @@ import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -34,7 +33,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.ILogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.INotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.proof.NameRecorder;
@@ -530,7 +529,7 @@ public class ProofSaver {
     private static ILogicPrinter createLogicPrinter(IServices serv, 
             boolean shortAttrNotation) {
 
-        NotationInfo ni = new NotationInfo();
+        INotationInfo ni = serv.getUIConfiguration().createDefaultNotationInfo();
         ILogicPrinter p = null;
         UIConfiguration uic;
         if (serv == null) {

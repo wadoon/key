@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -99,7 +99,7 @@ public final class PartialInvAxiom extends ClassAxiom {
                                                     + (i == 0 ? "" : " EQ"));
             
             //create schema variables
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final AbstractHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             final SchemaVariable heapSV =
                     SchemaVariableFactory.createTermSV(new Name("h"),
                                                        heapLDT.targetSort(),

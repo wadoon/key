@@ -4,7 +4,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -35,6 +34,8 @@ public interface IHeapLDT {
     public abstract Function getAcc();
 
     public abstract Function getAnon();
+    
+    public abstract Function getNull();
 
     public abstract LocationVariable getHeap();
 

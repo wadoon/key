@@ -13,6 +13,7 @@ package de.uka.ilkd.key.pp;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -263,7 +264,7 @@ public final class NotationInfo implements INotationInfo {
         	
 	//heap operators
 	final IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	if (heapLDT != null && heapLDT instanceof HeapLDT) {
+	if (heapLDT != null && heapLDT instanceof AbstractHeapLDT) {
 	    tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
 	    tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	    tbl.put(IProgramMethod.class, new Notation.ObserverNotation());

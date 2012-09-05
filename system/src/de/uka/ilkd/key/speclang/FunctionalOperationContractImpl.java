@@ -28,7 +28,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
@@ -269,7 +269,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	}
 
         if(atPreVars != null) {
-          final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+          final AbstractHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
           for(LocationVariable h : heapLDT.getAllHeaps()) {
              if(atPreVars.get(h) != null) {
                 assert originalAtPreVars.get(h).sort().equals(atPreVars.get(h).sort());
@@ -331,7 +331,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	}
 
         if(atPres != null) {
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final AbstractHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
             if(atPres.get(h) != null) {
               assert originalAtPreVars.get(h).sort().equals(atPres.get(h).sort());

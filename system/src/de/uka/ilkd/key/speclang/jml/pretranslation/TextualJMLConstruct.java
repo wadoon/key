@@ -57,7 +57,7 @@ public abstract class TextualJMLConstruct {
         }
         List<String> hs = new ArrayList<String>();
         while(t.startsWith("<") && !t.startsWith("<inv>")) {
-          for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
+          for(Name heapName : HeapLDT.getAllValidHeapNames()) {
             final String hName = heapName.toString();
             String h = "<" + hName + ">";
             if(t.startsWith(h)) {

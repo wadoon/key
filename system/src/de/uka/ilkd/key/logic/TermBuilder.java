@@ -21,6 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -1132,11 +1133,7 @@ public abstract class TermBuilder<S extends IServices> {
         return store(services, getBaseHeap(services), o, func(f), v);
     }
     
-    
-    public abstract Term NULL(S services);
-    
-    
-    
+        
     public Term anonUpd(LocationVariable heap, S services, Term mod, Term anonHeap) {
 	return elementary(services,
 		          heap,
@@ -1159,7 +1156,14 @@ public abstract class TermBuilder<S extends IServices> {
 	return all(heapLV, t);
     }
     
-    
+    public Term NULL(S services) {
+        return func(services.getTypeConverter().getHeapLDT().getNull());
+    }
+
+    public Term wellFormed(Term heap, Services services) {
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), 
+        	    heap);
+    }
     
     //-------------------------------------------------------------------------
     //reachability operators    

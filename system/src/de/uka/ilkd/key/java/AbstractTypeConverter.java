@@ -188,7 +188,7 @@ public abstract class AbstractTypeConverter<S extends IServices> {
      */
     public Expression convertToProgramElement(Term term) {
         assert term != null;
-        if (term.equals(services.getTermBuilder().NULL(services))) {
+        if (term.equals(services.getTypeConverter().getHeapLDT().getNull())) {
             return NullLiteral.NULL;
         } else if (term.op() instanceof Function) {
             for(LDT model : models) {

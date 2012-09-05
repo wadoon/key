@@ -52,7 +52,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
-        for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
+        for(Name hName : HeapLDT.getAllValidHeapNames()) {
           assignables.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           requires.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
@@ -222,13 +222,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         Iterator<PositionedString> it;
 
         sb.append(behavior).append("\n");
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+        for(Name h : HeapLDT.getAllValidHeapNames()) {
           it = requires.get(h.toString()).iterator();
           while(it.hasNext()) {
             sb.append("requires<"+h+">: " + it.next() + "\n");
           }
         }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+        for(Name h : HeapLDT.getAllValidHeapNames()) {
           it = assignables.get(h.toString()).iterator();
           while(it.hasNext()) {
             sb.append("assignable<"+h+">: " + it.next() + "\n");
@@ -238,7 +238,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("accessible: " + it.next() + "\n");
         }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+        for(Name h : HeapLDT.getAllValidHeapNames()) {
           it = ensures.get(h.toString()).iterator();
           while(it.hasNext()) {
             sb.append("ensures<"+h+">: " + it.next() + "\n");
