@@ -107,7 +107,7 @@ options {
     private PositionedString flipHeaps(String declString, PositionedString result) {
       String t = result.text;
       String p = declString+" ";
-      for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
+      for(Name heapName : HeapLDT.getAllValidHeapNames()) {
         t = t.trim();
 	String l = "<"+heapName+">";
         if(t.startsWith(l)) {
