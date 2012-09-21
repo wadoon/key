@@ -77,6 +77,11 @@ public class SMTProblem {
 
         }
 
+        public SMTProblem(Term newCondition) {
+            
+            this.term = newCondition;
+        }
+
         public Goal getGoal() {
                 return goal;
         }

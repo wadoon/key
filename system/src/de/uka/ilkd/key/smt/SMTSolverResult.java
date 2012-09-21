@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Encapsulates the result of a single solver. 
  */
@@ -48,6 +51,10 @@ public class SMTSolverResult {
     
     /**This is to identify where the result comes from. E.g. for user feedback. */
     public final String solverName;
+
+
+
+    private List<String> output;
     
     private SMTSolverResult(ThreeValuedTruth isValid, String solverName) {
 	this.solverName = solverName;
@@ -92,6 +99,28 @@ public class SMTSolverResult {
         }
         SMTSolverResult ssr = (SMTSolverResult) o;
         return isValid == ssr.isValid;
+    }
+
+        /**
+         * Retrieve the model satisfying the formula
+         * 
+         * @return
+         */
+        public List<String> getOutput() {
+        
+        if(output == null) {
+            
+            return new ArrayList<String>();
+        }
+        else {
+            
+            return output;
+        }
+    }
+    
+    public void setOutput(List<String> output) {
+        
+        this.output = output;
     }
     
     

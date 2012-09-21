@@ -103,7 +103,14 @@ public class SolverCommunication {
 	
 	/*Only public for classes of the same package */
 	void setFinalResult(SMTSolverResult finalResult) {
-		this.finalResult = finalResult;
+		
+	        /*
+                 * append the output from the solver to the result
+                 * before returning it.
+                 */
+                finalResult.setOutput(messages);
+	    
+	        this.finalResult = finalResult;
 		resultHasBeenSet = true;
 	}
 
