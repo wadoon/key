@@ -1,0 +1,280 @@
+package de.uka.ilkd.key.testgeneration.targetmodels;
+
+/**
+ * This class provides various methods which use primitive integer operations, coupled
+ * with control statements of gradually increasing complexity. The methods will 
+ * excercise all available integer operations, in all feasible combinations.
+ * 
+ * @author christopher
+ *
+ */
+public class PrimitiveIntegerOperations {
+
+    /*
+     * Local variables to simulate extra-method dependencies during 
+     * symbolic execution 
+     */
+    public static int externalX;
+    public static int externalY;
+    public static int externalZ;
+    
+    
+    
+    /* @
+    public normal_behavior
+
+    ensures (\result == x) || (\result == y) || (\result == z );
+
+    ensures ((\result <= y) && (\result <= z )) ||
+                  ((\result <= y) && (\result <= x )) ||
+                  ((\result <= x) && (\result <= z ));
+
+    ensures ((\result >= y) && (\result >= z )) ||
+                  ((\result >= y) && (\result >= x )) ||
+                  ((\result >= x) && (\result >= z ));
+    @ */
+    public static int mid (int x , int y , int z ) {
+
+        int mid = z;
+
+        if(y <z ) {
+            if(x <y ) {
+                mid = y;
+            }
+            else if(x <z ) {
+
+                mid = x;
+            }
+        }
+        else{
+
+            if(x >y ) {
+
+                mid = y;
+            }
+            else if(x >z ) {
+
+                mid = x;
+            }
+        }
+        return mid ;
+    }
+    
+    /* @
+    public normal_behavior
+
+    ensures (\result == x) || (\result == y) || (\result == z );
+
+    ensures ((\result <= y) && (\result <= z )) ||
+                  ((\result <= y) && (\result <= x )) ||
+                  ((\result <= x) && (\result <= z ));
+
+    ensures ((\result >= y) && (\result >= z )) ||
+                  ((\result >= y) && (\result >= x )) ||
+                  ((\result >= x) && (\result >= z ));
+    @ */
+    public static int midExperimental (int x , int y) {
+
+        int zInt=0;
+        int mid=zInt;
+
+        if(y <zInt ) {
+            int k = x;
+            if(k <y ) {
+                
+                mid = y;
+            }
+            else if(x <zInt ) {
+
+                mid = x;
+            }
+        }
+        else{
+
+            if(x >y ) {
+
+                mid = y;
+            }
+            else if(x >zInt ) {
+
+                mid = x;
+            }
+        }
+        return mid ;
+    }
+    
+    /* @
+    public normal_behavior
+
+    ensures (\result == x) || (\result == y) || (\result == externalZ );
+
+    ensures ((\result <= y) && (\result <= externalZ )) ||
+                  ((\result <= y) && (\result <= x )) ||
+                  ((\result <= x) && (\result <= externalZ ));
+
+    ensures ((\result >= y) && (\result >= externalZ )) ||
+                  ((\result >= y) && (\result >= x )) ||
+                  ((\result >= x) && (\result >= externalZ ));
+    @ */
+    public static int midOneExternal (int x , int y) {
+
+        int mid = externalZ;
+
+        if(y <externalZ ) {
+            if(x <y ) {
+                mid = y;
+            }
+            else if(x <externalZ ) {
+
+                mid = x;
+            }
+        }
+        else{
+
+            if(x >y ) {
+
+                mid = y;
+            }
+            else if(x >externalZ ) {
+
+                mid = x;
+            }
+        }
+        return mid ;
+    }
+    
+    /* @
+    public normal_behavior
+
+    ensures (\result == x) || (\result == y) || (\result == z );
+
+    ensures ((\result <= y) && (\result <= z )) ||
+                  ((\result <= y) && (\result <= x )) ||
+                  ((\result <= x) && (\result <= z ));
+
+    ensures ((\result >= y) && (\result >= z )) ||
+                  ((\result >= y) && (\result >= x )) ||
+                  ((\result >= x) && (\result >= z ));
+    @ */
+    public static int midTwoExternal (int x) {
+
+        int mid = externalZ;
+
+        if(externalY <externalZ ) {
+            if(x <externalY ) {
+                mid = externalY;
+            }
+            else if(x <externalZ ) {
+
+                mid = x;
+            }
+        }
+        else{
+
+            if(x >externalY ) {
+
+                mid = externalY;
+            }
+            else if(x >externalZ ) {
+
+                mid = x;
+            }
+        }
+        return mid ;
+    }
+    
+    /* @
+    public normal_behavior
+
+    ensures (\result == x) || (\result == y) || (\result == z );
+
+    ensures ((\result <= y) && (\result <= z )) ||
+                  ((\result <= y) && (\result <= x )) ||
+                  ((\result <= x) && (\result <= z ));
+
+    ensures ((\result >= y) && (\result >= z )) ||
+                  ((\result >= y) && (\result >= x )) ||
+                  ((\result >= x) && (\result >= z ));
+    @ */
+    public static int midThreeExternal () {
+
+        int mid = externalZ;
+
+        if(externalY <externalZ ) {
+            if(externalX <externalY ) {
+                mid = externalY;
+            }
+            else if(externalX <externalZ ) {
+
+                mid = externalX;
+            }
+        }
+        else{
+
+            if(externalX >externalY ) {
+
+                mid = externalY;
+            }
+            else if(externalX >externalZ ) {
+
+                mid = externalX;
+            }
+        }
+        return mid ;
+    }
+
+    /* @
+    public normal_behavior
+    
+    requires (year > 1900) && (year < 2099)
+    
+    ensures true
+    @ */
+    public static int easterDate (int year){
+
+        int n, a, b, m, q, w, d;
+        
+        if ( year < 1900 || year > 2099 ){
+        
+            throw new IllegalArgumentException("Bad year");
+        }
+
+        n = year-1900;
+        a = n%19;
+        b = (7*a+1)/19;
+        m = (11*a+4-b)%29;
+        q = n/4;
+        w = (n+q+31-m)%7;
+        d = 25-m-w;
+
+        if (d > 0) {
+            return d;
+        }
+        else
+            return 31+d;        
+    }
+    
+    /**
+     * Use Euclides algorithm to find the greatest common denominator of two integers.
+     * 
+     * @param a
+     * @param b
+     * @return
+     */
+    /* @
+    public normal_behavior
+    
+    requires true
+    
+    ensures true
+    @ */
+    public static int euclidesRecursive(int a, int b) {
+        
+        if(b == 0) {
+            return a;
+        }
+        else {
+          return euclidesRecursive(b, a % b);  
+        }
+    }
+}
