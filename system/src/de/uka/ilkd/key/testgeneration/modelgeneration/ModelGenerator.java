@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import z3parser.api.Z3ModelParser;
-import z3parser.api.Z3ModelParser.ValueContainer;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.Services;
@@ -24,6 +22,9 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.modelgeneration.IModelGenerator.IModelContainer;
+import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3ModelParser;
+import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContainer;
+
 
 /**
  * This is our default implementation of the IModelGenerator interface - it is used in
@@ -34,8 +35,8 @@ import de.uka.ilkd.key.testgeneration.modelgeneration.IModelGenerator.IModelCont
  * interface is used in order to find a preliminary assignment of variables
  * that satisfy the pathcondition<p>
  * 
- * The preliminary assignment found above is parsed, and turned into a 
- * {@link HashMap} mapping the name of each variable to its type and 
+ * The preliminary assignment found above is parsed, and turned into a set of 
+ * {@link IModelContainer}, mapping the name of each variable to its type and 
  * satisfactory value. This mapping forms the final output of the Model 
  * Generator.
  * 
@@ -160,7 +161,7 @@ public class ModelGenerator implements IModelGenerator {
         
         for(ValueContainer container : model.values()) {
             
-            IModelContainer modelContainer = new ModelContainer();
+            IModelContainer modelContainer = new ValueContainer();
             
             modelContainer.setName(container.getName());
             modelContainer.setType(IModelContainer.Type.valueOf(container.getType().toString()));
@@ -267,7 +268,7 @@ public class ModelGenerator implements IModelGenerator {
     }
     
     @Override
-    public HashMap<String,IModelContainer> generateModel(IExecutionNode node) throws ParseException, ModelGeneratorException {
+    public HashMap<String,IModelContainer> generateModel(IExecutionNode node) throws ModelGeneratorException {
         
     
         /*
@@ -284,51 +285,15 @@ public class ModelGenerator implements IModelGenerator {
          * Return the model satisfying the constraint
          */
 
-        return createModel(result);        
+        try {
+            return createModel(result);
+            
+        } catch (ParseException e) {
+            
+            throw new ModelGeneratorException(e.getMessage());
+        }        
     }
-    
-    public static class ModelContainer implements  IModelContainer {
 
-        private String name;
-        /**
-         * @return the name
-         */
-        public String getName() {
-            return name;
-        }
-        /**
-         * @param name the name to set
-         */
-        public void setName(String name) {
-            this.name = name;
-        }
-        /**
-         * @return the type
-         */
-        public Type getType() {
-            return type;
-        }
-        /**
-         * @param type the type to set
-         */
-        public void setType(Type type) {
-            this.type = type;
-        }
-        /**
-         * @return the value
-         */
-        public Object getValue() {
-            return value;
-        }
-        /**
-         * @param value the value to set
-         */
-        public void setValue(Object value) {
-            this.value = value;
-        }
-        private Type type;
-        private Object value;
-    }
 
     private static class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 

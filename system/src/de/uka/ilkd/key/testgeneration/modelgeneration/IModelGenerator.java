@@ -32,7 +32,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 public interface IModelGenerator {
     
-    public HashMap<String, IModelContainer> generateModel(IExecutionNode node) throws Exception;
+    public HashMap<String, IModelContainer> generateModel(IExecutionNode node) throws ModelGeneratorException;
     
     public interface IModelContainer {
         

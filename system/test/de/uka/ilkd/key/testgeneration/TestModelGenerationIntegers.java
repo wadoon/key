@@ -1,6 +1,7 @@
 
 package de.uka.ilkd.key.testgeneration;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,10 +11,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import z3parser.api.Z3ModelParser.ValueContainer;
 
 
 import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.KeYLexer;
+import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -54,6 +56,7 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
     @Test
     public  void testMidOneExternal() throws Exception {
         
+       
         /*
          * THIS METHOD IS CURRENTLY ONLY USED FOR DEVELOPMENT
          */
@@ -63,7 +66,8 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
         
         //printSymbolicExecutionTreePathConditions( environment.getBuilder().getStartNode());
 
-        DefaultTermParser termParser = new DefaultTermParser();
+        
+        
 
     
          ArrayList<IExecutionNode> nodes = retrieveNode(environment.getBuilder().getStartNode(), "mid=y");
@@ -105,19 +109,20 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
     public void testEuclides() throws FileNotFoundException, ProofInputException, ModelGeneratorException {
 
         /*
-         * Recursion is not supported at this stage
+         * For recursion to work, we will need a different strategy setting. How we can infer
+         * what strategy to be used, is not clear at this stage. 
          *
          * setup("euclides");
          */
     }
 
     /**
-     *Test that fixtures are generated s.t. all execution paths which cause y to be
-     *returned are taken.  
+     * Tests that we are able to generate path conditions in such a way that all possible
+     * return values for each input variable to mid() are taken.
      * @throws Exception 
      */
     @Test
-    public void testMidReturnY() throws Exception {
+    public void testMid() throws Exception {
 
         setup("mid");
 
@@ -144,6 +149,11 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
         for(IExecutionNode node : nodes) {
 
             HashMap<String, IModelContainer> model = modelGenerator.generateModel(node);
+            
+            for(IModelContainer container : model.values()) {
+                System.out.println(container);
+            }
+            
 
             int x = (Integer)model.get("x").getValue();
             int y = (Integer)model.get("y").getValue();

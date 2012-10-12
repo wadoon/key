@@ -8,13 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
-import z3parser.api.Z3ModelParser;
-import z3parser.api.Z3ModelParser.ValueContainer;
-import z3parser.parser.Yylex;
-import z3parser.parser.parser;
-import z3parser.tree.Model;
+
 
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
@@ -35,6 +32,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3ModelParser;
+import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContainer;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -60,80 +59,7 @@ public class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
      * @author Martin Hentschel (mods by Christopher)
      * @throws IOException 
      */
-    /*
-    protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getSymbolicExecutionEnvironment (
-            File baseDir, 
-            String javaPathInBaseDir, 
-            String containerTypeName, 
-            String methodFullName,
-            String precondition,
-            boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
-
-
-        // Make sure that required files exists
-        File javaFile = new File(baseDir, javaPathInBaseDir);
-        assertTrue(javaFile.exists());
-
-        // Create user interface
-        CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
-
-        // Load java file
-        InitConfig initConfig = ui.load(javaFile, null, null);
-
-        // Search method to proof
-        Services services = initConfig.getServices();
-        IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
-
-        // Start proof
-        ProofOblInput input = new ProgramMethodPO(initConfig, pm.getFullName(), pm, precondition, true);
-        Proof proof = ui.createProof(initConfig, input);
-        assertNotNull(proof);
-
-        // Set strategy and goal chooser to use for auto mode
-        SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
-
-        // Create symbolic execution tree which contains only the start node at beginning
-        SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, mergeBranchConditions);
-        builder.analyse();
-        assertNotNull(builder.getStartNode());
-
-        // Create a symbolic execution environment
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = 
-                new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui, initConfig, builder);
-
-
-        /*
-     * Set a stop condition. For now, we will simply go with the default 
-     * and simply run auto mode
-
-        proof = environment.getProof();
-
-        ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = 
-                new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
-
-        proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
-        /*
-     * Tell KeY to start running the proof
-         what might save us, me and you, is if the russians love their children too
-
-         Timeless.
-        environment.getUi().startAndWaitForProof(proof);
-
-        /*
-     * Construct a symbolic execution tree for the proof
-
-        environment.getBuilder().analyse();
-
-        /*
-     * Finally, return the environment
-
-        return environment;
-
-    }
-     */
-
-    protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getPreparedEnvironment(
+     protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getPreparedEnvironment(
             File keyRepo,
             String rootFolder,
             String resourceFile,
@@ -149,6 +75,7 @@ public class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
                         null, 
                         false
                         );
+        
         assertNotNull(env);
 
         Proof proof = env.getProof();
@@ -210,9 +137,9 @@ public class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         } 
     }
 
-    protected void printModel(HashMap<String, z3parser.api.Z3ModelParser.ValueContainer> model) {
+    protected void printModel(HashMap<String, ValueContainer> model) {
 
-        for(z3parser.api.Z3ModelParser.ValueContainer container : model.values()) {
+        for(ValueContainer container : model.values()) {
 
             System.out.println("GENERATED MODEL:" + 
                     "\nName: " + container.getName() + 

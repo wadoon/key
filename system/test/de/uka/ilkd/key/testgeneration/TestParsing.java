@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import org.junit.Test;
 
-import z3parser.api.Z3ModelParser;
-import z3parser.api.Z3ModelParser.ValueContainer;
+import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3ModelParser;
+import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContainer;
+
+
 
 import junit.framework.TestCase;
 
