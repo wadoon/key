@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.testgeneration.defaultimplementation;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.testgeneration.model.IModel;
 
@@ -11,7 +13,7 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
  * @author christopher
  */
 public class Model
-        implements IModel<IModelVariable> {
+        implements IModel {
 
     private final LinkedList<IModelVariable> variables = new LinkedList<>();
 
@@ -21,23 +23,35 @@ public class Model
      */
     @SafeVarargs
     @Override
-    public final List<IModelVariable> getVariables(
-            IModelFilter<IModelVariable>... filters) {
-
-        if (filters.length == 0) {
-            return variables;
-        }
+    public final List<IModelVariable> getVariables(IModelFilter... filters) {
 
         LinkedList<IModelVariable> filteredVariables =
                 new LinkedList<IModelVariable>();
 
         for (IModelVariable variable : variables) {
+
             if (satisfiesFilters(variable, filters)) {
+
                 filteredVariables.add(variable);
             }
         }
 
         return filteredVariables;
+    }
+
+    @Override
+    public Map<String, IModelVariable> getVariableNameMapping(
+            IModelFilter... filters) {
+
+        List<IModelVariable> filteredVariables = getFilteredVariables(filters);
+
+        HashMap<String, IModelVariable> variableMapping = new HashMap<>();
+
+        for (IModelVariable variable : filteredVariables) {
+
+            variableMapping.put(variable.getName(), variable);
+        }
+        return null;
     }
 
     /**
@@ -50,11 +64,30 @@ public class Model
         variables.add(variable);
     }
 
+    private List<IModelVariable> getFilteredVariables(IModelFilter[] filters) {
+
+        if (filters.length == 0) {
+            return variables;
+        }
+
+        LinkedList<IModelVariable> filteredVariables =
+                new LinkedList<IModelVariable>();
+
+        for (IModelVariable variable : variables) {
+            
+            if (satisfiesFilters(variable, filters)) {
+            
+                filteredVariables.add(variable);
+            }
+        }
+        return filteredVariables;
+    }
+
     private boolean satisfiesFilters(
             IModelVariable variable,
-            IModelFilter<IModelVariable>[] filters) {
+            IModelFilter[] filters) {
 
-        for (IModelFilter<IModelVariable> filter : filters) {
+        for (IModelFilter filter : filters) {
             if (!filter.satisfies(variable)) {
                 return false;
             }
@@ -68,7 +101,7 @@ public class Model
      * @author christopher
      */
     public static class NameFilter
-            implements IModelFilter<IModelVariable> {
+            implements IModelFilter {
 
         private String name;
 
@@ -83,5 +116,4 @@ public class Model
             return object.getName().equals(name);
         }
     }
-
 }

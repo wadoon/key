@@ -3,8 +3,7 @@ package de.uka.ilkd.key.testgeneration;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,10 +12,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.defaultimplementation.IModelVariable;
-import de.uka.ilkd.key.testgeneration.defaultimplementation.Model;
 import de.uka.ilkd.key.testgeneration.defaultimplementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.IModel;
-import de.uka.ilkd.key.testgeneration.model.IModel.IModelFilter;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.targetmodels.PrimitiveIntegerOperations;
@@ -33,7 +30,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 public class TestModelGenerationIntegers
         extends KeYTestGenTest {
 
-    private ModelGenerator modelGenerator;
+    private IModelGenerator modelGenerator;
     private final String javaPathInBaseDir =
             "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
     private final String containerTypeName = "PrimitiveIntegerOperations";
@@ -262,18 +259,20 @@ public class TestModelGenerationIntegers
             System.out.println("Mid " + variable);
             printSingleNode(node);
 
-            Model model =
-                    modelGenerator.generateModel(node);
-            
-            List<IModelVariable> variables = model.getVariables();
-            
-            int x = (Integer) model.get("x").getValue();
-            int y = (Integer) model.get("y").getValue();
-            int z = (Integer) model.get("z").getValue();
+            IModel model = modelGenerator.generateModel(node);
+
+            Map<String, IModelVariable> variableMapping =
+                    model.getVariableNameMapping();
+
+            int x = (Integer) variableMapping.get("x").getValue();
+            int y = (Integer) variableMapping.get("y").getValue();
+            int z = (Integer) variableMapping.get("z").getValue();
             int result = PrimitiveIntegerOperations.mid(x, y, z);
 
-            assertTrue(result == (Integer) model.get(variable).getValue());
+            assertTrue(result == (Integer) variableMapping.get(variable)
+                    .getValue());
         }
+    }
 
     private void setup(String method)
             throws ProofInputException, ModelGeneratorException, IOException {

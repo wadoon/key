@@ -32,11 +32,12 @@ import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContain
  * <p>
  * This particular implementation makes use of SMT solvers in order to
  * facilitate model generation. The pathcondition to be instantiated is
- * translated into the SMT-LIB2 language (which see), and the KeY SMT interface
- * is subsequently invoked in order to find a preliminary assignment of
- * variables that satisfy the pathcondition
+ * translated into the SMT-LIB2 language, and the KeY SMT interface is
+ * subsequently invoked in order to find an assignment of variables that satisfy
+ * the pathcondition (if such an assignment exits).
  * <p>
- * The preliminary assignment found above is parsed, and turned into a {@link IModel}
+ * The set of assignments found are further processed into an instance of
+ * {@link IModel}, which constitutes the final representaiton of the model.
  */
 public class ModelGenerator
         implements IModelGenerator {
@@ -134,7 +135,7 @@ public class ModelGenerator
         return null;
     }
 
-    private Model createModel(SMTSolverResult result) throws ParseException {
+    private IModel createModel(SMTSolverResult result) throws ParseException {
 
         Model finalModel = new Model();
 
@@ -257,7 +258,7 @@ public class ModelGenerator
     }
 
     @Override
-    public Model generateModel(IExecutionNode node)
+    public IModel generateModel(IExecutionNode node)
             throws ModelGeneratorException {
 
         /*
