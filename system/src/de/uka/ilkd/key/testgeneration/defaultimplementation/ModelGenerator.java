@@ -26,21 +26,17 @@ import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3ModelParser;
 import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContainer;
 
 /**
- * This is our default implementation of the IModelGenerator interface - it is
- * used in KeYTestGen2 whenever the user does not specify anything else. The
- * pathcondition to be instantiated is translated into a format acceptable to an
- * external SMT solvers. After that, the KeY SMT interface is used in order to
- * find a preliminary assignment of variables that satisfy the pathcondition
+ * Given that a client does not specify anything else, KeYTestGen2 will default
+ * to this implementation of {@link IModelGenerator} for the purpose of
+ * instantiating path conditions.
  * <p>
- * The preliminary assignment found above is parsed, and turned into a set of
- * {@link IModelContainer}, mapping the name of each variable to its type and
- * satisfactory value. This mapping forms the final output of the Model
- * Generator. The Model Generator is a work in progress, and only basic
- * functionality has been implemented so far. Future work:The Model generator
- * will be able to provide a rich set of feedback to the caller, for example
- * giving information if a model for a given pathcondition cannot be found. It
- * should also able to return data relevant to benchmarking and optimization,
- * such as execution time, bottlenecks, and the like.
+ * This particular implementation makes use of SMT solvers in order to
+ * facilitate model generation. The pathcondition to be instantiated is
+ * translated into the SMT-LIB2 language (which see), and the KeY SMT interface
+ * is subsequently invoked in order to find a preliminary assignment of
+ * variables that satisfy the pathcondition
+ * <p>
+ * The preliminary assignment found above is parsed, and turned into a {@link IModel}
  */
 public class ModelGenerator
         implements IModelGenerator {
@@ -54,7 +50,7 @@ public class ModelGenerator
      * The settings for the SMT solvers. These follow a default implementation,
      * although it is possible for the user to use custom settings.
      */
-    private final SMTSettings  settings;
+    private final SMTSettings settings;
 
     /**
      * Backend constructor for the factory methods
@@ -138,8 +134,7 @@ public class ModelGenerator
         return null;
     }
 
-    private Model createModel(SMTSolverResult result)
-            throws ParseException {
+    private Model createModel(SMTSolverResult result) throws ParseException {
 
         Model finalModel = new Model();
 
@@ -156,7 +151,7 @@ public class ModelGenerator
             ModelVariable modelVariable =
                     new ModelVariable(container.getName(), container.getType()
                             .toString(), container.getValue(), null);
-            
+
             finalModel.addVariable(modelVariable);
         }
 
@@ -294,57 +289,68 @@ public class ModelGenerator
 
         @Override
         public int getMaxConcurrentProcesses() {
+
             return 1;
         }
 
         @Override
         public int getMaxNumberOfGenerics() {
+
             return 2;
         }
 
         @Override
         public String getSMTTemporaryFolder() {
+
             return PathConfig.getKeyConfigDir() + File.separator
                     + "smt_formula";
         }
 
         @Override
         public Collection<Taclet> getTaclets() {
+
             return null;
         }
 
         @Override
         public long getTimeout() {
+
             return 5000;
         }
 
         @Override
         public boolean instantiateNullAssumption() {
+
             return true;
         }
 
         @Override
         public boolean makesUseOfTaclets() {
+
             return false;
         }
 
         @Override
         public boolean useExplicitTypeHierarchy() {
+
             return false;
         }
 
         @Override
         public boolean useBuiltInUniqueness() {
+
             return false;
         }
 
         @Override
         public boolean useAssumptionsForBigSmallIntegers() {
+
             return false;
         }
 
         @Override
         public boolean useUninterpretedMultiplicationIfNecessary() {
+
             return false;
         }
 
@@ -362,11 +368,13 @@ public class ModelGenerator
 
         @Override
         public String getLogic() {
+
             return "AUFLIA";
         }
 
         @Override
         public boolean checkForSupport() {
+
             return false;
         }
     }

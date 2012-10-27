@@ -7,30 +7,16 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 
 /**
+ * Objects implementing this interface are used in order to create a model for
+ * the path condition of a given {@link IExecutionNode}, i.e. find a set of
+ * concrete variable assignments that satisfy this particular model.
  * 
- * The Model Generator is used in order to turn the path condition for a given
- * {@link IExecutionNode} into a set of concrete values for the purpose of
- * instantiating a test fixture.
- * <p>
- * 
- * It works in the following way:
- * <p>
- * 
- * The Model Generator can take either the {@code node} itself, or a
- * {@link Term} representing the path condition for such a {@code node}.
- * 
- * The models created by a model generator must return a triplet for each
- * generated program element, containing the name, type and value of that
- * element. Such triplets must be instances of the {@link IModelContainer}
- * interface, which is a simple container type.
+ * The representation of such a model is indicated by generic type T. Implementing classes are
+ * not intended to be generic in themselves. 
  * 
  * @author christopher
- * @see SolverLauncher
- * @see IExecutionNode
- * @see SymbolicExecutionEnvironment
  */
-public interface IModelGenerator {
+public interface IModelGenerator<T> {
 
-    public <T> IModel<T> generateModel(IExecutionNode node)
-            throws ModelGeneratorException;
+    public T generateModel(IExecutionNode node) throws ModelGeneratorException;
 }
