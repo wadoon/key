@@ -74,9 +74,9 @@ public class Model
                 new LinkedList<IModelVariable>();
 
         for (IModelVariable variable : variables) {
-            
+
             if (satisfiesFilters(variable, filters)) {
-            
+
                 filteredVariables.add(variable);
             }
         }

@@ -1,410 +1,412 @@
 package de.uka.ilkd.key.testgeneration.targetmodels;
 
 /**
- * This class provides various methods which use primitive integer operations, coupled
- * with control statements of gradually increasing complexity. The methods will 
- * excercise all available integer operations, in all feasible combinations.
+ * This class provides various methods which use primitive integer operations,
+ * coupled with control statements of gradually increasing complexity. The
+ * methods will excercise all available integer operations, in all feasible
+ * combinations.
  * 
  * @author christopher
- *
  */
 public class PrimitiveIntegerOperations {
 
     /*
-     * Local variables to simulate extra-method dependencies during 
-     * symbolic execution 
+     * Local variables to simulate extra-method dependencies during symbolic
+     * execution
      */
     public static int staticX;
     public static int staticY;
     public static int staticZ;
-    
+
     public int instanceX;
     public int instanceY;
     public int instanceZ;
-    
+
     /*
      * Local refernce variables to simulate work with associated classes
      */
     public ClassProxy proxy = new ClassProxy();
-    
-    /* @
-    public normal_behavior
 
-    ensures (\result == x) || (\result == y) || (\result == z );
-
-    ensures ((\result <= y) && (\result <= z )) ||
-                  ((\result <= y) && (\result <= x )) ||
-                  ((\result <= x) && (\result <= z ));
-
-    ensures ((\result >= y) && (\result >= z )) ||
-                  ((\result >= y) && (\result >= x )) ||
-                  ((\result >= x) && (\result >= z ));
-    @ */
-    public static int nonStaticMid (int x , int y , int z ) {
+    /*
+     * @ public normal_behavior
+     * 
+     * ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
+    public static int nonStaticMid(int x, int y, int z) {
 
         int mid = z;
 
-        if(y <z ) {
-            if(x <y ) {
+        if (y < z) {
+            if (x < y) {
                 mid = y;
             }
-            else if(x <z ) {
+            else if (x < z) {
 
                 mid = x;
             }
         }
-        else{
+        else {
 
-            if(x >y ) {
+            if (x > y) {
 
                 mid = y;
             }
-            else if(x >z ) {
+            else if (x > z) {
 
                 mid = x;
             }
         }
-        return mid ;
+        return mid;
     }
-    
-    /* @
-    public normal_behavior
 
-    ensures (\result == x) || (\result == y) || (\result == externalZ );
-
-    ensures ((\result <= y) && (\result <= externalZ )) ||
-                  ((\result <= y) && (\result <= x )) ||
-                  ((\result <= x) && (\result <= externalZ ));
-
-    ensures ((\result >= y) && (\result >= externalZ )) ||
-                  ((\result >= y) && (\result >= x )) ||
-                  ((\result >= x) && (\result >= externalZ ));
-    @ */
-    public int nonStaticMidOneExternal (int x , int y) {
+    /*
+     * @ public normal_behavior
+     * 
+     * ensures (\result == x) || (\result == y) || (\result == externalZ );
+     * 
+     * ensures ((\result <= y) && (\result <= externalZ )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= externalZ ));
+     * 
+     * ensures ((\result >= y) && (\result >= externalZ )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= externalZ ));
+     * 
+     * @
+     */
+    public int nonStaticMidOneExternal(int x, int y) {
 
         int mid = instanceZ;
 
-        if(y <instanceZ ) {
-            if(x <y ) {
+        if (y < instanceZ) {
+            if (x < y) {
                 mid = y;
             }
-            else if(x <instanceZ ) {
+            else if (x < instanceZ) {
 
                 mid = x;
             }
         }
-        else{
+        else {
 
-            if(x >y ) {
+            if (x > y) {
 
                 mid = y;
             }
-            else if(x >instanceZ ) {
+            else if (x > instanceZ) {
 
                 mid = x;
             }
         }
-        return mid ;
+        return mid;
     }
-    
-    /* @
-    public normal_behavior
 
-    ensures (\result == x) || (\result == y) || (\result == externalZ );
-
-    ensures ((\result <= y) && (\result <= externalZ )) ||
-                  ((\result <= y) && (\result <= x )) ||
-                  ((\result <= x) && (\result <= externalZ ));
-
-    ensures ((\result >= y) && (\result >= externalZ )) ||
-                  ((\result >= y) && (\result >= x )) ||
-                  ((\result >= x) && (\result >= externalZ ));
-    @ */
-    public int nonStaticMidOneExternalProxy (int x , int y) {
+    /*
+     * @ public normal_behavior
+     * 
+     * ensures (\result == x) || (\result == y) || (\result == externalZ );
+     * 
+     * ensures ((\result <= y) && (\result <= externalZ )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= externalZ ));
+     * 
+     * ensures ((\result >= y) && (\result >= externalZ )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= externalZ ));
+     * 
+     * @
+     */
+    public int nonStaticMidOneExternalProxy(int x, int y) {
 
         int mid = proxy.instanceInt;
 
-        if(y <proxy.instanceInt ) {
-            if(x <y ) {
+        if (y < proxy.instanceInt) {
+            if (x < y) {
                 mid = y;
             }
-            else if(x <proxy.instanceInt ) {
+            else if (x < proxy.instanceInt) {
 
                 mid = x;
             }
         }
-        else{
+        else {
 
-            if(x >y ) {
+            if (x > y) {
 
                 mid = y;
             }
-            else if(x >proxy.instanceInt ) {
+            else if (x > proxy.instanceInt) {
 
                 mid = x;
             }
         }
-        return mid ;
+        return mid;
     }
-    
-    
-    /* @
-    public normal_behavior
 
-    ensures (\result == x) || (\result == y) || (\result == z );
-
-    ensures ((\result <= y) && (\result <= z )) ||
-                  ((\result <= y) && (\result <= x )) ||
-                  ((\result <= x) && (\result <= z ));
-
-    ensures ((\result >= y) && (\result >= z )) ||
-                  ((\result >= y) && (\result >= x )) ||
-                  ((\result >= x) && (\result >= z ));
-    @ */
-    public static int mid (int x , int y , int z ) {
+    /*
+     * @ public normal_behavior
+     * 
+     * ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
+    public static int mid(int x, int y, int z) {
 
         int mid = z;
 
-        if(y <z ) {
-            if(x <y ) {
+        if (y < z) {
+            if (x < y) {
                 mid = y;
             }
-            else if(x <z ) {
+            else if (x < z) {
 
                 mid = x;
             }
         }
-        else{
+        else {
 
-            if(x >y ) {
+            if (x > y) {
 
                 mid = y;
             }
-            else if(x >z ) {
+            else if (x > z) {
 
                 mid = x;
             }
         }
-        return mid ;
+        return mid;
     }
-    
-    /* @
-    public normal_behavior
 
-    ensures (\result == x) || (\result == y) || (\result == z );
+    /*
+     * @ public normal_behavior
+     * 
+     * ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
+    public static int midExperimental(int x, int y) {
 
-    ensures ((\result <= y) && (\result <= z )) ||
-                  ((\result <= y) && (\result <= x )) ||
-                  ((\result <= x) && (\result <= z ));
+        int zInt = 0;
+        int mid = zInt;
 
-    ensures ((\result >= y) && (\result >= z )) ||
-                  ((\result >= y) && (\result >= x )) ||
-                  ((\result >= x) && (\result >= z ));
-    @ */
-    public static int midExperimental (int x , int y) {
-
-        int zInt=0;
-        int mid=zInt;
-
-        if(y <zInt ) {
+        if (y < zInt) {
             int k = x;
-            if(k <y ) {
-                
+            if (k < y) {
+
                 mid = y;
             }
-            else if(x <zInt ) {
+            else if (x < zInt) {
 
                 mid = x;
             }
         }
-        else{
+        else {
 
-            if(x >y ) {
+            if (x > y) {
 
                 mid = y;
             }
-            else if(x >zInt ) {
+            else if (x > zInt) {
 
                 mid = x;
             }
         }
-        return mid ;
+        return mid;
     }
-    
-    /* @
-    public normal_behavior
 
-    ensures (\result == x) || (\result == y) || (\result == externalZ );
-
-    ensures ((\result <= y) && (\result <= externalZ )) ||
-                  ((\result <= y) && (\result <= x )) ||
-                  ((\result <= x) && (\result <= externalZ ));
-
-    ensures ((\result >= y) && (\result >= externalZ )) ||
-                  ((\result >= y) && (\result >= x )) ||
-                  ((\result >= x) && (\result >= externalZ ));
-    @ */
-    public static int midOneExternal (int x , int y) {
+    /*
+     * @ public normal_behavior
+     * 
+     * ensures (\result == x) || (\result == y) || (\result == externalZ );
+     * 
+     * ensures ((\result <= y) && (\result <= externalZ )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= externalZ ));
+     * 
+     * ensures ((\result >= y) && (\result >= externalZ )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= externalZ ));
+     * 
+     * @
+     */
+    public static int midOneExternal(int x, int y) {
 
         int mid = staticZ;
 
-        if(y <staticZ ) {
-            if(x <y ) {
+        if (y < staticZ) {
+            if (x < y) {
                 mid = y;
             }
-            else if(x <staticZ ) {
+            else if (x < staticZ) {
 
                 mid = x;
             }
         }
-        else{
+        else {
 
-            if(x >y ) {
+            if (x > y) {
 
                 mid = y;
             }
-            else if(x >staticZ ) {
+            else if (x > staticZ) {
 
                 mid = x;
             }
         }
-        return mid ;
+        return mid;
     }
-    
-    /* @
-    public normal_behavior
 
-    ensures (\result == x) || (\result == y) || (\result == z );
-
-    ensures ((\result <= y) && (\result <= z )) ||
-                  ((\result <= y) && (\result <= x )) ||
-                  ((\result <= x) && (\result <= z ));
-
-    ensures ((\result >= y) && (\result >= z )) ||
-                  ((\result >= y) && (\result >= x )) ||
-                  ((\result >= x) && (\result >= z ));
-    @ */
-    public static int midTwoExternal (int x) {
+    /*
+     * @ public normal_behavior
+     * 
+     * ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
+    public static int midTwoExternal(int x) {
 
         int mid = staticZ;
 
-        if(staticY <staticZ ) {
-            if(x <staticY ) {
+        if (staticY < staticZ) {
+            if (x < staticY) {
                 mid = staticY;
             }
-            else if(x <staticZ ) {
+            else if (x < staticZ) {
 
                 mid = x;
             }
         }
-        else{
+        else {
 
-            if(x >staticY ) {
+            if (x > staticY) {
 
                 mid = staticY;
             }
-            else if(x >staticZ ) {
+            else if (x > staticZ) {
 
                 mid = x;
             }
         }
-        return mid ;
+        return mid;
     }
-    
-    /* @
-    public normal_behavior
 
-    ensures (\result == x) || (\result == y) || (\result == z );
-
-    ensures ((\result <= y) && (\result <= z )) ||
-                  ((\result <= y) && (\result <= x )) ||
-                  ((\result <= x) && (\result <= z ));
-
-    ensures ((\result >= y) && (\result >= z )) ||
-                  ((\result >= y) && (\result >= x )) ||
-                  ((\result >= x) && (\result >= z ));
-    @ */
-    public static int midThreeExternal () {
+    /*
+     * @ public normal_behavior
+     * 
+     * ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
+    public static int midThreeExternal() {
 
         int mid = staticZ;
 
-        if(staticY <staticZ ) {
-            if(staticX <staticY ) {
+        if (staticY < staticZ) {
+            if (staticX < staticY) {
                 mid = staticY;
             }
-            else if(staticX <staticZ ) {
+            else if (staticX < staticZ) {
 
                 mid = staticX;
             }
         }
-        else{
+        else {
 
-            if(staticX >staticY ) {
+            if (staticX > staticY) {
 
                 mid = staticY;
             }
-            else if(staticX >staticZ ) {
+            else if (staticX > staticZ) {
 
                 mid = staticX;
             }
         }
-        return mid ;
+        return mid;
     }
 
-    /* @
-    public normal_behavior
-    
-    requires (year > 1900) && (year < 2099)
-    
-    ensures true
-    @ */
-    public static int easterDate (int year){
+    /*
+     * @ public normal_behavior
+     * 
+     * requires (year > 1900) && (year < 2099)
+     * 
+     * ensures true
+     * 
+     * @
+     */
+    public static int easterDate(int year) {
 
         int n, a, b, m, q, w, d;
-        
-        if ( year < 1900 || year > 2099 ){
-        
+
+        if (year < 1900 || year > 2099) {
+
             throw new IllegalArgumentException("Bad year");
         }
 
-        n = year-1900;
-        a = n%19;
-        b = (7*a+1)/19;
-        m = (11*a+4-b)%29;
-        q = n/4;
-        w = (n+q+31-m)%7;
-        d = 25-m-w;
+        n = year - 1900;
+        a = n % 19;
+        b = (7 * a + 1) / 19;
+        m = (11 * a + 4 - b) % 29;
+        q = n / 4;
+        w = (n + q + 31 - m) % 7;
+        d = 25 - m - w;
 
         if (d > 0) {
             return d;
         }
         else
-            return 31+d;        
+            return 31 + d;
     }
-    
-    
-    
+
     /**
-     * Use Euclides algorithm to find the greatest common denominator of two integers.
+     * Use Euclides algorithm to find the greatest common denominator of two
+     * integers.
      * 
      * @param a
      * @param b
      * @return
      */
-    /* @
-    public normal_behavior
-    
-    requires true
-    
-    ensures true
-    @ */
+    /*
+     * @ public normal_behavior
+     * 
+     * requires true
+     * 
+     * ensures true
+     * 
+     * @
+     */
     public static int euclidesRecursive(int a, int b) {
-        
-        if(b == 0) {
+
+        if (b == 0) {
             return a;
         }
         else {
-          return euclidesRecursive(b, a % b);  
+            return euclidesRecursive(b, a % b);
         }
     }
 }

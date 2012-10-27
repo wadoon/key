@@ -7,9 +7,9 @@ import java.util.List;
  * of fields in addition to the attributes defined by {@link IModelVariable}
  * 
  * @author christopher
- * 
  */
-interface IModelReferenceVariable extends IModelVariable {
+interface IModelReferenceVariable
+        extends IModelVariable {
 
     String getPackage();
 

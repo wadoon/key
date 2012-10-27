@@ -11,9 +11,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
-
-
-
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -37,60 +34,64 @@ import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContain
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * This class provides the basic functionality needed in order to construct 
- * test cases for KeYTestGen.
+ * This class provides the basic functionality needed in order to construct test
+ * cases for KeYTestGen.
  * 
  * @author Christopher Svanefalk
  */
-public class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
+public class KeYTestGenTest
+        extends AbstractSymbolicExecutionTestCase {
 
     /**
-     * Creates a {@link SymbolicExecutionEnvironment} which consists
-     * of loading a file to load, finding the method to proof, instantiation
-     * of proof and creation with configuration of {@link SymbolicExecutionTreeBuilder}.
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param containerTypeName The name of the type which contains the method.
-     * @param methodFullName The method name to search.
-     * @param precondition An optional precondition to use.
-     * @param mergeBranchConditions Merge branch conditions?
+     * Creates a {@link SymbolicExecutionEnvironment} which consists of loading
+     * a file to load, finding the method to proof, instantiation of proof and
+     * creation with configuration of {@link SymbolicExecutionTreeBuilder}.
+     * 
+     * @param baseDir
+     *            The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *            The path to the java file inside the base directory.
+     * @param containerTypeName
+     *            The name of the type which contains the method.
+     * @param methodFullName
+     *            The method name to search.
+     * @param precondition
+     *            An optional precondition to use.
+     * @param mergeBranchConditions
+     *            Merge branch conditions?
      * @return The created {@link SymbolicExecutionEnvironment}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *             Occurred Exception.
      * @author Martin Hentschel (mods by Christopher)
-     * @throws IOException 
+     * @throws IOException
      */
-     protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getPreparedEnvironment(
+    protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getPreparedEnvironment(
             File keyRepo,
             String rootFolder,
             String resourceFile,
             String method,
             String precondition,
-            boolean mergeBranchConditions) throws ProofInputException, IOException {
+            boolean mergeBranchConditions)
+            throws ProofInputException, IOException {
 
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = 
-                createSymbolicExecutionEnvironment(keyRepDirectory, 
-                        rootFolder, 
-                        resourceFile, 
-                        method,
-                        null, 
-                        false
-                        );
-        
+        SymbolicExecutionEnvironment<CustomConsoleUserInterface> env =
+                createSymbolicExecutionEnvironment(
+                        keyRepDirectory, rootFolder, resourceFile, method,
+                        null, false);
+
         assertNotNull(env);
 
         Proof proof = env.getProof();
 
-        ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = 
-                new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+        ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition =
+                new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
 
-        proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+        proof.getSettings().getStrategySettings()
+                .setCustomApplyStrategyStopCondition(stopCondition);
 
         env.getUi().startAndWaitForProof(proof);
 
         env.getBuilder().analyse();
-
-
 
         return env;
     }
@@ -101,19 +102,20 @@ public class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
      * @param nodeName
      * @return
      * @throws ProofInputException
-     * 
-     *  @author christopher
+     * @author christopher
      */
-    protected ArrayList<IExecutionNode> retrieveNode(IExecutionStartNode rootNode, String statement)
-            throws ProofInputException {
+    protected ArrayList<IExecutionNode> retrieveNode(
+            IExecutionStartNode rootNode,
+            String statement) throws ProofInputException {
 
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(rootNode);
+        ExecutionNodePreorderIterator iterator =
+                new ExecutionNodePreorderIterator(rootNode);
         ArrayList<IExecutionNode> nodes = new ArrayList<IExecutionNode>();
 
         while (iterator.hasNext()) {
             IExecutionNode next = iterator.next();
 
-            if(next.getName().trim().equalsIgnoreCase(statement + ";")) {
+            if (next.getName().trim().equalsIgnoreCase(statement + ";")) {
                 nodes.add(next);
             }
         }
@@ -121,117 +123,136 @@ public class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         return nodes;
     }
 
-    protected void printSymbolicExecutionTree(IExecutionStartNode root) throws ProofInputException {
+    protected void printSymbolicExecutionTree(IExecutionStartNode root)
+            throws ProofInputException {
 
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
+        ExecutionNodePreorderIterator iterator =
+                new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
             IExecutionNode next = iterator.next();
 
-            if (next instanceof IExecutionStateNode<?>){
-                IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>)next;
+            if (next instanceof IExecutionStateNode<?>) {
+                IExecutionStateNode<?> stateNode =
+                        (IExecutionStateNode<?>) next;
 
-                System.out.println(stateNode.getName());   
+                System.out.println(stateNode.getName());
             }
-        } 
+        }
     }
 
     protected void printModel(HashMap<String, ValueContainer> model) {
 
-        for(ValueContainer container : model.values()) {
+        for (ValueContainer container : model.values()) {
 
-            System.out.println("GENERATED MODEL:" + 
-                    "\nName: " + container.getName() + 
-                    "\nType: " + container.getType() + 
-                    "\nValue: " + container.getValue() +
-                    "\n");
+            System.out.println("GENERATED MODEL:" + "\nName: "
+                    + container.getName() + "\nType: " + container.getType()
+                    + "\nValue: " + container.getValue() + "\n");
         }
     }
 
-    protected void printSymbolicExecutionTreePathConditions(IExecutionStartNode root) throws ProofInputException {
+    protected void printSymbolicExecutionTreePathConditions(
+            IExecutionStartNode root) throws ProofInputException {
 
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
+        ExecutionNodePreorderIterator iterator =
+                new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
             IExecutionNode next = iterator.next();
 
-            if (next instanceof IExecutionStateNode<?>){
+            if (next instanceof IExecutionStateNode<?>) {
 
-                IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>)next;
-                System.out.println("Node " + stateNode.getName() + 
-                        "\nPath condition " + stateNode.getPathCondition() +
-                        "\nHuman readable: " + stateNode.getFormatedPathCondition().replaceAll("\n|\t", "") +
-                        "\n");   
+                IExecutionStateNode<?> stateNode =
+                        (IExecutionStateNode<?>) next;
+                System.out.println("Node "
+                        + stateNode.getName()
+                        + "\nPath condition "
+                        + stateNode.getPathCondition()
+                        + "\nHuman readable: "
+                        + stateNode.getFormatedPathCondition().replaceAll(
+                                "\n|\t", "") + "\n");
             }
         }
     }
 
-    protected void printSingleNode(IExecutionNode node) throws ProofInputException {
+    protected void printSingleNode(IExecutionNode node)
+            throws ProofInputException {
 
-        System.out.println("Node " + node.getName() + 
-                "\nPath condition " + node.getPathCondition() +
-                "\nHuman readable: " + node.getFormatedPathCondition().replaceAll("\n|\t", "") +
-                "\n");   
+        System.out.println("Node " + node.getName() + "\nPath condition "
+                + node.getPathCondition() + "\nHuman readable: "
+                + node.getFormatedPathCondition().replaceAll("\n|\t", "")
+                + "\n");
     }
 
-
-    protected static class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
+    protected static class SMTSettings
+            implements de.uka.ilkd.key.smt.SMTSettings {
 
         @Override
         public int getMaxConcurrentProcesses() {
+
             return 1;
         }
 
         @Override
         public int getMaxNumberOfGenerics() {
+
             return 2;
         }
 
         @Override
         public String getSMTTemporaryFolder() {
-            return   PathConfig.getKeyConfigDir()
-                    + File.separator + "smt_formula";
+
+            return PathConfig.getKeyConfigDir() + File.separator
+                    + "smt_formula";
         }
 
         @Override
         public Collection<Taclet> getTaclets() {
+
             return null;
         }
 
         @Override
         public long getTimeout() {
+
             return 5000;
         }
 
         @Override
         public boolean instantiateNullAssumption() {
+
             return true;
         }
 
         @Override
         public boolean makesUseOfTaclets() {
+
             return false;
         }
 
         @Override
         public boolean useExplicitTypeHierarchy() {
+
             return false;
         }
 
         @Override
         public boolean useBuiltInUniqueness() {
+
             return false;
         }
 
         @Override
         public boolean useAssumptionsForBigSmallIntegers() {
+
             return false;
         }
 
         @Override
         public boolean useUninterpretedMultiplicationIfNecessary() {
+
             return false;
         }
 
@@ -249,11 +270,13 @@ public class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
 
         @Override
         public String getLogic() {
+
             return "AUFLIA";
         }
 
         @Override
         public boolean checkForSupport() {
+
             return false;
 
         }

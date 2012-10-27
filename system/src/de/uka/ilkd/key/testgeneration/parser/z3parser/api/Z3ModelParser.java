@@ -10,16 +10,18 @@ import de.uka.ilkd.key.testgeneration.parser.z3parser.tree.bnf.Absyn.Mod;
 import de.uka.ilkd.key.testgeneration.parser.z3parser.tree.bnf.Absyn.Modl;
 
 public class Z3ModelParser {
-    
+
     public static HashMap<String, ValueContainer> parseModel(Mod model) {
-        
-        HashMap<String, ValueContainer> parsedModel = new HashMap<String, ValueContainer>();
+
+        HashMap<String, ValueContainer> parsedModel =
+                new HashMap<String, ValueContainer>();
         model.accept(Z3Visitor.getInstance(), parsedModel);
-        
+
         return parsedModel;
     }
-    
-    public static HashMap<String, ValueContainer> parseModel(String model) throws ParseException {
+
+    public static HashMap<String, ValueContainer> parseModel(String model)
+            throws ParseException {
 
         Yylex lexer = null;
         parser parser = null;
@@ -32,17 +34,17 @@ public class Z3ModelParser {
         try {
             modelTree = parser.pModel();
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
 
             throw new ParseException(e.getMessage(), -1);
-        } 
+        }
 
-        HashMap<String, ValueContainer> parsedModel = new HashMap<String, ValueContainer>();
+        HashMap<String, ValueContainer> parsedModel =
+                new HashMap<String, ValueContainer>();
         modelTree.accept(Z3Visitor.getInstance(), parsedModel);
 
         return parsedModel;
     }
-    
-    
 
 }

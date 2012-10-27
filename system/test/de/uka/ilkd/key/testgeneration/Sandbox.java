@@ -21,6 +21,7 @@ public class Sandbox {
 
     @Before
     public void setUp() throws Exception {
+
     }
 
     @Test
@@ -29,25 +30,25 @@ public class Sandbox {
         System.out.println(System.getProperty("key.rep"));
         System.out.println(System.getProperty("key.home"));
         System.out.println(System.getProperty("key.home") + "\n\n");
-        
-        for(Object prop : System.getProperties().keySet()){
-            System.out.println(prop + "\t" + System.getProperty((String)prop));
+
+        for (Object prop : System.getProperties().keySet()) {
+            System.out.println(prop + "\t" + System.getProperty((String) prop));
         }
-        
-        
-        for(String prop : System.getenv().keySet()){
+
+        for (String prop : System.getenv().keySet()) {
             System.out.println(prop + "\t" + System.getenv(prop));
         }
         DefaultTermParser termParser = new DefaultTermParser();
 
         String example = "public class TestClass { int x = 0; }";
 
-        ByteArrayInputStream stream = new ByteArrayInputStream(example.getBytes());
+        ByteArrayInputStream stream =
+                new ByteArrayInputStream(example.getBytes());
         KeYLexer lexer = new KeYLexer(stream);
         KeYParser parser = new KeYParser(lexer);
-        
+
         System.out.println(parser.javaSource());
-        
+
         System.out.println(parser.getAST().toStringTree());
     }
 

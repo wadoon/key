@@ -13,6 +13,7 @@ public class ModelVariable
             String type,
             Object value,
             ModelReferenceVariable parent) {
+
         super();
         this.name = name;
         this.type = type;
@@ -22,21 +23,25 @@ public class ModelVariable
 
     @Override
     public String getName() {
+
         return name;
     }
 
     @Override
     public String getType() {
+
         return type;
     }
 
     @Override
     public Object getValue() {
+
         return value;
     }
 
     @Override
     public IModelReferenceVariable getParent() {
+
         return parent;
     }
 }

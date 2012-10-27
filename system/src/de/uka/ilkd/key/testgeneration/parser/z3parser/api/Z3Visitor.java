@@ -31,11 +31,12 @@ public class Z3Visitor {
         return new ModelVisitor();
     }
 
-    private static class ModelVisitor implements
-            Mod.Visitor<Void, HashMap<String, ValueContainer>> {
+    private static class ModelVisitor
+            implements Mod.Visitor<Void, HashMap<String, ValueContainer>> {
 
         @Override
-        public Void visit(Mod model,
+        public Void visit(
+                Mod model,
                 HashMap<String, ValueContainer> valueContainers) {
 
             for (Fun fun : model.listfun_) {
@@ -55,8 +56,8 @@ public class Z3Visitor {
         }
     }
 
-    private static class FunVisitor implements
-            Fun.Visitor<Void, ValueContainer> {
+    private static class FunVisitor
+            implements Fun.Visitor<Void, ValueContainer> {
 
         @Override
         public Void visit(Function func, ValueContainer container) {
@@ -76,11 +77,12 @@ public class Z3Visitor {
         }
     }
 
-    private static class BlockVisitor implements
-            Block.Visitor<Void, ValueContainer> {
+    private static class BlockVisitor
+            implements Block.Visitor<Void, ValueContainer> {
 
         @Override
         public Void visit(Blck block, ValueContainer container) {
+
             /* Code For Block Goes Here */
 
             for (Exp exp : block.listexp_) {
@@ -92,8 +94,8 @@ public class Z3Visitor {
         }
     }
 
-    private static class ValVisitor implements
-            Val.Visitor<Void, ValueContainer> {
+    private static class ValVisitor
+            implements Val.Visitor<Void, ValueContainer> {
 
         public Void visit(EVal val, ValueContainer container) {
 
@@ -110,10 +112,11 @@ public class Z3Visitor {
         }
     }
 
-    private static class ExpVisitor implements
-            Exp.Visitor<Void, ValueContainer> {
+    private static class ExpVisitor
+            implements Exp.Visitor<Void, ValueContainer> {
 
         public Void visit(EInt integer, ValueContainer container) {
+
             /* Code For EInt Goes Here */
 
             container.setValue(integer.integer_);
@@ -142,8 +145,8 @@ public class Z3Visitor {
 
     }
 
-    private static class BoolVisitor implements
-            Bool.Visitor<Void, ValueContainer> {
+    private static class BoolVisitor
+            implements Bool.Visitor<Void, ValueContainer> {
 
         public Void visit(BTrue trueBool, ValueContainer container) {
 
@@ -161,7 +164,8 @@ public class Z3Visitor {
 
     }
 
-    private static class OpVisitor implements Op.Visitor<Character, Void> {
+    private static class OpVisitor
+            implements Op.Visitor<Character, Void> {
 
         public Character visit(SNeg sign, Void Nothing) {
 
@@ -174,8 +178,8 @@ public class Z3Visitor {
         }
     }
 
-    private static class TypeVisitor implements
-            Type.Visitor<Void, ValueContainer> {
+    private static class TypeVisitor
+            implements Type.Visitor<Void, ValueContainer> {
 
         public Void visit(TInt integerType, ValueContainer container) {
 
@@ -203,26 +207,32 @@ public class Z3Visitor {
         }
 
         public String getName() {
+
             return name;
         }
 
         public void setName(String name) {
+
             this.name = name;
         }
 
         public Type getType() {
+
             return type;
         }
 
         public void setType(Type type) {
+
             this.type = type;
         }
 
         public Object getValue() {
+
             return value;
         }
 
         public void setValue(Object value) {
+
             this.value = value;
         }
     }
