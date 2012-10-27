@@ -1,30 +1,14 @@
 package de.uka.ilkd.key.testgeneration;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
-import de.uka.ilkd.key.testgeneration.modelgeneration.IModelGenerator;
-import de.uka.ilkd.key.testgeneration.modelgeneration.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.modelgeneration.IModelGenerator.IModelContainer;
-import de.uka.ilkd.key.testgeneration.modelgeneration.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.defaultimplementation.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.model.IModel;
+import de.uka.ilkd.key.testgeneration.model.modelgeneration.IModelGenerator;
+import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.xml.ModelXMLWriter;
-import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 
 /**
  * The main API interface for the KeYTestGen2 test case generation system.
@@ -59,13 +43,13 @@ public class TestCaseGenerator {
         /*
          * Use the ModelGenerator in order to retrieve a model for the precondition
          */
-        HashMap<String, IModelContainer> model = modelGenerator.generateModel(targetNode);
+        IModel model = modelGenerator.generateModel(targetNode);
 
         /*
          * Use the XML writer in order to generate an XML representation for the entire
          * testcase
          */
-        return xmlWriter.generateXML( new ArrayList<IModelContainer>(model.values()) );
+        return xmlWriter.generateXML(model);
     }
 
     /**

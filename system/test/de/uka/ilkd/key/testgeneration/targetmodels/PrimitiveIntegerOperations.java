@@ -14,10 +14,138 @@ public class PrimitiveIntegerOperations {
      * Local variables to simulate extra-method dependencies during 
      * symbolic execution 
      */
-    public static int externalX;
-    public static int externalY;
-    public static int externalZ;
+    public static int staticX;
+    public static int staticY;
+    public static int staticZ;
     
+    public int instanceX;
+    public int instanceY;
+    public int instanceZ;
+    
+    /*
+     * Local refernce variables to simulate work with associated classes
+     */
+    public ClassProxy proxy = new ClassProxy();
+    
+    /* @
+    public normal_behavior
+
+    ensures (\result == x) || (\result == y) || (\result == z );
+
+    ensures ((\result <= y) && (\result <= z )) ||
+                  ((\result <= y) && (\result <= x )) ||
+                  ((\result <= x) && (\result <= z ));
+
+    ensures ((\result >= y) && (\result >= z )) ||
+                  ((\result >= y) && (\result >= x )) ||
+                  ((\result >= x) && (\result >= z ));
+    @ */
+    public static int nonStaticMid (int x , int y , int z ) {
+
+        int mid = z;
+
+        if(y <z ) {
+            if(x <y ) {
+                mid = y;
+            }
+            else if(x <z ) {
+
+                mid = x;
+            }
+        }
+        else{
+
+            if(x >y ) {
+
+                mid = y;
+            }
+            else if(x >z ) {
+
+                mid = x;
+            }
+        }
+        return mid ;
+    }
+    
+    /* @
+    public normal_behavior
+
+    ensures (\result == x) || (\result == y) || (\result == externalZ );
+
+    ensures ((\result <= y) && (\result <= externalZ )) ||
+                  ((\result <= y) && (\result <= x )) ||
+                  ((\result <= x) && (\result <= externalZ ));
+
+    ensures ((\result >= y) && (\result >= externalZ )) ||
+                  ((\result >= y) && (\result >= x )) ||
+                  ((\result >= x) && (\result >= externalZ ));
+    @ */
+    public int nonStaticMidOneExternal (int x , int y) {
+
+        int mid = instanceZ;
+
+        if(y <instanceZ ) {
+            if(x <y ) {
+                mid = y;
+            }
+            else if(x <instanceZ ) {
+
+                mid = x;
+            }
+        }
+        else{
+
+            if(x >y ) {
+
+                mid = y;
+            }
+            else if(x >instanceZ ) {
+
+                mid = x;
+            }
+        }
+        return mid ;
+    }
+    
+    /* @
+    public normal_behavior
+
+    ensures (\result == x) || (\result == y) || (\result == externalZ );
+
+    ensures ((\result <= y) && (\result <= externalZ )) ||
+                  ((\result <= y) && (\result <= x )) ||
+                  ((\result <= x) && (\result <= externalZ ));
+
+    ensures ((\result >= y) && (\result >= externalZ )) ||
+                  ((\result >= y) && (\result >= x )) ||
+                  ((\result >= x) && (\result >= externalZ ));
+    @ */
+    public int nonStaticMidOneExternalProxy (int x , int y) {
+
+        int mid = proxy.instanceInt;
+
+        if(y <proxy.instanceInt ) {
+            if(x <y ) {
+                mid = y;
+            }
+            else if(x <proxy.instanceInt ) {
+
+                mid = x;
+            }
+        }
+        else{
+
+            if(x >y ) {
+
+                mid = y;
+            }
+            else if(x >proxy.instanceInt ) {
+
+                mid = x;
+            }
+        }
+        return mid ;
+    }
     
     
     /* @
@@ -118,13 +246,13 @@ public class PrimitiveIntegerOperations {
     @ */
     public static int midOneExternal (int x , int y) {
 
-        int mid = externalZ;
+        int mid = staticZ;
 
-        if(y <externalZ ) {
+        if(y <staticZ ) {
             if(x <y ) {
                 mid = y;
             }
-            else if(x <externalZ ) {
+            else if(x <staticZ ) {
 
                 mid = x;
             }
@@ -135,7 +263,7 @@ public class PrimitiveIntegerOperations {
 
                 mid = y;
             }
-            else if(x >externalZ ) {
+            else if(x >staticZ ) {
 
                 mid = x;
             }
@@ -158,24 +286,24 @@ public class PrimitiveIntegerOperations {
     @ */
     public static int midTwoExternal (int x) {
 
-        int mid = externalZ;
+        int mid = staticZ;
 
-        if(externalY <externalZ ) {
-            if(x <externalY ) {
-                mid = externalY;
+        if(staticY <staticZ ) {
+            if(x <staticY ) {
+                mid = staticY;
             }
-            else if(x <externalZ ) {
+            else if(x <staticZ ) {
 
                 mid = x;
             }
         }
         else{
 
-            if(x >externalY ) {
+            if(x >staticY ) {
 
-                mid = externalY;
+                mid = staticY;
             }
-            else if(x >externalZ ) {
+            else if(x >staticZ ) {
 
                 mid = x;
             }
@@ -198,26 +326,26 @@ public class PrimitiveIntegerOperations {
     @ */
     public static int midThreeExternal () {
 
-        int mid = externalZ;
+        int mid = staticZ;
 
-        if(externalY <externalZ ) {
-            if(externalX <externalY ) {
-                mid = externalY;
+        if(staticY <staticZ ) {
+            if(staticX <staticY ) {
+                mid = staticY;
             }
-            else if(externalX <externalZ ) {
+            else if(staticX <staticZ ) {
 
-                mid = externalX;
+                mid = staticX;
             }
         }
         else{
 
-            if(externalX >externalY ) {
+            if(staticX >staticY ) {
 
-                mid = externalY;
+                mid = staticY;
             }
-            else if(externalX >externalZ ) {
+            else if(staticX >staticZ ) {
 
-                mid = externalX;
+                mid = staticX;
             }
         }
         return mid ;
@@ -253,6 +381,8 @@ public class PrimitiveIntegerOperations {
         else
             return 31+d;        
     }
+    
+    
     
     /**
      * Use Euclides algorithm to find the greatest common denominator of two integers.

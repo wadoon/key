@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.modelgeneration;
+package de.uka.ilkd.key.testgeneration.model.modelgeneration;
 
 public class ModelGeneratorException extends Exception {
 
