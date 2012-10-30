@@ -8,5 +8,6 @@ public class ClassProxy {
 
     public static int staticInt;
     public int instanceInt;
+    public ClassProxy nestedProxy;
 
 }

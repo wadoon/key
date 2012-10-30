@@ -55,13 +55,30 @@ public class Model
     }
 
     /**
-     * Add a variable to the Model
+     * Add a variable to the Model. A reference to the Model itself is returned
+     * in order for ease of use in recursive methods.
      * 
      * @param variable
      */
-    public void addVariable(IModelVariable variable) {
+    public IModel add(IModelVariable variable) {
 
         variables.add(variable);
+        return this;
+    }
+    
+    /**
+     * Merge with another Model
+     * @param model
+     * @return
+     */
+    public IModel addAll(IModel model) {
+        
+        for(IModelVariable variable : model.getVariables()) {
+            
+            variables.add(variable);
+        }
+        
+        return this;
     }
 
     private List<IModelVariable> getFilteredVariables(IModelFilter[] filters) {

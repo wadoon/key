@@ -6,13 +6,13 @@ public class ModelVariable
     private final String name;
     private final String type;
     private final Object value;
-    private final ModelReferenceVariable parent;
+    private final IModelVariable parent;
 
     public ModelVariable(
             String name,
             String type,
             Object value,
-            ModelReferenceVariable parent) {
+            IModelVariable parent) {
 
         super();
         this.name = name;
@@ -40,8 +40,14 @@ public class ModelVariable
     }
 
     @Override
-    public IModelReferenceVariable getParent() {
+    public IModelVariable getParent() {
 
         return parent;
+    }
+
+    @Override
+    public String toString() {
+
+        return parent.getName()+"."+name;
     }
 }

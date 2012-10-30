@@ -1,23 +1,18 @@
 package de.uka.ilkd.key.testgeneration;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.StringTokenizer;
-
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.parser.proofjava.ParseException;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.Taclet;
@@ -29,7 +24,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3ModelParser;
 import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContainer;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -39,7 +33,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christopher Svanefalk
  */
-public class KeYTestGenTest
+public abstract class KeYTestGenTest
         extends AbstractSymbolicExecutionTestCase {
 
     /**
@@ -97,12 +91,14 @@ public class KeYTestGenTest
     }
 
     /**
-     * Return all nodes in the execution tree where a given statement occurs.
+     * Retrieve all nodes corresponding to a given program statement.
      * 
-     * @param nodeName
+     * @param rootNode
+     *            starting node for the symbolic execution tree
+     * @param statement
+     *            the statement to search for
      * @return
      * @throws ProofInputException
-     * @author christopher
      */
     protected ArrayList<IExecutionNode> retrieveNode(
             IExecutionStartNode rootNode,
@@ -184,6 +180,72 @@ public class KeYTestGenTest
                 + node.getPathCondition() + "\nHuman readable: "
                 + node.getFormatedPathCondition().replaceAll("\n|\t", "")
                 + "\n");
+    }
+
+    protected void printVars(Term term) {
+
+        if (term.op() instanceof LocationVariable)
+            System.out.println(term);
+
+        for (int i = 0; i < term.arity(); i++) {
+            printVars(term.sub(i));
+        }
+
+    }
+
+    protected void printTermAST(Term term) {
+
+        System.out.println("\nTerm: " + term + "\nhas runtime class: "
+                + term.getClass() + "\nand sort: " + term.sort().declarationString()
+                + "\n\twith runtime type: " + term.sort().getClass()
+                + "\nand op: " + term.op() + "\n\twith runtime type: "
+                + term.op().getClass() + "\n");
+
+        for (int i = 0; i < term.arity(); i++) {
+
+            for (QuantifiableVariable variable : term.varsBoundHere(i)) {
+                System.out.println(term + " has bound variable: " + variable);
+            }
+        }
+
+        for (int i = 0; i < term.arity(); i++) {
+            System.out.println("Printing child " + i + " of current node");
+            printTermAST(term.sub(i));
+        }
+    }
+
+    protected void printNamespaceProgramVariables(
+            SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
+
+        int i = 0;
+        Namespace namespace = environment.getInitConfig().progVarNS();
+        
+        while (namespace != null) {
+            
+            System.out.println("**Namespace level: " + i + "**");
+            for (Named named : namespace.elements()) {
+                System.out.println(named);
+            }
+            
+            namespace = namespace.parent();
+        }
+    }
+
+    protected void printNamespaceVariables(
+            SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
+
+        int i = 0;
+        Namespace namespace = environment.getInitConfig().varNS();
+        
+        while (namespace != null) {
+            
+            System.out.println("**Namespace level: " + i + "**");
+            for (Named named : namespace.elements()) {
+                System.out.println(named);
+            }
+            
+            namespace = namespace.parent();
+        }
     }
 
     protected static class SMTSettings

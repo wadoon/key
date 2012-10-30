@@ -27,6 +27,86 @@ public class PrimitiveIntegerOperations {
      */
     public ClassProxy proxy = new ClassProxy();
 
+    public int maxProxyStatic(int x) {
+
+        if (x >= ClassProxy.staticInt) {
+            return x;
+        }
+        else {
+            return ClassProxy.staticInt;
+        }
+    }
+    
+    public int maxProxyInstance(int x) {
+
+        if (x >= proxy.nestedProxy.instanceInt) {
+            return x;
+        }
+        else {
+            return proxy.nestedProxy.instanceInt;
+        }
+    }
+
+    public int maxOvershadowInstance(int a, int instanceY) {
+
+        if (a >= instanceY) {
+            return a;
+        }
+        else {
+            return instanceY;
+        }
+    }
+
+    public int max(int add, int b) {
+
+        if (add >= b) {
+            return add;
+        }
+        else {
+            return b;
+        }
+    }
+
+    public int maxInstance(int x) {
+
+        if (x >= instanceY) {
+            return x;
+        }
+        else {
+            return staticY;
+        }
+    }
+
+    public int maxStatic(int x) {
+
+        if (x >= staticY) {
+            return x;
+        }
+        else {
+            return staticY;
+        }
+    }
+
+    public int nested(int a, int b) {
+
+        int i = 0;
+
+        if (a >= b) {
+            int c = b;
+            int d = a;
+            if (a > c) {
+                if (a > d) {
+                    return a;
+                }
+            }
+        }
+        else {
+            return b;
+        }
+
+        return i;
+    }
+
     /*
      * @ public normal_behavior
      * 

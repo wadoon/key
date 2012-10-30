@@ -7,12 +7,12 @@ package de.uka.ilkd.key.testgeneration.defaultimplementation;
  * @author christopher
  */
 public interface IModelVariable {
-
+    
     String getName();
 
     String getType();
 
     Object getValue();
 
-    IModelReferenceVariable getParent();
+    IModelVariable getParent();
 }
