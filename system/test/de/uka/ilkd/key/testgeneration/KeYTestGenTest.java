@@ -199,7 +199,7 @@ public abstract class KeYTestGenTest
                 + term.getClass() + "\nand sort: " + term.sort().declarationString()
                 + "\n\twith runtime type: " + term.sort().getClass()
                 + "\nand op: " + term.op() + "\n\twith runtime type: "
-                + term.op().getClass() + "\n");
+                + term.op().getClass() + "\n" + "Number of subs: " + term.arity() + "\n");
 
         for (int i = 0; i < term.arity(); i++) {
 

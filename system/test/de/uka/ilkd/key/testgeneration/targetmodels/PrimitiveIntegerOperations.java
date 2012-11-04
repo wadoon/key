@@ -39,7 +39,7 @@ public class PrimitiveIntegerOperations {
     
     public int maxProxyInstance(int x) {
 
-        if (x >= proxy.nestedProxy.instanceInt) {
+        if (x > proxy.nestedProxy.instanceInt) {
             return x;
         }
         else {
@@ -57,10 +57,10 @@ public class PrimitiveIntegerOperations {
         }
     }
 
-    public int max(int add, int b) {
+    public int max(int a, int b) {
 
-        if (add >= b) {
-            return add;
+        if (a >= b) {
+            return a;
         }
         else {
             return b;

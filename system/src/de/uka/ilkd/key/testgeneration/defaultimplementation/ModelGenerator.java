@@ -144,6 +144,9 @@ public class ModelGenerator
             stringBuilder.append(substring);
         }
 
+        /*
+         * Extract the heap state interpretation using the Z3 parser.
+         */
         HashMap<String, ValueContainer> rawModel =
                 Z3ModelParser.parseModel(stringBuilder.toString());
 
@@ -153,7 +156,7 @@ public class ModelGenerator
                     new ModelVariable(container.getName(), container.getType()
                             .toString(), container.getValue(), null);
 
-            finalModel.addVariable(modelVariable);
+            finalModel.add(modelVariable);
         }
 
         return finalModel;

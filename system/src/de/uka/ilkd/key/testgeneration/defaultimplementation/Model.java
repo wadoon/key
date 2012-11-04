@@ -51,7 +51,7 @@ public class Model
 
             variableMapping.put(variable.getName(), variable);
         }
-        return null;
+        return variableMapping;
     }
 
     /**

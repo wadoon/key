@@ -269,6 +269,9 @@ public class TestModelGenerationIntegers
             int z = (Integer) variableMapping.get("z").getValue();
             int result = PrimitiveIntegerOperations.mid(x, y, z);
 
+            System.out.println("Satisfiable assignment: x=" + x + " y=" + y
+                    + " z=" + z);
+
             assertTrue(result == (Integer) variableMapping.get(variable)
                     .getValue());
         }
