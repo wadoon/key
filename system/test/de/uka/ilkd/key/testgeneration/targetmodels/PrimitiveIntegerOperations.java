@@ -36,7 +36,7 @@ public class PrimitiveIntegerOperations {
             return ClassProxy.staticInt;
         }
     }
-    
+
     public int maxProxyInstance(int x) {
 
         if (x > proxy.nestedProxy.instanceInt) {
@@ -47,24 +47,18 @@ public class PrimitiveIntegerOperations {
         }
     }
 
-    public int maxOvershadowInstance(int a, int instanceY) {
-
-        if (a >= instanceY) {
-            return a;
-        }
-        else {
-            return instanceY;
-        }
-    }
-
     public int max(int a, int b) {
 
+        int max = 0;
+
         if (a >= b) {
-            return a;
+            max = a;
         }
         else {
-            return b;
+            max = a;
         }
+
+        return max;
     }
 
     public int maxInstance(int x) {
@@ -85,146 +79,6 @@ public class PrimitiveIntegerOperations {
         else {
             return staticY;
         }
-    }
-
-    public int nested(int a, int b) {
-
-        int i = 0;
-
-        if (a >= b) {
-            int c = b;
-            int d = a;
-            if (a > c) {
-                if (a > d) {
-                    return a;
-                }
-            }
-        }
-        else {
-            return b;
-        }
-
-        return i;
-    }
-
-    /*
-     * @ public normal_behavior
-     * 
-     * ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
-    public static int nonStaticMid(int x, int y, int z) {
-
-        int mid = z;
-
-        if (y < z) {
-            if (x < y) {
-                mid = y;
-            }
-            else if (x < z) {
-
-                mid = x;
-            }
-        }
-        else {
-
-            if (x > y) {
-
-                mid = y;
-            }
-            else if (x > z) {
-
-                mid = x;
-            }
-        }
-        return mid;
-    }
-
-    /*
-     * @ public normal_behavior
-     * 
-     * ensures (\result == x) || (\result == y) || (\result == externalZ );
-     * 
-     * ensures ((\result <= y) && (\result <= externalZ )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= externalZ ));
-     * 
-     * ensures ((\result >= y) && (\result >= externalZ )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= externalZ ));
-     * 
-     * @
-     */
-    public int nonStaticMidOneExternal(int x, int y) {
-
-        int mid = instanceZ;
-
-        if (y < instanceZ) {
-            if (x < y) {
-                mid = y;
-            }
-            else if (x < instanceZ) {
-
-                mid = x;
-            }
-        }
-        else {
-
-            if (x > y) {
-
-                mid = y;
-            }
-            else if (x > instanceZ) {
-
-                mid = x;
-            }
-        }
-        return mid;
-    }
-
-    /*
-     * @ public normal_behavior
-     * 
-     * ensures (\result == x) || (\result == y) || (\result == externalZ );
-     * 
-     * ensures ((\result <= y) && (\result <= externalZ )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= externalZ ));
-     * 
-     * ensures ((\result >= y) && (\result >= externalZ )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= externalZ ));
-     * 
-     * @
-     */
-    public int nonStaticMidOneExternalProxy(int x, int y) {
-
-        int mid = proxy.instanceInt;
-
-        if (y < proxy.instanceInt) {
-            if (x < y) {
-                mid = y;
-            }
-            else if (x < proxy.instanceInt) {
-
-                mid = x;
-            }
-        }
-        else {
-
-            if (x > y) {
-
-                mid = y;
-            }
-            else if (x > proxy.instanceInt) {
-
-                mid = x;
-            }
-        }
-        return mid;
     }
 
     /*
@@ -267,103 +121,8 @@ public class PrimitiveIntegerOperations {
         return mid;
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
-    public static int midExperimental(int x, int y) {
 
-        int zInt = 0;
-        int mid = zInt;
-
-        if (y < zInt) {
-            int k = x;
-            if (k < y) {
-
-                mid = y;
-            }
-            else if (x < zInt) {
-
-                mid = x;
-            }
-        }
-        else {
-
-            if (x > y) {
-
-                mid = y;
-            }
-            else if (x > zInt) {
-
-                mid = x;
-            }
-        }
-        return mid;
-    }
-
-    /*
-     * @ public normal_behavior
-     * 
-     * ensures (\result == x) || (\result == y) || (\result == externalZ );
-     * 
-     * ensures ((\result <= y) && (\result <= externalZ )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= externalZ ));
-     * 
-     * ensures ((\result >= y) && (\result >= externalZ )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= externalZ ));
-     * 
-     * @
-     */
-    public static int midOneExternal(int x, int y) {
-
-        int mid = staticZ;
-
-        if (y < staticZ) {
-            if (x < y) {
-                mid = y;
-            }
-            else if (x < staticZ) {
-
-                mid = x;
-            }
-        }
-        else {
-
-            if (x > y) {
-
-                mid = y;
-            }
-            else if (x > staticZ) {
-
-                mid = x;
-            }
-        }
-        return mid;
-    }
-
-    /*
-     * @ public normal_behavior
-     * 
-     * ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
-    public static int midTwoExternal(int x) {
+    public static int midTwoStatic(int x) {
 
         int mid = staticZ;
 
@@ -389,42 +148,56 @@ public class PrimitiveIntegerOperations {
         }
         return mid;
     }
+    
+    public int midTwoInstance(int x) {
 
-    /*
-     * @ public normal_behavior
-     * 
-     * ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
-    public static int midThreeExternal() {
+        int mid = instanceZ;
 
-        int mid = staticZ;
-
-        if (staticY < staticZ) {
-            if (staticX < staticY) {
-                mid = staticY;
+        if (instanceY < instanceZ) {
+            if (x < instanceY) {
+                mid = instanceY;
             }
-            else if (staticX < staticZ) {
+            else if (x < instanceZ) {
 
-                mid = staticX;
+                mid = x;
             }
         }
         else {
 
-            if (staticX > staticY) {
+            if (x > instanceY) {
 
-                mid = staticY;
+                mid =instanceY;
             }
-            else if (staticX > staticZ) {
+            else if (x > instanceZ) {
 
-                mid = staticX;
+                mid = x;
+            }
+        }
+        return mid;
+    }
+
+    public int midOneProxyOneInstance(int x) {
+
+        int mid = x;
+
+        if (proxy.instanceInt < instanceZ) {
+            if (x < proxy.instanceInt) {
+                mid = proxy.instanceInt;
+            }
+            else if (x < instanceZ) {
+
+                mid = x;
+            }
+        }
+        else {
+
+            if (x > proxy.instanceInt) {
+
+                mid = proxy.instanceInt;
+            }
+            else if (x > instanceZ) {
+
+                mid = x;
             }
         }
         return mid;
@@ -488,5 +261,131 @@ public class PrimitiveIntegerOperations {
         else {
             return euclidesRecursive(b, a % b);
         }
+    }
+    
+
+    /**
+     * @return the staticX
+     */
+    public static final int getStaticX() {
+    
+        return staticX;
+    }
+
+    
+    /**
+     * @param staticX the staticX to set
+     */
+    public static final void setStaticX(int staticX) {
+    
+        PrimitiveIntegerOperations.staticX = staticX;
+    }
+
+    
+    /**
+     * @return the staticY
+     */
+    public static final int getStaticY() {
+    
+        return staticY;
+    }
+
+    
+    /**
+     * @param staticY the staticY to set
+     */
+    public static final void setStaticY(int staticY) {
+    
+        PrimitiveIntegerOperations.staticY = staticY;
+    }
+
+    
+    /**
+     * @return the staticZ
+     */
+    public static final int getStaticZ() {
+    
+        return staticZ;
+    }
+
+    
+    /**
+     * @param staticZ the staticZ to set
+     */
+    public static final void setStaticZ(int staticZ) {
+    
+        PrimitiveIntegerOperations.staticZ = staticZ;
+    }
+
+    
+    /**
+     * @return the instanceX
+     */
+    public final int getInstanceX() {
+    
+        return instanceX;
+    }
+
+    
+    /**
+     * @param instanceX the instanceX to set
+     */
+    public final void setInstanceX(int instanceX) {
+    
+        this.instanceX = instanceX;
+    }
+
+    
+    /**
+     * @return the instanceY
+     */
+    public final int getInstanceY() {
+    
+        return instanceY;
+    }
+
+    
+    /**
+     * @param instanceY the instanceY to set
+     */
+    public final void setInstanceY(int instanceY) {
+    
+        this.instanceY = instanceY;
+    }
+
+    
+    /**
+     * @return the instanceZ
+     */
+    public final int getInstanceZ() {
+    
+        return instanceZ;
+    }
+
+    
+    /**
+     * @param instanceZ the instanceZ to set
+     */
+    public final void setInstanceZ(int instanceZ) {
+    
+        this.instanceZ = instanceZ;
+    }
+
+    
+    /**
+     * @return the proxy
+     */
+    public final ClassProxy getProxy() {
+    
+        return proxy;
+    }
+
+    
+    /**
+     * @param proxy the proxy to set
+     */
+    public final void setProxy(ClassProxy proxy) {
+    
+        this.proxy = proxy;
     }
 }

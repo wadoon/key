@@ -110,7 +110,6 @@ public abstract class KeYTestGenTest
 
         while (iterator.hasNext()) {
             IExecutionNode next = iterator.next();
-
             if (next.getName().trim().equalsIgnoreCase(statement + ";")) {
                 nodes.add(next);
             }

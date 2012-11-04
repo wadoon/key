@@ -15,7 +15,8 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
 public class Model
         implements IModel {
 
-    private final LinkedList<IModelVariable> variables = new LinkedList<>();
+    private final LinkedList<IModelVariable> variables =
+            new LinkedList<IModelVariable>();
 
     /**
      * Return a filtered subset of variables in this model. Filters can be left
@@ -45,7 +46,8 @@ public class Model
 
         List<IModelVariable> filteredVariables = getFilteredVariables(filters);
 
-        HashMap<String, IModelVariable> variableMapping = new HashMap<>();
+        HashMap<String, IModelVariable> variableMapping =
+                new HashMap<String, IModelVariable>();
 
         for (IModelVariable variable : filteredVariables) {
 
@@ -65,19 +67,20 @@ public class Model
         variables.add(variable);
         return this;
     }
-    
+
     /**
      * Merge with another Model
+     * 
      * @param model
      * @return
      */
     public IModel addAll(IModel model) {
-        
-        for(IModelVariable variable : model.getVariables()) {
-            
+
+        for (IModelVariable variable : model.getVariables()) {
+
             variables.add(variable);
         }
-        
+
         return this;
     }
 

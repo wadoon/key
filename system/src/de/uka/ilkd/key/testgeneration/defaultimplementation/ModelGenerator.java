@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.conditionparsing.ConditionParser;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
@@ -52,6 +54,11 @@ public class ModelGenerator
      * although it is possible for the user to use custom settings.
      */
     private final SMTSettings settings;
+
+    /**
+     * ConditionParser for the purpose of simplifying path conditions.
+     */
+    private final ConditionParser conditionParser = new ConditionParser();
 
     /**
      * Backend constructor for the factory methods
@@ -139,16 +146,12 @@ public class ModelGenerator
 
         Model finalModel = new Model();
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String substring : result.getOutput()) {
-            stringBuilder.append(substring);
-        }
-
         /*
          * Extract the heap state interpretation using the Z3 parser.
          */
+        String modelOutput = consolidateModelOutput(result.getOutput());
         HashMap<String, ValueContainer> rawModel =
-                Z3ModelParser.parseModel(stringBuilder.toString());
+                Z3ModelParser.parseModel(modelOutput);
 
         for (ValueContainer container : rawModel.values()) {
 
@@ -175,13 +178,19 @@ public class ModelGenerator
             final IExecutionNode targetNode) throws ModelGeneratorException {
 
         try {
+
+            /*
+             * Simplify the path condition
+             */
+            Term newCondition =
+                    conditionParser.simplifyTerm(targetNode.getPathCondition());
+
             /*
              * The path condition has to be negated, in order to undo the
              * negations that will be carried out by the SMT interface.
              */
-            Term newCondition =
-                    TermFactory.DEFAULT.createTerm(
-                            Junctor.NOT, targetNode.getPathCondition());
+            newCondition =
+                    TermFactory.DEFAULT.createTerm(Junctor.NOT, newCondition);
 
             return new SMTProblem(newCondition);
 
@@ -280,12 +289,21 @@ public class ModelGenerator
 
         try {
             return createModel(result);
-
         }
         catch (ParseException e) {
-
-            throw new ModelGeneratorException(e.getMessage());
+            throw new ModelGeneratorException(e.getMessage()
+                    + "\nThe defunct model is:\n"
+                    + consolidateModelOutput(result.getOutput()));
         }
+    }
+
+    private String consolidateModelOutput(List<String> output) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String substring : output) {
+            stringBuilder.append(substring);
+        }
+        return stringBuilder.toString();
     }
 
     private static class SMTSettings
