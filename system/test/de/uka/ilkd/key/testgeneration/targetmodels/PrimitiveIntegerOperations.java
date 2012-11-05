@@ -1,18 +1,16 @@
 package de.uka.ilkd.key.testgeneration.targetmodels;
 
 /**
- * This class provides various methods which use primitive integer operations,
- * coupled with control statements of gradually increasing complexity. The
- * methods will excercise all available integer operations, in all feasible
- * combinations.
+ * This class provides various methods which use primitive integer operations, coupled with control
+ * statements of gradually increasing complexity. The methods will excercise all available integer
+ * operations, in all feasible combinations.
  * 
  * @author christopher
  */
 public class PrimitiveIntegerOperations {
 
     /*
-     * Local variables to simulate extra-method dependencies during symbolic
-     * execution
+     * Local variables to simulate extra-method dependencies during symbolic execution
      */
     public static int staticX;
     public static int staticY;
@@ -86,11 +84,11 @@ public class PrimitiveIntegerOperations {
      * 
      * ensures (\result == x) || (\result == y) || (\result == z );
      * 
-     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) && (\result <= x )) ||
+     * ((\result <= x) && (\result <= z ));
      * 
-     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) && (\result >= x )) ||
+     * ((\result >= x) && (\result >= z ));
      * 
      * @
      */
@@ -121,7 +119,6 @@ public class PrimitiveIntegerOperations {
         return mid;
     }
 
-
     public static int midTwoStatic(int x) {
 
         int mid = staticZ;
@@ -148,7 +145,7 @@ public class PrimitiveIntegerOperations {
         }
         return mid;
     }
-    
+
     public int midTwoInstance(int x) {
 
         int mid = instanceZ;
@@ -166,9 +163,36 @@ public class PrimitiveIntegerOperations {
 
             if (x > instanceY) {
 
-                mid =instanceY;
+                mid = instanceY;
             }
             else if (x > instanceZ) {
+
+                mid = x;
+            }
+        }
+        return mid;
+    }
+
+    public int midTwoProxy(int x) {
+
+        int mid = proxy.nestedProxy.instanceInt;
+
+        if (proxy.instanceInt < proxy.nestedProxy.instanceInt) {
+            if (x < proxy.instanceInt) {
+                mid = proxy.instanceInt;
+            }
+            else if (x < proxy.nestedProxy.instanceInt) {
+
+                mid = x;
+            }
+        }
+        else {
+
+            if (x > proxy.instanceInt) {
+
+                mid = proxy.instanceInt;
+            }
+            else if (x > proxy.nestedProxy.instanceInt) {
 
                 mid = x;
             }
@@ -237,8 +261,7 @@ public class PrimitiveIntegerOperations {
     }
 
     /**
-     * Use Euclides algorithm to find the greatest common denominator of two
-     * integers.
+     * Use Euclides algorithm to find the greatest common denominator of two integers.
      * 
      * @param a
      * @param b
@@ -262,130 +285,123 @@ public class PrimitiveIntegerOperations {
             return euclidesRecursive(b, a % b);
         }
     }
-    
 
     /**
      * @return the staticX
      */
     public static final int getStaticX() {
-    
+
         return staticX;
     }
 
-    
     /**
-     * @param staticX the staticX to set
+     * @param staticX
+     *            the staticX to set
      */
     public static final void setStaticX(int staticX) {
-    
+
         PrimitiveIntegerOperations.staticX = staticX;
     }
 
-    
     /**
      * @return the staticY
      */
     public static final int getStaticY() {
-    
+
         return staticY;
     }
 
-    
     /**
-     * @param staticY the staticY to set
+     * @param staticY
+     *            the staticY to set
      */
     public static final void setStaticY(int staticY) {
-    
+
         PrimitiveIntegerOperations.staticY = staticY;
     }
 
-    
     /**
      * @return the staticZ
      */
     public static final int getStaticZ() {
-    
+
         return staticZ;
     }
 
-    
     /**
-     * @param staticZ the staticZ to set
+     * @param staticZ
+     *            the staticZ to set
      */
     public static final void setStaticZ(int staticZ) {
-    
+
         PrimitiveIntegerOperations.staticZ = staticZ;
     }
 
-    
     /**
      * @return the instanceX
      */
     public final int getInstanceX() {
-    
+
         return instanceX;
     }
 
-    
     /**
-     * @param instanceX the instanceX to set
+     * @param instanceX
+     *            the instanceX to set
      */
     public final void setInstanceX(int instanceX) {
-    
+
         this.instanceX = instanceX;
     }
 
-    
     /**
      * @return the instanceY
      */
     public final int getInstanceY() {
-    
+
         return instanceY;
     }
 
-    
     /**
-     * @param instanceY the instanceY to set
+     * @param instanceY
+     *            the instanceY to set
      */
     public final void setInstanceY(int instanceY) {
-    
+
         this.instanceY = instanceY;
     }
 
-    
     /**
      * @return the instanceZ
      */
     public final int getInstanceZ() {
-    
+
         return instanceZ;
     }
 
-    
     /**
-     * @param instanceZ the instanceZ to set
+     * @param instanceZ
+     *            the instanceZ to set
      */
     public final void setInstanceZ(int instanceZ) {
-    
+
         this.instanceZ = instanceZ;
     }
 
-    
     /**
      * @return the proxy
      */
     public final ClassProxy getProxy() {
-    
+
         return proxy;
     }
 
-    
     /**
-     * @param proxy the proxy to set
+     * @param proxy
+     *            the proxy to set
      */
     public final void setProxy(ClassProxy proxy) {
-    
+
         this.proxy = proxy;
     }
 }

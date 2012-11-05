@@ -28,8 +28,8 @@ import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContain
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * This class provides the basic functionality needed in order to construct test
- * cases for KeYTestGen.
+ * This class provides the basic functionality needed in order to construct test cases for
+ * KeYTestGen.
  * 
  * @author Christopher Svanefalk
  */
@@ -37,9 +37,9 @@ public abstract class KeYTestGenTest
         extends AbstractSymbolicExecutionTestCase {
 
     /**
-     * Creates a {@link SymbolicExecutionEnvironment} which consists of loading
-     * a file to load, finding the method to proof, instantiation of proof and
-     * creation with configuration of {@link SymbolicExecutionTreeBuilder}.
+     * Creates a {@link SymbolicExecutionEnvironment} which consists of loading a file to load,
+     * finding the method to proof, instantiation of proof and creation with configuration of
+     * {@link SymbolicExecutionTreeBuilder}.
      * 
      * @param baseDir
      *            The base directory which contains test and oracle file.
@@ -65,13 +65,11 @@ public abstract class KeYTestGenTest
             String resourceFile,
             String method,
             String precondition,
-            boolean mergeBranchConditions)
-            throws ProofInputException, IOException {
+            boolean mergeBranchConditions) throws ProofInputException, IOException {
 
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env =
-                createSymbolicExecutionEnvironment(
-                        keyRepDirectory, rootFolder, resourceFile, method,
-                        null, false);
+                createSymbolicExecutionEnvironment(keyRepDirectory, rootFolder, resourceFile,
+                        method, null, false);
 
         assertNotNull(env);
 
@@ -80,8 +78,7 @@ public abstract class KeYTestGenTest
         ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition =
                 new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
 
-        proof.getSettings().getStrategySettings()
-                .setCustomApplyStrategyStopCondition(stopCondition);
+        proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
 
         env.getUi().startAndWaitForProof(proof);
 
@@ -100,12 +97,11 @@ public abstract class KeYTestGenTest
      * @return
      * @throws ProofInputException
      */
-    protected ArrayList<IExecutionNode> retrieveNode(
-            IExecutionStartNode rootNode,
-            String statement) throws ProofInputException {
+    protected ArrayList<IExecutionNode> retrieveNode(IExecutionStartNode rootNode, String statement)
+            throws ProofInputException {
 
-        ExecutionNodePreorderIterator iterator =
-                new ExecutionNodePreorderIterator(rootNode);
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(rootNode);
+
         ArrayList<IExecutionNode> nodes = new ArrayList<IExecutionNode>();
 
         while (iterator.hasNext()) {
@@ -118,19 +114,16 @@ public abstract class KeYTestGenTest
         return nodes;
     }
 
-    protected void printSymbolicExecutionTree(IExecutionStartNode root)
-            throws ProofInputException {
+    protected void printSymbolicExecutionTree(IExecutionStartNode root) throws ProofInputException {
 
-        ExecutionNodePreorderIterator iterator =
-                new ExecutionNodePreorderIterator(root);
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
             IExecutionNode next = iterator.next();
 
             if (next instanceof IExecutionStateNode<?>) {
-                IExecutionStateNode<?> stateNode =
-                        (IExecutionStateNode<?>) next;
+                IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>) next;
 
                 System.out.println(stateNode.getName());
             }
@@ -141,17 +134,15 @@ public abstract class KeYTestGenTest
 
         for (ValueContainer container : model.values()) {
 
-            System.out.println("GENERATED MODEL:" + "\nName: "
-                    + container.getName() + "\nType: " + container.getType()
-                    + "\nValue: " + container.getValue() + "\n");
+            System.out.println("GENERATED MODEL:" + "\nName: " + container.getName() + "\nType: "
+                    + container.getType() + "\nValue: " + container.getValue() + "\n");
         }
     }
 
-    protected void printSymbolicExecutionTreePathConditions(
-            IExecutionStartNode root) throws ProofInputException {
+    protected void printSymbolicExecutionTreePathConditions(IExecutionStartNode root)
+            throws ProofInputException {
 
-        ExecutionNodePreorderIterator iterator =
-                new ExecutionNodePreorderIterator(root);
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
@@ -159,25 +150,18 @@ public abstract class KeYTestGenTest
 
             if (next instanceof IExecutionStateNode<?>) {
 
-                IExecutionStateNode<?> stateNode =
-                        (IExecutionStateNode<?>) next;
-                System.out.println("Node "
-                        + stateNode.getName()
-                        + "\nPath condition "
-                        + stateNode.getPathCondition()
-                        + "\nHuman readable: "
-                        + stateNode.getFormatedPathCondition().replaceAll(
-                                "\n|\t", "") + "\n");
+                IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>) next;
+                System.out.println("Node " + stateNode.getName() + "\nPath condition "
+                        + stateNode.getPathCondition() + "\nHuman readable: "
+                        + stateNode.getFormatedPathCondition().replaceAll("\n|\t", "") + "\n");
             }
         }
     }
 
-    protected void printSingleNode(IExecutionNode node)
-            throws ProofInputException {
+    protected void printSingleNode(IExecutionNode node) throws ProofInputException {
 
-        System.out.println("Node " + node.getName() + "\nPath condition "
-                + node.getPathCondition() + "\nHuman readable: "
-                + node.getFormatedPathCondition().replaceAll("\n|\t", "")
+        System.out.println("Node " + node.getName() + "\nPath condition " + node.getPathCondition()
+                + "\nHuman readable: " + node.getFormatedPathCondition().replaceAll("\n|\t", "")
                 + "\n");
     }
 
@@ -194,10 +178,9 @@ public abstract class KeYTestGenTest
 
     protected void printTermAST(Term term) {
 
-        System.out.println("\nTerm: " + term + "\nhas runtime class: "
-                + term.getClass() + "\nand sort: " + term.sort().declarationString()
-                + "\n\twith runtime type: " + term.sort().getClass()
-                + "\nand op: " + term.op() + "\n\twith runtime type: "
+        System.out.println("\nTerm: " + term + "\nhas runtime class: " + term.getClass()
+                + "\nand sort: " + term.sort().declarationString() + "\n\twith runtime type: "
+                + term.sort().getClass() + "\nand op: " + term.op() + "\n\twith runtime type: "
                 + term.op().getClass() + "\n" + "Number of subs: " + term.arity() + "\n");
 
         for (int i = 0; i < term.arity(); i++) {
@@ -218,14 +201,14 @@ public abstract class KeYTestGenTest
 
         int i = 0;
         Namespace namespace = environment.getInitConfig().progVarNS();
-        
+
         while (namespace != null) {
-            
+
             System.out.println("**Namespace level: " + i + "**");
             for (Named named : namespace.elements()) {
                 System.out.println(named);
             }
-            
+
             namespace = namespace.parent();
         }
     }
@@ -235,14 +218,14 @@ public abstract class KeYTestGenTest
 
         int i = 0;
         Namespace namespace = environment.getInitConfig().varNS();
-        
+
         while (namespace != null) {
-            
+
             System.out.println("**Namespace level: " + i + "**");
             for (Named named : namespace.elements()) {
                 System.out.println(named);
             }
-            
+
             namespace = namespace.parent();
         }
     }
@@ -265,8 +248,7 @@ public abstract class KeYTestGenTest
         @Override
         public String getSMTTemporaryFolder() {
 
-            return PathConfig.getKeyConfigDir() + File.separator
-                    + "smt_formula";
+            return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
         }
 
         @Override

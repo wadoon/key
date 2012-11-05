@@ -37,6 +37,25 @@ public class TestModelGenerationIntegers
     private final String containerTypeName = "PrimitiveIntegerOperations";
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment;
 
+    /**
+     * Test model instantiation for the standard mid method.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMid() throws Exception {
+
+        setup("mid");
+        testMid("x");
+        testMid("y");
+        testMid("z");
+    }
+
+    /**
+     * Tests the mid method using two instance variables of its encasing class.
+     * 
+     * @throws Exception
+     */
     @Test
     public void testMidTwoInstancel() throws Exception {
 
@@ -44,6 +63,20 @@ public class TestModelGenerationIntegers
         testMidTwoInstance("x");
         testMidTwoInstance("instanceY");
         testMidTwoInstance("instanceZ");
+    }
+
+    /**
+     * Test the mid method using two nested fields in other classes.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMidTwoProxy() throws Exception {
+
+        setup("midTwoProxy");
+        //testMidTwoProxy("x");
+        testMidTwoProxy("proxy.instanceInt");
+        //testMidTwoProxy("proxy.nestedProxy.instanceInt");
     }
 
     @Test
@@ -63,22 +96,6 @@ public class TestModelGenerationIntegers
          * For recursion to work, we will need a different strategy setting. How we can infer what
          * strategy to be used, is not clear at this stage. setup("euclides");
          */
-    }
-
-    /**
-     * Tests that we are able to generate path conditions in such a way that all possible return
-     * values for each input variable to mid() are taken.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testMid() throws Exception {
-
-        setup("mid");
-
-        testMid("x");
-        testMid("y");
-        testMid("z");
     }
 
     /**
@@ -137,11 +154,44 @@ public class TestModelGenerationIntegers
             operations.setInstanceZ(z);
 
             int result = operations.midTwoInstance(x);
-            
+
             for (IModelVariable var : model.getVariables()) {
                 String varName = var.getName();
                 if (varName.endsWith(variable)) {
-                    int varValue =(Integer) variableMapping.get(var.getName()).getValue();
+                    int varValue = (Integer) variableMapping.get(var.getName()).getValue();
+                    assertTrue(result == varValue);
+                }
+            }
+        }
+    }
+    
+    private void testMidTwoProxy(String variable) throws Exception {
+
+        //printSymbolicExecutionTree(environment.getBuilder().getStartNode());
+        
+        ArrayList<IExecutionNode> nodes =
+                retrieveNode(environment.getBuilder().getStartNode(), "mid=" + variable);
+
+        for (IExecutionNode node : nodes) {
+
+            IModel model = modelGenerator.generateModel(node);
+
+            Map<String, IModelVariable> variableMapping = model.getVariableNameMapping();
+
+            int x = (Integer) variableMapping.get("x").getValue();
+            int y = (Integer) variableMapping.get("self_dollar_proxy_dollar_instanceInt").getValue();
+            int z = (Integer) variableMapping.get("self_dollar_proxy_dollar_nestedProxy_dollar_instanceInt").getValue();
+
+            PrimitiveIntegerOperations operations = new PrimitiveIntegerOperations();
+            operations.setInstanceY(y);
+            operations.setInstanceZ(z);
+
+            int result = operations.midTwoProxy(x);
+
+            for (IModelVariable var : model.getVariables()) {
+                String varName = var.getName();
+                if (varName.endsWith(variable)) {
+                    int varValue = (Integer) variableMapping.get(var.getName()).getValue();
                     assertTrue(result == varValue);
                 }
             }
