@@ -1,20 +1,15 @@
 package de.uka.ilkd.key.testgeneration.oraclegeneration;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+
 /**
- * Implements the logic needed in order to parse the postconditoin for a given
- * proof, turning it
+ * Provides the logic needed in order to parse the {@link Term} postcondition of a method, in order
+ * to extract data needed to turn it into an actual metamodel.
  * 
  * @author christopher
  */
 public class OracleGenerator {
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        // TODO Auto-generated method stub
-
-    }
-
+    
 }

@@ -45,15 +45,23 @@ public class PrimitiveIntegerOperations {
         }
     }
 
+    /*@ public normal_behavior
+       @ requires (a > b);
+       @ ensures (\result == a);
+       @*/
     public int max(int a, int b) {
 
-        int max = 0;
+        int max = a;
 
+        if(max == 1) {
+              int x = 5;
+        }
+        
         if (a >= b) {
             max = a;
         }
         else {
-            max = a;
+            max = b;
         }
 
         return max;

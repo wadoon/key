@@ -19,9 +19,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContainer;
@@ -122,10 +125,52 @@ public abstract class KeYTestGenTest
 
             IExecutionNode next = iterator.next();
 
-            if (next instanceof IExecutionStateNode<?>) {
-                IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>) next;
+            printSingleNode(next);
+        }
+    }
 
-                System.out.println(stateNode.getName());
+    protected void printBranchNodes(IExecutionStartNode root) throws ProofInputException {
+
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
+
+        while (iterator.hasNext()) {
+
+            IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionBranchNode) {
+                System.out.println(((IExecutionBranchNode)next).getActivePositionInfo());
+                System.out.println(((IExecutionBranchNode)next).getActiveStatement());
+                printSingleNode(next);
+            }
+        }
+    }
+
+    protected void printExecutionStatementNodes(IExecutionStartNode root)
+            throws ProofInputException {
+
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
+
+        while (iterator.hasNext()) {
+
+            IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionStatement) {
+                printSingleNode(next);
+            }
+        }
+    }
+    
+    protected void printExecutionReturnStatementNodes(IExecutionStartNode root)
+            throws ProofInputException {
+
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
+
+        while (iterator.hasNext()) {
+
+            IExecutionNode next = iterator.next();
+
+            if (next instanceof ExecutionMethodReturn) {
+                printSingleNode(next);
             }
         }
     }
@@ -160,9 +205,16 @@ public abstract class KeYTestGenTest
 
     protected void printSingleNode(IExecutionNode node) throws ProofInputException {
 
-        System.out.println("Node " + node.getName() + "\nPath condition " + node.getPathCondition()
-                + "\nHuman readable: " + node.getFormatedPathCondition().replaceAll("\n|\t", "")
-                + "\n");
+        System.out.println("\nNode " + node.getName() + "\nType: " + node.getClass()
+                + "\nPath condition " + node.getPathCondition() + "\nHuman readable: "
+                + node.getFormatedPathCondition().replaceAll("\n|\t", "") + "\nAddress: " + node.hashCode() );
+        
+        System.out.println("Children:");
+        for (IExecutionNode child : node.getChildren()) {
+            System.out.println("\t" + child.getName());
+            System.out.println("\t" + child.getClass());
+            System.out.println("\t" + child.getFormatedPathCondition());
+        }
     }
 
     protected void printVars(Term term) {
