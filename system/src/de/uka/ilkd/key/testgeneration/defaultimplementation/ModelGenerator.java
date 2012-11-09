@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import z3parser.api.Z3ModelParser.ValueContainer;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.Services;
@@ -24,8 +25,6 @@ import de.uka.ilkd.key.testgeneration.conditionparsing.ConditionParser;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3ModelParser;
-import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContainer;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default
@@ -150,8 +149,8 @@ public class ModelGenerator
          * Extract the heap state interpretation using the Z3 parser.
          */
         String modelOutput = consolidateModelOutput(result.getOutput());
-        HashMap<String, ValueContainer> rawModel =
-                Z3ModelParser.parseModel(modelOutput);
+        HashMap<String, z3parser.api.Z3ModelParser.ValueContainer> rawModel =
+                z3parser.api.Z3ModelParser.parseModel(modelOutput);
 
         for (ValueContainer container : rawModel.values()) {
 

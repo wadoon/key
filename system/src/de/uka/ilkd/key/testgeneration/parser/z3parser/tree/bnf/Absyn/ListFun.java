@@ -1,9 +1,0 @@
-package de.uka.ilkd.key.testgeneration.parser.z3parser.tree.bnf.Absyn; // Java
-                                                                       // Package
-                                                                       // generated
-                                                                       // by the
-                                                                       // BNF
-                                                                       // Converter.
-
-public class ListFun
-        extends java.util.LinkedList<Fun> {}

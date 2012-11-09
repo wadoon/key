@@ -45,7 +45,7 @@
       <pathelement location="${ext.dir}/recoderKey.jar"/>
       <pathelement location="${ext.dir}/javacc.jar"/>
       <pathelement location="${ext.dir}/junit.jar"/>
-      <pathelement location="${ext.dir}/z3modelparser.jar"/>
+      <pathelement location="${ext.dir}/z3parser.jar"/>
       <pathelement path="${dist.dir}"/>
     </classpath>
 
@@ -144,7 +144,7 @@
         <pathelement location="${ext.dir}/recoderKey.jar"/>
         <pathelement location="${ext.dir}/javacc.jar"/>
         <pathelement location="${ext.dir}/junit.jar"/>
-      	<pathelement location="${ext.dir}/z3modelparser.jar"/>
+      	<pathelement location="${ext.dir}/z3parser.jar"/>
       </classpath>
     </javac>
   </target>

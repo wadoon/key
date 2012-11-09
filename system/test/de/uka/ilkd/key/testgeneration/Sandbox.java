@@ -1,18 +1,12 @@
 package de.uka.ilkd.key.testgeneration;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayInputStream;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import antlr.DumpASTVisitor;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
-import antlr.TreeParser;
-import antlr.collections.AST;
-
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
