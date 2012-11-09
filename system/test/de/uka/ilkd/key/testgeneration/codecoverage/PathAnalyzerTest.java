@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
@@ -20,12 +21,13 @@ public class PathAnalyzerTest
     @Test
     public void test() throws ProofInputException, ModelGeneratorException, IOException {
 
-        String method = "max";
+        String method = "maxProxyInstance";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
                 getEnvironmentForMethod(method);
 
-        printSymbolicExecutionTree(environment.getBuilder().getStartNode());
-
+        IExecutionStartNode root = environment.getBuilder().getStartNode();
+        
+        printSymbolicExecutionTree(root);
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

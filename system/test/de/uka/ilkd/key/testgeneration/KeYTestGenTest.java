@@ -8,6 +8,9 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -24,9 +27,12 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.testgeneration.parser.z3parser.api.Z3Visitor.ValueContainer;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -144,6 +150,16 @@ public abstract class KeYTestGenTest
             }
         }
     }
+    
+    protected void printJavaInfo(IExecutionStartNode root) {
+        
+        JavaInfo info = root.getMediator().getJavaInfo();
+        
+        for(KeYJavaType type : info.getAllKeYJavaTypes()) {
+            System.out.println(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+
+        }
+    }
 
     protected void printExecutionStatementNodes(IExecutionStartNode root)
             throws ProofInputException {
@@ -156,6 +172,31 @@ public abstract class KeYTestGenTest
 
             if (next instanceof IExecutionStatement) {
                 printSingleNode(next);
+                IExecutionStatement statement = (IExecutionStatement)next;
+            }
+        }
+    }
+    
+    protected void printExecutionStateNodes(IExecutionStartNode root)
+            throws ProofInputException {
+
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
+
+        while (iterator.hasNext()) {
+
+            IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionStateNode<?>) {
+                printSingleNode(next);
+                IExecutionStateNode<SourceElement> stuff = (IExecutionStateNode<SourceElement>)next;
+                for(IExecutionVariable var : SymbolicExecutionUtil.createExecutionVariables(stuff)) {
+                    System.out.println("\n" + var.getProgramVariable());
+                    for(IExecutionValue val : var.getValues()) {
+                        
+                        System.out.println("\t" + val.getValueString());
+                        System.out.println("\t" + val.getTypeString());
+                    }
+                }
             }
         }
     }
