@@ -24,6 +24,7 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
@@ -135,6 +136,21 @@ public abstract class KeYTestGenTest
         }
     }
 
+    protected IExecutionMethodCall getMethodCallNode(IExecutionStartNode root) {
+
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
+
+        while (iterator.hasNext()) {
+
+            IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionMethodCall) {
+                return (IExecutionMethodCall) next;
+            }
+        }
+        return null;
+    }
+
     protected void printBranchNodes(IExecutionStartNode root) throws ProofInputException {
 
         ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
@@ -144,18 +160,18 @@ public abstract class KeYTestGenTest
             IExecutionNode next = iterator.next();
 
             if (next instanceof IExecutionBranchNode) {
-                System.out.println(((IExecutionBranchNode)next).getActivePositionInfo());
-                System.out.println(((IExecutionBranchNode)next).getActiveStatement());
+                System.out.println(((IExecutionBranchNode) next).getActivePositionInfo());
+                System.out.println(((IExecutionBranchNode) next).getActiveStatement());
                 printSingleNode(next);
             }
         }
     }
-    
+
     protected void printJavaInfo(IExecutionStartNode root) {
-        
+
         JavaInfo info = root.getMediator().getJavaInfo();
-        
-        for(KeYJavaType type : info.getAllKeYJavaTypes()) {
+
+        for (KeYJavaType type : info.getAllKeYJavaTypes()) {
             System.out.println(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
 
         }
@@ -172,13 +188,12 @@ public abstract class KeYTestGenTest
 
             if (next instanceof IExecutionStatement) {
                 printSingleNode(next);
-                IExecutionStatement statement = (IExecutionStatement)next;
+                IExecutionStatement statement = (IExecutionStatement) next;
             }
         }
     }
-    
-    protected void printExecutionStateNodes(IExecutionStartNode root)
-            throws ProofInputException {
+
+    protected void printExecutionStateNodes(IExecutionStartNode root) throws ProofInputException {
 
         ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
@@ -188,11 +203,12 @@ public abstract class KeYTestGenTest
 
             if (next instanceof IExecutionStateNode<?>) {
                 printSingleNode(next);
-                IExecutionStateNode<SourceElement> stuff = (IExecutionStateNode<SourceElement>)next;
-                for(IExecutionVariable var : SymbolicExecutionUtil.createExecutionVariables(stuff)) {
+                IExecutionStateNode<SourceElement> stuff =
+                        (IExecutionStateNode<SourceElement>) next;
+                for (IExecutionVariable var : SymbolicExecutionUtil.createExecutionVariables(stuff)) {
                     System.out.println("\n" + var.getProgramVariable());
-                    for(IExecutionValue val : var.getValues()) {
-                        
+                    for (IExecutionValue val : var.getValues()) {
+
                         System.out.println("\t" + val.getValueString());
                         System.out.println("\t" + val.getTypeString());
                     }
@@ -200,7 +216,7 @@ public abstract class KeYTestGenTest
             }
         }
     }
-    
+
     protected void printExecutionReturnStatementNodes(IExecutionStartNode root)
             throws ProofInputException {
 
@@ -248,8 +264,9 @@ public abstract class KeYTestGenTest
 
         System.out.println("\nNode " + node.getName() + "\nType: " + node.getClass()
                 + "\nPath condition " + node.getPathCondition() + "\nHuman readable: "
-                + node.getFormatedPathCondition().replaceAll("\n|\t", "") + "\nAddress: " + node.hashCode() );
-        
+                + node.getFormatedPathCondition().replaceAll("\n|\t", "") + "\nAddress: "
+                + node.hashCode());
+
         System.out.println("Children:");
         for (IExecutionNode child : node.getChildren()) {
             System.out.println("\t" + child.getName());

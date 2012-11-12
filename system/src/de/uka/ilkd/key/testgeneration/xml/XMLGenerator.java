@@ -20,11 +20,10 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
  * @author christopher
  * 
  */
-public class ModelXMLWriter {
+public class XMLGenerator {
 
     XMLEventFactory eventFactory = XMLEventFactory.newFactory();
     XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
-
     XMLEventWriter eventWriter;
 
     /*

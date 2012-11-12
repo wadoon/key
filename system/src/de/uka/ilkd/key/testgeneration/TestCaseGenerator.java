@@ -8,7 +8,7 @@ import de.uka.ilkd.key.testgeneration.defaultimplementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.xml.ModelXMLWriter;
+import de.uka.ilkd.key.testgeneration.xml.XMLGenerator;
 
 /**
  * The main API interface for the KeYTestGen2 test case generation system.
@@ -22,7 +22,7 @@ import de.uka.ilkd.key.testgeneration.xml.ModelXMLWriter;
 public class TestCaseGenerator {
 
     private final IModelGenerator modelGenerator;
-    private final ModelXMLWriter xmlWriter = new ModelXMLWriter();
+    private final XMLGenerator xmlWriter = new XMLGenerator();
 
     private TestCaseGenerator(IModelGenerator modelGenerator)
             throws ModelGeneratorException {
