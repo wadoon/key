@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.model.modelgeneration;
+package de.uka.ilkd.key.testgeneration.model;
 
 import de.uka.ilkd.key.testgeneration.TestCaseGeneratorException;
 

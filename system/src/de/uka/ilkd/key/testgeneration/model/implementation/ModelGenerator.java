@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation;
+package de.uka.ilkd.key.testgeneration.model.implementation;
 
 import java.io.File;
 import java.text.ParseException;
@@ -23,9 +23,8 @@ import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.conditionparsing.ConditionParser;
 import de.uka.ilkd.key.testgeneration.model.IModel;
-import de.uka.ilkd.key.testgeneration.model.implementation.Model;
-import de.uka.ilkd.key.testgeneration.model.modelgeneration.IModelGenerator;
-import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
+import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default

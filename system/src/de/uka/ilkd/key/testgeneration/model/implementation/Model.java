@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.testgeneration.model.IModel;
-import de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation.IModelVariable;
+import de.uka.ilkd.key.testgeneration.model.IModelVariable;
 
 /**
  * Default implementation of the {@link IModel} interface

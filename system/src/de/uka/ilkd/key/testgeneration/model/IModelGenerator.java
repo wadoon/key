@@ -1,7 +1,6 @@
-package de.uka.ilkd.key.testgeneration.model.modelgeneration;
+package de.uka.ilkd.key.testgeneration.model;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.model.IModel;
 
 /**
  * Objects implementing this interface are used in order to create a model for

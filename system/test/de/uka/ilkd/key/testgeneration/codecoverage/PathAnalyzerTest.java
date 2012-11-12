@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
-import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class PathAnalyzerTest

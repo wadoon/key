@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation.IModelVariable;
 
 /**
  * Represents a model of a partial heapstate during program execution. The Model
