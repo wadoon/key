@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.defaultimplementation;
+package de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation;
 
 import de.uka.ilkd.key.logic.Term;
 

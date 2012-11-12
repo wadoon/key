@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.defaultimplementation;
+package de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation;
 
 /**
  * Represents a general variable on the program heap. Such a variable is

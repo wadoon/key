@@ -4,10 +4,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.defaultimplementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.xml.XMLGenerator;
 
 /**

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.defaultimplementation;
+package de.uka.ilkd.key.testgeneration.model.implementation;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.testgeneration.model.IModel;
+import de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation.IModelVariable;
 
 /**
  * Default implementation of the {@link IModel} interface

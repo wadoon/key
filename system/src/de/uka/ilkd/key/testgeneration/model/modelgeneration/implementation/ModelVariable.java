@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.defaultimplementation;
+package de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation;
 
 public class ModelVariable
         implements IModelVariable {

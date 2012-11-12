@@ -17,9 +17,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.testgeneration.defaultimplementation.IModelVariable;
-import de.uka.ilkd.key.testgeneration.defaultimplementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation.IModelVariable;
+import de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation.ModelVariable;
 
 /**
  * Encapsulates various methods aimed at parsing a pathcondition ({@link Term})

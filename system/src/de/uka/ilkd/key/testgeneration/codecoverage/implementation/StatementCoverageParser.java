@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.defaultimplementation;
+package de.uka.ilkd.key.testgeneration.codecoverage.implementation;
 
 import java.util.LinkedList;
 import java.util.List;

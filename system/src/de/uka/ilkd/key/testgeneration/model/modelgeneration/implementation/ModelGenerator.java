@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.defaultimplementation;
+package de.uka.ilkd.key.testgeneration.model.modelgeneration.implementation;
 
 import java.io.File;
 import java.text.ParseException;
@@ -23,6 +23,7 @@ import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.conditionparsing.ConditionParser;
 import de.uka.ilkd.key.testgeneration.model.IModel;
+import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.modelgeneration.ModelGeneratorException;
 
