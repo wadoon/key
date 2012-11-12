@@ -3,6 +3,7 @@ package de.uka.ilkd.key.testgeneration.visitors;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 import javax.xml.stream.XMLEventFactory;
@@ -91,6 +92,16 @@ public class TermXMLVisitor
     }
 
     /**
+     * Get the raw list of {@link XMLEvent}, suitable for external processing.
+     * 
+     * @return
+     */
+    public LinkedList<XMLEvent> getRawXML() {
+
+        return elements;
+    }
+
+    /**
      * Retrieves the (formatted) XML document created during the visitation process as a String.
      * 
      * @return the XML document as a String
@@ -98,7 +109,7 @@ public class TermXMLVisitor
      *             in the event that there was as problem writing to the XML stream, and hence the
      *             document could not be created.
      */
-    public String getXML() throws XMLVisitorException {
+    public String getXMLAsString() throws XMLVisitorException {
 
         try {
 

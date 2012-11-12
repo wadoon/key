@@ -10,6 +10,5 @@ package de.uka.ilkd.key.testgeneration;
  */
 public interface ITestCaseParser<T> {
 
-    public T parseXMLRepresentation(String representation);
-
+    public T generateTestCaseFromXML(String representation);
 }

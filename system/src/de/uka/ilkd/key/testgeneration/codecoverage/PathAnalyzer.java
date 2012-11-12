@@ -16,6 +16,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
  */
 public class PathAnalyzer {
 
+    public enum COVERAGE_CRITERIA {
+
+    }
+
     /**
      * <p>
      * Returns a set of {@link IExecutionNode} instances, s.t. generating a test case covering each
@@ -152,7 +156,7 @@ public class PathAnalyzer {
      * In the above, we have a single branching condition, which is the if-statement. The conditions
      * in this code is the set of atomic boolean sub-expressions inside this branching condition,
      * such that there exist no other boolean subexpressions within it. In our case, the only such
-     * subconditions are <code>a < b</code>, <code>b < c</code>, <code>c < d</code>. Thusm in order
+     * subconditions are <code>a < b</code>, <code>b < c</code>, <code>c < d</code>. Thus in order
      * to satisfy Condition Coverage for this snippet, we will need to provide sufficient testcases,
      * such that each of these conditions evaluate at least once to true, and at least one to false.
      * need to provide testcases s.t. this will once evaluate to true (i.e. a >= b) and at least

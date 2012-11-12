@@ -20,8 +20,8 @@ import de.uka.ilkd.key.testgeneration.visitors.TermXMLVisitor;
 import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
 
 /**
- * Provides the logic needed in order to parse the {@link Term} postcondition of a method, in order
- * to extract data needed to turn it into an actual metamodel.
+ * Provides the logic needed in order to parse the {@link Term} postcondition of a method, turning
+ * it into an equivalent XML representation.
  * 
  * @author christopher
  */
@@ -37,16 +37,17 @@ public class OracleGenerator {
      * @throws OracleGeneratorException
      *             in the event that the method cannot be found, or something went wrong with regard
      *             to extracting the postcondition.
-     * @throws XMLVisitorException 
+     * @throws XMLVisitorException
      */
-    public Term extractPostCondition(IExecutionStartNode root) throws OracleGeneratorException, XMLVisitorException {
+    public Term extractPostCondition(IExecutionStartNode root)
+            throws OracleGeneratorException, XMLVisitorException {
 
         IExecutionMethodCall methodCallNode = getMethodCallNode(root);
         FunctionalOperationContract contract = getContracts(methodCallNode);
 
         /*
-         * This is an ugly hack, but for now I do not see any more straightforward way of
-         * extracting the postconditions, which is all I really need. The standard implementation of
+         * This is an ugly hack, but for now I do not see any more straightforward way of extracting
+         * the postconditions, which is all I really need. The standard implementation of
          * FunctionalOperationContract appears to be structured exclusively for use within the Proof
          * context.
          */
@@ -60,7 +61,7 @@ public class OracleGenerator {
             term.execPreOrder(visitor);
         }
 
-        System.out.println(visitor.getXML());
+        System.out.println(visitor.getXMLAsString());
         return null;
     }
 
@@ -138,6 +139,7 @@ public class OracleGenerator {
             extends Visitor {
 
         StringBuilder postConditionXML;
+
         @Override
         public void visit(Term visited) {
 
