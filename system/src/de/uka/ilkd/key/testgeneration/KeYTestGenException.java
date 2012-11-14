@@ -5,14 +5,14 @@ package de.uka.ilkd.key.testgeneration;
  * 
  * @author christopher
  */
-public class TestCaseGeneratorException extends Exception {
+public class KeYTestGenException extends Exception {
     private static final long serialVersionUID = -4916814485272872541L;
     
-    public TestCaseGeneratorException(String message) {
+    public KeYTestGenException(String message) {
         super(message);
     }
     
-    public TestCaseGeneratorException(String message, Throwable cause) {
+    public KeYTestGenException(String message, Throwable cause) {
         super(message, cause);
     }
 }

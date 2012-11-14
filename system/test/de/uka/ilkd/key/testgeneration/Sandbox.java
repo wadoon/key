@@ -1,49 +1,26 @@
 package de.uka.ilkd.key.testgeneration;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class Sandbox {
 
-    @Before
-    public void setUp() throws Exception {
-
-    }
-
     @Test
-    public void test() throws RecognitionException, TokenStreamException {
+    public void test() throws IOException, ProofInputException {
+        File file = new File("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java");
+        File javaFile = new File(file, "PrimitiveIntegerOperations.java");
 
-        System.out.println(System.getProperty("key.rep"));
-        System.out.println(System.getProperty("key.home"));
-        System.out.println(System.getProperty("key.home") + "\n\n");
-
-        for (Object prop : System.getProperties().keySet()) {
-            System.out.println(prop + "\t" + System.getProperty((String) prop));
-        }
-
-        for (String prop : System.getenv().keySet()) {
-            System.out.println(prop + "\t" + System.getenv(prop));
-        }
-        DefaultTermParser termParser = new DefaultTermParser();
-
-        String example = "public class TestClass { int x = 0; }";
-
-        ByteArrayInputStream stream =
-                new ByteArrayInputStream(example.getBytes());
-        KeYLexer lexer = new KeYLexer(stream);
-        KeYParser parser = new KeYParser(lexer);
-
-        System.out.println(parser.javaSource());
-
-        System.out.println(parser.getAST().toStringTree());
+        System.out.println(file.getName().
     }
-
 }

@@ -2,10 +2,10 @@ package de.uka.ilkd.key.testgeneration.visitors;
 
 import javax.xml.stream.XMLStreamException;
 
-import de.uka.ilkd.key.testgeneration.TestCaseGeneratorException;
+import de.uka.ilkd.key.testgeneration.KeYTestGenException;
 
 public class XMLVisitorException
-        extends TestCaseGeneratorException {
+        extends KeYTestGenException {
 
     private static final long serialVersionUID = -286893052052896384L;
 
