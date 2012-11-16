@@ -11,6 +11,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 
 /**
@@ -22,16 +23,5 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
 public enum XMLGenerator {
     INSTANCE;
     
-    public String generateXMLTestSuite(IModel model, IExecutionStartNode symbolicTreeRoot) {
-        
-        /*
-         * Generate XML for the preconditions
-         */
-        
-        /*
-         * Generate XML for the postconditions
-         */
-        return null;
-    }
-    
+
 }

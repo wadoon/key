@@ -3,16 +3,13 @@ package de.uka.ilkd.key.testgeneration.model;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
- * Objects implementing this interface are used in order to create a model for
- * the path condition of a given {@link IExecutionNode}, i.e. find a set of
- * concrete variable assignments that satisfy this particular model. The
- * representation of such a model is indicated by generic type T. Implementing
- * classes are not intended to be generic in themselves.
+ * Objects implementing this interface are used in order to create {@link IModel} instances for the
+ * path condition of a given {@link IExecutionNode}, i.e. find a set of concrete value assignments
+ * that satisfy this particular path condition.
  * 
  * @author christopher
  */
 public interface IModelGenerator {
 
-    public IModel generateModel(IExecutionNode node)
-            throws ModelGeneratorException;
+    public IModel generateModel(IExecutionNode node) throws ModelGeneratorException;
 }

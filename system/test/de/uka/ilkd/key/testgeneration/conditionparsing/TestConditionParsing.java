@@ -46,6 +46,7 @@ import de.uka.ilkd.key.testgeneration.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestConditionParsing
@@ -113,7 +114,7 @@ public class TestConditionParsing
 
         // printDebug(method, targetNode);
 
-        ConditionParser parser = new ConditionParser();
+        PathconditionParser parser = new PathconditionParser();
         System.out.println(parser.simplifyTerm(targetNodeCondition));
     }
 

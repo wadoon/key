@@ -4,7 +4,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.speclang.ContractWrapper;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
  * Encapsulates information regarding a single Java method. The information contained in an instance
@@ -25,37 +28,69 @@ public class KeYJavaMethod {
     private final InitConfig initConfig;
 
     /**
-     * The preconditions for this method
+     * A wrapper for the an instance of {@link FunctionalOperationContract} specific for this
+     * method. Through this contract, we can access the specifications for the method (i.e. mappings
+     * between preconditions and postconditions).
      */
-    private List<Term> preconditions;
+    private final ContractWrapper functionalContract;
 
     KeYJavaMethod(
             IProgramMethod programMethod,
             InitConfig initConfig,
-            List<Term> preconditions) {
+            ContractWrapper functionalContract) {
 
         this.programMethod = programMethod;
         this.initConfig = initConfig;
-        this.preconditions = preconditions;
+        this.functionalContract = functionalContract;
     }
 
     /**
+     * Retrieve the preconditions for the method.
+     * 
      * @return the preconditions
      */
-    final List<Term> getPreconditions() {
+    public List<Term> getPreconditions() {
 
-        return preconditions;
+        return functionalContract.getPreconditions();
+    }
+    
+    /**
+     * Retrieve the postconditions for the method.
+     * 
+     * @return the postconditions
+     */
+    public List<Term> getPostconditions() {
+
+        return functionalContract.getPostconditions();
     }
 
     /**
+     * Get the parameters for this method.
+     * 
+     * @return
+     */
+    public List<IProgramVariable> getParameters() {
+
+        /*
+         * TODO: This violates the abstraction in a very ugly way, is there no nicer way to get the
+         * parameters?
+         */
+        return functionalContract.getParameters();
+    }
+
+    /**
+     * Retrieve the {@link IProgramMethod} instance for this method.
+     * 
      * @return the programMethod
      */
-    final IProgramMethod getProgramMethod() {
+    public IProgramMethod getProgramMethod() {
 
         return programMethod;
     }
 
     /**
+     * Return the {@link InitConfig} instance for this method.
+     * 
      * @return the initConfig
      */
     final InitConfig getInitConfig() {

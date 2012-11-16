@@ -24,7 +24,6 @@ public final class KeYJavaClass {
     private final HashMap<String, KeYJavaMethod> methods;
 
     KeYJavaClass(KeYJavaType type, HashMap<String, KeYJavaMethod> methodMappings) {
-
         this.type = type;
         this.methods = methodMappings;
     }

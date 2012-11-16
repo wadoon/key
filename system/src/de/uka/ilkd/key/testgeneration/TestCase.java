@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgeneration;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 
 /**
@@ -30,19 +31,29 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
 public class TestCase {
 
     /**
+     * The method for which the test case is being generated.
+     */
+    private final KeYJavaMethod method;
+
+    /**
      * A concrete representation of the heapstate before the test case is executed. This brings
      * together the (Pi, Si) definition of <i>I</i> as given above, in the sense that both parameter
      * values and required program state before execution will all be represented as part of the
      * same heapstate.
      */
-    private IModel input;
-    
+    private final IModel model;
+
     /**
      * The Oracle for the method, here represented as a postcondition (i.e. a set of logical
-     * expressions defining under which conditions the Oracle would evaluate to "pass"), encoded in
-     * KeYTestGens native XML format. This is necessary since KeYTestGen by itself generates no
-     * methods to act as Oracles, but leave this to implementations of the {@link ITestCaseParser}
-     * interface.
+     * expressions defining under which conditions the Oracle would evaluate to "pass"), here
+     * represented in its native {@link Term} format.
      */
-    private String oracle;
+    private final Term oracle;
+
+    public TestCase(KeYJavaMethod method, IModel model, Term oracle) {
+
+        this.method = method;
+        this.model = model;
+        this.oracle = oracle;
+    }
 }

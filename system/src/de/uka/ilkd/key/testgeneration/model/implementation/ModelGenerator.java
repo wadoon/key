@@ -21,10 +21,10 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.conditionparsing.ConditionParser;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default
@@ -57,7 +57,7 @@ public class ModelGenerator
     /**
      * ConditionParser for the purpose of simplifying path conditions.
      */
-    private final ConditionParser conditionParser = new ConditionParser();
+    private final PathconditionParser conditionParser = new PathconditionParser();
 
     /**
      * Backend constructor for the factory methods

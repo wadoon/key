@@ -32,11 +32,13 @@ public class OracleGeneratorTest
 
         IExecutionStartNode root = environment.getBuilder().getStartNode();
        
-        OracleGenerator generator = new OracleGenerator();
+        ContractExtractor extractor = ContractExtractor.INSTANCE;
         
         IExecutionMethodCall call;
         
-       generator.extractPostCondition(root);
+        extractor.extractPostCondition(root);
+        
+        
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

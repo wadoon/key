@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
@@ -70,10 +69,10 @@ public enum KeYInterface {
             return initConfig;
 
         }
-        catch (IOException e) {
+        catch (ProofInputException e) {
             throw new KeYInterfaceException(e.getMessage());
         }
-        catch (ProofInputException e) {
+        catch (IOException e) {
             throw new KeYInterfaceException(e.getMessage());
         }
         finally {

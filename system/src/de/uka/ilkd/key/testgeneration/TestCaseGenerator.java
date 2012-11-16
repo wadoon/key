@@ -5,29 +5,13 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
-import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
-import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
-import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
+import de.uka.ilkd.key.testgeneration.codecoverage.implementation.StatementCoverageParser;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
@@ -37,15 +21,15 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.oraclegeneration.ContractExtractor;
+import de.uka.ilkd.key.testgeneration.oraclegeneration.OracleGeneratorException;
 import de.uka.ilkd.key.testgeneration.xml.XMLGenerator;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * The main API interface for the KeYTestGen2 test case generation system. Targets can be passed
- * either as entire source files or individual methods. An implementation of the <
- * {@code ITestCaseXMLParser} can be provided in order to generate test cases for a specific
- * framework. Otherwise, KTG will simply return the default XML representation of test cases as a
- * raw {@code String}.
+ * Represents the main API interface for the KeYTestGen2. Targets can be passed either as entire
+ * source files or individual methods. An implementation of the < {@code ITestCaseXMLParser} can be
+ * provided in order to generate test cases for a specific framework. Otherwise, KTG will simply
+ * return the default XML representation of test cases as a raw {@code String}.
  * 
  * @author christopher
  */
@@ -81,15 +65,26 @@ public class TestCaseGenerator {
     private final XMLGenerator xmlWriter = XMLGenerator.INSTANCE;
 
     /**
+     * Used in order to communicate with and request services from the KeY runtime
+     */
+    private final KeYInterface keYInterface = KeYInterface.INSTANCE;
+
+    /**
+     * Used in order to extract pre- and postconditions for methods
+     */
+    private final ContractExtractor contractExtractor = ContractExtractor.INSTANCE;
+
+    /**
      * Used in order to generate instances of {@link KeYJavaClass} for a given source file
      */
     private final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.INSTANCE;
 
     /**
-     * Used in order to communicate with and request services from the KeY runtime
+     * Instances are generated through the {@link #getCustomInstance(IModelGenerator)} or
+     * {@link #getDefaultInstance()} mehtods.
+     * 
+     * @param modelGenerator
      */
-    private final KeYInterface keYInterface = KeYInterface.INSTANCE;
-
     private TestCaseGenerator(IModelGenerator modelGenerator) {
 
         this.modelGenerator = modelGenerator;
@@ -157,56 +152,14 @@ public class TestCaseGenerator {
     }
 
     /**
-     * Retrieve all methods for a given class.
+     * Generates a test case for a single {@link IExecutionNode} in a single method.
      * 
-     * @param targetClass
-     *            the class for which to retrieve methods
+     * @param targetNode
+     *            the target program node
      * @param services
-     *            services for this KeY session (see {@link Services})
-     * @param includePrivateMethods
-     *            also retrieve non-public methods?
-     * @param includeNativeMethods
-     *            also retrieve native methods?
      * @return
+     * @throws Exception
      */
-    private List<IProgramMethod> extractMethodsFromClass(
-            final KeYJavaType targetClass,
-            final Services services,
-            final boolean includePrivateMethods,
-            final boolean includeNativeMethods) {
-
-        LinkedList<IProgramMethod> methods = new LinkedList<IProgramMethod>();
-
-        for (IProgramMethod method : services.getJavaInfo().getAllProgramMethods(
-                targetClass)) {
-
-            /*
-             * Filter out all native methods
-             */
-            if (!includeNativeMethods && nativeMethods.contains(method.getFullName())) {
-                continue;
-            }
-
-            /*
-             * Filter out non-public methods
-             */
-            if (!includePrivateMethods && !method.isPublic()) {
-                continue;
-            }
-
-            /*
-             * Filter out implicit methods, i.e. <prepare>, <create> etc.
-             */
-            if (method.getFullName().startsWith("<")) {
-                continue;
-            }
-
-            methods.add(method);
-        }
-
-        return methods;
-    }
-
     private String generateTestCase(
             final IExecutionNode targetNode,
             final Services services) throws Exception {
@@ -244,22 +197,77 @@ public class TestCaseGenerator {
 
     /**
      * Generate test cases for a specific method in the class being tested. The test case will be
-     * returned in KeYTestGen2:s standard XML format
+     * returned in KeYTestGen2:s standard XML format. Uses a default level of code coverage.
      * 
      * @param sourcePath
      *            path to the source file to produce cases for
      * @param method
      *            the method to produce test cases for
      * @return
+     * @throws TestGeneratorException
+     *             in the event there was an error in creating the test case
      */
-    public String generateTestCase(String sourcePath, String method) {
+    public String generateTestCase(String sourcePath, String method)
+            throws TestGeneratorException {
 
-        /*
-         * Create a KeYJavaFile instance for the targeted file
-         */
-        KeYJavaClass keYJavaFile;
+        return generateTestCase(sourcePath, method, new StatementCoverageParser());
+    }
 
-        return null;
+    /**
+     * Generate test cases for a specific method in the class being tested. The test case will be
+     * returned in KeYTestGen2:s standard XML format
+     * 
+     * @param sourcePath
+     *            path to the source file to produce cases for
+     * @param method
+     *            the method to produce test cases for
+     * @param codeCoverageParser
+     *            the instance of {@link ICodeCoverageParser} to be used in order to achieve a
+     *            desired degree of code coverage
+     * @return
+     * @throws TestGeneratorException
+     *             in the event there was an error in creating the test cases
+     */
+    public String generateTestCase(
+            String sourcePath,
+            String method,
+            ICodeCoverageParser codeCoverageParser) throws TestGeneratorException {
+
+        try {
+
+            /*
+             * Extract the abstract representations of the targeted Java class and the specific
+             * method for which we wish to generate test cases.
+             */
+            KeYJavaClass targetClass = keYJavaClassFactory.createKeYJavaClass(sourcePath);
+            KeYJavaMethod targetMethod = targetClass.getMethod(method);
+
+            /*
+             * Retrieve the symbolic execution tree for the method, and extract from it the nodes
+             * needed in order to reach the desired level of code coverage.
+             */
+            IExecutionStartNode root =
+                    keYInterface.getSymbolicExecutionTree(targetMethod);
+            List<IExecutionNode> targetNodes = codeCoverageParser.retrieveNodes(root);
+
+            /*
+             * Extract the postcondition for the method, and generate test cases for each of the
+             * nodes.
+             */
+            List<TestCase> testCases = createTestCases(targetMethod, targetNodes);
+
+            /*
+             * Create and return a final XML representation of the 
+             */
+            
+            return null;
+        }
+        catch (KeYInterfaceException e) {
+            throw new TestGeneratorException(e.getMessage());
+        }
+        catch (IOException e) {
+            throw new TestGeneratorException(e.getMessage());
+        }
     }
 
     /**
@@ -308,94 +316,39 @@ public class TestCaseGenerator {
         return null;
     }
 
-    private KeYJavaType getMainClass(File java) {
-
-        return null;
-    }
-
-    private SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(
-            File javaFile,
-            IProgramMethod method,
-            String precondition)
-            throws ProofInputException, IOException, TestGeneratorException {
+    /**
+     * Creates a set of abstract test case representations.
+     * 
+     * @param method
+     *            the method for which test cases will be generated
+     * @param oracle
+     *            the test oracle (corresponding to the postcondition) of the method
+     * @param nodes
+     *            the nodes for which to generate test cases (one test case per node will be
+     *            generated)
+     * @return
+     * @throws TestGeneratorException
+     *             in the event there was a failure to generate a test case
+     */
+    private List<TestCase> createTestCases(
+            KeYJavaMethod method,
+            List<IExecutionNode> nodes) throws TestGeneratorException {
 
         try {
 
-            /*
-             * Set up the KeY user interface (here used only by the symbolic execution environment.
-             */
-            CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
+            List<TestCase> testCases = new LinkedList<TestCase>();
+            for (IExecutionNode node : nodes) {
+                IModel model = modelGenerator.generateModel(node);
+                // TODO: This is an ugly hack since I am not sure how to handle multiple
+                // postconditions yet, fix.
+                TestCase testCase =
+                        new TestCase(method, model, method.getPostconditions().get(0));
+            }
 
-            /*
-             * Load the Java file into KeY
-             */
-            DefaultProblemLoader loader = ui.load(javaFile, null, null);
-            InitConfig initConfig = loader.getInitConfig();
-
-            /*
-             * Setup and prepare the proof session
-             */
-            ProofOblInput input =
-                    new ProgramMethodPO(initConfig,
-                            method.getFullName(),
-                            method,
-                            precondition,
-                            true);
-            Proof proof = ui.createProof(initConfig, input);
-
-            assertNotNull(proof, "FATAL: unable to load proof");
-
-            /*
-             * Setup a strategy and goal chooser for the proof session
-             */
-            SymbolicExecutionEnvironment.configureProofForSymbolicExecution(
-                    proof,
-                    ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
-
-            /*
-             * Create the symbolic execution environment itself. Assert that it has been sucessfully
-             * created.
-             */
-            SymbolicExecutionTreeBuilder builder =
-                    new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, false);
-
-            SymbolicExecutionEnvironment<CustomConsoleUserInterface> env =
-                    new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui,
-                            initConfig,
-                            builder);
-
-            assertNotNull(env,
-                    "FATAL: unable to initialize symbolic execution environment");
-
-            /*
-             * Add a stop condition for the proof (we use a default in order to assure maximum
-             * coverage of execution paths. Start the proof and wait for it to finish.
-             */
-            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
-                    new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
-
-            env.getUi().startAndWaitForProof(proof);
-
-            /*
-             * Create the symbolic execution tree, and assert that it indeed exists.
-             */
-            builder.analyse();
-            assertNotNull(builder.getStartNode(),
-                    "FATAL: unable to initialize proof tree");
-
-            /*
-             * Finally, return the created environment.
-             */
-            return env;
-
+            return testCases;
         }
-        catch (ProofInputException pe) {
-            throw new TestGeneratorException("FATAL: unable to load proof: "
-                    + pe.getMessage());
-        }
-        catch (IOException e) {
-            throw new TestGeneratorException("FATAL: unable to load file: "
-                    + e.getMessage());
+        catch (ModelGeneratorException e) {
+            throw new TestGeneratorException(e.getMessage());
         }
     }
 
@@ -413,13 +366,5 @@ public class TestCaseGenerator {
             throw new TestGeneratorException("FATAL: no such file or directory: " + path);
         }
         return javaFile;
-    }
-
-    private void assertNotNull(Object object, String failureMessage)
-            throws TestGeneratorException {
-
-        if (object == null) {
-            throw new TestGeneratorException(failureMessage);
-        }
     }
 }
