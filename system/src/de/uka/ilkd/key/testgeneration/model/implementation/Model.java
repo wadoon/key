@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.xml.internal.ws.org.objectweb.asm.MethodVisitor;
+
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelVariable;
 
@@ -16,19 +18,17 @@ import de.uka.ilkd.key.testgeneration.model.IModelVariable;
 public class Model
         implements IModel {
 
-    private final LinkedList<IModelVariable> variables =
-            new LinkedList<IModelVariable>();
+    private final LinkedList<ModelVariable> variables = new LinkedList<ModelVariable>();
 
     /**
-     * Return a filtered subset of variables in this model. Filters can be left
-     * out to return all variables.
+     * Return a filtered subset of variables in this model. Filters can be left out to return all
+     * variables.
      */
     @SafeVarargs
     @Override
     public final List<IModelVariable> getVariables(IModelFilter... filters) {
 
-        LinkedList<IModelVariable> filteredVariables =
-                new LinkedList<IModelVariable>();
+        LinkedList<IModelVariable> filteredVariables = new LinkedList<IModelVariable>();
 
         for (IModelVariable variable : variables) {
 
@@ -42,8 +42,7 @@ public class Model
     }
 
     @Override
-    public Map<String, IModelVariable> getVariableNameMapping(
-            IModelFilter... filters) {
+    public Map<String, IModelVariable> getVariableNameMapping(IModelFilter... filters) {
 
         List<IModelVariable> filteredVariables = getFilteredVariables(filters);
 
@@ -57,42 +56,62 @@ public class Model
         return variableMapping;
     }
 
-    /**
-     * Add a variable to the Model. A reference to the Model itself is returned
-     * in order for ease of use in recursive methods.
-     * 
-     * @param variable
-     */
-    public IModel add(IModelVariable variable) {
+    public void add(ModelVariable variable) {
 
-        variables.add(variable);
-        return this;
+        /*
+         * If the variable does not have a parent, it is a local variable, and we just insert it
+         * as-is.
+         */
+        if (variable.getParent() == null) {
+            if (!variables.contains(variable)) {
+                variables.add(variable);
+            }
+        }
+
+        /*
+         * If the parent is not null, then this variable is either static, or part of a reference
+         * field in the main class. In this case we search for a reference to the parent and insert
+         * it as a childnode there.
+         */
+        else {
+            for (ModelVariable modelVariable : variables) {
+
+                /*
+                 * Shortcircuit the insertion if the value has been succesfully inserted.
+                 */
+                if (insertIntoModel(variable, modelVariable)) {
+                    return;
+                }
+            }
+        }
     }
 
     /**
-     * Merge with another Model
+     * Recursively insert a {@link ModelVariable} into the {@link Model} as a child of its parent.
      * 
-     * @param model
+     * @param variable
+     * @param target
      * @return
      */
-    public IModel addAll(IModel model) {
+    private boolean insertIntoModel(ModelVariable variable, ModelVariable target) {
 
-        for (IModelVariable variable : model.getVariables()) {
-
-            variables.add(variable);
+        if (target.equals(variable.getParent())) {
+            target.addChild(variable);
+            return true;
         }
-
-        return this;
+        else {
+            for (ModelVariable child : target.getChildren()) {
+                if(insertIntoModel(variable, child)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private List<IModelVariable> getFilteredVariables(IModelFilter[] filters) {
 
-        if (filters.length == 0) {
-            return variables;
-        }
-
-        LinkedList<IModelVariable> filteredVariables =
-                new LinkedList<IModelVariable>();
+        LinkedList<IModelVariable> filteredVariables = new LinkedList<IModelVariable>();
 
         for (IModelVariable variable : variables) {
 
@@ -104,9 +123,7 @@ public class Model
         return filteredVariables;
     }
 
-    private boolean satisfiesFilters(
-            IModelVariable variable,
-            IModelFilter[] filters) {
+    private boolean satisfiesFilters(IModelVariable variable, IModelFilter[] filters) {
 
         for (IModelFilter filter : filters) {
             if (!filter.satisfies(variable)) {

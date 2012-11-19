@@ -24,6 +24,7 @@ import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.oraclegeneration.OracleGeneratorException;
 import de.uka.ilkd.key.testgeneration.xml.XMLGenerator;
+import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 
 /**
  * Represents the main API interface for the KeYTestGen2. Targets can be passed either as entire
@@ -62,7 +63,7 @@ public class TestCaseGenerator {
     /**
      * Used in order to transform test case data into KeYTestGens internal XML format
      */
-    private final XMLGenerator xmlWriter = XMLGenerator.INSTANCE;
+    private final XMLGenerator xmlWriter;
 
     /**
      * Used in order to communicate with and request services from the KeY runtime
@@ -84,10 +85,19 @@ public class TestCaseGenerator {
      * {@link #getDefaultInstance()} mehtods.
      * 
      * @param modelGenerator
+     * @throws XMLGeneratorException
      */
-    private TestCaseGenerator(IModelGenerator modelGenerator) {
+    private TestCaseGenerator(IModelGenerator modelGenerator)
+            throws XMLGeneratorException {
 
-        this.modelGenerator = modelGenerator;
+        try {
+            xmlWriter = new XMLGenerator();
+            this.modelGenerator = modelGenerator;
+        }
+        catch (XMLGeneratorException e) {
+            throw new XMLGeneratorException(e.getMessage());
+        }
+
     }
 
     /**
@@ -97,8 +107,9 @@ public class TestCaseGenerator {
      * @return a default instance of {@link TestCaseGenerator}
      * @throws ModelGeneratorException
      *             in the event that the model could not be sucessfully initialized
+     * @throws XMLGeneratorException 
      */
-    public static TestCaseGenerator getDefaultInstance() throws ModelGeneratorException {
+    public static TestCaseGenerator getDefaultInstance() throws ModelGeneratorException, XMLGeneratorException {
 
         return new TestCaseGenerator(ModelGenerator.getDefaultModelGenerator());
     }
@@ -110,8 +121,9 @@ public class TestCaseGenerator {
      * @param modelGenerator
      *            the custom instance of {@link IModelGenerator} to use
      * @return a new instance of {@link TestCaseGenerator}
+     * @throws XMLGeneratorException
      */
-    public static TestCaseGenerator getCustomInstance(IModelGenerator modelGenerator) {
+    public static TestCaseGenerator getCustomInstance(IModelGenerator modelGenerator) throws XMLGeneratorException {
 
         return new TestCaseGenerator(modelGenerator);
     }
@@ -257,9 +269,9 @@ public class TestCaseGenerator {
             List<TestCase> testCases = createTestCases(targetMethod, targetNodes);
 
             /*
-             * Create and return a final XML representation of the 
+             * Create and return a final XML representation of the test suite.
              */
-            
+
             return null;
         }
         catch (KeYInterfaceException e) {

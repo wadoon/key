@@ -30,6 +30,9 @@ import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 public class PathconditionParser
         extends AbstractTermParser {
 
+    
+
+    
     /**
      * Given an initial {@link Term}, constructs a simpler Term which "localizes" all occurences of
      * primitive datatypes, by transforming the instances of {@link SortDependingFunction} which
@@ -175,7 +178,7 @@ public class PathconditionParser
          */
         else {
 
-            return simplifySortDependentFunctionHelper(term.sub(1)) + "$"
+            return simplifySortDependentFunctionHelper(term.sub(1)) + "_dot_"
                     + extractName(term);
         }
     }

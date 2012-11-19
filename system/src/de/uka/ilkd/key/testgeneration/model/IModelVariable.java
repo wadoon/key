@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.testgeneration.model;
 
+import java.util.List;
+
 /**
  * Represents a general variable on the program heap. Such a variable is
  * identified by its name, type, value, and parent object.
@@ -13,6 +15,4 @@ public interface IModelVariable {
     String getType();
 
     Object getValue();
-
-    IModelVariable getParent();
 }

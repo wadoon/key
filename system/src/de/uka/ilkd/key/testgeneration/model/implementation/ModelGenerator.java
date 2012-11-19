@@ -25,20 +25,19 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
+import de.uka.ilkd.key.testgeneration.visitors.TermModelVisitor;
 
 /**
- * Given that a client does not specify anything else, KeYTestGen2 will default
- * to this implementation of {@link IModelGenerator} for the purpose of
- * instantiating path conditions.
+ * Given that a client does not specify anything else, KeYTestGen2 will default to this
+ * implementation of {@link IModelGenerator} for the purpose of instantiating path conditions.
  * <p>
- * This particular implementation makes use of SMT solvers in order to
- * facilitate model generation. The pathcondition to be instantiated is
- * translated into the SMT-LIB2 language, and the KeY SMT interface is
- * subsequently invoked in order to find an assignment of variables that satisfy
- * the pathcondition (if such an assignment exits).
+ * This particular implementation makes use of SMT solvers in order to facilitate model generation.
+ * The pathcondition to be instantiated is translated into the SMT-LIB2 language, and the KeY SMT
+ * interface is subsequently invoked in order to find an assignment of variables that satisfy the
+ * pathcondition (if such an assignment exits).
  * <p>
- * The set of assignments found are further processed into an instance of
- * {@link IModel}, which constitutes the final representaiton of the model.
+ * The set of assignments found are further processed into an instance of {@link IModel}, which
+ * constitutes the final representaiton of the model.
  */
 public class ModelGenerator
         implements IModelGenerator {
@@ -49,8 +48,8 @@ public class ModelGenerator
     private final SolverType[] solvers;
 
     /**
-     * The settings for the SMT solvers. These follow a default implementation,
-     * although it is possible for the user to use custom settings.
+     * The settings for the SMT solvers. These follow a default implementation, although it is
+     * possible for the user to use custom settings.
      */
     private final SMTSettings settings;
 
@@ -74,8 +73,8 @@ public class ModelGenerator
     }
 
     /**
-     * Creates a default implementation of the ModelGenerator, which uses the Z3
-     * solvers with default settings.
+     * Creates a default implementation of the ModelGenerator, which uses the Z3 solvers with
+     * default settings.
      * 
      * @return a default instance of ModelGenerator
      * @throws ModelGeneratorException
@@ -89,10 +88,9 @@ public class ModelGenerator
     }
 
     /**
-     * Creates a custom implementation of the ModelGenerator. The user specifies
-     * which SMT solvers(s) and what settings should be used TODO Currently only
-     * the Z3 solver will return a model, implment this for the other supported
-     * solvers as well
+     * Creates a custom implementation of the ModelGenerator. The user specifies which SMT
+     * solvers(s) and what settings should be used TODO Currently only the Z3 solver will return a
+     * model, implment this for the other supported solvers as well
      * 
      * @param settings
      *            The settings for the SMT solvers used
@@ -109,9 +107,8 @@ public class ModelGenerator
     }
 
     /**
-     * Generates a model satisfying the pathcondition for a given {link
-     * {@link IExecutionNode}. The model is encoded in XML format, and serves as
-     * a basis for creating executable test suites.
+     * Generates a model satisfying the pathcondition for a given {link {@link IExecutionNode}. The
+     * model is encoded in XML format, and serves as a basis for creating executable test suites.
      * 
      * @param targetNode
      *            the node whose path condition we wish to find a model for
@@ -141,57 +138,81 @@ public class ModelGenerator
         return null;
     }
 
-    private IModel createModel(SMTSolverResult result) throws ParseException {
+    private IModel createModel(IExecutionNode node, SMTSolverResult result)
+            throws ParseException, ModelGeneratorException {
 
-        Model finalModel = new Model();
+        try {
 
-        /*
-         * Extract the heap state interpretation using the Z3 parser.
-         */
-        String modelOutput = consolidateModelOutput(result.getOutput());
-        HashMap<String, z3parser.api.Z3ModelParser.ValueContainer> rawModel =
-                z3parser.api.Z3ModelParser.parseModel(modelOutput);
+            /*
+             * Extract the variables in the partial heap state
+             */
+            TermModelVisitor termModelVisitor = new TermModelVisitor(node.getServices());
+            node.getPathCondition().execPostOrder(termModelVisitor);
+            List<ModelVariable> modelVariables = termModelVisitor.getModelSkeleton();
 
-        for (ValueContainer container : rawModel.values()) {
+            /*
+             * Extract the heap state interpretation using the Z3 parser.
+             */
+            String modelOutput = consolidateModelOutput(result.getOutput());
+            HashMap<String, z3parser.api.Z3ModelParser.ValueContainer> rawModel =
+                    z3parser.api.Z3ModelParser.parseModel(modelOutput);
 
-            ModelVariable modelVariable =
-                    new ModelVariable(container.getName(), container.getType()
-                            .toString(), container.getValue(), null);
+            /*
+             * Insert the generated values into the partial heapstate
+             */
+            for (ValueContainer container : rawModel.values()) {
+                for(ModelVariable modelVariable : modelVariables) {
+                    if(modelVariable.getId().equals(container.getName())) {
+                        modelVariable.setValue(container.getValue());
+                    }
+                }
+            }
+            
+            /*
+             * Finally, turn the partial heapstate into a full-fledged Model
+             */
+            Model finalModel = new Model();
+            for(ModelVariable modelVariable : modelVariables) {
+                finalModel.add(modelVariable);
+            }
 
-            finalModel.add(modelVariable);
+            return finalModel;
+
         }
-
-        return finalModel;
+        catch (ProofInputException pie) {
+            throw new ModelGeneratorException(pie.getMessage());
+        }
     }
 
     /**
-     * Encapsulates the path condition of the {@code targetNode} in an
-     * {@link SMTProblem}, which can in be passed to external SMT solvers.
+     * Encapsulates the path condition of the {@code targetNode} in an {@link SMTProblem}, which can
+     * in be passed to external SMT solvers.
      * 
      * @param the
      *            target path condition
      * @return an SMTProblem corresponding to the path condition
      * @throws ModelGeneratorException
      */
-    private synchronized SMTProblem createSMTProblem(
-            final IExecutionNode targetNode) throws ModelGeneratorException {
+    private synchronized SMTProblem createSMTProblem(final IExecutionNode targetNode)
+            throws ModelGeneratorException {
 
         try {
+
+            Term pathCondition = targetNode.getPathCondition();
 
             /*
              * Simplify the path condition
              */
-            Term newCondition =
-                    conditionParser.simplifyTerm(targetNode.getPathCondition());
+            Term simplifiedPathCondition = conditionParser.simplifyTerm(pathCondition);
 
             /*
-             * The path condition has to be negated, in order to undo the
-             * negations that will be carried out by the SMT interface.
+             * The path condition has to be negated, in order to undo the negations that will be
+             * carried out by the SMT interface.
              */
-            newCondition =
-                    TermFactory.DEFAULT.createTerm(Junctor.NOT, newCondition);
+            simplifiedPathCondition =
+                    TermFactory.DEFAULT.createTerm(Junctor.NOT, simplifiedPathCondition);
 
-            return new SMTProblem(newCondition);
+            return new SMTProblem(simplifiedPathCondition);
 
         }
         catch (ProofInputException e) {
@@ -208,20 +229,20 @@ public class ModelGenerator
         SMTSolverResult result = null;
 
         /*
-         * Assert that we could actually find a satisfiable assignment for the
-         * SMT problem. If not, keep trying until we do
+         * Assert that we could actually find a satisfiable assignment for the SMT problem. If not,
+         * keep trying until we do
          */
         do {
 
             /*
-             * Set up a SolverLauncher for the purpose of interfacing with the
-             * associated SMT solvers.
+             * Set up a SolverLauncher for the purpose of interfacing with the associated SMT
+             * solvers.
              */
             SolverLauncher launcher = new SolverLauncher(settings);
 
             /*
-             * Start the constraint solving procedure, the solution will be
-             * encapsulated in the existing SMTProblem.
+             * Start the constraint solving procedure, the solution will be encapsulated in the
+             * existing SMTProblem.
              */
             try {
 
@@ -234,8 +255,8 @@ public class ModelGenerator
             catch (RuntimeException re) {
 
                 /*
-                 * In the event that the system fails due launchers being
-                 * reused, dispose of them and create new ones.
+                 * In the event that the system fails due launchers being reused, dispose of them
+                 * and create new ones.
                  */
                 System.err.println(re.getMessage());
                 re.printStackTrace();
@@ -250,8 +271,7 @@ public class ModelGenerator
     }
 
     /**
-     * Assert that the solvers associated with the ModelGenerator are
-     * accessible.
+     * Assert that the solvers associated with the ModelGenerator are accessible.
      * 
      * @param solvers
      * @throws ModelGeneratorException
@@ -261,16 +281,14 @@ public class ModelGenerator
 
         for (SolverType solver : solvers) {
             if (!solver.isInstalled(false)) {
-                throw new ModelGeneratorException("Solver "
-                        + solver.getName()
+                throw new ModelGeneratorException("Solver " + solver.getName()
                         + " is not installed or could not be accessed. Check paths?");
             }
         }
     }
 
     @Override
-    public IModel generateModel(IExecutionNode node)
-            throws ModelGeneratorException {
+    public IModel generateModel(IExecutionNode node) throws ModelGeneratorException {
 
         /*
          * Turn the path condition of the node into a constraint problem
@@ -285,9 +303,8 @@ public class ModelGenerator
         /*
          * Return the model satisfying the constraint
          */
-
         try {
-            return createModel(result);
+            return createModel(node, result);
         }
         catch (ParseException e) {
             throw new ModelGeneratorException(e.getMessage()
@@ -323,8 +340,7 @@ public class ModelGenerator
         @Override
         public String getSMTTemporaryFolder() {
 
-            return PathConfig.getKeyConfigDir() + File.separator
-                    + "smt_formula";
+            return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
         }
 
         @Override

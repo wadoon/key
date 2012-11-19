@@ -1,41 +1,58 @@
 package de.uka.ilkd.key.testgeneration;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InitConfig;
+import z3parser.tree.bnf.Absyn.Modl;
+
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.implementation.Model;
+import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.visitors.TermModelVisitor;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-public class Sandbox {
+public class Sandbox
+        extends KeYTestGenTest {
+
+    private final String javaPathInBaseDir =
+            "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
+    private final String containerTypeName = "PrimitiveIntegerOperations";
 
     @Test
-    public void test() throws IOException, ProofInputException, ModelGeneratorException {
-        File file = new File("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java");
-        File javaFile = new File(file, "PrimitiveIntegerOperations.java");
+    public void test() throws ProofInputException, ModelGeneratorException, IOException {
 
-        TestCaseGenerator testCaseGenerator = TestCaseGenerator.getDefaultInstance();
-        String stuff = testCaseGenerator.generateTestCase(new stuff<String>(), null, null);
+        
+        String method = "midOneProxyOneInstance";
+        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
+                getEnvironmentForMethod(method);
+
+        ArrayList<IExecutionNode> nodes =
+                retrieveNode(environment.getBuilder().getStartNode(), "mid=x");
+
+        Term nodeCondition = nodes.get(0).getPathCondition();
+        TermModelVisitor modelVisitor = new TermModelVisitor(nodes.get(0).getServices());
+
+        System.out.println(nodes.get(0).getFormatedPathCondition());
+        System.out.println(nodes.get(0).getPathCondition());
+        nodeCondition.execPostOrder(modelVisitor);
+        
+       List<ModelVariable> variables = modelVisitor.getModelSkeleton();
+        System.out.println();
     }
+
+    private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
+            String method)
+            throws ProofInputException, ModelGeneratorException, IOException {
+
+        return getPreparedEnvironment(keyRepDirectory, javaPathInBaseDir,
+                containerTypeName, method, null, false);
     
-}
-
-
-class stuff<String> implements ITestCaseParser<String> {
-
-    @Override
-    public String generateTestCaseFromXML(java.lang.String representation) {
-
-        // TODO Auto-generated method stub
-        return null;
     }
-    
 }

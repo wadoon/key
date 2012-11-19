@@ -69,37 +69,38 @@ public class PrimitiveIntegerOperations {
 
     public int maxInstance(int x) {
 
+        int max = x;
+        
         if (x >= instanceY) {
-            return x;
+            max = x;
         }
         else {
-            return staticY;
+            max = instanceY;
         }
+
+        return max;
     }
 
+    
     public int maxStatic(int x) {
 
+        int max = x;
+        
         if (x >= staticY) {
-            return x;
+            max = x;
         }
         else {
-            return staticY;
+            max = staticY;
         }
+        
+        return max;
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * ensures ((\result <= y) && (\result <= z )) || ((\result <= y) && (\result <= x )) ||
-     * ((\result <= x) && (\result <= z ));
-     * 
-     * ensures ((\result >= y) && (\result >= z )) || ((\result >= y) && (\result >= x )) ||
-     * ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
+    /*@ public normal_behavior
+       @ ensures (\result == x) || (\result == y) || (\result == z );
+       @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) && (\result <= x )) || ((\result <= x) && (\result <= z ));
+       @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) && (\result >= x )) || ((\result >= x) && (\result >= z ));
+       @*/
     public static int mid(int x, int y, int z) {
 
         int mid = z;
@@ -213,8 +214,8 @@ public class PrimitiveIntegerOperations {
         int mid = x;
 
         if (proxy.instanceInt < instanceZ) {
-            if (x < proxy.instanceInt) {
-                mid = proxy.instanceInt;
+            if (x < proxy.nestedProxy.nestedProxy.nestedProxy.instanceInt) {
+                mid = proxy.nestedProxy.instanceInt;
             }
             else if (x < instanceZ) {
 
@@ -223,9 +224,9 @@ public class PrimitiveIntegerOperations {
         }
         else {
 
-            if (x > proxy.instanceInt) {
+            if (x > proxy.nestedProxy.instanceInt) {
 
-                mid = proxy.instanceInt;
+                mid = proxy.nestedProxy.instanceInt;
             }
             else if (x > instanceZ) {
 

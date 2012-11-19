@@ -56,4 +56,34 @@ public class TestCase {
         this.model = model;
         this.oracle = oracle;
     }
+
+    /**
+     * Retrieve the {@link KeYJavaMethod} this testcase belongs to.
+     * 
+     * @return
+     */
+    public KeYJavaMethod getMethod() {
+
+        return method;
+    }
+
+    /**
+     * Retrieve the {@link IModel} instance for this test case.
+     * 
+     * @return
+     */
+    public IModel getModel() {
+
+        return model;
+    }
+
+    /**
+     * Retrieve the oracle for the test case.
+     * 
+     * @return
+     */
+    public Term getOracle() {
+
+        return oracle;
+    }
 }
