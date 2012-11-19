@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.testgeneration.visitors;
 
-import javax.xml.stream.XMLStreamException;
-
 import de.uka.ilkd.key.testgeneration.KeYTestGenException;
 
 public class XMLVisitorException

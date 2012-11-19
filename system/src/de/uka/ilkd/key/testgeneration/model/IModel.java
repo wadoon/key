@@ -3,8 +3,6 @@ package de.uka.ilkd.key.testgeneration.model;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
-
 /**
  * A Model represents a set of variables (here represented by {@link IModelVariable}) on the heap,
  * together with relevant metadata and value bindings.

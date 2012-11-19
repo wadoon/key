@@ -2,7 +2,6 @@ package de.uka.ilkd.key.testgeneration.visitors;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Equality;

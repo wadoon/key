@@ -13,8 +13,6 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
-import de.uka.ilkd.key.testgeneration.visitors.TermXMLVisitor;
-import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
 
 /**
  * Provides various utility methods for extracting and processing the

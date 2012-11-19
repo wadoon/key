@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
@@ -22,7 +21,6 @@ import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.oraclegeneration.ContractExtractor;
-import de.uka.ilkd.key.testgeneration.oraclegeneration.OracleGeneratorException;
 import de.uka.ilkd.key.testgeneration.xml.XMLGenerator;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 

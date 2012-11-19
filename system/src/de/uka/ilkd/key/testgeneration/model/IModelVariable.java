@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.testgeneration.model;
 
-import java.util.List;
-
 /**
  * Represents a general variable on the program heap. 
  * 

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
 public class ModifiedConditionDecisionCoverageParser
         implements ICodeCoverageParser {
 
+    @Override
     public List<IExecutionNode> retrieveNodes(IExecutionStartNode root) {
 
         throw new UnsupportedOperationException("Not implemented yet");

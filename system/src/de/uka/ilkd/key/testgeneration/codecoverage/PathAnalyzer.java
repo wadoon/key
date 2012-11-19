@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.testgeneration.codecoverage;
 
-import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 

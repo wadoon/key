@@ -3,7 +3,6 @@ package de.uka.ilkd.key.testgeneration.visitors;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Stack;
 
 import javax.xml.stream.XMLEventFactory;

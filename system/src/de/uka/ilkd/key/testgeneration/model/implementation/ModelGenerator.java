@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import sun.net.smtp.SmtpProtocolException;
-
 import z3parser.api.Z3ModelParser.ValueContainer;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
@@ -138,7 +136,7 @@ public class ModelGenerator
         /*
          * Return the model satisfying the constraint
          */
-        // return createModel(result);
+        //return createModel(targetNode, result);
         return null;
     }
 
