@@ -16,6 +16,7 @@ import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.visitors.TermModelVisitor;
+import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class Sandbox
@@ -26,7 +27,7 @@ public class Sandbox
     private final String containerTypeName = "PrimitiveIntegerOperations";
 
     @Test
-    public void test() throws ProofInputException, ModelGeneratorException, IOException {
+    public void test() throws ProofInputException, ModelGeneratorException, IOException, XMLGeneratorException {
 
         
         String method = "midOneProxyOneInstance";
@@ -39,12 +40,8 @@ public class Sandbox
         Term nodeCondition = nodes.get(0).getPathCondition();
         TermModelVisitor modelVisitor = new TermModelVisitor(nodes.get(0).getServices());
 
-        System.out.println(nodes.get(0).getFormatedPathCondition());
-        System.out.println(nodes.get(0).getPathCondition());
-        nodeCondition.execPostOrder(modelVisitor);
+        TestCaseGenerator testCaseGenerator = TestCaseGenerator.getDefaultInstance();
         
-       List<ModelVariable> variables = modelVisitor.getModelSkeleton();
-        System.out.println();
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

@@ -168,21 +168,17 @@ public class TermXMLVisitor
             return;
         }
 
-        System.out.println("Operator: " + visited.op());
-        System.out.println("Sort: " + visited.sort());
-        System.out.println("Operator Class: " + visited.op().getClass());
-        System.out.println("Sort Class: " + visited.sort().getClass());
-
-        System.out.println();
-
         Operator operator = visited.op();
 
         /*
          * TODO: Make polymorphic
          */
+        /*
         if (operator instanceof LocationVariable) {
             addVariableNode(visited);
         }
+        */
+        elements.add(eventFactory.createCharacters(visited.toString()));
     }
 
     /**

@@ -84,8 +84,9 @@ public class TermModelVisitor
 
                 ModelVariable parentModelVariable = null;
                 if (parentVariable != null) {
+                    String parentIdentifier = resolveIdentifierString(visited.sub(1));
                     parentModelVariable =
-                            new ModelVariable(parentVariable, null, identifier);
+                            new ModelVariable(parentVariable, null, parentIdentifier);
                 }
 
                 addToList(new ModelVariable(programVariable,

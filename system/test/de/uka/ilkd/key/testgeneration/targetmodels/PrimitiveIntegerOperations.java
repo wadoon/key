@@ -209,6 +209,9 @@ public class PrimitiveIntegerOperations {
         return mid;
     }
 
+    /*@ public normal_behavior
+       @ ensures true;
+       @*/
     public int midOneProxyOneInstance(int x) {
 
         int mid = x;

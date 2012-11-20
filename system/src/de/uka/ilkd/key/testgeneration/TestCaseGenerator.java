@@ -59,11 +59,6 @@ public class TestCaseGenerator {
     private final IModelGenerator modelGenerator;
 
     /**
-     * Used in order to transform test case data into KeYTestGens internal XML format
-     */
-    private final XMLGenerator xmlWriter;
-
-    /**
      * Used in order to communicate with and request services from the KeY runtime
      */
     private final KeYInterface keYInterface = KeYInterface.INSTANCE;
@@ -88,13 +83,7 @@ public class TestCaseGenerator {
     private TestCaseGenerator(IModelGenerator modelGenerator)
             throws XMLGeneratorException {
 
-        try {
-            xmlWriter = new XMLGenerator();
-            this.modelGenerator = modelGenerator;
-        }
-        catch (XMLGeneratorException e) {
-            throw new XMLGeneratorException(e.getMessage());
-        }
+        this.modelGenerator = modelGenerator;
 
     }
 
@@ -271,13 +260,16 @@ public class TestCaseGenerator {
             /*
              * Create and return a final XML representation of the test suite.
              */
-
-            return null;
+            XMLGenerator xmlWriter = new XMLGenerator();
+            return xmlWriter.createTestSuite(testCases, true);
         }
         catch (KeYInterfaceException e) {
             throw new TestGeneratorException(e.getMessage());
         }
         catch (IOException e) {
+            throw new TestGeneratorException(e.getMessage());
+        }
+        catch (XMLGeneratorException e) {
             throw new TestGeneratorException(e.getMessage());
         }
     }
@@ -346,22 +338,32 @@ public class TestCaseGenerator {
             KeYJavaMethod method,
             List<IExecutionNode> nodes) throws TestGeneratorException {
 
-        try {
+        List<TestCase> testCases = new LinkedList<TestCase>();
+        for (IExecutionNode node : nodes) {
 
-            List<TestCase> testCases = new LinkedList<TestCase>();
-            for (IExecutionNode node : nodes) {
-                IModel model = modelGenerator.generateModel(node);
-                // TODO: This is an ugly hack since I am not sure how to handle multiple
-                // postconditions yet, fix.
-                TestCase testCase =
-                        new TestCase(method, model, method.getPostconditions().get(0));
+            /*
+             * FIXME: Very ugly workaround to safeguard against the model failing...why does this
+             * happen?
+             */
+            IModel model = null;
+            while (model == null) {
+                try {
+                    model = modelGenerator.generateModel(node);
+                }
+                catch (ModelGeneratorException e) {
+                    System.err.println("WARNING: Model generation failed!");
+                }
             }
 
-            return testCases;
+            /*
+             * FIXME: This is an ugly hack since I am not sure how to handle multiple postconditions
+             * yet, fix.
+             */
+            TestCase testCase =
+                    new TestCase(method, model, method.getPostconditions().get(0));
+            testCases.add(testCase);
         }
-        catch (ModelGeneratorException e) {
-            throw new TestGeneratorException(e.getMessage());
-        }
+        return testCases;
     }
 
     /**

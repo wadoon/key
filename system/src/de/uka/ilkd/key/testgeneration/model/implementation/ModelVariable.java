@@ -68,7 +68,9 @@ public class ModelVariable
     @Override
     public String getName() {
 
-        return wrappedProgramVariable.name().toString();
+        String parentName = wrappedProgramVariable.name().toString();
+        String[] splitParentName = parentName.split("::");
+        return splitParentName[splitParentName.length-1];
     }
 
     /**
@@ -155,6 +157,11 @@ public class ModelVariable
     public String getId() {
 
         return identifier;
+    }
+
+    public boolean isStatic() {
+
+        return wrappedProgramVariable.isStatic();
     }
 
     /**
