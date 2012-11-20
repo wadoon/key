@@ -3,6 +3,11 @@ package de.uka.ilkd.key.testgeneration.cli;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import de.uka.ilkd.key.testgeneration.TestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.TestGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
+
 /**
  * Provides a CLI interface for KeYTestGen2
  * 
@@ -32,14 +37,26 @@ public final class KTGCommandLineInterface {
 
     /**
      * @param args
+     * @throws XMLGeneratorException 
+     * @throws ModelGeneratorException 
+     * @throws TestGeneratorException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ModelGeneratorException, XMLGeneratorException, TestGeneratorException {
 
         if (args.length==0) {
             printHelp();
             System.exit(0);
-        }
+        } 
         
+        String source = args[0];
+        System.out.println(source);
+        String method = args[1];
+        System.out.println(method);
+        
+        TestCaseGenerator testCaseGenerator = TestCaseGenerator.getDefaultInstance();
+        System.out.println(testCaseGenerator.generateTestCase(source, method));
+        
+        /*
         Queue<String> argumentQueue = new LinkedList<String>();
         for(String argument : args) {
             argumentQueue.add(argument.trim());
@@ -47,6 +64,7 @@ public final class KTGCommandLineInterface {
         
         parseArgs(argumentQueue);
         printAbout();
+        */
     }
 
     private static void parseArgs(Queue<String> argumentQueue) {

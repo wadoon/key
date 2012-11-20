@@ -228,8 +228,6 @@ public class XMLGenerator {
         writeOracle(testCase.getOracle());
 
         writeEndTag(TESTCASE_ROOT);
-        eventWriter.add(newline);
-        eventWriter.add(newline);
     }
 
     private void writeOracle(Term oracle) throws XMLVisitorException, XMLStreamException {

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 /**
  * Generates an XML representation for a {@link Term}.
@@ -81,7 +82,8 @@ public class TermXMLVisitor
     public TermXMLVisitor(String rootTag) throws XMLVisitorException {
 
         try {
-            eventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(outputStream);
+            eventWriter =
+                    XMLOutputFactory.newFactory().createXMLEventWriter(outputStream);
         }
         catch (XMLStreamException e) {
             throw new XMLVisitorException("FATAL: failed to initialize XMLVisitor", e);
@@ -145,7 +147,8 @@ public class TermXMLVisitor
         }
         catch (XMLStreamException xse) {
             throw new XMLVisitorException("FATAL: there was an error writing to the XML stream: "
-                    + xse.getMessage(), xse);
+                    + xse.getMessage(),
+                    xse);
         }
 
         /*
@@ -160,6 +163,8 @@ public class TermXMLVisitor
     @Override
     public void visit(Term visited) {
 
+        System.out.println("TERM: " + visited);
+        System.out.println("OPERATOR: " + visited.op().getClass());
         /*
          * Output text only if the node contains something suitable, i.e. it is not a Junctor or
          * other composite operation, but an actual value.
@@ -173,12 +178,16 @@ public class TermXMLVisitor
         /*
          * TODO: Make polymorphic
          */
-        /*
-        if (operator instanceof LocationVariable) {
+
+        if (operator instanceof LocationVariable
+                || operator instanceof SortDependingFunction) {
             addVariableNode(visited);
         }
-        */
-        elements.add(eventFactory.createCharacters(visited.toString()));
+        else {
+            addTag(eventFactory.createStartElement("", "", "field"));
+            addTag(eventFactory.createCharacters(visited.toString()), 1);
+            addTag(eventFactory.createEndElement("", "", "field"));
+        }
     }
 
     /**
@@ -262,13 +271,10 @@ public class TermXMLVisitor
      */
     private void addVariableNode(Term term) {
 
-        String sortName = term.sort().name().toString();
-        String variableName = term.op().name().toString();
+        String variableName = resolveIdentifierString(term);
 
         addTag(eventFactory.createStartElement("", "", "field"));
-        addTag(eventFactory.createStartElement("", "", sortName), 1);
-        addTag(eventFactory.createCharacters(variableName), 2);
-        addTag(eventFactory.createEndElement("", "", sortName), 1);
+        addTag(eventFactory.createCharacters(variableName), 1);
         addTag(eventFactory.createEndElement("", "", "field"));
     }
 }
