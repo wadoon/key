@@ -5,7 +5,7 @@ package de.uka.ilkd.key.testgeneration.model;
  * 
  * @author christopher
  */
-public interface IModelVariable {
+public interface IModelObject {
     
     String getName();
 

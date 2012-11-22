@@ -5,8 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import z3parser.tree.bnf.Absyn.Modl;
+
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.model.IModel;
-import de.uka.ilkd.key.testgeneration.model.IModelVariable;
+import de.uka.ilkd.key.testgeneration.model.IModelObject;
 
 /**
  * Default implementation of the {@link IModel} interface
@@ -16,112 +19,189 @@ import de.uka.ilkd.key.testgeneration.model.IModelVariable;
 public class Model
         implements IModel {
 
+    /**
+     * Indicates whether this instance will use buffering or not in order to avoid
+     * nullpointerexceptions.
+     */
+    // private final boolean useBuffer;
+
+    /**
+     * Buffers variables which currently cannot be inserted due to broken reference dependencies.
+     * Primarily, this will occur when the user tries to insert a variable as a field into an
+     * instace which currently does'nt exist. This can happens if this class is used in
+     * non-postorder visitations of {@link Term} ASTs. Use mainly to allow safe visitations.
+     */
+    private final LinkedList<ModelVariable> buffer = new LinkedList<ModelVariable>();
+
+    /**
+     * The {@link ModelVariable} instances represented on this heap.
+     */
     private final LinkedList<ModelVariable> variables = new LinkedList<ModelVariable>();
 
     /**
-     * Return a filtered subset of variables in this model. Filters can be left out to return all
-     * variables.
+     * Adds a variable to the heap, causing it to point to a given object instance. If the variable
+     * already exists on the heap, this method will cause the variable to point to the new instance
+     * instead, unless the variable is declared as <code>final</code>.
+     * 
+     * @param variable
+     *            the variable to be added
+     * @param instance
+     *            the instance the variable will point to. Can be <code>null</code>.
+     */
+    public void add(ModelVariable variable, Object instance) {
+
+        /*
+         * FIXME: This is NOT a good way to handle this. This should throw an exception, not fail
+         * silently.
+         */
+        if (!ModelVariable.isValidValueType(instance)) {
+            return;
+        }
+
+        ModelVariable localVariable = lookupVariable(variable);
+
+        if (localVariable == null) {
+
+            variable.setValue(instance);
+            variables.add(variable);
+        }
+        else {
+
+            variable.setValue(instance);
+        }
+    }
+
+    /**
+     * Links two {@link ModelVariable} instances, causing target to point to the
+     * {@link ModelInstance} which other is pointing to.
+     * 
+     * @param target
+     *            the target variable, i.e. the one the address of the instance is being bound to.
+     *            Cannot be <code>null</code>
+     * @param other
+     *            the other variable, i.e. the one currently holding the address of the instance.
+     *            Cannot be <code>null</code>
+     */
+    public void assignPointer(ModelVariable target, ModelVariable other) {
+
+        if (!target.equals(other)) {
+            target = lookupVariable(target);
+            other = lookupVariable(other);
+            
+            target.setValue(other.getValue());
+        }
+    }
+
+    /**
+     * Adds a new variable without violating uniqueness
+     * 
+     * @param variable
+     *            the variable to add
+     */
+    private void addVariableNoDuplicates(ModelVariable variable) {
+
+        if (!variables.contains(variable)) {
+            variables.add(variable);
+        }
+    }
+
+    /**
+     * Places the variable target as a field of the {@link ModelInstance} referred to by the
+     * variable other.
+     * 
+     * @param target
+     *            the variable to insert as a field
+     * @param other
+     *            the variable pointing to the object instance we are inserting into
+     */
+    public void assignField(ModelVariable target, ModelVariable other) {
+
+        if (!target.equals(other)) {
+            target = lookupVariable(target);
+            other = lookupVariable(other);
+            
+            ModelInstance instance = (ModelInstance) other.getValue();
+            instance.addField(target);
+            target.setParentModelInstance(instance);
+        }
+    }
+
+    /**
+     * Retrieves the actual in-memory reference to a variable, as represented on the heap.
+     * 
+     * @param variable
+     *            the variable to lookup
+     */
+    private ModelVariable lookupVariable(ModelVariable variable) {
+
+        int index = variables.indexOf(variable);
+        return index >= 0 ? variables.get(index) : null;
+    }
+
+    /**
+     * Return a filtered subset of objects in this model. Filters can be left out to return all
+     * objects.
      */
     @SafeVarargs
     @Override
-    public final List<IModelVariable> getVariables(IModelFilter... filters) {
+    public final List<IModelObject> getVariables(IModelFilter... filters) {
 
-        LinkedList<IModelVariable> filteredVariables = new LinkedList<IModelVariable>();
+        LinkedList<IModelObject> filteredVariables = new LinkedList<IModelObject>();
 
-        for (IModelVariable variable : variables) {
+        for (ModelVariable variable : variables) {
 
             if (satisfiesFilters(variable, filters)) {
 
                 filteredVariables.add(variable);
             }
         }
-
         return filteredVariables;
     }
 
     @Override
-    public Map<String, IModelVariable> getVariableNameMapping(IModelFilter... filters) {
+    public Map<String, IModelObject> getVariableNameMapping(IModelFilter... filters) {
 
-        List<IModelVariable> filteredVariables = getFilteredVariables(filters);
+        List<IModelObject> filteredVariables = getFilteredVariables(filters);
 
-        HashMap<String, IModelVariable> variableMapping =
-                new HashMap<String, IModelVariable>();
+        HashMap<String, IModelObject> variableMapping =
+                new HashMap<String, IModelObject>();
 
-        for (IModelVariable variable : filteredVariables) {
+        for (IModelObject variable : filteredVariables) {
 
             variableMapping.put(variable.getName(), variable);
         }
         return variableMapping;
     }
 
-    public void add(ModelVariable variable) {
+    /**
+     * Returns the {@link ModelVariable} instance having a specific reference.
+     * 
+     * @param reference
+     *            the reference
+     * @return the found instance, null if no instance is found with the specified reference
+     */
+    public ModelVariable getVariableByReference(String reference) {
 
-        /*
-         * If the variable does not have a parent, it is a local variable, and we just insert it
-         * as-is.
-         */
-        if (variable.getParent() == null) {
-            if (!variables.contains(variable)) {
-                variables.add(variable);
+        for (ModelVariable variable : variables) {
+
+            if (variable.getIdentifier().equals(reference)) {
+                return variable;
             }
         }
-
-        /*
-         * If the parent is not null, then this variable is either static, or part of a reference
-         * field in the main class. In this case we search for a reference to the parent and insert
-         * it as a childnode there.
-         */
-        else {
-            for (ModelVariable modelVariable : variables) {
-
-                /*
-                 * Shortcircuit the insertion if the value has been succesfully inserted.
-                 */
-                if (insertIntoModel(variable, modelVariable)) {
-                    return;
-                }
-            }
-        }
+        return null;
     }
 
     /**
-     * Recursively insert a {@link ModelVariable} into the {@link Model} as a child of its parent.
+     * Determines if a given {@link ModelVariable} satisfied the conditions postulated in a given
+     * set of {@link IModelFilter} instances.
      * 
      * @param variable
-     * @param target
+     *            the variable to check
+     * @param filters
+     *            the filters to check against
      * @return
      */
-    private boolean insertIntoModel(ModelVariable variable, ModelVariable target) {
-
-        if (target.equals(variable.getParent())) {
-            target.addChild(variable);
-            return true;
-        }
-        else {
-            for (ModelVariable child : target.getChildren()) {
-                if(insertIntoModel(variable, child)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private List<IModelVariable> getFilteredVariables(IModelFilter[] filters) {
-
-        LinkedList<IModelVariable> filteredVariables = new LinkedList<IModelVariable>();
-
-        for (IModelVariable variable : variables) {
-
-            if (satisfiesFilters(variable, filters)) {
-
-                filteredVariables.add(variable);
-            }
-        }
-        return filteredVariables;
-    }
-
-    private boolean satisfiesFilters(IModelVariable variable, IModelFilter[] filters) {
+    private boolean satisfiesFilters(ModelVariable variable, IModelFilter[] filters) {
 
         for (IModelFilter filter : filters) {
             if (!filter.satisfies(variable)) {
@@ -131,8 +211,22 @@ public class Model
         return true;
     }
 
+    private List<IModelObject> getFilteredVariables(IModelFilter[] filters) {
+
+        LinkedList<IModelObject> filteredVariables = new LinkedList<IModelObject>();
+
+        for (ModelVariable variable : variables) {
+
+            if (satisfiesFilters(variable, filters)) {
+
+                filteredVariables.add(variable);
+            }
+        }
+        return filteredVariables;
+    }
+
     /**
-     * Filter variables according to name.
+     * Filter objects according to name.
      * 
      * @author christopher
      */
@@ -147,7 +241,7 @@ public class Model
         }
 
         @Override
-        public boolean satisfies(IModelVariable object) {
+        public boolean satisfies(IModelObject object) {
 
             return object.getName().equals(name);
         }

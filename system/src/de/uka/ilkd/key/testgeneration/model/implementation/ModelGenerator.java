@@ -23,9 +23,9 @@ import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
+import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
-import de.uka.ilkd.key.testgeneration.visitors.TermModelVisitor;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default to this
@@ -52,11 +52,6 @@ public class ModelGenerator
      * possible for the user to use custom settings.
      */
     private final SMTSettings settings;
-
-    /**
-     * ConditionParser for the purpose of simplifying path conditions.
-     */
-    private final PathconditionParser conditionParser = new PathconditionParser();
 
     /**
      * Backend constructo, used by the factory methods.
@@ -136,7 +131,7 @@ public class ModelGenerator
         /*
          * Return the model satisfying the constraint
          */
-        //return createModel(targetNode, result);
+        // return createModel(targetNode, result);
         return null;
     }
 
@@ -160,14 +155,17 @@ public class ModelGenerator
         try {
 
             /*
-             * Extract the variables in the partial heap state
+             * Extract the fundamental information about the heapstate (i.e. Model) from the
+             * pathcondition of this node. We will later assign concrete values to the variables
+             * extracted in this process.
              */
-            TermModelVisitor termModelVisitor = new TermModelVisitor(node.getServices());
-            node.getPathCondition().execPostOrder(termModelVisitor);
-            List<ModelVariable> modelVariables = termModelVisitor.getModelSkeleton();
+            Model model =
+                    PathconditionParser.createModel(node.getPathCondition(),
+                            node.getServices());
 
             /*
-             * Extract the heap state interpretation using the Z3 parser.
+             * Extract the concrete values of any primitive values on the heap representation, using
+             * the Z3 parser.
              */
             String modelOutput = consolidateModelOutput(result.getOutput());
             HashMap<String, z3parser.api.Z3ModelParser.ValueContainer> rawModel =
@@ -177,19 +175,15 @@ public class ModelGenerator
              * Insert the generated values into the partial heapstate
              */
             for (ValueContainer container : rawModel.values()) {
-                for (ModelVariable modelVariable : modelVariables) {
-                    if (modelVariable.getId().equals(container.getName())) {
-                        modelVariable.setValue(container.getValue());
-                    }
-                }
+
             }
 
             /*
              * Finally, turn the partial heapstate into a full-fledged Model
              */
             Model finalModel = new Model();
-            for (ModelVariable modelVariable : modelVariables) {
-                finalModel.add(modelVariable);
+            for (IModelObject modelVariable : model.getVariables()) {
+
             }
 
             return finalModel;
@@ -225,7 +219,8 @@ public class ModelGenerator
             /*
              * Simplify the path condition
              */
-            Term simplifiedPathCondition = conditionParser.simplifyTerm(pathCondition);
+            Term simplifiedPathCondition =
+                    PathconditionParser.simplifyTerm(pathCondition);
 
             /*
              * The path condition has to be negated, in order to undo the negations that will be

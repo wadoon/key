@@ -1,36 +1,42 @@
 package de.uka.ilkd.key.testgeneration.model.implementation;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.testgeneration.model.IModel;
-import de.uka.ilkd.key.testgeneration.model.IModelVariable;
+import de.uka.ilkd.key.testgeneration.model.IModelObject;
 
 /**
- * The default implementation of {@link IModelVariable}.
+ * Instances of this class represent Java program variables during runtime. It's main function is to
+ * encapsulate a corresponding instance of {@link ProgramVariable}, which will contain rather
+ * complete information about the variable itself. However, it adds an additional layer runtime
+ * information, showing exactly which concrete object on the heap this variable points to.
  * <p>
- * This class encapsulates the actual {@link ProgramVariable} instance for the variable which it
- * represents. On top of the information contained in this wrapped instance, this class adds a bound
- * value, as well as parent-children references, allowing instances of this class to be organized as
- * a tree.This is done in order to represent declaration hierarchies in an actual Java program.
+ * Instances of this class can represent either an object reference or primitive type reference.
+ * <ul>
+ * <li>If it represents an object reference, its bound value will be a {@link ModelInstance},
+ * representing the heap object this variable is pointing to. This value defaults null if no
+ * reference is given.</li>
+ * <li>If it represents a primitive reference, then its value be one of the primitive wrapper
+ * classes supported by KeY ({@link Integer}, {@link Boolean}, {@link Long}, {@link Byte} or
+ * {@link Character}). It cannot be null in this case.</li>
+ * </ul>
  * 
  * @author christopher
  */
 public class ModelVariable
-        implements IModelVariable {
+        implements IHeapObject {
+
+    /**
+     * Represents a unique identifier for this variable, denoting its relative point of declaration
+     * in the program, in the form self_dot_someField_dot_someOtherField_dot_thisvariable. Since no
+     * two variables can have the same declaration space, this is also used to uniquely distinguish
+     * this variable as a {@link IHeapObject}.
+     */
+    private final String identifier;
 
     /**
      * The {@link ProgramVariable} instance wrapped by this variable
      */
-    private ProgramVariable wrappedProgramVariable;
-
-    /**
-     * A unique identifier related to the particular implementation of {@link IModel} we are using
-     * (i.e. {@link Model}).
-     */
-    private final String identifier;
+    private final ProgramVariable wrappedProgramVariable;
 
     /**
      * The value bound to this object. Primitive types are represented by their wrapper types (
@@ -39,15 +45,10 @@ public class ModelVariable
     private Object boundValue;
 
     /**
-     * The parent of this value
+     * The instance of {@link ModelInstance} in which this particular instance of
+     * {@link ModelVariable} has been initialized.
      */
-    private ModelVariable parent;
-
-    /**
-     * The children bound to this node. Such a child can correspond to one and only one of this
-     * types fields.T
-     */
-    private List<ModelVariable> children = new LinkedList<ModelVariable>();
+    private ModelInstance parentModelInstance;
 
     /**
      * Create a ModelVariable from an existing {@link ProgramVariable}, effectively encapsulating
@@ -57,12 +58,17 @@ public class ModelVariable
      */
     public ModelVariable(
             ProgramVariable programVariable,
-            ModelVariable parent,
-            String identifier) {
+            String path,
+            ModelInstance referedInstance) {
 
         this.wrappedProgramVariable = programVariable;
-        this.parent = parent;
-        this.identifier = identifier;
+        this.identifier = path;
+        this.boundValue = referedInstance;
+    }
+
+    public ModelVariable(ProgramVariable programVariable, String path) {
+
+        this(programVariable, path, null);
     }
 
     @Override
@@ -70,7 +76,7 @@ public class ModelVariable
 
         String parentName = wrappedProgramVariable.name().toString();
         String[] splitParentName = parentName.split("::");
-        return splitParentName[splitParentName.length-1];
+        return splitParentName[splitParentName.length - 1];
     }
 
     /**
@@ -113,60 +119,24 @@ public class ModelVariable
     }
 
     /**
-     * Returns the parent {@link ModelVariable} of this variable.
-     * 
-     * @return
+     * A variable is uniquely identified by its identifier.
      */
-    public ModelVariable getParent() {
-
-        return parent;
-    }
-
-    /**
-     * @return the children of this variable
-     */
-    public List<ModelVariable> getChildren() {
-
-        return children;
-    }
-
-    /**
-     * Add a child {@link ModelVariable} to this variable
-     * 
-     * @param child
-     *            the child to add
-     */
-    public void addChild(ModelVariable child) {
-
-        if (!children.contains(child)) {
-            children.add(child);
-        }
-    }
-
     @Override
-    public String toString() {
-
-        return wrappedProgramVariable.toString() + " (id=" + identifier + ")";
-    }
-
-    /**
-     * Returns the unique identifier of this variable.
-     * 
-     * @return the identifier String
-     */
-    public String getId() {
+    public String getIdentifier() {
 
         return identifier;
     }
 
-    public boolean isStatic() {
+    public static boolean isValidValueType(Object object) {
 
-        return wrappedProgramVariable.isStatic();
+        return object.getClass() == ModelInstance.class
+                || object.getClass() == Integer.class || object.getClass() == Byte.class
+                || object.getClass() == Long.class || object.getClass() == Boolean.class;
     }
 
     /**
      * Since we are working with unique Java statements, two {@link ModelVariable} instances are
-     * equal iff. their identifiers are identical.
+     * equal iff. their paths are identical.
      */
     @Override
     public boolean equals(Object obj) {
@@ -182,5 +152,32 @@ public class ModelVariable
         }
         ModelVariable other = (ModelVariable) obj;
         return this.identifier.equals(other.identifier);
+    }
+
+    @Override
+    public String toString() {
+
+        return wrappedProgramVariable.getKeYJavaType().getFullName() + " : " + identifier;
+    }
+
+    /**
+     * Returns the {@link ModelInstance} of which this variable is a field
+     * 
+     * @return
+     */
+    public ModelInstance getParentModelInstance() {
+
+        return parentModelInstance;
+    }
+
+    /**
+     * Sets the {@link ModelInstance} of which this variable forms a field. FIXME: this should not
+     * be assignable at all, violates abstraction.
+     * 
+     * @param parentModelInstance
+     */
+    public void setParentModelInstance(ModelInstance parentModelInstance) {
+
+        this.parentModelInstance = parentModelInstance;
     }
 }

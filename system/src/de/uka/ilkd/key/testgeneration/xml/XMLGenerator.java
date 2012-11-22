@@ -20,7 +20,7 @@ import de.uka.ilkd.key.testgeneration.ITestCaseParser;
 import de.uka.ilkd.key.testgeneration.TestCase;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.model.IModel;
-import de.uka.ilkd.key.testgeneration.model.IModelVariable;
+import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.visitors.TermXMLVisitor;
@@ -289,7 +289,7 @@ public class XMLGenerator {
 
         writeStartTag(TESTFIXTURE_ROOT);
 
-        for (IModelVariable variable : model.getVariables()) {
+        for (IModelObject variable : model.getVariables()) {
             ModelVariable modelVariable = (ModelVariable) variable;
 
             /*

@@ -84,7 +84,7 @@ public abstract class KeYTestGenTermVisitor
 
         return operator instanceof Function || operator instanceof ProgramVariable;
     }
-    
+
     /**
      * Generate an identifier String for a variable. Such an identifier is used in order to uniquely
      * distinguish an instance of a {@link ModelVariable}.
@@ -110,12 +110,15 @@ public abstract class KeYTestGenTermVisitor
         /*
          * Recursive case: underlying definition is still recursively defined, so keep unwinding it.
          */
+        else if (term.toString().equals("null")) {
+            return "null";
+        }
         else {
             return resolveIdentifierString(term.sub(1)) + "_dot_"
                     + getVariableNameForTerm(term.sub(2));
         }
     }
-    
+
     /**
      * Retrieves the short-hand name of the variable a given Term represents. For example, in the
      * Term

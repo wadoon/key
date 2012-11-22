@@ -13,7 +13,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
-import de.uka.ilkd.key.testgeneration.model.IModelVariable;
+import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
@@ -121,7 +121,7 @@ public class TestModelGenerationIntegers
 
             IModel model = modelGenerator.generateModel(node);
 
-            Map<String, IModelVariable> variableMapping = model.getVariableNameMapping();
+            Map<String, IModelObject> variableMapping = model.getVariableNameMapping();
 
             int x = (Integer) variableMapping.get("x").getValue();
             int y = (Integer) variableMapping.get("y").getValue();
@@ -143,7 +143,7 @@ public class TestModelGenerationIntegers
 
             IModel model = modelGenerator.generateModel(node);
 
-            Map<String, IModelVariable> variableMapping = model.getVariableNameMapping();
+            Map<String, IModelObject> variableMapping = model.getVariableNameMapping();
 
             int x = (Integer) variableMapping.get("x").getValue();
             int y = (Integer) variableMapping.get("self_dollar_instanceY").getValue();
@@ -155,7 +155,7 @@ public class TestModelGenerationIntegers
 
             int result = operations.midTwoInstance(x);
 
-            for (IModelVariable var : model.getVariables()) {
+            for (IModelObject var : model.getVariables()) {
                 String varName = var.getName();
                 if (varName.endsWith(variable)) {
                     int varValue = (Integer) variableMapping.get(var.getName()).getValue();
@@ -176,7 +176,7 @@ public class TestModelGenerationIntegers
 
             IModel model = modelGenerator.generateModel(node);
 
-            Map<String, IModelVariable> variableMapping = model.getVariableNameMapping();
+            Map<String, IModelObject> variableMapping = model.getVariableNameMapping();
 
             int x = (Integer) variableMapping.get("x").getValue();
             int y = (Integer) variableMapping.get("self_dollar_proxy_dollar_instanceInt").getValue();
@@ -188,7 +188,7 @@ public class TestModelGenerationIntegers
 
             int result = operations.midTwoProxy(x);
 
-            for (IModelVariable var : model.getVariables()) {
+            for (IModelObject var : model.getVariables()) {
                 String varName = var.getName();
                 if (varName.endsWith(variable)) {
                     int varValue = (Integer) variableMapping.get(var.getName()).getValue();

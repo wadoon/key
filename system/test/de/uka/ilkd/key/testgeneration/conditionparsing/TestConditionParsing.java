@@ -114,8 +114,7 @@ public class TestConditionParsing
 
         // printDebug(method, targetNode);
 
-        PathconditionParser parser = new PathconditionParser();
-        System.out.println(parser.simplifyTerm(targetNodeCondition));
+        System.out.println(PathconditionParser.simplifyTerm(targetNodeCondition));
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A Model represents a set of variables (here represented by {@link IModelVariable}) on the heap,
+ * A Model represents a set of variables (here represented by {@link IModelObject}) on the heap,
  * together with relevant metadata and value bindings.
  * <p>
  * In the context of KeYTestGen2, the specific use of a Model is to describe a heapstate which will
@@ -24,7 +24,7 @@ public interface IModel {
      *            a set of filters which each variable in he list must satisfy.
      * @return
      */
-    List<IModelVariable> getVariables(IModelFilter... filters);
+    List<IModelObject> getVariables(IModelFilter... filters);
 
     /**
      * Returns a mapping between the name of each heap variable (which must per definition be
@@ -34,7 +34,7 @@ public interface IModel {
      *            a set of filters which each mapped variable must satisfy.
      * @return
      */
-    Map<String, IModelVariable> getVariableNameMapping(IModelFilter... filters);
+    Map<String, IModelObject> getVariableNameMapping(IModelFilter... filters);
 
     /**
      * A filter which can be used in order to select a subset 
@@ -43,6 +43,6 @@ public interface IModel {
      */
     interface IModelFilter {
 
-        boolean satisfies(IModelVariable variable);
+        boolean satisfies(IModelObject variable);
     }
 }

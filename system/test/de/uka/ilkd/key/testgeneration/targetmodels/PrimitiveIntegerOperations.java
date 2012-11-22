@@ -208,13 +208,29 @@ public class PrimitiveIntegerOperations {
         }
         return mid;
     }
+    
+ /*@ public normal_behavior
+    @ ensures true;
+    @*/
+    public int broken() {
+        
+        int value = 0;
+        proxy = null;
+        
+        
+        if(proxy.nestedProxy.nestedProxy == proxy.nestedProxy) {
+            value = 15;
+        }
+        
+        return value;
+    }
 
     /*@ public normal_behavior
        @ ensures true;
        @*/
     public int midOneProxyOneInstance(int x) {
 
-        int mid = x;
+        int mid = 0;
 
         if (proxy.instanceInt < instanceZ) {
             if (x < proxy.nestedProxy.nestedProxy.nestedProxy.instanceInt) {
