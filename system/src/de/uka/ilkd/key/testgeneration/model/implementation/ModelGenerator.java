@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import z3parser.api.Z3ModelParser;
 import z3parser.api.Z3ModelParser.ValueContainer;
+import z3parser.api.Z3ModelParser.ValueContainer.Type;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.Services;
@@ -104,104 +106,61 @@ public class ModelGenerator
     }
 
     /**
-     * Generates a model satisfying the pathcondition for a given {link {@link IExecutionNode}. The
-     * model is encoded in XML format, and serves as a basis for creating executable test suites.
+     * This method takes a {@link Model} instance, and <i>instantiates</i> this Model using the
+     * output of an SMT solver, here represented by {@link SMTSolverResult}.
+     * <p>
+     * Instantiation means that any concrete values of <i>primitive</i> values represented in the
+     * Model will be extracted from the SMT solver result and inserted into their respective
+     * locations in the Model. The precise location of a given value instantiation is determined by
+     * the <i>identifier</i> String associated with the value. A concrete value belonging to a
+     * specific {@link ModelVariable} instance will have the same identifier as that variable.
      * 
-     * @param targetNode
-     *            the node whose path condition we wish to find a model for
-     * @param services
-     *            related to the underlying implementation. See {@link Services}
-     * @return the model for the path condition, in XML format
+     * @param model
+     *            the Model to instantiate
+     * @param smtResult
+     *            the output of an SMT solver
+     * @return the instantiated Model
      * @throws ModelGeneratorException
+     *             in the event that the instantiation went wrong
      */
-    public String generateNodeModel(
-            final IExecutionNode targetNode,
-            final Services services) throws ModelGeneratorException {
-
-        /*
-         * Turn the path condition of the node into a constraint problem
-         */
-        SMTProblem problem = createSMTProblem(targetNode);
-
-        /*
-         * Solve the constraint
-         */
-        SMTSolverResult result = solveSMTProblem(problem, services);
-
-        /*
-         * Return the model satisfying the constraint
-         */
-        // return createModel(targetNode, result);
-        return null;
-    }
-
-    /**
-     * This method takes an {@link IExecutionNode} corresponding to a Java statement and the output
-     * of an SMT solver, and uses this information to construct a concrete {@link Model} instance
-     * for this node. This Model will contain the variables represented in the nodes pathcondition,
-     * togeteher with concrete value bindings for these variables.
-     * 
-     * @param node
-     *            the execution node (i.e. program statement) for which we are generating the model.
-     * @param result
-     *            the {@link SMTSolverResult} for the node, containing raw, concrete value
-     *            assignments.
-     * @return a {@link Model} for the node
-     * @throws ModelGeneratorException
-     */
-    private IModel createModel(IExecutionNode node, SMTSolverResult result)
+    private Model instantiateModel(Model model, SMTSolverResult smtResult)
             throws ModelGeneratorException {
 
         try {
 
             /*
-             * Extract the fundamental information about the heapstate (i.e. Model) from the
-             * pathcondition of this node. We will later assign concrete values to the variables
-             * extracted in this process.
-             */
-            Model model =
-                    PathconditionParser.createModel(node.getPathCondition(),
-                            node.getServices());
-
-            /*
              * Extract the concrete values of any primitive values on the heap representation, using
              * the Z3 parser.
              */
-            String modelOutput = consolidateModelOutput(result.getOutput());
-            HashMap<String, z3parser.api.Z3ModelParser.ValueContainer> rawModel =
-                    z3parser.api.Z3ModelParser.parseModel(modelOutput);
+            String modelOutput = consolidateModelOutput(smtResult.getOutput());
+            HashMap<String, ValueContainer> rawModel =
+                    Z3ModelParser.parseModel(modelOutput);
 
             /*
-             * Insert the generated values into the partial heapstate
+             * Insert the generated values into the Model
              */
             for (ValueContainer container : rawModel.values()) {
 
+                /*
+                 * FIXME: This is living proof that the fundamental abstraction does not work and
+                 * needs to be completely redone. Fix this when time allows.
+                 */
+                String identifier = container.getName();
+                model.getVariableByReference(identifier).setValue(container.getValue());
             }
 
-            /*
-             * Finally, turn the partial heapstate into a full-fledged Model
-             */
-            Model finalModel = new Model();
-            for (IModelObject modelVariable : model.getVariables()) {
-
-            }
-
-            return finalModel;
-
-        }
-        catch (ProofInputException pie) {
-            throw new ModelGeneratorException(pie.getMessage());
+            return model;
         }
         catch (ParseException pe) {
             throw new ModelGeneratorException(pe.getMessage()
                     + "\nThe defunct model is:\n"
-                    + consolidateModelOutput(result.getOutput()));
+                    + consolidateModelOutput(smtResult.getOutput()));
         }
     }
 
     /**
-     * Encapsulates the path condition of the {@code targetNode} in an {@link SMTProblem}, which can
-     * in turn be passed to external SMT solvers.
+     * Creates an {@link SMTProblem} from a {@link Term} representing a path condition for an
+     * {@link IExecutionNode}.
      * 
      * @param targetNode
      *            the node for which to generate an SMT problem.
@@ -209,34 +168,23 @@ public class ModelGenerator
      * @throws ModelGeneratorException
      *             in the event that the SMT problem cannot be generated
      */
-    private synchronized SMTProblem createSMTProblem(final IExecutionNode targetNode)
+    private synchronized SMTProblem createSMTProblem(final Term pathCondition)
             throws ModelGeneratorException {
 
-        try {
+        /*
+         * Simplify the path condition
+         */
+        Term simplifiedPathCondition = PathconditionParser.simplifyTerm(pathCondition);
 
-            Term pathCondition = targetNode.getPathCondition();
+        /*
+         * The path condition has to be negated, in order to undo the negations that will be carried
+         * out by the SMT interface.
+         */
+        simplifiedPathCondition =
+                TermFactory.DEFAULT.createTerm(Junctor.NOT, simplifiedPathCondition);
 
-            /*
-             * Simplify the path condition
-             */
-            Term simplifiedPathCondition =
-                    PathconditionParser.simplifyTerm(pathCondition);
+        return new SMTProblem(simplifiedPathCondition);
 
-            /*
-             * The path condition has to be negated, in order to undo the negations that will be
-             * carried out by the SMT interface.
-             */
-            simplifiedPathCondition =
-                    TermFactory.DEFAULT.createTerm(Junctor.NOT, simplifiedPathCondition);
-
-            return new SMTProblem(simplifiedPathCondition);
-
-        }
-        catch (ProofInputException e) {
-
-            throw new ModelGeneratorException("It was not possible to generate an SMT Problem: "
-                    + e.getMessage());
-        }
     }
 
     private synchronized SMTSolverResult solveSMTProblem(
@@ -304,8 +252,48 @@ public class ModelGenerator
     }
 
     /**
-     * generates a {@link Model} for the pathcondition of a single {@link IExecutionNode}, i.e.
-     * program statement.
+     * Returns an {@link SMTSolverResult} for the pathcondition of a given {@link IExecutionNode}.
+     * This result will represent a concrete assignment of primitive values in the pathcondition,
+     * such that the constraint represented by the pathcondition becomes satisifed.
+     * <p>
+     * We are not interested in the shape of the solved contraint per se, rather we will use these
+     * concrete values to instantiate our {@link Model}.
+     * 
+     * @param node
+     *            the node whose pathpathcondition to instantiate
+     * @return the SMT solver result
+     * @throws ModelGeneratorException
+     */
+    private SMTSolverResult instantiatePathCondition(Term pathCondition, Services services)
+            throws ModelGeneratorException {
+
+        /*
+         * Simplify the path condition. If the simplified path condition is null, this means that it
+         * does not contain any primitive values. There is hence nothing useful we can do with it,
+         * and we just return it as null.
+         */
+        Term simplifiedPathcondition = PathconditionParser.simplifyTerm(pathCondition);
+
+        if (simplifiedPathcondition == null) {
+            return null;
+        }
+        else {
+
+            /*
+             * Turn the path condition of the node into a constraint problem
+             */
+            SMTProblem problem = createSMTProblem(simplifiedPathcondition);
+
+            /*
+             * Solve the constraint and return the result
+             */
+            return solveSMTProblem(problem, services);
+        }
+    }
+
+    /**
+     * generates a {@link Model} for the pathcondition of a single {@link IExecutionNode}, i.e. a
+     * single program statement.
      * 
      * @param node
      *            the node for which to generate a Model
@@ -316,20 +304,36 @@ public class ModelGenerator
     @Override
     public IModel generateModel(IExecutionNode node) throws ModelGeneratorException {
 
-        /*
-         * Turn the path condition of the node into a constraint problem
-         */
-        SMTProblem problem = createSMTProblem(node);
+        try {
 
-        /*
-         * Solve the constraint
-         */
-        SMTSolverResult result = solveSMTProblem(problem, node.getServices());
+            Term pathCondition = node.getPathCondition();
+            Services services = node.getServices();
 
-        /*
-         * Return the model satisfying the constraint
-         */
-        return createModel(node, result);
+            /*
+             * Create the Model
+             */
+            Model model = PathconditionParser.createModel(pathCondition, services);
+
+            /*
+             * Get concrete values for any primitive types represented in the Model, extracting them
+             * from an SMT solution for the pathcondition for this node.
+             */
+            SMTSolverResult solverResult =
+                    instantiatePathCondition(pathCondition, services);
+
+            /*
+             * If any such primitive values were found, merge their concrete values into the Model
+             */
+            if (solverResult != null) {
+                return instantiateModel(model, solverResult);
+            }
+            else {
+                return model;
+            }
+        }
+        catch (ProofInputException e) {
+            throw new ModelGeneratorException(e.getMessage());
+        }
     }
 
     /**

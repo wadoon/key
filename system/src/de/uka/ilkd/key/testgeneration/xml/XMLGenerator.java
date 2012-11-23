@@ -27,6 +27,7 @@ import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
+import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
 import de.uka.ilkd.key.testgeneration.visitors.TermXMLVisitor;
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
 
 /**
  * Provides functionality for turning a set of {@link TestCase} instances into a corresponding XML
- * representation. This XML constitutes the defaul output produced by KeYTestGen2, and can be parsed
+ * representation. This XML constitutes the default output produced by KeYTestGen2, and can be parsed
  * by instances of {@link ITestCaseParser} in order to generate more specific test suites.
  * 
  * @author christopher
@@ -56,7 +57,7 @@ public class XMLGenerator {
      * The eventFactory is used in order to produce {@link XMLEvent}s, that is, XML tags.
      */
     private static final XMLEventFactory eventFactory = XMLEventFactory.newFactory();
-    
+
     /**
      * The outputStream acts as a buffer for generated XML tags. its content can later be encoded to
      * some other representation, such as a String or File.
@@ -70,7 +71,6 @@ public class XMLGenerator {
         primitiveTypes.add("long");
         primitiveTypes.add("boolean");
     }
-
 
     /**
      * {@link XMLEvent} representing a newline.
@@ -116,11 +116,26 @@ public class XMLGenerator {
      * Root tag name for variables
      */
     private static final String VARIABLE_ROOT = "variable";
-    
+
+    /**
+     * Root tag name for variables
+     */
+    private static final String VARIABLES_ROOT = "variables";
+
     /**
      * Root tag name for object instances
      */
     private static final String INSTANCE_ROOT = "instance";
+
+    /**
+     * Root tag name for object instance sets
+     */
+    private static final String INSTANCES_ROOT = "instances";
+
+    /**
+     * Root tag name for heap object identifiers.
+     */
+    private static final String IDENTIFIER_ROOT = "identifier";
 
     /**
      * Root tag name for fields
@@ -242,6 +257,19 @@ public class XMLGenerator {
         writeEndTag(TESTCASE_ROOT);
     }
 
+    /**
+     * Writes the {@link Term} AST representing the Oracle of a given test case as XML. To do so, a
+     * {@link Visitor} instance is used to walk the AST, substituting concrete names for Terms
+     * representing variables in the tree, in order to make things more clean and readable (and more
+     * importantly, more easy to refere to for the parser).
+     * 
+     * @param oracle
+     *            the Oracle
+     * @throws XMLVisitorException
+     *             in case there was a problem during the visitation process
+     * @throws XMLStreamException
+     *             in case the XML could not be generated
+     */
     private void writeOracle(Term oracle) throws XMLVisitorException, XMLStreamException {
 
         TermXMLVisitor termXMLVisitor = new TermXMLVisitor(null);
@@ -302,70 +330,107 @@ public class XMLGenerator {
         writeStartTag(TESTFIXTURE_ROOT);
 
         /*
-         * Write the variables
+         * Write the variables contained in this fixture
          */
+        writeStartTag(VARIABLES_ROOT);
         for (IModelObject variable : model.getVariables()) {
             ModelVariable modelVariable = (ModelVariable) variable;
-
-            /*
-             * The variable is part of the base class for the method itself, i.e. "self"
-             */
-            if (modelVariable.getParent() == null && !modelVariable.isStatic()) {
-                writeStartTag(SELF_ROOT);
-                writeVariable(modelVariable);
-                writeEndTag(SELF_ROOT);
-            }
-
-            /*
-             * The variable is static, and part either of self or some other class
-             */
+            writeVariable(modelVariable);
         }
-
+        writeEndTag(VARIABLES_ROOT);
+        
+        /*
+         * Write the instances contained in this fixture
+         */
+        writeStartTag(INSTANCES_ROOT);
+        for (IModelObject variable : model.getVariables()) {
+            ModelVariable modelVariable = (ModelVariable) variable;
+            //writeInstance(modelVariable.getValue());
+        }
+        writeEndTag(INSTANCES_ROOT);
+        
         writeEndTag(TESTFIXTURE_ROOT);
-
     }
 
+    /**
+     * Writes an instance of {@link ModelVariable} as XML.
+     * 
+     * @param variable
+     *            the variable to write
+     * @throws XMLStreamException
+     *             in case the XML could not be generated
+     */
     private void writeVariable(ModelVariable variable) throws XMLStreamException {
 
         writeStartTag(VARIABLE_ROOT);
 
-        String variableName = variable.getName();
-        String variableType = variable.getType();
+        String identifier = variable.getIdentifier();
+        String type = variable.getType();
 
         /*
-         * Write the name of the variable
+         * Write the identifier of this particular variable
          */
-        writeStartTag(NAME_ROOT);
-        writeTextElement(variableName);
-        writeEndTag(NAME_ROOT);
+        writeStartTag(IDENTIFIER_ROOT);
+        writeTextElement(identifier);
+        writeEndTag(IDENTIFIER_ROOT);
+
+        /*
+         * Write the type of this variable
+         */
+        writeStartTag(TYPE_ROOT);
+        writeTextElement(type);
+        writeEndTag(TYPE_ROOT);
+
+        /*
+         * Write the instance pointed to by this variable FIXME: Abstraction needs to handle
+         * uniqueness in a better way, do not rely on hashCode.
+         */
+        writeStartTag(VALUE_ROOT);
+        writeTextElement(variable.getValue());
+        writeEndTag(VALUE_ROOT);
+
+        writeEndTag(VARIABLE_ROOT);
+    }
+
+    /**
+     * Writes an instance of {@link ModelInstance} as XML.
+     * 
+     * @param instance
+     *            the instance to write
+     * @throws XMLStreamException
+     *             in case the XML could not be generated
+     */
+    private void writeInstance(ModelInstance instance) throws XMLStreamException {
+
+        writeStartTag(INSTANCE_ROOT);
+
+        String identifier = instance.getIdentifier();
+        String type = instance.getType();
+
+        /*
+         * Write the identifier of the instance
+         */
+        writeStartTag(IDENTIFIER_ROOT);
+        writeTextElement(identifier);
+        writeEndTag(IDENTIFIER_ROOT);
 
         /*
          * Write the type
          */
         writeStartTag(TYPE_ROOT);
-        writeTextElement(variableType);
+        writeTextElement(type);
         writeEndTag(TYPE_ROOT);
 
         /*
-         * Distinguish between primitive and reference types here - a primitive type will only have
-         * a value, whereas a reference type will have a set of fields instead. Create output
-         * appropriately.
+         * Write the fields belonging to this instance
          */
-        if (primitiveTypes.contains(variableType)) {
-
-            writeStartTag(VALUE_ROOT);
-            writeTextElement(variable.getValue().toString());
-            writeEndTag(VALUE_ROOT);
+        writeStartTag(FIELD_ROOT);
+        for (ModelVariable child : instance.getFields()) {
+            writeTextElement(child.getIdentifier());
         }
-        else {
-            writeStartTag(FIELD_ROOT);
-            for (ModelVariable child : variable.getChildren()) {
-                writeVariable(child);
-            }
-            writeEndTag(FIELD_ROOT);
-        }
+        writeEndTag(FIELD_ROOT);
 
-        writeEndTag(VARIABLE_ROOT);
+        writeEndTag(INSTANCE_ROOT);
     }
 
     /**
@@ -459,18 +524,24 @@ public class XMLGenerator {
      * @throws XMLStreamException
      *             in the event there was an error writing the XML
      */
-    private void writeTextElement(String element) throws XMLStreamException {
+    private void writeTextElement(Object element) throws XMLStreamException {
 
+        /*
+         * Create a String representation for null objects.
+         */
+        if(element == null) {
+            element = new String("null");
+        }
+        
         if (format) {
             indentationCounter++;
             addIndentation();
             indentationCounter--;
-
-            eventWriter.add(eventFactory.createCharacters(element));
+            eventWriter.add(eventFactory.createCharacters(element.toString()));
             eventWriter.add(newline);
         }
         else {
-            eventWriter.add(eventFactory.createCharacters(element));
+            eventWriter.add(eventFactory.createCharacters(element.toString()));
         }
     }
 

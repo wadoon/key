@@ -128,10 +128,14 @@ public class PrimitiveIntegerOperations {
         return mid;
     }
     
+    /*@ public normal_behavior
+       @ ensures true;
+       @*/
     public int references() {
         
         if(proxy != null) {
             return 1;
+            
         }  else {
             return 0;
         }
