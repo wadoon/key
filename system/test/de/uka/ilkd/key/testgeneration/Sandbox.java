@@ -37,12 +37,14 @@ public class Sandbox
         System.out.println(var);
         // String method = "midOneProxyOneInstance";
         
-        String method = "maxProxyInstance";
+        String method = "references";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
                 getEnvironmentForMethod(method);
 
+        //printSymbolicExecutionTree(environment.getBuilder().getStartNode());
+        
         ArrayList<IExecutionNode> nodes =
-                retrieveNode(environment.getBuilder().getStartNode(), "return x");
+                retrieveNode(environment.getBuilder().getStartNode(), "return 1");
 
         Term nodeCondition = nodes.get(0).getPathCondition();
         TestCaseGenerator testCaseGenerator = TestCaseGenerator.getDefaultInstance();

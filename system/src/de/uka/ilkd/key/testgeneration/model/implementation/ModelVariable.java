@@ -180,4 +180,20 @@ public class ModelVariable
 
         this.parentModelInstance = parentModelInstance;
     }
+
+    /**
+     * @return true if this variable is declared as static, false otherwise
+     */
+    public boolean isStatic() {
+
+        return wrappedProgramVariable.isStatic();
+    }
+
+    /**
+     * @return true if this variable is declared as final, false otherwise
+     */
+    public boolean isFinal() {
+
+        return wrappedProgramVariable.isFinal();
+    }
 }

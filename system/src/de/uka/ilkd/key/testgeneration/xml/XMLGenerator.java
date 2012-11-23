@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
@@ -15,7 +16,11 @@ import javax.xml.stream.events.XMLEvent;
 import com.sun.xml.internal.fastinfoset.stax.events.StartElementEvent;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.ITestCaseParser;
 import de.uka.ilkd.key.testgeneration.TestCase;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
@@ -23,6 +28,7 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
 import de.uka.ilkd.key.testgeneration.visitors.TermXMLVisitor;
 import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
 
@@ -47,6 +53,11 @@ public class XMLGenerator {
     private final XMLEventWriter eventWriter;
 
     /**
+     * The eventFactory is used in order to produce {@link XMLEvent}s, that is, XML tags.
+     */
+    private static final XMLEventFactory eventFactory = XMLEventFactory.newFactory();
+    
+    /**
      * The outputStream acts as a buffer for generated XML tags. its content can later be encoded to
      * some other representation, such as a String or File.
      */
@@ -60,10 +71,6 @@ public class XMLGenerator {
         primitiveTypes.add("boolean");
     }
 
-    /**
-     * The eventFactory is used in order to produce {@link XMLEvent}s, that is, XML tags.
-     */
-    private static final XMLEventFactory eventFactory = XMLEventFactory.newFactory();
 
     /**
      * {@link XMLEvent} representing a newline.
@@ -109,6 +116,11 @@ public class XMLGenerator {
      * Root tag name for variables
      */
     private static final String VARIABLE_ROOT = "variable";
+    
+    /**
+     * Root tag name for object instances
+     */
+    private static final String INSTANCE_ROOT = "instance";
 
     /**
      * Root tag name for fields
@@ -289,6 +301,9 @@ public class XMLGenerator {
 
         writeStartTag(TESTFIXTURE_ROOT);
 
+        /*
+         * Write the variables
+         */
         for (IModelObject variable : model.getVariables()) {
             ModelVariable modelVariable = (ModelVariable) variable;
 
@@ -478,6 +493,198 @@ public class XMLGenerator {
             addIndentation();
             indentationCounter--;
             eventWriter.add(event);
+        }
+    }
+
+    /**
+     * Generates an XML representation from a {@link Term} postcondition.
+     * 
+     * @author christopher
+     */
+    private class OracleVisitor
+            extends KeYTestGenTermVisitor {
+
+        /**
+         * Since {@link Visitor} does not support exceptional behavior, whereas the
+         * {@link XMLEventWriter} demands it, we use an intermediary buffer to store events, and
+         * write them only after the visitation process is completed.
+         */
+        private LinkedList<XMLEvent> elements = new LinkedList<XMLEvent>();
+
+        /**
+         * Use a stack in order to properly determine the order in which start and end tags should
+         * be inserted for XML elements in the Term.
+         */
+        private Stack<String> elementNames = new Stack<String>();
+
+        public OracleVisitor() {
+
+        }
+
+        /**
+         * Get the raw list of {@link XMLEvent}, suitable for external processing.
+         * 
+         * @return
+         */
+        public LinkedList<XMLEvent> getRawXML() {
+
+            return elements;
+        }
+
+        /**
+         * Retrieves the (formatted) XML document created during the visitation process as a String.
+         * 
+         * @return the XML document as a String
+         * @throws XMLVisitorException
+         *             in the event that there was as problem writing to the XML stream, and hence
+         *             the document could not be created.
+         */
+        public String getXMLAsString() throws XMLVisitorException {
+
+            try {
+
+                /*
+                 * Write each buffered XMLElement to the actual XML stream
+                 */
+                while (!elements.isEmpty()) {
+                    XMLEvent next = elements.poll();
+                    eventWriter.add(next);
+                }
+
+                eventWriter.add(eventFactory.createEndDocument());
+            }
+            catch (XMLStreamException xse) {
+                throw new XMLVisitorException("FATAL: there was an error writing to the XML stream: "
+                        + xse.getMessage(),
+                        xse);
+            }
+
+            /*
+             * Finally, return the XML document as a String
+             */
+            return outputStream.toString();
+        }
+
+        /**
+         * Generate a textual representation for each relevant node
+         */
+        @Override
+        public void visit(Term visited) {
+
+            System.out.println("TERM: " + visited);
+            System.out.println("OPERATOR: " + visited.op().getClass());
+            /*
+             * Output text only if the node contains something suitable, i.e. it is not a Junctor or
+             * other composite operation, but an actual value.
+             */
+            if (isBinaryFunction(visited)) {
+                return;
+            }
+
+            Operator operator = visited.op();
+
+            /*
+             * TODO: Make polymorphic
+             */
+
+            if (operator instanceof LocationVariable
+                    || operator instanceof SortDependingFunction) {
+                addVariableNode(visited);
+            }
+            else {
+                addTag(eventFactory.createStartElement("", "", "field"));
+                addTag(eventFactory.createCharacters(visited.toString()), 1);
+                addTag(eventFactory.createEndElement("", "", "field"));
+            }
+        }
+
+        /**
+         * Whenever a subtree is entered, create a tag corresponding to the type of the root
+         * element, and push the name of the element on the stack in order to later generate an end
+         * tag.
+         */
+        @Override
+        public void subtreeEntered(Term subtreeRoot) {
+
+            /*
+             * Verify that the operator bound at the current term represents a concept suitable for
+             * putting in a tag
+             */
+            if (!isBinaryFunction(subtreeRoot)) {
+                return;
+            }
+
+            String operatorName = subtreeRoot.op().name().toString();
+
+            XMLEvent startTag = eventFactory.createStartElement("", "", operatorName);
+            addTag(startTag);
+
+            elementNames.push(operatorName);
+        }
+
+        /**
+         * Whenever a subtree is left, generate a closing tag corresponding to the one that was
+         * created when the tree was first entered.
+         */
+        @Override
+        public void subtreeLeft(Term subtreeRoot) {
+
+            if (!isBinaryFunction(subtreeRoot)) {
+                return;
+            }
+
+            String operatorName = elementNames.pop();
+
+            XMLEvent endTag = eventFactory.createEndElement("", "", operatorName);
+            addTag(endTag);
+
+        }
+
+        /**
+         * Add a tag, together with formatting, to the outputStream.
+         * 
+         * @param tag
+         *            the tag to insert
+         */
+        private void addTag(XMLEvent tag) {
+
+            for (int i = 0; i < elementNames.size(); i++) {
+                elements.add(tab);
+            }
+            elements.add(tag);
+            elements.add(newline);
+        }
+
+        /**
+         * Add a tag, together with formatting, to the outputstream, indented by a specific number
+         * of extra tabs.
+         * 
+         * @param tag
+         *            the tag to insert
+         * @param extraTabs
+         *            number of extra tabs that should be added to the indentation of the tag
+         */
+        private void addTag(XMLEvent tag, int extraTabs) {
+
+            for (int i = 0; i < extraTabs; i++) {
+                elements.add(tab);
+            }
+            addTag(tag);
+        }
+
+        /**
+         * Add a node representing a program variable to the outputStream.
+         * 
+         * @param term
+         *            the {@link Term} from which to generate the Node
+         */
+        private void addVariableNode(Term term) {
+
+            String variableName = resolveIdentifierString(term);
+
+            addTag(eventFactory.createStartElement("", "", "field"));
+            addTag(eventFactory.createCharacters(variableName), 1);
+            addTag(eventFactory.createEndElement("", "", "field"));
         }
     }
 }

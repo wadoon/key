@@ -31,7 +31,8 @@ public class Model
      * instace which currently does'nt exist. This can happens if this class is used in
      * non-postorder visitations of {@link Term} ASTs. Use mainly to allow safe visitations.
      */
-    private final LinkedList<ModelVariable> buffer = new LinkedList<ModelVariable>();
+    private final HashMap<ModelVariable, ModelVariable> buffer =
+            new HashMap<ModelVariable, ModelVariable>();
 
     /**
      * The {@link ModelVariable} instances represented on this heap.
@@ -87,8 +88,13 @@ public class Model
         if (!target.equals(other)) {
             target = lookupVariable(target);
             other = lookupVariable(other);
-            
-            target.setValue(other.getValue());
+
+            if (other != null) {
+                target.setValue(other.getValue());
+            }
+            else {
+                target.setValue(null);
+            }
         }
     }
 
@@ -118,11 +124,44 @@ public class Model
 
         if (!target.equals(other)) {
             target = lookupVariable(target);
-            other = lookupVariable(other);
-            
-            ModelInstance instance = (ModelInstance) other.getValue();
+            ModelVariable localOther = lookupVariable(other);
+
+            /*
+             * If the other currently does not exist in the Model, buffer it for subsequent
+             * insertion.
+             */
+            if (other == null) {
+                buffer.put(other, target);
+                return;
+            }
+
+            ModelInstance instance = (ModelInstance) localOther.getValue();
             instance.addField(target);
             target.setParentModelInstance(instance);
+        }
+    }
+
+    /**
+     * Synchronize the buffer by going through each buffered element, and seeing if it can be
+     * inserted into the Model. If the element could be inserted, remove it from the buffer.
+     */
+    private void synchronizeBuffer() {
+
+        if (!buffer.isEmpty()) {
+
+            for (ModelVariable variable : buffer.keySet()) {
+
+                ModelVariable localVariable = lookupVariable(variable);
+
+                if (localVariable != null) {
+
+                    ModelVariable target = buffer.get(variable);
+
+                    assignField(target, localVariable);
+
+                    buffer.remove(variable);
+                }
+            }
         }
     }
 
@@ -139,8 +178,7 @@ public class Model
     }
 
     /**
-     * Return a filtered subset of objects in this model. Filters can be left out to return all
-     * objects.
+     * {@inheritDoc}
      */
     @SafeVarargs
     @Override
@@ -158,6 +196,9 @@ public class Model
         return filteredVariables;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, IModelObject> getVariableNameMapping(IModelFilter... filters) {
 

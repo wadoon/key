@@ -127,6 +127,16 @@ public class PrimitiveIntegerOperations {
         }
         return mid;
     }
+    
+    public int references() {
+        
+        if(proxy != null) {
+            return 1;
+        }  else {
+            return 0;
+        }
+        
+    }
 
     public static int midTwoStatic(int x) {
 
@@ -208,22 +218,6 @@ public class PrimitiveIntegerOperations {
         }
         return mid;
     }
-    
- /*@ public normal_behavior
-    @ ensures true;
-    @*/
-    public int broken() {
-        
-        int value = 0;
-        proxy = null;
-        
-        
-        if(proxy.nestedProxy.nestedProxy == proxy.nestedProxy) {
-            value = 15;
-        }
-        
-        return value;
-    }
 
     /*@ public normal_behavior
        @ ensures true;
@@ -231,6 +225,14 @@ public class PrimitiveIntegerOperations {
     public int midOneProxyOneInstance(int x) {
 
         int mid = 0;
+        
+        if(proxy == proxy.nestedProxy && x == proxy.instanceInt && proxy.nestedProxy.nestedProxy == null ) {
+            mid = 15;
+        }
+        
+        if(proxy == null) {
+            mid = 16;
+        }
 
         if (proxy.instanceInt < instanceZ) {
             if (x < proxy.nestedProxy.nestedProxy.nestedProxy.instanceInt) {
