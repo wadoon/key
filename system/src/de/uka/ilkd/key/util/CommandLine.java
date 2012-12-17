@@ -111,6 +111,7 @@ public final class CommandLine {
     private class AdditionalHelpTextParts extends HelpElement {
         private String description;
         private String command;
+        @SuppressWarnings("unused")
         private boolean indentToDescriptionColumn;
 
         @Override
@@ -390,7 +391,7 @@ public final class CommandLine {
             return Integer.decode(value);
         } catch (NumberFormatException e) {
             throw new CommandLineException(param + " expects an integer argument, but received: "
-                                            + option.value);
+                                            + option.value, e);
         }
     }
 
@@ -424,7 +425,7 @@ public final class CommandLine {
             return Long.decode(value);
         } catch (NumberFormatException e) {
             throw new CommandLineException(param + " expects a long integer argument, but received: "
-                                            + option.value);
+                                            + option.value, e);
         }
     }
 

@@ -46,11 +46,11 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
@@ -463,19 +463,19 @@ public final class ProblemInitializer {
 	alreadyParsed.clear();
 
         //the first time, read in standard rules
-        if(baseConfig == null || profile != baseConfig.getProfile()) {
-            baseConfig = new InitConfig(services, profile);
-
-	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-	    if(tacletBase != null) {
-    	    	KeYFile tacletBaseFile
-    	    	    = new KeYFile("taclet base", 
-    	    		          profile.getStandardRules().getTacletBase(),
-			          progMon);
-    	    	readEnvInput(tacletBaseFile, baseConfig);
-	    }	    
+	if(baseConfig == null || profile != baseConfig.getProfile()) {            
+		InitConfig newBaseConfig = new InitConfig(services, profile);
+			RuleSource tacletBase = profile.getStandardRules().getTacletBase();
+			if(tacletBase != null) {
+				KeYFile tacletBaseFile
+				= new KeYFile("taclet base", 
+						profile.getStandardRules().getTacletBase(),
+						progMon);
+				readEnvInput(tacletBaseFile, newBaseConfig);			
+			}
+			baseConfig = newBaseConfig;
 	}
-	  return prepare(envInput, baseConfig);
+	return prepare(envInput, baseConfig);
 	
 	}
     

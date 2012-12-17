@@ -781,6 +781,11 @@ options {
                 } catch(Throwable e) {
                     semanticError("Getting array length failed");
                 }
+            } else if(attributeName.equals("<inv>")) {
+                // The invariant observer "<inv>" is implicit and 
+                // not part of the class declaration
+                // A special case is needed, hence.
+                result = javaInfo.getInvProgramVar();
             } else {
                 if (inSchemaMode()) {
                     semanticError("Either undeclared schema variable '" + 
@@ -796,7 +801,7 @@ options {
                 if(!isDeclParser()) {			      	
                     final ImmutableList<ProgramVariable> vars = 	
                     javaInfo.getAllAttributes(attributeName, prefixKJT);
-                    
+
                     if (vars.size() == 0) {
                         semanticError("There is no attribute '" + attributeName + 
                             "' declared in type '" + prefixSort + "'.\n"+
@@ -3301,8 +3306,8 @@ funcpredvarterm returns [Term a = null]
 	                        if(i < op.arity() && !op.bindVarsAt(i)) {
 	                            for(QuantifiableVariable qv : args[i].freeVars()) {
 	                                if(boundVars.contains(qv)) {
-	                                    semanticError("Building a function term with bound variables failed: "
-	                                                   + "Variable " + qv + " must not occur free in subterm " + i);
+	                                    semanticError("Building function term "+op+" with bound variables failed: "
+	                                                   + "Variable " + qv + " must not occur free in subterm " + args[i]);
 	                                } 
 	                            }	                            
 	                        }
@@ -4244,7 +4249,6 @@ problem returns [ Term a = null ]
     Choice c = null;
     ImmutableList<String> stlist = null;
     String string = null;
-    Namespace funcNSForSelectedChoices = new Namespace();
     String pref = null;
 }
     :

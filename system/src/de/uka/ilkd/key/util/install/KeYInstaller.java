@@ -278,7 +278,7 @@ public abstract class KeYInstaller {
     protected void extractExamples(JarFile jarFile) 
                                                throws KeYInstallerException {
 	try {
-            Enumeration en = jarFile.entries();
+            Enumeration<JarEntry> en = jarFile.entries();
             while(en.hasMoreElements()) {
                 JarEntry entry = ((JarEntry)en.nextElement());
                 if (!entry.getName().startsWith("examples/")) continue;
@@ -349,7 +349,7 @@ public abstract class KeYInstaller {
      * and returns a list of missing files 
      */
     public String[] checkLibraries () {
-	LinkedList l = new LinkedList ();	
+	LinkedList<String> l = new LinkedList<String> ();	
 	for ( int i = 0; i < libs ().length; i++ ) {
 	    File lib = new File ( keyLib () + File.separatorChar + libs () [i] );
 	    if ( ! lib.exists() ) {
