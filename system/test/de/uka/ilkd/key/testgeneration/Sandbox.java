@@ -1,18 +1,33 @@
 package de.uka.ilkd.key.testgeneration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
 
+import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.IllegalFormulaException;
+import de.uka.ilkd.key.smt.SMTTranslator;
+import de.uka.ilkd.key.smt.SmtLib2Translator;
+import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -27,41 +42,135 @@ public class Sandbox
     @Test
     public void test()
             throws ProofInputException, ModelGeneratorException, IOException,
-            XMLGeneratorException {
+            XMLGeneratorException, ProblemLoaderException, IllegalFormulaException {
 
-        KeYJavaType type = new KeYJavaType();
-        
-        ProgramElementName name = new ProgramElementName("self");
-        LocationVariable var = new LocationVariable(name, type);
-        
-        System.out.println(var);
-        // String method = "midOneProxyOneInstance";
-        
-        String method = "references";
+        String method = "midTwoProxy";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
                 getEnvironmentForMethod(method);
 
-        //printSymbolicExecutionTree(environment.getBuilder().getStartNode());
-        
-        ArrayList<IExecutionNode> nodes =
-                retrieveNode(environment.getBuilder().getStartNode(), "return 1");
+        List<IExecutionNode> nodes =
+                retrieveNode(environment.getBuilder().getStartNode(), "mid=x");
 
-        Term nodeCondition = nodes.get(0).getPathCondition();
-        TestCaseGenerator testCaseGenerator = TestCaseGenerator.getDefaultInstance();
+        ModelGenerator modelGenerator = ModelGenerator.getDefaultModelGenerator();
+        
         for (IExecutionNode node : nodes) {
-            printSingleNode(node);
-            PathconditionParser.createModel(node.getPathCondition(),
-                    node.getServices());
-            // modelgeneratingParser.createModel(node.getPathCondition(), node.getServices());
+            Term toSolve =
+                    TermFactory.DEFAULT.createTerm(Junctor.NOT, node.getPathCondition());
+            toSolve = PathconditionParser.simplifyTerm(toSolve);
+            SMTTranslator translator =
+                    SolverType.Z3_SOLVER.createTranslator(environment.getServices());
+            System.out.println(translator.translateProblem(toSolve, node.getServices(),
+                    new SMTSettings2()));
+            
+            modelGenerator.generateModel(node);
         }
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
             String method)
-            throws ProofInputException, ModelGeneratorException, IOException {
+            throws ProofInputException, ModelGeneratorException, IOException,
+            ProblemLoaderException {
 
         return getPreparedEnvironment(keyRepDirectory, javaPathInBaseDir,
                 containerTypeName, method, null, false);
+    }
 
+    /**
+     * Settings to pass to the SMT solver.
+     * 
+     * @author christopher
+     */
+    private static class SMTSettings2
+            implements de.uka.ilkd.key.smt.SMTSettings {
+
+        @Override
+        public int getMaxConcurrentProcesses() {
+
+            return 1;
+        }
+
+        @Override
+        public int getMaxNumberOfGenerics() {
+
+            return 2;
+        }
+
+        @Override
+        public String getSMTTemporaryFolder() {
+
+            return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
+        }
+
+        @Override
+        public Collection<Taclet> getTaclets() {
+
+            return null;
+        }
+
+        @Override
+        public long getTimeout() {
+
+            return 5000;
+        }
+
+        @Override
+        public boolean instantiateNullAssumption() {
+
+            return true;
+        }
+
+        @Override
+        public boolean makesUseOfTaclets() {
+
+            return false;
+        }
+
+        @Override
+        public boolean useExplicitTypeHierarchy() {
+
+            return false;
+        }
+
+        @Override
+        public boolean useBuiltInUniqueness() {
+
+            return false;
+        }
+
+        @Override
+        public boolean useAssumptionsForBigSmallIntegers() {
+
+            return false;
+        }
+
+        @Override
+        public boolean useUninterpretedMultiplicationIfNecessary() {
+
+            return false;
+        }
+
+        @Override
+        public long getMaximumInteger() {
+
+            return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+        }
+
+        @Override
+        public long getMinimumInteger() {
+
+            return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
+        }
+
+        @Override
+        public String getLogic() {
+
+            return "AUFLIA";
+        }
+
+        @Override
+        public boolean checkForSupport() {
+
+            return false;
+        }
     }
 }

@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -65,7 +66,7 @@ public class TestConditionParsing
 
     @Test
     public void testSimpleBuilderExtraction()
-            throws ProofInputException, TestGeneratorException, IOException {
+            throws ProofInputException, TestGeneratorException, IOException, ProblemLoaderException {
 
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
                 createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInBaseDir,
@@ -79,7 +80,7 @@ public class TestConditionParsing
         proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
                 stopCondition);
 
-        environment.getUi().startAndWaitForProof(proof);
+        environment.getUi().startAndWaitForAutoMode(proof);
 
         environment.getBuilder().analyse();
 
@@ -88,7 +89,7 @@ public class TestConditionParsing
 
     @Test
     public void testProofNodeExtraction()
-            throws ProofInputException, ModelGeneratorException, IOException {
+            throws ProofInputException, ModelGeneratorException, IOException, ProblemLoaderException {
 
         String method = "max";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
@@ -102,7 +103,7 @@ public class TestConditionParsing
 
     @Test
     public void testASTProcessing()
-            throws ProofInputException, ModelGeneratorException, IOException {
+            throws ProofInputException, ModelGeneratorException, IOException, ProblemLoaderException {
 
         String method = "maxProxyInstance";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
@@ -119,7 +120,7 @@ public class TestConditionParsing
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
             String method)
-            throws ProofInputException, ModelGeneratorException, IOException {
+            throws ProofInputException, ModelGeneratorException, IOException, ProblemLoaderException {
 
         return getPreparedEnvironment(keyRepDirectory, javaPathInBaseDir,
                 containerTypeName, method, null, false);

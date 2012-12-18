@@ -24,7 +24,7 @@ public interface IModel {
      *            a set of filters which each variable in he list must satisfy.
      * @return
      */
-    List<IModelObject> getVariables(IModelFilter... filters);
+    List<? extends IModelObject> getVariables(IModelFilter... filters);
 
     /**
      * Returns a mapping between the name of each heap variable (which must per definition be
@@ -34,7 +34,7 @@ public interface IModel {
      *            a set of filters which each mapped variable must satisfy.
      * @return
      */
-    Map<String, IModelObject> getVariableNameMapping(IModelFilter... filters);
+    Map<String, ? extends IModelObject> getVariableNameMapping(IModelFilter... filters);
 
     /**
      * A filter which can be used in order to select a subset 

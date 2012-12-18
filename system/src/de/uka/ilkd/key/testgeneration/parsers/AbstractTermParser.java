@@ -147,7 +147,8 @@ public abstract class AbstractTermParser {
         if (operator.getClass() == LocationVariable.class) {
 
             String name = getVariableNameForTerm(term);
-            return isPrimitiveType(term) ? "self_" + name : name;
+            return name;
+            //return isPrimitiveType(term) ? "self_" + name : name;
         }
 
         /*

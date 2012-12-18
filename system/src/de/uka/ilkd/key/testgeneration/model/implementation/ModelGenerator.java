@@ -28,6 +28,7 @@ import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
+import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default to this
@@ -76,7 +77,7 @@ public class ModelGenerator
      * @return a default instance of ModelGenerator
      * @throws ModelGeneratorException
      */
-    public static IModelGenerator getDefaultModelGenerator()
+    public static ModelGenerator getDefaultModelGenerator()
             throws ModelGeneratorException {
 
         verifySolverAvailability(SolverType.Z3_SOLVER);
@@ -132,9 +133,19 @@ public class ModelGenerator
              * Extract the concrete values of any primitive values on the heap representation, using
              * the Z3 parser.
              */
-            String modelOutput = consolidateModelOutput(smtResult.getOutput());
-            HashMap<String, ValueContainer> rawModel =
-                    Z3ModelParser.parseModel(modelOutput);
+            HashMap<String, ValueContainer> rawModel = null;
+            while (true) {
+                String modelOutput = consolidateModelOutput(smtResult.getOutput());
+                System.out.println(modelOutput);
+                rawModel = Z3ModelParser.parseModel(modelOutput.replaceAll("sat", "")); // Hack to
+                                                                                        // address
+                                                                                        // changes
+                                                                                        // to master
+
+                if (rawModel != null) {
+                    break;
+                }
+            }
 
             /*
              * Insert the generated values into the Model
@@ -146,7 +157,8 @@ public class ModelGenerator
                  * needs to be completely redone. Fix this when time allows.
                  */
                 String identifier = container.getName();
-                model.getVariableByReference(identifier).setValue(container.getValue());
+                ModelVariable variable = model.getVariableByReference(identifier);
+                variable.setValue(container.getValue());
             }
 
             return model;
@@ -198,6 +210,7 @@ public class ModelGenerator
          * keep trying until we do
          */
         do {
+            Benchmark.resetStopwatch();
 
             /*
              * Set up a SolverLauncher for the purpose of interfacing with the associated SMT
@@ -210,7 +223,6 @@ public class ModelGenerator
              * existing SMTProblem.
              */
             try {
-
                 launcher.launch(problem, services, SolverType.Z3_SOLVER);
 
                 result = problem.getFinalResult();
@@ -227,8 +239,12 @@ public class ModelGenerator
                 re.printStackTrace();
                 continue;
             }
-        }
 
+            if (!result.isValid().equals(ThreeValuedTruth.FALSIFIABLE)) {
+                System.err.println("Failed to retrieve adequate SMT solution, lost "
+                        + Benchmark.readStopWatch() + " milliseconds");
+            }
+        }
         while (!result.isValid().equals(ThreeValuedTruth.FALSIFIABLE));
 
         return result;

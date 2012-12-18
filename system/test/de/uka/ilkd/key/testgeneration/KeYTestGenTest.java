@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.Taclet;
@@ -68,6 +69,7 @@ public abstract class KeYTestGenTest
      *             Occurred Exception.
      * @author Martin Hentschel (mods by Christopher)
      * @throws IOException
+     * @throws ProblemLoaderException 
      */
     protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getPreparedEnvironment(
             File keyRepo,
@@ -75,7 +77,7 @@ public abstract class KeYTestGenTest
             String resourceFile,
             String method,
             String precondition,
-            boolean mergeBranchConditions) throws ProofInputException, IOException {
+            boolean mergeBranchConditions) throws ProofInputException, IOException, ProblemLoaderException {
 
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env =
                 createSymbolicExecutionEnvironment(keyRepDirectory, rootFolder, resourceFile,
@@ -90,7 +92,7 @@ public abstract class KeYTestGenTest
 
         proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
 
-        env.getUi().startAndWaitForProof(proof);
+        env.getUi().startAndWaitForAutoMode(proof);
 
         env.getBuilder().analyse();
 

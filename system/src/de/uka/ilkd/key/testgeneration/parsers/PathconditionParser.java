@@ -144,6 +144,7 @@ public class PathconditionParser
     private static Term simplifyFunction(Term term) throws ModelGeneratorException {
 
         Operator operator = term.op();
+        Sort sort = term.sort();
 
         if (operator.toString().equals("null")) {
             return null;
@@ -202,7 +203,7 @@ public class PathconditionParser
         if (primitiveTypes.contains(sortName)) {
 
             ProgramElementName resolvedVariableName =
-                    new ProgramElementName(simplifySortDependentFunctionHelper(term));
+                    new ProgramElementName(resolveIdentifierString(term));
 
             LocationVariable resolvedVariable =
                     new LocationVariable(resolvedVariableName, term.sort());

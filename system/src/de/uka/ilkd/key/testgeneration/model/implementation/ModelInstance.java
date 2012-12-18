@@ -51,7 +51,7 @@ public class ModelInstance
      */
     public String getType() {
 
-        return type.toString();
+        return type.getJavaType().getFullName();
     }
 
     /**

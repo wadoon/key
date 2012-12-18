@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -24,7 +25,7 @@ public class OracleGeneratorTest
     private final String containerTypeName = "PrimitiveIntegerOperations";
 
     @Test
-    public void testPostConditionExtraction() throws ProofInputException, ModelGeneratorException, IOException, OracleGeneratorException, XMLVisitorException {
+    public void testPostConditionExtraction() throws ProofInputException, ModelGeneratorException, IOException, OracleGeneratorException, XMLVisitorException, ProblemLoaderException {
 
         String method = "max";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
@@ -42,7 +43,7 @@ public class OracleGeneratorTest
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
-            String method) throws ProofInputException, ModelGeneratorException, IOException {
+            String method) throws ProofInputException, ModelGeneratorException, IOException, ProblemLoaderException {
 
         return getPreparedEnvironment(keyRepDirectory, javaPathInBaseDir, containerTypeName,
                 method, null, false);

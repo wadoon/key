@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration;
+package de.uka.ilkd.key.testgeneration.xmlparser;
 
 /**
  * Classes implementing this interface are capable of producing concrete test suites based on XML
@@ -9,6 +9,6 @@ package de.uka.ilkd.key.testgeneration;
  */
 public interface ITestCaseParser<T> {
 
-    public T generateTestCaseFromXML(String representation);
+    public T generateTestCaseFromXML(String representation) throws XMLParserException;
 
 }

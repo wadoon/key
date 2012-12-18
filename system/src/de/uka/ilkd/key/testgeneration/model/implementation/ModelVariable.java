@@ -85,7 +85,7 @@ public class ModelVariable
     @Override
     public String getType() {
 
-        return wrappedProgramVariable.getKeYJavaType().getFullName();
+        return wrappedProgramVariable.getKeYJavaType().getJavaType().getFullName();
     }
 
     /**

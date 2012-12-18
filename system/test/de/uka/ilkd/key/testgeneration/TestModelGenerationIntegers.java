@@ -8,6 +8,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.implementation.IHeapObject;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
@@ -121,7 +123,7 @@ public class TestModelGenerationIntegers
 
             IModel model = modelGenerator.generateModel(node);
 
-            Map<String, IModelObject> variableMapping = model.getVariableNameMapping();
+            Map<String, ? extends IModelObject> variableMapping = model.getVariableNameMapping();
 
             int x = (Integer) variableMapping.get("x").getValue();
             int y = (Integer) variableMapping.get("y").getValue();
@@ -143,7 +145,7 @@ public class TestModelGenerationIntegers
 
             IModel model = modelGenerator.generateModel(node);
 
-            Map<String, IModelObject> variableMapping = model.getVariableNameMapping();
+            Map<String, ? extends IModelObject> variableMapping = model.getVariableNameMapping();
 
             int x = (Integer) variableMapping.get("x").getValue();
             int y = (Integer) variableMapping.get("self_dollar_instanceY").getValue();
@@ -176,7 +178,7 @@ public class TestModelGenerationIntegers
 
             IModel model = modelGenerator.generateModel(node);
 
-            Map<String, IModelObject> variableMapping = model.getVariableNameMapping();
+            Map<String, ? extends IModelObject> variableMapping = model.getVariableNameMapping();
 
             int x = (Integer) variableMapping.get("x").getValue();
             int y = (Integer) variableMapping.get("self_dollar_proxy_dollar_instanceInt").getValue();
@@ -199,7 +201,7 @@ public class TestModelGenerationIntegers
     }
 
     private void setup(String method)
-            throws ProofInputException, ModelGeneratorException, IOException {
+            throws ProofInputException, ModelGeneratorException, IOException, ProblemLoaderException {
 
         if (modelGenerator == null) {
             modelGenerator = ModelGenerator.getDefaultModelGenerator();

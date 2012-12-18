@@ -21,8 +21,10 @@ import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.oraclegeneration.ContractExtractor;
+import de.uka.ilkd.key.testgeneration.util.Benchmark;
 import de.uka.ilkd.key.testgeneration.xml.XMLGenerator;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
+import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 
 /**
  * Represents the main API interface for the KeYTestGen2. Targets can be passed either as entire
@@ -240,28 +242,37 @@ public class TestCaseGenerator {
              * Extract the abstract representations of the targeted Java class and the specific
              * method for which we wish to generate test cases.
              */
+            Benchmark.startBenchmarking("setting up class and method abstractions");
             KeYJavaClass targetClass = keYJavaClassFactory.createKeYJavaClass(sourcePath);
             KeYJavaMethod targetMethod = targetClass.getMethod(method);
+            Benchmark.finishBenchmarking("setting up class and method abstractions");
 
             /*
              * Retrieve the symbolic execution tree for the method, and extract from it the nodes
              * needed in order to reach the desired level of code coverage.
              */
+            Benchmark.startBenchmarking("getting code coverage nodes");
             IExecutionStartNode root =
                     keYInterface.getSymbolicExecutionTree(targetMethod);
             List<IExecutionNode> targetNodes = codeCoverageParser.retrieveNodes(root);
-
+            Benchmark.finishBenchmarking("getting code coverage nodes");
             /*
              * Extract the postcondition for the method, and generate test cases for each of the
              * nodes.
              */
+            Benchmark.startBenchmarking("create test case abstractions");
             List<TestCase> testCases = createTestCases(targetMethod, targetNodes);
+            Benchmark.finishBenchmarking("create test case abstractions");
 
             /*
              * Create and return a final XML representation of the test suite.
              */
+            Benchmark.startBenchmarking("write XML");
             XMLGenerator xmlWriter = new XMLGenerator();
-            return xmlWriter.createTestSuite(testCases, true);
+            String testSuite = xmlWriter.createTestSuite(testCases, true);
+            Benchmark.finishBenchmarking("write XML");
+
+            return testSuite;
         }
         catch (KeYInterfaceException e) {
             throw new TestGeneratorException(e.getMessage());
@@ -345,15 +356,18 @@ public class TestCaseGenerator {
              * FIXME: Very ugly workaround to safeguard against the model failing...why does this
              * happen?
              */
+            Benchmark.startBenchmarking("   generating model " + ++Benchmark.counters[0]);
             IModel model = null;
             while (model == null) {
                 try {
+                    
                     model = modelGenerator.generateModel(node);
                 }
                 catch (ModelGeneratorException e) {
                     System.err.println("WARNING: Model generation failed!");
                 }
             }
+            Benchmark.finishBenchmarking("   generating model " + Benchmark.counters[0]);
 
             /*
              * FIXME: This is an ugly hack since I am not sure how to handle multiple postconditions

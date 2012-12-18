@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -69,10 +70,7 @@ public enum KeYInterface {
             return initConfig;
 
         }
-        catch (ProofInputException e) {
-            throw new KeYInterfaceException(e.getMessage());
-        }
-        catch (IOException e) {
+        catch (ProblemLoaderException e) {
             throw new KeYInterfaceException(e.getMessage());
         }
         finally {
@@ -116,7 +114,7 @@ public enum KeYInterface {
             proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
                     new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
 
-            userInterface.startAndWaitForProof(proof);
+            userInterface.startAndWaitForAutoMode(proof);
 
             /*
              * Create the symbolic execution tree, and assert that it indeed exists.
