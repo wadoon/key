@@ -80,6 +80,9 @@ public class ModelGenerator
     public static ModelGenerator getDefaultModelGenerator()
             throws ModelGeneratorException {
 
+        /*
+         * TODO: Use embedded solver so that this no longer throws exceptions
+         */
         verifySolverAvailability(SolverType.Z3_SOLVER);
 
         return new ModelGenerator(new SMTSettings(), SolverType.Z3_SOLVER);

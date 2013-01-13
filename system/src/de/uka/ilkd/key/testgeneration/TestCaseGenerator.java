@@ -119,6 +119,7 @@ public class TestCaseGenerator {
         return new TestCaseGenerator(modelGenerator);
     }
 
+    /*
     public void test()
             throws IOException, ProofInputException, TestGeneratorException,
             KeYInterfaceException {
@@ -127,7 +128,7 @@ public class TestCaseGenerator {
                 keYJavaClassFactory.createKeYJavaClass("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java");
         KeYJavaMethod method = javaFile.getMethod("max");
         System.out.println(keYInterface.getSymbolicExecutionTree(method).getChildren()[0]);
-        /*
+        
          * File file = getJavaFile(
          * "/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"
          * );
@@ -151,8 +152,9 @@ public class TestCaseGenerator {
          * System.out.println("Prepping: "+ method.getFullName());
          * System.out.println(createSymbolicExecutionEnvironment(file, method,
          * null).getBuilder().getStartNode()); }
+         * }
          */
-    }
+    
 
     /**
      * Generates a test case for a single {@link IExecutionNode} in a single method.
@@ -192,7 +194,7 @@ public class TestCaseGenerator {
      */
     public <T> T generateTestCase(
             ITestCaseParser<T> parser,
-            String sourcePath,
+            File sourcePath,
             String method) {
 
         return null;
@@ -210,17 +212,17 @@ public class TestCaseGenerator {
      * @throws TestGeneratorException
      *             in the event there was an error in creating the test case
      */
-    public String generateTestCase(String sourcePath, String method)
+    public String generateTestCase(File sourceFile, String method)
             throws TestGeneratorException {
 
-        return generateTestCase(sourcePath, method, new StatementCoverageParser());
+        return generateTestCase(sourceFile, method, new StatementCoverageParser());
     }
 
     /**
      * Generate test cases for a specific method in the class being tested. The test case will be
      * returned in KeYTestGen2:s standard XML format
      * 
-     * @param sourcePath
+     * @param sourceFile
      *            path to the source file to produce cases for
      * @param method
      *            the method to produce test cases for
@@ -232,7 +234,7 @@ public class TestCaseGenerator {
      *             in the event there was an error in creating the test cases
      */
     public String generateTestCase(
-            String sourcePath,
+            File sourceFile,
             String method,
             ICodeCoverageParser codeCoverageParser) throws TestGeneratorException {
 
@@ -243,7 +245,7 @@ public class TestCaseGenerator {
              * method for which we wish to generate test cases.
              */
             Benchmark.startBenchmarking("setting up class and method abstractions");
-            KeYJavaClass targetClass = keYJavaClassFactory.createKeYJavaClass(sourcePath);
+            KeYJavaClass targetClass = keYJavaClassFactory.createKeYJavaClass(sourceFile);
             KeYJavaMethod targetMethod = targetClass.getMethod(method);
             Benchmark.finishBenchmarking("setting up class and method abstractions");
 
@@ -299,7 +301,7 @@ public class TestCaseGenerator {
      */
     public <T> T generateTestCases(
             ITestCaseParser<T> parser,
-            String sourcePath,
+            File sourcePath,
             boolean includePrivateMethods) {
 
         return null;
@@ -318,12 +320,11 @@ public class TestCaseGenerator {
      * @return
      * @throws TestGeneratorException
      */
-    public List<String> generateTestCases(
-            String sourcePath,
+    public String generateTestCases(
+            File sourcePath,
             boolean includeNonPublicMethods,
             boolean includeNativeMethods) throws TestGeneratorException {
 
-        File javaFile = getJavaFile(sourcePath);
 
         // List<IProgramMethod> methods = extractMethodsFromClass(targetClass, services,
         // includePrivateMethods, includeNativeMethods)
@@ -378,21 +379,5 @@ public class TestCaseGenerator {
             testCases.add(testCase);
         }
         return testCases;
-    }
-
-    /**
-     * Retrieve a {@link File} reference to the .java file selected by the user.
-     * 
-     * @param path
-     * @return
-     * @throws TestGeneratorException
-     */
-    private File getJavaFile(String path) throws TestGeneratorException {
-
-        File javaFile = new File(path);
-        if (!javaFile.exists()) {
-            throw new TestGeneratorException("FATAL: no such file or directory: " + path);
-        }
-        return javaFile;
     }
 }

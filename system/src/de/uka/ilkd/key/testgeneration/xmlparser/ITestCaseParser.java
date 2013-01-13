@@ -10,5 +10,4 @@ package de.uka.ilkd.key.testgeneration.xmlparser;
 public interface ITestCaseParser<T> {
 
     public T generateTestCaseFromXML(String representation) throws XMLParserException;
-
 }

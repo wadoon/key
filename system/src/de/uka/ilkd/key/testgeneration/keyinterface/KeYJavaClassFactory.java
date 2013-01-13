@@ -47,13 +47,12 @@ public enum KeYJavaClassFactory {
      *             if the file could not be found or read
      * @throws KeYInterfaceException
      */
-    public KeYJavaClass createKeYJavaClass(String absolutePath)
+    public KeYJavaClass createKeYJavaClass(File javaFile)
             throws IOException, KeYInterfaceException {
 
         /*
          * Load the file into key and set the InitConfig instance for it.
          */
-        File javaFile = loadFile(absolutePath);
         InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
 
         Services services = initConfig.getServices();
