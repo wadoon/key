@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Contains various constants and utility methods related to handling XML in KeYTestGen2
+ * Contains various constants and utility methods related to handling XML in KeYTestGen2.
  * 
  * @author christopher
  */

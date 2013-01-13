@@ -19,20 +19,23 @@ public class CommandParser {
     private static final String INDENT = "\t\t\t";
 
     /**
-     * The Java files to be processed
+     * Select which Java files to use as a basis for test case generation.
      */
     @Parameter(description = "files", validateWith = JavaFileValidator.class, converter = JavaFileConverter.class)
     private List<File> files = new ArrayList<File>();
 
     /**
-     * The output directory
+     * Select top-level output directory for the generated test suite(s). Default is the current
+     * directory at the time o invocation.
      */
     @Parameter(names = { "-o", "--output" }, description = "target output directory for generated test suites.\n"
             + INDENT + "default: current folder (.))", arity = 1)
     private String outputDirectory = ".";
 
     /**
-     * The test framework(s) to generate test cases for.
+     * Select which test framework(s) to generate test cases for. Multiple selections are possible
+     * per session, in which case a separate output folder will be generated for each framework.
+     * Default is JUnit4.
      */
     @Parameter(names = { "-f", "--framework" }, description = "the test frameworks to use.\n"
             + INDENT
@@ -44,7 +47,9 @@ public class CommandParser {
     private Set<String> testFrameworks = new HashSet<String>();
 
     /**
-     * Set to generate test cases also for private methods
+     * Select what methods to generate test cases for. This can either be done on a categorical
+     * basis (i.e. all, public, private, protected and/or native) or on a specific basis. Both ways
+     * can be combined in order to customize method coverage.
      */
     @Parameter(names = { "-m", "--methods" }, description = "what methods should be included in the test suite.\n"
             + INDENT
@@ -60,7 +65,28 @@ public class CommandParser {
             + INDENT
             + "native\t\tinclude methods declared in Java.lang.Object (not recommended)\n"
             + INDENT + "[method name]\tspecify methods to include (by identifier)")
-    List<String> methods;
+    List<String> methods = new ArrayList<String>();
+
+    /**
+     * Select the degree of code coverage to guarantee. Only one option per session is legal.
+     * Default is standard statement coverage.
+     */
+    @Parameter(names = { "-c", "--coverage" }, arity = 1, description = "target degree of code coverage for each method.\n"
+            + INDENT
+            + "Parameters (only one per session):\n"
+            + INDENT
+            + "statement\tstatement coverage (default)\n"
+            + INDENT
+            + "branch\t\tbranch coverage\n"
+            + INDENT
+            + "path\t\tpath coverage\n"
+            + INDENT
+            + "condition\tcondition coverage\n"
+            + INDENT
+            + "decision\tdecision coverage\n"
+            + INDENT
+            + "mcdc\t\tmodified condition/decision coverage")
+    List<String> coverageCriteria = new ArrayList<String>();
 
     /**
      * Flag to decide if usage help should be shown.
