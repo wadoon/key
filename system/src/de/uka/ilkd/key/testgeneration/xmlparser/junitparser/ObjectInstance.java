@@ -4,8 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Represents a very simple view of an Object instance, based on the metadata available in the XML
- * document.
+ * Instances of this bean represent simple views of object instances.
  * 
  * @author christopher
  */
