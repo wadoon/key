@@ -3,7 +3,7 @@ package de.uka.ilkd.key.testgeneration.cli;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
-import de.uka.ilkd.key.testgeneration.xmlparser.JUnitParser;
+import de.uka.ilkd.key.testgeneration.xmlparser.junitparser.JUnitParser;
 
 /**
  * Shared resources for the KeyTestGen CLI.

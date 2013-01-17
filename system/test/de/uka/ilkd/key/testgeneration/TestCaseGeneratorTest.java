@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.testgeneration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map.Entry;
 
@@ -20,13 +21,12 @@ public class TestCaseGeneratorTest {
 
         TestCaseGenerator testCaseGenerator = TestCaseGenerator.getDefaultInstance();
         String output = testCaseGenerator.generateTestCase(
-                "/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
+                new File("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"),
                 "midOneProxyOneInstance");
         
         for(Entry<String, Long> entry : Benchmark.getReadings().entrySet()) {
             System.out.println(entry.getKey() + " : " + entry.getValue() + " milliseconds");
         }
-        
         System.out.println(output);
     }
 }

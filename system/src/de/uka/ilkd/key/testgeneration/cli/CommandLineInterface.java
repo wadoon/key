@@ -43,8 +43,8 @@ public final class CommandLineInterface {
         private TestCaseGenerator testCaseGenerator = null;
 
         /**
-         * The parser and {@link JCommander} processor to use for the session serviced by this
-         * worker.
+         * The {@link CommandParser} and {@link JCommander} processor to use for the session
+         * serviced by this worker.
          */
         CommandParser parser = new CommandParser();
         JCommander processor = new JCommander(parser);

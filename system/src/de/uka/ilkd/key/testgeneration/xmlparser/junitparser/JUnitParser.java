@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.xmlparser;
+package de.uka.ilkd.key.testgeneration.xmlparser.junitparser;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -11,6 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import de.uka.ilkd.key.testgeneration.XMLHandler;
+import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
+import de.uka.ilkd.key.testgeneration.xmlparser.XMLParserException;
 
 /**
  * Instances of this class are used in order to create JUnit4 test suites from the internal XML
@@ -39,7 +41,6 @@ public class JUnitParser
         if (instance == null) {
             instance = new JUnitParser();
         }
-
         return instance;
     }
 
@@ -112,7 +113,7 @@ public class JUnitParser
         }
 
         /**
-         * Processes an XML tree corresponding to a test case
+         * Processes an XML subtree corresponding to a test case.
          * 
          * @param inputStream
          *            the {@link InputStream} for this session
@@ -135,7 +136,6 @@ public class JUnitParser
 
             return "";
         }
-
     }
 
     /**
@@ -159,136 +159,6 @@ public class JUnitParser
         public List<String> getImports() {
 
             return imports;
-        }
-    }
-
-    /**
-     * Represents a simple view of a JUnit test method, i.e. a method annotated with @Test.
-     * 
-     * @author christopher
-     */
-    private static class TestMethod {
-
-        /**
-         * Object instances declared in this particular method.
-         */
-        private final List<ObjectInstance> objectInstances =
-                new LinkedList<ObjectInstance>();
-
-        /**
-         * The oracle for this method
-         */
-        private String oracle;
-
-        /**
-         * @return the objectInstances
-         */
-        public List<ObjectInstance> getObjectInstances() {
-
-            return objectInstances;
-        }
-
-        public void addObjectInstance(ObjectInstance instance) {
-
-            objectInstances.add(instance);
-        }
-    }
-
-    /**
-     * Represents a very simple view of an Object instance, based on the metadata available in the
-     * XML document.
-     * 
-     * @author christopher
-     */
-    private static class ObjectInstance {
-
-        /**
-         * The static type of this object.
-         */
-        private String type;
-
-        /**
-         * The name of this object.
-         */
-        private String name;
-
-        /**
-         * Indicates whether this object is declared final or not.
-         */
-        private boolean isFinal = false;
-
-        /**
-         * Arguments to the constructor of this object
-         */
-        private List<ObjectInstance> constructorArguments =
-                new LinkedList<ObjectInstance>();
-
-        /**
-         * @return the type
-         */
-        public String getType() {
-
-            return type;
-        }
-
-        /**
-         * @param type
-         *            the type to set
-         */
-        public void setType(String type) {
-
-            this.type = type;
-        }
-
-        /**
-         * @return the name
-         */
-        public String getName() {
-
-            return name;
-        }
-
-        /**
-         * @param name
-         *            the name to set
-         */
-        public void setName(String name) {
-
-            this.name = name;
-        }
-
-        /**
-         * @return the isFinal
-         */
-        public boolean isFinal() {
-
-            return isFinal;
-        }
-
-        /**
-         * @param isFinal
-         *            the isFinal to set
-         */
-        public void setFinal(boolean isFinal) {
-
-            this.isFinal = isFinal;
-        }
-
-        /**
-         * @return the constructorArguments
-         */
-        public List<ObjectInstance> getConstructorArguments() {
-
-            return constructorArguments;
-        }
-
-        /**
-         * @param constructorArguments
-         *            the constructorArguments to set
-         */
-        public void addConstructorArgument(ObjectInstance argument) {
-
-            constructorArguments.add(argument);
         }
     }
 }

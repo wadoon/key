@@ -8,8 +8,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
-import de.uka.ilkd.key.testgeneration.xmlparser.JUnitParser;
 import de.uka.ilkd.key.testgeneration.xmlparser.XMLParserException;
+import de.uka.ilkd.key.testgeneration.xmlparser.junitparser.JUnitParser;
 
 public class TestJUnitParser {
 
