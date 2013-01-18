@@ -10,15 +10,12 @@ import java.util.List;
  */
 public class ObjectInstance {
 
+    private String identifier;
+
     /**
      * The static type of this object.
      */
     private String type;
-
-    /**
-     * The name of this object.
-     */
-    private String name;
 
     /**
      * Indicates whether this object is declared final or not.
@@ -29,6 +26,11 @@ public class ObjectInstance {
      * Arguments to the constructor of this object
      */
     private List<ObjectInstance> constructorArguments = new LinkedList<ObjectInstance>();
+
+    /**
+     * Fields of this object instance
+     */
+    private List<ObjectVariable> fields = new LinkedList<ObjectVariable>();
 
     /**
      * @return the type
@@ -45,23 +47,6 @@ public class ObjectInstance {
     public void setType(String type) {
 
         this.type = type;
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-
-        return name;
-    }
-
-    /**
-     * @param name
-     *            the name to set
-     */
-    public void setName(String name) {
-
-        this.name = name;
     }
 
     /**
@@ -96,5 +81,39 @@ public class ObjectInstance {
     public void addConstructorArgument(ObjectInstance argument) {
 
         constructorArguments.add(argument);
+    }
+
+    /**
+     * @return the identifier
+     */
+    public String getIdentifier() {
+
+        return identifier;
+    }
+
+    /**
+     * @param identifier
+     *            the identifier to set
+     */
+    public void setIdentifier(String identifier) {
+
+        this.identifier = identifier;
+    }
+
+    /**
+     * @return the fields
+     */
+    public List<ObjectVariable> getFields() {
+
+        return fields;
+    }
+
+    /**
+     * @param fields
+     *            the fields to set
+     */
+    public void addField(ObjectVariable variable) {
+
+        fields.add(variable);
     }
 }

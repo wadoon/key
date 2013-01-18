@@ -2,6 +2,7 @@ package de.uka.ilkd.key.testgeneration.xmlparser.junitparser;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -159,9 +160,14 @@ public class JUnitParser
             MethodDeclaration methodDeclaration = processMethod();
 
             /*
+             * Set up the mediator for this test case.
+             */
+            TestCaseMediator testCaseMediator = new TestCaseMediator();
+
+            /*
              * Set up the preliminary fixture mapping.
              */
-            generateFixtureMapping();
+            generateFixtureMapping(testCaseMediator);
         }
 
         /**
@@ -197,7 +203,6 @@ public class JUnitParser
             eventReader.nextTag();
 
             return methodDeclaration;
-
         }
 
         /**
@@ -295,18 +300,18 @@ public class JUnitParser
          * {@link ObjectInstance} instances, representing a set of variable declarations and the
          * actual object instances they point to (if any).
          * 
+         * @param testCaseMediator
          * @return the variable -> instance mapping.
          * @throws XMLStreamException
          */
-        private Map<ObjectVariable, ObjectInstance> generateFixtureMapping()
+        private void generateFixtureMapping(TestCaseMediator testCaseMediator)
                 throws XMLStreamException {
 
             // Discards the opening tag
             XMLEvent startTag = eventReader.nextTag();
 
-            List<ObjectVariable> objectVariables = extractVariables();
-
-            return null;
+            extractVariables(testCaseMediator);
+            extractInstances(testCaseMediator);
         }
 
         /**
@@ -325,30 +330,26 @@ public class JUnitParser
          * this method will extract an {@link ObjectVariable} instance for each variable, and return
          * a list of these.
          * 
-         * @return a list of {@link ObjectInstance} instances
+         * @param testCaseMediator
+         * @return a list of {@link ObjectVariable} instances
          * @throws XMLStreamException
          */
-        private List<ObjectVariable> extractVariables() throws XMLStreamException {
+        private void extractVariables(TestCaseMediator testCaseMediator)
+                throws XMLStreamException {
 
             // Discards the opening tag
             XMLEvent startTag = eventReader.nextTag();
-
-            List<ObjectVariable> variables = new LinkedList<ObjectVariable>();
 
             /*
              * Extract all variables, stop when the </variables> tag is encountered, and discard it.
              */
             while (!eventReader.nextTag().isEndElement()) {
 
-                System.out.println(eventReader.peek().getEventType());
-                System.out.println(eventReader.peek().getClass());
                 ObjectVariable variable = extractVariable();
-                variables.add(variable);
-                System.out.println(eventReader.peek());
+                testCaseMediator.addVariable(variable.getIdentifier(), variable);
             }
             eventReader.nextTag();
 
-            return variables;
         }
 
         /**
@@ -410,58 +411,188 @@ public class JUnitParser
         }
 
         /**
-         * Retrieves the identifier for an {@link XMLEvent}. For example, in:
+         * Given that the stream pointer in the {@link XMLEventReader} is currently pointing to the
+         * start of an XML subtree of the form:
          * 
          * <pre>
-         *      {@literal <testcase>}
+         * {@literal <instances>}
+         *      instance1
+         *      instance2
+         *      ...
+         *      instanceN
+         *  {@literal </instances>}
          * </pre>
          * 
-         * The identifier will be "testcase".
+         * this method will extract an {@link ObjectInstance} instance for each variable, and return
+         * a list of these.
          * 
-         * @param event
-         *            the event to get the identifier for
-         * @return the identifier
+         * @param testCaseMediator
+         * @return a list of {@link ObjectInstance} instances
+         * @throws XMLStreamException
          */
-        private String getEventName(XMLEvent event) {
+        private List<ObjectInstance> extractInstances(TestCaseMediator testCaseMediator)
+                throws XMLStreamException {
 
-            if (event.isStartElement()) {
-                return event.asStartElement().getName().getLocalPart();
+            // Discards the opening tag
+            XMLEvent startTag = eventReader.nextTag();
+
+            List<ObjectInstance> instances = new LinkedList<ObjectInstance>();
+
+            while (!eventReader.nextTag().isEndElement()) {
+
+                ObjectInstance instance = extractInstance(testCaseMediator);
+                testCaseMediator.addInstance(instance.getIdentifier(), instance);
             }
+            eventReader.nextTag();
 
-            if (event.isEndElement()) {
-                return event.asEndElement().getName().getLocalPart();
-            }
-
-            return "";
+            return null;
         }
 
         /**
-         * Validates an XML tag by
-         * <ul>
-         * <li>asserting that the {@link XMLEvent} passed is indeed a tag, and</li>
-         * <li>asserting that the identifier associated with the tag is of the expected type.</li>
-         * </ul>
+         * Given that the stream pointer in the {@link XMLEventReader} is currently pointing to the
+         * start of an XML subtree of the form:
          * 
-         * @param event
-         *            the {@link XMLEvent} to validate
-         * @param expectedIdentifier
-         *            the expected type of the tags identifier
+         * <pre>
+         * {@literal <instance>}
+         *      {@literal <identifier>}
+         *              The identifier for the variable
+         *      {@literal <\identifier>}
+         *      {@literal <type>}
+         *              The type of this variable
+         *      {@literal <\type>}
+         *      {@literal <value>}
+         *              the object instance referred by this variable
+         *      {@literal <\type>}
+         * {@literal </instance>}
+         * </pre>
+         * 
+         * this method constructs an {@link ObjectVariable} instance the variable represented in
+         * this XML subtree.
+         * 
+         * @param testCaseMediator
+         * @return a list of {@link ObjectInstance} instances
          * @throws XMLStreamException
-         *             if validation fails
          */
-        private void validateXMLTag(XMLEvent event, String expectedIdentifier)
+        private ObjectInstance extractInstance(TestCaseMediator testCaseMediator)
                 throws XMLStreamException {
 
-            if (!event.isStartElement() && !event.isEndElement()) {
-                throw new XMLStreamException("Bad XML structure: " + event
-                        + " is not a valid tag");
+            ObjectInstance instance = new ObjectInstance();
+
+            /*
+             * Extract the identifier for this instance.
+             */
+            eventReader.nextTag();
+            String identifier = eventReader.nextEvent().asCharacters().getData().trim();
+            eventReader.nextTag();
+
+            /*
+             * Extract the type of this instance.
+             */
+            eventReader.nextTag();
+            String type = eventReader.nextEvent().asCharacters().getData().trim();
+            eventReader.nextTag();
+
+            instance.setIdentifier(identifier);
+            instance.setType(type);
+
+            /*
+             * Extract the field identifiers of this instance, and map each field to an
+             * ObjectVariabel instance.
+             */
+            for (String fieldIdentifier : extractFieldIdentifiers()) {
+                instance.addField(testCaseMediator.getVariable(fieldIdentifier));
             }
 
-            if (!event.asStartElement().getName().getLocalPart().equals(
-                    expectedIdentifier)) {
-                throw new XMLStreamException("Bad XML structure: expected " + "<"
-                        + expectedIdentifier + ">" + " but saw: " + event);
+            return instance;
+        }
+
+        /**
+         * Given that the stream pointer in the {@link XMLEventReader} is currently pointing to the
+         * start of an XML subtree of the form:
+         * 
+         * <pre>
+         * {@literal <instances>}
+         *      instance1
+         *      instance2
+         *      ...
+         *      instanceN
+         *  {@literal </instances>}
+         * </pre>
+         * 
+         * this method will extract the identifier for each field, and return a list of these.
+         * 
+         * @return a list of variable identifiers.
+         * @throws XMLStreamException
+         */
+        private List<String> extractFieldIdentifiers() throws XMLStreamException {
+
+            // Discards the opening tag
+            XMLEvent startTag = eventReader.nextTag();
+
+            List<String> fields = new LinkedList<String>();
+
+            while (!eventReader.peek().isEndElement()) {
+
+                XMLEvent event = eventReader.nextEvent();
+                fields.add(event.toString().trim());
             }
+            eventReader.nextTag();
+
+            return fields;
+        }
+    }
+
+    /**
+     * Retrieves the identifier for an {@link XMLEvent}. For example, in:
+     * 
+     * <pre>
+     *      {@literal <testcase>}
+     * </pre>
+     * 
+     * The identifier will be "testcase".
+     * 
+     * @param event
+     *            the event to get the identifier for
+     * @return the identifier
+     */
+    private static String getEventName(XMLEvent event) {
+
+        if (event.isStartElement()) {
+            return event.asStartElement().getName().getLocalPart();
+        }
+
+        if (event.isEndElement()) {
+            return event.asEndElement().getName().getLocalPart();
+        }
+
+        return "";
+    }
+
+    /**
+     * Validates an XML tag by
+     * <ul>
+     * <li>asserting that the {@link XMLEvent} passed is indeed a tag, and</li>
+     * <li>asserting that the identifier associated with the tag is of the expected type.</li>
+     * </ul>
+     * 
+     * @param event
+     *            the {@link XMLEvent} to validate
+     * @param expectedIdentifier
+     *            the expected type of the tags identifier
+     * @throws XMLStreamException
+     *             if validation fails
+     */
+    private void validateXMLTag(XMLEvent event, String expectedIdentifier)
+            throws XMLStreamException {
+
+        if (!event.isStartElement() && !event.isEndElement()) {
+            throw new XMLStreamException("Bad XML structure: " + event
+                    + " is not a valid tag");
+        }
+
+        if (!event.asStartElement().getName().getLocalPart().equals(expectedIdentifier)) {
+            throw new XMLStreamException("Bad XML structure: expected " + "<"
+                    + expectedIdentifier + ">" + " but saw: " + event);
         }
     }
 
@@ -489,6 +620,74 @@ public class JUnitParser
         public List<String> getImports() {
 
             return imports;
+        }
+    }
+
+    /**
+     * Mediator for processing individual test cases.
+     * 
+     * @author christopher
+     */
+    private static class TestCaseMediator {
+
+        /**
+         * Variables related to this particular test case.
+         */
+        Map<String, ObjectVariable> variables = new HashMap<String, ObjectVariable>();
+
+        /**
+         * Object instances related to this particular test case.
+         */
+        Map<String, ObjectInstance> instances = new HashMap<String, ObjectInstance>();
+
+        /**
+         * Retrieves a variable corresponding to a given identifier.
+         * 
+         * @param identifier
+         *            the identifier
+         * @return the variable
+         */
+        public ObjectVariable getVariable(String identifier) {
+
+            return variables.get(identifier);
+        }
+
+        /**
+         * Add a variable.
+         * 
+         * @param identifier
+         *            String identifier for the variable
+         * @param variable
+         *            the variable
+         */
+        public void addVariable(String identifier, ObjectVariable variable) {
+
+            this.variables = variables;
+        }
+
+        /**
+         * Retrieves an instance corresponding to a given identifier.
+         * 
+         * @param identifier
+         *            the identifier
+         * @return the instance
+         */
+        public ObjectVariable getInstance(String identifier) {
+
+            return variables.get(identifier);
+        }
+
+        /**
+         * Add an instance.
+         * 
+         * @param identifier
+         *            String identifier for the instance
+         * @param variable
+         *            the instance
+         */
+        public void addInstance(String identifier, ObjectInstance instance) {
+
+            instances.put(identifier, instance);
         }
     }
 }

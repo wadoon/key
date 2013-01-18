@@ -52,8 +52,7 @@ public class Model
     public void add(ModelVariable variable, Object instance) {
 
         /*
-         * FIXME: This is NOT a good way to handle this. This should throw an exception, not fail
-         * silently.
+         * TODO: This should throw an exception, not fail silently.
          */
         if (!ModelVariable.isValidValueType(instance)) {
             return;

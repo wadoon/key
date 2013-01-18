@@ -13,8 +13,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.DTD;
 import javax.xml.stream.events.XMLEvent;
 
-import com.sun.xml.internal.fastinfoset.stax.events.StartElementEvent;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -31,7 +29,6 @@ import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
-import de.uka.ilkd.key.testgeneration.visitors.TermXMLVisitor;
 import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
 import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 
@@ -42,7 +39,8 @@ import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
  * 
  * @author christopher
  */
-public class XMLGenerator extends XMLHandler {
+public class XMLGenerator
+        extends XMLHandler {
 
     /**
      * Flag to determine if the XML should be formatted or not.

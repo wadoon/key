@@ -538,7 +538,7 @@ public class PathconditionParser
             if (operator instanceof ProgramVariable) {
 
                 /*
-                 * Key represents the heap as a LocationVariable as well. We cannot(?) do anything
+                 * KeY represents the heap as a LocationVariable as well. We cannot(?) do anything
                  * useful with it, so we ignore it. However, if the LocationVariable correspons to
                  * "self" (i.e. the root variable), we return the default root, although we first
                  * properly set the type (which is not needed, but nice to have).
