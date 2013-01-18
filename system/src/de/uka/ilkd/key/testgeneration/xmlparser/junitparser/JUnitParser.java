@@ -569,34 +569,6 @@ public class JUnitParser
     }
 
     /**
-     * Validates an XML tag by
-     * <ul>
-     * <li>asserting that the {@link XMLEvent} passed is indeed a tag, and</li>
-     * <li>asserting that the identifier associated with the tag is of the expected type.</li>
-     * </ul>
-     * 
-     * @param event
-     *            the {@link XMLEvent} to validate
-     * @param expectedIdentifier
-     *            the expected type of the tags identifier
-     * @throws XMLStreamException
-     *             if validation fails
-     */
-    private void validateXMLTag(XMLEvent event, String expectedIdentifier)
-            throws XMLStreamException {
-
-        if (!event.isStartElement() && !event.isEndElement()) {
-            throw new XMLStreamException("Bad XML structure: " + event
-                    + " is not a valid tag");
-        }
-
-        if (!event.asStartElement().getName().getLocalPart().equals(expectedIdentifier)) {
-            throw new XMLStreamException("Bad XML structure: expected " + "<"
-                    + expectedIdentifier + ">" + " but saw: " + event);
-        }
-    }
-
-    /**
      * Mediating class which encapsulates JUnit data generated during the parsing of an XML test
      * suite.
      * 

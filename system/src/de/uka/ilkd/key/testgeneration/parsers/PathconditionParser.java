@@ -215,34 +215,6 @@ public class PathconditionParser
     }
 
     /**
-     * Recursive helper method to {@link #simplifyBinaryFunction(Term)}
-     * 
-     * @param term
-     *            the Term to process
-     * @return a String representation of a variable path
-     */
-    private static String simplifySortDependentFunctionHelper(Term term) {
-
-        /*
-         * Base case: underlying definition does not consist of any more nested recursions, so we
-         * just extract the current variable name and go back.
-         */
-        if (term.op().getClass() == LocationVariable.class) {
-
-            return extractName(term);
-        }
-
-        /*
-         * Recursive case: underlying definition is still recursively defined, so keep unwinding it.
-         */
-        else {
-
-            return simplifySortDependentFunctionHelper(term.sub(1)) + "_dot_"
-                    + extractName(term);
-        }
-    }
-
-    /**
      * Simplify a junctor (i.e. NOT, AND, OR, IMP).
      * 
      * @param term
