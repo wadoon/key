@@ -67,6 +67,8 @@ public class JUnitParser
         }
     }
 
+    // //////////////////////// WORKERS //////////////////////////
+
     /**
      * Worker which services a single invocation of
      * {@link JUnitParser#generateTestCaseFromXML(String)}.
@@ -567,6 +569,8 @@ public class JUnitParser
 
         return "";
     }
+
+    // //////////////////////// MEDIATORS //////////////////////////
 
     /**
      * Mediating class which encapsulates JUnit data generated during the parsing of an XML test
