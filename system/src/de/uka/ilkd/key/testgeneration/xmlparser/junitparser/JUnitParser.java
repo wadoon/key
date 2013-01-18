@@ -6,8 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import java_cup.non_terminal;
-
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -178,7 +176,6 @@ public class JUnitParser
 
             // Validates and discards the opening tag
             XMLEvent startTag = eventReader.nextTag();
-            // validateXMLTag(startTag, METHOD_ROOT);
 
             MethodDeclaration methodDeclaration = new MethodDeclaration();
 
@@ -255,9 +252,8 @@ public class JUnitParser
          */
         private List<String> getMethodParameters() throws XMLStreamException {
 
-            // Validates and discards the opening tag
+            // Discards the opening tag
             XMLEvent startTag = eventReader.nextTag();
-            // validateXMLTag(startTag, PARAMETERS_ROOT);
 
             List<String> identifiers = new LinkedList<String>();
 
@@ -305,9 +301,8 @@ public class JUnitParser
         private Map<ObjectVariable, ObjectInstance> generateFixtureMapping()
                 throws XMLStreamException {
 
-            // Validates and discards the opening tag
+            // Discards the opening tag
             XMLEvent startTag = eventReader.nextTag();
-            // validateXMLTag(startTag, TESTFIXTURE_ROOT);
 
             List<ObjectVariable> objectVariables = extractVariables();
 
@@ -335,19 +330,21 @@ public class JUnitParser
          */
         private List<ObjectVariable> extractVariables() throws XMLStreamException {
 
-            // Validates and discards the opening tag
+            // Discards the opening tag
             XMLEvent startTag = eventReader.nextTag();
-            // validateXMLTag(startTag, VARIABLES_ROOT);
 
             List<ObjectVariable> variables = new LinkedList<ObjectVariable>();
 
             /*
              * Extract all variables, stop when the </variables> tag is encountered, and discard it.
              */
-            while (!eventReader.peek().isEndElement()) {
+            while (!eventReader.nextTag().isEndElement()) {
 
+                System.out.println(eventReader.peek().getEventType());
+                System.out.println(eventReader.peek().getClass());
                 ObjectVariable variable = extractVariable();
                 variables.add(variable);
+                System.out.println(eventReader.peek());
             }
             eventReader.nextTag();
 
@@ -379,10 +376,6 @@ public class JUnitParser
          * @throws XMLStreamException
          */
         private ObjectVariable extractVariable() throws XMLStreamException {
-
-            // Validates and discards the opening tag
-            XMLEvent startTag = eventReader.nextTag();
-            // validateXMLTag(startTag, VARIABLE_ROOT);
 
             ObjectVariable variable = new ObjectVariable();
 
