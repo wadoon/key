@@ -13,12 +13,11 @@ package de.uka.ilkd.key.smt;
 import java.util.Collection;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
+import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 final class ExternalSMTSolverImplementation extends AbstractSMTSolver{
- 
-        private static int IDCounter = 0;
-        private final int ID = IDCounter++;
 
         /** starts a external process and returns the result */
         private ExternalProcessLauncher<SolverCommunication> processLauncher;
@@ -93,65 +92,16 @@ final class ExternalSMTSolverImplementation extends AbstractSMTSolver{
                         setSolverState(SolverState.Stopped);
                         listener.processStopped(this, problem);
                 }
-
         }
-
-        @Override
-        public String name() {
-                return type.getName();
-        }
-
+        
         @Override
         public void interrupt(ReasonOfInterruption reason) {
 
-                // order of assignments is important;
-                setReasonOfInterruption(reason);
-                setSolverState(SolverState.Stopped);
-                if (solverTimeout != null) {
-                        solverTimeout.cancel();
-                }
-                if (thread != null) {
-                		processLauncher.stop();
-                        thread.interrupt();
-                }
-        }
-
-        @Override
-        public SMTSolverResult getFinalResult() {
-
-                return isRunning() ? null : solverCommunication.getFinalResult();
-        }
-
-        @Override
-        public TacletSetTranslation getTacletTranslation() {
-                return isRunning() ? null : tacletTranslation;
-        }
-
-        @Override
-        public String getTranslation() {
-                return isRunning() ? null : problemString;
-        }
-
-        @Override
-        public String toString() {
-                return name() + " (ID: " + ID + ")";
-        }
-
-        @Override
-        public String getSolverOutput() {
-         		String output = "";
-        		output+= "Result: "+ solverCommunication.getFinalResult().toString()+"\n\n";
-      	
-      
-        		for(String s : solverCommunication.getMessages()){
-        			output += s+"\n";
-        		}
-                return output;
-        }
-
-        @Override
-        public Collection<Throwable> getExceptionsOfTacletTranslation() {
-                
-                return exceptionsForTacletTranslation;
+            super.interrupt(reason);
+            
+            if (thread != null) {
+                processLauncher.stop();
+                thread.interrupt();
+            }
         }
 }

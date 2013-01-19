@@ -19,6 +19,12 @@ public abstract class AbstractSMTSolver
         implements SMTSolver, Runnable {
 
     /**
+     * Counter for creating unique identifiers for each individual solver instance.
+     */
+    protected static int IDCounter = 0;
+    protected final int ID = IDCounter++;
+
+    /**
      * The {@link SMTProblem} instance that is associated with this solver.
      */
     protected SMTProblem problem;
@@ -250,6 +256,7 @@ public abstract class AbstractSMTSolver
      * Sets the current state of the solver session.
      * 
      * @param value
+     *            new state of the solver
      */
     protected void setSolverState(SolverState value) {
 
@@ -342,5 +349,85 @@ public abstract class AbstractSMTSolver
                 listener.processUser(this, problem);
                 break;
         }
+    }
+
+    /**
+     * @return the name of the type of this solver.
+     */
+    @Override
+    public String name() {
+
+        return type.getName();
+    }
+
+    /**
+     * Interrupt the execution of this particular solver.
+     * 
+     * @param reason
+     *            the reason for the interruption
+     */
+    @Override
+    public void interrupt(ReasonOfInterruption reason) {
+
+        // order of assignments is important;
+        setReasonOfInterruption(reason);
+        setSolverState(SolverState.Stopped);
+        if (solverTimeout != null) {
+            solverTimeout.cancel();
+        }
+    }
+
+    /**
+     * @return the {@link SMTSolverResult}, representing the result of the execution of the solver.
+     */
+    @Override
+    public SMTSolverResult getFinalResult() {
+
+        return isRunning() ? null : solverCommunication.getFinalResult();
+    }
+
+    /**
+     * @return the translation of the Taclet set.
+     */
+    @Override
+    public TacletSetTranslation getTacletTranslation() {
+
+        return isRunning() ? null : tacletTranslation;
+    }
+
+    /**
+     * @return the translation of the proof obligation(?).
+     */
+    @Override
+    public String getTranslation() {
+
+        return isRunning() ? null : problemString;
+    }
+
+    /**
+     * @return a String with the ID of this particular solver instance.
+     */
+    @Override
+    public String toString() {
+
+        return name() + " (ID: " + ID + ")";
+    }
+
+    @Override
+    public String getSolverOutput() {
+
+        String output = "";
+        output += "Result: " + solverCommunication.getFinalResult().toString() + "\n\n";
+
+        for (String s : solverCommunication.getMessages()) {
+            output += s + "\n";
+        }
+        return output;
+    }
+
+    @Override
+    public Collection<Throwable> getExceptionsOfTacletTranslation() {
+
+        return exceptionsForTacletTranslation;
     }
 }
