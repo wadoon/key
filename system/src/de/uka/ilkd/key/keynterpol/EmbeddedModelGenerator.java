@@ -100,9 +100,6 @@ public class EmbeddedModelGenerator
          * Solve the constraint.
          */
         SMTSolverResult result = solveSMTProblem(problem, services);
-        
-        
-
     }
 
     /**
@@ -185,7 +182,7 @@ public class EmbeddedModelGenerator
 
         return result;
     }
-    
+
     /**
      * Settings to pass to the SMT solver.
      * 

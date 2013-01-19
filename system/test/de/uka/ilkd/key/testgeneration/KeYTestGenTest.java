@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import z3parser.api.Z3ModelParser.ValueContainer;
+
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -234,6 +235,7 @@ public abstract class KeYTestGenTest
         }
     }
 
+    
     protected void printModel(HashMap<String, ValueContainer> model) {
 
         for (ValueContainer container : model.values()) {

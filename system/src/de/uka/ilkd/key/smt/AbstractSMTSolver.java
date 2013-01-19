@@ -413,6 +413,9 @@ public abstract class AbstractSMTSolver
         return name() + " (ID: " + ID + ")";
     }
 
+    /**
+     * Returns the output of the solver.
+     */
     @Override
     public String getSolverOutput() {
 
@@ -425,6 +428,9 @@ public abstract class AbstractSMTSolver
         return output;
     }
 
+    /**
+     * Return all {@link Throwable} instances raised in the course of execution of the solver.
+     */
     @Override
     public Collection<Throwable> getExceptionsOfTacletTranslation() {
 
