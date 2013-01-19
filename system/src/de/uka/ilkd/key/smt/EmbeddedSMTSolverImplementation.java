@@ -42,11 +42,16 @@ public class EmbeddedSMTSolverImplementation
     @Override
     public void run() {
 
-        // Firstly: Set the state to running and inform the listener.
+        /*
+         * Step one: flag the solver as running and notify listeners about this.
+         */
         solverState = SolverState.Running;
         listener.processStarted(this, problem);
 
-        // Secondly: Translate the given problem
+        /*
+         * Second, translate the problem into a solver readable format (depending on which scripting
+         * language is used by the particular solver.
+         */
         String commands[];
         try {
             commands = translateToCommand(problem.getTerm());
@@ -63,7 +68,7 @@ public class EmbeddedSMTSolverImplementation
          * TODO: rather than starting an external process, use the native SMT solver instead.
          */
         try {
-
+            
         }
         catch (Throwable e) {
             interruptionOccurred(e);

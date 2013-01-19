@@ -49,66 +49,6 @@ final class ExternalSMTSolverImplementation extends AbstractSMTSolver{
         }
 
         @Override
-        public ReasonOfInterruption getReasonOfInterruption() {
-                return isRunning() ? ReasonOfInterruption.NoInterruption
-                                : reasonOfInterruption;
-        }
-
-        
-
-        @Override
-        public SolverType getType() {
-                return type;
-        }
-
-        @Override
-        public long getStartTime() {
-                if (solverTimeout == null) {
-                        return -1;
-                }
-                return solverTimeout.scheduledExecutionTime();
-        }
-
-        @Override
-        public long getTimeout() {
-                if (solverTimeout == null) {
-                        return -1;
-                }
-                return solverTimeout.getTimeout();
-        }
-
-        @Override
-        public SolverState getState() {
-                try {
-                        lockStateVariable.lock();
-                        SolverState b = solverState;
-                        return b;
-                } finally { // finally trumps return
-                        lockStateVariable.unlock();
-                }
-        }
-
-        private void setSolverState(SolverState value) {
-                try {
-                        lockStateVariable.lock();
-                        solverState = value;
-                } finally { // finally trumps return
-                        lockStateVariable.unlock();
-                }
-        }
-
-        @Override
-        public boolean wasInterrupted() {
-                return getReasonOfInterruption() != ReasonOfInterruption.NoInterruption;
-        }
-
-        @Override
-        public boolean isRunning() {
-                return getState() == SolverState.Running;
-        }
-
-
-        @Override
         public void run() {
                 // Firstly: Set the state to running and inform the listener.
                 setSolverState(SolverState.Running);
@@ -156,16 +96,10 @@ final class ExternalSMTSolverImplementation extends AbstractSMTSolver{
 
         }
 
-
-
         @Override
         public String name() {
                 return type.getName();
         }
-
-
-        
-        
 
         @Override
         public void interrupt(ReasonOfInterruption reason) {
