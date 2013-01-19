@@ -112,7 +112,88 @@ public interface SolverType extends PipeListener<SolverCommunication> {
          * returns true if and only if the support has been checked for the currently installed solver.
          */
         public boolean supportHasBeenChecked();
-        
+
+        static public final SolverType KeYnterpol= new AbstractSolverType() {
+            
+            @Override
+            public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+            
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public boolean supportsIfThenElse() {
+            
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+            @Override
+            public String getVersionParameter() {
+            
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public String[] getSupportedVersions() {
+            
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public String getName() {
+            
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public String getInfo() {
+            
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public String[] getDelimiters() {
+            
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public String getDefaultSolverParameters() {
+            
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public String getDefaultSolverCommand() {
+            
+                return "KeYnterpol";
+            }
+            
+            @Override
+            public SMTTranslator createTranslator(Services services) {
+            
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public SMTSolver createSolver(
+                    SMTProblem problem,
+                    SolverListener listener,
+                    Services services) {
+            
+                // TODO Auto-generated method stub
+                return null;
+            }
+        }; 
 
         /**
          * Class for the Z3 solver. It makes use of the SMT2-format.
@@ -131,7 +212,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
                                 SolverListener listener, Services services) {
-                        return new SMTSolverImplementation(problem, listener,
+                        return new ExternalSMTSolverImplementation(problem, listener,
                                         services, this);
                 }
 
@@ -243,7 +324,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
                                 SolverListener listener, Services services) {
-                        return new SMTSolverImplementation(problem, listener,
+                        return new ExternalSMTSolverImplementation(problem, listener,
                                         services, this);
                 }
 
@@ -325,7 +406,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
                                 SolverListener listener, Services services) {
-                        return new SMTSolverImplementation(problem, listener,
+                        return new ExternalSMTSolverImplementation(problem, listener,
                                         services, this);
                 }
 
@@ -409,7 +490,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
                                 SolverListener listener, Services services) {
-                        return new SMTSolverImplementation(problem, listener,
+                        return new ExternalSMTSolverImplementation(problem, listener,
                                         services, this);
                 }
 

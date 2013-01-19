@@ -3,12 +3,17 @@ package de.uka.ilkd.key.keynterpol;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Scanner;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.smt.SmtLib2Translator;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.Bridge;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.IParser;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.Main;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTLIB2Parser;
 
 /**
  * The primary interface between KeY and SMTInterpol. Very experimental for now, just wanting to
@@ -33,13 +38,31 @@ public class KeYnterpolInterface {
                 + "(assert (! (> y 0) :named IP_2))\n" + "(check-sat)\n" + "(exit)");
         writer.close();
 
-        Main.main(new String[] { "hej" });
-
         /*
-         * Invoke the SMTLib parser and see what happens.
+         * Invoke the SMTLib parser and see what happens. TODO: Need to redirect output from stdout
+         * to filestream.
          */
-        Bridge.run(null, null, null, file);
+        run(null, null, null, file);
+    }
 
-        file.delete();
+    public static void run(
+            BigInteger verbosity,
+            BigInteger timeout,
+            BigInteger seed,
+            File file) {
+
+        IParser parser = new SMTLIB2Parser();
+
+        int exitCode = parser.run(verbosity, timeout, seed, file);
+        System.exit(exitCode);
+    }
+
+    /**
+     * Translates a {@link Term} instance to a corresponding SMTLIB-2 proof obligation.
+     * 
+     * @param term
+     */
+    private void translateTerm(Term term) {
+
     }
 }

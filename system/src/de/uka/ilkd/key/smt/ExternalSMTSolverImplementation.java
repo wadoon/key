@@ -10,104 +10,25 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.IOException;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
-interface SolverListener {
-        void processStarted(SMTSolver solver, SMTProblem problem);
-
-        void processInterrupted(SMTSolver solver, SMTProblem problem,
-                        Throwable e);
-
-        void processStopped(SMTSolver solver, SMTProblem problem);
-
-        void processTimeout(SMTSolver solver, SMTProblem problem);
-
-        void processUser(SMTSolver solver, SMTProblem problem);
-}
-
-final class SMTSolverImplementation implements SMTSolver, Runnable{
+final class ExternalSMTSolverImplementation extends AbstractSMTSolver{
  
         private static int IDCounter = 0;
         private final int ID = IDCounter++;
 
-
-        /** The SMT problem that is related to this solver */
-        private SMTProblem problem;
-        /** It is possible that a solver has a listener. */
-        private SolverListener listener;
-
         /** starts a external process and returns the result */
         private ExternalProcessLauncher<SolverCommunication> processLauncher;
-   
-        /**
-         * The services object is stored in order to have the possibility to
-         * access it in every method
-         */
-        private Services services;
-        /**
-         * The record of the communication between KeY and the given solver. If everything works fine,
-         * it also contains the final result.
-         */
-        private SolverCommunication solverCommunication = SolverCommunication.EMPTY;
-      
-
-        /**
-         * This lock variable is responsible for the state variable
-         * <code>sovlerState</code>
-         */
-        private ReentrantLock lockStateVariable = new ReentrantLock();
-        /**
-         * This lock variable is responsible for the attribute
-         * <code>reasonOfInterruption</code>
-         */
-        private ReentrantLock lockInterruptionVariable = new ReentrantLock();
-
-        /** The thread that is associated with this solver. */
-        private Thread thread;
-        /**
-         * The timeout that is associated with this solver. Represents the
-         * timertask that is started when the solver is started.
-         */
-        private SolverTimeout solverTimeout;
-
-        private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NoInterruption;
-        private SolverState solverState = SolverState.Waiting;
-
-        private final SolverType type;
-        /** Strores the settings that are used for the execution. */
-        private SMTSettings smtSettings;
-
-        /**
-         * Stores the translation of the problem that is associated with this
-         * solver
-         */
-        private String problemString = "NOT YET COMPUTED";
-        /** Stores the taclet translation that is associated with this solver. */
-        private TacletSetTranslation tacletTranslation;
-        /**
-         * If there was an exception while executing the solver it is stored in
-         * this attribute
-         */
-        private Throwable exception;
-        
-        private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<Throwable>();
-
- 
-
-
-        SMTSolverImplementation(SMTProblem problem, SolverListener listener,
+  
+        ExternalSMTSolverImplementation(SMTProblem problem, SolverListener listener,
                         Services services, SolverType myType) {
+            super(myType);
                 this.problem = problem;
                 this.listener = listener;
                 this.services = services;
-                this.type = myType;
                 processLauncher = new ExternalProcessLauncher<SolverCommunication>(new SolverCommunication(),type.getDelimiters());
 
         }
@@ -133,34 +54,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                                 : reasonOfInterruption;
         }
 
-        public Throwable getException() {
-                return isRunning() ? null : exception;
-        }
-
-        public SMTProblem getProblem() {
-                return isRunning() ? null : problem;
-        }
-
-        public void setReasonOfInterruption(
-                        ReasonOfInterruption reasonOfInterruption) {
-                try {
-                        lockInterruptionVariable.lock();
-                        this.reasonOfInterruption = reasonOfInterruption;
-                } finally {
-                        lockInterruptionVariable.unlock();
-                }
-        }
-
-        private void setReasonOfInterruption(
-                        ReasonOfInterruption reasonOfInterruption, Throwable exc) {
-                try {
-                        lockInterruptionVariable.lock();
-                        this.reasonOfInterruption = reasonOfInterruption;
-                        this.exception = exc;
-                } finally {
-                        lockInterruptionVariable.unlock();
-                }
-        }
+        
 
         @Override
         public SolverType getType() {
@@ -262,23 +156,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         }
 
-        private void interruptionOccurred(Throwable e) {
-                ReasonOfInterruption reason = getReasonOfInterruption();
-                switch (reason) {
-                case Exception:
-                case NoInterruption:
-                        setReasonOfInterruption(ReasonOfInterruption.Exception,
-                                        e);
-                        listener.processInterrupted(this, problem, e);
-                        break;
-                case Timeout:
-                        listener.processTimeout(this, problem);
-                        break;
-                case User:
-                        listener.processUser(this, problem);
-                        break;
-                }
-        }
+
 
         @Override
         public String name() {
@@ -287,52 +165,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
 
         
-        private static String indent(String string) {
-
-            StringBuilder sb = new StringBuilder();
-            int indention = 0;
-
-            for (int i = 0; i < string.length(); i++) {
-                char c = string.charAt(i);
-                switch (c) {
-                case '(':
-                    sb.append("\n");
-                    for (int j = 0; j < indention; j++)
-                        sb.append(" ");
-                    sb.append("(");
-                    indention++;
-                    break;
-                case ')':
-                    indention--;
-                    // fall through
-                default:
-                    sb.append(c);
-                }
-            }
-
-            return sb.toString();
-        }
-
-
-       private String[] translateToCommand(Term term)
-                        throws IllegalFormulaException, IOException {
-
-                SMTTranslator trans = getType().createTranslator(services);
-                // instantiateTaclets(trans);
-
-                problemString = indent(trans.translateProblem(term, services,
-                                smtSettings).toString());
-            
-                tacletTranslation = ((AbstractSMTTranslator) trans)
-                                .getTacletSetTranslation();
-                exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
-                String parameters [] = this.type.getSolverParameters().split(" ");
-                String result [] = new String[parameters.length+1];
-                for(int i=0; i < result.length; i++){
-                    result[i] = i==0? type.getSolverCommand() : parameters[i-1];
-                }
-                return result;
-        }
+        
 
         @Override
         public void interrupt(ReasonOfInterruption reason) {
@@ -347,7 +180,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 		processLauncher.stop();
                         thread.interrupt();
                 }
-
         }
 
         @Override
@@ -388,6 +220,4 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 
                 return exceptionsForTacletTranslation;
         }
-
-
 }
