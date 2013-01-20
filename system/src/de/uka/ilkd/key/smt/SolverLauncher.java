@@ -310,9 +310,8 @@ public class SolverLauncher implements SolverListener {
 	 
 	    timer.schedule(solverTimeout, settings.getTimeout(),PERIOD);
 	    session.addCurrentlyRunning(solver);
-	    // This cast is okay since there is only the class
-	    // ExternalSMTSolverImplementation that implements SMTSolver.
-	    ((ExternalSMTSolverImplementation) solver).start(solverTimeout, settings);
+	    
+	    solver.startConcurrently(solverTimeout, settings);
 	    i++;
 	}
     }

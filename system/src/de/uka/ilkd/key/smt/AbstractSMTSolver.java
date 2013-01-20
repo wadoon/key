@@ -177,6 +177,34 @@ public abstract class AbstractSMTSolver
     }
 
     /**
+     * Starts a solver process. This method should be accessed only by an instance of
+     * <code>SolverLauncher</code>. If you want to start a solver please have a look at
+     * <code>SolverLauncher</code>.
+     * 
+     * @param timeout
+     * @param settings
+     */
+    @Override
+    public void startConcurrently(SolverTimeout timeout, SMTSettings settings) {
+
+        thread = new Thread(this);
+        solverTimeout = timeout;
+        smtSettings = settings;
+        thread.start();
+    }
+
+    /**
+     * Starts the solver as part of the current thread.
+     */
+    @Override
+    public void start(SolverTimeout timeout, SMTSettings settings) {
+
+        solverTimeout = timeout;
+        smtSettings = settings;
+        run();
+    }
+
+    /**
      * @return an instance of {@link Throwable} in the event that an exception was raised during the
      *         solvers execution, <code>null</code> otherwise.
      */

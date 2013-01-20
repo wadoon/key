@@ -32,21 +32,6 @@ final class ExternalSMTSolverImplementation extends AbstractSMTSolver{
 
         }
 
-        /**
-         * Starts a solver process. This method should be accessed only by an
-         * instance of <code>SolverLauncher</code>. If you want to start a
-         * solver please have a look at <code>SolverLauncher</code>.
-         * 
-         * @param timeout
-         * @param settings
-         */
-        public void start(SolverTimeout timeout, SMTSettings settings) {
-                thread = new Thread(this);
-                solverTimeout = timeout;
-                smtSettings = settings;
-                thread.start();
-        }
-
         @Override
         public void run() {
                 // Firstly: Set the state to running and inform the listener.
