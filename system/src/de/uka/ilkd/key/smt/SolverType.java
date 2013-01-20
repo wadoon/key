@@ -42,6 +42,10 @@ public interface SolverType
      * return the result of the previous call.
      */
     public boolean isInstalled(boolean recheck);
+    
+    /**
+     * Checks whether the solver is embedded.
+     */
 
     /**
      * Some specific information about the solver which can be presented. <code>null</code> means no
@@ -54,6 +58,10 @@ public interface SolverType
      */
     public String getSolverParameters();
 
+    /**
+     * The parameters to pass to the solver
+     * @param s the parameters
+     */
     public void setSolverParameters(String s);
 
     /** The default parameters which should be used for starting a solver */
@@ -226,6 +234,11 @@ public interface SolverType
             
             //TODO: Add logic for speaking to an embedded solver. The best thing is most likely to read everything at once.
         }
+
+        @Override
+        protected boolean isEmbedded() {
+            return true;
+        }
     };
 
     /**
@@ -354,6 +367,11 @@ public interface SolverType
             }
         }
 
+        @Override
+        protected boolean isEmbedded() {
+            return false;
+        }
+
     };
 
     /**
@@ -449,6 +467,11 @@ public interface SolverType
 
         }
 
+        @Override
+        protected boolean isEmbedded() {
+            return false;
+        }
+
     };
 
     /**
@@ -540,6 +563,11 @@ public interface SolverType
         public String modifyProblem(String problem) {
 
             return problem += "\n\n check\n";
+        }
+
+        @Override
+        protected boolean isEmbedded() {
+            return false;
         };
 
     };
@@ -630,6 +658,11 @@ public interface SolverType
             }
 
         }
+
+        @Override
+        protected boolean isEmbedded() {
+            return false;
+        }
     };
 
 }
@@ -668,6 +701,13 @@ abstract class AbstractSolverType
      */
     public boolean isInstalled(boolean recheck) {
 
+        /*
+         * If the solver is embedded, it is part of KeY, and there is no need for further checking. 
+         */
+        if(isEmbedded()) {
+            return true;
+        }
+        
         if (recheck || !installWasChecked) {
 
             String cmd = getSolverCommand();
@@ -680,6 +720,11 @@ abstract class AbstractSolverType
         }
         return isInstalled;
     }
+    
+    /**
+     * @return true if the solver is an embedded type, false otherwise.
+     */
+    protected abstract boolean isEmbedded();
 
     private static boolean checkEnvVariable(String cmd) {
 
@@ -722,18 +767,27 @@ abstract class AbstractSolverType
         return false;
     }
 
+    /**
+     * @return true if support for this solver has already been checked, false otherwise.
+     */
     @Override
     public boolean supportHasBeenChecked() {
 
         return supportHasBeenChecked;
     }
 
+    /**
+     * @return true if the version of this solver is supported by KeY, false otherwise.
+     */
     @Override
     public boolean isSupportedVersion() {
 
         return isSupportedVersion;
     }
 
+    /**
+     * @return the parameters to be passed to the solver (if the solver is invoked externally).
+     */
     public String getSolverParameters() {
 
         if (solverParameters == null) {
@@ -742,11 +796,17 @@ abstract class AbstractSolverType
         return solverParameters;
     }
 
+    /**
+     * Set the parameters to be passed to the solver.
+     */
     public void setSolverParameters(String s) {
 
         solverParameters = s;
     }
 
+    /**
+     * Set the command to be passed to the solver.
+     */
     @Override
     public void setSolverCommand(String s) {
 
@@ -754,6 +814,9 @@ abstract class AbstractSolverType
         solverCommand = s;
     }
 
+    /**
+     * @return the solver command. If a custom value has not been set.
+     */
     @Override
     public final String getSolverCommand() {
 
@@ -763,11 +826,17 @@ abstract class AbstractSolverType
         return solverCommand;
     }
 
+    /**
+     * @return the version of the solver.
+     */
     public String getVersion() {
 
         return solverVersion;
     }
 
+    /**
+     * Notify the solver session that an exception has occured, and buffer this internally.
+     */
     @Override
     public void exceptionOccurred(Pipe<SolverCommunication> pipe, Throwable exception) {
 
@@ -780,10 +849,12 @@ abstract class AbstractSolverType
         return getName();
     }
 
+    /**
+     * Modify the problem to be passed to the solver.
+     */
     @Override
     public String modifyProblem(String problem) {
 
         return problem;
     }
-
 }
