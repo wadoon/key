@@ -156,7 +156,7 @@ public class EmbeddedModelGenerator
              * existing SMTProblem.
              */
             try {
-                launcher.launch(problem, services, SolverType.Z3_SOLVER);
+                launcher.launch(problem, services, SolverType.KeYnterpol);
 
                 result = problem.getFinalResult();
 
