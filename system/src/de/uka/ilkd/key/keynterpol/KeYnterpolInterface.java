@@ -1,18 +1,8 @@
 package de.uka.ilkd.key.keynterpol;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Scanner;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.smt.SmtLib2Translator;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.Bridge;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.IParser;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.Main;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTLIB2Parser;
 
 /**
@@ -21,48 +11,37 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTLIB2Parser;
  * 
  * @author christopher
  */
-public class KeYnterpolInterface {
+public enum KeYnterpolInterface {
+    INSTANCE;
 
-    public static void main(String[] args) throws IOException {
-
-        /*
-         * Setup the pseduo file holding the SMTLib script (to avoid messing too much with the
-         * parser internals for now.
-         */
-        File file = new File("hej");
-        FileWriter writer = new FileWriter(file);
-        writer.write("(set-option :print-success false)\n" + "(set-logic QF_LIA)\n"
-                + "(declare-fun x () Int)\n" + "(declare-fun y () Int)\n"
-                + "(assert (! (> x y) :named IP_0))\n"
-                + "(assert (! (= x 0) :named IP_1))\n"
-                + "(assert (! (> y 0) :named IP_2))\n" + "(check-sat)\n" + "(exit)");
-        writer.close();
-
-        /*
-         * Invoke the SMTLib parser and see what happens. TODO: Need to redirect output from stdout
-         * to filestream.
-         */
-        run(null, null, null, file);
-    }
-
-    public static void run(
+    /**
+     * Execute SMTInterpol with the given parameters.
+     * 
+     * @param verbosity
+     *            the verbosity of the output from the solver.
+     * @param timeout
+     *            timeout settings for the solver.
+     * @param seed
+     *            random seed for this session.
+     * @param commands
+     *            the SMTLIB2 commands to run.
+     * @return the output of the solver.
+     */
+    public static String run(
             BigInteger verbosity,
             BigInteger timeout,
             BigInteger seed,
-            File file) {
+            String commands) {
 
         IParser parser = new SMTLIB2Parser();
 
-        int exitCode = parser.run(verbosity, timeout, seed, file);
-        System.exit(exitCode);
-    }
+        int exitCode = parser.runCommands(verbosity, timeout, seed, commands);
 
-    /**
-     * Translates a {@link Term} instance to a corresponding SMTLIB-2 proof obligation.
-     * 
-     * @param term
-     */
-    private void translateTerm(Term term) {
-
+        if (exitCode == 0) {
+            return "";
+        }
+        else {
+            return "ERROR";
+        }
     }
 }
