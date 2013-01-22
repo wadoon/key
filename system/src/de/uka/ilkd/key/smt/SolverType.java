@@ -211,7 +211,7 @@ public interface SolverType
         @Override
         public SMTTranslator createTranslator(Services services) {
 
-            return new SmtLib2Translator(services, new Configuration(false, false));
+            return new SmtLib2Translator(services, new Configuration(false, true));
         }
 
         /**

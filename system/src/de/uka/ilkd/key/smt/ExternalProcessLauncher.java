@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.PipedReader;
-import java.io.PipedWriter;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**

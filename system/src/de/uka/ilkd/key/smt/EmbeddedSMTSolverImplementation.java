@@ -12,23 +12,18 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 /**
- * Instances of this class represent, to KeY, an SMT solver running natively with KeY itself (as
- * opposed to external, possibly non-Java solvers such as those represented by
- * ExternalSMTSolverImplementation).
+ * Instances of this class represent, to KeY, an SMT solver running natively
+ * with KeY itself (as opposed to external, possibly non-Java solvers such as
+ * those represented by ExternalSMTSolverImplementation).
  * 
  * @author christopher
  */
-public class EmbeddedSMTSolverImplementation
-        extends AbstractSMTSolver {
+public class EmbeddedSMTSolverImplementation extends AbstractSMTSolver {
 
-    private Collection<Throwable> exceptionsForTacletTranslation =
-            new LinkedList<Throwable>();
+    private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<Throwable>();
 
-    public EmbeddedSMTSolverImplementation(
-            SMTProblem problem,
-            SolverListener listener,
-            Services services,
-            SolverType myType) {
+    public EmbeddedSMTSolverImplementation(SMTProblem problem,
+            SolverListener listener, Services services, SolverType myType) {
 
         super(myType);
         this.problem = problem;
@@ -49,14 +44,14 @@ public class EmbeddedSMTSolverImplementation
         listener.processStarted(this, problem);
 
         /*
-         * Second, translate the problem into a solver readable format (depending on which scripting
-         * language is used by the particular solver.
+         * Second, translate the problem into a solver readable format
+         * (depending on which scripting language is used by the particular
+         * solver.
          */
         String commands[];
         try {
             commands = translateToCommand(problem.getTerm());
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             interruptionOccurred(e);
             listener.processInterrupted(this, problem, e);
             setSolverState(SolverState.Stopped);
@@ -65,15 +60,17 @@ public class EmbeddedSMTSolverImplementation
         }
 
         /*
-         * TODO: rather than starting an external process, use the native SMT solver instead.
+         * TODO: rather than starting an external process, use the native SMT
+         * solver instead.
          */
         try {
-            
-        }
-        catch (Throwable e) {
+            KeYnterpolLauncher launcher = new KeYnterpolLauncher();
+            String response = launcher.startSession(problemString);
+            System.out.println(response);
+
+        } catch (Throwable e) {
             interruptionOccurred(e);
-        }
-        finally {
+        } finally {
             // Close every thing.
             solverTimeout.cancel();
             setSolverState(SolverState.Stopped);

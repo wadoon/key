@@ -43,6 +43,7 @@ final class ExternalSMTSolverImplementation extends AbstractSMTSolver {
          */
         String commands[];
         try {
+            // TODO: This should be done in two separate methods.
             commands = translateToCommand(problem.getTerm());
         } catch (Throwable e) {
             interruptionOccurred(e);

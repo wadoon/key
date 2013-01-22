@@ -156,7 +156,7 @@ public class EmbeddedModelGenerator
              * existing SMTProblem.
              */
             try {
-                launcher.launch(problem, services, SolverType.Z3_SOLVER);
+                launcher.launch(problem, services, SolverType.KeYnterpol);
 
                 result = problem.getFinalResult();
 
@@ -272,7 +272,7 @@ public class EmbeddedModelGenerator
         @Override
         public String getLogic() {
 
-            return "AUFLIA";
+            return "QF_UFLIRA";
         }
 
         @Override
