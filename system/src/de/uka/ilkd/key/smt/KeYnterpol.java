@@ -77,14 +77,11 @@ public class KeYnterpol extends AbstractSMTSolver {
              * Extract the model portion of the result
              */
             solverCommunication.addMessage(getModel(response));
-            
+
             /*
              * Set the response of the solving process
              */
             solverCommunication.setFinalResult(parseResult(response));
-
-
-            int x;
 
         } catch (Throwable e) {
             interruptionOccurred(e);
@@ -95,6 +92,13 @@ public class KeYnterpol extends AbstractSMTSolver {
         }
     }
 
+    /**
+     * Extract the model section of the SMT solver result.
+     * 
+     * @param resultString
+     *            output of the SMT solver
+     * @return
+     */
     private String getModel(String resultString) {
 
         Scanner scanner = new Scanner(resultString);
@@ -111,6 +115,13 @@ public class KeYnterpol extends AbstractSMTSolver {
         return model;
     }
 
+    /**
+     * Interpret the result of the SMT solving process.
+     * 
+     * @param resultString
+     *            output of the SMT solver
+     * @return
+     */
     private SMTSolverResult parseResult(String resultString) {
 
         Scanner scanner = new Scanner(resultString);
