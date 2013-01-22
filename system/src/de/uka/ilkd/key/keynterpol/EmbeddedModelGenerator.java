@@ -128,7 +128,6 @@ public class EmbeddedModelGenerator
                 TermFactory.DEFAULT.createTerm(Junctor.NOT, simplifiedPathCondition);
 
         return new SMTProblem(simplifiedPathCondition);
-
     }
 
     private synchronized SMTSolverResult solveSMTProblem(

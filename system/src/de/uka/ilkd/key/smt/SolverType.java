@@ -16,19 +16,17 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 
 /**
- * This interface is used for modeling different solvers. It provides methods that encode
- * information about the concrete solver: - name - command for starting the solver - parameters -
- * supported versions
+ * This interface is used for modeling different solvers. It provides methods
+ * that encode information about the concrete solver: - name - command for
+ * starting the solver - parameters - supported versions
  */
-public interface SolverType
-        extends PipeListener<SolverCommunication> {
+public interface SolverType extends PipeListener<SolverCommunication> {
 
     /**
-     * Creates an instance of SMTSolver representing a concrete instance of that solver.
+     * Creates an instance of SMTSolver representing a concrete instance of that
+     * solver.
      */
-    public SMTSolver createSolver(
-            SMTProblem problem,
-            SolverListener listener,
+    public SMTSolver createSolver(SMTProblem problem, SolverListener listener,
             Services services);
 
     /**
@@ -37,19 +35,20 @@ public interface SolverType
     public String getName();
 
     /**
-     * Checks whether the solver is installed. If <code>recheck</code> is set to true the method
-     * should check for the path variable of the system and for the absolute path, otherwise it can
-     * return the result of the previous call.
+     * Checks whether the solver is installed. If <code>recheck</code> is set to
+     * true the method should check for the path variable of the system and for
+     * the absolute path, otherwise it can return the result of the previous
+     * call.
      */
     public boolean isInstalled(boolean recheck);
-    
+
     /**
      * Checks whether the solver is embedded.
      */
 
     /**
-     * Some specific information about the solver which can be presented. <code>null</code> means no
-     * information.
+     * Some specific information about the solver which can be presented.
+     * <code>null</code> means no information.
      */
     public String getInfo();
 
@@ -60,7 +59,9 @@ public interface SolverType
 
     /**
      * The parameters to pass to the solver
-     * @param s the parameters
+     * 
+     * @param s
+     *            the parameters
      */
     public void setSolverParameters(String s);
 
@@ -68,8 +69,8 @@ public interface SolverType
     public String getDefaultSolverParameters();
 
     /**
-     * the command for starting the solver. For example "z3" if it is registered in the PATH
-     * variable, otherwise "ABSOLUTE_PATH/z3"
+     * the command for starting the solver. For example "z3" if it is registered
+     * in the PATH variable, otherwise "ABSOLUTE_PATH/z3"
      */
     public String getSolverCommand();
 
@@ -83,8 +84,8 @@ public interface SolverType
     public SMTTranslator createTranslator(Services services);
 
     /**
-     * The delimiters of the messages that are sent from the solver to KeY. For example it could be
-     * "\n"
+     * The delimiters of the messages that are sent from the solver to KeY. For
+     * example it could be "\n"
      */
     public String[] getDelimiters();
 
@@ -94,13 +95,14 @@ public interface SolverType
     public boolean supportsIfThenElse();
 
     /**
-     * Directly before the problem description is sent to the solver one can modify the problem
-     * string by using this method.
+     * Directly before the problem description is sent to the solver one can
+     * modify the problem string by using this method.
      */
     public String modifyProblem(String problem);
 
     /**
-     * Returns the parameter that can be used to gain the version of the solver when executing it.
+     * Returns the parameter that can be used to gain the version of the solver
+     * when executing it.
      */
     public String getVersionParameter();
 
@@ -110,8 +112,8 @@ public interface SolverType
     public String[] getSupportedVersions();
 
     /**
-     * Returns the current version that is installed, if it has already been checked, otherwise
-     * null.
+     * Returns the current version that is installed, if it has already been
+     * checked, otherwise null.
      */
     public String getVersion();
 
@@ -126,15 +128,17 @@ public interface SolverType
     public boolean checkForSupport();
 
     /**
-     * returns true if and only if the support has been checked for the currently installed solver.
+     * returns true if and only if the support has been checked for the
+     * currently installed solver.
      */
     public boolean supportHasBeenChecked();
 
     /**
-     * The KeYnterpol solver, an embedded, stripped version of the SMTInterpol solver developed at
-     * the University of Freiburg.
+     * The KeYnterpol solver, an embedded, stripped version of the SMTInterpol
+     * solver developed at the University of Freiburg.
      * <p>
-     * It can use both the SMT-LIB and SMT-LIB2 syntaxes, but for simplicity we only use SMT-LIB2.
+     * It can use both the SMT-LIB and SMT-LIB2 syntaxes, but for simplicity we
+     * only use SMT-LIB2.
      */
     static public final SolverType KeYnterpol = new AbstractSolverType() {
 
@@ -144,7 +148,8 @@ public interface SolverType
         };
 
         /**
-         * @return an empty string, since we do not need to pass any actual parameters to the solver itself.
+         * @return an empty string, since we do not need to pass any actual
+         *         parameters to the solver itself.
          */
         public String getDefaultSolverParameters() {
 
@@ -152,16 +157,14 @@ public interface SolverType
         };
 
         /**
-         * @return and {@link EmbeddedSMTSolverImplementation} instance to represent a 
-         * runtime instance of KeYnterpol.
+         * @return and {@link KeYnterpol} instance to represent a runtime
+         *         instance of KeYnterpol.
          */
         @Override
-        public SMTSolver createSolver(
-                SMTProblem problem,
-                SolverListener listener,
-                Services services) {
+        public SMTSolver createSolver(SMTProblem problem,
+                SolverListener listener, Services services) {
 
-            return new EmbeddedSMTSolverImplementation(problem, listener, services, this);
+            return new KeYnterpol(problem, listener, services, this);
         }
 
         /**
@@ -174,7 +177,8 @@ public interface SolverType
         }
 
         /**
-         * @return the version parameter of the solver. Not really relevant here.
+         * @return the version parameter of the solver. Not really relevant
+         *         here.
          */
         public String getVersionParameter() {
 
@@ -182,11 +186,12 @@ public interface SolverType
         };
 
         /**
-         * @return the supported version. Not really relevant since it is beyond user control.
+         * @return the supported version. Not really relevant since it is beyond
+         *         user control.
          */
         public String[] getSupportedVersions() {
 
-            return new String[] { "version 2.0"};
+            return new String[] { "version 2.0" };
         };
 
         /**
@@ -211,7 +216,8 @@ public interface SolverType
         @Override
         public SMTTranslator createTranslator(Services services) {
 
-            return new SmtLib2Translator(services, new Configuration(false, true));
+            return new SmtLib2Translator(services, new Configuration(false,
+                    true));
         }
 
         /**
@@ -224,20 +230,30 @@ public interface SolverType
         }
 
         /**
-         * Handle an incoming message over the {@link Pipe} connected to the solver.
+         * Handle an incoming message over the {@link Pipe} connected to the
+         * solver.
          */
         @Override
-        public void messageIncoming(
-                Pipe<SolverCommunication> pipe,
-                String message,
-                int type) {
-            
-            //TODO: Add logic for speaking to an embedded solver. The best thing is most likely to read everything at once.
+        public void messageIncoming(Pipe<SolverCommunication> pipe,
+                String message, int type) {
+
         }
 
         @Override
         protected boolean isEmbedded() {
             return true;
+        }
+
+        /**
+         * Modifies the problem string for compliance with KeYnterpol.
+         */
+        @Override
+        public String modifyProblem(String problem) {
+
+            problem = "(set-option :produce-assignments true)\n" + problem;
+            problem += "\n(get-model)\n";
+            problem += "(exit)\n";
+            return problem;
         }
     };
 
@@ -257,12 +273,11 @@ public interface SolverType
         };
 
         @Override
-        public SMTSolver createSolver(
-                SMTProblem problem,
-                SolverListener listener,
-                Services services) {
+        public SMTSolver createSolver(SMTProblem problem,
+                SolverListener listener, Services services) {
 
-            return new ExternalSMTSolverImplementation(problem, listener, services, this);
+            return new ExternalSMTSolverImplementation(problem, listener,
+                    services, this);
         }
 
         @Override
@@ -295,7 +310,8 @@ public interface SolverType
         @Override
         public SMTTranslator createTranslator(Services services) {
 
-            return new SmtLib2Translator(services, new Configuration(false, false));
+            return new SmtLib2Translator(services, new Configuration(false,
+                    false));
         }
 
         @Override
@@ -304,7 +320,8 @@ public interface SolverType
             return "";
             // return
             // "Z3 does not use quantifier elimination by default. This means for example that"
-            // + " the following problem cannot be solved automatically by default:\n\n"
+            // +
+            // " the following problem cannot be solved automatically by default:\n\n"
             // + "\\functions{\n"
             // + "\tint n;\n"
             // + "}\n\n"
@@ -312,7 +329,8 @@ public interface SolverType
             // + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
             // + "}"
             // + "\n\n"
-            // + "You can activate quantifier elimination by appending QUANT_FM=true to"
+            // +
+            // "You can activate quantifier elimination by appending QUANT_FM=true to"
             // + " the execution command.";
         }
 
@@ -320,10 +338,8 @@ public interface SolverType
         private static final int WAIT_FOR_DETAILS = 1;
 
         @Override
-        public void messageIncoming(
-                Pipe<SolverCommunication> pipe,
-                String message,
-                int type) {
+        public void messageIncoming(Pipe<SolverCommunication> pipe,
+                String message, int type) {
 
             SolverCommunication sc = pipe.getSession();
             if (type == Pipe.ERROR_MESSAGE || message.startsWith("(error")) {
@@ -331,39 +347,43 @@ public interface SolverType
                 if (message.indexOf("WARNING:") > -1) {
                     return;
                 }
-                throw new RuntimeException("Error while executing Z3:\n" + message);
+                throw new RuntimeException("Error while executing Z3:\n"
+                        + message);
             }
             if (!message.equals("success")) {
                 sc.addMessage(message);
             }
 
             switch (sc.getState()) {
-                case WAIT_FOR_RESULT:
-                    if (message.equals("unsat")) {
-                        sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                        pipe.sendMessage("(get-proof)\n");
-                        pipe.sendMessage("(exit)\n");
-                        sc.setState(WAIT_FOR_DETAILS);
-                    }
-                    if (message.equals("sat")) {
-                        sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-                        pipe.sendMessage("(get-model)");
-                        pipe.sendMessage("(exit)\n");
-                        sc.setState(WAIT_FOR_DETAILS);
+            case WAIT_FOR_RESULT:
+                if (message.equals("unsat")) {
+                    sc.setFinalResult(SMTSolverResult
+                            .createValidResult(getName()));
+                    pipe.sendMessage("(get-proof)\n");
+                    pipe.sendMessage("(exit)\n");
+                    sc.setState(WAIT_FOR_DETAILS);
+                }
+                if (message.equals("sat")) {
+                    sc.setFinalResult(SMTSolverResult
+                            .createInvalidResult(getName()));
+                    pipe.sendMessage("(get-model)");
+                    pipe.sendMessage("(exit)\n");
+                    sc.setState(WAIT_FOR_DETAILS);
 
-                    }
-                    if (message.equals("unknown")) {
-                        sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
-                        sc.setState(WAIT_FOR_DETAILS);
-                        pipe.sendMessage("(exit)\n");
-                    }
-                    break;
+                }
+                if (message.equals("unknown")) {
+                    sc.setFinalResult(SMTSolverResult
+                            .createUnknownResult(getName()));
+                    sc.setState(WAIT_FOR_DETAILS);
+                    pipe.sendMessage("(exit)\n");
+                }
+                break;
 
-                case WAIT_FOR_DETAILS:
-                    if (message.equals("success")) {
-                        pipe.close();
-                    }
-                    break;
+            case WAIT_FOR_DETAILS:
+                if (message.equals("success")) {
+                    pipe.close();
+                }
+                break;
             }
         }
 
@@ -371,7 +391,6 @@ public interface SolverType
         protected boolean isEmbedded() {
             return false;
         }
-
     };
 
     /**
@@ -386,12 +405,11 @@ public interface SolverType
         }
 
         @Override
-        public SMTSolver createSolver(
-                SMTProblem problem,
-                SolverListener listener,
-                Services services) {
+        public SMTSolver createSolver(SMTProblem problem,
+                SolverListener listener, Services services) {
 
-            return new ExternalSMTSolverImplementation(problem, listener, services, this);
+            return new ExternalSMTSolverImplementation(problem, listener,
+                    services, this);
         }
 
         public String getDefaultSolverCommand() {
@@ -423,7 +441,8 @@ public interface SolverType
         @Override
         public SMTTranslator createTranslator(Services services) {
 
-            return new SmtLibTranslator(services, new Configuration(false, true));
+            return new SmtLibTranslator(services,
+                    new Configuration(false, true));
         }
 
         public boolean supportsIfThenElse() {
@@ -441,30 +460,29 @@ public interface SolverType
         final static int FINISH = 1;
 
         @Override
-        public void messageIncoming(
-                Pipe<SolverCommunication> pipe,
-                String message,
-                int type) {
+        public void messageIncoming(Pipe<SolverCommunication> pipe,
+                String message, int type) {
 
             SolverCommunication sc = pipe.getSession();
             sc.addMessage(message);
             if (type == Pipe.ERROR_MESSAGE
                     && message.indexOf("Interrupted by signal") == -1) {
-                throw new RuntimeException("Error while executing CVC:\n" + message);
+                throw new RuntimeException("Error while executing CVC:\n"
+                        + message);
             }
 
             if (sc.getState() == WAIT_FOR_RESULT) {
                 if (message.indexOf(" sat") > -1) {
-                    sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+                    sc.setFinalResult(SMTSolverResult
+                            .createInvalidResult(getName()));
                 }
                 if (message.indexOf(" unsat") > -1) {
-                    sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
+                    sc.setFinalResult(SMTSolverResult
+                            .createValidResult(getName()));
                 }
                 sc.setState(FINISH);
                 pipe.close();
-
             }
-
         }
 
         @Override
@@ -486,12 +504,11 @@ public interface SolverType
         }
 
         @Override
-        public SMTSolver createSolver(
-                SMTProblem problem,
-                SolverListener listener,
-                Services services) {
+        public SMTSolver createSolver(SMTProblem problem,
+                SolverListener listener, Services services) {
 
-            return new ExternalSMTSolverImplementation(problem, listener, services, this);
+            return new ExternalSMTSolverImplementation(problem, listener,
+                    services, this);
         }
 
         @Override
@@ -540,10 +557,8 @@ public interface SolverType
         };
 
         @Override
-        public void messageIncoming(
-                Pipe<SolverCommunication> pipe,
-                String message,
-                int type) {
+        public void messageIncoming(Pipe<SolverCommunication> pipe,
+                String message, int type) {
 
             SolverCommunication sc = pipe.getSession();
             message = message.replaceAll("\n", "");
@@ -554,7 +569,8 @@ public interface SolverType
                 pipe.close();
             }
             if (message.equals("sat")) {
-                sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+                sc.setFinalResult(SMTSolverResult
+                        .createInvalidResult(getName()));
                 pipe.close();
             }
 
@@ -584,18 +600,18 @@ public interface SolverType
         }
 
         @Override
-        public SMTSolver createSolver(
-                SMTProblem problem,
-                SolverListener listener,
-                Services services) {
+        public SMTSolver createSolver(SMTProblem problem,
+                SolverListener listener, Services services) {
 
-            return new ExternalSMTSolverImplementation(problem, listener, services, this);
+            return new ExternalSMTSolverImplementation(problem, listener,
+                    services, this);
         }
 
         @Override
         public SMTTranslator createTranslator(Services services) {
 
-            return new SimplifyTranslator(services, new Configuration(false, true));
+            return new SimplifyTranslator(services, new Configuration(false,
+                    true));
         }
 
         public String getDefaultSolverCommand() {
@@ -635,10 +651,8 @@ public interface SolverType
         };
 
         @Override
-        public void messageIncoming(
-                Pipe<SolverCommunication> pipe,
-                String message,
-                int type) {
+        public void messageIncoming(Pipe<SolverCommunication> pipe,
+                String message, int type) {
 
             SolverCommunication sc = pipe.getSession();
             sc.addMessage(message);
@@ -649,7 +663,8 @@ public interface SolverType
             }
 
             if (message.indexOf("Invalid.") > -1) {
-                sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+                sc.setFinalResult(SMTSolverResult
+                        .createInvalidResult(getName()));
                 pipe.close();
             }
 
@@ -667,8 +682,7 @@ public interface SolverType
 
 }
 
-abstract class AbstractSolverType
-        implements SolverType {
+abstract class AbstractSolverType implements SolverType {
 
     private boolean installWasChecked = false;
     private boolean isInstalled = false;
@@ -682,8 +696,7 @@ abstract class AbstractSolverType
 
         if (checkEnvVariable(cmd)) {
             return true;
-        }
-        else {
+        } else {
 
             File file = new File(cmd);
 
@@ -696,18 +709,20 @@ abstract class AbstractSolverType
      * check, if this solver is installed and can be used.
      * 
      * @param recheck
-     *            if false, the solver is not checked again, if a cached value for this exists.
+     *            if false, the solver is not checked again, if a cached value
+     *            for this exists.
      * @return true, if it is installed.
      */
     public boolean isInstalled(boolean recheck) {
 
         /*
-         * If the solver is embedded, it is part of KeY, and there is no need for further checking. 
+         * If the solver is embedded, it is part of KeY, and there is no need
+         * for further checking.
          */
-        if(isEmbedded()) {
+        if (isEmbedded()) {
             return true;
         }
-        
+
         if (recheck || !installWasChecked) {
 
             String cmd = getSolverCommand();
@@ -720,7 +735,7 @@ abstract class AbstractSolverType
         }
         return isInstalled;
     }
-    
+
     /**
      * @return true if the solver is an embedded type, false otherwise.
      */
@@ -749,9 +764,8 @@ abstract class AbstractSolverType
             return false;
         }
         supportHasBeenChecked = true;
-        solverVersion =
-                VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),
-                        getVersionParameter());
+        solverVersion = VersionChecker.INSTANCE.getVersionFor(
+                getSolverCommand(), getVersionParameter());
         if (solverVersion == null) {
             solverVersion = "";
             isSupportedVersion = false;
@@ -768,7 +782,8 @@ abstract class AbstractSolverType
     }
 
     /**
-     * @return true if support for this solver has already been checked, false otherwise.
+     * @return true if support for this solver has already been checked, false
+     *         otherwise.
      */
     @Override
     public boolean supportHasBeenChecked() {
@@ -777,7 +792,8 @@ abstract class AbstractSolverType
     }
 
     /**
-     * @return true if the version of this solver is supported by KeY, false otherwise.
+     * @return true if the version of this solver is supported by KeY, false
+     *         otherwise.
      */
     @Override
     public boolean isSupportedVersion() {
@@ -786,7 +802,8 @@ abstract class AbstractSolverType
     }
 
     /**
-     * @return the parameters to be passed to the solver (if the solver is invoked externally).
+     * @return the parameters to be passed to the solver (if the solver is
+     *         invoked externally).
      */
     public String getSolverParameters() {
 
@@ -835,10 +852,12 @@ abstract class AbstractSolverType
     }
 
     /**
-     * Notify the solver session that an exception has occured, and buffer this internally.
+     * Notify the solver session that an exception has occured, and buffer this
+     * internally.
      */
     @Override
-    public void exceptionOccurred(Pipe<SolverCommunication> pipe, Throwable exception) {
+    public void exceptionOccurred(Pipe<SolverCommunication> pipe,
+            Throwable exception) {
 
         pipe.getSession().addException(exception);
 
