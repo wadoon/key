@@ -9,7 +9,7 @@ import java.util.List;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 
-import de.uka.ilkd.key.testgeneration.TestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.XMLTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 
 /**
@@ -38,9 +38,9 @@ public final class CommandLineInterface {
     private static class CommandLineInterfaceWorker {
 
         /**
-         * The {@link TestCaseGenerator} to use for the session serviced by this worker.
+         * The {@link XMLTestCaseGenerator} to use for the session serviced by this worker.
          */
-        private TestCaseGenerator testCaseGenerator = null;
+        private XMLTestCaseGenerator testCaseGenerator = null;
 
         /**
          * The {@link CommandParser} and {@link JCommander} processor to use for the session
@@ -55,7 +55,7 @@ public final class CommandLineInterface {
         public CommandLineInterfaceWorker() {
 
             try {
-                testCaseGenerator = TestCaseGenerator.getDefaultInstance();
+                testCaseGenerator = XMLTestCaseGenerator.getDefaultInstance();
             }
             catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
@@ -155,8 +155,8 @@ public final class CommandLineInterface {
             directory.mkdir();
             for (File file : files) {
 
-                String testSuite =
-                        testCaseGenerator.generateTestCases(testCaseParser, file, true);
+                String testSuite =null;
+                   //    testCaseGenerator.generateTestCases(testCaseParser, file, true);
 
                 File output = new File(framework + "\\" + file.getName());
                 output.createNewFile();

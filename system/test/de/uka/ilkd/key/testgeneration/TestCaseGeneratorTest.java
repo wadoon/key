@@ -19,7 +19,7 @@ public class TestCaseGeneratorTest {
             throws IOException, ProofInputException, ModelGeneratorException,
             TestGeneratorException, KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
-        TestCaseGenerator testCaseGenerator = TestCaseGenerator.getDefaultInstance();
+        XMLTestCaseGenerator testCaseGenerator = XMLTestCaseGenerator.getDefaultInstance();
         String output = testCaseGenerator.generateTestCase(
                 new File("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"),
                 "midOneProxyOneInstance");

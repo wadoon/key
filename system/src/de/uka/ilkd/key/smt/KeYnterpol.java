@@ -1,16 +1,10 @@
 package de.uka.ilkd.key.smt;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.concurrent.locks.ReentrantLock;
 
-import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
 
 /**
