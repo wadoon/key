@@ -9,17 +9,18 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
 
-public class StatementCoverageParser
-        implements ICodeCoverageParser {
+public class StatementCoverageParser implements ICodeCoverageParser {
 
     /**
      * <p>
-     * Returns a set of {@link IExecutionNode} instances, s.t. generating a test case covering each
-     * of these nodes will satisfy Statement Coverage for this symbolic execution tree.
+     * Returns a set of {@link IExecutionNode} instances, s.t. generating a test
+     * case covering each of these nodes will satisfy Statement Coverage for
+     * this symbolic execution tree.
      * </p>
      * <p>
-     * Statement Coverage is satisfied iff. a set of test cases is provided, s.t. the execution of
-     * these test cases will lead to each statement in the IUT being executed at least once.
+     * Statement Coverage is satisfied iff. a set of test cases is provided,
+     * s.t. the execution of these test cases will lead to each statement in the
+     * IUT being executed at least once.
      * </p>
      * 
      * @param root
@@ -30,11 +31,13 @@ public class StatementCoverageParser
     public List<IExecutionNode> retrieveNodes(IExecutionStartNode root) {
 
         /*
-         * Due to the way symbolic execution trees are implemented (do not confuse them with
-         * standard execution trees), simply gathering all return statements should guarantee full
-         * statement coverage. See separate proof.
+         * Due to the way symbolic execution trees are implemented (do not
+         * confuse them with standard execution trees), simply gathering all
+         * return statements should guarantee full statement coverage. See
+         * separate proof.
          */
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
+        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                root);
         List<IExecutionNode> nodes = new LinkedList<IExecutionNode>();
 
         while (iterator.hasNext()) {

@@ -6,7 +6,8 @@ import java.util.List;
 import de.uka.ilkd.key.java.statement.Assert;
 
 /**
- * This bean represents a simple view of a JUnit test method, i.e. a method annotated with @Test.
+ * This bean represents a simple view of a JUnit test method, i.e. a method
+ * annotated with @Test.
  * 
  * @author christopher
  */
@@ -18,13 +19,14 @@ public class TestMethod {
     String name;
 
     /**
-     * Object instances declared in this particular method, represented by {@link ObjectInstance}.
+     * Object instances declared in this particular method, represented by
+     * {@link ObjectInstance}.
      */
     private final List<ObjectInstance> objectInstances = new LinkedList<ObjectInstance>();
 
     /**
-     * The oracle for this method, ie the set of calls to methods of {@link Assert} determining
-     * whether the test case succeeded or failed.
+     * The oracle for this method, ie the set of calls to methods of
+     * {@link Assert} determining whether the test case succeeded or failed.
      */
     private String oracle;
 

@@ -14,10 +14,10 @@ import de.uka.ilkd.key.testgeneration.xmlparser.junitparser.JUnitParser;
 public class TestJUnitParser {
 
     @Test
-    public void test()
-            throws IOException, ProofInputException, ModelGeneratorException,
-            TestGeneratorException, KeYInterfaceException, XMLGeneratorException,
-            InterruptedException, XMLParserException {
+    public void test() throws IOException, ProofInputException,
+            ModelGeneratorException, TestGeneratorException,
+            KeYInterfaceException, XMLGeneratorException, InterruptedException,
+            XMLParserException {
 
         JUnitParser parser = JUnitParser.getInstance();
 
@@ -2643,30 +2643,54 @@ public class TestJUnitParser {
                 + "                    </identifier>\n"
                 + "                    <type>\n"
                 + "                        de.uka.ilkd.key.testgeneration.targetmodels.ClassProxy\n"
-                + "                    </type>\n" + "                    <field>\n"
-                + "                    </field>\n" + "                </instance>\n"
-                + "                <instance>\n" + "                    <identifier>\n"
-                + "                        0\n" + "                    </identifier>\n"
-                + "                    <type>\n" + "                        int\n"
-                + "                    </type>\n" + "                    <field>\n"
-                + "                        0\n" + "                    </field>\n"
-                + "                </instance>\n" + "                <instance>\n"
-                + "                    <identifier>\n" + "                        0\n"
-                + "                    </identifier>\n" + "                    <type>\n"
-                + "                        int\n" + "                    </type>\n"
-                + "                    <field>\n" + "                        0\n"
-                + "                    </field>\n" + "                </instance>\n"
-                + "                <instance>\n" + "                    <identifier>\n"
-                + "                        0\n" + "                    </identifier>\n"
-                + "                    <type>\n" + "                        int\n"
-                + "                    </type>\n" + "                    <field>\n"
-                + "                        0\n" + "                    </field>\n"
-                + "                </instance>\n" + "            </instances>\n"
-                + "        </fixture>\n" + "        <oracle>\n" + "            <and>\n"
-                + "                    heap\n" + "                    self\n"
-                + "                <equals>\n" + "                        exc\n"
-                + "                        null\n" + "                </equals>\n"
-                + "            </and>\n" + "        </oracle>\n" + "    </testcase>\n"
-                + "</testsuite>");
+                + "                    </type>\n"
+                + "                    <field>\n"
+                + "                    </field>\n"
+                + "                </instance>\n"
+                + "                <instance>\n"
+                + "                    <identifier>\n"
+                + "                        0\n"
+                + "                    </identifier>\n"
+                + "                    <type>\n"
+                + "                        int\n"
+                + "                    </type>\n"
+                + "                    <field>\n"
+                + "                        0\n"
+                + "                    </field>\n"
+                + "                </instance>\n"
+                + "                <instance>\n"
+                + "                    <identifier>\n"
+                + "                        0\n"
+                + "                    </identifier>\n"
+                + "                    <type>\n"
+                + "                        int\n"
+                + "                    </type>\n"
+                + "                    <field>\n"
+                + "                        0\n"
+                + "                    </field>\n"
+                + "                </instance>\n"
+                + "                <instance>\n"
+                + "                    <identifier>\n"
+                + "                        0\n"
+                + "                    </identifier>\n"
+                + "                    <type>\n"
+                + "                        int\n"
+                + "                    </type>\n"
+                + "                    <field>\n"
+                + "                        0\n"
+                + "                    </field>\n"
+                + "                </instance>\n"
+                + "            </instances>\n"
+                + "        </fixture>\n"
+                + "        <oracle>\n"
+                + "            <and>\n"
+                + "                    heap\n"
+                + "                    self\n"
+                + "                <equals>\n"
+                + "                        exc\n"
+                + "                        null\n"
+                + "                </equals>\n"
+                + "            </and>\n"
+                + "        </oracle>\n" + "    </testcase>\n" + "</testsuite>");
     }
 }

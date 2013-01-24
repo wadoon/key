@@ -6,8 +6,8 @@ import java.util.Set;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 /**
- * This class encapsulates information related to a Java class, to the extent such information is
- * needed for test case generation.
+ * This class encapsulates information related to a Java class, to the extent
+ * such information is needed for test case generation.
  * 
  * @author christopher
  */
@@ -19,7 +19,8 @@ public final class KeYJavaClass {
     private final KeYJavaType type;
 
     /**
-     * Maps the name of a method to its corresponding {@link KeYJavaMethod} instance.
+     * Maps the name of a method to its corresponding {@link KeYJavaMethod}
+     * instance.
      */
     private final HashMap<String, KeYJavaMethod> methods;
 
@@ -39,8 +40,8 @@ public final class KeYJavaClass {
     }
 
     /**
-     * Retrieves the {@link KeYJavaMethod} instance corresponding to the provided name, or
-     * <code>code</code> if such a method cannot be found.
+     * Retrieves the {@link KeYJavaMethod} instance corresponding to the
+     * provided name, or <code>code</code> if such a method cannot be found.
      * 
      * @param name
      *            the name of the method

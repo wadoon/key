@@ -6,18 +6,19 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
 
-public class DecisionCoverageParser
-        implements ICodeCoverageParser {
+public class DecisionCoverageParser implements ICodeCoverageParser {
 
     /**
      * <p>
-     * Returns a set of {@link IExecutionNode} instances, s.t. generating a test case covering each
-     * of these nodes will satisfy Decision Coverage for this symbolic execution tree.
+     * Returns a set of {@link IExecutionNode} instances, s.t. generating a test
+     * case covering each of these nodes will satisfy Decision Coverage for this
+     * symbolic execution tree.
      * </p>
      * <p>
-     * Decision Coverage for a test suite T over a program P is satisfied iff. the execution of each
-     * test case t in T will cause each branching statement in the code (such as if...else
-     * statements and the like) to evaluate at least once to true, and at least once to false.
+     * Decision Coverage for a test suite T over a program P is satisfied iff.
+     * the execution of each test case t in T will cause each branching
+     * statement in the code (such as if...else statements and the like) to
+     * evaluate at least once to true, and at least once to false.
      * <p>
      * To illustrate this, consider the following:
      * <p>
@@ -30,9 +31,10 @@ public class DecisionCoverageParser
      * <br>}
      * </code>
      * <p>
-     * In the above, our only branching condition is the condition in the if-statement,
-     * <code>a >= b</code>. Accordingly, we need to provide testcases s.t. this will once evaluate
-     * to true (i.e. a >= b) and at least once to false (i.e. a < b).
+     * In the above, our only branching condition is the condition in the
+     * if-statement, <code>a >= b</code>. Accordingly, we need to provide
+     * testcases s.t. this will once evaluate to true (i.e. a >= b) and at least
+     * once to false (i.e. a < b).
      * 
      * @param root
      *            the root of the symbolic execution tree

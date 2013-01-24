@@ -33,14 +33,14 @@ import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
 import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 
 /**
- * Provides functionality for turning a set of {@link TestCase} instances into a corresponding XML
- * representation. This XML constitutes the default output produced by KeYTestGen2, and can be
- * parsed by instances of {@link ITestCaseParser} in order to generate more specific test suites.
+ * Provides functionality for turning a set of {@link TestCase} instances into a
+ * corresponding XML representation. This XML constitutes the default output
+ * produced by KeYTestGen2, and can be parsed by instances of
+ * {@link ITestCaseParser} in order to generate more specific test suites.
  * 
  * @author christopher
  */
-public class XMLGenerator
-        extends XMLHandler {
+public class XMLGenerator extends XMLHandler {
 
     /**
      * Flag to determine if the XML should be formatted or not.
@@ -48,19 +48,21 @@ public class XMLGenerator
     private boolean format;
 
     /**
-     * The eventWriter is used to add new {@link XMLEvent}s to the outputStream. These events, in
-     * turn, are created by the eventFactory.
+     * The eventWriter is used to add new {@link XMLEvent}s to the outputStream.
+     * These events, in turn, are created by the eventFactory.
      */
     private final XMLEventWriter eventWriter;
 
     /**
-     * The eventFactory is used in order to produce {@link XMLEvent}s, that is, XML tags.
+     * The eventFactory is used in order to produce {@link XMLEvent}s, that is,
+     * XML tags.
      */
-    private static final XMLEventFactory eventFactory = XMLEventFactory.newFactory();
+    private static final XMLEventFactory eventFactory = XMLEventFactory
+            .newFactory();
 
     /**
-     * The outputStream acts as a buffer for generated XML tags. its content can later be encoded to
-     * some other representation, such as a String or File.
+     * The outputStream acts as a buffer for generated XML tags. its content can
+     * later be encoded to some other representation, such as a String or File.
      */
     private final OutputStream outputStream = new ByteArrayOutputStream();
 
@@ -75,17 +77,19 @@ public class XMLGenerator
     private static final XMLEvent tab = eventFactory.createDTD("    ");
 
     /**
-     * count the number of indentation tags that should be added before each element in the
-     * document.
+     * count the number of indentation tags that should be added before each
+     * element in the document.
      */
     private int indentationCounter = 0;
 
     /**
-     * Sets up the XML visitor, initializing the {@link XMLEventWriter} in the process.
+     * Sets up the XML visitor, initializing the {@link XMLEventWriter} in the
+     * process.
      * 
      * @param rootTag
-     *            the name of the root tag of the resulting XML document. If this parameter is null
-     *            or empty, no root tag will be generated for the document.
+     *            the name of the root tag of the resulting XML document. If
+     *            this parameter is null or empty, no root tag will be generated
+     *            for the document.
      * @throws XMLGeneratorException
      * @throws XMLVisitorException
      *             in the event that the event writer could not be set up
@@ -93,18 +97,17 @@ public class XMLGenerator
     public XMLGenerator() throws XMLGeneratorException {
 
         try {
-            eventWriter =
-                    XMLOutputFactory.newFactory().createXMLEventWriter(outputStream);
-        }
-        catch (XMLStreamException e) {
-            throw new XMLGeneratorException("FATAL: failed to initialize XMLVisitor"
-                    + e.getMessage());
+            eventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(
+                    outputStream);
+        } catch (XMLStreamException e) {
+            throw new XMLGeneratorException(
+                    "FATAL: failed to initialize XMLVisitor" + e.getMessage());
         }
     }
 
     /**
-     * Create a complete test suite from a set of {@link TestCase} instances, encoded in KeYTestGens
-     * native XML format.
+     * Create a complete test suite from a set of {@link TestCase} instances,
+     * encoded in KeYTestGens native XML format.
      * 
      * @param testCases
      *            the testcases to include in the test suite
@@ -114,8 +117,8 @@ public class XMLGenerator
      * @throws XMLGeneratorException
      *             if XML generation failed
      */
-    public synchronized String createTestSuite(List<TestCase> testCases, boolean format)
-            throws XMLGeneratorException {
+    public synchronized String createTestSuite(List<TestCase> testCases,
+            boolean format) throws XMLGeneratorException {
 
         this.format = format;
 
@@ -139,11 +142,9 @@ public class XMLGenerator
             writeDocumentEnd(TESTSUITE_ROOT);
 
             return outputStream.toString();
-        }
-        catch (XMLStreamException xse) {
+        } catch (XMLStreamException xse) {
             throw new XMLGeneratorException(xse.getMessage());
-        }
-        catch (XMLVisitorException xve) {
+        } catch (XMLVisitorException xve) {
             throw new XMLGeneratorException(xve.getMessage());
         }
     }
@@ -157,8 +158,8 @@ public class XMLGenerator
      *             in case the XML could not be generated
      * @throws XMLVisitorException
      */
-    private void writeTestCase(TestCase testCase)
-            throws XMLStreamException, XMLVisitorException {
+    private void writeTestCase(TestCase testCase) throws XMLStreamException,
+            XMLVisitorException {
 
         writeStartTag(TESTCASE_ROOT);
 
@@ -170,10 +171,11 @@ public class XMLGenerator
     }
 
     /**
-     * Writes the {@link Term} AST representing the Oracle of a given test case as XML. To do so, a
-     * {@link Visitor} instance is used to walk the AST, substituting concrete names for Terms
-     * representing variables in the tree, in order to make things more clean and readable (and more
-     * importantly, more easy to refere to for the parser).
+     * Writes the {@link Term} AST representing the Oracle of a given test case
+     * as XML. To do so, a {@link Visitor} instance is used to walk the AST,
+     * substituting concrete names for Terms representing variables in the tree,
+     * in order to make things more clean and readable (and more importantly,
+     * more easy to refere to for the parser).
      * 
      * @param oracle
      *            the Oracle
@@ -182,7 +184,8 @@ public class XMLGenerator
      * @throws XMLStreamException
      *             in case the XML could not be generated
      */
-    private void writeOracle(Term oracle) throws XMLVisitorException, XMLStreamException {
+    private void writeOracle(Term oracle) throws XMLVisitorException,
+            XMLStreamException {
 
         OracleVisitor oracleVisitor = new OracleVisitor();
         oracle.execPreOrder(oracleVisitor);
@@ -196,15 +199,16 @@ public class XMLGenerator
     }
 
     /**
-     * Write the relevant information contained in the {@link KeYJavaMethod} instance belonging to
-     * the test case.
+     * Write the relevant information contained in the {@link KeYJavaMethod}
+     * instance belonging to the test case.
      * 
      * @param method
      *            the {@link KeYJavaMethod} instance
      * @throws XMLStreamException
      *             in case the XML could not be generated
      */
-    private void writeMethodInfo(KeYJavaMethod method) throws XMLStreamException {
+    private void writeMethodInfo(KeYJavaMethod method)
+            throws XMLStreamException {
 
         writeStartTag(METHOD_ROOT);
 
@@ -228,9 +232,9 @@ public class XMLGenerator
     }
 
     /**
-     * Converts a {@link Model} instance to KeYTestgens native XML format. In the context of the
-     * test case itself, this represents the test fixture, or program state prior to the execution
-     * of the method.
+     * Converts a {@link Model} instance to KeYTestgens native XML format. In
+     * the context of the test case itself, this represents the test fixture, or
+     * program state prior to the execution of the method.
      * 
      * @param model
      *            the model to convert
@@ -272,7 +276,8 @@ public class XMLGenerator
      * @throws XMLStreamException
      *             in case the XML could not be generated
      */
-    private void writeVariable(ModelVariable variable) throws XMLStreamException {
+    private void writeVariable(ModelVariable variable)
+            throws XMLStreamException {
 
         writeStartTag(VARIABLE_ROOT);
 
@@ -294,8 +299,8 @@ public class XMLGenerator
         writeEndTag(TYPE_ROOT);
 
         /*
-         * Write the instance pointed to by this variable FIXME: Abstraction needs to handle
-         * uniqueness in a better way, do not rely on hashCode.
+         * Write the instance pointed to by this variable FIXME: Abstraction
+         * needs to handle uniqueness in a better way, do not rely on hashCode.
          */
         writeStartTag(VALUE_ROOT);
         writeTextElement(variable.getValue());
@@ -318,8 +323,7 @@ public class XMLGenerator
 
         if (instance instanceof ModelInstance) {
             writeInstance((ModelInstance) instance);
-        }
-        else if (instance instanceof Integer) {
+        } else if (instance instanceof Integer) {
             writeInstance((Integer) instance);
         }
         writeEndTag(INSTANCE_ROOT);
@@ -333,7 +337,8 @@ public class XMLGenerator
      * @throws XMLStreamException
      *             in case the XML could not be generated
      */
-    private void writeInstance(ModelInstance instance) throws XMLStreamException {
+    private void writeInstance(ModelInstance instance)
+            throws XMLStreamException {
 
         String identifier = instance.getIdentifier();
         String type = instance.getType();
@@ -396,17 +401,19 @@ public class XMLGenerator
      *            the root tag of the document
      * @throws XMLStreamException
      */
-    private void writeDocumentStart(String documentName) throws XMLStreamException {
+    private void writeDocumentStart(String documentName)
+            throws XMLStreamException {
 
         if (format) {
             eventWriter.add(eventFactory.createStartDocument());
             eventWriter.add(newline);
-            eventWriter.add(eventFactory.createStartElement("", "", documentName));
+            eventWriter.add(eventFactory.createStartElement("", "",
+                    documentName));
             eventWriter.add(newline);
-        }
-        else {
+        } else {
             eventWriter.add(eventFactory.createStartDocument());
-            eventWriter.add(eventFactory.createStartElement("", "", documentName));
+            eventWriter.add(eventFactory.createStartElement("", "",
+                    documentName));
         }
     }
 
@@ -416,16 +423,18 @@ public class XMLGenerator
      * @param documentName
      * @throws XMLStreamException
      */
-    private void writeDocumentEnd(String documentName) throws XMLStreamException {
+    private void writeDocumentEnd(String documentName)
+            throws XMLStreamException {
 
         if (format) {
-            eventWriter.add(eventFactory.createEndElement("", "", documentName));
+            eventWriter
+                    .add(eventFactory.createEndElement("", "", documentName));
             eventWriter.add(newline);
             eventWriter.add(eventFactory.createEndDocument());
             eventWriter.add(newline);
-        }
-        else {
-            eventWriter.add(eventFactory.createEndElement("", "", documentName));
+        } else {
+            eventWriter
+                    .add(eventFactory.createEndElement("", "", documentName));
             eventWriter.add(eventFactory.createEndDocument());
         }
     }
@@ -445,8 +454,7 @@ public class XMLGenerator
             addIndentation();
             eventWriter.add(eventFactory.createStartElement("", "", tagName));
             eventWriter.add(newline);
-        }
-        else {
+        } else {
             eventWriter.add(eventFactory.createStartElement("", "", tagName));
         }
     }
@@ -466,8 +474,7 @@ public class XMLGenerator
             eventWriter.add(eventFactory.createEndElement("", "", tagName));
             eventWriter.add(newline);
             indentationCounter--;
-        }
-        else {
+        } else {
             eventWriter.add(eventFactory.createEndElement("", "", tagName));
         }
     }
@@ -495,8 +502,7 @@ public class XMLGenerator
             indentationCounter--;
             eventWriter.add(eventFactory.createCharacters(element.toString()));
             eventWriter.add(newline);
-        }
-        else {
+        } else {
             eventWriter.add(eventFactory.createCharacters(element.toString()));
         }
     }
@@ -514,8 +520,7 @@ public class XMLGenerator
             if (format) {
                 eventWriter.add(event);
             }
-        }
-        else {
+        } else {
             indentationCounter++;
             addIndentation();
             indentationCounter--;
@@ -524,24 +529,24 @@ public class XMLGenerator
     }
 
     /**
-     * Instances of this class are used to generate an XML representation from a {@link Term}
-     * postcondition.
+     * Instances of this class are used to generate an XML representation from a
+     * {@link Term} postcondition.
      * 
      * @author christopher
      */
-    private static class OracleVisitor
-            extends KeYTestGenTermVisitor {
+    private static class OracleVisitor extends KeYTestGenTermVisitor {
 
         /**
-         * Since {@link Visitor} does not support exceptional behavior, whereas the
-         * {@link XMLEventWriter} demands it, we use an intermediary buffer to store events, and
-         * write them only after the visitation process is completed.
+         * Since {@link Visitor} does not support exceptional behavior, whereas
+         * the {@link XMLEventWriter} demands it, we use an intermediary buffer
+         * to store events, and write them only after the visitation process is
+         * completed.
          */
         private LinkedList<XMLEvent> elements = new LinkedList<XMLEvent>();
 
         /**
-         * Use a stack in order to properly determine the order in which start and end tags should
-         * be inserted for XML elements in the Term.
+         * Use a stack in order to properly determine the order in which start
+         * and end tags should be inserted for XML elements in the Term.
          */
         private Stack<String> elementNames = new Stack<String>();
 
@@ -566,21 +571,22 @@ public class XMLGenerator
         }
 
         /**
-         * Whenever a subtree is entered, create a tag corresponding to the type of the root
-         * element, and push the name of the element on the stack in order to later generate an end
-         * tag.
+         * Whenever a subtree is entered, create a tag corresponding to the type
+         * of the root element, and push the name of the element on the stack in
+         * order to later generate an end tag.
          */
         @Override
         public void subtreeEntered(Term subtreeRoot) {
 
             /*
-             * Verify that the operator bound at the current term represents a concept suitable for
-             * putting in a tag
+             * Verify that the operator bound at the current term represents a
+             * concept suitable for putting in a tag
              */
             if (isBinaryFunction(subtreeRoot)) {
                 String operatorName = subtreeRoot.op().name().toString();
 
-                XMLEvent startTag = eventFactory.createStartElement("", "", operatorName);
+                XMLEvent startTag = eventFactory.createStartElement("", "",
+                        operatorName);
                 addTag(startTag);
 
                 elementNames.push(operatorName);
@@ -588,15 +594,16 @@ public class XMLGenerator
         }
 
         /**
-         * Whenever a subtree is left, generate a closing tag corresponding to the one that was
-         * created when the tree was first entered.
+         * Whenever a subtree is left, generate a closing tag corresponding to
+         * the one that was created when the tree was first entered.
          */
         @Override
         public void subtreeLeft(Term subtreeRoot) {
 
             if (isBinaryFunction(subtreeRoot)) {
                 String operatorName = elementNames.pop();
-                XMLEvent endTag = eventFactory.createEndElement("", "", operatorName);
+                XMLEvent endTag = eventFactory.createEndElement("", "",
+                        operatorName);
                 addTag(endTag);
             }
         }
@@ -617,13 +624,14 @@ public class XMLGenerator
         }
 
         /**
-         * Add a tag, together with formatting, to the outputstream, indented by a specific number
-         * of extra tabs.
+         * Add a tag, together with formatting, to the outputstream, indented by
+         * a specific number of extra tabs.
          * 
          * @param tag
          *            the tag to insert
          * @param extraTabs
-         *            number of extra tabs that should be added to the indentation of the tag
+         *            number of extra tabs that should be added to the
+         *            indentation of the tag
          */
         private void addTag(XMLEvent tag, int extraTabs) {
 

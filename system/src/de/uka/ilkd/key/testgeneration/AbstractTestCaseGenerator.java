@@ -66,7 +66,7 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
     public AbstractTestCaseGenerator() {
         this(new EmbeddedModelGenerator());
     }
-    
+
     public AbstractTestCaseGenerator(IModelGenerator modelGenerator) {
         this.modelGenerator = modelGenerator;
     }

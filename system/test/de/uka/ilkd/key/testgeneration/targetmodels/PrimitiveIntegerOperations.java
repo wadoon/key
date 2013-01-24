@@ -1,16 +1,18 @@
 package de.uka.ilkd.key.testgeneration.targetmodels;
 
 /**
- * This class provides various methods which use primitive integer operations, coupled with control
- * statements of gradually increasing complexity. The methods will excercise all available integer
- * operations, in all feasible combinations.
+ * This class provides various methods which use primitive integer operations,
+ * coupled with control statements of gradually increasing complexity. The
+ * methods will excercise all available integer operations, in all feasible
+ * combinations.
  * 
  * @author christopher
  */
 public class PrimitiveIntegerOperations {
 
     /*
-     * Local variables to simulate extra-method dependencies during symbolic execution
+     * Local variables to simulate extra-method dependencies during symbolic
+     * execution
      */
     public static int staticX;
     public static int staticY;
@@ -29,8 +31,7 @@ public class PrimitiveIntegerOperations {
 
         if (x >= ClassProxy.staticInt) {
             return x;
-        }
-        else {
+        } else {
             return ClassProxy.staticInt;
         }
     }
@@ -39,28 +40,31 @@ public class PrimitiveIntegerOperations {
 
         if (x > proxy.nestedProxy.instanceInt) {
             return x;
-        }
-        else {
+        } else {
             return proxy.nestedProxy.instanceInt;
         }
     }
 
-    /*@ public normal_behavior
-       @ requires (a > b);
-       @ ensures (\result == a);
-       @*/
+    /*
+     * @ public normal_behavior
+     * 
+     * @ requires (a > b);
+     * 
+     * @ ensures (\result == a);
+     * 
+     * @
+     */
     public int max(int a, int b) {
 
         int max = a;
 
-        if(max == 1) {
-              int x = 5;
+        if (max == 1) {
+            int x = 5;
         }
-        
+
         if (a >= b) {
             max = a;
-        }
-        else {
+        } else {
             max = b;
         }
 
@@ -70,37 +74,42 @@ public class PrimitiveIntegerOperations {
     public int maxInstance(int x) {
 
         int max = x;
-        
+
         if (x >= instanceY) {
             max = x;
-        }
-        else {
+        } else {
             max = instanceY;
         }
 
         return max;
     }
 
-    
     public int maxStatic(int x) {
 
         int max = x;
-        
+
         if (x >= staticY) {
             max = x;
-        }
-        else {
+        } else {
             max = staticY;
         }
-        
+
         return max;
     }
 
-    /*@ public normal_behavior
-       @ ensures (\result == x) || (\result == y) || (\result == z );
-       @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) && (\result <= x )) || ((\result <= x) && (\result <= z ));
-       @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) && (\result >= x )) || ((\result >= x) && (\result >= z ));
-       @*/
+    /*
+     * @ public normal_behavior
+     * 
+     * @ ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
     public static int mid(int x, int y, int z) {
 
         int mid = z;
@@ -108,38 +117,39 @@ public class PrimitiveIntegerOperations {
         if (y < z) {
             if (x < y) {
                 mid = y;
-            }
-            else if (x < z) {
+            } else if (x < z) {
 
                 mid = x;
             }
-        }
-        else {
+        } else {
 
             if (x > y) {
 
                 mid = y;
-            }
-            else if (x > z) {
+            } else if (x > z) {
 
                 mid = x;
             }
         }
         return mid;
     }
-    
-    /*@ public normal_behavior
-       @ ensures true;
-       @*/
+
+    /*
+     * @ public normal_behavior
+     * 
+     * @ ensures true;
+     * 
+     * @
+     */
     public int references() {
-        
-        if(proxy != null) {
+
+        if (proxy != null) {
             return 1;
-            
-        }  else {
+
+        } else {
             return 0;
         }
-        
+
     }
 
     public static int midTwoStatic(int x) {
@@ -149,19 +159,16 @@ public class PrimitiveIntegerOperations {
         if (staticY < staticZ) {
             if (x < staticY) {
                 mid = staticY;
-            }
-            else if (x < staticZ) {
+            } else if (x < staticZ) {
 
                 mid = x;
             }
-        }
-        else {
+        } else {
 
             if (x > staticY) {
 
                 mid = staticY;
-            }
-            else if (x > staticZ) {
+            } else if (x > staticZ) {
 
                 mid = x;
             }
@@ -176,19 +183,16 @@ public class PrimitiveIntegerOperations {
         if (instanceY < instanceZ) {
             if (x < instanceY) {
                 mid = instanceY;
-            }
-            else if (x < instanceZ) {
+            } else if (x < instanceZ) {
 
                 mid = x;
             }
-        }
-        else {
+        } else {
 
             if (x > instanceY) {
 
                 mid = instanceY;
-            }
-            else if (x > instanceZ) {
+            } else if (x > instanceZ) {
 
                 mid = x;
             }
@@ -203,19 +207,16 @@ public class PrimitiveIntegerOperations {
         if (proxy.instanceInt < proxy.nestedProxy.instanceInt) {
             if (x < proxy.instanceInt) {
                 mid = proxy.instanceInt;
-            }
-            else if (x < proxy.nestedProxy.instanceInt) {
+            } else if (x < proxy.nestedProxy.instanceInt) {
 
                 mid = x;
             }
-        }
-        else {
+        } else {
 
             if (x > proxy.instanceInt) {
 
                 mid = proxy.instanceInt;
-            }
-            else if (x > proxy.nestedProxy.instanceInt) {
+            } else if (x > proxy.nestedProxy.instanceInt) {
 
                 mid = x;
             }
@@ -223,37 +224,39 @@ public class PrimitiveIntegerOperations {
         return mid;
     }
 
-    /*@ public normal_behavior
-       @ ensures true;
-       @*/
+    /*
+     * @ public normal_behavior
+     * 
+     * @ ensures true;
+     * 
+     * @
+     */
     public int midOneProxyOneInstance(int x) {
 
         int mid = 0;
-        
-        if(proxy == proxy.nestedProxy && x == proxy.instanceInt && proxy.nestedProxy.nestedProxy == null ) {
+
+        if (proxy == proxy.nestedProxy && x == proxy.instanceInt
+                && proxy.nestedProxy.nestedProxy == null) {
             mid = 15;
         }
-        
-        if(proxy == null) {
+
+        if (proxy == null) {
             mid = 16;
         }
 
         if (proxy.instanceInt < instanceZ) {
             if (x < proxy.nestedProxy.nestedProxy.nestedProxy.instanceInt) {
                 mid = proxy.nestedProxy.instanceInt;
-            }
-            else if (x < instanceZ) {
+            } else if (x < instanceZ) {
 
                 mid = x;
             }
-        }
-        else {
+        } else {
 
             if (x > proxy.nestedProxy.instanceInt) {
 
                 mid = proxy.nestedProxy.instanceInt;
-            }
-            else if (x > instanceZ) {
+            } else if (x > instanceZ) {
 
                 mid = x;
             }
@@ -289,13 +292,13 @@ public class PrimitiveIntegerOperations {
 
         if (d > 0) {
             return d;
-        }
-        else
+        } else
             return 31 + d;
     }
 
     /**
-     * Use Euclides algorithm to find the greatest common denominator of two integers.
+     * Use Euclides algorithm to find the greatest common denominator of two
+     * integers.
      * 
      * @param a
      * @param b
@@ -314,8 +317,7 @@ public class PrimitiveIntegerOperations {
 
         if (b == 0) {
             return a;
-        }
-        else {
+        } else {
             return euclidesRecursive(b, a % b);
         }
     }

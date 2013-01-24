@@ -10,11 +10,11 @@ import com.beust.jcommander.ParameterException;
  * 
  * @author christopher
  */
-public class JavaFileValidator
-        implements IParameterValidator {
+public class JavaFileValidator implements IParameterValidator {
 
     @Override
-    public void validate(String parameter, String value) throws ParameterException {
+    public void validate(String parameter, String value)
+            throws ParameterException {
 
         /*
          * Check that the filename is properly prefixed

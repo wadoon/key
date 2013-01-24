@@ -10,33 +10,35 @@ import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
- * Encapsulates information regarding a single Java method. The information contained in an instance
- * of this class is sufficient to facilitate symbolic execution of the method.
+ * Encapsulates information regarding a single Java method. The information
+ * contained in an instance of this class is sufficient to facilitate symbolic
+ * execution of the method.
  * 
  * @author christopher
  */
 public class KeYJavaMethod {
 
     /**
-     * The {@link IProgramMethod} instance for this method, containing the KeY-specific data for it.
+     * The {@link IProgramMethod} instance for this method, containing the
+     * KeY-specific data for it.
      */
     private final IProgramMethod programMethod;
 
     /**
-     * The {@link InitConfig} instance for the class which this method is part of.
+     * The {@link InitConfig} instance for the class which this method is part
+     * of.
      */
     private final InitConfig initConfig;
 
     /**
-     * A wrapper for the an instance of {@link FunctionalOperationContract} specific for this
-     * method. Through this contract, we can access the specifications for the method (i.e. mappings
-     * between preconditions and postconditions).
+     * A wrapper for the an instance of {@link FunctionalOperationContract}
+     * specific for this method. Through this contract, we can access the
+     * specifications for the method (i.e. mappings between preconditions and
+     * postconditions).
      */
     private final ContractWrapper functionalContract;
 
-    KeYJavaMethod(
-            IProgramMethod programMethod,
-            InitConfig initConfig,
+    KeYJavaMethod(IProgramMethod programMethod, InitConfig initConfig,
             ContractWrapper functionalContract) {
 
         this.programMethod = programMethod;
@@ -53,7 +55,7 @@ public class KeYJavaMethod {
 
         return functionalContract.getPreconditions();
     }
-    
+
     /**
      * Retrieve the postconditions for the method.
      * 
@@ -72,8 +74,8 @@ public class KeYJavaMethod {
     public List<IProgramVariable> getParameters() {
 
         /*
-         * TODO: This violates the abstraction in a very ugly way, is there no nicer way to get the
-         * parameters?
+         * TODO: This violates the abstraction in a very ugly way, is there no
+         * nicer way to get the parameters?
          */
         return functionalContract.getParameters();
     }

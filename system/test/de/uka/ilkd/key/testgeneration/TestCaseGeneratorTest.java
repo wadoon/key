@@ -15,17 +15,21 @@ import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 public class TestCaseGeneratorTest {
 
     @Test
-    public void test()
-            throws IOException, ProofInputException, ModelGeneratorException,
-            TestGeneratorException, KeYInterfaceException, XMLGeneratorException, InterruptedException {
+    public void test() throws IOException, ProofInputException,
+            ModelGeneratorException, TestGeneratorException,
+            KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
-        XMLTestCaseGenerator testCaseGenerator = XMLTestCaseGenerator.getDefaultInstance();
-        String output = testCaseGenerator.generateTestCase(
-                new File("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"),
-                "midOneProxyOneInstance");
-        
-        for(Entry<String, Long> entry : Benchmark.getReadings().entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue() + " milliseconds");
+        XMLTestCaseGenerator testCaseGenerator = XMLTestCaseGenerator
+                .getDefaultInstance();
+        String output = testCaseGenerator
+                .generateTestCase(
+                        new File(
+                                "/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"),
+                        "midOneProxyOneInstance");
+
+        for (Entry<String, Long> entry : Benchmark.getReadings().entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue()
+                    + " milliseconds");
         }
         System.out.println(output);
     }

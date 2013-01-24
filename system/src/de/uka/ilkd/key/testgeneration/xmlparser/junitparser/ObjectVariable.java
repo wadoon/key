@@ -16,7 +16,7 @@ public class ObjectVariable {
      * Type of this variable.
      */
     private String type;
-    
+
     private String reference;
 
     /**
@@ -75,21 +75,20 @@ public class ObjectVariable {
         this.isfinal = isfinal;
     }
 
-    
     /**
      * @return the reference
      */
     public String getReference() {
-    
+
         return reference;
     }
 
-    
     /**
-     * @param reference the reference to set
+     * @param reference
+     *            the reference to set
      */
     public void setReference(String reference) {
-    
+
         this.reference = reference;
     }
 }

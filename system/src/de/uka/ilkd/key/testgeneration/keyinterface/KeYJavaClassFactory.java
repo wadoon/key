@@ -28,12 +28,14 @@ public enum KeYJavaClassFactory {
     INSTANCE;
 
     /**
-     * The singleton {@link KeYInterface}, used in order to communicate with the KeY runtime.
+     * The singleton {@link KeYInterface}, used in order to communicate with the
+     * KeY runtime.
      */
     private final KeYInterface keyInterface = KeYInterface.INSTANCE;
 
     /**
-     * Used in order to extract {@link FunctionalOperationContract} information for Java methods
+     * Used in order to extract {@link FunctionalOperationContract} information
+     * for Java methods
      */
     private final ContractExtractor contractExtractor = ContractExtractor.INSTANCE;
 
@@ -47,8 +49,8 @@ public enum KeYJavaClassFactory {
      *             if the file could not be found or read
      * @throws KeYInterfaceException
      */
-    public KeYJavaClass createKeYJavaClass(File javaFile)
-            throws IOException, KeYInterfaceException {
+    public KeYJavaClass createKeYJavaClass(File javaFile) throws IOException,
+            KeYInterfaceException {
 
         /*
          * Load the file into key and set the InitConfig instance for it.
@@ -59,15 +61,17 @@ public enum KeYJavaClassFactory {
         JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
 
         /*
-         * Retrieve the KeYJavaType for the top level class declaration in this file
+         * Retrieve the KeYJavaType for the top level class declaration in this
+         * file
          */
         String fileName = getFileName(javaFile);
         KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
         /*
-         * Extract all methods declared in this class (including the ones provided in
-         * Java.lang.Object, even if these have not been overridden), and create name-value mappings
-         * for them. Exclude implicit methods (i.e. <create>, <init> etc).
+         * Extract all methods declared in this class (including the ones
+         * provided in Java.lang.Object, even if these have not been
+         * overridden), and create name-value mappings for them. Exclude
+         * implicit methods (i.e. <create>, <init> etc).
          */
         HashMap<String, KeYJavaMethod> methods = new HashMap<String, KeYJavaMethod>();
 
@@ -75,16 +79,17 @@ public enum KeYJavaClassFactory {
             if (!method.getFullName().startsWith("<")) {
 
                 /*
-                 * Extract the operational contracts of the method, and create a separate
-                 * abstraction of the method for each one of them (since each one will effectively
-                 * represent a unique set of restrictions on the invocation of the method).
+                 * Extract the operational contracts of the method, and create a
+                 * separate abstraction of the method for each one of them
+                 * (since each one will effectively represent a unique set of
+                 * restrictions on the invocation of the method).
                  */
                 List<ContractWrapper> contracts = getContracts(method, services);
                 for (ContractWrapper contract : contracts) {
 
-                    KeYJavaMethod keYJavaMethod =
-                            new KeYJavaMethod(method, initConfig, contract);
-                    
+                    KeYJavaMethod keYJavaMethod = new KeYJavaMethod(method,
+                            initConfig, contract);
+
                     methods.put(method.getFullName(), keYJavaMethod);
                 }
             }
@@ -125,31 +130,36 @@ public enum KeYJavaClassFactory {
     }
 
     /**
-     * Extracts the {@link FunctionalOperationContract} instances for a specific method. Such
-     * contracts represent the concrete specifications for the method, i.e. a mapping between a
-     * precondition (initial heapstate) and postcondition (postcondition).
+     * Extracts the {@link FunctionalOperationContract} instances for a specific
+     * method. Such contracts represent the concrete specifications for the
+     * method, i.e. a mapping between a precondition (initial heapstate) and
+     * postcondition (postcondition).
      * 
      * @param methodCallNode
      *            the symbolic execution node corresponding to the method call
      * @return the contract for the method
      * @throws OracleGeneratorException
-     *             failure to find a contract for the method is always exceptional
+     *             failure to find a contract for the method is always
+     *             exceptional
      */
-    private List<ContractWrapper> getContracts(IProgramMethod method, Services services) {
+    private List<ContractWrapper> getContracts(IProgramMethod method,
+            Services services) {
 
-        SpecificationRepository specificationRepository =
-                services.getSpecificationRepository();
+        SpecificationRepository specificationRepository = services
+                .getSpecificationRepository();
 
         /*
-         * Extract the abstract representation of the method itself, as well as the type of the
-         * class which contains it. Use this information in order to retrieve the specification
-         * contracts which exist for the method.
+         * Extract the abstract representation of the method itself, as well as
+         * the type of the class which contains it. Use this information in
+         * order to retrieve the specification contracts which exist for the
+         * method.
          */
         KeYJavaType containerClass = method.getContainerType();
         List<ContractWrapper> contracts = new LinkedList<ContractWrapper>();
-        for (FunctionalOperationContract contract : specificationRepository.getOperationContracts(
-                containerClass, method)) {
-            contracts.add(new ContractWrapper((FunctionalOperationContractImpl) contract));
+        for (FunctionalOperationContract contract : specificationRepository
+                .getOperationContracts(containerClass, method)) {
+            contracts.add(new ContractWrapper(
+                    (FunctionalOperationContractImpl) contract));
         }
 
         return contracts;

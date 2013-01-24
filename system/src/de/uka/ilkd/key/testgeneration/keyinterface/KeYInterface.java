@@ -20,12 +20,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * This singleton provides services on behalf of a single KeY runtime instance to the rest of
- * KeYTestGen. No part of KeYTestGen apart from this class should ever be allowed to in any way
- * manipulate the KeY internals, or otherwise interact directly with the KeY runtime.
+ * This singleton provides services on behalf of a single KeY runtime instance
+ * to the rest of KeYTestGen. No part of KeYTestGen apart from this class should
+ * ever be allowed to in any way manipulate the KeY internals, or otherwise
+ * interact directly with the KeY runtime.
  * <p>
- * Use of this singleton is synchronized in order to make sure that no thread is able to request
- * services of the KeY runtime until another one has completely finished doing so.
+ * Use of this singleton is synchronized in order to make sure that no thread is
+ * able to request services of the KeY runtime until another one has completely
+ * finished doing so.
  * 
  * @author christopher
  */
@@ -35,20 +37,22 @@ public enum KeYInterface {
     /**
      * Main interface to the KeY system itself.
      */
-    private final CustomConsoleUserInterface userInterface =
-            new CustomConsoleUserInterface(false);
+    private final CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
+            false);
 
     /**
-     * The public methods of this singleton must use this {@link ReentrantLock} instance in order to
-     * guarantee atomic access to the singleton at all times. Private methods need not use the lock.
-     * Further, no two public methods using the lock are allowed to call each other under any
-     * circumstances, in order to make sure that a single thread no longer requires services from
-     * KeY before another requests them.
+     * The public methods of this singleton must use this {@link ReentrantLock}
+     * instance in order to guarantee atomic access to the singleton at all
+     * times. Private methods need not use the lock. Further, no two public
+     * methods using the lock are allowed to call each other under any
+     * circumstances, in order to make sure that a single thread no longer
+     * requires services from KeY before another requests them.
      */
     private static final ReentrantLock lock = new ReentrantLock(true);
 
     /**
-     * Load a given file into the KeY system, and return the {@link InitConfig} instance for it.
+     * Load a given file into the KeY system, and return the {@link InitConfig}
+     * instance for it.
      * 
      * @param javaFile
      *            the file to load
@@ -64,28 +68,29 @@ public enum KeYInterface {
         try {
             lock.lock();
 
-            DefaultProblemLoader loader = userInterface.load(javaFile, null, null);
+            DefaultProblemLoader loader = userInterface.load(javaFile, null,
+                    null);
             InitConfig initConfig = loader.getInitConfig();
 
             return initConfig;
 
-        }
-        catch (ProblemLoaderException e) {
+        } catch (ProblemLoaderException e) {
             throw new KeYInterfaceException(e.getMessage());
-        }
-        finally {
+        } finally {
             lock.unlock();
         }
     }
 
     /**
-     * Symbolically execute a given method, and return the resulting symbolic execution tree.
+     * Symbolically execute a given method, and return the resulting symbolic
+     * execution tree.
      * 
      * @param method
      *            the method
      * @return the symbolic execution tree
      * @throws KeYInterfaceException
-     *             in the event that a symbolic execution tree cannot be generated.
+     *             in the event that a symbolic execution tree cannot be
+     *             generated.
      */
     public IExecutionStartNode getSymbolicExecutionTree(KeYJavaMethod method)
             throws KeYInterfaceException {
@@ -95,47 +100,52 @@ public enum KeYInterface {
             lock.lock();
 
             /*
-             * Setup and prepare the proof session, and retrieve the KeYMediator instance to use.
+             * Setup and prepare the proof session, and retrieve the KeYMediator
+             * instance to use.
              */
-            Proof proof =
-                    getProof(method.getInitConfig(), method.getProgramMethod(), null);
+            Proof proof = getProof(method.getInitConfig(),
+                    method.getProgramMethod(), null);
             KeYMediator mediator = userInterface.getMediator();
 
             /*
              * Create the symbolic execution tree builder.
              */
-            SymbolicExecutionTreeBuilder builder =
-                    new SymbolicExecutionTreeBuilder(mediator, proof, false);
+            SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(
+                    mediator, proof, false);
 
             /*
-             * Add a stop condition for the proof (we use a default in order to assure maximum
-             * coverage of execution paths). Start the proof and wait for it to finish.
+             * Add a stop condition for the proof (we use a default in order to
+             * assure maximum coverage of execution paths). Start the proof and
+             * wait for it to finish.
              */
-            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
-                    new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+            proof.getSettings()
+                    .getStrategySettings()
+                    .setCustomApplyStrategyStopCondition(
+                            new ExecutedSymbolicExecutionTreeNodesStopCondition(
+                                    ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
 
             userInterface.startAndWaitForAutoMode(proof);
 
             /*
-             * Create the symbolic execution tree, and assert that it indeed exists.
+             * Create the symbolic execution tree, and assert that it indeed
+             * exists.
              */
             builder.analyse();
             IExecutionStartNode rootNode = builder.getStartNode();
             assertNotNull(rootNode, "FATAL: unable to initialize proof tree");
 
             return builder.getStartNode();
-        }
-        catch (ProofInputException e) {
+        } catch (ProofInputException e) {
             throw new KeYInterfaceException("FATAL: could not create proof: "
                     + e.getMessage());
-        }
-        finally {
+        } finally {
             lock.unlock();
         }
     }
 
     /**
-     * Assert that a given object is not null, and generate an exception if it is
+     * Assert that a given object is not null, and generate an exception if it
+     * is
      * 
      * @param object
      *            the object to check
@@ -156,7 +166,8 @@ public enum KeYInterface {
      * Create a {@link Proof} for a given method
      * 
      * @param initConfig
-     *            the {@link InitConfig} instance for the Java file which the method is part of.
+     *            the {@link InitConfig} instance for the Java file which the
+     *            method is part of.
      * @param method
      *            the method to generate the proof for
      * @param precondition
@@ -165,19 +176,14 @@ public enum KeYInterface {
      * @throws ProofInputException
      *             in the event that the proof cannot be created
      */
-    private Proof getProof(
-            InitConfig initConfig,
-            IProgramMethod method,
+    private Proof getProof(InitConfig initConfig, IProgramMethod method,
             String precondition) throws ProofInputException {
 
-        ProofOblInput proofObligationInput =
-                new ProgramMethodPO(initConfig,
-                        method.getFullName(),
-                        method,
-                        precondition,
-                        true);
+        ProofOblInput proofObligationInput = new ProgramMethodPO(initConfig,
+                method.getFullName(), method, precondition, true);
 
-        Proof proof = userInterface.createProof(initConfig, proofObligationInput);
+        Proof proof = userInterface.createProof(initConfig,
+                proofObligationInput);
         if (proof == null) {
             throw new ProofInputException("Unable to load proof");
         }
@@ -185,9 +191,10 @@ public enum KeYInterface {
         /*
          * Setup a strategy and goal chooser for the proof session
          */
-        SymbolicExecutionEnvironment.configureProofForSymbolicExecution(
-                proof,
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+        SymbolicExecutionEnvironment
+                .configureProofForSymbolicExecution(
+                        proof,
+                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
 
         return proof;
     }

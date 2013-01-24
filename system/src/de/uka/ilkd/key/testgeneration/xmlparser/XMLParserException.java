@@ -2,8 +2,7 @@ package de.uka.ilkd.key.testgeneration.xmlparser;
 
 import de.uka.ilkd.key.testgeneration.KeYTestGenException;
 
-public class XMLParserException
-        extends KeYTestGenException {
+public class XMLParserException extends KeYTestGenException {
 
     public XMLParserException(String message) {
 

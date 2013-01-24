@@ -4,18 +4,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.testgeneration.model.IModelObject;
 
 /**
- * Instances of this class represent concrete Java objects on the heap. Such instances are
- * necessarily unique (as they would be in Java) and contain information about the state of the
- * object. Importantly, it stores the concrete values of any fields its class may have, as well as
- * information about the {@link ModelVariable} instances referring to it.
+ * Instances of this class represent concrete Java objects on the heap. Such
+ * instances are necessarily unique (as they would be in Java) and contain
+ * information about the state of the object. Importantly, it stores the
+ * concrete values of any fields its class may have, as well as information
+ * about the {@link ModelVariable} instances referring to it.
  * 
  * @author christopher
  */
-public class ModelInstance
-        implements IHeapObject {
+public class ModelInstance implements IHeapObject {
 
     /**
      * The type of which this instance is an instance.
@@ -23,8 +22,8 @@ public class ModelInstance
     private final KeYJavaType type;
 
     /**
-     * A unique identifier for this particular instance. Think of it as the memory address of an
-     * actual Java object on the heap.
+     * A unique identifier for this particular instance. Think of it as the
+     * memory address of an actual Java object on the heap.
      */
     private final String identifier;
 
@@ -34,8 +33,8 @@ public class ModelInstance
     private final List<ModelVariable> fields = new LinkedList<ModelVariable>();
 
     /**
-     * Creates a new ModelInstance, corresponding to an object of type {@link KeYJavaType} together
-     * with a unique identifier.
+     * Creates a new ModelInstance, corresponding to an object of type
+     * {@link KeYJavaType} together with a unique identifier.
      * 
      * @param type
      *            the type of the instance
@@ -49,6 +48,7 @@ public class ModelInstance
     /**
      * @return the type
      */
+    @Override
     public String getType() {
 
         return type.getJavaType().getFullName();
@@ -93,8 +93,8 @@ public class ModelInstance
     }
 
     /**
-     * Two instances are equal iff. their references are the same (compare reference equality in
-     * Java).
+     * Two instances are equal iff. their references are the same (compare
+     * reference equality in Java).
      */
     @Override
     public boolean equals(Object obj) {
@@ -111,12 +111,12 @@ public class ModelInstance
         ModelInstance other = (ModelInstance) obj;
         return this.identifier.equals(other.identifier);
     }
-    
+
     @Override
     public String toString() {
-    
+
         String toReturn = "Instance " + identifier + " [";
-        for(ModelVariable variable : fields) {
+        for (ModelVariable variable : fields) {
             toReturn += variable.toString() + " ";
         }
         return toReturn;

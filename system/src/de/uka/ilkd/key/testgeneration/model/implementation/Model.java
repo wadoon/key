@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import z3parser.tree.bnf.Absyn.Modl;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
@@ -16,23 +14,22 @@ import de.uka.ilkd.key.testgeneration.model.IModelObject;
  * 
  * @author christopher
  */
-public class Model
-        implements IModel {
+public class Model implements IModel {
 
     /**
-     * Indicates whether this instance will use buffering or not in order to avoid
-     * nullpointerexceptions.
+     * Indicates whether this instance will use buffering or not in order to
+     * avoid nullpointerexceptions.
      */
     // private final boolean useBuffer;
 
     /**
-     * Buffers variables which currently cannot be inserted due to broken reference dependencies.
-     * Primarily, this will occur when the user tries to insert a variable as a field into an
-     * instace which currently does'nt exist. This can happens if this class is used in
-     * non-postorder visitations of {@link Term} ASTs. Use mainly to allow safe visitations.
+     * Buffers variables which currently cannot be inserted due to broken
+     * reference dependencies. Primarily, this will occur when the user tries to
+     * insert a variable as a field into an instace which currently does'nt
+     * exist. This can happens if this class is used in non-postorder
+     * visitations of {@link Term} ASTs. Use mainly to allow safe visitations.
      */
-    private final HashMap<ModelVariable, ModelVariable> buffer =
-            new HashMap<ModelVariable, ModelVariable>();
+    private final HashMap<ModelVariable, ModelVariable> buffer = new HashMap<ModelVariable, ModelVariable>();
 
     /**
      * The {@link ModelVariable} instances represented on this heap.
@@ -40,14 +37,16 @@ public class Model
     private final LinkedList<ModelVariable> variables = new LinkedList<ModelVariable>();
 
     /**
-     * Adds a variable to the heap, causing it to point to a given object instance. If the variable
-     * already exists on the heap, this method will cause the variable to point to the new instance
-     * instead, unless the variable is declared as <code>final</code>.
+     * Adds a variable to the heap, causing it to point to a given object
+     * instance. If the variable already exists on the heap, this method will
+     * cause the variable to point to the new instance instead, unless the
+     * variable is declared as <code>final</code>.
      * 
      * @param variable
      *            the variable to be added
      * @param instance
-     *            the instance the variable will point to. Can be <code>null</code>.
+     *            the instance the variable will point to. Can be
+     *            <code>null</code>.
      */
     public void add(ModelVariable variable, Object instance) {
 
@@ -64,8 +63,7 @@ public class Model
 
             variable.setValue(instance);
             variables.add(variable);
-        }
-        else {
+        } else {
 
             variable.setValue(instance);
         }
@@ -76,11 +74,11 @@ public class Model
      * {@link ModelInstance} which other is pointing to.
      * 
      * @param target
-     *            the target variable, i.e. the one the address of the instance is being bound to.
-     *            Cannot be <code>null</code>
+     *            the target variable, i.e. the one the address of the instance
+     *            is being bound to. Cannot be <code>null</code>
      * @param other
-     *            the other variable, i.e. the one currently holding the address of the instance.
-     *            Cannot be <code>null</code>
+     *            the other variable, i.e. the one currently holding the address
+     *            of the instance. Cannot be <code>null</code>
      */
     public void assignPointer(ModelVariable target, ModelVariable other) {
 
@@ -90,8 +88,7 @@ public class Model
 
             if (other != null) {
                 target.setValue(other.getValue());
-            }
-            else {
+            } else {
                 target.setValue(null);
             }
         }
@@ -111,13 +108,14 @@ public class Model
     }
 
     /**
-     * Places the variable target as a field of the {@link ModelInstance} referred to by the
-     * variable other.
+     * Places the variable target as a field of the {@link ModelInstance}
+     * referred to by the variable other.
      * 
      * @param target
      *            the variable to insert as a field
      * @param other
-     *            the variable pointing to the object instance we are inserting into
+     *            the variable pointing to the object instance we are inserting
+     *            into
      */
     public void assignField(ModelVariable target, ModelVariable other) {
 
@@ -126,8 +124,8 @@ public class Model
             ModelVariable localOther = lookupVariable(other);
 
             /*
-             * If the other currently does not exist in the Model, buffer it for subsequent
-             * insertion.
+             * If the other currently does not exist in the Model, buffer it for
+             * subsequent insertion.
              */
             if (other == null) {
                 buffer.put(other, target);
@@ -141,8 +139,9 @@ public class Model
     }
 
     /**
-     * Synchronize the buffer by going through each buffered element, and seeing if it can be
-     * inserted into the Model. If the element could be inserted, remove it from the buffer.
+     * Synchronize the buffer by going through each buffered element, and seeing
+     * if it can be inserted into the Model. If the element could be inserted,
+     * remove it from the buffer.
      */
     private void synchronizeBuffer() {
 
@@ -165,7 +164,8 @@ public class Model
     }
 
     /**
-     * Retrieves the actual in-memory reference to a variable, as represented on the heap.
+     * Retrieves the actual in-memory reference to a variable, as represented on
+     * the heap.
      * 
      * @param variable
      *            the variable to lookup
@@ -199,12 +199,12 @@ public class Model
      * {@inheritDoc}
      */
     @Override
-    public Map<String, IModelObject> getVariableNameMapping(IModelFilter... filters) {
+    public Map<String, IModelObject> getVariableNameMapping(
+            IModelFilter... filters) {
 
         List<IModelObject> filteredVariables = getFilteredVariables(filters);
 
-        HashMap<String, IModelObject> variableMapping =
-                new HashMap<String, IModelObject>();
+        HashMap<String, IModelObject> variableMapping = new HashMap<String, IModelObject>();
 
         for (IModelObject variable : filteredVariables) {
 
@@ -218,7 +218,8 @@ public class Model
      * 
      * @param reference
      *            the reference
-     * @return the found instance, null if no instance is found with the specified reference
+     * @return the found instance, null if no instance is found with the
+     *         specified reference
      */
     public ModelVariable getVariableByReference(String reference) {
 
@@ -232,8 +233,8 @@ public class Model
     }
 
     /**
-     * Determines if a given {@link ModelVariable} satisfied the conditions postulated in a given
-     * set of {@link IModelFilter} instances.
+     * Determines if a given {@link ModelVariable} satisfied the conditions
+     * postulated in a given set of {@link IModelFilter} instances.
      * 
      * @param variable
      *            the variable to check
@@ -241,7 +242,8 @@ public class Model
      *            the filters to check against
      * @return
      */
-    private boolean satisfiesFilters(ModelVariable variable, IModelFilter[] filters) {
+    private boolean satisfiesFilters(ModelVariable variable,
+            IModelFilter[] filters) {
 
         for (IModelFilter filter : filters) {
             if (!filter.satisfies(variable)) {
@@ -270,8 +272,7 @@ public class Model
      * 
      * @author christopher
      */
-    public static class NameFilter
-            implements IModelFilter {
+    public static class NameFilter implements IModelFilter {
 
         private String name;
 

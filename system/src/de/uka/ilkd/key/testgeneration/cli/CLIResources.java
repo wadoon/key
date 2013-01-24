@@ -14,8 +14,8 @@ public enum CLIResources {
     INSTANCE;
 
     /**
-     * Collection which keeps track of the target test FRAMEWORKS currently supported by KeyTestgen,
-     * together with their parsers.
+     * Collection which keeps track of the target test FRAMEWORKS currently
+     * supported by KeyTestgen, together with their parsers.
      */
     private static final HashMap<String, ITestCaseParser<String>> FRAMEWORKS;
     static {

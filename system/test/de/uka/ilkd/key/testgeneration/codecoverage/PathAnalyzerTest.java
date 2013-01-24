@@ -19,21 +19,20 @@ import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-public class PathAnalyzerTest
-        extends KeYTestGenTest {
+public class PathAnalyzerTest extends KeYTestGenTest {
 
-    private final String javaPathInBaseDir =
-            "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
+    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
     private final String containerTypeName = "PrimitiveIntegerOperations";
 
     @Test
-    public void test() throws ProofInputException, ModelGeneratorException, IOException, ProblemLoaderException {
+    public void test() throws ProofInputException, ModelGeneratorException,
+            IOException, ProblemLoaderException {
 
         String method = "max";
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
-                getEnvironmentForMethod(method);
+        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
-        SpecificationRepository repo = environment.getServices().getSpecificationRepository();
+        SpecificationRepository repo = environment.getServices()
+                .getSpecificationRepository();
         IExecutionStartNode root = environment.getBuilder().getStartNode();
         IExecutionMethodCall callNode = getMethodCallNode(root);
         KeYMediator mediator = environment.getBuilder().getMediator();
@@ -46,25 +45,31 @@ public class PathAnalyzerTest
         System.out.println(container);
 
         /*
-         * for(KeYJavaType type : info.getAllKeYJavaTypes()) { System.out.println(type); }
+         * for(KeYJavaType type : info.getAllKeYJavaTypes()) {
+         * System.out.println(type); }
          * 
          * int i = 0; for(Contract contract : repo.getAllContracts()) {
          * System.out.println(contract.getKJT()); System.out.println(i++); }
          */
 
-        System.out.println("TYPE: " + info.getTypeByClassName("PrimitiveIntegerOperations"));
-        System.out.println(info.getTypeByName("de.uka.ilkd.key.testgeneration.targetmodels.PrimitiveIntegerOperations"));
+        System.out.println("TYPE: "
+                + info.getTypeByClassName("PrimitiveIntegerOperations"));
+        System.out
+                .println(info
+                        .getTypeByName("de.uka.ilkd.key.testgeneration.targetmodels.PrimitiveIntegerOperations"));
         System.out.println(programMethod.getType());
         KeYJavaType methodType = programMethod.getType();
-        for (FunctionalOperationContract contract : repo.getOperationContracts(methodType, callNode.getProgramMethod())) {
+        for (FunctionalOperationContract contract : repo.getOperationContracts(
+                methodType, callNode.getProgramMethod())) {
             System.out.println(contract);
         }
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
-            String method) throws ProofInputException, ModelGeneratorException, IOException, ProblemLoaderException {
+            String method) throws ProofInputException, ModelGeneratorException,
+            IOException, ProblemLoaderException {
 
-        return getPreparedEnvironment(keyRepDirectory, javaPathInBaseDir, containerTypeName,
-                method, null, false);
+        return getPreparedEnvironment(keyRepDirectory, javaPathInBaseDir,
+                containerTypeName, method, null, false);
     }
 }

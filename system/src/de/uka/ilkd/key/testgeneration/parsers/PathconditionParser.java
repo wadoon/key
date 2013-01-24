@@ -20,15 +20,14 @@ import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
 
 /**
- * Provides various methods for processing the pathconditions for {@link IExecutionNode} instances.
+ * Provides various methods for processing the pathconditions for
+ * {@link IExecutionNode} instances.
  * 
  * @author christopher
  */
-public class PathconditionParser
-        extends AbstractTermParser {
+public class PathconditionParser extends AbstractTermParser {
 
     /**
      * Allow only static access
@@ -38,9 +37,10 @@ public class PathconditionParser
     }
 
     /**
-     * Creates a skeletal {@link Model} instance from a {@link Term}. The Term will be parsed, and
-     * all representations of program variables (along with their relationships to one another) will
-     * be used to construct a "skeletal" Model instance (i.e. no concrete primitive values).
+     * Creates a skeletal {@link Model} instance from a {@link Term}. The Term
+     * will be parsed, and all representations of program variables (along with
+     * their relationships to one another) will be used to construct a
+     * "skeletal" Model instance (i.e. no concrete primitive values).
      * 
      * @param term
      *            the Term to process
@@ -53,15 +53,17 @@ public class PathconditionParser
         Model model = new Model();
 
         /*
-         * Construct the initial Model, containing representation of all the variables and values
-         * found in the Term. Done postorder to eliminate buffering penalties in the Model.
+         * Construct the initial Model, containing representation of all the
+         * variables and values found in the Term. Done postorder to eliminate
+         * buffering penalties in the Model.
          */
         ContextVisitor modelVisitor = new ContextVisitor(model, services);
         term.execPostOrder(modelVisitor);
 
         /*
-         * Setup all reference relationships expressed in the Term. Done preorder to correctly
-         * handle non-assigning operations, such as not-equals.
+         * Setup all reference relationships expressed in the Term. Done
+         * preorder to correctly handle non-assigning operations, such as
+         * not-equals.
          */
         ReferenceVisitor referenceVisitor = new ReferenceVisitor(model);
         term.execPreOrder(referenceVisitor);
@@ -70,25 +72,29 @@ public class PathconditionParser
     }
 
     /**
-     * Given an initial {@link Term}, constructs a simpler Term which "localizes" all occurences of
-     * primitive datatypes, by transforming the instances of {@link SortDependingFunction} which
-     * contain them.
+     * Given an initial {@link Term}, constructs a simpler Term which
+     * "localizes" all occurences of primitive datatypes, by transforming the
+     * instances of {@link SortDependingFunction} which contain them.
      * <p>
-     * As an example of how this works, consider the case where we have an instace of some class
-     * <code>Base</code> named "base", which as a field has an instance of some other class
-     * <code>Inner</code> named "inner", which in turn has a local instance of an
-     * <code>integer </code> named "localInt. Normally, simply transforming such a construct to an
-     * SMT-LIB formula would result in a needlesly complex expression and model, which is a waste of
-     * both resources and time invested in developing additional parsers to understand it.
+     * As an example of how this works, consider the case where we have an
+     * instace of some class <code>Base</code> named "base", which as a field
+     * has an instance of some other class <code>Inner</code> named "inner",
+     * which in turn has a local instance of an <code>integer </code> named
+     * "localInt. Normally, simply transforming such a construct to an SMT-LIB
+     * formula would result in a needlesly complex expression and model, which
+     * is a waste of both resources and time invested in developing additional
+     * parsers to understand it.
      * <p>
-     * What we do instead is to simply transform the construct into a local variable of our base
-     * class, giving it a name corresponding to its nesting order. In our case, such a name migh be
-     * "base$nested$localInt". When all variables have been processed like this, we end up with a
-     * greatly simplified term which can easily be expressed as an SMT-LIB construct.
+     * What we do instead is to simply transform the construct into a local
+     * variable of our base class, giving it a name corresponding to its nesting
+     * order. In our case, such a name migh be "base$nested$localInt". When all
+     * variables have been processed like this, we end up with a greatly
+     * simplified term which can easily be expressed as an SMT-LIB construct.
      * <p>
-     * This process will also remove all implied properties of internal objects, such as not-null
-     * requirements, since these are not needed in the simplified formula, and would only further
-     * pollute the SMT-LIB expression. Further, it will simplify the formula by removing unnecessary
+     * This process will also remove all implied properties of internal objects,
+     * such as not-null requirements, since these are not needed in the
+     * simplified formula, and would only further pollute the SMT-LIB
+     * expression. Further, it will simplify the formula by removing unnecessary
      * conjuntions.
      * 
      * @param term
@@ -120,16 +126,17 @@ public class PathconditionParser
     }
 
     /**
-     * In terms of logical representation, equality differs from the other comparators (leq, geq
-     * etc) in the sense that it can be applied to boolean values as well as numeric ones. Thus, it
-     * is treated differently in the sense that we simplify it the same way that we simplify
-     * junctors.
+     * In terms of logical representation, equality differs from the other
+     * comparators (leq, geq etc) in the sense that it can be applied to boolean
+     * values as well as numeric ones. Thus, it is treated differently in the
+     * sense that we simplify it the same way that we simplify junctors.
      * 
      * @param term
      * @return
      * @throws ModelGeneratorException
      */
-    private static Term simplifyEquals(Term term) throws ModelGeneratorException {
+    private static Term simplifyEquals(Term term)
+            throws ModelGeneratorException {
 
         return simplifyJunctor(term);
     }
@@ -141,7 +148,8 @@ public class PathconditionParser
      * @return
      * @throws ModelGeneratorException
      */
-    private static Term simplifyFunction(Term term) throws ModelGeneratorException {
+    private static Term simplifyFunction(Term term)
+            throws ModelGeneratorException {
 
         Operator operator = term.op();
         Sort sort = term.sort();
@@ -162,30 +170,34 @@ public class PathconditionParser
     }
 
     /**
-     * Simplifies a binary function (i.e. any instance of {@link Function} taking two operands, such
-     * as the comparators).
+     * Simplifies a binary function (i.e. any instance of {@link Function}
+     * taking two operands, such as the comparators).
      * 
      * @param term
      * @return
      * @throws ModelGeneratorException
      */
-    private static Term simplifyBinaryFunction(Term term) throws ModelGeneratorException {
+    private static Term simplifyBinaryFunction(Term term)
+            throws ModelGeneratorException {
 
         // Function function = new Function(term.op().name(), term.sort());
         Term firstChild = simplifyTerm(term.sub(0));
         Term secondChild = simplifyTerm(term.sub(1));
 
-        Term newTerm = termFactory.createTerm(term.op(), firstChild, secondChild);
+        Term newTerm = termFactory.createTerm(term.op(), firstChild,
+                secondChild);
 
         return newTerm;
     }
 
     /**
-     * Given an {@link Term} of type {@link SortDependingFunction}, with a primitive type as its
-     * sort, resolve the nesting hierarchy for this variable, and encode this information as a new
-     * local variable, whose name will depend on the classes involved in the nesting hierarchy. For
-     * example, the int value x in the hiearchy main.nested.other.yetanother.x will be renamed
-     * "main$nested$other$yetanother$x", and treated simply as a local variable in the object main.
+     * Given an {@link Term} of type {@link SortDependingFunction}, with a
+     * primitive type as its sort, resolve the nesting hierarchy for this
+     * variable, and encode this information as a new local variable, whose name
+     * will depend on the classes involved in the nesting hierarchy. For
+     * example, the int value x in the hiearchy main.nested.other.yetanother.x
+     * will be renamed "main$nested$other$yetanother$x", and treated simply as a
+     * local variable in the object main.
      * 
      * @param term
      *            the term to process
@@ -196,17 +208,18 @@ public class PathconditionParser
         String sortName = term.sort().toString();
 
         /*
-         * Check if the base type of the selection statement is a primitive type (we do not handle
-         * anything else). If so, create an alias for the nested variable, and return everything
-         * else as a new LocationVariable.
+         * Check if the base type of the selection statement is a primitive type
+         * (we do not handle anything else). If so, create an alias for the
+         * nested variable, and return everything else as a new
+         * LocationVariable.
          */
         if (primitiveTypes.contains(sortName)) {
 
-            ProgramElementName resolvedVariableName =
-                    new ProgramElementName(resolveIdentifierString(term));
+            ProgramElementName resolvedVariableName = new ProgramElementName(
+                    resolveIdentifierString(term));
 
-            LocationVariable resolvedVariable =
-                    new LocationVariable(resolvedVariableName, term.sort());
+            LocationVariable resolvedVariable = new LocationVariable(
+                    resolvedVariableName, term.sort());
 
             return termFactory.createTerm(resolvedVariable);
         }
@@ -222,30 +235,28 @@ public class PathconditionParser
      * @return the simplified term
      * @throws ModelGeneratorException
      */
-    private static Term simplifyJunctor(Term term) throws ModelGeneratorException {
+    private static Term simplifyJunctor(Term term)
+            throws ModelGeneratorException {
 
         String junctorName = term.op().toString();
 
         if (junctorName.equals("and")) {
             return simplifyBinaryJunctor(term);
-        }
-        else if (junctorName.equals("or")) {
+        } else if (junctorName.equals("or")) {
             return simplifyBinaryJunctor(term);
-        }
-        else if (junctorName.equals("equals")) {
+        } else if (junctorName.equals("equals")) {
             return simplifyBinaryJunctor(term);
-        }
-        else if (junctorName.equals("not")) {
+        } else if (junctorName.equals("not")) {
             return simplifyNot(term);
-        }
-        else {
+        } else {
             throw new ModelGeneratorException("Parse error");
         }
     }
 
     /**
-     * Simplify a negation. If the child is simplified to null, simply return null. Otherwise,
-     * create a new negation of the simplification of the child.
+     * Simplify a negation. If the child is simplified to null, simply return
+     * null. Otherwise, create a new negation of the simplification of the
+     * child.
      * 
      * @param term
      *            the term (logical negator) to simplify
@@ -264,14 +275,16 @@ public class PathconditionParser
     }
 
     /**
-     * Simplifies a binary junctor by examining the operands. If one of them can be simplified to
-     * null, the entire junction can be replaced by the second operand. If both are simplified to
-     * null, the entire conjunction can be removed (hence this method will return null as well).
+     * Simplifies a binary junctor by examining the operands. If one of them can
+     * be simplified to null, the entire junction can be replaced by the second
+     * operand. If both are simplified to null, the entire conjunction can be
+     * removed (hence this method will return null as well).
      * 
      * @param term
      * @throws ModelGeneratorException
      */
-    private static Term simplifyBinaryJunctor(Term term) throws ModelGeneratorException {
+    private static Term simplifyBinaryJunctor(Term term)
+            throws ModelGeneratorException {
 
         Term firstChild = simplifyTerm(term.sub(0));
         Term secondChild = simplifyTerm(term.sub(1));
@@ -290,8 +303,8 @@ public class PathconditionParser
     }
 
     /**
-     * Constructs a new binary {@link Junctor} depending on the kind of Junctor represented by the
-     * input {@link Term}.
+     * Constructs a new binary {@link Junctor} depending on the kind of Junctor
+     * represented by the input {@link Term}.
      * 
      * @param term
      *            the original Term
@@ -302,8 +315,8 @@ public class PathconditionParser
      * @return
      * @throws ModelGeneratorException
      */
-    private static Term createBinaryJunctor(Term term, Term firstChild, Term secondChild)
-            throws ModelGeneratorException {
+    private static Term createBinaryJunctor(Term term, Term firstChild,
+            Term secondChild) throws ModelGeneratorException {
 
         String junctorName = term.op().name().toString();
 
@@ -323,26 +336,27 @@ public class PathconditionParser
     }
 
     /**
-     * This Visitor walks a {@link Term} and extracts information related to the program variables
-     * represented in the term. The goal of this procedure is to provide sufficient information for
-     * later constructing a {@link Model} including the extracted variables.
+     * This Visitor walks a {@link Term} and extracts information related to the
+     * program variables represented in the term. The goal of this procedure is
+     * to provide sufficient information for later constructing a {@link Model}
+     * including the extracted variables.
      * 
      * @author christopher
      */
-    private static class ContextVisitor
-            extends Visitor {
+    private static class ContextVisitor extends Visitor {
 
         /**
-         * Stores Java specific information related to the {@link Term} we are working with.
+         * Stores Java specific information related to the {@link Term} we are
+         * working with.
          */
         private final JavaInfo javaInfo;
 
         /**
-         * The default root variable, representing a reference to the class instance of which the
-         * tested method is part.
+         * The default root variable, representing a reference to the class
+         * instance of which the tested method is part.
          */
-        private static final LocationVariable default_self =
-                new LocationVariable(new ProgramElementName("$SELF$"), new KeYJavaType());
+        private static final LocationVariable default_self = new LocationVariable(
+                new ProgramElementName("$SELF$"), new KeYJavaType());
 
         /**
          * The {@link Model} to be populated by visiting the associated Term.
@@ -357,8 +371,10 @@ public class PathconditionParser
             /*
              * Add the root variable and instance to the Model
              */
-            ModelInstance selfInstance = new ModelInstance(default_self.getKeYJavaType());
-            ModelVariable self = new ModelVariable(default_self, "self", selfInstance);
+            ModelInstance selfInstance = new ModelInstance(
+                    default_self.getKeYJavaType());
+            ModelVariable self = new ModelVariable(default_self, "self",
+                    selfInstance);
             model.add(self, selfInstance);
         }
 
@@ -373,19 +389,21 @@ public class PathconditionParser
         }
 
         /**
-         * Visit a {@link Term} node, extracting any data related to {@link ProgramVariable}
-         * instances in this node, if any. If such data is found, it will be encoded in a
-         * {@link ModelVariable} format.
+         * Visit a {@link Term} node, extracting any data related to
+         * {@link ProgramVariable} instances in this node, if any. If such data
+         * is found, it will be encoded in a {@link ModelVariable} format.
          * <p>
-         * <strong>IMPORTANT:</strong> Due to how {@link Term} ASTs are implemented, this method
-         * will only have the desired effect if the visitation is carried out in postorder. Preorder
-         * will cause the Model to be constructed with wrong parent-child relationships.
+         * <strong>IMPORTANT:</strong> Due to how {@link Term} ASTs are
+         * implemented, this method will only have the desired effect if the
+         * visitation is carried out in postorder. Preorder will cause the Model
+         * to be constructed with wrong parent-child relationships.
          * <p>
-         * To achieve correct results, thus, please only pass this visitor as a parameter to
+         * To achieve correct results, thus, please only pass this visitor as a
+         * parameter to
          * {@link Term#execPostOrder(de.uka.ilkd.key.logic.Visitor)}
          * <p>
-         * TODO: This entire class should be re-implemented as a one-way parser. See
-         * {@link PathconditionParser}.
+         * TODO: This entire class should be re-implemented as a one-way parser.
+         * See {@link PathconditionParser}.
          */
         @Override
         public void visit(Term visited) {
@@ -398,9 +416,10 @@ public class PathconditionParser
         }
 
         /**
-         * Parse a {@link Term} representing a program variable. Such a Term can be either a plain
-         * local declaration (i.e. a {@link LocationVariable}), or it can be part of a nested
-         * hierarchy (i.e. a {@link SortDependingFunction}). We treat both cases here.
+         * Parse a {@link Term} representing a program variable. Such a Term can
+         * be either a plain local declaration (i.e. a {@link LocationVariable}
+         * ), or it can be part of a nested hierarchy (i.e. a
+         * {@link SortDependingFunction}). We treat both cases here.
          * 
          * @param term
          *            the term to parse
@@ -408,71 +427,78 @@ public class PathconditionParser
         private void parseVariableTerm(Term term) {
 
             /*
-             * If the program variable instance resolves to null, it does not correspond to a
-             * variable type recognized by KeYTestGen (this is likely to change in the future).
+             * If the program variable instance resolves to null, it does not
+             * correspond to a variable type recognized by KeYTestGen (this is
+             * likely to change in the future).
              * 
-             * Also, if the variable corresponds to the root type, we do not process it (since it is
-             * already part of the model by default.
+             * Also, if the variable corresponds to the root type, we do not
+             * process it (since it is already part of the model by default.
              * 
-             * FIXME: There must be a cleaner way of checking if the root variable has been found -
-             * this is a terribly ugly hack. Check if sort is null instead? What other variables (if
-             * any) may have nulled sorts?
+             * FIXME: There must be a cleaner way of checking if the root
+             * variable has been found - this is a terribly ugly hack. Check if
+             * sort is null instead? What other variables (if any) may have
+             * nulled sorts?
              */
             ProgramVariable programVariable = getVariable(term);
-            if (programVariable == null || programVariable.toString().equals("$SELF$")) {
+            if (programVariable == null
+                    || programVariable.toString().equals("$SELF$")) {
                 return;
             }
 
             /*
-             * Create the variable itself, together with its corresponding instance. If the variable
-             * is a primitive type, a corresponding wrapper class has to be generated in order to
-             * represent its value. If it is not primitive, we simply create a new ModelInstance to
-             * hold any reference object.
+             * Create the variable itself, together with its corresponding
+             * instance. If the variable is a primitive type, a corresponding
+             * wrapper class has to be generated in order to represent its
+             * value. If it is not primitive, we simply create a new
+             * ModelInstance to hold any reference object.
              */
             String identifier = resolveIdentifierString(term);
-            ModelVariable variable = new ModelVariable(programVariable, identifier);
+            ModelVariable variable = new ModelVariable(programVariable,
+                    identifier);
 
             Object instance = null;
             if (isPrimitiveType(term)) {
                 instance = resolvePrimitiveType(programVariable);
-            }
-            else {
+            } else {
                 instance = new ModelInstance(programVariable.getKeYJavaType());
             }
 
             /*
-             * Add the variable and its instance to the Model. This might seem premature, but must
-             * be done to preserve referential integrity and avoiding extra work.
+             * Add the variable and its instance to the Model. This might seem
+             * premature, but must be done to preserve referential integrity and
+             * avoiding extra work.
              */
             model.add(variable, instance);
 
             /*
-             * If the term is a SortDependingFunction, we are faced with two possibilities:
+             * If the term is a SortDependingFunction, we are faced with two
+             * possibilities:
              * 
-             * 1. the variable in question may be a field of some instance. In this case, we attempt
-             * to resolve the variable pointing to this instance, in order to add the our newly
-             * created variable as a field of that instance.
+             * 1. the variable in question may be a field of some instance. In
+             * this case, we attempt to resolve the variable pointing to this
+             * instance, in order to add the our newly created variable as a
+             * field of that instance.
              * 
-             * 2. the variable is null, in which case this variable must be a static field of its
-             * declaring class. In this case, it is not part of any instance, and we let the parent
-             * remain null.
+             * 2. the variable is null, in which case this variable must be a
+             * static field of its declaring class. In this case, it is not part
+             * of any instance, and we let the parent remain null.
              */
             if (term.op().getClass() == SortDependingFunction.class) {
 
                 ProgramVariable parentVariable = getVariable(term.sub(1));
 
                 /*
-                 * The parent is not null, and this variable is hence an instance variable of some
-                 * class. Connect it to the parent.
+                 * The parent is not null, and this variable is hence an
+                 * instance variable of some class. Connect it to the parent.
                  */
                 if (parentVariable != null) {
-                    String parentIdentifier = resolveIdentifierString(term.sub(1));
-                    ModelVariable parentModelVariable =
-                            new ModelVariable(parentVariable, parentIdentifier);
+                    String parentIdentifier = resolveIdentifierString(term
+                            .sub(1));
+                    ModelVariable parentModelVariable = new ModelVariable(
+                            parentVariable, parentIdentifier);
 
                     model.assignField(variable, parentModelVariable);
-                }
-                else if (!programVariable.isStatic()) {
+                } else if (!programVariable.isStatic()) {
 
                     ModelVariable self = new ModelVariable(default_self, "self");
                     model.assignField(variable, self);
@@ -480,9 +506,10 @@ public class PathconditionParser
             }
 
             /*
-             * Finally, if the variable was not a SortDependentFunction (i.e. did not have an
-             * explicitly declared parent), we deduce that it is a locally declared variable, and
-             * hence set its parent to be the root class.
+             * Finally, if the variable was not a SortDependentFunction (i.e.
+             * did not have an explicitly declared parent), we deduce that it is
+             * a locally declared variable, and hence set its parent to be the
+             * root class.
              */
             else {
                 ModelVariable self = new ModelVariable(default_self, "self");
@@ -491,29 +518,33 @@ public class PathconditionParser
         }
 
         /**
-         * Retrieve the {@link ProgramVariable} represented by a given {@link Term}, if any.
+         * Retrieve the {@link ProgramVariable} represented by a given
+         * {@link Term}, if any.
          * 
          * @param term
          *            the term to process
-         * @return the {@link ProgramVariable} corresponding to the Term, iff. the Term represents a
-         *         variable.
+         * @return the {@link ProgramVariable} corresponding to the Term, iff.
+         *         the Term represents a variable.
          */
         private ProgramVariable getVariable(Term term) {
 
             Operator operator = term.op();
 
             /*
-             * Process an instance of ProgramVariable (most often, this will be a LocationVariable).
-             * Such an object will represent a non-static field of some class, and its parent is as
-             * such simply an instance of that class.
+             * Process an instance of ProgramVariable (most often, this will be
+             * a LocationVariable). Such an object will represent a non-static
+             * field of some class, and its parent is as such simply an instance
+             * of that class.
              */
             if (operator instanceof ProgramVariable) {
 
                 /*
-                 * KeY represents the heap as a LocationVariable as well. We cannot(?) do anything
-                 * useful with it, so we ignore it. However, if the LocationVariable correspons to
-                 * "self" (i.e. the root variable), we return the default root, although we first
-                 * properly set the type (which is not needed, but nice to have).
+                 * KeY represents the heap as a LocationVariable as well. We
+                 * cannot(?) do anything useful with it, so we ignore it.
+                 * However, if the LocationVariable correspons to "self" (i.e.
+                 * the root variable), we return the default root, although we
+                 * first properly set the type (which is not needed, but nice to
+                 * have).
                  */
                 if (!operator.toString().equalsIgnoreCase("heap")) {
 
@@ -524,18 +555,18 @@ public class PathconditionParser
                         default_self.getKeYJavaType().setJavaType(realType);
 
                         return default_self;
-                    }
-                    else {
+                    } else {
                         return (ProgramVariable) operator;
                     }
                 }
             }
 
             /*
-             * Process a normal Function. This step is necessary since the root instance of the
-             * class holding the method under test (i.e. "self") will be of this type. If self is
-             * encountered, insert a placebo variable for it (since KeY does not always create a
-             * native variable for it).
+             * Process a normal Function. This step is necessary since the root
+             * instance of the class holding the method under test (i.e. "self")
+             * will be of this type. If self is encountered, insert a placebo
+             * variable for it (since KeY does not always create a native
+             * variable for it).
              */
             if (operator.getClass() == Function.class) {
 
@@ -550,8 +581,9 @@ public class PathconditionParser
             }
 
             /*
-             * Process a SortDependingFunction. A Term of this sort represents a recursively defined
-             * variable (i.e. a variable at the end of a nested hiearchy, such as
+             * Process a SortDependingFunction. A Term of this sort represents a
+             * recursively defined variable (i.e. a variable at the end of a
+             * nested hiearchy, such as
              * self.nestedObject.anotherNestedObject.variable).
              */
             if (operator.getClass() == SortDependingFunction.class) {
@@ -562,13 +594,14 @@ public class PathconditionParser
         }
 
         /**
-         * Works around the fact that KeY inserts the "$" sign into {@link Term}s, which messes with
-         * the variable lookup of the {@link JavaInfo} instance.
+         * Works around the fact that KeY inserts the "$" sign into {@link Term}
+         * s, which messes with the variable lookup of the {@link JavaInfo}
+         * instance.
          * 
          * @param term
          *            a {@link Term} with a sort of type Field
-         * @return the {@link ProgramVariable} instance corresponding to the field represented by
-         *         the Term
+         * @return the {@link ProgramVariable} instance corresponding to the
+         *         field represented by the Term
          */
         private ProgramVariable getProgramVariableForField(Term term) {
 
@@ -590,8 +623,8 @@ public class PathconditionParser
         private Object resolvePrimitiveType(ProgramVariable variable) {
 
             /*
-             * FIXME: Horrible. Do not do String comparison here, find a convenient way to compare
-             * based on types.
+             * FIXME: Horrible. Do not do String comparison here, find a
+             * convenient way to compare based on types.
              */
             String typeName = variable.getKeYJavaType().getFullName();
             if (typeName.equals("int")) {
@@ -608,21 +641,19 @@ public class PathconditionParser
             }
             if (typeName.equals("char")) {
                 return new Character('0');
-            }
-            else {
+            } else {
                 return null;
             }
         }
     }
 
     /**
-     * Looks for junctors in a {@link Term}, and reflects their semantic meaning in the
-     * {@link Model} corresponding to the term.
+     * Looks for junctors in a {@link Term}, and reflects their semantic meaning
+     * in the {@link Model} corresponding to the term.
      * 
      * @author christopher
      */
-    private static class ReferenceVisitor
-            extends Visitor {
+    private static class ReferenceVisitor extends Visitor {
 
         /**
          * Flag to indicate if we have seen a Not operator.
@@ -630,8 +661,8 @@ public class PathconditionParser
         private boolean sawNot;
 
         /**
-         * The {@link Model} instance associated with the Term being visited. Constructed separately
-         * by an instance of {@link ContextVisitor}.
+         * The {@link Model} instance associated with the Term being visited.
+         * Constructed separately by an instance of {@link ContextVisitor}.
          */
         private final Model model;
 
@@ -645,32 +676,35 @@ public class PathconditionParser
 
             Operator operator = visited.op();
 
-            if (operator instanceof Junctor && operator.toString().equals("not")) {
+            if (operator instanceof Junctor
+                    && operator.toString().equals("not")) {
                 sawNot = true;
-            }
-            else if (operator instanceof Equality && !sawNot) {
+            } else if (operator instanceof Equality && !sawNot) {
                 parseEquals(visited);
                 sawNot = false;
-            }
-            else if (operator instanceof Junctor) {
+            } else if (operator instanceof Junctor) {
                 sawNot = false;
             }
         }
 
         /**
-         * Equality has to be dealt with depending on the type of the <strong>left-hand</strong>
-         * variable, since this is the operand which will determine the meaning of the equality.
+         * Equality has to be dealt with depending on the type of the
+         * <strong>left-hand</strong> variable, since this is the operand which
+         * will determine the meaning of the equality.
          * <p>
-         * If the variable is <strong>primitve</strong>, equality, in our abstraction, implies a
-         * value assignment: equals(a,b) simply means that the value of b is copied into a. There is
-         * no need to do this explicitly here, since the SMT interface will taking care of this, and
-         * we would thus only be performing the same work twice.
+         * If the variable is <strong>primitve</strong>, equality, in our
+         * abstraction, implies a value assignment: equals(a,b) simply means
+         * that the value of b is copied into a. There is no need to do this
+         * explicitly here, since the SMT interface will taking care of this,
+         * and we would thus only be performing the same work twice.
          * <p>
-         * If the variable is a <strong>reference</strong> type, things get more interesting, since
-         * equality in this case implies that the operands are pointing to a common object in
-         * memory. To represent this in our abstraction, we need to cross-reference to Value
-         * property of both operands, making them point to each other. We do this by making sure
-         * that whatever Value is assigned to both operands has the same unique identifier.
+         * If the variable is a <strong>reference</strong> type, things get more
+         * interesting, since equality in this case implies that the operands
+         * are pointing to a common object in memory. To represent this in our
+         * abstraction, we need to cross-reference to Value property of both
+         * operands, making them point to each other. We do this by making sure
+         * that whatever Value is assigned to both operands has the same unique
+         * identifier.
          * 
          * @param term
          *            the term to process
@@ -688,11 +722,11 @@ public class PathconditionParser
                 String leftOperandIdentifier = resolveIdentifierString(leftOperand);
                 String rightOperandIdentifier = resolveIdentifierString(rightOperand);
 
-                ModelVariable leftModelVariable =
-                        model.getVariableByReference(leftOperandIdentifier);
+                ModelVariable leftModelVariable = model
+                        .getVariableByReference(leftOperandIdentifier);
 
-                ModelVariable rightModelVariable =
-                        model.getVariableByReference(rightOperandIdentifier);
+                ModelVariable rightModelVariable = model
+                        .getVariableByReference(rightOperandIdentifier);
 
                 model.assignPointer(leftModelVariable, rightModelVariable);
             }

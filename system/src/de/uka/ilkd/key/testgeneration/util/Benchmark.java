@@ -13,20 +13,20 @@ public class Benchmark {
     private static final HashMap<String, Long> readings = new HashMap<String, Long>();
 
     public static int[] counters = new int[100];
-    
+
     private static long stopWatch = 0L;
 
     public static void resetStopwatch() {
         stopWatch = Calendar.getInstance().getTimeInMillis();
     }
-    
+
     public static long readStopWatch() {
         return Calendar.getInstance().getTimeInMillis() - stopWatch;
     }
-    
+
     /**
-     * Resets the clock (i.e. sets it to the current time, since all readings are done relative to
-     * this).
+     * Resets the clock (i.e. sets it to the current time, since all readings
+     * are done relative to this).
      */
     public static void startBenchmarking(String event) {
 
@@ -35,7 +35,8 @@ public class Benchmark {
     }
 
     /**
-     * Registers the clockValue it took to move from the last clock reading to this event.
+     * Registers the clockValue it took to move from the last clock reading to
+     * this event.
      * 
      * @param item
      */

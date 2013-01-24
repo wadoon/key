@@ -2,7 +2,6 @@ package de.uka.ilkd.key.testgeneration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -10,20 +9,15 @@ import org.junit.Test;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTTranslator;
-import de.uka.ilkd.key.smt.SmtLib2Translator;
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
@@ -32,44 +26,41 @@ import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-public class Sandbox
-        extends KeYTestGenTest {
+public class Sandbox extends KeYTestGenTest {
 
-    private final String javaPathInBaseDir =
-            "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
+    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
     private final String containerTypeName = "PrimitiveIntegerOperations";
 
     @Test
-    public void test()
-            throws ProofInputException, ModelGeneratorException, IOException,
-            XMLGeneratorException, ProblemLoaderException, IllegalFormulaException {
+    public void test() throws ProofInputException, ModelGeneratorException,
+            IOException, XMLGeneratorException, ProblemLoaderException,
+            IllegalFormulaException {
 
         String method = "midTwoProxy";
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment =
-                getEnvironmentForMethod(method);
+        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
-        List<IExecutionNode> nodes =
-                retrieveNode(environment.getBuilder().getStartNode(), "mid=x");
+        List<IExecutionNode> nodes = retrieveNode(environment.getBuilder()
+                .getStartNode(), "mid=x");
 
-        ModelGenerator modelGenerator = ModelGenerator.getDefaultModelGenerator();
-        
+        ModelGenerator modelGenerator = ModelGenerator
+                .getDefaultModelGenerator();
+
         for (IExecutionNode node : nodes) {
-            Term toSolve =
-                    TermFactory.DEFAULT.createTerm(Junctor.NOT, node.getPathCondition());
+            Term toSolve = TermFactory.DEFAULT.createTerm(Junctor.NOT,
+                    node.getPathCondition());
             toSolve = PathconditionParser.simplifyTerm(toSolve);
-            SMTTranslator translator =
-                    SolverType.Z3_SOLVER.createTranslator(environment.getServices());
-            System.out.println(translator.translateProblem(toSolve, node.getServices(),
-                    new SMTSettings2()));
-            
+            SMTTranslator translator = SolverType.Z3_SOLVER
+                    .createTranslator(environment.getServices());
+            System.out.println(translator.translateProblem(toSolve,
+                    node.getServices(), new SMTSettings2()));
+
             modelGenerator.generateModel(node);
         }
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
-            String method)
-            throws ProofInputException, ModelGeneratorException, IOException,
-            ProblemLoaderException {
+            String method) throws ProofInputException, ModelGeneratorException,
+            IOException, ProblemLoaderException {
 
         return getPreparedEnvironment(keyRepDirectory, javaPathInBaseDir,
                 containerTypeName, method, null, false);
@@ -80,8 +71,8 @@ public class Sandbox
      * 
      * @author christopher
      */
-    private static class SMTSettings2
-            implements de.uka.ilkd.key.smt.SMTSettings {
+    private static class SMTSettings2 implements
+            de.uka.ilkd.key.smt.SMTSettings {
 
         @Override
         public int getMaxConcurrentProcesses() {
@@ -98,7 +89,8 @@ public class Sandbox
         @Override
         public String getSMTTemporaryFolder() {
 
-            return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
+            return PathConfig.getKeyConfigDir() + File.separator
+                    + "smt_formula";
         }
 
         @Override

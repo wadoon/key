@@ -25,7 +25,8 @@ public final class CommandLineInterface {
          * Default output for no-args invocations.
          */
         if (args.length == 0) {
-            System.out.println("No arguments specified. Type -h or --help for usage instructions");
+            System.out
+                    .println("No arguments specified. Type -h or --help for usage instructions");
             System.exit(0);
         }
 
@@ -38,13 +39,14 @@ public final class CommandLineInterface {
     private static class CommandLineInterfaceWorker {
 
         /**
-         * The {@link XMLTestCaseGenerator} to use for the session serviced by this worker.
+         * The {@link XMLTestCaseGenerator} to use for the session serviced by
+         * this worker.
          */
         private XMLTestCaseGenerator testCaseGenerator = null;
 
         /**
-         * The {@link CommandParser} and {@link JCommander} processor to use for the session
-         * serviced by this worker.
+         * The {@link CommandParser} and {@link JCommander} processor to use for
+         * the session serviced by this worker.
          */
         CommandParser parser = new CommandParser();
         JCommander processor = new JCommander(parser);
@@ -56,8 +58,7 @@ public final class CommandLineInterface {
 
             try {
                 testCaseGenerator = XMLTestCaseGenerator.getDefaultInstance();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);
             }
@@ -65,7 +66,8 @@ public final class CommandLineInterface {
         }
 
         /**
-         * Executes a single test case generation session based on the user provided parameters.
+         * Executes a single test case generation session based on the user
+         * provided parameters.
          * 
          * @param args
          *            user provided parameters.
@@ -115,18 +117,18 @@ public final class CommandLineInterface {
                  * TODO: method selection needs to be implemented.
                  */
                 if (!parser.getMethods().isEmpty()) {
-                    System.out.println("Warning: method selection not implemented yet");
+                    System.out
+                            .println("Warning: method selection not implemented yet");
                 }
 
                 /*
-                 * Generate test suites for each file and each framework specified by the user, and
-                 * write them to disc.
+                 * Generate test suites for each file and each framework
+                 * specified by the user, and write them to disc.
                  */
                 for (String framework : parser.getTestFrameworks()) {
                     generateTestCases(framework, parser.getFiles());
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);
             }
@@ -144,19 +146,20 @@ public final class CommandLineInterface {
         private void generateTestCases(String framework, List<File> files)
                 throws IOException {
 
-            ITestCaseParser<String> testCaseParser =
-                    CLIResources.INSTANCE.getFrameworkParser(framework);
+            ITestCaseParser<String> testCaseParser = CLIResources.INSTANCE
+                    .getFrameworkParser(framework);
 
             /*
-             * Create an output folder for the framework files, and write the generated test suite
-             * to it..
+             * Create an output folder for the framework files, and write the
+             * generated test suite to it..
              */
             File directory = new File(framework);
             directory.mkdir();
             for (File file : files) {
 
-                String testSuite =null;
-                   //    testCaseGenerator.generateTestCases(testCaseParser, file, true);
+                String testSuite = null;
+                // testCaseGenerator.generateTestCases(testCaseParser, file,
+                // true);
 
                 File output = new File(framework + "\\" + file.getName());
                 output.createNewFile();
@@ -165,8 +168,7 @@ public final class CommandLineInterface {
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 try {
                     bufferedWriter.write(testSuite);
-                }
-                finally {
+                } finally {
                     bufferedWriter.close();
                 }
             }
@@ -193,20 +195,21 @@ public final class CommandLineInterface {
          */
         private static void printAbout() {
 
-            System.out.println("\nKeYTestGen version 2.0\n\n"
-                    + "KeYTestGen2 is part of the KeY project, a system for integrated, deductive\n"
-                    + "software design. For more info, please visit: <www.key-project.org>\n\n"
-                    + "Copyright (C) 2013 Christopher Svanefalk\n"
-                    + "This program is free software: you can redistribute it and/or modify\n"
-                    + "it under the terms of the GNU General Public License as published by\n"
-                    + "the Free Software Foundation, either version 3 of the License, or\n"
-                    + "(at your option) any later version.\n\n"
-                    + "This program is distributed in the hope that it will be useful,\n"
-                    + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-                    + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-                    + "GNU General Public License for more details.\n\n"
-                    + "You should have received a copy of the GNU General Public License\n"
-                    + "along with this program.  If not, see <http://www.gnu.org/licenses/>.");
+            System.out
+                    .println("\nKeYTestGen version 2.0\n\n"
+                            + "KeYTestGen2 is part of the KeY project, a system for integrated, deductive\n"
+                            + "software design. For more info, please visit: <www.key-project.org>\n\n"
+                            + "Copyright (C) 2013 Christopher Svanefalk\n"
+                            + "This program is free software: you can redistribute it and/or modify\n"
+                            + "it under the terms of the GNU General Public License as published by\n"
+                            + "the Free Software Foundation, either version 3 of the License, or\n"
+                            + "(at your option) any later version.\n\n"
+                            + "This program is distributed in the hope that it will be useful,\n"
+                            + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                            + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                            + "GNU General Public License for more details.\n\n"
+                            + "You should have received a copy of the GNU General Public License\n"
+                            + "along with this program.  If not, see <http://www.gnu.org/licenses/>.");
         }
     }
 }
