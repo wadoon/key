@@ -145,7 +145,7 @@ public enum KeYInterface {
 
     /**
      * Assert that a given object is not null, and generate an exception if it
-     * is
+     * is.
      * 
      * @param object
      *            the object to check
@@ -163,7 +163,7 @@ public enum KeYInterface {
     }
 
     /**
-     * Create a {@link Proof} for a given method
+     * Create a {@link Proof} for a given method.
      * 
      * @param initConfig
      *            the {@link InitConfig} instance for the Java file which the

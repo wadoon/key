@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.testgeneration;
 
 /**
- * Default supertype for all exceptions which can be thrown from any module in
- * KeYTestGen
+ * Default supertype for all exceptions that can be thrown from any module in
+ * KeYTestGen.
  * 
  * @author christopher
  */

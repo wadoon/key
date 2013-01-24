@@ -79,11 +79,6 @@ public class ModelGenerator implements IModelGenerator {
     public static ModelGenerator getDefaultModelGenerator()
             throws ModelGeneratorException {
 
-        /*
-         * TODO: Use embedded solver so that this no longer throws exceptions
-         */
-        verifySolverAvailability(SolverType.Z3_SOLVER);
-
         return new ModelGenerator(new SMTSettings(), SolverType.Z3_SOLVER);
     }
 
@@ -128,53 +123,11 @@ public class ModelGenerator implements IModelGenerator {
      * @throws ModelGeneratorException
      *             in the event that the instantiation went wrong
      */
-    private Model instantiateModel(Model model, SMTSolverResult smtResult)
-            throws ModelGeneratorException {
+    private Model instantiateModel(Model model, SMTSolverResult smtResult) {
 
-        try {
-
-            /*
-             * Extract the concrete values of any primitive values on the heap
-             * representation, using the Z3 parser.
-             */
-            HashMap<String, ValueContainer> rawModel = null;
-            while (true) {
-                String modelOutput = consolidateModelOutput(smtResult
-                        .getOutput());
-                System.out.println(modelOutput);
-                rawModel = Z3ModelParser.parseModel(modelOutput.replaceAll(
-                        "sat", "")); // Hack to
-                                     // address
-                                     // changes
-                                     // to master
-
-                if (rawModel != null) {
-                    break;
-                }
-            }
-
-            /*
-             * Insert the generated values into the Model
-             */
-            for (ValueContainer container : rawModel.values()) {
-
-                /*
-                 * FIXME: This is living proof that the fundamental abstraction
-                 * does not work and needs to be completely redone. Fix this
-                 * when time allows.
-                 */
-                String identifier = container.getName();
-                ModelVariable variable = model
-                        .getVariableByReference(identifier);
-                variable.setValue(container.getValue());
-            }
-
-            return model;
-        } catch (ParseException pe) {
-            throw new ModelGeneratorException(pe.getMessage()
-                    + "\nThe defunct model is:\n"
-                    + consolidateModelOutput(smtResult.getOutput()));
-        }
+        String modelOutput = consolidateModelOutput(smtResult.getOutput());
+        model.consumeSMTOutput(modelOutput);
+        return model;
     }
 
     /**
@@ -231,7 +184,7 @@ public class ModelGenerator implements IModelGenerator {
              * encapsulated in the existing SMTProblem.
              */
             try {
-                launcher.launch(problem, services, SolverType.Z3_SOLVER);
+                launcher.launch(problem, services, SolverType.KeYnterpol);
 
                 result = problem.getFinalResult();
 
@@ -471,7 +424,7 @@ public class ModelGenerator implements IModelGenerator {
         @Override
         public String getLogic() {
 
-            return "AUFLIA";
+            return "QF_UFLIRA";
         }
 
         @Override

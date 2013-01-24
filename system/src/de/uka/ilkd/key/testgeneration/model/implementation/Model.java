@@ -233,6 +233,53 @@ public class Model implements IModel {
     }
 
     /**
+     * Consumes the output of an SMT solver, connecting values to their
+     * corresponding variables.
+     * 
+     * @param smtOutput
+     */
+    public void consumeSMTOutput(String smtOutput) {
+        
+        /*
+         * Break the SMT output into individual variable declarations and process them separately.
+         */
+        String[] definitions = smtOutput.trim().split("\\(define-fun");
+        for (String definition : definitions) {
+
+            if (!definition.isEmpty()) {
+
+                definition = definition.trim();
+
+                /*
+                 * Extract the variable name
+                 */
+                String varName = definition.substring(0, definition.lastIndexOf('_'));
+                    
+                /*
+                 * Extract the value
+                 */
+                String result = "";
+                boolean negFlag = false;
+                for(int i = definition.indexOf(' '); i < definition.length(); i++) {
+                    
+                    char currentChar = definition.charAt(i);
+                    
+                    if(!negFlag && currentChar == '-') {
+                        negFlag = true;
+                    }
+                    
+                    if(Character.isDigit(currentChar)) {
+                        result += currentChar;
+                    }
+                }
+                
+                Integer value = (negFlag) ? Integer.parseInt(result) * -1 : Integer.parseInt(result);
+                getVariableByReference(varName).setValue(value);
+            }
+        }
+    }
+
+    /**
      * Determines if a given {@link ModelVariable} satisfied the conditions
      * postulated in a given set of {@link IModelFilter} instances.
      * 
