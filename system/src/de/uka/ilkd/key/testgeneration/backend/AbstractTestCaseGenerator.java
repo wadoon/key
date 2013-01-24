@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration;
+package de.uka.ilkd.key.testgeneration.backend;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration;
+package de.uka.ilkd.key.testgeneration.backend;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;

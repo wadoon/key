@@ -274,7 +274,10 @@ public class Model implements IModel {
                 }
                 
                 Integer value = (negFlag) ? Integer.parseInt(result) * -1 : Integer.parseInt(result);
-                getVariableByReference(varName).setValue(value);
+                ModelVariable variable = getVariableByReference(varName);
+                if(variable != null) {
+                    variable.setValue(value);
+                }
             }
         }
     }

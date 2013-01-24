@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.cli;
+package de.uka.ilkd.key.testgeneration.frontend.cli;
 
 import java.io.File;
 

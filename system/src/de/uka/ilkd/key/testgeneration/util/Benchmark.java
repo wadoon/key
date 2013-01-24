@@ -45,6 +45,7 @@ public class Benchmark {
         long clockValue = readings.get(event);
         long finalClockValue = Calendar.getInstance().getTimeInMillis();
 
+        System.out.println("BENCHMARK: " + event + " took " + (finalClockValue - clockValue));
         readings.put(event, finalClockValue - clockValue);
     }
 

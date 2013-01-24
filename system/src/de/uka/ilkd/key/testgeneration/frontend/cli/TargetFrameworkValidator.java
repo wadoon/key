@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.cli;
+package de.uka.ilkd.key.testgeneration.frontend.cli;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.ParameterException;

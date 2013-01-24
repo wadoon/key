@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.xml;
+package de.uka.ilkd.key.testgeneration.backend.xml;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -20,8 +20,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.testgeneration.TestCase;
-import de.uka.ilkd.key.testgeneration.XMLHandler;
+import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
@@ -30,6 +29,8 @@ import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
 import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
+import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
+import de.uka.ilkd.key.testgeneration.xml.XMLHandler;
 import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 
 /**

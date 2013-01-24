@@ -1,4 +1,6 @@
-package de.uka.ilkd.key.testgeneration;
+package de.uka.ilkd.key.testgeneration.backend;
+
+import de.uka.ilkd.key.testgeneration.KeYTestGenException;
 
 public class TestGeneratorException extends KeYTestGenException {
 

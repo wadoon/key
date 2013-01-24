@@ -1,15 +1,19 @@
-package de.uka.ilkd.key.testgeneration;
+package de.uka.ilkd.key.testgeneration.backend.xml;
 
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.TestCase;
+import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
+import de.uka.ilkd.key.testgeneration.codecoverage.implementation.StatementCoverageParser;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
-import de.uka.ilkd.key.testgeneration.xml.XMLGenerator;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 
@@ -125,6 +129,10 @@ public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
 
         try {
 
+            if(coverage == null) {
+                coverage = new StatementCoverageParser();
+            }
+            
             List<TestCase> testCases = generatePartialTestSuiteHelper(source,
                     coverage, methods);
 

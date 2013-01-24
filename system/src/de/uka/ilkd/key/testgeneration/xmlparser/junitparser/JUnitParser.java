@@ -12,7 +12,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import de.uka.ilkd.key.testgeneration.XMLHandler;
+import de.uka.ilkd.key.testgeneration.xml.XMLHandler;
 import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 import de.uka.ilkd.key.testgeneration.xmlparser.XMLParserException;
 

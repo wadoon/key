@@ -1,7 +1,10 @@
-package de.uka.ilkd.key.testgeneration;
+package de.uka.ilkd.key.testgeneration.backend.junit;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
 
 /**

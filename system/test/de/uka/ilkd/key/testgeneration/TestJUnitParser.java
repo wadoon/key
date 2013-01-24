@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;

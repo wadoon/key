@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
-import de.uka.ilkd.key.testgeneration.TestGeneratorException;
+import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.oraclegeneration.OracleGeneratorException;
 

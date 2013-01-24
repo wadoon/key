@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.cli;
+package de.uka.ilkd.key.testgeneration.frontend.cli;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,7 +9,7 @@ import java.util.List;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 
-import de.uka.ilkd.key.testgeneration.XMLTestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.xml.XMLTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 
 /**
