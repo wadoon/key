@@ -8,14 +8,12 @@ import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.backend.xml.XMLGenerator;
 import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.codecoverage.implementation.StatementCoverageParser;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
-import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 
 /**
  * Instances of this implementation of {@link ITestCaseGenerator} generate test

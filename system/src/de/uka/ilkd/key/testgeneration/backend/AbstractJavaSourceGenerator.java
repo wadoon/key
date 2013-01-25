@@ -56,7 +56,7 @@ public abstract class AbstractJavaSourceGenerator {
 
         if (annotations != null) {
             for (String annotation : annotations) {
-                writeLine(annotation);
+                writeLine(annotation + "\n");
             }
         }
 
@@ -65,7 +65,7 @@ public abstract class AbstractJavaSourceGenerator {
         output.append(visibility + " ");
         output.append(modifier + " ");
         output.append("class" + " ");
-        output.append("Test" + name);
+        output.append(name);
         output.append(" {\n");
 
         indentation++;
@@ -127,7 +127,7 @@ public abstract class AbstractJavaSourceGenerator {
 
         if (annotations != null) {
             for (String annotation : annotations) {
-                writeLine(annotation);
+                writeLine(annotation + "\n");
             }
         }
 
@@ -167,7 +167,46 @@ public abstract class AbstractJavaSourceGenerator {
     protected void writeLine(String text) {
 
         indent();
-        output.append(text + "\n");
+        output.append(text);
+    }
+
+    /**
+     * Writes a nested Java comment.
+     * 
+     * @param text
+     *            text of comment
+     */
+    protected void writeComment(String text, boolean isJavadoc) {
+
+        if (isJavadoc) {
+            writeLine("/**\n");
+        } else {
+            writeLine("/*\n");
+        }
+
+        String[] words = text.split(" ");
+
+        writeLine(" *");
+        int characterCount = 0;
+        for (String word : words) {
+
+            if (word.trim().isEmpty()) {
+                continue;
+            }
+
+            if (characterCount >= 50) {
+                characterCount = 0;
+                output.append(" "+ word + "\n");
+                writeLine(" *");
+                continue;
+            } else {
+                output.append(" " + word);
+                characterCount += word.length();
+            }
+        }
+        output.append("\n");
+
+        writeLine(" */\n");
     }
 
     /**
@@ -194,5 +233,9 @@ public abstract class AbstractJavaSourceGenerator {
 
     protected String getCurrentOutput() {
         return output.toString();
+    }
+
+    protected void appendToOutput(String text) {
+        output.append(text);
     }
 }
