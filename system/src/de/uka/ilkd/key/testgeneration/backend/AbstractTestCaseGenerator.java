@@ -71,8 +71,7 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
         this.modelGenerator = modelGenerator;
     }
 
-    protected List<TestCase> generatePartialTestSuiteHelper(String source,
-            ICodeCoverageParser codeCoverageParser, String... methods)
+    protected KeYJavaClass extractKeYJavaClass(String source)
             throws TestGeneratorException {
 
         try {
@@ -83,16 +82,33 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
              */
             Benchmark
                     .startBenchmarking("setting up class and method abstractions");
-            KeYJavaClass targetClass = keYJavaClassFactory
+
+            KeYJavaClass keYJavaClass = keYJavaClassFactory
                     .createKeYJavaClass(new File(source));
+
+            Benchmark
+                    .finishBenchmarking("setting up class and method abstractions");
+
+            return keYJavaClass;
+
+        } catch (KeYInterfaceException e) {
+            throw new TestGeneratorException(e.getMessage());
+        } catch (IOException e) {
+            throw new TestGeneratorException(e.getMessage());
+        }
+
+    }
+
+    protected List<TestCase> createTestCases(KeYJavaClass targetClass,
+            ICodeCoverageParser codeCoverageParser, String... methods)
+            throws TestGeneratorException {
+
+        try {
 
             List<TestCase> testCases = new LinkedList<TestCase>();
 
             for (String method : methods) {
                 KeYJavaMethod targetMethod = targetClass.getMethod(method);
-
-                Benchmark
-                        .finishBenchmarking("setting up class and method abstractions");
 
                 /*
                  * Retrieve the symbolic execution tree for the method, and
@@ -102,23 +118,24 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
                 Benchmark.startBenchmarking("getting code coverage nodes");
                 IExecutionStartNode root = keYInterface
                         .getSymbolicExecutionTree(targetMethod);
+
                 List<IExecutionNode> targetNodes = codeCoverageParser
                         .retrieveNodes(root);
                 Benchmark.finishBenchmarking("getting code coverage nodes");
+
                 /*
                  * Extract the postcondition for the method, and generate test
                  * cases for each of the nodes.
                  */
                 Benchmark.startBenchmarking("create test case abstractions");
-                testCases.addAll(createTestCases(targetMethod, targetNodes));
+                testCases.addAll(createTestCasesForMethod(targetMethod,
+                        targetNodes));
                 Benchmark.finishBenchmarking("create test case abstractions");
             }
 
             return testCases;
 
         } catch (KeYInterfaceException e) {
-            throw new TestGeneratorException(e.getMessage());
-        } catch (IOException e) {
             throw new TestGeneratorException(e.getMessage());
         }
     }
@@ -140,7 +157,7 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
      * @throws TestGeneratorException
      *             in the event there was a failure to generate a test case
      */
-    protected List<TestCase> createTestCases(KeYJavaMethod method,
+    protected List<TestCase> createTestCasesForMethod(KeYJavaMethod method,
             List<IExecutionNode> nodes) throws TestGeneratorException {
 
         List<TestCase> testCases = new LinkedList<TestCase>();
@@ -154,9 +171,11 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
                     + ++Benchmark.counters[0]);
             IModel model = null;
             while (model == null) {
+
                 try {
 
                     model = modelGenerator.generateModel(node);
+
                 } catch (ModelGeneratorException e) {
                     System.err.println("WARNING: Model generation failed!");
                 }

@@ -79,7 +79,7 @@ public class ModelGenerator implements IModelGenerator {
     public static ModelGenerator getDefaultModelGenerator()
             throws ModelGeneratorException {
 
-        return new ModelGenerator(new SMTSettings(), SolverType.Z3_SOLVER);
+        return new ModelGenerator(new SMTSettings(), SolverType.KeYnterpol);
     }
 
     /**

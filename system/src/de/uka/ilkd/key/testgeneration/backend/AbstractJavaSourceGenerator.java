@@ -62,11 +62,11 @@ public abstract class AbstractJavaSourceGenerator {
 
         indent();
 
-        output.append(visibility);
-        output.append(modifier);
-        output.append("class");
-        output.append(name);
-        output.append(" {");
+        output.append(visibility + " ");
+        output.append(modifier + " ");
+        output.append("class" + " ");
+        output.append("Test" + name);
+        output.append(" {\n");
 
         indentation++;
     }
@@ -135,8 +135,10 @@ public abstract class AbstractJavaSourceGenerator {
 
         output.append(visibility + " ");
 
-        for (String modifier : modifiers) {
-            output.append(modifier + " ");
+        if (modifiers != null && modifiers.length != 0) {
+            for (String modifier : modifiers) {
+                output.append(modifier + " ");
+            }
         }
 
         output.append(returnType + " ");
@@ -144,12 +146,14 @@ public abstract class AbstractJavaSourceGenerator {
         output.append(name + " ");
 
         output.append("(");
-        for (String parameter : parameters) {
-            output.append(parameter + " ");
+        if (parameters != null && parameters.length != 0) {
+            for (String parameter : parameters) {
+                output.append(parameter + " ");
+            }
         }
         output.append(")");
 
-        output.append(" {");
+        output.append(" {\n");
 
         indentation++;
     }
@@ -186,5 +190,9 @@ public abstract class AbstractJavaSourceGenerator {
         for (int i = 0; i < indentation; i++) {
             output.append(TAB);
         }
+    }
+
+    protected String getCurrentOutput() {
+        return output.toString();
     }
 }

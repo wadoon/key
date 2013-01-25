@@ -10,6 +10,8 @@ import java.util.HashMap;
  */
 public class Benchmark {
 
+    private static final boolean toggleBenchmark = false;
+
     private static final HashMap<String, Long> readings = new HashMap<String, Long>();
 
     public static int[] counters = new int[100];
@@ -30,8 +32,10 @@ public class Benchmark {
      */
     public static void startBenchmarking(String event) {
 
-        long clockValue = Calendar.getInstance().getTimeInMillis();
-        readings.put(event, clockValue);
+        if (toggleBenchmark) {
+            long clockValue = Calendar.getInstance().getTimeInMillis();
+            readings.put(event, clockValue);
+        }
     }
 
     /**
@@ -41,12 +45,14 @@ public class Benchmark {
      * @param item
      */
     public static void finishBenchmarking(String event) {
+        if (toggleBenchmark) {
+            long clockValue = readings.get(event);
+            long finalClockValue = Calendar.getInstance().getTimeInMillis();
 
-        long clockValue = readings.get(event);
-        long finalClockValue = Calendar.getInstance().getTimeInMillis();
-
-        System.out.println("BENCHMARK: " + event + " took " + (finalClockValue - clockValue));
-        readings.put(event, finalClockValue - clockValue);
+            System.out.println("BENCHMARK: " + event + " took "
+                    + (finalClockValue - clockValue));
+            readings.put(event, finalClockValue - clockValue);
+        }
     }
 
     public static HashMap<String, Long> getReadings() {

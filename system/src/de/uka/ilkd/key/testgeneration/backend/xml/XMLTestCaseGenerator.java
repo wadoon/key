@@ -10,6 +10,7 @@ import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.codecoverage.implementation.StatementCoverageParser;
+import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
@@ -129,12 +130,14 @@ public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
 
         try {
 
-            if(coverage == null) {
+            if (coverage == null) {
                 coverage = new StatementCoverageParser();
             }
-            
-            List<TestCase> testCases = generatePartialTestSuiteHelper(source,
-                    coverage, methods);
+
+            KeYJavaClass keYJavaClass = extractKeYJavaClass(source);
+
+            List<TestCase> testCases = createTestCases(keYJavaClass, coverage,
+                    methods);
 
             /*
              * Create and return a final XML representation of the test suite.
