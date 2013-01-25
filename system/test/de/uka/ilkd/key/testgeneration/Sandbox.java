@@ -161,9 +161,7 @@ public class Sandbox extends KeYTestGenTest {
 
         @Override
         public boolean checkForSupport() {
-            
-            (define-fun self_dot_instanceY_3 () Int    (- 1))  (define-fun self_dot_instanceZ_6 () Int    1)  (define-fun self_dot_instanceZ_2 () Int    0)  (define-fun self_dot_instanceY_4 () Int    0)  (define-fun x_5 () Int    0))
-
+        
             return false;
         }
     }

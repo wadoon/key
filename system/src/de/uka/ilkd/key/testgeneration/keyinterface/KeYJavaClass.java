@@ -14,6 +14,11 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 public final class KeYJavaClass {
 
     /**
+     * The identifier for this class.
+     */
+    final String name;
+
+    /**
      * The {@link KeYJavaType} instance for this class
      */
     private final KeYJavaType type;
@@ -24,7 +29,9 @@ public final class KeYJavaClass {
      */
     private final HashMap<String, KeYJavaMethod> methods;
 
-    KeYJavaClass(KeYJavaType type, HashMap<String, KeYJavaMethod> methodMappings) {
+    KeYJavaClass(String name, KeYJavaType type,
+            HashMap<String, KeYJavaMethod> methodMappings) {
+        this.name = name;
         this.type = type;
         this.methods = methodMappings;
     }
@@ -50,5 +57,19 @@ public final class KeYJavaClass {
     public KeYJavaMethod getMethod(String name) {
 
         return methods.get(name);
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return the type
+     */
+    public KeYJavaType getType() {
+        return type;
     }
 }

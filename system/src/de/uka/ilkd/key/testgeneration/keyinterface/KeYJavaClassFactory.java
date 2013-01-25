@@ -53,6 +53,14 @@ public enum KeYJavaClassFactory {
             KeYInterfaceException {
 
         /*
+         * TODO: this is OS specific and makes too many assumptions on file
+         * format. Not good.
+         */
+        String name = javaFile.getAbsolutePath();
+        int delimiter = name.lastIndexOf("/");
+        name = name.substring(delimiter + 1, name.length() - 5);
+
+        /*
          * Load the file into key and set the InitConfig instance for it.
          */
         InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
@@ -95,7 +103,7 @@ public enum KeYJavaClassFactory {
             }
         }
 
-        return new KeYJavaClass(mainClass, methods);
+        return new KeYJavaClass(name, mainClass, methods);
     }
 
     /**
