@@ -135,7 +135,7 @@ public class JUnitGenerator {
                  * the type of the value itself. Primitive types are trivial to
                  * process, and only involve printing the actual value
                  * associated with the variable. References are a different
-                 * matter and require complex processing.
+                 * matter and require separate processing.
                  */
                 String instantiation = "";
                 if (isPrimitiveType(variable.getValue())) {
@@ -151,6 +151,13 @@ public class JUnitGenerator {
             }
         }
 
+        /**
+         * Checks if an objects runtime type is primitive.
+         * 
+         * @param object
+         *            the object whose type to check
+         * @return true if the runtime type is positive, false otherwise
+         */
         private boolean isPrimitiveType(Object object) {
             return object.getClass() == Integer.class
                     || object.getClass() == Boolean.class
