@@ -8,6 +8,7 @@ import java.util.Map;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
+import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
 
 /**
  * Default implementation of the {@link IModel} interface
@@ -239,9 +240,10 @@ public class Model implements IModel {
      * @param smtOutput
      */
     public void consumeSMTOutput(String smtOutput) {
-        
+
         /*
-         * Break the SMT output into individual variable declarations and process them separately.
+         * Break the SMT output into individual variable declarations and
+         * process them separately.
          */
         String[] definitions = smtOutput.trim().split("\\(define-fun");
         for (String definition : definitions) {
@@ -253,35 +255,37 @@ public class Model implements IModel {
                 /*
                  * Extract the variable name
                  */
-                String varName = definition.substring(0, definition.lastIndexOf('_'));
-                    
+                String varName = definition.substring(0,
+                        definition.lastIndexOf('_'));
+
                 /*
                  * Extract the value
                  */
                 String result = "";
                 boolean negFlag = false;
-                for(int i = definition.indexOf(' '); i < definition.length(); i++) {
-                    
+                for (int i = definition.indexOf(' '); i < definition.length(); i++) {
+
                     char currentChar = definition.charAt(i);
-                    
-                    if(!negFlag && currentChar == '-') {
+
+                    if (!negFlag && currentChar == '-') {
                         negFlag = true;
                     }
-                    
-                    if(Character.isDigit(currentChar)) {
+
+                    if (Character.isDigit(currentChar)) {
                         result += currentChar;
                     }
                 }
-                
-                Integer value = (negFlag) ? Integer.parseInt(result) * -1 : Integer.parseInt(result);
+
+                Integer value = (negFlag) ? Integer.parseInt(result) * -1
+                        : Integer.parseInt(result);
                 ModelVariable variable = getVariableByReference(varName);
-                if(variable != null) {
+                if (variable != null) {
                     variable.setValue(value);
                 }
             }
         }
     }
-
+    
     /**
      * Determines if a given {@link ModelVariable} satisfied the conditions
      * postulated in a given set of {@link IModelFilter} instances.

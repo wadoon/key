@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
@@ -36,7 +37,7 @@ public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
      * @param modelGenerator
      * @throws XMLGeneratorException
      */
-    public XMLTestCaseGenerator(IModelGenerator modelGenerator)
+    public XMLTestCaseGenerator(ModelGenerator modelGenerator)
             throws XMLGeneratorException {
 
         super(modelGenerator);
@@ -69,7 +70,7 @@ public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
      * @throws XMLGeneratorException
      */
     public static XMLTestCaseGenerator getCustomInstance(
-            IModelGenerator modelGenerator) throws XMLGeneratorException {
+            ModelGenerator modelGenerator) throws XMLGeneratorException {
 
         return new XMLTestCaseGenerator(modelGenerator);
     }
@@ -128,6 +129,11 @@ public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
             ICodeCoverageParser coverage, String... methods)
             throws TestGeneratorException {
 
+        /*
+         * Set up mediator
+         */
+        KeYTestGenMediator mediator = new KeYTestGenMediator();
+
         try {
 
             if (coverage == null) {
@@ -135,9 +141,10 @@ public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
             }
 
             KeYJavaClass keYJavaClass = extractKeYJavaClass(source);
+            mediator.setMainClass(keYJavaClass);
 
             List<TestCase> testCases = createTestCases(keYJavaClass, coverage,
-                    methods);
+                    mediator, methods);
 
             /*
              * Create and return a final XML representation of the test suite.

@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.keynterpol.EmbeddedModelGenerator;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYInterfaceException;
@@ -15,8 +15,8 @@ import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClassFactory;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.model.IModel;
-import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
@@ -40,11 +40,11 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
     }
 
     /**
-     * An instance of {@link IModelGenerator} for the purpose of generating
+     * An instance of {@link ModelGenerator} for the purpose of generating
      * concrete fixtures for test cases. Default implementation based on SMT
      * solvers is available, but the user can choose to use her own.
      */
-    protected final IModelGenerator modelGenerator;
+    protected final ModelGenerator modelGenerator;
 
     /**
      * Used in order to communicate with and request services from the KeY
@@ -64,10 +64,10 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.INSTANCE;
 
     public AbstractTestCaseGenerator() {
-        this(new EmbeddedModelGenerator());
+        this(ModelGenerator.getDefaultModelGenerator());
     }
 
-    public AbstractTestCaseGenerator(IModelGenerator modelGenerator) {
+    public AbstractTestCaseGenerator(ModelGenerator modelGenerator) {
         this.modelGenerator = modelGenerator;
     }
 
@@ -99,13 +99,14 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
 
     }
 
-    protected List<TestCase> createTestCases(KeYJavaClass targetClass,
-            ICodeCoverageParser codeCoverageParser, String... methods)
+    protected LinkedList<TestCase> createTestCases(KeYJavaClass targetClass,
+            ICodeCoverageParser codeCoverageParser,
+            KeYTestGenMediator mediator, String... methods)
             throws TestGeneratorException {
 
         try {
 
-            List<TestCase> testCases = new LinkedList<TestCase>();
+            LinkedList<TestCase> testCases = new LinkedList<TestCase>();
 
             for (String method : methods) {
                 KeYJavaMethod targetMethod = targetClass.getMethod(method);
@@ -129,7 +130,7 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
                  */
                 Benchmark.startBenchmarking("create test case abstractions");
                 testCases.addAll(createTestCasesForMethod(targetMethod,
-                        targetNodes));
+                        mediator, targetNodes));
                 Benchmark.finishBenchmarking("create test case abstractions");
             }
 
@@ -146,6 +147,7 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
      * 
      * @param method
      *            the method for which test cases will be generated
+     * @param mediator
      * @param oracle
      *            the test oracle (corresponding to the postcondition) of the
      *            method
@@ -158,7 +160,8 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
      *             in the event there was a failure to generate a test case
      */
     protected List<TestCase> createTestCasesForMethod(KeYJavaMethod method,
-            List<IExecutionNode> nodes) throws TestGeneratorException {
+            KeYTestGenMediator mediator, List<IExecutionNode> nodes)
+            throws TestGeneratorException {
 
         List<TestCase> testCases = new LinkedList<TestCase>();
         for (IExecutionNode node : nodes) {
@@ -174,7 +177,7 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
 
                 try {
 
-                    model = modelGenerator.generateModel(node);
+                    model = modelGenerator.generateModel(node, mediator);
 
                 } catch (ModelGeneratorException e) {
                     System.err.println("WARNING: Model generation failed!");

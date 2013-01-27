@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.testgeneration.keyinterface;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -24,16 +25,23 @@ public final class KeYJavaClass {
     private final KeYJavaType type;
 
     /**
+     * A reference to the actual source file on disc, whose public class this
+     * instance represents.
+     */
+    File source;
+
+    /**
      * Maps the name of a method to its corresponding {@link KeYJavaMethod}
      * instance.
      */
     private final HashMap<String, KeYJavaMethod> methods;
 
     KeYJavaClass(String name, KeYJavaType type,
-            HashMap<String, KeYJavaMethod> methodMappings) {
+            HashMap<String, KeYJavaMethod> methodMappings, File source) {
         this.name = name;
         this.type = type;
         this.methods = methodMappings;
+        this.source = source;
     }
 
     /**

@@ -196,7 +196,7 @@ public abstract class AbstractJavaSourceGenerator {
 
             if (characterCount >= 50) {
                 characterCount = 0;
-                output.append(" "+ word + "\n");
+                output.append(" " + word + "\n");
                 writeLine(" *");
                 continue;
             } else {
@@ -207,6 +207,17 @@ public abstract class AbstractJavaSourceGenerator {
         output.append("\n");
 
         writeLine(" */\n");
+    }
+
+    /**
+     * Writes an opening brace ("{") to the Java source file. This will increase
+     * the indentation level for the text.
+     */
+    protected void writeOpeningBrace() {
+
+        indent();
+        indentation++;
+        output.append("{\n");
     }
 
     /**

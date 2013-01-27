@@ -10,6 +10,9 @@ package de.uka.ilkd.key.testgeneration.targetmodels;
  */
 public class PrimitiveIntegerOperations {
 
+    public PrimitiveIntegerOperations() {}
+    
+    public         PrimitiveIntegerOperations(String a, String b) {}
     /*
      * Local variables to simulate extra-method dependencies during symbolic
      * execution

@@ -31,7 +31,7 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
  * 
  * @author christopher
  */
-public class TestCase {
+public class TestCase implements Comparable<TestCase> {
 
     /**
      * The method for which the test case is being generated.
@@ -91,4 +91,21 @@ public class TestCase {
 
         return oracle;
     }
+
+    /**
+     * @return the name of the method handled by this tescase
+     */
+    public String getMethodName() {
+        return method.getProgramMethod().getName();
+    }
+
+    @Override
+    public int compareTo(TestCase o) {
+
+        String ownName = method.getProgramMethod().getName();
+        String otherName = o.getMethod().getProgramMethod().getName();
+
+        return ownName.compareTo(otherName);
+    }
+
 }

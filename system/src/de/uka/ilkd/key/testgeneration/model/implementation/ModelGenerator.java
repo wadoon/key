@@ -22,6 +22,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
@@ -76,8 +77,7 @@ public class ModelGenerator implements IModelGenerator {
      * @return a default instance of ModelGenerator
      * @throws ModelGeneratorException
      */
-    public static ModelGenerator getDefaultModelGenerator()
-            throws ModelGeneratorException {
+    public static ModelGenerator getDefaultModelGenerator() {
 
         return new ModelGenerator(new SMTSettings(), SolverType.KeYnterpol);
     }
@@ -278,12 +278,13 @@ public class ModelGenerator implements IModelGenerator {
      * 
      * @param node
      *            the node for which to generate a Model
+     * @param mediator
+     *            session mediator
      * @return the Model instance for the node
      * @throws ModelGeneratorException
      *             in the event that there was a failure to generate the Model
      */
-    @Override
-    public IModel generateModel(IExecutionNode node)
+    public IModel generateModel(IExecutionNode node, KeYTestGenMediator mediator)
             throws ModelGeneratorException {
 
         try {
@@ -295,7 +296,7 @@ public class ModelGenerator implements IModelGenerator {
              * Create the Model
              */
             Model model = PathconditionParser.createModel(pathCondition,
-                    services);
+                    services, mediator);
 
             /*
              * Get concrete values for any primitive types represented in the
@@ -432,6 +433,16 @@ public class ModelGenerator implements IModelGenerator {
 
             return false;
         }
+    }
+
+    /*
+     * FIXME: BAD!
+     */
+    @Override
+    public IModel generateModel(IExecutionNode node)
+            throws ModelGeneratorException {
+
+        return generateModel(node, null);
     }
 
 }

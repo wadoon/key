@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.testgeneration.backend.junit;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
@@ -27,7 +29,7 @@ public class JUnitTestCaseGenerator extends AbstractTestCaseGenerator {
     public JUnitTestCaseGenerator() throws ModelGeneratorException {
         super(ModelGenerator.getDefaultModelGenerator());
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -46,36 +48,42 @@ public class JUnitTestCaseGenerator extends AbstractTestCaseGenerator {
             ICodeCoverageParser coverage, String... methods)
             throws TestGeneratorException {
 
-            /*
-             * If no coverage criteria are specificed, use default.
-             */
-            if (coverage == null) {
-                coverage = new StatementCoverageParser();
-            }
+        /*
+         * Set up the mediator
+         */
+        KeYTestGenMediator mediator = new KeYTestGenMediator();
 
-            /*
-             * Get the abstract representation of the class.
-             */
-            KeYJavaClass keYJavaClass = extractKeYJavaClass(source);
+        /*
+         * If no coverage criteria are specificed, use default.
+         */
+        if (coverage == null) {
+            coverage = new StatementCoverageParser();
+        }
 
-            /*
-             * Get the abstract representations of the test cases for the
-             * selected method(s).
-             */
-            List<TestCase> testCases = createTestCases(keYJavaClass, coverage,
-                    methods);
+        /*
+         * Get the abstract representation of the class.
+         */
+        KeYJavaClass keYJavaClass = extractKeYJavaClass(source);
+        mediator.setMainClass(keYJavaClass);
+        
+        /*
+         * Get the abstract representations of the test cases for the selected
+         * method(s).
+         */
+        LinkedList<TestCase> testCases = createTestCases(keYJavaClass,
+                coverage, mediator, methods);
 
-            /*
-             * Turn the representations into JUnit sources.
-             */
-            Benchmark.startBenchmarking("create JUnit sources");
-            JUnitGenerator jUnitGenerator = new JUnitGenerator();
+        /*
+         * Turn the representations into JUnit sources.
+         */
+        Benchmark.startBenchmarking("create JUnit sources");
+        JUnitGenerator jUnitGenerator = new JUnitGenerator();
 
-            String testSuite = jUnitGenerator.generateJUnitSources(
-                    keYJavaClass, testCases);
-            Benchmark.finishBenchmarking("create JUnit sources");
+        String testSuite = jUnitGenerator.generateJUnitSources(keYJavaClass,
+                testCases);
+        Benchmark.finishBenchmarking("create JUnit sources");
 
-            return testSuite;
+        return testSuite;
     }
 
     /**

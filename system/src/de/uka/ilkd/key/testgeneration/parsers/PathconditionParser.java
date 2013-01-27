@@ -4,6 +4,9 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
@@ -16,6 +19,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
@@ -46,9 +50,12 @@ public class PathconditionParser extends AbstractTermParser {
      *            the Term to process
      * @param services
      *            {@link Services} associated with the Term
+     * @param mediator
+     *            session mediator
      * @return the Model instance built from the Term
      */
-    public static Model createModel(Term term, Services services) {
+    public static Model createModel(Term term, Services services,
+            KeYTestGenMediator mediator) {
 
         Model model = new Model();
 
@@ -57,7 +64,8 @@ public class PathconditionParser extends AbstractTermParser {
          * variables and values found in the Term. Done postorder to eliminate
          * buffering penalties in the Model.
          */
-        ContextVisitor modelVisitor = new ContextVisitor(model, services);
+        ContextVisitor modelVisitor = new ContextVisitor(model, services,
+                mediator);
         term.execPostOrder(modelVisitor);
 
         /*
@@ -355,24 +363,38 @@ public class PathconditionParser extends AbstractTermParser {
          * The default root variable, representing a reference to the class
          * instance of which the tested method is part.
          */
-        private static final LocationVariable default_self = new LocationVariable(
-                new ProgramElementName("$SELF$"), new KeYJavaType());
+        private final LocationVariable default_self;
 
         /**
          * The {@link Model} to be populated by visiting the associated Term.
          */
         Model model;
 
-        public ContextVisitor(Model model, Services services) {
+        public ContextVisitor(Model model, Services services,
+                KeYTestGenMediator mediator) {
 
             this.model = model;
             javaInfo = services.getJavaInfo();
+
+            /*
+             * Construct the default base class
+             */
+            ProgramElementName name = new ProgramElementName(mediator
+                    .getMainClass().getName());
+
+            ClassDeclaration baseType = new ClassDeclaration(new Modifier[0],
+                    name, null, name, null, new MemberDeclaration[0], false,
+                    false);
+
+            default_self = new LocationVariable(
+                    new ProgramElementName("$SELF$"), new KeYJavaType(baseType));
 
             /*
              * Add the root variable and instance to the Model
              */
             ModelInstance selfInstance = new ModelInstance(
                     default_self.getKeYJavaType());
+
             ModelVariable self = new ModelVariable(default_self, "self",
                     selfInstance);
             model.add(self, selfInstance);

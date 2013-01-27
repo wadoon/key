@@ -103,7 +103,7 @@ public enum KeYJavaClassFactory {
             }
         }
 
-        return new KeYJavaClass(name, mainClass, methods);
+        return new KeYJavaClass(name, mainClass, methods, javaFile);
     }
 
     /**
@@ -171,5 +171,9 @@ public enum KeYJavaClassFactory {
         }
 
         return contracts;
+    }
+
+    private String getPackageDeclaration() {
+        return null;
     }
 }
