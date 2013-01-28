@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.testgeneration;
 
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
 
 /**
@@ -15,6 +17,11 @@ public class KeYTestGenMediator {
      * The Java class for which test cases are currently being generated.
      */
     KeYJavaClass mainClass;
+
+    /**
+     * Method parameters for a given instance
+     */
+    LinkedList<String> methodParameterNames = new LinkedList<String>();
 
     /**
      * @return the mainClass

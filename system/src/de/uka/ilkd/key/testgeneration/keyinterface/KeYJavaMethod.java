@@ -95,9 +95,16 @@ public class KeYJavaMethod {
      * 
      * @return the initConfig
      */
-    final InitConfig getInitConfig() {
+    public final InitConfig getInitConfig() {
 
         return initConfig;
     }
 
+    /**
+     * @return the return type of the method
+     */
+    public String getReturnType() {
+
+        return programMethod.getReturnType().getName();
+    }
 }

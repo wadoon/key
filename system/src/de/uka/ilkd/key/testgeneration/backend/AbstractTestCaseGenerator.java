@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.model.implementation.ModelMediator;
 import de.uka.ilkd.key.testgeneration.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
@@ -164,36 +166,100 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
             throws TestGeneratorException {
 
         List<TestCase> testCases = new LinkedList<TestCase>();
-        for (IExecutionNode node : nodes) {
+        List<ModelCapsule> capsules = new LinkedList<ModelCapsule>();
+
+        Benchmark.startBenchmarking("   generating models "
+                + ++Benchmark.counters[0]);
+
+        try {
 
             /*
-             * FIXME: Very ugly workaround to safeguard against the model
-             * failing...why does this happen?
+             * Setup the module generation capsules for each node.
              */
-            Benchmark.startBenchmarking("   generating model "
-                    + ++Benchmark.counters[0]);
+            for (IExecutionNode node : nodes) {
+                ModelCapsule capsule = new ModelCapsule(method, node, mediator);
+                capsules.add(capsule);
+            }
+
+            /*
+             * Dispatch the capsules.
+             */
+            for (ModelCapsule capsule : capsules) {
+                capsule.start();
+            }
+
+            /*
+             * Finally, wait for the capsules to finsh their work, and collect
+             * the results.
+             */
+            for (ModelCapsule capsule : capsules) {
+                capsule.join();
+                testCases.add(capsule.getResult());
+            }
+
+        } catch (InterruptedException ie) {
+            System.err.println("INTERRUPTED!");
+        }
+
+        Benchmark.finishBenchmarking("   generating models "
+                + Benchmark.counters[0]);
+
+        return testCases;
+    }
+
+    /**
+     * Instances of this class are used in order to execute model generation for
+     * multiple nodes in a concurrent manner.
+     * 
+     * @author christopher
+     * 
+     */
+    private class ModelCapsule extends Thread {
+
+        private final IExecutionNode node;
+        private final ModelMediator modelMediator = new ModelMediator();
+        private final KeYJavaMethod method;
+        TestCase testCase = null;
+
+        public ModelCapsule(KeYJavaMethod method, IExecutionNode node,
+                KeYTestGenMediator mediator) {
+
+            this.method = method;
+            this.node = node;
+
+            /*
+             * Set up the ModelMediator to be used for this concurrent session.
+             */
+            modelMediator.setMainClass(mediator.getMainClass());
+            LinkedList<String> methodParameters = new LinkedList<String>();
+            for (IProgramVariable programVariable : method.getParameters()) {
+                methodParameters.add(programVariable.name().toString());
+            }
+            modelMediator.setMethodParameterNames(methodParameters);
+        }
+
+        @Override
+        public void run() {
+
             IModel model = null;
             while (model == null) {
 
                 try {
 
-                    model = modelGenerator.generateModel(node, mediator);
+                    model = modelGenerator.generateModel(node, modelMediator);
 
                 } catch (ModelGeneratorException e) {
                     System.err.println("WARNING: Model generation failed!");
                 }
             }
-            Benchmark.finishBenchmarking("   generating model "
-                    + Benchmark.counters[0]);
 
-            /*
-             * FIXME: This is an ugly hack since I am not sure how to handle
-             * multiple postconditions yet, fix.
-             */
-            TestCase testCase = new TestCase(method, model, method
+            testCase = new TestCase(method, model, method
                     .getPostconditions().get(0));
-            testCases.add(testCase);
+            testCase.setNode(node);
         }
-        return testCases;
+
+        public TestCase getResult() {
+            return testCase;
+        }
     }
 }

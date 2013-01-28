@@ -218,4 +218,19 @@ public class ModelVariable implements IHeapObject {
 
         return wrappedProgramVariable.isFinal();
     }
+
+    /**
+     * @return the isParameter
+     */
+    public boolean isParameter() {
+        return isParameter;
+    }
+
+    /**
+     * @param isParameter
+     *            the isParameter to set
+     */
+    public void setParameter(boolean isParameter) {
+        this.isParameter = isParameter;
+    }
 }

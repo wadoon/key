@@ -19,10 +19,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
+import de.uka.ilkd.key.testgeneration.model.implementation.ModelMediator;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 
 /**
@@ -55,7 +55,7 @@ public class PathconditionParser extends AbstractTermParser {
      * @return the Model instance built from the Term
      */
     public static Model createModel(Term term, Services services,
-            KeYTestGenMediator mediator) {
+            ModelMediator mediator) {
 
         Model model = new Model();
 
@@ -353,6 +353,8 @@ public class PathconditionParser extends AbstractTermParser {
      */
     private static class ContextVisitor extends Visitor {
 
+        private final ModelMediator mediator;
+
         /**
          * Stores Java specific information related to the {@link Term} we are
          * working with.
@@ -371,7 +373,9 @@ public class PathconditionParser extends AbstractTermParser {
         Model model;
 
         public ContextVisitor(Model model, Services services,
-                KeYTestGenMediator mediator) {
+                ModelMediator mediator) {
+
+            this.mediator = mediator;
 
             this.model = model;
             javaInfo = services.getJavaInfo();
@@ -424,8 +428,6 @@ public class PathconditionParser extends AbstractTermParser {
          * parameter to
          * {@link Term#execPostOrder(de.uka.ilkd.key.logic.Visitor)}
          * <p>
-         * TODO: This entire class should be re-implemented as a one-way parser.
-         * See {@link PathconditionParser}.
          */
         @Override
         public void visit(Term visited) {
@@ -475,6 +477,7 @@ public class PathconditionParser extends AbstractTermParser {
              * ModelInstance to hold any reference object.
              */
             String identifier = resolveIdentifierString(term);
+
             ModelVariable variable = new ModelVariable(programVariable,
                     identifier);
 
@@ -529,13 +532,32 @@ public class PathconditionParser extends AbstractTermParser {
 
             /*
              * Finally, if the variable was not a SortDependentFunction (i.e.
-             * did not have an explicitly declared parent), we deduce that it is
-             * a locally declared variable, and hence set its parent to be the
-             * root class.
+             * did not have an explicitly declared parent), we check if its name
+             * corresponds to the names of any of the parameters for the method
+             * we are currently dealing with. If that is not the case, we deduce
+             * that it is a locally declared variable, and hence set its parent
+             * to be the root class.
+             * 
+             * If the variable indeed is a parameter, we create a separate
+             * variable and instance for it.
              */
             else {
-                ModelVariable self = new ModelVariable(default_self, "self");
-                model.assignField(variable, self);
+
+                /*
+                 * The case where the variable is a parameter.
+                 */
+                if (mediator.getMethodParameterNames().contains(
+                        variable.getIdentifier())) {
+
+                    variable.setParameter(true);
+
+                    /*
+                     * The case where it is not.
+                     */
+                } else {
+                    ModelVariable self = new ModelVariable(default_self, "self");
+                    model.assignField(variable, self);
+                }
             }
         }
 

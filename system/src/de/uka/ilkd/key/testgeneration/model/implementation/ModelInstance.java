@@ -16,6 +16,22 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
  */
 public class ModelInstance implements IHeapObject {
 
+    private boolean debug;
+    
+    /**
+     * @return the debug
+     */
+    public boolean isDebug() {
+        return debug;
+    }
+
+    /**
+     * @param debug the debug to set
+     */
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
     /**
      * The type of which this instance is an instance.
      */
@@ -27,6 +43,12 @@ public class ModelInstance implements IHeapObject {
      */
     private final String identifier;
 
+    /**
+     * Variables pointing to this instance
+     */
+    private final List<ModelVariable> referees = new LinkedList<ModelVariable>();
+
+    
     /**
      * Concrete values for a subset of the fields bound to this instance.
      */
@@ -97,6 +119,14 @@ public class ModelInstance implements IHeapObject {
 
         return identifier;
     }
+    
+    public void addReferee(ModelVariable referee) {
+        referees.add(referee);
+    }
+    
+    public List<ModelVariable> getReferees() {
+        return referees;
+    }
 
     /**
      * Two instances are equal iff. their references are the same (compare
@@ -121,10 +151,6 @@ public class ModelInstance implements IHeapObject {
     @Override
     public String toString() {
 
-        String toReturn = "Instance " + identifier + " [";
-        for (ModelVariable variable : fields) {
-            toReturn += variable.toString() + " ";
-        }
-        return toReturn;
+        return "Instance " + identifier;
     }
 }

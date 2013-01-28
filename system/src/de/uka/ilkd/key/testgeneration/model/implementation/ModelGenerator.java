@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.testgeneration.model.implementation;
 
 import java.io.File;
-import java.text.ParseException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
-import z3parser.api.Z3ModelParser;
-import z3parser.api.Z3ModelParser.ValueContainer;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.Services;
@@ -22,7 +18,6 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
@@ -284,10 +279,12 @@ public class ModelGenerator implements IModelGenerator {
      * @throws ModelGeneratorException
      *             in the event that there was a failure to generate the Model
      */
-    public IModel generateModel(IExecutionNode node, KeYTestGenMediator mediator)
+    public IModel generateModel(IExecutionNode node, ModelMediator mediator)
             throws ModelGeneratorException {
 
         try {
+            
+            System.out.println(node.getFormatedPathCondition());
 
             Term pathCondition = node.getPathCondition();
             Services services = node.getServices();

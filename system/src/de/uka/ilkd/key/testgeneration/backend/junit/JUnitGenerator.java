@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
@@ -53,12 +54,26 @@ public class JUnitGenerator {
          * The name of the class for which the test suite is being generated.
          * Kept for the purpose of naming and type declaration.
          */
-        String className = "X";
+        private String className = "X";
 
         /**
          * Imports to be included in this test class
          */
-        HashSet<String> imports = new HashSet<String>();
+        private HashSet<String> imports = new HashSet<String>();
+
+        /**
+         * The name of the root variable (i.e. the variable pointing to the
+         * instane of the object that has the methods to be tested).
+         */
+        private final String SELF = "self";
+
+        /**
+         * The name of the container for the result value (if any) resulting
+         * from the invocation of a method being tested. This value is used in
+         * the assertion process, and must not conflict with the names of any
+         * parameter values.
+         */
+        private final String RESULT = "testmethodCallResult";
 
         /**
          * Services invocations of
@@ -170,9 +185,34 @@ public class JUnitGenerator {
              */
             writeTestFixture(testCase);
 
+            try {
+                writeComment( testCase.getNode().getFormatedPathCondition(), false);
+            } catch (ProofInputException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
             /*
              * Close the method.
              */
+            String returnType = testCase.getMethod().getReturnType();
+            String methodInvocation = "";
+            if (!returnType.equals("void")) {
+                methodInvocation += returnType + " " + RESULT + " = ";
+            }
+            methodInvocation += SELF + "." + testCase.getMethodName() + "(";
+            List<IProgramVariable> parameters = testCase.getMethod()
+                    .getParameters();
+            for (int i = 0; i < parameters.size(); i++) {
+                String parameterName = parameters.get(i).name().toString();
+                methodInvocation += parameterName;
+                if (i != parameters.size() - 1) {
+                    methodInvocation += ",";
+                }
+            }
+            methodInvocation += ");\n";
+            writeLine(methodInvocation);
+
             writeClosingBrace();
         }
 
@@ -186,37 +226,14 @@ public class JUnitGenerator {
          */
         private void writeTestFixture(TestCase testCase) {
 
-            IModel model = testCase.getModel();
-
             /*
-             * Isolate the ModelInstance corresponding to the class which
-             * contains the method being tested.
+             * Write the text fixture, using all relevant variables. Relevant
+             * variables in this context includes the parameters for the method
+             * (if any), as well as the root class itself.
              */
-            ModelInstance self = null;
             for (IModelObject object : testCase.getModel().getVariables()) {
                 ModelVariable variable = (ModelVariable) object;
-                if (variable.getIdentifier().equals("self")) {
-                    self = (ModelInstance) variable.getValue();
-                }
-            }
-
-            /*
-             * Extract the names of the method parameters.
-             */
-            LinkedList<String> parameterNames = new LinkedList<String>();
-            for (IProgramVariable variable : testCase.getMethod()
-                    .getParameters()) {
-
-                parameterNames.add(variable.name().toString());
-            }
-
-            /*
-             * Proceed with writing the fixture, but only for parameters (all
-             * other fields will be instantiated as part of the instance setup
-             * process.
-             */
-            for (ModelVariable variable : self.getFields()) {
-                if (parameterNames.contains(variable.getIdentifier())) {
+                if (isSelf(variable) || variable.isParameter()) {
                     writeVariableDeclaration(variable);
                 }
             }
@@ -236,7 +253,7 @@ public class JUnitGenerator {
              * needs special treatment.
              */
             String declaration = "";
-            if (variable.getIdentifier().equals("self")) {
+            if (isSelf(variable)) {
                 declaration = className + " self";
             } else {
                 declaration = variable.getType() + " " + variable.getName();
@@ -312,7 +329,7 @@ public class JUnitGenerator {
             writeComment(
                     "KeYTestGen put me here to keep track of your object instances! Don't mind me :)",
                     true);
-            writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>()\n\n");
+            writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>();\n\n");
         }
 
         /**
@@ -329,7 +346,7 @@ public class JUnitGenerator {
             writeMethodHeader(null, "private",
                     new String[] { "static", "<T>" }, "T", "getObjectInstance",
                     new String[] { "int reference" }, null);
-            writeLine("return (T)objectInstances.get(reference)\n");
+            writeLine("return (T)objectInstances.get(reference);\n");
             writeClosingBrace();
         }
 
@@ -383,9 +400,10 @@ public class JUnitGenerator {
                     "Finalize the repository setup by setting up the relevant fields of each object instance.. ",
                     false);
             for (ModelInstance instance : instances) {
-                if (!instance.getFields().isEmpty()) {
-                    writeObjectFieldInstantiation(instance);
+                if (instance.getFields().isEmpty()) {
+                    System.out.println();
                 }
+                writeObjectFieldInstantiation(instance);
             }
 
             writeClosingBrace();
@@ -425,6 +443,12 @@ public class JUnitGenerator {
             LinkedList<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (IModelObject object : model.getVariables()) {
                 ModelVariable variable = (ModelVariable) object;
+                if (variable
+                        .getIdentifier()
+                        .equals("self_dot_proxy_dot_nestedProxy_dot_nestedProxy_dot_nestedProxy")) {
+                    System.out.println();
+                    ((ModelInstance) variable.getValue()).setDebug(true);
+                }
                 if (variable.getValue() instanceof ModelInstance) {
                     instances.add((ModelInstance) variable.getValue());
                 }
@@ -445,7 +469,6 @@ public class JUnitGenerator {
              * Indicates whether or not this instance corresponds to the Java
              * class being tested (as we treat this one separately).
              */
-            boolean isSelf = instance.getIdentifier().equals("self");
 
             writeLine("objectInstances.put(" + instance.getIdentifier() + ","
                     + " new " + instance.getTypeName() + "());\n");
@@ -476,31 +499,34 @@ public class JUnitGenerator {
              * order to set it up properly.
              */
             for (ModelVariable field : instance.getFields()) {
-                String variableName = field.getName();
-                writeLine("\n");
-                writeLine("Field " + variableName + " = "
-                        + "instance.getClass().getDeclaredField(" + "\""
-                        + variableName + "\"" + ");\n");
-                writeLine(variableName + ".setAccessible(true);\n");
 
-                /*
-                 * When it comes to setting the value, different courses of
-                 * action are needed for primitive and reference type variables.
-                 * Reference types will be encoded as a fetch of the relevant
-                 * object instance using the getObjectInstance method. Primitive
-                 * types will simply be encoded in terms of their primitive
-                 * values.
-                 */
-                if (field.getValue() instanceof ModelInstance) {
+                if (!field.isParameter()) {
+                    String variableName = field.getName();
+                    writeLine("\n");
+                    writeLine("Field " + variableName + " = "
+                            + "instance.getClass().getDeclaredField(" + "\""
+                            + variableName + "\"" + ");\n");
+                    writeLine(variableName + ".setAccessible(true);\n");
 
-                    ModelInstance instanceField = (ModelInstance) field
-                            .getValue();
-                    writeLine(variableName + ".set(instance, "
-                            + "getObjectInstance("
-                            + instanceField.getIdentifier() + ") " + ");\n");
-                } else {
-                    writeLine(variableName + ".set(instance, "
-                            + field.getValue() + ");\n");
+                    /*
+                     * When it comes to setting the value, different courses of
+                     * action are needed for primitive and reference type
+                     * variables. Reference types will be encoded as a fetch of
+                     * the relevant object instance using the getObjectInstance
+                     * method. Primitive types will simply be encoded in terms
+                     * of their primitive values.
+                     */
+                    if (field.getValue() instanceof ModelInstance) {
+
+                        ModelInstance instanceField = (ModelInstance) field
+                                .getValue();
+                        writeLine(variableName + ".set(instance, "
+                                + "getObjectInstance("
+                                + instanceField.getIdentifier() + ") " + ");\n");
+                    } else {
+                        writeLine(variableName + ".set(instance, "
+                                + field.getValue() + ");\n");
+                    }
                 }
             }
 
@@ -547,6 +573,10 @@ public class JUnitGenerator {
             builder.append(super.getCurrentOutput());
 
             return builder.toString();
+        }
+
+        private boolean isSelf(ModelVariable variable) {
+            return variable.getIdentifier().equals("self");
         }
 
         /**

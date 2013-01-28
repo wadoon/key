@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgeneration.backend;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 
@@ -32,6 +33,11 @@ import de.uka.ilkd.key.testgeneration.model.IModel;
  * @author christopher
  */
 public class TestCase implements Comparable<TestCase> {
+
+    /**
+     * DEBUG: the execution node associated with this test case.
+     */
+    private IExecutionNode node;
 
     /**
      * The method for which the test case is being generated.
@@ -106,6 +112,20 @@ public class TestCase implements Comparable<TestCase> {
         String otherName = o.getMethod().getProgramMethod().getName();
 
         return ownName.compareTo(otherName);
+    }
+
+    /**
+     * @return the node
+     */
+    public IExecutionNode getNode() {
+        return node;
+    }
+
+    /**
+     * @param node the node to set
+     */
+    public void setNode(IExecutionNode node) {
+        this.node = node;
     }
 
 }
