@@ -123,7 +123,7 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void writeMethodHeader(String[] annotations, String visibility,
             String[] modifiers, String returnType, String name,
-            String[] parameters) {
+            String[] parameters, String[] exceptions) {
 
         if (annotations != null) {
             for (String annotation : annotations) {
@@ -145,6 +145,9 @@ public abstract class AbstractJavaSourceGenerator {
 
         output.append(name + " ");
 
+        /*
+         * Write the parameters for the method, if any.
+         */
         output.append("(");
         if (parameters != null && parameters.length != 0) {
             for (String parameter : parameters) {
@@ -153,8 +156,24 @@ public abstract class AbstractJavaSourceGenerator {
         }
         output.append(")");
 
-        output.append(" {\n");
+        /*
+         * Write the exceptions, if any.
+         */
+        if (exceptions != null) {
+            output.append("\n");
+            indent();
 
+            writeLine("throws ");
+            for (int i = 0; i < exceptions.length; i++) {
+                String exception = exceptions[i];
+                output.append(exception);
+                if (i != exceptions.length - 1) {
+                    output.append(", ");
+                }
+            }
+        }
+
+        output.append(" {\n");
         indentation++;
     }
 
@@ -177,6 +196,8 @@ public abstract class AbstractJavaSourceGenerator {
      *            text of comment
      */
     protected void writeComment(String text, boolean isJavadoc) {
+
+        writeLine("\n");
 
         if (isJavadoc) {
             writeLine("/**\n");

@@ -10,9 +10,17 @@ package de.uka.ilkd.key.testgeneration.targetmodels;
  */
 public class PrimitiveIntegerOperations {
 
-    public PrimitiveIntegerOperations() {}
+    public 
     
-    public         PrimitiveIntegerOperations(String a, String b) {}
+        PrimitiveIntegerOperations(
+                ) {}
+    
+    public         
+        PrimitiveIntegerOperations
+        
+            (String 
+                    a, 
+                        String b) {}
     /*
      * Local variables to simulate extra-method dependencies during symbolic
      * execution
@@ -95,19 +103,13 @@ public class PrimitiveIntegerOperations {
         return max;
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
+    /*@ public normal_behavior   
+     @ ensures (\result == x) || (\result == y) || (\result == z );      
+     @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+      (\result <= x )) || ((\result <= x) && (\result <= z ));      
+     @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+      (\result >= x )) || ((\result >= x) && (\result >= z ));      
+     @*/
     public static int mid(int x, int y, int z) {
 
         int mid = z;

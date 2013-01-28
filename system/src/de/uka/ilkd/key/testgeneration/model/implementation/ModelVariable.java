@@ -54,6 +54,21 @@ public class ModelVariable implements IHeapObject {
     private ModelInstance parentModelInstance;
 
     /**
+     * This flag indicates whether or not this variable represents a top level
+     * declaration. What this means in the context of KeYTestGen is that this
+     * variable is declared as part of the class which contains the method being
+     * tested (as opposed to being declared as a field of some other object
+     * which is itself declared by this class, etc.
+     */
+    private boolean isTopLevelVariable = false;
+
+    /**
+     * This flag indicates whether or not this variable is declared in the
+     * parameter list for a method.
+     */
+    private boolean isParameter = false;
+
+    /**
      * Create a ModelVariable from an existing {@link ProgramVariable},
      * effectively encapsulating it, but we maintain the type hierarchy for the
      * sake of consistency.

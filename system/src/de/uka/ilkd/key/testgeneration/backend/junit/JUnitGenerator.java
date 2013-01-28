@@ -3,16 +3,20 @@ package de.uka.ilkd.key.testgeneration.backend.junit;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.parsers.JavaSourceParser;
 
 /**
  * This singleton provides the functionality needed to produce test suites for
@@ -41,10 +45,20 @@ public class JUnitGenerator {
             AbstractJavaSourceGenerator {
 
         /**
+         * Used to differentiate between the names of test cases.
+         */
+        private int ID = 0;
+
+        /**
          * The name of the class for which the test suite is being generated.
          * Kept for the purpose of naming and type declaration.
          */
         String className = "X";
+
+        /**
+         * Imports to be included in this test class
+         */
+        HashSet<String> imports = new HashSet<String>();
 
         /**
          * Services invocations of
@@ -149,12 +163,12 @@ public class JUnitGenerator {
             String methodName = "test"
                     + testCase.getMethod().getProgramMethod().getName();
             writeMethodHeader(new String[] { "@Test" }, "public", null, "void",
-                    methodName, null);
+                    methodName + ID++, null, null);
 
             /*
              * Write the method body.
              */
-            writeTestFixture((Model) testCase.getModel());
+            writeTestFixture(testCase);
 
             /*
              * Close the method.
@@ -165,11 +179,14 @@ public class JUnitGenerator {
         /**
          * Writes the fixture portion of a JUnit test method. Primarily, this
          * involves declaring and instantiating variables and parameter values.
+         * Only variables declared on the top level are considered here.
          * 
          * @param model
          *            {@link Model} instance representing the fixture
          */
-        private void writeTestFixture(Model model) {
+        private void writeTestFixture(TestCase testCase) {
+
+            IModel model = testCase.getModel();
 
             for (IModelObject object : model.getVariables()) {
                 writeVariableDeclaration((ModelVariable) object);
@@ -204,22 +221,22 @@ public class JUnitGenerator {
              * processing.
              */
             String instantiation = "";
-            if (isPrimitiveType(variable.getValue())) {
-                instantiation = variable.getValue().toString();
-            } else {
+            if (variable.getValue() instanceof ModelInstance) {
                 if (variable.getValue() != null) {
                     String reference = ((ModelInstance) variable.getValue())
                             .getIdentifier();
-                    instantiation = "getObjectInstance(" + reference + ");";
+                    instantiation = "getObjectInstance(" + reference + ")";
                 } else {
-                    instantiation = "null;";
+                    instantiation = "null";
                 }
+            } else {
+                instantiation = variable.getValue().toString();
             }
 
             /*
              * Finally, print the complete declaration and instantiation
              */
-            writeLine(declaration + " = " + instantiation + "\n");
+            writeLine(declaration + " = " + instantiation + ";\n");
         }
 
         /**
@@ -242,115 +259,265 @@ public class JUnitGenerator {
             /*
              * Write the HashMap for holding the object instances.
              */
-            writeLine("\n");
-            writeComment(
-                    "KeYTestGen put me here to keep track of your object instances! Don't mind me :)",
-                    true);
-            writeLine("HashMap<Integer, Object> objectInstances = new HashMap<String,Object>()\n\n");
+            writeObjectInstanceMap();
 
             /*
              * Write the method for retrieving the actual test instances.
              */
-            writeLine("\n");
-            writeComment(
-                    "This method will retrieve an object instance corresponding to its reference ID.",
-                    true);
-            writeMethodHeader(null, "private", new String[] { "<T>" }, "T",
-                    "getObjectInstance", new String[] { "int reference" });
-            writeLine("return (T)objectInstances.get(reference)\n");
-            writeClosingBrace();
+            writeGetObjectInstanceMethod();
 
             /*
              * Write the main init method for creating the repository of Object
              * instances.
              */
-            writeLine("\n");
-            writeMethodHeader(new String[] { "@BeforeClass" }, "public",
-                    new String[] { "static" }, "void",
-                    "createFixtureRepository", null);
+            writeCreateInstanceRepositoryMethod(testCases);
+        }
 
-            /*
-             * Inside the init method, write the initializers for the individual
-             * instances.
-             */
-            for (TestCase testCase : testCases) {
-                createInstancesForModel((Model) testCase.getModel());
-            }
+        /**
+         * Writes the declaration and initialization of the Map holding the
+         * concrete object instances used in this test class.
+         */
+        private void writeObjectInstanceMap() {
+
+            writeLine("\n");
+            writeComment(
+                    "KeYTestGen put me here to keep track of your object instances! Don't mind me :)",
+                    true);
+            writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>()\n\n");
+        }
+
+        /**
+         * Writes the declaration and definition of the getObjectInstance(int
+         * reference), which allows the test methods in the class to retrieve
+         * the object instances they need in order to set up their fixtures.
+         */
+        private void writeGetObjectInstanceMethod() {
+
+            writeLine("\n");
+            writeComment(
+                    "This method will retrieve an object instance corresponding to its reference ID.",
+                    true);
+            writeMethodHeader(null, "private",
+                    new String[] { "static", "<T>" }, "T", "getObjectInstance",
+                    new String[] { "int reference" }, null);
+            writeLine("return (T)objectInstances.get(reference)\n");
             writeClosingBrace();
         }
 
         /**
-         * Creates object instances for a {@link Model} instance.
+         * Writes the createInstanceRepository() method, which is responsible
+         * for creating and instantiating all the concrete object instances used
+         * in the test fixtures of the test methods.
+         * 
+         * @param testCases
+         */
+        private void writeCreateInstanceRepositoryMethod(
+                LinkedList<TestCase> testCases) {
+
+            writeComment(
+                    "This method will set up the entire repository of object instances needed to execute the test cases declared above.",
+                    true);
+
+            /*
+             * Write the method header. Observe the annotation.
+             */
+            writeMethodHeader(new String[] { "@BeforeClass" }, "public",
+                    new String[] { "static" }, "void",
+                    "createFixtureRepository", null, new String[] {
+                            "NoSuchFieldException", "SecurityException",
+                            "IllegalArgumentException",
+                            "IllegalAccessException" });
+
+            /*
+             * Write the object instantiations and the routines for storing them
+             * in the instance Map.
+             */
+            LinkedList<ModelInstance> instances = collectInstances(testCases);
+
+            /*
+             * Write the instantiation of the instances.
+             */
+            writeComment(
+                    "Instantiate and insert the raw object instances into the repository. ",
+                    false);
+            for (ModelInstance instance : instances) {
+                String toImport = instance.getType();
+                imports.add(toImport);
+                writeObjectInstantiation(instance);
+            }
+
+            /*
+             * Write the field-instantiations for the same instances, concluding
+             * the fixture setup procedure.
+             */
+            writeComment(
+                    "Finalize the repository setup by setting up the relevant fields of each object instance.. ",
+                    false);
+            for (ModelInstance instance : instances) {
+                if (!instance.getFields().isEmpty()) {
+                    writeObjectFieldInstantiation(instance);
+                }
+            }
+
+            writeClosingBrace();
+        }
+
+        /**
+         * Given a set of {@link TestCase} instances, this method will extract
+         * put all {@link ModelInstance} declared in the model of each testcase
+         * into a single list.
+         * 
+         * @param testCases
+         *            the test cases
+         * @return a list of all instances declared in all test cases models
+         */
+        private LinkedList<ModelInstance> collectInstances(
+                LinkedList<TestCase> testCases) {
+
+            LinkedList<ModelInstance> instances = new LinkedList<ModelInstance>();
+            for (TestCase testCase : testCases) {
+                List<ModelInstance> collectedInstances = extractInstancesFromModel((Model) testCase
+                        .getModel());
+                instances.addAll(collectedInstances);
+            }
+
+            return instances;
+        }
+
+        /**
+         * Given a {@link Model}, this method will extract all instances of
+         * {@link ModelInstance} from it.
          * 
          * @param model
-         *            the model
+         * @return
          */
-        private void createInstancesForModel(Model model) {
+        private List<ModelInstance> extractInstancesFromModel(Model model) {
 
+            LinkedList<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (IModelObject object : model.getVariables()) {
                 ModelVariable variable = (ModelVariable) object;
                 if (variable.getValue() instanceof ModelInstance) {
-                    writeLine("\n");
-                    writeModelInstantiation((ModelInstance) variable.getValue());
+                    instances.add((ModelInstance) variable.getValue());
                 }
             }
+            return instances;
         }
 
-        private void writeModelInstantiation(ModelInstance instance) {
+        /**
+         * Writes the logic needed to instantiate an object and put it into the
+         * instance Map.
+         * 
+         * @param instance
+         *            the object instance to encode
+         */
+        private void writeObjectInstantiation(ModelInstance instance) {
 
-            try {
+            /*
+             * Indicates whether or not this instance corresponds to the Java
+             * class being tested (as we treat this one separately).
+             */
+            boolean isSelf = instance.getIdentifier().equals("self");
 
-                Class<?> instanceType;
-                if (instance.getIdentifier().equals("self")) {
-                    instanceType = Class.forName(className);
+            writeLine("objectInstances.put(" + instance.getIdentifier() + ","
+                    + " new " + instance.getTypeName() + "());\n");
+        }
+
+        /**
+         * Given an object instance, this method will properly setup this
+         * instances by setting any mentioned fields to their expected values.
+         * 
+         * @param instance
+         */
+        private void writeObjectFieldInstantiation(ModelInstance instance) {
+
+            /*
+             * To avoid any potential namespace clashes, we let each
+             * instantiation take place in its own scope.
+             */
+            writeOpeningBrace();
+
+            /*
+             * Write logic to fetch the actual instance of the instance.
+             */
+            writeLine(instance.getTypeName() + " instance = getObjectInstance("
+                    + instance.getIdentifier() + ");\n");
+
+            /*
+             * Write reflection code for each relevant field of the instance, in
+             * order to set it up properly.
+             */
+            for (ModelVariable field : instance.getFields()) {
+                String variableName = field.getName();
+                writeLine("\n");
+                writeLine("Field " + variableName + " = "
+                        + "instance.getClass().getDeclaredField(" + "\""
+                        + variableName + "\"" + ");\n");
+                writeLine(variableName + ".setAccessible(true);\n");
+
+                /*
+                 * When it comes to setting the value, different courses of
+                 * action are needed for primitive and reference type variables.
+                 * Reference types will be encoded as a fetch of the relevant
+                 * object instance using the getObjectInstance method. Primitive
+                 * types will simply be encoded in terms of their primitive
+                 * values.
+                 */
+                if (field.getValue() instanceof ModelInstance) {
+
+                    ModelInstance instanceField = (ModelInstance) field
+                            .getValue();
+                    writeLine(variableName + ".set(instance, "
+                            + "getObjectInstance("
+                            + instanceField.getIdentifier() + ") " + ");\n");
                 } else {
-                    instanceType = Class.forName(instance.getType());
-                }
-                writeOpeningBrace();
-                writeLine("Integer identifier = " + instance.getIdentifier()
-                        + ";\n");
-
-                writeClosingBrace();
-
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        /**
-         * Attempts to find a no-args constructor for a target type.
-         * 
-         * @param klass
-         *            the type for which to find the constructor
-         * @return the constructor
-         */
-        private Constructor<?> getNoArgsConstructor(Class<?> klass) {
-
-            for (Constructor<?> constructor : klass.getConstructors()) {
-
-                if (constructor.getParameterTypes().length == 0) {
-                    return constructor;
+                    writeLine(variableName + ".set(instance, "
+                            + field.getValue() + ");\n");
                 }
             }
 
-            return null;
+            writeClosingBrace();
+            writeLine("\n");
         }
 
-        /**
-         * Checks if an objects runtime type is primitive.
-         * 
-         * @param object
-         *            the object whose type to check
-         * @return true if the runtime type is positive, false otherwise
-         */
-        private boolean isPrimitiveType(Object object) {
-            return object.getClass() == Integer.class
-                    || object.getClass() == Boolean.class
-                    || object.getClass() == Byte.class
-                    || object.getClass() == Long.class
-                    || object.getClass() == Float.class
-                    || object.getClass() == Double.class;
+        @Override
+        protected String getCurrentOutput() {
+
+            StringBuilder builder = new StringBuilder();
+
+            /*
+             * Write the package declaration.
+             */
+            builder.append("package ");
+            builder.append(className);
+            builder.append("TestClass;\n\n");
+
+            /*
+             * Write the general imports (JUnit libs etc)
+             */
+            builder.append("import ");
+            builder.append("org.junit.*");
+            builder.append(";\n");
+
+            builder.append("import ");
+            builder.append("java.lang.reflect.*");
+            builder.append(";\n");
+
+            builder.append("import ");
+            builder.append("java.util.*");
+            builder.append(";\n");
+
+            /*
+             * Write the specific imports.
+             */
+            for (String importt : imports) {
+                builder.append("import ");
+                builder.append(importt);
+                builder.append(";\n");
+            }
+            builder.append("\n");
+            builder.append(super.getCurrentOutput());
+
+            return builder.toString();
         }
 
         /**
@@ -405,6 +572,24 @@ public class JUnitGenerator {
             }
 
             return true;
+        }
+
+        /**
+         * Attempts to find a no-args constructor for a target type.
+         * 
+         * @param klass
+         *            the type for which to find the constructor
+         * @return the constructor
+         */
+        private Constructor<?> getNoArgsConstructor(Class<?> klass) {
+
+            for (Constructor<?> constructor : klass.getConstructors()) {
+
+                if (constructor.getParameterTypes().length == 0) {
+                    return constructor;
+                }
+            }
+            return null;
         }
     }
 }
