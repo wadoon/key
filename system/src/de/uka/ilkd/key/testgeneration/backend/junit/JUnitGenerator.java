@@ -188,8 +188,37 @@ public class JUnitGenerator {
 
             IModel model = testCase.getModel();
 
-            for (IModelObject object : model.getVariables()) {
-                writeVariableDeclaration((ModelVariable) object);
+            /*
+             * Isolate the ModelInstance corresponding to the class which
+             * contains the method being tested.
+             */
+            ModelInstance self = null;
+            for (IModelObject object : testCase.getModel().getVariables()) {
+                ModelVariable variable = (ModelVariable) object;
+                if (variable.getIdentifier().equals("self")) {
+                    self = (ModelInstance) variable.getValue();
+                }
+            }
+
+            /*
+             * Extract the names of the method parameters.
+             */
+            LinkedList<String> parameterNames = new LinkedList<String>();
+            for (IProgramVariable variable : testCase.getMethod()
+                    .getParameters()) {
+
+                parameterNames.add(variable.name().toString());
+            }
+
+            /*
+             * Proceed with writing the fixture, but only for parameters (all
+             * other fields will be instantiated as part of the instance setup
+             * process.
+             */
+            for (ModelVariable variable : self.getFields()) {
+                if (parameterNames.contains(variable.getIdentifier())) {
+                    writeVariableDeclaration(variable);
+                }
             }
         }
 
