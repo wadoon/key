@@ -74,7 +74,7 @@ public class ModelGenerator implements IModelGenerator {
      */
     public static ModelGenerator getDefaultModelGenerator() {
 
-        return new ModelGenerator(new SMTSettings(), SolverType.KeYnterpol);
+        return new ModelGenerator(new SMTSettings(), SolverType.Z3_SOLVER);
     }
 
     /**
@@ -179,7 +179,7 @@ public class ModelGenerator implements IModelGenerator {
              * encapsulated in the existing SMTProblem.
              */
             try {
-                launcher.launch(problem, services, SolverType.KeYnterpol);
+                launcher.launch(problem, services, SolverType.Z3_SOLVER);
 
                 result = problem.getFinalResult();
 
@@ -422,7 +422,8 @@ public class ModelGenerator implements IModelGenerator {
         @Override
         public String getLogic() {
 
-            return "QF_UFLIRA";
+            //return "QF_UFLIRA";
+            return "AUFLIA";
         }
 
         @Override

@@ -187,6 +187,8 @@ public class JUnitGenerator {
 
             try {
                 writeComment( testCase.getNode().getFormatedPathCondition(), false);
+                writeComment(testCase.getNode().getPathCondition().toString(), false);
+                writeComment(testCase.getNode().getParent().toString(), false);
             } catch (ProofInputException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

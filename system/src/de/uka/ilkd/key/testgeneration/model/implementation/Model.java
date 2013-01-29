@@ -257,7 +257,7 @@ public class Model implements IModel {
         String[] definitions = smtOutput.trim().split("\\(define-fun");
         for (String definition : definitions) {
 
-            if (!definition.isEmpty()) {
+            if (!definition.isEmpty() && !definition.trim().startsWith("sat")) {
 
                 definition = definition.trim();
 

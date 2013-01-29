@@ -36,7 +36,7 @@ public class Sandbox extends KeYTestGenTest {
             IOException, XMLGeneratorException, ProblemLoaderException,
             IllegalFormulaException {
 
-        String method = "midTwoProxy";
+        String method = "midOneProxyOneInstance";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
         List<IExecutionNode> nodes = retrieveNode(environment.getBuilder()
@@ -161,7 +161,7 @@ public class Sandbox extends KeYTestGenTest {
 
         @Override
         public boolean checkForSupport() {
-        
+
             return false;
         }
     }

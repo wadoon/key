@@ -375,7 +375,11 @@ public class PathconditionParser extends AbstractTermParser {
         public ContextVisitor(Model model, Services services,
                 ModelMediator mediator) {
 
-            this.mediator = mediator;
+            if (mediator == null) {
+                this.mediator = new ModelMediator();
+            } else {
+                this.mediator = mediator;
+            }
 
             this.model = model;
             javaInfo = services.getJavaInfo();
@@ -383,8 +387,12 @@ public class PathconditionParser extends AbstractTermParser {
             /*
              * Construct the default base class
              */
-            ProgramElementName name = new ProgramElementName(mediator
-                    .getMainClass().getName());
+            ProgramElementName name = null;
+            if (mediator == null || mediator.getMainClass() == null) {
+                name = new ProgramElementName("UnitTestingClass");
+            } else {
+                name = new ProgramElementName(mediator.getMainClass().getName());
+            }
 
             ClassDeclaration baseType = new ClassDeclaration(new Modifier[0],
                     name, null, name, null, new MemberDeclaration[0], false,

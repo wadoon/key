@@ -6,6 +6,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
+import de.uka.ilkd.key.testgeneration.backend.AbstractConcurrentTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
@@ -24,7 +25,7 @@ import de.uka.ilkd.key.testgeneration.util.Benchmark;
  * @author christopher
  * 
  */
-public class JUnitTestCaseGenerator extends AbstractTestCaseGenerator {
+public class JUnitTestCaseGenerator extends AbstractConcurrentTestCaseGenerator {
 
     public JUnitTestCaseGenerator() throws ModelGeneratorException {
         super(ModelGenerator.getDefaultModelGenerator());

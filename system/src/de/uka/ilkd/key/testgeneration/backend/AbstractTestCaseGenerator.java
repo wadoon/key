@@ -179,9 +179,17 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
 
                 try {
 
+                    /*
+                     * Set up a temporary ModelMediator for use with this
+                     * particular node.
+                     */
                     ModelMediator modelMediator = new ModelMediator();
                     modelMediator.setMainClass(mediator.getMainClass());
 
+                    /*
+                     * Extract the method parameter names, to be passed to the
+                     * model generator as part of the mediator.
+                     */
                     LinkedList<String> methodParameters = new LinkedList<String>();
                     for (IProgramVariable programVariable : method
                             .getParameters()) {
@@ -189,6 +197,15 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
                     }
                     modelMediator.setMethodParameterNames(methodParameters);
 
+                    /*
+                     * Start the model generation session.
+                     */
+                    try {
+                        System.out.println(node.getFormatedPathCondition());
+                        System.out.println(node.getPathCondition().toString());
+                    } catch (Exception e) {
+                        
+                    }
                     model = modelGenerator.generateModel(node, modelMediator);
 
                 } catch (ModelGeneratorException e) {
@@ -199,11 +216,12 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
                     + Benchmark.counters[0]);
 
             /*
-             * FIXME: This is an ugly hack since I am not sure how to handle
-             * multiple postconditions yet, fix.
+             * Finally, encapsulate the metadata for the method together with
+             * the newly generated model, as a final TestCase instance.
              */
             TestCase testCase = new TestCase(method, model, method
                     .getPostconditions().get(0));
+            testCase.setNode(node); // Debug
             testCases.add(testCase);
         }
         return testCases;
