@@ -70,6 +70,7 @@ public enum KeYInterface {
 
             DefaultProblemLoader loader = userInterface.load(javaFile, null,
                     null);
+            
             InitConfig initConfig = loader.getInitConfig();
 
             return initConfig;

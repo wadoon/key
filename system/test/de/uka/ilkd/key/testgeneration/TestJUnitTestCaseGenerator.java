@@ -20,14 +20,6 @@ import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 
 public class TestJUnitTestCaseGenerator {
     
-    @BeforeClass
-    public static void buildUp() throws ClassNotFoundException {
-        
-        System.out.println("GOT IT!");
-        
-       //System.out.println(Class.forName("de.uka.ilkd.key.testgeneration.targetmodels.PrimitiveIntegerOperations"));
-        
-    }
     
     @Test
     public void test() throws IOException, ProofInputException,
@@ -40,7 +32,7 @@ public class TestJUnitTestCaseGenerator {
         String output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        null, "midOneProxyOneInstance");
+                        null, "mid");
 
         for (Entry<String, Long> entry : Benchmark.getReadings().entrySet()) {
             System.out.println(entry.getKey() + " : " + entry.getValue()

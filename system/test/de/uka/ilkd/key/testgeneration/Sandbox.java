@@ -28,8 +28,8 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class Sandbox extends KeYTestGenTest {
 
-    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
-    private final String containerTypeName = "PrimitiveIntegerOperations";
+    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/Mid.java";
+    private final String containerTypeName = "Mid";
 
     @Test
     public void test() throws ProofInputException, ModelGeneratorException,
@@ -42,20 +42,9 @@ public class Sandbox extends KeYTestGenTest {
         List<IExecutionNode> nodes = retrieveNode(environment.getBuilder()
                 .getStartNode(), "mid=x");
 
-        ModelGenerator modelGenerator = ModelGenerator
-                .getDefaultModelGenerator();
-
-        for (IExecutionNode node : nodes) {
-            Term toSolve = TermFactory.DEFAULT.createTerm(Junctor.NOT,
-                    node.getPathCondition());
-            toSolve = PathconditionParser.simplifyTerm(toSolve);
-            SMTTranslator translator = SolverType.Z3_SOLVER
-                    .createTranslator(environment.getServices());
-            System.out.println(translator.translateProblem(toSolve,
-                    node.getServices(), new SMTSettings2()));
-
-            modelGenerator.generateModel(node);
-        }
+       for(IExecutionNode node : nodes) {
+           printSingleNode(node);
+       }
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

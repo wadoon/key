@@ -105,10 +105,8 @@ public class PrimitiveIntegerOperations {
 
     /*@ public normal_behavior   
      @ ensures (\result == x) || (\result == y) || (\result == z );      
-     @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-      (\result <= x )) || ((\result <= x) && (\result <= z ));      
-     @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-      (\result >= x )) || ((\result >= x) && (\result >= z ));      
+     @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) && (\result <= x )) || ((\result <= x) && (\result <= z ));      
+     @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) && (\result >= x )) || ((\result >= x) && (\result >= z ));      
      @*/
     public static int mid(int x, int y, int z) {
 

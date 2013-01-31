@@ -7,17 +7,16 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
-import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.parsers.JavaSourceParser;
+import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
 
 /**
  * This singleton provides the functionality needed to produce test suites for
@@ -59,13 +58,13 @@ public class JUnitGenerator {
         /**
          * Imports to be included in this test class
          */
-        private HashSet<String> imports = new HashSet<String>();
+        private final HashSet<String> imports = new HashSet<String>();
 
         /**
          * The name of the root variable (i.e. the variable pointing to the
          * instane of the object that has the methods to be tested).
          */
-        private final String SELF = "self";
+        private static final String SELF = "self";
 
         /**
          * The name of the container for the result value (if any) resulting
@@ -73,7 +72,7 @@ public class JUnitGenerator {
          * the assertion process, and must not conflict with the names of any
          * parameter values.
          */
-        private final String RESULT = "testmethodCallResult";
+        private static final String EXECUTION_RESULT = "testmethodCallResult";
 
         /**
          * Services invocations of
@@ -170,7 +169,7 @@ public class JUnitGenerator {
          */
         private void writeTestMethod(TestCase testCase) {
 
-            writeLine("\n");
+            writeLine(NEWLINE);
 
             /*
              * Write the method header.
@@ -185,14 +184,16 @@ public class JUnitGenerator {
              */
             writeTestFixture(testCase);
 
-            try {
-                writeComment( testCase.getNode().getFormatedPathCondition(), false);
-                writeComment(testCase.getNode().getPathCondition().toString(), false);
-                writeComment(testCase.getNode().getParent().toString(), false);
-            } catch (ProofInputException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            /*
+             * try { writeComment(testCase.getNode().getParent().getParent()
+             * .toString(), true);
+             * writeComment(testCase.getNode().getFormatedPathCondition(),
+             * false);
+             * writeComment(testCase.getNode().getPathCondition().toString(),
+             * false); writeComment(testCase.getNode().getParent().toString(),
+             * false); } catch (ProofInputException e) { // TODO Auto-generated
+             * catch block e.printStackTrace(); }
+             */
 
             /*
              * Close the method.
@@ -200,11 +201,13 @@ public class JUnitGenerator {
             String returnType = testCase.getMethod().getReturnType();
             String methodInvocation = "";
             if (!returnType.equals("void")) {
-                methodInvocation += returnType + " " + RESULT + " = ";
+                methodInvocation += returnType + " " + EXECUTION_RESULT + " = ";
             }
+
             methodInvocation += SELF + "." + testCase.getMethodName() + "(";
             List<IProgramVariable> parameters = testCase.getMethod()
                     .getParameters();
+
             for (int i = 0; i < parameters.size(); i++) {
                 String parameterName = parameters.get(i).name().toString();
                 methodInvocation += parameterName;
@@ -212,8 +215,13 @@ public class JUnitGenerator {
                     methodInvocation += ",";
                 }
             }
-            methodInvocation += ");\n";
+            methodInvocation += ");" + NEWLINE;
             writeLine(methodInvocation);
+
+            /*
+             * Write the oracle
+             */
+            writeTestOracle(testCase);
 
             writeClosingBrace();
         }
@@ -284,7 +292,7 @@ public class JUnitGenerator {
             /*
              * Finally, print the complete declaration and instantiation
              */
-            writeLine(declaration + " = " + instantiation + ";\n");
+            writeLine(declaration + " = " + instantiation + ";" + NEWLINE);
         }
 
         /**
@@ -327,11 +335,12 @@ public class JUnitGenerator {
          */
         private void writeObjectInstanceMap() {
 
-            writeLine("\n");
+            writeLine(NEWLINE);
             writeComment(
                     "KeYTestGen put me here to keep track of your object instances! Don't mind me :)",
                     true);
-            writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>();\n\n");
+            writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>();"
+                    + NEWLINE + NEWLINE);
         }
 
         /**
@@ -341,15 +350,33 @@ public class JUnitGenerator {
          */
         private void writeGetObjectInstanceMethod() {
 
-            writeLine("\n");
+            writeLine(NEWLINE);
             writeComment(
                     "This method will retrieve an object instance corresponding to its reference ID.",
                     true);
             writeMethodHeader(null, "private",
                     new String[] { "static", "<T>" }, "T", "getObjectInstance",
                     new String[] { "int reference" }, null);
-            writeLine("return (T)objectInstances.get(reference);\n");
+            writeLine("return (T)objectInstances.get(reference);" + NEWLINE);
             writeClosingBrace();
+        }
+
+        /**
+         * Writes the Java code constituting the test oracle for a given test
+         * case.
+         * 
+         * @param testCase
+         *            the test case
+         */
+        private void writeTestOracle(TestCase testCase) {
+
+            /*
+             * Delegate oracle generation to the Term visitor.
+             */
+            OracleGenerationVisitor oracleGenerationVisitor = new OracleGenerationVisitor(
+                    testCase);
+            oracleGenerationVisitor.generateOracle(testCase);
+
         }
 
         /**
@@ -402,10 +429,9 @@ public class JUnitGenerator {
                     "Finalize the repository setup by setting up the relevant fields of each object instance.. ",
                     false);
             for (ModelInstance instance : instances) {
-                if (instance.getFields().isEmpty()) {
-                    System.out.println();
+                if (!instance.getFields().isEmpty()) {
+                    writeObjectFieldInstantiation(instance);
                 }
-                writeObjectFieldInstantiation(instance);
             }
 
             writeClosingBrace();
@@ -473,7 +499,7 @@ public class JUnitGenerator {
              */
 
             writeLine("objectInstances.put(" + instance.getIdentifier() + ","
-                    + " new " + instance.getTypeName() + "());\n");
+                    + " new " + instance.getTypeName() + "());" + NEWLINE);
         }
 
         /**
@@ -494,7 +520,7 @@ public class JUnitGenerator {
              * Write logic to fetch the actual instance of the instance.
              */
             writeLine(instance.getTypeName() + " instance = getObjectInstance("
-                    + instance.getIdentifier() + ");\n");
+                    + instance.getIdentifier() + ");" + NEWLINE);
 
             /*
              * Write reflection code for each relevant field of the instance, in
@@ -504,11 +530,11 @@ public class JUnitGenerator {
 
                 if (!field.isParameter()) {
                     String variableName = field.getName();
-                    writeLine("\n");
+                    writeLine(NEWLINE);
                     writeLine("Field " + variableName + " = "
                             + "instance.getClass().getDeclaredField(" + "\""
                             + variableName + "\"" + ");\n");
-                    writeLine(variableName + ".setAccessible(true);\n");
+                    writeLine(variableName + ".setAccessible(true);" + NEWLINE);
 
                     /*
                      * When it comes to setting the value, different courses of
@@ -524,16 +550,17 @@ public class JUnitGenerator {
                                 .getValue();
                         writeLine(variableName + ".set(instance, "
                                 + "getObjectInstance("
-                                + instanceField.getIdentifier() + ") " + ");\n");
+                                + instanceField.getIdentifier() + ") " + ");"
+                                + NEWLINE);
                     } else {
                         writeLine(variableName + ".set(instance, "
-                                + field.getValue() + ");\n");
+                                + field.getValue() + ");" + NEWLINE);
                     }
                 }
             }
 
             writeClosingBrace();
-            writeLine("\n");
+            writeLine(NEWLINE);
         }
 
         @Override
@@ -571,7 +598,7 @@ public class JUnitGenerator {
                 builder.append(importt);
                 builder.append(";\n");
             }
-            builder.append("\n");
+            builder.append(NEWLINE);
             builder.append(super.getCurrentOutput());
 
             return builder.toString();
@@ -651,6 +678,187 @@ public class JUnitGenerator {
                 }
             }
             return null;
+        }
+
+        /**
+         * {@link Term} visitor which converts postconditions into Java code.
+         * 
+         * @author christopher
+         * 
+         */
+        private static class OracleGenerationVisitor extends
+                KeYTestGenTermVisitor {
+
+            /**
+             * Test case associated with this visitor;
+             */
+            private final TestCase testCase;
+
+            /**
+             * The names of the parameters declared in the testCase associated
+             * with this visitor.
+             */
+            private final List<String> parameterNames;
+
+            /**
+             * Buffer for holding generated Java code
+             */
+            LinkedList<String> buffer = new LinkedList<String>();
+
+            public OracleGenerationVisitor(TestCase testCase) {
+                this.testCase = testCase;
+
+                parameterNames = new LinkedList<String>();
+                List<IProgramVariable> variables = testCase.getMethod()
+                        .getParameters();
+                for (IProgramVariable variable : variables) {
+                    parameterNames.add(variable.name().toString());
+                }
+            }
+
+            public void generateOracle(TestCase testCase) {
+
+                /*
+                 * Traverse the postcondition(s) in the testcase, filling the
+                 * buffer with the encoded terms.
+                 */
+                System.out.println("ORACLE\n\n");
+                testCase.getOracle().execPreOrder(this);
+
+                /*
+                 * Process and turn the buffer into an executable JUnit
+                 * assertion
+                 */
+                String assertion = processBuffer();
+                System.out.println(assertion);
+            }
+
+            /**
+             * Recursively unwind the buffer, turning the order of encoded
+             * statements and identifiers into a semantically equivalent Java
+             * statement.
+             * 
+             * @return
+             */
+            private String processBuffer() {
+
+                if (!buffer.isEmpty()) {
+                    String next = buffer.pollFirst();
+
+                    /*
+                     * Process unary operators
+                     */
+                    if (next.equals(NOT)) {
+                        String statement = processBuffer();
+                        return "!(" + statement + ")";
+
+                        /*
+                         * Process binary operators
+                         */
+                    } else if (operators.contains(next)) {
+                        String lefthand = processBuffer();
+                        String righthand = processBuffer();
+
+                        if (next.equals(AND)) {
+                            return lefthand + " && " + righthand;
+
+                        } else if (next.equals(OR)) {
+                            return lefthand + " || " + righthand;
+
+                        } else if (next.equals(EQUALS)) {
+                            return "(" + lefthand + " == " + righthand + ")";
+
+                        } else if (next.equals(GREATER_OR_EQUALS)) {
+                            return "(" + lefthand + " >= " + righthand + ")";
+
+                        } else if (next.equals(LESS_OR_EQUALS)) {
+                            return "(" + lefthand + " >= " + righthand + ")";
+
+                        } else if (next.equals(GREATER_THAN)) {
+                            return "(" + lefthand + " > " + righthand + ")";
+
+                        } else if (next.equals(LESS_THAN)) {
+                            return "(" + lefthand + " < " + righthand + ")";
+
+                        } else if (next.equals(ADDITION)) {
+                            return "(" + lefthand + " < " + righthand + ")";
+
+                        } else if (next.equals(SUBTRACTION)) {
+                            return "(" + lefthand + " < " + righthand + ")";
+
+                        } else if (next.equals(DIVISION)) {
+                            return "(" + lefthand + " < " + righthand + ")";
+
+                        } else if (next.equals(MULTIPLICATION)) {
+                            return "(" + lefthand + " < " + righthand + ")";
+                        }
+
+                        /*
+                         * If none of the above were trapped, the operator is an
+                         * identifier, and returned as such.
+                         */
+                    } else {
+                        return next;
+                    }
+                }
+
+                /*
+                 * Default case (iff. the buffer is empty)
+                 */
+                return "";
+            }
+
+            /**
+             * Generate a textual representation for each relevant node
+             */
+            @Override
+            public void visit(Term visited) {
+
+                if (isAnd(visited)) {
+                    buffer.add(AND);
+
+                } else if (isOr(visited)) {
+                    buffer.add(OR);
+
+                } else if (isGreaterOrEquals(visited)) {
+                    buffer.add(GREATER_OR_EQUALS);
+
+                } else if (isGreaterThan(visited)) {
+                    buffer.add(GREATER_THAN);
+
+                } else if (isLessOrEquals(visited)) {
+                    buffer.add(LESS_OR_EQUALS);
+
+                } else if (isLessThan(visited)) {
+                    buffer.add(LESS_THAN);
+
+                } else if (isEquals(visited)) {
+                    buffer.add(EQUALS);
+
+                } else if (isNot(visited)) {
+                    buffer.add(NOT);
+
+                } else if (isParamaterValue(visited)) {
+                    buffer.add("--PARAM" + visited.op().name().toString());
+
+                } else if (isLocationVariable(visited)) {
+                    buffer.add(visited.op().name().toString());
+
+                } else if (isSortDependingFunction(visited)) {
+                    String identifier = resolveIdentifierString(visited);
+                    buffer.add(identifier);
+
+                } else if (isResult(visited)) {
+                    buffer.add(EXECUTION_RESULT);
+                }
+            }
+
+            private boolean isParamaterValue(Term term) {
+
+                String name = term.op().name().toString();
+
+                return parameterNames.contains(name);
+            }
         }
     }
 }

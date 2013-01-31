@@ -168,8 +168,7 @@ public abstract class AbstractConcurrentTestCaseGenerator implements ITestCaseGe
         List<TestCase> testCases = new LinkedList<TestCase>();
         List<ModelCapsule> capsules = new LinkedList<ModelCapsule>();
 
-        Benchmark.startBenchmarking("   generating models "
-                + ++Benchmark.counters[0]);
+        Benchmark.startBenchmarking("generating models");
 
         try {
 
@@ -201,8 +200,7 @@ public abstract class AbstractConcurrentTestCaseGenerator implements ITestCaseGe
             System.err.println("INTERRUPTED!");
         }
 
-        Benchmark.finishBenchmarking("   generating models "
-                + Benchmark.counters[0]);
+        Benchmark.finishBenchmarking("generating models");
 
         return testCases;
     }

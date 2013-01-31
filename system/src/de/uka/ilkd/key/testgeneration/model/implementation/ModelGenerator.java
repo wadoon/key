@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -135,23 +136,17 @@ public class ModelGenerator implements IModelGenerator {
      * @throws ModelGeneratorException
      *             in the event that the SMT problem cannot be generated
      */
-    private synchronized SMTProblem createSMTProblem(final Term pathCondition)
+    private synchronized SMTProblem createSMTProblem(Term pathCondition)
             throws ModelGeneratorException {
-
-        /*
-         * Simplify the path condition
-         */
-        Term simplifiedPathCondition = PathconditionParser
-                .simplifyTerm(pathCondition);
 
         /*
          * The path condition has to be negated, in order to undo the negations
          * that will be carried out by the SMT interface.
          */
-        simplifiedPathCondition = TermFactory.DEFAULT.createTerm(Junctor.NOT,
-                simplifiedPathCondition);
+        pathCondition = TermFactory.DEFAULT.createTerm(Junctor.NOT,
+                pathCondition);
 
-        return new SMTProblem(simplifiedPathCondition);
+        return new SMTProblem(pathCondition);
 
     }
 
@@ -248,17 +243,17 @@ public class ModelGenerator implements IModelGenerator {
          * is hence nothing useful we can do with it, and we just return it as
          * null.
          */
-        Term simplifiedPathcondition = PathconditionParser
+        Term simplifiedPathCondition = PathconditionParser
                 .simplifyTerm(pathCondition);
 
-        if (simplifiedPathcondition == null) {
+        if (simplifiedPathCondition == null) {
             return null;
         } else {
 
             /*
              * Turn the path condition of the node into a constraint problem
              */
-            SMTProblem problem = createSMTProblem(simplifiedPathcondition);
+            SMTProblem problem = createSMTProblem(simplifiedPathCondition);
 
             /*
              * Solve the constraint and return the result
@@ -284,8 +279,6 @@ public class ModelGenerator implements IModelGenerator {
 
         try {
             
-            System.out.println(node.getFormatedPathCondition());
-
             Term pathCondition = node.getPathCondition();
             Services services = node.getServices();
 
@@ -422,7 +415,7 @@ public class ModelGenerator implements IModelGenerator {
         @Override
         public String getLogic() {
 
-            //return "QF_UFLIRA";
+            // return "QF_UFLIRA";
             return "AUFLIA";
         }
 

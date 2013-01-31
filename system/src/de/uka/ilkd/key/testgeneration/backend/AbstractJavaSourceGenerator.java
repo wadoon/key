@@ -11,6 +11,8 @@ public abstract class AbstractJavaSourceGenerator {
 
     // 4-space tab
     private static final String TAB = "    ";
+    
+    protected static final String NEWLINE = "\n";
 
     private int indentation = 0;
 
@@ -56,7 +58,7 @@ public abstract class AbstractJavaSourceGenerator {
 
         if (annotations != null) {
             for (String annotation : annotations) {
-                writeLine(annotation + "\n");
+                writeLine(annotation + NEWLINE);
             }
         }
 
@@ -127,7 +129,7 @@ public abstract class AbstractJavaSourceGenerator {
 
         if (annotations != null) {
             for (String annotation : annotations) {
-                writeLine(annotation + "\n");
+                writeLine(annotation + NEWLINE);
             }
         }
 
@@ -160,7 +162,7 @@ public abstract class AbstractJavaSourceGenerator {
          * Write the exceptions, if any.
          */
         if (exceptions != null) {
-            output.append("\n");
+            output.append(NEWLINE);
             indent();
 
             writeLine("throws ");
@@ -197,7 +199,7 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void writeComment(String text, boolean isJavadoc) {
 
-        writeLine("\n");
+        writeLine(NEWLINE);
 
         if (isJavadoc) {
             writeLine("/**\n");
@@ -217,7 +219,7 @@ public abstract class AbstractJavaSourceGenerator {
 
             if (characterCount >= 50) {
                 characterCount = 0;
-                output.append(" " + word + "\n");
+                output.append(" " + word + NEWLINE);
                 writeLine(" *");
                 continue;
             } else {
@@ -225,7 +227,7 @@ public abstract class AbstractJavaSourceGenerator {
                 characterCount += word.length();
             }
         }
-        output.append("\n");
+        output.append(NEWLINE);
 
         writeLine(" */\n");
     }
