@@ -29,16 +29,23 @@ public class TestJUnitTestCaseGenerator {
         Assert.assertTrue(new File("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
         
         ITestCaseGenerator testCaseGenerator = new JUnitTestCaseGenerator();
+   
         String output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
                         null, "mid");
 
+        /*
+        String output = testCaseGenerator
+                .generatePartialTestSuite(
+                        "/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
+                        null, "midOneProxyOneInstance");
+*/
         for (Entry<String, Long> entry : Benchmark.getReadings().entrySet()) {
             System.out.println(entry.getKey() + " : " + entry.getValue()
                     + " milliseconds");
         }
-        System.out.println(output);
+        //System.out.println(output);
     }
     
     private <T> T get(Object o) {

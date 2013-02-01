@@ -108,6 +108,14 @@ public abstract class KeYTestGenTermVisitor extends Visitor {
      */
     protected boolean isBinaryFunction(Term term) {
 
+        /*
+         * Since Not also qualifies as a junctor, albeit a unary one, check this
+         * first.
+         */
+        if (isNot(term)) {
+            return false;
+        }
+
         de.uka.ilkd.key.logic.op.Operator operator = term.op();
 
         return operator instanceof Junctor || operator instanceof Equality;
@@ -128,14 +136,7 @@ public abstract class KeYTestGenTermVisitor extends Visitor {
      */
     protected boolean isAnd(Term term) {
 
-        if (isBinaryFunction(term)) {
-
-            return term.op().name().toString().equals(AND);
-
-        } else {
-
-            return false;
-        }
+        return term.op().name().toString().equals(AND);
     }
 
     /**
@@ -145,7 +146,7 @@ public abstract class KeYTestGenTermVisitor extends Visitor {
      */
     protected boolean isGreaterOrEquals(Term term) {
 
-            return term.op().name().toString().equals(GREATER_OR_EQUALS);
+        return term.op().name().toString().equals(GREATER_OR_EQUALS);
     }
 
     /**
@@ -155,7 +156,7 @@ public abstract class KeYTestGenTermVisitor extends Visitor {
      */
     protected boolean isGreaterThan(Term term) {
 
-            return term.op().name().toString().equals(GREATER_THAN);
+        return term.op().name().toString().equals(GREATER_THAN);
     }
 
     /**
@@ -165,7 +166,7 @@ public abstract class KeYTestGenTermVisitor extends Visitor {
      */
     protected boolean isLessOrEquals(Term term) {
 
-            return term.op().name().toString().equals(LESS_OR_EQUALS);
+        return term.op().name().toString().equals(LESS_OR_EQUALS);
     }
 
     /**
@@ -175,7 +176,7 @@ public abstract class KeYTestGenTermVisitor extends Visitor {
      */
     protected boolean isLessThan(Term term) {
 
-            return term.op().name().toString().equals(LESS_THAN);
+        return term.op().name().toString().equals(LESS_THAN);
     }
 
     /**
@@ -202,14 +203,7 @@ public abstract class KeYTestGenTermVisitor extends Visitor {
      */
     protected boolean isEquals(Term term) {
 
-        if (isBinaryFunction(term)) {
-
-            return term.op() instanceof Equality;
-
-        } else {
-
-            return false;
-        }
+        return term.op() instanceof Equality;
     }
 
     /**
@@ -229,14 +223,7 @@ public abstract class KeYTestGenTermVisitor extends Visitor {
      */
     protected boolean isNot(Term term) {
 
-        if (isBinaryFunction(term)) {
-
-            return term.op().name().toString().equals(NOT);
-
-        } else {
-
-            return false;
-        }
+        return term.op().name().toString().equals(NOT);
     }
 
     /**

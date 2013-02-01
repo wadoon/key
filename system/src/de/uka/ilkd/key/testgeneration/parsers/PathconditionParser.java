@@ -24,6 +24,7 @@ import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelMediator;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
 
 /**
  * Provides various methods for processing the pathconditions for
@@ -160,7 +161,6 @@ public class PathconditionParser extends AbstractTermParser {
             throws ModelGeneratorException {
 
         Operator operator = term.op();
-        Sort sort = term.sort();
 
         if (operator.toString().equals("null")) {
             return null;
@@ -440,8 +440,6 @@ public class PathconditionParser extends AbstractTermParser {
         @Override
         public void visit(Term visited) {
 
-            Operator operator = visited.op();
-
             if (isVariable(visited)) {
                 parseVariableTerm(visited);
             }
@@ -705,7 +703,7 @@ public class PathconditionParser extends AbstractTermParser {
      * 
      * @author christopher
      */
-    private static class ReferenceVisitor extends Visitor {
+    private static class ReferenceVisitor extends KeYTestGenTermVisitor {
 
         /**
          * Flag to indicate if we have seen a Not operator.
@@ -726,15 +724,12 @@ public class PathconditionParser extends AbstractTermParser {
         @Override
         public void visit(Term visited) {
 
-            Operator operator = visited.op();
-
-            if (operator instanceof Junctor
-                    && operator.toString().equals("not")) {
+            if (isNot(visited)) {
                 sawNot = true;
-            } else if (operator instanceof Equality && !sawNot) {
+            } else if (isEquals(visited) && !sawNot) {
                 parseEquals(visited);
                 sawNot = false;
-            } else if (operator instanceof Junctor) {
+            } else if (isBinaryFunction(visited) && sawNot) {
                 sawNot = false;
             }
         }

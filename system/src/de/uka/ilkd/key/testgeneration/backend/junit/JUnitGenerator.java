@@ -180,43 +180,16 @@ public class JUnitGenerator {
                     methodName + ID++, null, null);
 
             /*
-             * Write the method body.
+             * Write the test fixture.
              */
             writeTestFixture(testCase);
 
             /*
-             * try { writeComment(testCase.getNode().getParent().getParent()
-             * .toString(), true);
-             * writeComment(testCase.getNode().getFormatedPathCondition(),
-             * false);
-             * writeComment(testCase.getNode().getPathCondition().toString(),
-             * false); writeComment(testCase.getNode().getParent().toString(),
-             * false); } catch (ProofInputException e) { // TODO Auto-generated
-             * catch block e.printStackTrace(); }
+             * Write the invocation of the method itself. If the method return
+             * type is different from void, write a temporary variable to store
+             * the result.
              */
-
-            /*
-             * Close the method.
-             */
-            String returnType = testCase.getMethod().getReturnType();
-            String methodInvocation = "";
-            if (!returnType.equals("void")) {
-                methodInvocation += returnType + " " + EXECUTION_RESULT + " = ";
-            }
-
-            methodInvocation += SELF + "." + testCase.getMethodName() + "(";
-            List<IProgramVariable> parameters = testCase.getMethod()
-                    .getParameters();
-
-            for (int i = 0; i < parameters.size(); i++) {
-                String parameterName = parameters.get(i).name().toString();
-                methodInvocation += parameterName;
-                if (i != parameters.size() - 1) {
-                    methodInvocation += ",";
-                }
-            }
-            methodInvocation += ");" + NEWLINE;
-            writeLine(methodInvocation);
+            writeMethodInvocation(testCase);
 
             /*
              * Write the oracle
@@ -247,6 +220,36 @@ public class JUnitGenerator {
                     writeVariableDeclaration(variable);
                 }
             }
+        }
+
+        /**
+         * Writes the logic needed to invoke the method under test (MUT) for a
+         * given testcase. If the MUT is of non-void type, this logic will
+         * include a temporary variable for storing the result.
+         * 
+         * @param testCase
+         */
+        private void writeMethodInvocation(TestCase testCase) {
+
+            String returnType = testCase.getMethod().getReturnType();
+            String methodInvocation = "";
+            if (!returnType.equals("void")) {
+                methodInvocation += returnType + " " + EXECUTION_RESULT + " = ";
+            }
+
+            methodInvocation += SELF + "." + testCase.getMethodName() + "(";
+            List<IProgramVariable> parameters = testCase.getMethod()
+                    .getParameters();
+
+            for (int i = 0; i < parameters.size(); i++) {
+                String parameterName = parameters.get(i).name().toString();
+                methodInvocation += parameterName;
+                if (i != parameters.size() - 1) {
+                    methodInvocation += ",";
+                }
+            }
+            methodInvocation += ");" + NEWLINE;
+            writeLine(methodInvocation);
         }
 
         /**
@@ -373,10 +376,10 @@ public class JUnitGenerator {
             /*
              * Delegate oracle generation to the Term visitor.
              */
-            OracleGenerationVisitor oracleGenerationVisitor = new OracleGenerationVisitor(
-                    testCase);
-            oracleGenerationVisitor.generateOracle(testCase);
-
+            List<String> assertions = new OracleGenerationVisitor(testCase)
+                    .generateOracle();
+            
+            
         }
 
         /**
@@ -716,21 +719,27 @@ public class JUnitGenerator {
                 }
             }
 
-            public void generateOracle(TestCase testCase) {
+            public List<String> generateOracle() {
 
                 /*
                  * Traverse the postcondition(s) in the testcase, filling the
                  * buffer with the encoded terms.
                  */
-                System.out.println("ORACLE\n\n");
                 testCase.getOracle().execPreOrder(this);
 
                 /*
-                 * Process and turn the buffer into an executable JUnit
-                 * assertion
+                 * Process and turn the buffer into a String of boolean Java
+                 * statements. Split this assertion into units, and store them
+                 * as a linked list. Return the resulting list.
                  */
-                String assertion = processBuffer();
-                System.out.println(assertion);
+                String assertionString = processBuffer();
+                String[] assertionArray = assertionString.split(NEWLINE);
+                LinkedList<String> assertions = new LinkedList<String>();
+                for (String assertion : assertionArray) {
+                    assertions.add(assertion);
+                }
+
+                return assertions;
             }
 
             /**
@@ -766,31 +775,40 @@ public class JUnitGenerator {
                             return lefthand + " || " + righthand;
 
                         } else if (next.equals(EQUALS)) {
-                            return "(" + lefthand + " == " + righthand + ")";
+                            return "(" + lefthand + " == " + righthand + ")"
+                                    + NEWLINE;
 
                         } else if (next.equals(GREATER_OR_EQUALS)) {
-                            return "(" + lefthand + " >= " + righthand + ")";
+                            return "(" + lefthand + " >= " + righthand + ")"
+                                    + NEWLINE;
 
                         } else if (next.equals(LESS_OR_EQUALS)) {
-                            return "(" + lefthand + " >= " + righthand + ")";
+                            return "(" + lefthand + " >= " + righthand + ")"
+                                    + NEWLINE;
 
                         } else if (next.equals(GREATER_THAN)) {
-                            return "(" + lefthand + " > " + righthand + ")";
+                            return "(" + lefthand + " > " + righthand + ")"
+                                    + NEWLINE;
 
                         } else if (next.equals(LESS_THAN)) {
-                            return "(" + lefthand + " < " + righthand + ")";
+                            return "(" + lefthand + " < " + righthand + ")"
+                                    + NEWLINE;
 
                         } else if (next.equals(ADDITION)) {
-                            return "(" + lefthand + " < " + righthand + ")";
+                            return "(" + lefthand + " < " + righthand + ")"
+                                    + NEWLINE;
 
                         } else if (next.equals(SUBTRACTION)) {
-                            return "(" + lefthand + " < " + righthand + ")";
+                            return "(" + lefthand + " < " + righthand + ")"
+                                    + NEWLINE;
 
                         } else if (next.equals(DIVISION)) {
-                            return "(" + lefthand + " < " + righthand + ")";
+                            return "(" + lefthand + " < " + righthand + ")"
+                                    + NEWLINE;
 
                         } else if (next.equals(MULTIPLICATION)) {
-                            return "(" + lefthand + " < " + righthand + ")";
+                            return "(" + lefthand + " < " + righthand + ")"
+                                    + NEWLINE;
                         }
 
                         /*
@@ -839,7 +857,7 @@ public class JUnitGenerator {
                     buffer.add(NOT);
 
                 } else if (isParamaterValue(visited)) {
-                    buffer.add("--PARAM" + visited.op().name().toString());
+                    buffer.add(SELF + "." + visited.op().name().toString());
 
                 } else if (isLocationVariable(visited)) {
                     buffer.add(visited.op().name().toString());
