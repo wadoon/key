@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.testgeneration.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.parsers.AbstractTermParser;
 import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
 
 /**

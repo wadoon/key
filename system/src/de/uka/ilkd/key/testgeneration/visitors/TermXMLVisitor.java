@@ -23,7 +23,7 @@ import de.uka.ilkd.key.testgeneration.parsers.AbstractTermParser;
  * 
  * @author christopher
  */
-public class TermXMLVisitor extends AbstractTermParser implements Visitor {
+public class TermXMLVisitor extends KeYTestGenTermVisitor {
 
     /**
      * The name of the root tag of the XML document. If null or empty, it is

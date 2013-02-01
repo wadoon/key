@@ -146,7 +146,7 @@ public enum OracleGenerator {
      * 
      * @author christopher
      */
-    private static class OracleGenerationVisitor extends Visitor {
+    private static class OracleGenerationVisitor extends DefaultVisitor {
 
         StringBuilder postConditionXML;
 
