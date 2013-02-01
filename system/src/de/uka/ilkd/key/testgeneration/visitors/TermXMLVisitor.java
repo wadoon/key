@@ -16,13 +16,14 @@ import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.testgeneration.parsers.AbstractTermParser;
 
 /**
  * Generates an XML representation for a {@link Term}.
  * 
  * @author christopher
  */
-public class TermXMLVisitor extends KeYTestGenTermVisitor {
+public class TermXMLVisitor extends AbstractTermParser implements Visitor {
 
     /**
      * The name of the root tag of the XML document. If null or empty, it is
