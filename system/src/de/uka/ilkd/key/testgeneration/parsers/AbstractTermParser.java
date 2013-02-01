@@ -344,6 +344,16 @@ public abstract class AbstractTermParser {
         return term.op() instanceof LocationVariable
                 || primitiveTypes.contains(sort);
     }
+    
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link LocationVariable}
+     */
+    protected boolean isSortDependingFunction(Term term) {
+
+        return term.op() instanceof SortDependingFunction;
+    }
 
     /**
      * Retrieves the short-hand name of the variable a given Term represents.

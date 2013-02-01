@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.testgeneration.oraclegeneration;
 
 import java.util.List;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
