@@ -351,7 +351,7 @@ public class PathconditionParser extends AbstractTermParser {
      * 
      * @author christopher
      */
-    private static class ContextVisitor extends Visitor {
+    private static class ContextVisitor extends KeYTestGenTermVisitor {
 
         private final ModelMediator mediator;
 

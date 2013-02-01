@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 
@@ -38,28 +39,64 @@ public abstract class AbstractTermParser {
      * since it is represented by its own operational type {@link Equality}.
      */
     protected static final LinkedList<String> binaryFunctions;
+
+    /**
+     * Used for storing an index over all operator types currently handled by
+     * KeYTestGen
+     */
+    protected static final LinkedList<String> operators;
+
+    protected static final String AND = "and";
+    protected static final String OR = "or";
+    protected static final String NOT = "not";
+
+    protected static final String GREATER_OR_EQUALS = "geq";
+    protected static final String LESS_OR_EQUALS = "leq";
+    protected static final String GREATER_THAN = "geq";
+    protected static final String LESS_THAN = "leq";
+    protected static final String EQUALS = "equals";
+
+    protected static final String MULTIPLICATION = "and";
+    protected static final String DIVISION = "division";
+    protected static final String ADDITION = "addition";
+    protected static final String SUBTRACTION = "subtraction";
+
+    protected static final String INTEGER = "int";
+    protected static final String BOOLEAN = "boolean";
+    protected static final String LONG = "long";
+    protected static final String BYTE = "byte";
+
+    protected static final String RESULT = "result";
+    
     static {
 
         primitiveTypes = new LinkedList<String>();
-        primitiveTypes.add("byte");
-        primitiveTypes.add("int");
-        primitiveTypes.add("long");
-        primitiveTypes.add("boolean");
+        primitiveTypes.add(INTEGER);
+        primitiveTypes.add(BOOLEAN);
+        primitiveTypes.add(LONG);
+        primitiveTypes.add(BYTE);
 
         binaryFunctions = new LinkedList<String>();
+        binaryFunctions.add(GREATER_OR_EQUALS);
+        binaryFunctions.add(LESS_OR_EQUALS);
+        binaryFunctions.add(MULTIPLICATION);
+        binaryFunctions.add(DIVISION);
+        binaryFunctions.add(ADDITION);
+        binaryFunctions.add(SUBTRACTION);
 
-        // The Greater-Or-Equals (>=) operator
-        binaryFunctions.add("geq");
-        // The Less-Or-Equals (<=) operator
-        binaryFunctions.add("leq");
-        // The multiplication (*) operator
-        binaryFunctions.add("mul");
-        // The division (/) operator
-        binaryFunctions.add("div");
-        // The addition (+) operator
-        binaryFunctions.add("add");
-        // The subtraction (-) operator
-        binaryFunctions.add("sub");
+        operators = new LinkedList<String>();
+        operators.add(AND);
+        operators.add(OR);
+        operators.add(NOT);
+        operators.add(GREATER_OR_EQUALS);
+        operators.add(LESS_OR_EQUALS);
+        operators.add(GREATER_THAN);
+        operators.add(LESS_THAN);
+        operators.add(MULTIPLICATION);
+        operators.add(DIVISION);
+        operators.add(ADDITION);
+        operators.add(SUBTRACTION);
+        operators.add(EQUALS);
     }
 
     /**
@@ -97,35 +134,6 @@ public abstract class AbstractTermParser {
         String sortName = term.sort().name().toString();
 
         return primitiveTypes.contains(sortName);
-    }
-
-    /**
-     * Check if the given Term represents a binary function, such as any of the
-     * {@link Junctor} instances.
-     * 
-     * @param term
-     * @return
-     */
-    protected static boolean isBinaryFunction(Term term) {
-
-        de.uka.ilkd.key.logic.op.Operator operator = term.op();
-
-        return operator instanceof Junctor || operator instanceof Equality;
-    }
-
-    /**
-     * Determines if a given {@link Term} represents a variable.
-     * 
-     * @param term
-     *            the term to check
-     * @return true if the Term represents a variable, false otherwise
-     */
-    protected static boolean isVariable(Term term) {
-
-        Operator operator = term.op();
-
-        return operator instanceof Function
-                || operator instanceof ProgramVariable;
     }
 
     /**
@@ -178,6 +186,163 @@ public abstract class AbstractTermParser {
             return resolveIdentifierString(term.sub(1)) + "_dot_"
                     + getVariableNameForTerm(term.sub(2));
         }
+    }
+    
+    
+    /**
+     * Check if the given Term represents a binary function, such as any of the
+     * {@link Junctor} instances.
+     * 
+     * @param term
+     * @return
+     */
+    protected boolean isBinaryFunction(Term term) {
+
+        /*
+         * Since Not also qualifies as a junctor, albeit a unary one, check this
+         * first.
+         */
+        if (isNot(term)) {
+            return false;
+        }
+
+        de.uka.ilkd.key.logic.op.Operator operator = term.op();
+
+        return operator instanceof Junctor || operator instanceof Equality;
+    }
+
+    protected boolean isVariable(Term term) {
+
+        Operator operator = term.op();
+
+        return operator instanceof Function
+                || operator instanceof ProgramVariable;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an AND junctor
+     */
+    protected boolean isAnd(Term term) {
+
+        return term.op().name().toString().equals(AND);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a GEQ operator
+     */
+    protected boolean isGreaterOrEquals(Term term) {
+
+        return term.op().name().toString().equals(GREATER_OR_EQUALS);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a GREATER_THAN operator
+     */
+    protected boolean isGreaterThan(Term term) {
+
+        return term.op().name().toString().equals(GREATER_THAN);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a LEQ operator
+     */
+    protected boolean isLessOrEquals(Term term) {
+
+        return term.op().name().toString().equals(LESS_OR_EQUALS);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a LESS_THAN operator
+     */
+    protected boolean isLessThan(Term term) {
+
+        return term.op().name().toString().equals(LESS_THAN);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an or junctor
+     */
+    protected boolean isOr(Term term) {
+
+        if (isBinaryFunction(term)) {
+
+            return term.op().name().toString().equals(OR);
+
+        } else {
+
+            return false;
+        }
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an EQUALS junctor
+     */
+    protected boolean isEquals(Term term) {
+
+        return term.op() instanceof Equality;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents the RESULT constant
+     */
+    protected boolean isResult(Term term) {
+
+        return term.op().name().equals(RESULT);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a NOT junctor
+     */
+    protected boolean isNot(Term term) {
+
+        return term.op().name().toString().equals(NOT);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents the {@link NullSort}
+     */
+    protected boolean isNullSort(Term term) {
+
+        if (isBinaryFunction(term)) {
+
+            return term.sort() instanceof NullSort;
+
+        } else {
+
+            return false;
+        }
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link LocationVariable}
+     */
+    protected boolean isLocationVariable(Term term) {
+
+        String sort = term.sort().name().toString();
+        return term.op() instanceof LocationVariable
+                || primitiveTypes.contains(sort);
     }
 
     /**
