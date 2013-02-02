@@ -19,7 +19,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
+import de.uka.ilkd.key.testgeneration.parsers.PathconditionTools;
+import de.uka.ilkd.key.testgeneration.parsers.TermTransformerException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestConditionParsing extends KeYTestGenTest {
@@ -73,7 +74,8 @@ public class TestConditionParsing extends KeYTestGenTest {
 
     @Test
     public void testASTProcessing() throws ProofInputException,
-            ModelGeneratorException, IOException, ProblemLoaderException {
+            ModelGeneratorException, IOException, ProblemLoaderException,
+            TermTransformerException {
 
         String method = "maxProxyInstance";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
@@ -84,8 +86,8 @@ public class TestConditionParsing extends KeYTestGenTest {
 
         // printDebug(method, targetNode);
 
-        System.out.println(PathconditionParser
-                .simplifyTerm(targetNodeCondition));
+        System.out
+                .println(PathconditionTools.simplifyTerm(targetNodeCondition));
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

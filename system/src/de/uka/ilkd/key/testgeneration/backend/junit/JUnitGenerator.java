@@ -861,7 +861,7 @@ public class JUnitGenerator {
                 } else if (isParamaterValue(visited)) {
                     buffer.add(SELF + "." + visited.op().name().toString());
 
-                } else if (isLocationVariable(visited)) {
+                } else if (isLocationVariable(visited) && isPrimitiveType(visited)) {
                     buffer.add(visited.op().name().toString());
 
                 } else if (isSortDependingFunction(visited)) {

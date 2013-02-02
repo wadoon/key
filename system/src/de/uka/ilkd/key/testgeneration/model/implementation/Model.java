@@ -8,7 +8,7 @@ import java.util.Map;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelObject;
-import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
+import de.uka.ilkd.key.testgeneration.parsers.PathconditionTools;
 
 /**
  * Default implementation of the {@link IModel} interface

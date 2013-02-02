@@ -26,14 +26,14 @@ public class TestJUnitTestCaseGenerator {
             ModelGeneratorException, TestGeneratorException,
             KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
-        Assert.assertTrue(new File("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
+        Assert.assertTrue(new File("/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
         
         ITestCaseGenerator testCaseGenerator = new JUnitTestCaseGenerator();
    
         String output = testCaseGenerator
                 .generatePartialTestSuite(
-                        "/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        null, "mid");
+                        "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
+                        null, "midOneProxyOneInstance");
 
         /*
         String output = testCaseGenerator
@@ -45,7 +45,7 @@ public class TestJUnitTestCaseGenerator {
             System.out.println(entry.getKey() + " : " + entry.getValue()
                     + " milliseconds");
         }
-        //System.out.println(output);
+        System.out.println(output);
     }
     
     private <T> T get(Object o) {

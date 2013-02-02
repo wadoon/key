@@ -22,7 +22,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.model.IModel;
 import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
+import de.uka.ilkd.key.testgeneration.parsers.PathconditionTools;
+import de.uka.ilkd.key.testgeneration.parsers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 /**
@@ -237,28 +238,36 @@ public class ModelGenerator implements IModelGenerator {
     private SMTSolverResult instantiatePathCondition(Term pathCondition,
             Services services) throws ModelGeneratorException {
 
-        /*
-         * Simplify the path condition. If the simplified path condition is
-         * null, this means that it does not contain any primitive values. There
-         * is hence nothing useful we can do with it, and we just return it as
-         * null.
-         */
-        Term simplifiedPathCondition = PathconditionParser
-                .simplifyTerm(pathCondition);
-
-        if (simplifiedPathCondition == null) {
-            return null;
-        } else {
+        try {
 
             /*
-             * Turn the path condition of the node into a constraint problem
+             * Simplify the path condition. If the simplified path condition is
+             * null, this means that it does not contain any primitive values.
+             * There is hence nothing useful we can do with it, and we just
+             * return it as null.
              */
-            SMTProblem problem = createSMTProblem(simplifiedPathCondition);
+            Term simplifiedPathCondition;
 
-            /*
-             * Solve the constraint and return the result
-             */
-            return solveSMTProblem(problem, services);
+            simplifiedPathCondition = PathconditionTools
+                    .simplifyTerm(pathCondition);
+
+            if (simplifiedPathCondition == null) {
+                return null;
+            } else {
+
+                /*
+                 * Turn the path condition of the node into a constraint problem
+                 */
+                SMTProblem problem = createSMTProblem(simplifiedPathCondition);
+
+                /*
+                 * Solve the constraint and return the result
+                 */
+                return solveSMTProblem(problem, services);
+            }
+
+        } catch (TermTransformerException e) {
+            throw new ModelGeneratorException(e.getMessage());
         }
     }
 
@@ -278,14 +287,14 @@ public class ModelGenerator implements IModelGenerator {
             throws ModelGeneratorException {
 
         try {
-            
+
             Term pathCondition = node.getPathCondition();
             Services services = node.getServices();
 
             /*
              * Create the Model
              */
-            Model model = PathconditionParser.createModel(pathCondition,
+            Model model = PathconditionTools.createModel(pathCondition,
                     services, mediator);
 
             /*

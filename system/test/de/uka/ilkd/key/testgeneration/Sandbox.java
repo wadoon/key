@@ -10,31 +10,28 @@ import org.junit.Test;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
-import de.uka.ilkd.key.smt.SMTTranslator;
-import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
-import de.uka.ilkd.key.testgeneration.parsers.PathconditionParser;
+import de.uka.ilkd.key.testgeneration.parsers.TermSimplificationTransformer;
+import de.uka.ilkd.key.testgeneration.parsers.RemoveSDPsTransformer;
+import de.uka.ilkd.key.testgeneration.parsers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class Sandbox extends KeYTestGenTest {
 
-    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/Mid.java";
-    private final String containerTypeName = "Mid";
+    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
+    private final String containerTypeName = "PrimitiveIntegerOperations";
 
     @Test
     public void test() throws ProofInputException, ModelGeneratorException,
             IOException, XMLGeneratorException, ProblemLoaderException,
-            IllegalFormulaException {
+            IllegalFormulaException, TermTransformerException {
 
         String method = "midOneProxyOneInstance";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
@@ -43,7 +40,13 @@ public class Sandbox extends KeYTestGenTest {
                 .getStartNode(), "mid=x");
 
        for(IExecutionNode node : nodes) {
-           printSingleNode(node);
+           RemoveSDPsTransformer sdpRemovingTransformer = new RemoveSDPsTransformer();
+           Term oldTerm = node.getPathCondition();
+           Term newTerm = sdpRemovingTransformer.removeSortDependingFunctions(node.getPathCondition());
+           Term newNewTerm = new TermSimplificationTransformer().simplifyTerm(newTerm);
+           System.out.println(oldTerm);
+           System.out.println(newTerm);
+           System.out.println(newNewTerm);
        }
     }
 

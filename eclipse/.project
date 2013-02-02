@@ -27,7 +27,7 @@
 		<link>
 			<name>genSrc</name>
 			<type>2</type>
-			<location>/home/christopher/workspace/Key/system/genSrc</location>
+			<location>/home/christopher/git/key/system/genSrc</location>
 		</link>
 		<link>
 			<name>key_lib</name>
@@ -37,18 +37,18 @@
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>/home/christopher/workspace/Key/system/src</location>
+			<location>/home/christopher/git/key/system/src</location>
 		</link>
 		<link>
 			<name>test</name>
 			<type>2</type>
-			<location>/home/christopher/workspace/Key/system/test</location>
+			<location>/home/christopher/git/key/system/test</location>
 		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
 			<name>KEY_HOME</name>
-			<value>file:/home/christopher/workspace/Key</value>
+			<value>file:/home/christopher/git/key</value>
 		</variable>
 		<variable>
 			<name>KEY_LIB</name>
@@ -56,11 +56,11 @@
 		</variable>
 		<variable>
 			<name>KEY_REP</name>
-			<value>file:/home/christopher/workspace/Key</value>
+			<value>file:/home/christopher/git/key</value>
 		</variable>
 		<variable>
 			<name>key_home</name>
-			<value>file:/home/christopher/workspace/Key</value>
+			<value>file:/home/christopher/git/key</value>
 		</variable>
 		<variable>
 			<name>key_lib</name>
@@ -68,7 +68,7 @@
 		</variable>
 		<variable>
 			<name>key_rep</name>
-			<value>file:/home/christopher/workspace/Key</value>
+			<value>file:/home/christopher/git/key</value>
 		</variable>
 	</variableList>
 </projectDescription>

@@ -583,7 +583,7 @@ public class XMLGenerator extends XMLHandler {
              * Verify that the operator bound at the current term represents a
              * concept suitable for putting in a tag
              */
-            if (isBinaryFunction(subtreeRoot)) {
+            if (isBinaryFunction2(subtreeRoot)) {
                 String operatorName = subtreeRoot.op().name().toString();
 
                 XMLEvent startTag = eventFactory.createStartElement("", "",
@@ -601,7 +601,7 @@ public class XMLGenerator extends XMLHandler {
         @Override
         public void subtreeLeft(Term subtreeRoot) {
 
-            if (isBinaryFunction(subtreeRoot)) {
+            if (isBinaryFunction2(subtreeRoot)) {
                 String operatorName = elementNames.pop();
                 XMLEvent endTag = eventFactory.createEndElement("", "",
                         operatorName);

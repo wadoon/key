@@ -3,14 +3,16 @@ package de.uka.ilkd.key.testgeneration.parsers;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfExThenElse;
+import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
@@ -22,8 +24,6 @@ import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
  * @author christopher
  */
 public abstract class AbstractTermParser {
-
-    protected final static TermFactory termFactory = TermFactory.DEFAULT;
 
     /**
      * The names of the various primitive types in Java. As of the
@@ -41,6 +41,16 @@ public abstract class AbstractTermParser {
     protected static final LinkedList<String> binaryFunctions;
 
     /**
+     * The sort names of the unary functions as supported by KeYTestGen.
+     */
+    protected static final LinkedList<String> unaryFunctions;
+
+    /**
+     * The sort names of the literal kinds supported by KeYTestGen.
+     */
+    protected static final LinkedList<String> literals;
+
+    /**
      * Used for storing an index over all operator types currently handled by
      * KeYTestGen
      */
@@ -56,10 +66,15 @@ public abstract class AbstractTermParser {
     protected static final String LESS_THAN = "leq";
     protected static final String EQUALS = "equals";
 
-    protected static final String MULTIPLICATION = "and";
-    protected static final String DIVISION = "division";
-    protected static final String ADDITION = "addition";
-    protected static final String SUBTRACTION = "subtraction";
+    protected static final String MULTIPLICATION = "mul";
+    protected static final String DIVISION = "div";
+    protected static final String ADDITION = "add";
+    protected static final String SUBTRACTION = "sub";
+
+    protected static final String Z = "Z";
+    protected static final String NEGATE_LITERAL = "neglit";
+
+    protected static final String NUMBERS = "numbers";
 
     protected static final String INTEGER = "int";
     protected static final String BOOLEAN = "boolean";
@@ -67,7 +82,7 @@ public abstract class AbstractTermParser {
     protected static final String BYTE = "byte";
 
     protected static final String RESULT = "result";
-    
+
     static {
 
         primitiveTypes = new LinkedList<String>();
@@ -76,9 +91,18 @@ public abstract class AbstractTermParser {
         primitiveTypes.add(LONG);
         primitiveTypes.add(BYTE);
 
+        literals = new LinkedList<String>();
+        literals.add(NUMBERS);
+
+        unaryFunctions = new LinkedList<String>();
+        unaryFunctions.add(Z);
+        unaryFunctions.add(NEGATE_LITERAL);
+
         binaryFunctions = new LinkedList<String>();
         binaryFunctions.add(GREATER_OR_EQUALS);
         binaryFunctions.add(LESS_OR_EQUALS);
+        binaryFunctions.add(GREATER_THAN);
+        binaryFunctions.add(LESS_THAN);
         binaryFunctions.add(MULTIPLICATION);
         binaryFunctions.add(DIVISION);
         binaryFunctions.add(ADDITION);
@@ -188,7 +212,27 @@ public abstract class AbstractTermParser {
         }
     }
     
-    
+    protected boolean isLiteral(Term term) {
+        
+        String sortName = term.sort().name().toString();
+
+        return literals.contains(sortName);
+    }
+
+    protected boolean isUnaryFunction(Term term) {
+
+        String sortName = term.op().name().toString();
+
+        return unaryFunctions.contains(sortName);
+    }
+
+    protected boolean isBinaryFunction(Term term) {
+
+        String sortName = term.op().name().toString();
+
+        return binaryFunctions.contains(sortName);
+    }
+
     /**
      * Check if the given Term represents a binary function, such as any of the
      * {@link Junctor} instances.
@@ -196,7 +240,7 @@ public abstract class AbstractTermParser {
      * @param term
      * @return
      */
-    protected boolean isBinaryFunction(Term term) {
+    protected boolean isBinaryFunction2(Term term) {
 
         /*
          * Since Not also qualifies as a junctor, albeit a unary one, check this
@@ -276,7 +320,7 @@ public abstract class AbstractTermParser {
      */
     protected boolean isOr(Term term) {
 
-        if (isBinaryFunction(term)) {
+        if (isBinaryFunction2(term)) {
 
             return term.op().name().toString().equals(OR);
 
@@ -323,36 +367,88 @@ public abstract class AbstractTermParser {
      */
     protected boolean isNullSort(Term term) {
 
-        if (isBinaryFunction(term)) {
-
-            return term.sort() instanceof NullSort;
-
-        } else {
-
-            return false;
-        }
+        return term.sort() instanceof NullSort;
     }
 
     /**
      * @param term
      *            the term
-     * @return true iff. the term represents a {@link LocationVariable}
+     * @return true iff. the term represents a {@link ProgramVariable}.
+     */
+    protected boolean isProgramVariable(Term term) {
+
+        return term.op() instanceof ProgramVariable;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link LocationVariable}.
      */
     protected boolean isLocationVariable(Term term) {
 
-        String sort = term.sort().name().toString();
-        return term.op() instanceof LocationVariable
-                || primitiveTypes.contains(sort);
+        return term.op() instanceof LocationVariable;
     }
-    
+
     /**
      * @param term
      *            the term
-     * @return true iff. the term represents a {@link LocationVariable}
+     * @return true iff. the term represents a {@link SortDependingFunction}
      */
     protected boolean isSortDependingFunction(Term term) {
 
         return term.op() instanceof SortDependingFunction;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link Function}
+     */
+    protected boolean isFunction(Term term) {
+
+        return term.op() instanceof Function;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link Junctor}
+     */
+    protected boolean isJunctor(Term term) {
+
+        return term.op() instanceof Junctor;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link SortedOperator}, which is
+     *         one of the two fundamental base sorts for Terms in KeY.
+     */
+    protected boolean isSortedOperator(Term term) {
+
+        return term.op() instanceof SortedOperator;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an {@link IfExThenElse} statement.
+     */
+    protected boolean isIfExThenElse(Term term) {
+
+        return term.op() instanceof IfExThenElse;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an {@link IfThenElse} statement.
+     */
+    protected boolean isIfThenElse(Term term) {
+
+        return term.op() instanceof IfThenElse;
     }
 
     /**

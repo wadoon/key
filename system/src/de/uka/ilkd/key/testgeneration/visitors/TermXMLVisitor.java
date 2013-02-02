@@ -175,7 +175,7 @@ public class TermXMLVisitor extends KeYTestGenTermVisitor {
          * Output text only if the node contains something suitable, i.e. it is
          * not a Junctor or other composite operation, but an actual value.
          */
-        if (isBinaryFunction(visited)) {
+        if (isBinaryFunction2(visited)) {
             return;
         }
 
@@ -207,7 +207,7 @@ public class TermXMLVisitor extends KeYTestGenTermVisitor {
          * Verify that the operator bound at the current term represents a
          * concept suitable for putting in a tag
          */
-        if (!isBinaryFunction(subtreeRoot)) {
+        if (!isBinaryFunction2(subtreeRoot)) {
             return;
         }
 
@@ -227,7 +227,7 @@ public class TermXMLVisitor extends KeYTestGenTermVisitor {
     @Override
     public void subtreeLeft(Term subtreeRoot) {
 
-        if (!isBinaryFunction(subtreeRoot)) {
+        if (!isBinaryFunction2(subtreeRoot)) {
             return;
         }
 

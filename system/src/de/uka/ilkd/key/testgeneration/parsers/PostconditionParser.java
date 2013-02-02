@@ -10,6 +10,11 @@ import de.uka.ilkd.key.logic.Term;
  */
 public class PostconditionParser extends AbstractTermParser {
 
+    /**
+     * For the purpose of 
+     * @param postondition
+     * @return
+     */
     public Term simplifyPostcondition(Term postondition) {
 
         return null;

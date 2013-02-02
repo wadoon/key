@@ -44,12 +44,6 @@ public class StatementCoverageParser implements ICodeCoverageParser {
         while (iterator.hasNext()) {
             IExecutionNode next = iterator.next();
             if (next instanceof IExecutionMethodReturn) {
-                try {
-                    System.out.println(next.getParent().getParent().getName());
-                } catch (ProofInputException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
                 nodes.add(next);
             }
         }
