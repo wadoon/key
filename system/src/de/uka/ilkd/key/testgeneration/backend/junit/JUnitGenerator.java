@@ -12,15 +12,15 @@ import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
-import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
-import de.uka.ilkd.key.testgeneration.model.IModelObject;
-import de.uka.ilkd.key.testgeneration.model.implementation.Model;
-import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
-import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.parsers.AbstractTermParser;
-import de.uka.ilkd.key.testgeneration.parsers.RemoveSDPsTransformer;
-import de.uka.ilkd.key.testgeneration.parsers.TermTransformerException;
-import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.core.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveSDPsTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
 
 /**
  * This singleton provides the functionality needed to produce test suites for

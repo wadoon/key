@@ -10,7 +10,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 
 import de.uka.ilkd.key.testgeneration.backend.xml.XMLTestCaseGenerator;
-import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
+import de.uka.ilkd.key.testgeneration.core.xmlparser.ITestCaseParser;
 
 /**
  * Provides a CLI interface for KeYTestGen2.

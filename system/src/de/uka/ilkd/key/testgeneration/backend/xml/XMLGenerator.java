@@ -21,17 +21,17 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
-import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
-import de.uka.ilkd.key.testgeneration.model.IModel;
-import de.uka.ilkd.key.testgeneration.model.IModelObject;
-import de.uka.ilkd.key.testgeneration.model.implementation.Model;
-import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
-import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
-import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
-import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
-import de.uka.ilkd.key.testgeneration.xml.XMLHandler;
-import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaMethod;
+import de.uka.ilkd.key.testgeneration.core.model.IModel;
+import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
+import de.uka.ilkd.key.testgeneration.core.parsers.visitors.XMLVisitorException;
+import de.uka.ilkd.key.testgeneration.core.xml.XMLGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.xml.XMLHandler;
+import de.uka.ilkd.key.testgeneration.core.xmlparser.ITestCaseParser;
 
 /**
  * Provides functionality for turning a set of {@link TestCase} instances into a

@@ -6,11 +6,11 @@ import org.junit.Test;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.keyinterface.KeYInterfaceException;
-import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
-import de.uka.ilkd.key.testgeneration.xmlparser.XMLParserException;
-import de.uka.ilkd.key.testgeneration.xmlparser.junitparser.JUnitParser;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
+import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.xml.XMLGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.xmlparser.XMLParserException;
+import de.uka.ilkd.key.testgeneration.core.xmlparser.junitparser.JUnitParser;
 
 public class TestJUnitParser {
 

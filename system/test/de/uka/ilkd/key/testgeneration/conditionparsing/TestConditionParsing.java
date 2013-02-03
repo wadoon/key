@@ -18,9 +18,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.parsers.PathconditionTools;
-import de.uka.ilkd.key.testgeneration.parsers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.parsers.PathconditionTools;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestConditionParsing extends KeYTestGenTest {

@@ -9,15 +9,15 @@ import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
-import de.uka.ilkd.key.testgeneration.codecoverage.implementation.StatementCoverageParser;
-import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
-import de.uka.ilkd.key.testgeneration.model.IModelGenerator;
-import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.model.implementation.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
+import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
+import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.core.xml.XMLGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.xmlparser.ITestCaseParser;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
-import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
-import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
 
 /**
  * This implementation of {@link ITestCaseGenerator} generates test suites in

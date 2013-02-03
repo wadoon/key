@@ -5,7 +5,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.codecoverage.ICodeCoverageParser;
+import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 
 /**
  * Instances of this implementation of {@link ITestCaseGenerator} generate test

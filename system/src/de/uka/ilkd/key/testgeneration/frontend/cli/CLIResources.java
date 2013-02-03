@@ -2,8 +2,8 @@ package de.uka.ilkd.key.testgeneration.frontend.cli;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.testgeneration.xmlparser.ITestCaseParser;
-import de.uka.ilkd.key.testgeneration.xmlparser.junitparser.JUnitParser;
+import de.uka.ilkd.key.testgeneration.core.xmlparser.ITestCaseParser;
+import de.uka.ilkd.key.testgeneration.core.xmlparser.junitparser.JUnitParser;
 
 /**
  * Shared resources for the KeyTestGen CLI.

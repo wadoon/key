@@ -10,8 +10,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
-import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.visitors.XMLVisitorException;
+import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.ContractExtractor;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.parsers.visitors.XMLVisitorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class OracleGeneratorTest extends KeYTestGenTest {

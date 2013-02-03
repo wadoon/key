@@ -2,8 +2,8 @@ package de.uka.ilkd.key.testgeneration.backend;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaMethod;
-import de.uka.ilkd.key.testgeneration.model.IModel;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaMethod;
+import de.uka.ilkd.key.testgeneration.core.model.IModel;
 
 /**
  * Formally, a test case is a tuple (m, I, Or), where:

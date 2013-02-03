@@ -2,7 +2,7 @@ package de.uka.ilkd.key.testgeneration;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.testgeneration.keyinterface.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
 
 /**
  * Bucket class meant to carry shared data around in a single KeYTestGen

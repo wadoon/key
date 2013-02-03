@@ -1,0 +1,32 @@
+package de.uka.ilkd.key.testgeneration.core.codecoverage.implementation;
+
+import java.util.List;
+
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
+
+public class BranchCoverageParser implements ICodeCoverageParser {
+
+    /**
+     * <p>
+     * Returns a set of {@link IExecutionNode} instances, s.t. generating a test
+     * case covering each of these nodes will satisfy Branch Coverage for this
+     * symbolic execution tree.
+     * </p>
+     * <p>
+     * Branch Coverage for a test suite T over a program P is satisfied iff. the
+     * execution of each test case t in T will cause each possible path between
+     * two statement in P to be taken at least once.
+     * </p>
+     * 
+     * @param root
+     *            the root of the symbolic execution tree
+     * @return
+     */
+    @Override
+    public List<IExecutionNode> retrieveNodes(IExecutionStartNode root) {
+
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+}
