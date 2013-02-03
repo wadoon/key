@@ -63,6 +63,8 @@ public class TermXMLVisitor extends KeYTestGenTermVisitor {
     private static final XMLEventFactory eventFactory = XMLEventFactory
             .newFactory();
 
+    private static final String SEPARATOR = "_dot_";
+    
     /**
      * {@link XMLEvent} representing a newline
      */
@@ -279,7 +281,7 @@ public class TermXMLVisitor extends KeYTestGenTermVisitor {
      */
     private void addVariableNode(Term term) {
 
-        String variableName = resolveIdentifierString(term);
+        String variableName = resolveIdentifierString(term, SEPARATOR);
 
         addTag(eventFactory.createStartElement("", "", "field"));
         addTag(eventFactory.createCharacters(variableName), 1);

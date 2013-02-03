@@ -17,7 +17,6 @@ import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.model.ModelGeneratorException;
-
 import de.uka.ilkd.key.testgeneration.parsers.RemoveSDPsTransformer;
 import de.uka.ilkd.key.testgeneration.parsers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.xml.XMLGeneratorException;
@@ -39,15 +38,17 @@ public class Sandbox extends KeYTestGenTest {
         List<IExecutionNode> nodes = retrieveNode(environment.getBuilder()
                 .getStartNode(), "mid=x");
 
-       for(IExecutionNode node : nodes) {
-           RemoveSDPsTransformer sdpRemovingTransformer = new RemoveSDPsTransformer();
-           Term oldTerm = node.getPathCondition();
-           Term newTerm = sdpRemovingTransformer.removeSortDependingFunctions(node.getPathCondition());
-           //Term newNewTerm = new TermSimplificationTransformer().simplifyTerm(newTerm);
-           System.out.println(oldTerm);
-           System.out.println(newTerm);
-           System.out.println(newNewTerm);
-       }
+        for (IExecutionNode node : nodes) {
+            RemoveSDPsTransformer sdpRemovingTransformer = new RemoveSDPsTransformer("_dot_");
+            Term oldTerm = node.getPathCondition();
+            Term newTerm = sdpRemovingTransformer
+                    .removeSortDependingFunctions(node.getPathCondition());
+            // Term newNewTerm = new
+            // TermSimplificationTransformer().simplifyTerm(newTerm);
+            System.out.println(oldTerm);
+            System.out.println(newTerm);
+           // System.out.println(newNewTerm);
+        }
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

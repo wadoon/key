@@ -294,7 +294,7 @@ public class ModelGenerator implements IModelGenerator {
             /*
              * Create the Model
              */
-            Model model = PathconditionTools.createModel(pathCondition,
+            Model model = PathconditionTools.termToModel(pathCondition,
                     services, mediator);
 
             /*

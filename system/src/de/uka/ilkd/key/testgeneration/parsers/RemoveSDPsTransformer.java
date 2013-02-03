@@ -7,6 +7,13 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 public class RemoveSDPsTransformer extends AbstractTermTransformer {
 
+    private final String SEPARATOR;
+    
+    public RemoveSDPsTransformer(String separator) {
+        
+        this.SEPARATOR = separator;
+    }
+    
     /**
      * Removes all instances of {@link SortDependingFunction} nodes in a given
      * term, replacing them with {@link LocationVariable} instances whose names
@@ -22,18 +29,16 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
 
         return transformTerm(term);
     }
-    
+
     @Override
     protected Term transformSortDependentFunction(Term term) {
-       
-            ProgramElementName resolvedVariableName = new ProgramElementName(
-                    resolveIdentifierString(term));
 
-            LocationVariable resolvedVariable = new LocationVariable(
-                    resolvedVariableName, term.sort());
+        ProgramElementName resolvedVariableName = new ProgramElementName(
+                resolveIdentifierString(term, SEPARATOR));
 
-            System.out.println(resolvedVariable);
-            return termFactory.createTerm(resolvedVariable);
-        
+        LocationVariable resolvedVariable = new LocationVariable(
+                resolvedVariableName, term.sort());
+
+        return termFactory.createTerm(resolvedVariable);
     }
 }

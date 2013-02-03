@@ -184,6 +184,11 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
             return transformLiteral(term);
         }
 
+        if (isObserverFunction(term)) {
+            return transformObserverFunction(term);
+
+        }
+
         throw new TermTransformerException("Unsupported Function: "
                 + term.op().name());
     }
@@ -256,6 +261,20 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      * @return the transformed term
      */
     protected Term transformSortDependentFunction(Term term) {
+
+        return term;
+    }
+
+    protected Term transformObserverFunction(Term term) {
+
+        if (isProgramMethod(term)) {
+            return transformProgramMethod(term);
+        }
+
+        return term;
+    }
+
+    protected Term transformProgramMethod(Term term) {
 
         return term;
     }

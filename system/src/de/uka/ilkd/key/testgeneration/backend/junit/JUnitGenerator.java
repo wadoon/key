@@ -18,6 +18,8 @@ import de.uka.ilkd.key.testgeneration.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.parsers.RemoveSDPsTransformer;
+import de.uka.ilkd.key.testgeneration.parsers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
 
 /**
@@ -67,7 +69,7 @@ public class JUnitGenerator {
          * instane of the object that has the methods to be tested).
          */
         private static final String SELF = "self";
-
+        
         /**
          * The name of the container for the result value (if any) resulting
          * from the invocation of a method being tested. This value is used in
@@ -380,8 +382,12 @@ public class JUnitGenerator {
              */
             List<String> assertions = new OracleGenerationVisitor(testCase)
                     .generateOracle();
-            
-            
+
+            for (String assertion : assertions) {
+                System.out.println(assertion);
+            }
+            System.out.println();
+
         }
 
         /**
@@ -704,6 +710,8 @@ public class JUnitGenerator {
              * with this visitor.
              */
             private final List<String> parameterNames;
+            
+            private final static String SEPARATOR = "-";
 
             /**
              * Buffer for holding generated Java code
@@ -724,10 +732,23 @@ public class JUnitGenerator {
             public List<String> generateOracle() {
 
                 /*
+                 * Simplify the postcondition
+                 */
+                Term oracle = testCase.getOracle();
+                Term simplifiedOracle = null;
+                try {
+                    simplifiedOracle = new RemoveSDPsTransformer(SEPARATOR)
+                            .removeSortDependingFunctions(oracle);
+                } catch (TermTransformerException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                /*
                  * Traverse the postcondition(s) in the testcase, filling the
                  * buffer with the encoded terms.
                  */
-                testCase.getOracle().execPreOrder(this);
+                simplifiedOracle.execPreOrder(this);
 
                 /*
                  * Process and turn the buffer into a String of boolean Java
@@ -861,11 +882,12 @@ public class JUnitGenerator {
                 } else if (isParamaterValue(visited)) {
                     buffer.add(SELF + "." + visited.op().name().toString());
 
-                } else if (isLocationVariable(visited) && isPrimitiveType(visited)) {
+                } else if (isLocationVariable(visited)
+                        && isPrimitiveType(visited)) {
                     buffer.add(visited.op().name().toString());
 
                 } else if (isSortDependingFunction(visited)) {
-                    String identifier = resolveIdentifierString(visited);
+                    String identifier = resolveIdentifierString(visited, SEPARATOR);
                     buffer.add(identifier);
 
                 } else if (isResult(visited)) {

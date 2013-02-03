@@ -31,6 +31,8 @@ import de.uka.ilkd.key.testgeneration.visitors.KeYTestGenTermVisitor;
  */
 public class PathconditionTools {
 
+    private static final String SEPARATOR = "_dot_";
+    
     private static final TermSimplificationTransformer termSimplificationTransformer = new TermSimplificationTransformer();
 
     private static final PathToTermParser pathToTermParser = new PathToTermParser();
@@ -94,7 +96,7 @@ public class PathconditionTools {
      *            session mediator
      * @return the Model instance built from the Term
      */
-    public static Model createModel(Term pathCondition, Services services,
+    public static Model termToModel(Term pathCondition, Services services,
             ModelMediator mediator) {
 
         return pathToTermParser.createModel(pathCondition, services, mediator);
@@ -168,7 +170,7 @@ public class PathconditionTools {
             if (primitiveTypes.contains(sortName)) {
 
                 ProgramElementName resolvedVariableName = new ProgramElementName(
-                        resolveIdentifierString(term));
+                        resolveIdentifierString(term, SEPARATOR));
 
                 LocationVariable resolvedVariable = new LocationVariable(
                         resolvedVariableName, term.sort());
@@ -531,7 +533,7 @@ public class PathconditionTools {
                  * represent its value. If it is not primitive, we simply create
                  * a new ModelInstance to hold any reference object.
                  */
-                String identifier = resolveIdentifierString(term);
+                String identifier = resolveIdentifierString(term, SEPARATOR);
 
                 ModelVariable variable = new ModelVariable(programVariable,
                         identifier);
@@ -575,7 +577,7 @@ public class PathconditionTools {
                      */
                     if (parentVariable != null) {
                         String parentIdentifier = resolveIdentifierString(term
-                                .sub(1));
+                                .sub(1), SEPARATOR);
                         ModelVariable parentModelVariable = new ModelVariable(
                                 parentVariable, parentIdentifier);
 
@@ -822,8 +824,8 @@ public class PathconditionTools {
                  */
                 if (!isPrimitiveType(term)) {
 
-                    String leftOperandIdentifier = resolveIdentifierString(leftOperand);
-                    String rightOperandIdentifier = resolveIdentifierString(rightOperand);
+                    String leftOperandIdentifier = resolveIdentifierString(leftOperand, SEPARATOR);
+                    String rightOperandIdentifier = resolveIdentifierString(rightOperand, SEPARATOR);
 
                     ModelVariable leftModelVariable = model
                             .getVariableByReference(leftOperandIdentifier);

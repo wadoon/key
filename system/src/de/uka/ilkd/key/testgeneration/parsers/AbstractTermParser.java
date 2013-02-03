@@ -9,7 +9,9 @@ import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedOperator;
@@ -173,7 +175,7 @@ public abstract class AbstractTermParser {
      * @return the identifier String.
      * @see Model
      */
-    protected static String resolveIdentifierString(Term term) {
+    protected static String resolveIdentifierString(Term term, String separator) {
 
         Operator operator = term.op();
 
@@ -207,13 +209,13 @@ public abstract class AbstractTermParser {
          */
         else {
 
-            return resolveIdentifierString(term.sub(1)) + "_dot_"
+            return resolveIdentifierString(term.sub(1), separator) + separator
                     + getVariableNameForTerm(term.sub(2));
         }
     }
-    
+
     protected boolean isLiteral(Term term) {
-        
+
         String sortName = term.sort().name().toString();
 
         return literals.contains(sortName);
@@ -449,6 +451,26 @@ public abstract class AbstractTermParser {
     protected boolean isIfThenElse(Term term) {
 
         return term.op() instanceof IfThenElse;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an {@link ObserverFunction} construct.
+     */
+    protected boolean isObserverFunction(Term term) {
+
+        return term.op() instanceof ObserverFunction;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents aa {@link ProgramMethod}.
+     */
+    protected boolean isProgramMethod(Term term) {
+
+        return term.op() instanceof ProgramMethod;
     }
 
     /**

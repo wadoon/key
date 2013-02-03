@@ -76,6 +76,8 @@ public class XMLGenerator extends XMLHandler {
      * {@link XMLEvent} representing a tab.
      */
     private static final XMLEvent tab = eventFactory.createDTD("    ");
+    
+    private static final String SEPARATOR = "_dot_";
 
     /**
      * count the number of indentation tags that should be added before each
@@ -650,7 +652,7 @@ public class XMLGenerator extends XMLHandler {
          */
         private void addVariableNode(Term term) {
 
-            String variableName = resolveIdentifierString(term);
+            String variableName = resolveIdentifierString(term, SEPARATOR);
             addTag(eventFactory.createCharacters(variableName), 1);
         }
     }

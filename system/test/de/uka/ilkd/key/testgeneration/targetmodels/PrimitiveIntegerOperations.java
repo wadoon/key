@@ -223,9 +223,11 @@ public class PrimitiveIntegerOperations {
     }
 
 
-    /*@ public normal_behavior
-       @ ensures true;
-       @*/
+    /*@ public normal_behavior   
+    @ ensures (\result == x) || (\result == proxy.nestedProxy.instanceInt) || (\result == instanceZ );      
+    @ ensures ((\result <= proxy.nestedProxy.instanceInt) && (\result <= instanceZ )) || ((\result <= proxy.nestedProxy.instanceInt) && (\result <= x )) || ((\result <= x) && (\result <= instanceZ));      
+    @ ensures ((\result >= proxy.nestedProxy.instanceInt) && (\result >= instanceZ )) || ((\result >= proxy.nestedProxy.instanceInt) && (\result >= x )) || ((\result >= x) && (\result >= instanceZ));      
+    @*/
     public int midOneProxyOneInstance(int x) {
 
         int mid = 0;
@@ -253,7 +255,7 @@ public class PrimitiveIntegerOperations {
                 mid = proxy.nestedProxy.instanceInt;
             } else if (x > instanceZ) {
 
-                mid = x;
+                mid = instanceZ;
             }
         }
         return mid;
