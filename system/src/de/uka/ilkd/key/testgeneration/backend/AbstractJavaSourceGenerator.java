@@ -9,13 +9,25 @@ package de.uka.ilkd.key.testgeneration.backend;
  */
 public abstract class AbstractJavaSourceGenerator {
 
-    // 4-space tab
+    /**
+     * 4-space tab
+     */
     private static final String TAB = "    ";
-    
+
+    /**
+     * A newline
+     */
     protected static final String NEWLINE = "\n";
 
+    /**
+     * Indentation counter, for keeping tabs on how many tabs (hah!) should be
+     * prefixed to each line.
+     */
     private int indentation = 0;
 
+    /**
+     * Used for constructing the final output String.
+     */
     private StringBuilder output = new StringBuilder();
 
     /**
@@ -135,8 +147,14 @@ public abstract class AbstractJavaSourceGenerator {
 
         indent();
 
+        /*
+         * Write the visibility modifier of the method
+         */
         output.append(visibility + " ");
 
+        /*
+         * Write the modifiers, if any.
+         */
         if (modifiers != null && modifiers.length != 0) {
             for (String modifier : modifiers) {
                 output.append(modifier + " ");
@@ -175,6 +193,9 @@ public abstract class AbstractJavaSourceGenerator {
             }
         }
 
+        /*
+         * Close the method header.
+         */
         output.append(" {\n");
         indentation++;
     }

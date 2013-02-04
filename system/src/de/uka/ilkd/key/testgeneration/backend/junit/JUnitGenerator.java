@@ -17,6 +17,7 @@ import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.PostconditionTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.AbstractTermParser;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveSDPsTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
@@ -32,7 +33,7 @@ import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisito
 public class JUnitGenerator {
 
     public String generateJUnitSources(KeYJavaClass klass,
-            LinkedList<TestCase> testCases) {
+            LinkedList<TestCase> testCases) throws JUnitGeneratorException {
 
         return new JUnitGeneratorWorker().serviceConvertToJUnit(klass,
                 testCases);
@@ -69,7 +70,7 @@ public class JUnitGenerator {
          * instane of the object that has the methods to be tested).
          */
         private static final String SELF = "self";
-        
+
         /**
          * The name of the container for the result value (if any) resulting
          * from the invocation of a method being tested. This value is used in
@@ -87,9 +88,10 @@ public class JUnitGenerator {
          * @param testCases
          *            the test cases to generate
          * @return a JUnit source file in String format
+         * @throws JUnitGeneratorException
          */
         public String serviceConvertToJUnit(KeYJavaClass klass,
-                LinkedList<TestCase> testCases) {
+                LinkedList<TestCase> testCases) throws JUnitGeneratorException {
 
             /*
              * Safeguard
@@ -170,8 +172,10 @@ public class JUnitGenerator {
          * a single test method).
          * 
          * @param testCase
+         * @throws JUnitGeneratorException
          */
-        private void writeTestMethod(TestCase testCase) {
+        private void writeTestMethod(TestCase testCase)
+                throws JUnitGeneratorException {
 
             writeLine(NEWLINE);
 
@@ -374,8 +378,10 @@ public class JUnitGenerator {
          * 
          * @param testCase
          *            the test case
+         * @throws JUnitGeneratorException
          */
-        private void writeTestOracle(TestCase testCase) {
+        private void writeTestOracle(TestCase testCase)
+                throws JUnitGeneratorException {
 
             /*
              * Delegate oracle generation to the Term visitor.
@@ -692,7 +698,9 @@ public class JUnitGenerator {
         }
 
         /**
-         * {@link Term} visitor which converts postconditions into Java code.
+         * {@link Term} visitor which converts a postcondition, expressed as a
+         * {@link Term}, into a functional test case oracle in executable Java
+         * code.
          * 
          * @author christopher
          * 
@@ -710,7 +718,10 @@ public class JUnitGenerator {
              * with this visitor.
              */
             private final List<String> parameterNames;
-            
+
+            /**
+             * Separator between instance names, and the names of their fields.
+             */
             private final static String SEPARATOR = "-";
 
             /**
@@ -729,40 +740,41 @@ public class JUnitGenerator {
                 }
             }
 
-            public List<String> generateOracle() {
+            public List<String> generateOracle() throws JUnitGeneratorException {
 
-                /*
-                 * Simplify the postcondition
-                 */
-                Term oracle = testCase.getOracle();
-                Term simplifiedOracle = null;
                 try {
-                    simplifiedOracle = new RemoveSDPsTransformer(SEPARATOR)
-                            .removeSortDependingFunctions(oracle);
+
+                    /*
+                     * Simplify the postcondition
+                     */
+                    Term oracle = testCase.getOracle();
+                    Term simplifiedOracle = PostconditionTools
+                            .simplifyPostCondition(oracle, SEPARATOR);
+
+                    /*
+                     * Traverse the postcondition(s) in the testcase, filling
+                     * the buffer with the encoded terms.
+                     */
+                    simplifiedOracle.execPreOrder(this);
+
+                    /*
+                     * Process and turn the buffer into a String of boolean Java
+                     * statements. Split this assertion into units, and store
+                     * them as a linked list. Return the resulting list.
+                     */
+                    String assertionString = processBuffer();
+                    String[] assertionArray = assertionString.split(NEWLINE);
+                    LinkedList<String> assertions = new LinkedList<String>();
+                    for (String assertion : assertionArray) {
+                        assertions.add(assertion);
+                    }
+
+                    return assertions;
+
                 } catch (TermTransformerException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+
+                    throw new JUnitGeneratorException(e.getMessage());
                 }
-
-                /*
-                 * Traverse the postcondition(s) in the testcase, filling the
-                 * buffer with the encoded terms.
-                 */
-                simplifiedOracle.execPreOrder(this);
-
-                /*
-                 * Process and turn the buffer into a String of boolean Java
-                 * statements. Split this assertion into units, and store them
-                 * as a linked list. Return the resulting list.
-                 */
-                String assertionString = processBuffer();
-                String[] assertionArray = assertionString.split(NEWLINE);
-                LinkedList<String> assertions = new LinkedList<String>();
-                for (String assertion : assertionArray) {
-                    assertions.add(assertion);
-                }
-
-                return assertions;
             }
 
             /**
@@ -887,7 +899,8 @@ public class JUnitGenerator {
                     buffer.add(visited.op().name().toString());
 
                 } else if (isSortDependingFunction(visited)) {
-                    String identifier = resolveIdentifierString(visited, SEPARATOR);
+                    String identifier = resolveIdentifierString(visited,
+                            SEPARATOR);
                     buffer.add(identifier);
 
                 } else if (isResult(visited)) {

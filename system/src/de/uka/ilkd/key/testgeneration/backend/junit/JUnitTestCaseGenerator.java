@@ -43,48 +43,60 @@ public class JUnitTestCaseGenerator extends AbstractConcurrentTestCaseGenerator 
 
     /**
      * {@inheritDoc}
+     * 
+     * @throws JUnitGeneratorException
      */
     @Override
     public String generatePartialTestSuite(String source,
             ICodeCoverageParser coverage, String... methods)
             throws TestGeneratorException {
 
-        /*
-         * Set up the mediator
-         */
-        KeYTestGenMediator mediator = new KeYTestGenMediator();
+        try {
 
-        /*
-         * If no coverage criteria are specificed, use default.
-         */
-        if (coverage == null) {
-            coverage = new StatementCoverageParser();
+            /*
+             * Set up the mediator
+             */
+            KeYTestGenMediator mediator = new KeYTestGenMediator();
+
+            /*
+             * If no coverage criteria are specificed, use default.
+             */
+            if (coverage == null) {
+                coverage = new StatementCoverageParser();
+            }
+
+            /*
+             * Get the abstract representation of the class.
+             */
+            KeYJavaClass keYJavaClass = extractKeYJavaClass(source);
+            mediator.setMainClass(keYJavaClass);
+
+            /*
+             * Get the abstract representations of the test cases for the
+             * selected method(s).
+             */
+            LinkedList<TestCase> testCases = createTestCases(keYJavaClass,
+                    coverage, mediator, methods);
+
+            /*
+             * Turn the representations into JUnit sources.
+             */
+            Benchmark.startBenchmarking("create JUnit sources");
+            JUnitGenerator jUnitGenerator = new JUnitGenerator();
+
+            String testSuite;
+
+            testSuite = jUnitGenerator.generateJUnitSources(keYJavaClass,
+                    testCases);
+
+            Benchmark.finishBenchmarking("create JUnit sources");
+
+            return testSuite;
+
+        } catch (JUnitGeneratorException e) {
+
+            throw new TestGeneratorException(e.getMessage());
         }
-
-        /*
-         * Get the abstract representation of the class.
-         */
-        KeYJavaClass keYJavaClass = extractKeYJavaClass(source);
-        mediator.setMainClass(keYJavaClass);
-        
-        /*
-         * Get the abstract representations of the test cases for the selected
-         * method(s).
-         */
-        LinkedList<TestCase> testCases = createTestCases(keYJavaClass,
-                coverage, mediator, methods);
-
-        /*
-         * Turn the representations into JUnit sources.
-         */
-        Benchmark.startBenchmarking("create JUnit sources");
-        JUnitGenerator jUnitGenerator = new JUnitGenerator();
-
-        String testSuite = jUnitGenerator.generateJUnitSources(keYJavaClass,
-                testCases);
-        Benchmark.finishBenchmarking("create JUnit sources");
-
-        return testSuite;
     }
 
     /**

@@ -22,7 +22,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.core.model.IModel;
 import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.parsers.PathconditionTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 

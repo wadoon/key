@@ -15,6 +15,8 @@ import de.uka.ilkd.key.logic.Term;
  * C ::= D | D AND T
  * </pre>
  * 
+ * The algorithm used in this particular implementation was taken from:
+ * <p>
  * (Huth and Ryan, <i>Logic in Computer Science</i>, 2nd Ed. Cambridge
  * University press, 2008)
  * 

@@ -19,7 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.parsers.PathconditionTools;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.PathconditionTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
