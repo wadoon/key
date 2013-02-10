@@ -4,11 +4,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Scanner;
 
 import org.junit.Test;
 
+import com.sun.org.apache.bcel.internal.classfile.JavaClass;
+import com.sun.org.apache.bcel.internal.generic.ClassGen;
+
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.TypeReferenceImp;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -49,6 +59,17 @@ public class Sandbox extends KeYTestGenTest {
             System.out.println(newTerm);
            // System.out.println(newNewTerm);
         }
+    }
+    
+    @Test
+    public void test2() throws IOException {
+        
+        
+        ProgramElementName name = new ProgramElementName("int");
+        KeYJavaType type = new KeYJavaType();
+        TypeReference ref = new TypeRef(type);
+        
+        MethodDeclaration declaration = new MethodDeclaration()
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
