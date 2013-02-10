@@ -18,6 +18,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.parsers.JavaSourceParser;
 
 /**
  * Produces instances of {@link KeYJavaClass}.
@@ -61,7 +62,7 @@ public enum KeYJavaClassFactory {
         name = name.substring(delimiter + 1, name.length() - 5);
 
         /*
-         * Load the file into key and set the InitConfig instance for it.
+         * Load the file into KeY and set the InitConfig instance for it.
          */
         InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
 
@@ -74,6 +75,12 @@ public enum KeYJavaClassFactory {
          */
         String fileName = getFileName(javaFile);
         KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
+
+        /*
+         * Extract the package of the class
+         */
+        String packageDeclaration = JavaSourceParser
+                .getPackageDeclaration(javaFile);
 
         /*
          * Extract all methods declared in this class (including the ones
@@ -103,7 +110,8 @@ public enum KeYJavaClassFactory {
             }
         }
 
-        return new KeYJavaClass(name, mainClass, methods, javaFile);
+        return new KeYJavaClass(packageDeclaration, name, mainClass, methods,
+                javaFile);
     }
 
     /**
@@ -171,9 +179,5 @@ public enum KeYJavaClassFactory {
         }
 
         return contracts;
-    }
-
-    private String getPackageDeclaration() {
-        return null;
     }
 }

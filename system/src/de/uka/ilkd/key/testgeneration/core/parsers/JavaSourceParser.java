@@ -25,6 +25,42 @@ import recoder.util.FileUtils;
 public class JavaSourceParser {
 
     /**
+     * Extracts the package declaration for a Java source file on disk, if any.
+     * 
+     * @param path
+     *            path to the file
+     * @return the package declaration
+     * @throws FileNotFoundException
+     */
+    public static String getPackageDeclaration(File file)
+            throws FileNotFoundException {
+
+        Scanner scanner = new Scanner(file);
+        String packageDeclaration = "";
+        while (scanner.hasNext()) {
+
+            packageDeclaration = scanner.nextLine();
+            if (packageDeclaration != null) {
+
+                /*
+                 * A package declaration has the form "package a.b.c", so split
+                 * it and select the second part.
+                 */
+                return packageDeclaration.replaceAll("package|;", "").trim();
+            }
+        }
+
+        return packageDeclaration;
+    }
+
+    public static String getPackageDeclaration(String path)
+            throws FileNotFoundException {
+
+        File file = new File(path);
+        return getPackageDeclaration(file);
+    }
+
+    /**
      * Checks if the public class of the file declares a no-args constructor.
      * There are only two cases where this is true:
      * 
@@ -63,8 +99,8 @@ public class JavaSourceParser {
         if (consMatcher.find()) {
             return true;
         }
-        
-        //TODO:
+
+        // TODO:
 
         System.out.println(Calendar.getInstance().getTimeInMillis() - time);
 

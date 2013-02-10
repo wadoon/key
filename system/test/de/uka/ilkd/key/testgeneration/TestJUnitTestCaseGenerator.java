@@ -20,7 +20,6 @@ import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 public class TestJUnitTestCaseGenerator {
     
-    
     @Test
     public void test() throws IOException, ProofInputException,
             ModelGeneratorException, TestGeneratorException,
@@ -33,7 +32,7 @@ public class TestJUnitTestCaseGenerator {
         String output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        null, "midOneProxyOneInstance");
+                        null, "mid");
 
         /*
         String output = testCaseGenerator

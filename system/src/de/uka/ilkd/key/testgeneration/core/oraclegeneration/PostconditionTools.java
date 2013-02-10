@@ -50,7 +50,7 @@ public class PostconditionTools {
             Term termWithoutSDFs = new RemoveSDPsTransformer(separator)
                     .removeSortDependingFunctions(term);
 
-            return transformTerm(term);
+            return transformTerm(termWithoutSDFs);
         }
 
         /**

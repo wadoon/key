@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
@@ -30,7 +31,7 @@ import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisito
 public class PathconditionTools {
 
     private static final String SEPARATOR = "_dot_";
-    
+
     private static final TermSimplificationTransformer termSimplificationTransformer = new TermSimplificationTransformer();
 
     private static final PathToTermParser pathToTermParser = new PathToTermParser();
@@ -421,6 +422,9 @@ public class PathconditionTools {
             public ContextVisitor(Model model, Services services,
                     ModelMediator mediator) {
 
+                /*
+                 * TODO: Hack to make test cases pass. Kill it.
+                 */
                 if (mediator == null) {
                     this.mediator = new ModelMediator();
                 } else {
@@ -431,14 +435,16 @@ public class PathconditionTools {
                 javaInfo = services.getJavaInfo();
 
                 /*
-                 * Construct the default base class
+                 * Construct the default base class. TODO: Even more hacks.
+                 * Remove.
                  */
                 ProgramElementName name = null;
                 if (mediator == null || mediator.getMainClass() == null) {
                     name = new ProgramElementName("UnitTestingClass");
                 } else {
-                    name = new ProgramElementName(mediator.getMainClass()
-                            .getName());
+                    KeYJavaClass klass = mediator.getMainClass();
+                    name = new ProgramElementName(klass.getPackageDeclaration()
+                            + "." + klass.getName());
                 }
 
                 ClassDeclaration baseType = new ClassDeclaration(
@@ -574,8 +580,8 @@ public class PathconditionTools {
                      * parent.
                      */
                     if (parentVariable != null) {
-                        String parentIdentifier = resolveIdentifierString(term
-                                .sub(1), SEPARATOR);
+                        String parentIdentifier = resolveIdentifierString(
+                                term.sub(1), SEPARATOR);
                         ModelVariable parentModelVariable = new ModelVariable(
                                 parentVariable, parentIdentifier);
 
@@ -822,8 +828,10 @@ public class PathconditionTools {
                  */
                 if (!isPrimitiveType(term)) {
 
-                    String leftOperandIdentifier = resolveIdentifierString(leftOperand, SEPARATOR);
-                    String rightOperandIdentifier = resolveIdentifierString(rightOperand, SEPARATOR);
+                    String leftOperandIdentifier = resolveIdentifierString(
+                            leftOperand, SEPARATOR);
+                    String rightOperandIdentifier = resolveIdentifierString(
+                            rightOperand, SEPARATOR);
 
                     ModelVariable leftModelVariable = model
                             .getVariableByReference(leftOperandIdentifier);

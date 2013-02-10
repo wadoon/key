@@ -15,6 +15,11 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 public final class KeYJavaClass {
 
     /**
+     * The package declaration for this class.
+     */
+    final String packageDeclaration;
+
+    /**
      * The identifier for this class.
      */
     final String name;
@@ -36,8 +41,9 @@ public final class KeYJavaClass {
      */
     private final HashMap<String, KeYJavaMethod> methods;
 
-    KeYJavaClass(String name, KeYJavaType type,
+    KeYJavaClass(String packageDeclaration, String name, KeYJavaType type,
             HashMap<String, KeYJavaMethod> methodMappings, File source) {
+        this.packageDeclaration = packageDeclaration;
         this.name = name;
         this.type = type;
         this.methods = methodMappings;
@@ -79,5 +85,12 @@ public final class KeYJavaClass {
      */
     public KeYJavaType getType() {
         return type;
+    }
+
+    /**
+     * @return the packageDeclaration
+     */
+    public String getPackageDeclaration() {
+        return packageDeclaration;
     }
 }

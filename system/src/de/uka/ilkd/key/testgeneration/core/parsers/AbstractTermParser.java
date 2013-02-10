@@ -53,6 +53,12 @@ public abstract class AbstractTermParser {
     protected static final LinkedList<String> literals;
 
     /**
+     * The sort names for various Java Exceptions, as they are modelled in
+     * KeYTestGen
+     */
+    protected static final LinkedList<String> exceptionSorts;
+
+    /**
      * Used for storing an index over all operator types currently handled by
      * KeYTestGen
      */
@@ -82,6 +88,8 @@ public abstract class AbstractTermParser {
     protected static final String BOOLEAN = "boolean";
     protected static final String LONG = "long";
     protected static final String BYTE = "byte";
+
+    protected static final String EXCEPTION_BASE = "java.lang.Exception";
 
     protected static final String RESULT = "result";
 
@@ -123,6 +131,9 @@ public abstract class AbstractTermParser {
         operators.add(ADDITION);
         operators.add(SUBTRACTION);
         operators.add(EQUALS);
+
+        exceptionSorts = new LinkedList<String>();
+        exceptionSorts.add(EXCEPTION_BASE);
     }
 
     /**
@@ -375,6 +386,16 @@ public abstract class AbstractTermParser {
     /**
      * @param term
      *            the term
+     * @return true iff. the term represents a Java Exception
+     */
+    protected boolean isExceptionSort(Term term) {
+
+        return exceptionSorts.contains(term.sort().name().toString());
+    }
+
+    /**
+     * @param term
+     *            the term
      * @return true iff. the term represents a {@link ProgramVariable}.
      */
     protected boolean isProgramVariable(Term term) {
@@ -456,7 +477,8 @@ public abstract class AbstractTermParser {
     /**
      * @param term
      *            the term
-     * @return true iff. the term represents an {@link ObserverFunction} construct.
+     * @return true iff. the term represents an {@link ObserverFunction}
+     *         construct.
      */
     protected boolean isObserverFunction(Term term) {
 

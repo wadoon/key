@@ -77,7 +77,7 @@ public class JUnitGenerator {
          * the assertion process, and must not conflict with the names of any
          * parameter values.
          */
-        private static final String EXECUTION_RESULT = "testmethodCallResult";
+        private static final String EXECUTION_RESULT = "result";
 
         /**
          * Services invocations of
@@ -389,11 +389,11 @@ public class JUnitGenerator {
             List<String> assertions = new OracleGenerationVisitor(testCase)
                     .generateOracle();
 
+            writeLine("Assert.assertTrue(" + NEWLINE);
             for (String assertion : assertions) {
-                System.out.println(assertion);
+                writeLine(assertion + NEWLINE);
             }
-            System.out.println();
-
+            writeLine(");" + NEWLINE);
         }
 
         /**
@@ -851,6 +851,9 @@ public class JUnitGenerator {
                          * identifier, and returned as such.
                          */
                     } else {
+                        if (next.equals("result")) {
+                            return RESULT;
+                        }
                         return next;
                     }
                 }
@@ -892,7 +895,7 @@ public class JUnitGenerator {
                     buffer.add(NOT);
 
                 } else if (isParamaterValue(visited)) {
-                    buffer.add(SELF + "." + visited.op().name().toString());
+                    buffer.add(visited.op().name().toString());
 
                 } else if (isLocationVariable(visited)
                         && isPrimitiveType(visited)) {
@@ -914,6 +917,7 @@ public class JUnitGenerator {
 
                 return parameterNames.contains(name);
             }
+
         }
     }
 }

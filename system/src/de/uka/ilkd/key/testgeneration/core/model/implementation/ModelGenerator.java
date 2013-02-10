@@ -251,7 +251,9 @@ public class ModelGenerator implements IModelGenerator {
                     .simplifyTerm(pathCondition);
 
             if (simplifiedPathCondition == null) {
+                
                 return null;
+            
             } else {
 
                 /*
@@ -291,7 +293,8 @@ public class ModelGenerator implements IModelGenerator {
             Services services = node.getServices();
 
             /*
-             * Create the Model
+             * Create the initial Model, without any concrete values assigned to
+             * primitive values in it.
              */
             Model model = PathconditionTools.termToModel(pathCondition,
                     services, mediator);
