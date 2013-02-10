@@ -1,19 +1,14 @@
 package de.uka.ilkd.key.testgeneration.core.model.implementation;
 
-import java.io.File;
-import java.util.Collection;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -75,7 +70,8 @@ public class ModelGenerator implements IModelGenerator {
      */
     public static ModelGenerator getDefaultModelGenerator() {
 
-        return new ModelGenerator(new SMTSettings(), SolverType.Z3_SOLVER);
+        return new ModelGenerator(ModelSettings.getDEFAULT_SMT_SETTINGS(),
+                SolverType.Z3_SOLVER);
     }
 
     /**
@@ -251,9 +247,9 @@ public class ModelGenerator implements IModelGenerator {
                     .simplifyTerm(pathCondition);
 
             if (simplifiedPathCondition == null) {
-                
+
                 return null;
-            
+
             } else {
 
                 /*
@@ -337,106 +333,6 @@ public class ModelGenerator implements IModelGenerator {
         return stringBuilder.toString();
     }
 
-    /**
-     * Settings to pass to the SMT solver.
-     * 
-     * @author christopher
-     */
-    private static class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings {
-
-        @Override
-        public int getMaxConcurrentProcesses() {
-
-            return 1;
-        }
-
-        @Override
-        public int getMaxNumberOfGenerics() {
-
-            return 2;
-        }
-
-        @Override
-        public String getSMTTemporaryFolder() {
-
-            return PathConfig.getKeyConfigDir() + File.separator
-                    + "smt_formula";
-        }
-
-        @Override
-        public Collection<Taclet> getTaclets() {
-
-            return null;
-        }
-
-        @Override
-        public long getTimeout() {
-
-            return 5000;
-        }
-
-        @Override
-        public boolean instantiateNullAssumption() {
-
-            return true;
-        }
-
-        @Override
-        public boolean makesUseOfTaclets() {
-
-            return false;
-        }
-
-        @Override
-        public boolean useExplicitTypeHierarchy() {
-
-            return false;
-        }
-
-        @Override
-        public boolean useBuiltInUniqueness() {
-
-            return false;
-        }
-
-        @Override
-        public boolean useAssumptionsForBigSmallIntegers() {
-
-            return false;
-        }
-
-        @Override
-        public boolean useUninterpretedMultiplicationIfNecessary() {
-
-            return false;
-        }
-
-        @Override
-        public long getMaximumInteger() {
-
-            return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
-        }
-
-        @Override
-        public long getMinimumInteger() {
-
-            return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
-        }
-
-        @Override
-        public String getLogic() {
-
-            // return "QF_UFLIRA";
-            return "AUFLIA";
-        }
-
-        @Override
-        public boolean checkForSupport() {
-
-            return false;
-        }
-    }
-
     /*
      * FIXME: BAD!
      */
@@ -444,7 +340,6 @@ public class ModelGenerator implements IModelGenerator {
     public IModel generateModel(IExecutionNode node)
             throws ModelGeneratorException {
 
-        return generateModel(node, null);
+        return generateModel(node, new ModelMediator());
     }
-
 }

@@ -7,7 +7,7 @@ import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaMethod;
 
 /**
  * This bucket class carries data needed for context resolution in a single
- * model generation session.
+ * model generation session, as well as other goodies.
  * 
  * @author christopher
  * 
