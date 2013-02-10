@@ -153,6 +153,12 @@ public class ModelGenerator implements IModelGenerator {
         SMTSolverResult result = null;
 
         /*
+         * Used for keeping track of the number of attempts at model generation
+         * so far.
+         */
+        int attempts = 1;
+
+        /*
          * Assert that we could actually find a satisfiable assignment for the
          * SMT problem. If not, keep trying until we do
          */
@@ -191,7 +197,24 @@ public class ModelGenerator implements IModelGenerator {
                         .println("Failed to retrieve adequate SMT solution, lost "
                                 + Benchmark.readStopWatch() + " milliseconds");
             }
-        } while (!result.isValid().equals(ThreeValuedTruth.FALSIFIABLE));
+
+            attempts++;
+
+        } while (result.isValid().equals(ThreeValuedTruth.UNKNOWN)
+                && attempts < ModelSettings.getNUMBER_OF_TRIES());
+
+        /*
+         * If the path condition is not satisfiable (should never happen), then
+         * signal this with an exception. Mostly for debug and reliability
+         * reasons.
+         */
+        if (result.isValid().equals(ThreeValuedTruth.UNKNOWN)
+                || result.isValid().equals(ThreeValuedTruth.VALID)) {
+
+            throw new ModelGeneratorException(
+                    "Could not generate model for this path condition: "
+                            + problem.getTerm());
+        }
 
         return result;
     }
