@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.parsers.AbstractTermParser;
 
 /**
@@ -63,8 +64,9 @@ public class TermXMLVisitor extends KeYTestGenTermVisitor {
     private static final XMLEventFactory eventFactory = XMLEventFactory
             .newFactory();
 
-    private static final String SEPARATOR = "_dot_";
-    
+    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
+            .toString();
+
     /**
      * {@link XMLEvent} representing a newline
      */

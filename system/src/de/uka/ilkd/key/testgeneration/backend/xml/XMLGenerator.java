@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.model.IModel;
@@ -76,8 +77,9 @@ public class XMLGenerator extends XMLHandler {
      * {@link XMLEvent} representing a tab.
      */
     private static final XMLEvent tab = eventFactory.createDTD("    ");
-    
-    private static final String SEPARATOR = "_dot_";
+
+    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
+            .toString();
 
     /**
      * count the number of indentation tags that should be added before each

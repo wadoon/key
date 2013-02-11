@@ -11,6 +11,10 @@ package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
  * <code>o.x = v</code>
  * </pre>
  * 
+ * This class defines only the data needed to construct such a statement, it
+ * does not define how the actual field access takes place at the source code
+ * level.
+ * 
  * @author christopher
  * 
  */

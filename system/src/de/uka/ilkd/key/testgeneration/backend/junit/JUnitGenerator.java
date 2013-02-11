@@ -10,6 +10,7 @@ import java.util.List;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
@@ -37,6 +38,19 @@ public class JUnitGenerator {
 
         return new JUnitGeneratorWorker().serviceConvertToJUnit(klass,
                 testCases);
+    }
+
+    /**
+     * Worker which services invocations of
+     * {@link JUnitGenerator#convertToJUnit(List)}.
+     * 
+     * @author christopher
+     * 
+     */
+    private static class JUnitGeneratorWorker2 extends
+            AbstractJavaSourceGenerator {
+
+        
     }
 
     /**
@@ -903,7 +917,7 @@ public class JUnitGenerator {
 
                 } else if (isSortDependingFunction(visited)) {
                     String identifier = resolveIdentifierString(visited,
-                            SEPARATOR);
+                            StringConstants.FIELD_SEPARATOR.toString());
                     buffer.add(identifier);
 
                 } else if (isResult(visited)) {
