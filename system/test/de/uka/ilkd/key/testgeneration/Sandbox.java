@@ -65,11 +65,6 @@ public class Sandbox extends KeYTestGenTest {
     public void test2() throws IOException {
         
         
-        ProgramElementName name = new ProgramElementName("int");
-        KeYJavaType type = new KeYJavaType();
-        TypeReference ref = new TypeRef(type);
-        
-        MethodDeclaration declaration = new MethodDeclaration()
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

@@ -1,0 +1,62 @@
+package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
+
+/**
+ * Instances of this class represent field assignment statements in a JUnit test
+ * class.
+ * <p>
+ * Given some Object o and field x of o, such a statments assigns a
+ * (type-coherent w.r.t. x) value v to x:
+ * 
+ * <pre>
+ * <code>o.x = v</code>
+ * </pre>
+ * 
+ * @author christopher
+ * 
+ */
+public class JUnitAssignmentStatement {
+
+    /**
+     * The identifier name of the object which the field belongs to.
+     */
+    private final String objectName;
+
+    /**
+     * The identifier name of the field.
+     */
+    private final String fieldName;
+
+    /**
+     * The identifier name (for a reference type), or raw value (for a primitive
+     * type) of the value being assigned to the field.
+     */
+    private final String fieldValue;
+
+    public JUnitAssignmentStatement(String objectName, String fieldName,
+            String fieldValue) {
+        this.objectName = objectName;
+        this.fieldName = fieldName;
+        this.fieldValue = fieldValue;
+    }
+
+    /**
+     * @return the objectName
+     */
+    public String getObjectName() {
+        return objectName;
+    }
+
+    /**
+     * @return the fieldName
+     */
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    /**
+     * @return the fieldValue
+     */
+    public String getFieldValue() {
+        return fieldValue;
+    }
+}
