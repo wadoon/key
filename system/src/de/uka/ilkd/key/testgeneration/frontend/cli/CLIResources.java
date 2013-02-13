@@ -2,8 +2,8 @@ package de.uka.ilkd.key.testgeneration.frontend.cli;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.testgeneration.core.xmlparser.ITestCaseParser;
-import de.uka.ilkd.key.testgeneration.core.xmlparser.junitparser.JUnitParser;
+import de.uka.ilkd.key.testgeneration.backend.custom.ITestCaseParser;
+
 
 /**
  * Shared resources for the KeyTestGen CLI.
@@ -20,7 +20,6 @@ public enum CLIResources {
     private static final HashMap<String, ITestCaseParser<String>> FRAMEWORKS;
     static {
         FRAMEWORKS = new HashMap<String, ITestCaseParser<String>>();
-        FRAMEWORKS.put("junit", JUnitParser.getInstance());
     }
 
     public boolean isSupportedFramework(String framework) {

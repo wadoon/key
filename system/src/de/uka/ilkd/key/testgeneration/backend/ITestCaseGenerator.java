@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.testgeneration.backend;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 
 /**
@@ -10,11 +8,6 @@ import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
  * 
  * The API supports the following basic modes of operation:
  * <ul>
- * <li>
- * Generate a test case only for a single {@link IExecutionNode} instance
- * (provided for compatibility with the Symbolic Debugger, may not be relevant
- * to ordinary users).</li>
- * <li>
  * Generate a test suite only for a subset case methods in a class.</li>
  * <li>
  * Generate a test suite for all methods in a class, with the option of
@@ -31,21 +24,6 @@ import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
  * 
  */
 public interface ITestCaseGenerator {
-
-    /**
-     * Generates a test case for a single {@link IExecutionNode} instance,
-     * corresponding to a single statement in a single method.
-     * 
-     * @param targetNode
-     *            the target program node
-     * @param services
-     *            {@link Services} instance for the execution node
-     * @return the entire test suite as a String.
-     * @throws TestGeneratorException
-     *             in the event that something went wrong.
-     */
-    public String generateTestCase(final IExecutionNode targetNode,
-            final Services services) throws TestGeneratorException;
 
     /**
      * Generates a test suite covering a subset of methods in a Java source

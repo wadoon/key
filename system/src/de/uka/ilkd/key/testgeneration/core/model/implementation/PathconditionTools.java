@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.StringConstants;
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;

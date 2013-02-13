@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.backend;
+package de.uka.ilkd.key.testgeneration.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,22 +9,31 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
-import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
-import de.uka.ilkd.key.testgeneration.core.KeYJavaClassFactory;
-import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
-import de.uka.ilkd.key.testgeneration.core.TestCase;
+import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.model.IModel;
+import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelMediator;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
-public abstract class AbstractConcurrentTestCaseGenerator implements
-        ITestCaseGenerator {
+/**
+ * Instances of this class provide a single interface between backend modules
+ * and KeYTestGen itself, allowing them to request services related to test case
+ * generation.
+ * <p>
+ * Backend modules should not be allowed to interact with KeYTestGen2 through
+ * any other means than this singleton. TODO: Enforce this through access
+ * restriction.
+ * 
+ * @author christopher
+ * 
+ */
+public final class TestGenerationInterface {
 
     /**
      * A list of native methods (i.e. those part of any type with {@link Object}
@@ -67,16 +76,26 @@ public abstract class AbstractConcurrentTestCaseGenerator implements
      */
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.INSTANCE;
 
-    public AbstractConcurrentTestCaseGenerator() {
+    private TestGenerationInterface() {
         this(ModelGenerator.getDefaultModelGenerator());
     }
+
+    public static TestGenerationInterface getDefaultTestGenerationInterface() {
+        return new TestGenerationInterface();
+    }
+
+    /*
+     * public static TestGenerationInterface getCustomTestGenerationInterface(
+     * IModelGenerator modelGenerator) { return new
+     * TestGenerationInterface(modelGenerator); }
+     */
 
     /**
      * Creates a concurrent test case generator with a custom model generator.
      * 
      * @param modelGenerator
      */
-    public AbstractConcurrentTestCaseGenerator(ModelGenerator modelGenerator) {
+    private TestGenerationInterface(ModelGenerator modelGenerator) {
         this.modelGenerator = modelGenerator;
     }
 
@@ -92,7 +111,7 @@ public abstract class AbstractConcurrentTestCaseGenerator implements
      *             in the event that there is a failure in the KeYInterface, or
      *             if there is a problem finding or reading the source file.
      */
-    protected KeYJavaClass extractKeYJavaClass(String source)
+    public KeYJavaClass extractKeYJavaClass(String source)
             throws TestGeneratorException {
 
         try {
@@ -120,7 +139,7 @@ public abstract class AbstractConcurrentTestCaseGenerator implements
 
     }
 
-    protected LinkedList<TestCase> createTestCases(KeYJavaClass targetClass,
+    public LinkedList<TestCase> createTestCases(KeYJavaClass targetClass,
             ICodeCoverageParser codeCoverageParser,
             KeYTestGenMediator mediator, String... methods)
             throws TestGeneratorException {
@@ -181,7 +200,7 @@ public abstract class AbstractConcurrentTestCaseGenerator implements
      * @throws TestGeneratorException
      *             in the event there was a failure to generate a test case
      */
-    protected List<TestCase> createTestCasesForMethod(KeYJavaMethod method,
+    private List<TestCase> createTestCasesForMethod(KeYJavaMethod method,
             KeYTestGenMediator mediator, List<IExecutionNode> nodes)
             throws TestGeneratorException {
 
@@ -279,7 +298,7 @@ public abstract class AbstractConcurrentTestCaseGenerator implements
         public void run() {
 
             IModel model = null;
-            while (model == null ) {
+            while (model == null) {
 
                 try {
 

@@ -2,8 +2,8 @@ package de.uka.ilkd.key.testgeneration.core.model.implementation;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaMethod;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 
 /**
  * This bucket class carries data needed for context resolution in a single

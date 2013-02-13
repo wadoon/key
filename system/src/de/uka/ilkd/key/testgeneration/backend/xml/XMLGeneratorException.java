@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.xml;
+package de.uka.ilkd.key.testgeneration.backend.xml;
 
 public class XMLGeneratorException extends Exception {
 

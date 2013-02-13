@@ -17,6 +17,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**

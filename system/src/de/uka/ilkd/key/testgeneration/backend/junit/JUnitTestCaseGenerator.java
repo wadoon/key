@@ -1,19 +1,19 @@
 package de.uka.ilkd.key.testgeneration.backend.junit;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.backend.AbstractConcurrentTestCaseGenerator;
-import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.INodeTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
-import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.TestCase;
+import de.uka.ilkd.key.testgeneration.core.TestGenerationInterface;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
@@ -25,11 +25,14 @@ import de.uka.ilkd.key.testgeneration.util.Benchmark;
  * @author christopher
  * 
  */
-public class JUnitTestCaseGenerator extends AbstractConcurrentTestCaseGenerator {
+public class JUnitTestCaseGenerator implements ITestCaseGenerator,
+        INodeTestCaseGenerator {
 
-    public JUnitTestCaseGenerator() throws ModelGeneratorException {
-        super(ModelGenerator.getDefaultModelGenerator());
-    }
+    /**
+     * KeYTestGen services for this test generation session.
+     */
+    TestGenerationInterface testGenerationInterface = TestGenerationInterface
+            .getDefaultTestGenerationInterface();
 
     /**
      * {@inheritDoc}
@@ -68,15 +71,17 @@ public class JUnitTestCaseGenerator extends AbstractConcurrentTestCaseGenerator 
             /*
              * Get the abstract representation of the class.
              */
-            KeYJavaClass keYJavaClass = extractKeYJavaClass(source);
+            KeYJavaClass keYJavaClass = testGenerationInterface
+                    .extractKeYJavaClass(source);
+
             mediator.setMainClass(keYJavaClass);
 
             /*
              * Get the abstract representations of the test cases for the
              * selected method(s).
              */
-            LinkedList<TestCase> testCases = createTestCases(keYJavaClass,
-                    coverage, mediator, methods);
+            LinkedList<TestCase> testCases = testGenerationInterface
+                    .createTestCases(keYJavaClass, coverage, mediator, methods);
 
             /*
              * Turn the representations into JUnit sources.

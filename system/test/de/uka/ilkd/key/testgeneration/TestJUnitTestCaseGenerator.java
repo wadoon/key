@@ -13,9 +13,9 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.backend.junit.JUnitTestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.xml.XMLGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.xml.XMLGeneratorException;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 public class TestJUnitTestCaseGenerator {

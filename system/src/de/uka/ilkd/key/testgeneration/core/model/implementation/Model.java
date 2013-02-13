@@ -63,17 +63,17 @@ public class Model implements IModel {
 
             variable.setValue(instance);
 
-            if(instance instanceof ModelInstance) {
-                ((ModelInstance)instance).addReferee(variable);
+            if (instance instanceof ModelInstance) {
+                ((ModelInstance) instance).addReferee(variable);
             }
-            
+
             variables.add(variable);
         } else {
 
-            if(instance instanceof ModelInstance) {
-                ((ModelInstance)instance).addReferee(localVariable);
+            if (instance instanceof ModelInstance) {
+                ((ModelInstance) instance).addReferee(localVariable);
             }
-            
+
             variable.setValue(instance);
         }
     }
@@ -131,7 +131,7 @@ public class Model implements IModel {
         if (!target.equals(other)) {
             target = lookupVariable(target);
             ModelVariable localOther = lookupVariable(other);
-            
+
             /*
              * If the other currently does not exist in the Model, buffer it for
              * subsequent insertion.
@@ -293,7 +293,7 @@ public class Model implements IModel {
             }
         }
     }
-    
+
     /**
      * Determines if a given {@link ModelVariable} satisfied the conditions
      * postulated in a given set of {@link IModelFilter} instances.

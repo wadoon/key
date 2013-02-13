@@ -6,17 +6,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.INodeTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
-import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
+import de.uka.ilkd.key.testgeneration.backend.custom.ITestCaseParser;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.TestCase;
+import de.uka.ilkd.key.testgeneration.core.TestGenerationInterface;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
-import de.uka.ilkd.key.testgeneration.core.xml.XMLGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.xmlparser.ITestCaseParser;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 /**
@@ -27,7 +28,13 @@ import de.uka.ilkd.key.testgeneration.util.Benchmark;
  * 
  * @author christopher
  */
-public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
+public class XMLTestCaseGenerator implements ITestCaseGenerator,
+        INodeTestCaseGenerator {
+
+    /**
+     * KeYTestGen services for this test generation session.
+     */
+    private final TestGenerationInterface testGenerationInterface;
 
     /**
      * Instances are generated through the
@@ -40,7 +47,8 @@ public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
     public XMLTestCaseGenerator(ModelGenerator modelGenerator)
             throws XMLGeneratorException {
 
-        super(modelGenerator);
+        testGenerationInterface = TestGenerationInterface
+                .getDefaultTestGenerationInterface();
     }
 
     /**
@@ -140,11 +148,12 @@ public class XMLTestCaseGenerator extends AbstractTestCaseGenerator {
                 coverage = new StatementCoverageParser();
             }
 
-            KeYJavaClass keYJavaClass = extractKeYJavaClass(source);
+            KeYJavaClass keYJavaClass = testGenerationInterface
+                    .extractKeYJavaClass(source);
             mediator.setMainClass(keYJavaClass);
 
-            List<TestCase> testCases = createTestCases(keYJavaClass, coverage,
-                    mediator, methods);
+            List<TestCase> testCases = testGenerationInterface.createTestCases(
+                    keYJavaClass, coverage, mediator, methods);
 
             /*
              * Create and return a final XML representation of the test suite.

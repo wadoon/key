@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.keyinterface;
+package de.uka.ilkd.key.testgeneration.core;
 
 import java.io.File;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.Set;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 /**
- * This class encapsulates information related to a Java class, to the extent
- * such information is needed for test case generation.
+ * Instances of this class represent an abstract view of a Java class,
+ * encapsulating essential information related to test case generation.
  * 
  * @author christopher
  */
@@ -17,12 +17,12 @@ public final class KeYJavaClass {
     /**
      * The package declaration for this class.
      */
-    final String packageDeclaration;
+    private final String packageDeclaration;
 
     /**
      * The identifier for this class.
      */
-    final String name;
+    private final String name;
 
     /**
      * The {@link KeYJavaType} instance for this class

@@ -3,46 +3,54 @@
 <style|article>
 
 <\body>
-  <doc-data|<doc-title|Symbolic execution based test case
-  generation>|<doc-author-data|<author-name|Christopher
-  Svanefalk>|<\author-address>
+  <doc-data|<doc-title|KeYTestGen2: a whitebox test case generation system
+  based on symbolic execution>|<\doc-author-data|<author-name|Christopher
+  Svanefalk>>
     \;
-  </author-address>|<\author-address>
+  </doc-author-data|<\author-address>
     B.Sc. Thesis.
-  </author-address>|<\author-address>
-    University of Gothenburg, 2012
 
     \;
+  </author-address>|<\author-address>
+    <\strong>
+      University of Gothenburg, Chalmers University of Technology
+    </strong>
+
+    Department of Computer Science and Engineering \ 
+
+    \;
+
+    Responsible supervisor: Dr. Wolfgang Ahrendt
+
+    Supervisor: Gabriele Paganelli, Mr.Sc.
+
+    \;
+
+    \;
+
+    Gothenburg, June 2013
   </author-address>>>
-
-  <\abstract>
-    Software testing is a verification technique frequently used in software
-    engineering, aiding both the development of the system itself, as well as
-    subsequent quality assurance and maintenance. It suffers, however, from
-    the drawback that writing test cases is a tedious and resource heavy
-    process. This work outlines an automatic approach to test case generation
-    based on symbolic execution, which aims to address this problem by
-    automating the creation of robust test suites. In particular, it details
-    strategies for instantiating concrete heap states from symbolic metadata.
-    The application of these principles are then demonstrated in the
-    KeYTestGen2 system.\ 
-  </abstract>
-
-  \;
 
   <new-page*>
 
-  \;
+  <\abstract>
+    Software testing is a common verification technique in software
+    engineering, aiding both the development of the system itself, as well as
+    subsequent quality assurance, maintenance and extension. It suffers,
+    however, from the drawback that writing test cases is a tedious, error
+    prone and resource heavy process.\ 
 
-  \;
+    \;
 
-  \;
+    This work outlines an automatic approach to test case generation based on
+    symbolic execution, which aims to address this problem by automating the
+    creation of robust test suites. In particular, it details strategies for
+    instantiating concrete heap states from symbolic metadata. The
+    application of these principles are then demonstrated in the KeYTestGen2
+    system.\ 
+  </abstract>
 
-  \;
-
-  \;
-
-  \;
+  <new-page*>
 
   <\with|par-first|0fn>
     <\with|par-mode|left>
@@ -56,13 +64,12 @@
 
               This work has been made possible through the tireless support
               of the KeY community. I especially thank Dr. Reiner Hähnle, Dr.
-              Richard Bubel, and Martin Hentschel, Mr.Sc. and their
-              colleagues at the Darmstadt University of Technology, for
-              letting me stay and work with them leading up to the 2012 KeY
-              Symposium. My deepest thanks also to Dr. Wolfgang Ahrendt,
-              Gabriele Paganelli, Mr.Sc. and the Software Engineering using
-              Formal Methods group at Chalmers, for inviting me to join them
-              in their work.
+              Richard Bubel, Martin Hentschel and their colleagues at the
+              Darmstadt University of Technology, for letting me stay and
+              work with them leading up to the 2012 KeY Symposium. My deepest
+              thanks also to Dr. Wolfgang Ahrendt, Gabriele Paganelli and the
+              Software Engineering using Formal Methods group at Chalmers,
+              for inviting me to join them in their work.
             </with>
           </with>
         </with>
@@ -70,151 +77,188 @@
     </with>
   </with>
 
-  <new-page*>
+  <page-break>
 
   <\table-of-contents|toc>
     <vspace*|1fn><with|font-series|bold|math-font-series|bold|1<space|2spc>Introduction>
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-1><vspace|0.5fn>
 
-    <with|par-left|1.5fn|1.1<space|2spc>The pursuit of correctness
-    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <with|par-left|1.5fn|1.1<space|2spc>Motivation: the pursuit of
+    correctness <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-2>>
 
-    <with|par-left|1.5fn|1.2<space|2spc>Scope of this work
-    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <with|par-left|1.5fn|1.2<space|2spc>Software testing as a means to
+    correctness <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-3>>
 
-    <with|par-left|1.5fn|1.3<space|2spc>Organization
+    <with|par-left|1.5fn|1.3<space|2spc>Scope of this work
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-4>>
 
-    <vspace*|1fn><with|font-series|bold|math-font-series|bold|2<space|2spc>Fundamental
-    concepts> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-    <no-break><pageref|auto-5><vspace|0.5fn>
+    <with|par-left|3fn|1.3.1<space|2spc>Previous work - KeYTestGen(1)
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-5>>
 
-    <with|par-left|1.5fn|2.1<space|2spc>A formal look at correctness
+    <with|par-left|3fn|1.3.2<space|2spc>Towards KeYTestGen2
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-6>>
 
-    <with|par-left|3fn|2.1.1<space|2spc>The Java Modelling Language
+    <with|par-left|3fn|1.3.3<space|2spc>Target platforms
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-7>>
 
-    <with|par-left|1.5fn|2.2<space|2spc>Software verification and
-    verification methods <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <with|par-left|1.5fn|1.4<space|2spc>Organization of this work
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-8>>
 
-    <with|par-left|3fn|2.2.1<space|2spc>The verification ecosystem
-    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-    <no-break><pageref|auto-9>>
+    <vspace*|1fn><with|font-series|bold|math-font-series|bold|2<space|2spc>Fundamental
+    concepts> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-9><vspace|0.5fn>
 
-    <with|par-left|3fn|2.2.2<space|2spc>The formal methods
-    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <with|par-left|1.5fn|2.1<space|2spc>Specifications - formalizing
+    correctness <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-10>>
 
-    <with|par-left|3fn|2.2.3<space|2spc>Software testing
+    <with|par-left|3fn|2.1.1<space|2spc>The Java Modelling Language
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-11>>
 
-    <with|par-left|1.5fn|2.3<space|2spc>Unit testing
-    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <with|par-left|1.5fn|2.2<space|2spc>Software verification and
+    verification methods <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-12>>
 
-    <with|par-left|1.5fn|2.4<space|2spc>Test cases and test suites
+    <with|par-left|3fn|2.2.1<space|2spc>The verification ecosystem
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-13>>
 
-    <with|par-left|1.5fn|2.5<space|2spc>Automating testing
+    <with|par-left|3fn|2.2.2<space|2spc>The formal methods
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-14>>
 
-    <with|par-left|1.5fn|2.6<space|2spc>Automating test case generation
+    <with|par-left|3fn|2.2.3<space|2spc>Software testing
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-15>>
 
-    <with|par-left|3fn|2.6.1<space|2spc>Black box test generation
+    <with|par-left|1.5fn|2.3<space|2spc>Unit testing
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-16>>
 
-    <with|par-left|3fn|2.6.2<space|2spc>White box test generation
+    <with|par-left|1.5fn|2.4<space|2spc>Test frameworks
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-17>>
 
-    <with|par-left|3fn|2.6.3<space|2spc>White box vs black box
+    <with|par-left|3fn|2.4.1<space|2spc>xUnit
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-18>>
 
-    <with|par-left|1.5fn|2.7<space|2spc>A metric for test quality: code
-    coverage <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <with|par-left|1.5fn|2.5<space|2spc>Coverage criteria - a metric for test
+    quality <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-19>>
 
-    <with|par-left|3fn|2.7.1<space|2spc>Logic coverage
+    <with|par-left|3fn|2.5.1<space|2spc>Logic coverage
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-20>>
 
-    <with|par-left|3fn|2.7.2<space|2spc>Graph coverage
+    <with|par-left|3fn|2.5.2<space|2spc>Graph coverage
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-21>>
 
-    <with|par-left|1.5fn|2.8<space|2spc>Symbolic execution
+    <with|par-left|1.5fn|2.6<space|2spc>Automating testing
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-22>>
 
-    <vspace*|1fn><with|font-series|bold|math-font-series|bold|3<space|2spc>Background>
+    <with|par-left|1.5fn|2.7<space|2spc>Automating test case generation
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-    <no-break><pageref|auto-23><vspace|0.5fn>
+    <no-break><pageref|auto-23>>
 
-    <with|par-left|1.5fn|3.1<space|2spc>Early work - KeY and the Verification
-    Based Test Generator <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <with|par-left|3fn|2.7.1<space|2spc>Black box test generators
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-24>>
 
-    <vspace*|1fn><with|font-series|bold|math-font-series|bold|4<space|2spc>The
-    KeY system> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-    <no-break><pageref|auto-25><vspace|0.5fn>
+    <with|par-left|3fn|2.7.2<space|2spc>White box test generators
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-25>>
 
-    <with|par-left|1.5fn|4.1<space|2spc>KeY - an overview
+    <with|par-left|3fn|2.7.3<space|2spc>White box vs black box generators
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-26>>
 
-    <vspace*|1fn><with|font-series|bold|math-font-series|bold|5<space|2spc>KeYTestGen2>
+    <with|par-left|1.5fn|2.8<space|2spc>Symbolic execution
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-    <no-break><pageref|auto-27><vspace|0.5fn>
+    <no-break><pageref|auto-27>>
 
-    <vspace*|1fn><with|font-series|bold|math-font-series|bold|6<space|2spc>Conclusion
-    and future work> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <vspace*|1fn><with|font-series|bold|math-font-series|bold|3<space|2spc>Background>
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-28><vspace|0.5fn>
 
-    <with|par-left|1.5fn|6.1<space|2spc>Reflections
-    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-    <no-break><pageref|auto-29>>
+    <vspace*|1fn><with|font-series|bold|math-font-series|bold|4<space|2spc>The
+    KeY system> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-29><vspace|0.5fn>
 
-    <with|par-left|1.5fn|6.2<space|2spc>Future work
+    <with|par-left|1.5fn|4.1<space|2spc>KeY - an overview
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-30>>
 
-    <with|par-left|3fn|6.2.1<space|2spc>Code coverage
-    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-    <no-break><pageref|auto-31>>
+    <vspace*|1fn><with|font-series|bold|math-font-series|bold|5<space|2spc>Implementation
+    of KeYTestGen2> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-31><vspace|0.5fn>
 
-    <with|par-left|3fn|6.2.2<space|2spc>Improved user feedback
+    <with|par-left|1.5fn|5.1<space|2spc>Overview
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-32>>
 
-    <with|par-left|3fn|6.2.3<space|2spc>KeY integration
+    <with|par-left|3fn|5.1.1<space|2spc>Core
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-33>>
 
-    <with|par-left|3fn|6.2.4<space|2spc>Support for more frameworks
+    <with|par-left|3fn|5.1.2<space|2spc>Backend
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
     <no-break><pageref|auto-34>>
 
+    <with|par-left|3fn|5.1.3<space|2spc>Frontend
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-35>>
+
+    <with|par-left|1.5fn|5.2<space|2spc> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-36>>
+
+    <vspace*|1fn><with|font-series|bold|math-font-series|bold|6<space|2spc>Conclusion
+    and future work> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-37><vspace|0.5fn>
+
+    <with|par-left|1.5fn|6.1<space|2spc>Reflections
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-38>>
+
+    <with|par-left|1.5fn|6.2<space|2spc>Current and future work
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-39>>
+
+    <with|par-left|3fn|6.2.1<space|2spc>Code coverage
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-40>>
+
+    <with|par-left|3fn|6.2.2<space|2spc>Improved user feedback
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-41>>
+
+    <with|par-left|3fn|6.2.3<space|2spc>KeY integration
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-42>>
+
+    <with|par-left|3fn|6.2.4<space|2spc>Support for more frameworks
+    <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+    <no-break><pageref|auto-43>>
+
     <vspace*|1fn><with|font-series|bold|math-font-series|bold|Bibliography>
     <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-    <no-break><pageref|auto-35><vspace|0.5fn>
+    <no-break><pageref|auto-44><vspace|0.5fn>
   </table-of-contents>
 
   <new-page*>
+
+  <set-page-number|1>
 
   <section|Introduction>
 
@@ -267,65 +311,151 @@
 
   It wasn't. \ 
 
-  <subsection|The pursuit of correctness>
+  <subsection|Motivation: the pursuit of correctness>
 
-  The Ariane 5 disaster<cite|jazequel1997design><cite|dowson1997ariane><cite|lions1996ariane>
-  has become one of the flagship examples of the potentially disastrous
-  consequences of <em|software failure>. Her demise emphasized the prominence
-  of one of the great challenges in software engineering: the pursuit of
+  The Ariane 5 disaster <cite|jazequel1997design><cite|dowson1997ariane><cite|lions1996ariane>
+  has become a flagship example of the potentially disastrous consequences of
+  <em|software failure>. Through her demise, she emphasized the prominence of
+  one of the great challenges in software engineering: the pursuit of
   <em|correctness> - assuring that a software system functions as intended.
 
   \;
 
   The advent of the Information Age has transformed human civilization like
-  nothing else in our history. We now live in a world which is growing ever
-  closer to irreversible dependence on computer technology, computers forming
-  a part of almost every aspect of modern life, from supporting the very
-  infrastructure of society, to helping individuals do their daily work and
-  stay in contact with their friends and loved ones. As such, we deal with
-  the consequences of software failure in some shape or form on an almost
-  daily basis, although they most often will not be as serious as what
-  happened to Ariane 5. Smartphones resetting, laptop screens going black,
-  and word processors crashing (of course only when you forgot to enable
-  document recovery), are all symptoms of software not being correct.\ 
+  nothing else in our history, and we now live in a world which is growing
+  ever closer to irreversible dependence on computer technology. In modern
+  countries, computers and the software they run saturate almost every aspect
+  of life, from keeping the institutions of society running, to helping
+  individuals work and stay in touch with their loved ones<\footnote>
+    Not to mention other important things, such as raiding dungeons with
+    friends, tweeting what we had for breakfast today, or watching cats have
+    in-depth conversations about important topics in...whatever it is that
+    cats have important discussions about.
+  </footnote>. Due to our dependence on them, we also deal with the
+  consequences of their failings on an almost daily basis. Smartphones
+  resetting, laptop screens going black, and word processors
+  crashing<\footnote>
+    Although, as is commonly known, word processors always wait to crash
+    until you manage to somehow disable document recovery.
+  </footnote>, are all symptoms of software failure.\ 
 
   \;
 
-  These examples are perhaps trivial at best, and their consequences are
-  perhaps inconvenient at worst. The stakes rapidly scale up when we consider
-  just how many critical elements of our modern societies depend on software.
-  Software runs in life-support systems, medical instruments<\footnote>
+  While these examples may be trivial at best, and their consequences
+  inconvenient at worst<\footnote>
+    Depending on what was in that document you just lost, of course!\ 
+  </footnote>, the stakes rapidly scale up when we consider just how many of
+  the more critical elements of our societies depend on software. Software
+  operates life-support systems, medical instruments<\footnote>
     ADD NOTE ABOUT X-RAY DISASTER HERE
-  </footnote>, emergency dispatch services, banking systems military
+  </footnote>, emergency dispatch services, banking systems, military
   appliances<\footnote>
     In 1991, during the Gulf War, a software failure in the then-deployed
     Patriot missile system caused it to fail to intercept an incoming SCUD
     ballistic missile, leading to the deaths of 28 soldiers, with scores more
     suffering injuries.
-  </footnote>, nuclear reactors, airplanes, and rockets such as Ariane 5.
-  It's crucial role in society means that its cost of failure runs a high
-  risk of being counted in human lives and property. As such, the pursuit of
-  correctness in software development is a topic well worth to prioritize.
+  </footnote>, nuclear reactors, airplanes, and in important research
+  projects such as the Large Hadron Collider. Here, our dependence on
+  software means that its cost of failure runs a high risk of being counted,
+  ultimately, in human lives and property.\ 
+
+  \;
+
+  With this in mind, it is clear the pursuit of correctness is one of the
+  most important tasks in any software engineering process. The present work
+  is all about contributing to winning that pursuit.
+
+  <subsection|Software testing as a means to correctness>
+
+  // TODO
 
   <subsection|Scope of this work>
 
   This work describes the implementation of the KeYTestGen2 automated test
   case generation system, as well as the theoretical concepts behind it. It
-  aims to tackle the problem of software failure by providing a powerful
-  addition to existing tools for software testing: the ability to
-  automatically generate robust test suites. The end goal of this is to
-  contribute to a more robust software engineering process, where developers
-  will be able to spend more time developing software addressing the problems
-  of the world, while letting tools such KeYTestGen2 ease the burden of
-  verification.\ 
+  aims to tackle the problem of software failure by contributing powerful
+  tool support to the development, verification and validation phases of
+  software engineering processes. Prominently, it offers the ability to
+  automatically create highly robust software test suites, which both
+  relieves developers of an otherwise time consuming task, while
+  strengthening the reliability of software testing as a whole.
 
   \;
 
-  The programming language targeted by KeYTestGen2, and hence also this
-  thesis, is Java. The test framework we will focus on is JUnit, although
-  KeYTestGen2 also has preliminary support for other frameworks as well.\ 
+  Here, we will briefly summarize previous work leading up to KeYTestGen2,
+  and give a short introduction to the system itself.\ 
 
-  <subsection|Organization>
+  <subsubsection|Previous work - KeYTestGen(1)>
+
+  As the name implies, KeYTestGen2 is a sequel - although not entirely.\ 
+
+  \;
+
+  Conceptually, KeYTestGen2 is based on an earlier system called the
+  <em|Verification-Based Testcase Generator>, which was developed as part of
+  research by Dr. Christoph Gladisch, Dr. Bernhard Beckert, and others at the
+  Karlsruhe Institute of Technology and Darmstadt University of Technology
+  <cite|EngelHaehnle07><cite|Engel2006><cite|BeckertGladisch2007><cite|Gladisch2008_TAP><cite|Gladisch2008>.
+  This system was subsequently adopted and further developed by researchers
+  at Chalmers University of Technolgy, where it was also (re-)branded as
+  <em|KeYTestGen> <cite|Paganelli2010>.
+
+  \;
+
+  The idea behind KeYTestGen was to create a white box test generation
+  system<\footnote>
+    See section 2.
+  </footnote> based on the state-of-the-art symbolic execution<\footnote>
+    See section 2.
+  </footnote> system used in KeY <cite|EngelHaehnle07>. The symbolic
+  execution carried out by KeY, due to its rigour<\footnote>
+    A virtue of KeY being a deductive verification tool.
+  </footnote>, explored the source code of Java programs so thoroughly that
+  the resulting metadata could be used to create test cases satisfying such
+  rigorous code coverage criteria as MCDC<\footnote>
+    See section 2.
+  </footnote>.
+
+  \;
+
+  KeYTestGen showed itself to be a powerful proof of concept, being used by
+  Chalmers in at least one international research project, and even recieving
+  mention by the ACM. For various reasons, \ however, the developers behind
+  it abandoned the project, and it is currently no longer being actively
+  maintained<\footnote>
+    While the source code of KeYTestGen is no longer being distributed as
+    part of the mainline KeY system, it still exists on a separate
+    development branch. An executable legacy version of the system itself is
+    still available for download on the KeY homepage.
+  </footnote>.
+
+  <subsubsection|Towards KeYTestGen2>
+
+  Despite its name, KeYTestGen2 is not an attempt to resurrect KeYTestGen.
+  Rather, it is an attempt to create, completely from scratch, a novel white
+  box test case generation system based on the same fundamental principles as
+  the original KeYTestGen. It is designed to provide the same basic
+  functionality as its predecessor, while at the same time bringing a host of
+  new features to the table.\ 
+
+  \;
+
+  One of the resolutions //TODO
+
+  <subsubsection|Target platforms>
+
+  KeYTestGen2 is purely implemented in Java, and can hence execute on all
+  platforms capable of running a Java Virtual Machine. As input, it consumes
+  Java source files.
+
+  \;
+
+  The system produces output in a variety of formats, including XML and
+  JUnit<\footnote>
+    See section 2.
+  </footnote>, the latter being our focus of attention in this work.\ 
+
+  <subsection|Organization of this work>
 
   The body of this work is broken up into 5 sections.
 
@@ -361,18 +491,21 @@
 
   <section|Fundamental concepts>
 
-  In this section, we will set the context for the rest of the work by
-  outlining the fundamental concepts relevant to it. We will begin by looking
-  at verification and verification methods, focusing especially on
-  <em|testing> as a verification method. We will formally define concepts
-  central to testing itself, as well as the related testing quality metric
-  known as <em|code coverage>. After that, we cover testing automation -
-  first the automation of the test execution process, and then the central
-  interest of this work: automating the test case generation process. We
-  finish by introducing the KeY system, which forms the basis for
-  KeYTestGen2.
+  In this section, we will lay a theoretical foundation for the rest of the
+  work by outlining the central concepts in the universe it lives and
+  breathes in. We will begin by looking at verification and verification
+  methods, focusing especially on <em|software testing> as a verification
+  method. Here, we formally define concepts central to testing itself, as
+  well as the related testing quality metric known as <em|code coverage>.
+  After that, we cover testing automation - first the automation of the test
+  execution process, and then the central interest of this work: automating
+  the test case generation process itself. Here, we introduce black box and
+  white box test generation systems, focusing on the white box ones, in
+  connection with which we also introduce the conept of <em|symbolic
+  execution>. We finish by introducing the KeY system, which forms the basis
+  for KeYTestGen2.
 
-  <subsection|Specifications - a formal look at correctness>
+  <subsection|Specifications - formalizing correctness>
 
   Until now we have been content with using a rather loose definition of
   correctness, simply saying that software should ``function as intended''.
@@ -475,8 +608,10 @@
 
             \ \ \ if(x \<less\> 0 \|\| y \<less\> 0) {
 
-            \ \ \ \ \ \ throw new IllegalArgumentException("Not a positive
-            whole number");
+            \ \ \ \ \ \ throw new\ 
+
+            \ \ \ \ \ \ \ \ \ IllegalArgumentException("Not a positive whole
+            number");
 
             \ \ \ }
 
@@ -496,7 +631,7 @@
         the function. As can be easily seen here, this specification
         guarantees that the result will equal x+y and be greater than 0, if
         parameters x and y are both greater than 0 at the time of invocation.
-        </example>
+      </example>
     </framed>
   </with>
 
@@ -686,8 +821,8 @@
 
   \;
 
-  During its execution cycle, a test case usually passes through the
-  following stages <cite|TestPatterns2007>:
+  Depending on how it is implemented, such a test case generally has the
+  following life cycle <cite|TestPatterns2007>:
 
   <\enumerate-numeric>
     <item><with|font-shape|italic|Setup> a <with|font-shape|italic|test
@@ -733,131 +868,71 @@
   environment, and this is the granularity we will have in mind whenever we
   mention testing for the remainder of it.
 
-  <subsubsection|Test cases and test suites>
+  <subsection|Test frameworks>
 
   A larger system will usually consist of hundreds - if not thousands - of
-  individual units. Assuming we wish to create at least one test case for the
-  non-trivial ones (getters, setters etc), we will quickly end up with a
-  massive heap of tests to keep track of. The common approach in contemporary
-  practice is to organize test cases into <em|test suites>, where each such
-  test suite consists only of test cases for a given method, or a set of
-  methods belonging to a module. Other ways of organizing test suites exist
-  as well, and we do not endeavour to follow any given type of organization.\ 
-
-  <subsection|Automating testing>
-
-  The efficiency of unit testing can be augmented by using a <em|test
-  framework>. One of the great benefits usually offered by such frameworks is
-  the ability to <em|automate> large amounts of the testing process,
-  especially the setting up of test environments and the execution of the
-  tests themselves. The programmer can thus devote herself entirely to
-  writing test suites, and then simply hand these over to the frameworks
-  execution system for automatic runs, saving a lot of time and effort. It
-  also means that the tests can easily be re-run without much efforts, which
-  makes regression testing when refactoring or extending the system very
-  easy, as the tests can simply be re-run repeatedly to verify that
-  modifications to the system don't cause existing test suites to fail.
+  individual units. Assuming we wish to create at least one test case for
+  each of the non-trivial ones<\footnote>
+    i.e. setters, getters and the like.
+  </footnote> (which is usually the case), we will swiftly end up with a
+  massive pool of test code to manage. In addition to that, we still need
+  some kind of tool or scripting support for effectively executing the test
+  cases, tracking down failures, and so forth.
 
   \;
 
+  The definitive way to make this easy is to use a <em|test framework> for
+  developing and running our unit tests. Such a framework will usually
+  contain both a toolkit for developing and structuring the test cases
+  themselves, as well as a comprehensive environment to run and study their
+  output in. Today, at least one such framework exists for practically every
+  major programming language in existence.\ 
+
   <subsubsection|xUnit>
 
-  While several test frameworks exist for unit testing, the most popular
-  family of such frameworks is probably <em|xUnit>. Its Java implementation,
-  called <em|JUnit>, is widely used in the Java development community.
+  \ One of the more popular families of unit testing frameworks in
+  contemporary use is xUnit. Initially described in a landmark paper by Kent
+  Beck <cite|Beck1989> on testing SmallTalk <cite|Ingalls1978> code, xUnit is
+  now implemented for a wide range of programming languages.
 
   \;
 
   An xUnit // TODO
 
-  <subsection|Automating test case generation>
+  \;
 
-  While test frameworks can help in automating the <em|execution> of test
-  cases, they do not readily address the more expensive problem of
-  <em|creating> them.\ 
+  \ The common approach in contemporary practice is to organize test cases
+  into <em|test suites>, where each such test suite consists only of test
+  cases for a given method, or a set of methods belonging to a module. Other
+  ways of organizing test suites exist as well, and we do not endeavour to
+  follow any given type of organization.\ 
+
+  <subsection|Coverage criteria - a metric for test quality>
+
+  We have now introduced how to construct and organize test cases, but we
+  still have not said much about how we can determine their <em|quality> with
+  regard to the code they are testing. Since we are dealing with the
+  correctness of software, having a metric for measuring this is of course
+  desirable.\ 
 
   \;
 
-  One attempt to solve overcome this hurdle are <em|test case generation
-  systems>. Such systems will usually consume the source code along with some
-  metadata about it (for example, constraints on the system state prior to
-  the execution of the tests), and attempt to generate a set of tests for it
-  depending on this information. Depending on what forms the basis of such
-  test case generation, we can broadly classify into two main categories:
-  black-box and white-box test generation.
-
-  <subsubsection|Black box test generation>
-
-  These systems work under the assumption that we do <em|not> have access to
-  the source code itself, and as such will have to generate our test cases
-  from some data <em|about> the code. In most cases, such metadata will be in
-  the form of a <em|contract>, or <em|specification> for the code - a set of
-  conditions that are promised to hold after the system finishes
-  executing<\footnote>
-    In reality, postconditions can of course be specified in such a way as to
-    <em|not> demand that the execution actually terminates for them to hold.
-  </footnote>, given that some other set of conditions hold before it starts
-  execution. The former set of conditions are here called <em|preconditions>,
-  the latter being <em|postconditions>.
+  One metric we can use is to measure the degree to which test cases
+  <em|cover> various aspects of the unit they are written for. Such coverage
+  can cover several things, for example the range of inputs for the unit, or
+  the execution of the statements in the source code of the unit itself. The
+  former is known as <em|input space coverage>, the latter as <em|code
+  coverage>. It is the latter that is our prime concern in this work.
 
   \;
 
-  A black box system will usually analyze such pre- and postconditions, and
-  use them to create program code corresponding to test cases. The
-  precondition(s) will be broken down in order to find a representative set
-  of input values, while the postcondition(s) likewise will be processed in
-  order to produce code which will check the output of the test. Examples of
-  systems using this approach are JMLUnitNG.\ 
-
-  <subsubsection|White box test generation>
-
-  Systems in this category work under the assumption that we <em|do> have
-  access to the underlying source code. Knowing this gives us a much richer
-  basis for test case generation, as we can now consider exploring the source
-  code in order to extract information for creating more surgical tests, such
-  as tests causing a given execution path to be taken, testing if a given
-  statement is reachable, etc.
-
-  \;
-
-  \ How the source code is explored varies from system to system. A prominent
-  approach is <em|symbolic execution>, which ``executes'' the code on a
-  <em|symbolic> basis, i.e. without actually compiling or executing it.
-  During symbolic execution, we walk the code statement by statement, mapping
-  possible execution paths, and gathering interesting information about each
-  statement in the code. This process can allow us, for example, to deduce
-  the exact constraints on the program state for a given statement to be
-  executed, allowing us to construct a test case which will reach this
-  statement under actual runtime.\ 
-
-  \;
-
-  \ Importantly, only white box systems will allow us to generate tests which
-  satisfy various <em|code coverage criteria> - a prominent metric for test
-  case quality, measuring how much of the code is effectively covered by a
-  set of tests. We discuss code coverage in the next subsection.
-
-  <subsubsection|White box vs black box>
-
-  White box test generation systems effectively subsume the functionality of
-  black box ones, since they have access to all the data the latter use. On
-  the downside, implementing symbolic execution (or some other method of
-  exploring the source code) and related processing is usually non-trivial,
-  and make white box systems much harder to implement then black box ones. \ 
-
-  \;
-
-  For the remainder of this work, we will consider a white box system, since
-  it will give us access to the full range of features needed to facilitate
-  robust test case generation. \ 
-
-  <subsection|A metric for test quality: code coverage>
-
-  Code coverage provides gives us a metric by which we can.\ 
+  To see why code coverage is important, let's consider an example:
 
   \;
 
   <\framed>
+    \;
+
     <\with|par-left|1cm>
       <\example>
         \;
@@ -898,38 +973,31 @@
 
       \;
 
-      <with|font-series|bold|[insert graphic]>
-
-      \;
-
-      Under this suite, the switch-branch triggered when num is 2 will never
-      be taken. This is obviously problematic, since the invocation of
-      <with|font-series|bold|processTwo()> could throw an exception, or
-      affect the state of the system in an inadvert way.\ 
+      <with|font-series|bold|[insert graphic]>\ 
     </with>
+
+    \;
   </framed>
 
   \;
 
-  We see from the simple example above that the robustness of a test suite
-  does not simply depend on excercising (even a large) set of possible input
-  parameters. Rather, what is really significant is that we process a
-  sufficient number of execution paths in the code itself.
+  Under this test suite, the switch-branch triggered when num is 2 will never
+  be taken. To see why this is a serious problem, we need only consider
+  situtations where processTwo() throws an exception, has undesirable side
+  effects, or otherwise functions improperly with regard to the input for the
+  unit. This will <em|not> be uncovered if we rely only on the test cases
+  provided - we hence say that we <em|lack code coverage> for the execution
+  path(s) leading to processTwo(). For our test suite to be genuinely robust,
+  we would need to introduce at least one more test case which would cause
+  processTwo() to be executed as well.
 
   \;
 
-  This leads us to the concept of <with|font-shape|italic|code coverage> - a
-  formal criterion for what execution paths in the IUT have to be taken by
-  executed by the test cases in a test suit . We say that a test suite
-  fulfills a given code coverage criterion, iff there is at least one test
-  case in the test suite which causes the specified branches to be executed.
-
-  \;
-
-  In contemporary industry and research a wide arrange of such criteria have
-  been formulated. Generally, they are categorized as either
-  <with|font-shape|italic|logic coverage criterion> or
-  <with|font-shape|italic|graph coverage criterion>.\ 
+  Code coverage is not a monolithic concept, and there exist a great deal of
+  different <em|code coverage criteria> defining defining different degrees
+  of code coverage. We will describe some of the most prominent of these
+  criteria for the purpose of our work here. They can generally be divided
+  into two categories - <em|logic coverage> and\ 
 
   <subsubsection|Logic coverage>
 
@@ -1033,88 +1101,80 @@
     A test suite TS satisfies statement coverage, if and only if
   </definition>
 
+  <subsection|Automating testing>
+
+  \ One of the great benefits usually offered most test frameworks is the
+  ability to <em|automate> large amounts of the testing process, especially
+  the setting up of test environments and the execution of the tests
+  themselves. The programmer can thus devote herself entirely to writing test
+  suites, and then simply hand these over to the frameworks execution system
+  for automatic runs, saving a lot of time and effort. It also means that the
+  tests can easily be re-run without much efforts, which makes regression
+  testing when refactoring or extending the system very easy, as the tests
+  can simply be re-run repeatedly to verify that modifications to the system
+  don't cause existing test suites to fail.
+
+  <subsection|Automating test case generation>
+
+  While test frameworks can help in automating the <em|execution> of test
+  cases, they do not readily address the more expensive problem of
+  <em|creating> them.\ 
+
+  \;
+
+  One attempt to overcome this hurdle is the use of <em|test case generation
+  systems>. Such systems will usually consume a portion of source code along
+  with some metadata about it (such as its specification), and attempt to
+  generate a set of tests for it based on this information.\ 
+
+  \;
+
+  Depending on how they approach test case generation, we can broadly
+  classify such systems into two primary categories: black-box and white-box
+  generators.
+
+  <subsubsection|Black box test generators>
+
+  Black box test generators do their work based on metadata about the unit
+  being tested. For example, given some unit with an associated
+  specification, a black box generator can analyze the preconditions for the
+  unit in order to generate a set of test fixtures, and the postconditions in
+  order to generate a corresponding set of oracles. Each such fixture-oracle
+  pair is then encoded as a single test case. A system taking this approach
+  is JMLUnitNG.
+
+  <subsubsection|White box test generators>
+
+  Unlike their black box counterparts, white box test case generators can use
+  both the units source code and metadata to produce their output. As such,
+  they are able explore the actual implementation of the unit in order to
+  gather information about it, allowing for the generation of more surgical
+  test cases. For example, a white box generator could determine the exact
+  input needed for a certain exception to be raised, or for a certain set of
+  statements to be executed, and generate a test case accordingly.
+
+  \;
+
+  How the source code is explored can vary widely between implementations.
+  KeYTestGen, which falls into this category of generators, uses a method
+  known as <em|symbolic execution>, which we will explore further on.
+
+  <subsubsection|White box vs black box generators>
+
+  White box systems effectively subsume the functionality of black box ones,
+  since they have access to all the data the latter use, along with the data
+  they gather from exploring the source code. In practice this means that
+  they are able to generate test cases of much higher quality (how we measure
+  this quality is the subject of the next section). On the downside, white
+  box systems are generally much more complicated to implement than black box
+  ones, due to the fact that source code exploration and processing is
+  non-trivial to implement.
+
   <subsection|Symbolic execution>
 
   The clear benefit of using the Symbolic Debugger is that it provides a very
   helpful abstraction on top of KeY:s proof representation, in order to make
   it easier to reason about execution paths.
-
-  <new-page*>
-
-  <section|Background>
-
-  We are now done with much of the introduction of the fundamental concepts,
-  and ready to dive into our solution of all the problems of the world -
-  KeYTestGen. In this section, we provide a historical context for this work,
-  discussing the various theoretical developments leading up to it. We also
-  discuss similar solutions in the field.
-
-  <subsection|Early work - KeY and the Verification Based Test Generator>
-
-  The idea to use KeYs symbolic execution engine for test case generation was
-  initially explored by Gladisch et al <cite|BeckertGladisch2007>. A master
-  thesis was later produced at Chalmers, providing a reference implementation
-  <cite|Engel2006>. At this stage, this method for automated test case
-  generation was termed <with|font-shape|italic|verification based test
-  generation> <cite|EngelHaehnle07>.
-
-  \;
-
-  This early work used the fact that the proof process of KeY, in particular
-  the symbolic execution driving it, contained enough information for mapping
-  the possible execution paths through a given JavaCard program. This came as
-  a natural consequence of the soundness of the dynamic logic
-  <cite|Beckert01> used to reason about proof obligations in KeY - if certain
-  paths were indiscernible, this would in turn mean that it would not be
-  possible to prove something which should hold with regard to the source
-  code. Thus, in the course of a proof, the system would consider (on a
-  symbolic level) every possible path that could be taken from the execution
-  of any given statement. This formed the basis for the
-  <with|font-shape|italic|path analysis> part of the test generation
-  processs.
-
-  \;
-
-  Moreover, for any such path, KeY made it possible to extract a
-  <with|font-shape|italic|path condition> - a set of constraints on the
-  initial state of they system which had to hold in order for that particular
-  path to be taken in the course of execution. The constraints in these path
-  conditions, in turn, could be used in order to create concrete data that
-  satisfied them, and thus made ensured that the execution path would be
-  taken. This, naturally, was the basis for <with|font-shape|italic|fixture
-  generation> in the test generation process.
-
-  \;
-
-  Generating test fixtures was a non-trivial process. Integer data types
-  could effectively be generated using constraint solving. In this case, an
-  SMT solver would be used to find a counterexample to the negation of a
-  given pathcondition, and concrete values would then be extracted from this
-  result. For booleans, an algorithm working on equivalance classes of
-  available boolean fields could be applied directly to establish a working
-  resultant set. Reference types could be obtained (at least on the
-  theoretical level) in an analogous fashion. At this stage, floats were not
-  supported, due to limitation of the KeY system.
-
-  \;
-
-  Apart from the full automation of the process itself, one of the most
-  powerful contributions of VBT was the ability to obtain very high levels of
-  code coverage, including the industrial strength MCDC criterion (which is
-  used, for example, in the avionics industry). This followed directly from
-  the thorough examination of possible execution paths throughout the proof
-  process itself. Almost as a side effect to this rigourous exploration,
-  issues such as the <with|font-shape|italic|inner variable problem> were
-  addressed as well.
-
-  \;
-
-  Limitations existed on the reach of VBT as well. Apart from floats not
-  being supported, certain core language features, such as statics, were
-  disallowed as well. More relevant to our work, intricate Object type
-  problems, such as implicit state dependencies between classes, were not
-  addressed, which could potentially lead to erroneous test conditions being
-  generated.
 
   <new-page*>
 
@@ -1131,20 +1191,82 @@
 
   <new-page*>
 
-  <section|KeYTestGen2>
+  <section|Implementation of KeYTestGen2>
 
-  //TODO
+  In this section, we provide an exposè of the overall architecture of
+  KeYTestGen2, discussing the functions of the system and its various
+  subsystems to some detail, justifying how they satisfy the design goals
+  behind the system.
 
-  <new-page*>
+  <subsection|Overview>
+
+  KeYTestGen2 has been designed and developed with <strong|simplicity>,
+  <strong|maintainability,> <strong|performance> and <strong|usability> as
+  the driving system attributes. Low coupling has been sought between
+  individual subsystems and modules, and communication between the same
+  subsystems is generally carried out through use of intuitive, simple data
+  abstractions. Each subsystem is generally interface based, and can thus
+  easily be modified through providing custom implementations of such
+  interfaces.
+
+  \;
+
+  The\ 
+
+  <subsubsection|Core>
+
+  The core system provides central services related to test case generation,
+  including the creation of symbolic execution trees, and the generating of
+  models for the same. Modules in this section are the following:
+
+  <\itemize-dot>
+    <item><strong|The KeY Interface> - provides a central interface for
+    KeYTestGen2 to interact with a runtime instance of KeY and the Symbolic
+    Debugger. KeYTestGen2 uses this primarily invoke the Symbolic Debugger in
+    order to retrieve a symbolic execution tree for a method it is generating
+    test cases for.
+
+    <item><strong|Code Coverage Parser> - consumes a symbolic execution tree,
+    and extracts from it a subset of \ nodes whose collective execution will
+    guarantee the fulfillment of some given code coverage criteria.
+
+    <item><strong|Model Generator> - consumes nodes in a symbolic execution
+    tree, and generates a Model which satisfiy their path conditions.
+
+    \;
+  </itemize-dot>
+
+  <subsubsection|Backend>
+
+  The backend primarily provides a set of utilities and abstract classes
+  which can be extended to implement output generators for a specific test
+  framework. Such output generators will consume the abstract test cases
+  produced by KeYTestGen2, and convert them to some final format. As of
+  current, the KeYTestGen2 backend has near-complete support for JUnit and
+  XML outputs, and targeted support for TestNG. Adding additional generators
+  is simple.
+
+  <subsubsection|Frontend>
+
+  KeYTestGen2 has projected support both for CLI and GUI usage. The CLI is
+  based on JCommander, whereas the GUI uses standard Java Swing.
+
+  <subsection|The Core>
+
+  The role of the core system is to consume Java source files, gather data
+  about them through symbolic execution, and create a set of abstract test
+  cases which can then be passed to the various backend implementations for
+  encoding to specific test frameworks. This is accomplished through\ 
 
   <section|Conclusion and future work>
 
   Automated test case generation tools can provide a significant productivity
-  boost to most software engineering processes, since they allow for the
-  automation of otherwise time consuming elements of development and
-  validation. Moreover, the more advanced crop of such tools can provide
-  powerful benefits such as code coverage, leading to test suite robustness
-  which is both hard and resource heavy to do manually.
+  boost to most software engineering processes, since they allow otherwise
+  time consuming aspects of development and verification to be automated.
+  Moreover, the more advanced crop of such tools can provide powerful
+  benefits, such as code coverage. KeYTestGen2 aims to be one such tool, by
+  combining the state-of-the art symbolic execution engine of KeY with a
+  feature rich, extensible white box test case generation system.
 
   \;
 
@@ -1153,14 +1275,13 @@
 
   <subsection|Reflections>
 
-  <subsection|Future work>
+  <subsection|Current and future work>
 
-  KeYTestGen is under continous development, and the present work at best
-  represents an early prototype of what we would like it to be. At a more
-  mature stage, we firmly believe KeYTestGen can establish itself as a
-  powerful tool in the software engineering community, especially as an
-  integrated part of the KeY system itself. To reach such maturity, of
-  course, very much will still have to be done.\ 
+  Even as this is being written, KeYTestGen is under continous development.
+  The version of the system presented as a part of this thesis at best
+  represents an early prototype of what the project is envisioned to become.
+  Below, we outline some of the more interesting aspects of current and
+  future work on KeYTestGen2.\ 
 
   <subsubsection|Code coverage>
 
@@ -1238,7 +1359,7 @@
   Since a \<gtr\> b and a \<less\> b are mutually exclusive expressions, the
   statement return x; can never be executed under normal conditions. Such
   anomalies are certainly results of a mistake in the development process,
-  and something the developer would like to get notified about.
+  and thus something the developer would want to get notified about.
 
   <subsubsection|KeY integration>
 
@@ -1297,7 +1418,7 @@
   <new-page*>
 
   <\bibliography|bib|tm-plain|literature.bib>
-    <\bib-list|24>
+    <\bib-list|25>
       <bibitem*|1><label|bib-AhrendtEtAl2007>Wolfgang<nbsp>Ahrendt,
       Bernhard<nbsp>Beckert, Reiner<nbsp>Hähnle,
       Philipp<nbsp>Rümmer<localize| and >Peter H.<nbsp>Schmitt.<newblock>
@@ -1316,13 +1437,9 @@
       <localize|volume> 5846<localize| of ><with|font-shape|italic|LNCS>,
       <localize|pages >125--143. Springer, 2009.<newblock>
 
-      <bibitem*|3><label|bib-Beckert01>Bernhard<nbsp>Beckert.<newblock> A
-      Dynamic Logic for the formal verification of Java Card
-      programs.<newblock> <localize|In >I.<nbsp>Attali<localize| and
-      >T.<nbsp>Jensen<localize|, editors>, <with|font-shape|italic|Java on
-      Smart Cards: Programming and Security. Revised Papers, Java Card 2000,
-      International Workshop, Cannes, France>, LNCS 2041, <localize|pages
-      >6--24. Springer, 2001.<newblock>
+      <bibitem*|3><label|bib-Beck1989>Kent<nbsp>Beck.<newblock> Simple
+      smalltalk testing: with patterns.<newblock>
+      <href|Http://www.xprogramming.com/testfram.htm>, 1989.<newblock>
 
       <bibitem*|4><label|bib-BeckertGladisch2007>Bernhard<nbsp>Beckert<localize|
       and >Christoph<nbsp>Gladisch.<newblock> White-box testing by combining
@@ -1380,57 +1497,62 @@
       Tests and Proofs (TAP), Zürich, Switzerland>, LNCS. Springer, to
       appear, 2007.<newblock>
 
-      <bibitem*|14><label|bib-Gladisch2008_TAP>Christoph<nbsp>Gladisch.<newblock>
+      <bibitem*|14><label|bib-Paganelli2010>Wolfgang Ahrendt<nbsp>Gabriele
+      Paganelli.<newblock> Verification driven test generator.<newblock>
+      <localize|In ><with|font-shape|italic|Publications of the CHARTER
+      project>. 2010.<newblock>
+
+      <bibitem*|15><label|bib-Gladisch2008_TAP>Christoph<nbsp>Gladisch.<newblock>
       Verification-based test case generation with loop invariants and method
       specifications.<newblock> <localize|Technical Report>, University of
       Koblenz-Landau, 2008.<newblock>
 
-      <bibitem*|15><label|bib-Gladisch2008>Christoph<nbsp>Gladisch.<newblock>
+      <bibitem*|16><label|bib-Gladisch2008>Christoph<nbsp>Gladisch.<newblock>
       Verification-based testing for full feasible branch coverage.<newblock>
       <localize|In >Antonio<nbsp>Cerone<localize|, editor>,
       <with|font-shape|italic|Proc. 6th IEEE Int. Conf. Software Engineering
       and Formal Methods (SEFM'08)>. IEEE Computer Society Press,
       2008.<newblock>
 
-      <bibitem*|16><label|bib-Gladisch2010>Christoph<nbsp>Gladisch.<newblock>
+      <bibitem*|17><label|bib-Gladisch2010>Christoph<nbsp>Gladisch.<newblock>
       Test data generation for programs with quantified first-order logic
       specifications.<newblock> <localize|In ><cite|DBLP:conf/pts/2010>,
       <localize|pages >158--173.<newblock>
 
-      <bibitem*|17><label|bib-Gladisch2012>Christoph<nbsp>Gladisch.<newblock>
+      <bibitem*|18><label|bib-Gladisch2012>Christoph<nbsp>Gladisch.<newblock>
       Model generation for quantified formulas with application to test data
       generation.<newblock> <with|font-shape|italic|International Journal on
       Software Tools for Technology Transfer (STTT)>, :1--21, feb
       2012.<newblock> 10.1007/s10009-012-0227-0.<newblock>
 
-      <bibitem*|18><label|bib-HahnleEtAl2010>R.<nbsp>Hähnle, M.<nbsp>Baum,
+      <bibitem*|19><label|bib-HahnleEtAl2010>R.<nbsp>Hähnle, M.<nbsp>Baum,
       R.<nbsp>Bubel<localize| and >M.<nbsp>Rothe.<newblock> A visual
       interactive debugger based on symbolic execution.<newblock>
       <localize|In ><with|font-shape|italic|Proceedings of the IEEE/ACM
       international conference on Automated software engineering>,
       <localize|pages >143--146. ACM, 2010.<newblock>
 
-      <bibitem*|19><label|bib-jazequel1997design>J.M.<nbsp>Jazequel<localize|
+      <bibitem*|20><label|bib-jazequel1997design>J.M.<nbsp>Jazequel<localize|
       and >B.<nbsp>Meyer.<newblock> Design by contract: the lessons of
       ariane.<newblock> <with|font-shape|italic|Computer>, 30(1):129--130,
       1997.<newblock>
 
-      <bibitem*|20><label|bib-JML-Ref-Manual>Gary T.<nbsp>Leavens,
+      <bibitem*|21><label|bib-JML-Ref-Manual>Gary T.<nbsp>Leavens,
       Erik<nbsp>Poll, Curtis<nbsp>Clifton, Yoonsik<nbsp>Cheon,
       Clyde<nbsp>Ruby, David<nbsp>Cok, Peter<nbsp>Müller,
       Joseph<nbsp>Kiniry<localize| and >Patrice<nbsp>Chalin.<newblock>
       <with|font-shape|italic|JML Reference Manual. Draft Revision
       1.200>.<newblock> Feb 2007.<newblock>
 
-      <bibitem*|21><label|bib-lions1996ariane>J.L.<nbsp>Lions
+      <bibitem*|22><label|bib-lions1996ariane>J.L.<nbsp>Lions
       et<nbsp>al.<newblock> Ariane 5 flight 501 failure.<newblock>
       1996.<newblock>
 
-      <bibitem*|22><label|bib-TestPatterns2007>Gerard<nbsp>Meszaros.<newblock>
+      <bibitem*|23><label|bib-TestPatterns2007>Gerard<nbsp>Meszaros.<newblock>
       <with|font-shape|italic|XUnit Test Patterns>.<newblock> Addison-Wesley
       Signature Series. Addison-Wesley, 2007.<newblock>
 
-      <bibitem*|23><label|bib-DBLP:conf/pts/2010>Alexandre<nbsp>Petrenko,
+      <bibitem*|24><label|bib-DBLP:conf/pts/2010>Alexandre<nbsp>Petrenko,
       Adenilso<nbsp>da<nbsp>Silva Simão<localize| and >José
       Carlos<nbsp>Maldonado<localize|, editors>.<newblock>
       <with|font-shape|italic|Testing Software and Systems - 22nd IFIP WG 6.1
@@ -1439,7 +1561,7 @@
       ><with|font-shape|italic|Lecture Notes in Computer Science>.<newblock>
       Springer, 2010.<newblock>
 
-      <bibitem*|24><label|bib-SoftwareEngineering9>Ian<nbsp>Sommerville.<newblock>
+      <bibitem*|25><label|bib-SoftwareEngineering9>Ian<nbsp>Sommerville.<newblock>
       <with|font-shape|italic|Software Engineering>.<newblock> Pearson
       International, 9th<localize| edition>, 2011.<newblock>
     </bib-list>
@@ -1448,85 +1570,114 @@
 
 <\references>
   <\collection>
-    <associate|auto-1|<tuple|1|4>>
-    <associate|auto-10|<tuple|2.2.2|7>>
-    <associate|auto-11|<tuple|2.2.3|8>>
-    <associate|auto-12|<tuple|2.3|8>>
-    <associate|auto-13|<tuple|2.3.1|8>>
-    <associate|auto-14|<tuple|2.4|9>>
-    <associate|auto-15|<tuple|2.4.1|9>>
-    <associate|auto-16|<tuple|2.5|10>>
-    <associate|auto-17|<tuple|2.5.1|10>>
-    <associate|auto-18|<tuple|2.5.2|10>>
-    <associate|auto-19|<tuple|2.5.3|10>>
-    <associate|auto-2|<tuple|1.1|4>>
-    <associate|auto-20|<tuple|2.6|11>>
-    <associate|auto-21|<tuple|2.6.1|12>>
-    <associate|auto-22|<tuple|2.6.2|12>>
-    <associate|auto-23|<tuple|2.7|13>>
-    <associate|auto-24|<tuple|3|13>>
-    <associate|auto-25|<tuple|3.1|14>>
-    <associate|auto-26|<tuple|4|14>>
-    <associate|auto-27|<tuple|4.1|15>>
-    <associate|auto-28|<tuple|5|16>>
-    <associate|auto-29|<tuple|6|16>>
-    <associate|auto-3|<tuple|1.2|5>>
-    <associate|auto-30|<tuple|6.1|16>>
-    <associate|auto-31|<tuple|6.2|16>>
-    <associate|auto-32|<tuple|6.2.1|16>>
-    <associate|auto-33|<tuple|6.2.2|17>>
-    <associate|auto-34|<tuple|6.2.3|17>>
-    <associate|auto-35|<tuple|6.2.4|18>>
-    <associate|auto-36|<tuple|6.2.4|?>>
-    <associate|auto-37|<tuple|6.2.4|?>>
-    <associate|auto-4|<tuple|1.3|5>>
-    <associate|auto-5|<tuple|2|6>>
-    <associate|auto-6|<tuple|2.1|6>>
-    <associate|auto-7|<tuple|2.1.1|6>>
-    <associate|auto-8|<tuple|2.2|7>>
-    <associate|auto-9|<tuple|2.2.1|7>>
-    <associate|bib-AhrendtEtAl2007|<tuple|1|18>>
-    <associate|bib-AhrendtEtAl2009|<tuple|2|18>>
-    <associate|bib-Beckert01|<tuple|3|18>>
-    <associate|bib-BeckertEtAl2008|<tuple|7|18>>
-    <associate|bib-BeckertGladisch2007|<tuple|4|18>>
-    <associate|bib-BubelEtAl2009|<tuple|6|18>>
-    <associate|bib-DBLP:conf/pts/2010|<tuple|23|18>>
-    <associate|bib-Engel2006|<tuple|11|18>>
-    <associate|bib-EngelEtAl2008|<tuple|12|18>>
-    <associate|bib-EngelHaehnle07|<tuple|13|18>>
-    <associate|bib-Gladisch2008|<tuple|15|18>>
-    <associate|bib-Gladisch2008_TAP|<tuple|14|18>>
-    <associate|bib-Gladisch2010|<tuple|16|18>>
-    <associate|bib-Gladisch2012|<tuple|17|18>>
-    <associate|bib-HahnleEtAl2010|<tuple|18|?>>
-    <associate|bib-JML-Ref-Manual|<tuple|20|18>>
-    <associate|bib-JMLwebsite|<tuple|8|18>>
-    <associate|bib-KeYwebsite|<tuple|9|18>>
-    <associate|bib-SoftwareEngineering9|<tuple|24|18>>
-    <associate|bib-TestNGwebsite|<tuple|5|18>>
-    <associate|bib-TestPatterns2007|<tuple|22|18>>
-    <associate|bib-dowson1997ariane|<tuple|10|?>>
-    <associate|bib-jazequel1997design|<tuple|19|?>>
-    <associate|bib-lions1996ariane|<tuple|21|?>>
-    <associate|footnote-1|<tuple|1|5>>
-    <associate|footnote-2|<tuple|2|5>>
-    <associate|footnote-3|<tuple|3|6>>
-    <associate|footnote-4|<tuple|4|7>>
-    <associate|footnote-5|<tuple|5|7>>
-    <associate|footnote-6|<tuple|6|8>>
-    <associate|footnote-7|<tuple|7|8>>
-    <associate|footnote-8|<tuple|8|10>>
-    <associate|footnote-9|<tuple|9|16>>
-    <associate|footnr-1|<tuple|1|5>>
-    <associate|footnr-2|<tuple|2|5>>
-    <associate|footnr-3|<tuple|3|6>>
-    <associate|footnr-4|<tuple|4|7>>
-    <associate|footnr-5|<tuple|5|7>>
-    <associate|footnr-6|<tuple|6|8>>
-    <associate|footnr-7|<tuple|7|8>>
-    <associate|footnr-8|<tuple|8|10>>
-    <associate|footnr-9|<tuple|9|16>>
+    <associate|auto-1|<tuple|1|1>>
+    <associate|auto-10|<tuple|2.1|4>>
+    <associate|auto-11|<tuple|2.1.1|4>>
+    <associate|auto-12|<tuple|2.2|5>>
+    <associate|auto-13|<tuple|2.2.1|5>>
+    <associate|auto-14|<tuple|2.2.2|5>>
+    <associate|auto-15|<tuple|2.2.3|6>>
+    <associate|auto-16|<tuple|2.3|7>>
+    <associate|auto-17|<tuple|2.4|8>>
+    <associate|auto-18|<tuple|2.4.1|8>>
+    <associate|auto-19|<tuple|2.5|8>>
+    <associate|auto-2|<tuple|1.1|1>>
+    <associate|auto-20|<tuple|2.5.1|9>>
+    <associate|auto-21|<tuple|2.5.2|10>>
+    <associate|auto-22|<tuple|2.6|10>>
+    <associate|auto-23|<tuple|2.7|10>>
+    <associate|auto-24|<tuple|2.7.1|10>>
+    <associate|auto-25|<tuple|2.7.2|11>>
+    <associate|auto-26|<tuple|2.7.3|11>>
+    <associate|auto-27|<tuple|2.8|11>>
+    <associate|auto-28|<tuple|3|12>>
+    <associate|auto-29|<tuple|3.1|13>>
+    <associate|auto-3|<tuple|1.2|2>>
+    <associate|auto-30|<tuple|4|13>>
+    <associate|auto-31|<tuple|4.1|14>>
+    <associate|auto-32|<tuple|4.1.1|14>>
+    <associate|auto-33|<tuple|4.1.2|14>>
+    <associate|auto-34|<tuple|4.1.3|14>>
+    <associate|auto-35|<tuple|4.2|14>>
+    <associate|auto-36|<tuple|5|14>>
+    <associate|auto-37|<tuple|5.1|14>>
+    <associate|auto-38|<tuple|5.2|15>>
+    <associate|auto-39|<tuple|5.2.1|15>>
+    <associate|auto-4|<tuple|1.3|2>>
+    <associate|auto-40|<tuple|5.2.2|15>>
+    <associate|auto-41|<tuple|5.2.3|15>>
+    <associate|auto-42|<tuple|5.2.4|16>>
+    <associate|auto-43|<tuple|5.2.4|16>>
+    <associate|auto-44|<tuple|6.2.4|17>>
+    <associate|auto-45|<tuple|6.2.4|17>>
+    <associate|auto-46|<tuple|6.2.4|?>>
+    <associate|auto-5|<tuple|1.3.1|2>>
+    <associate|auto-6|<tuple|1.3.2|3>>
+    <associate|auto-7|<tuple|1.3.3|3>>
+    <associate|auto-8|<tuple|1.4|3>>
+    <associate|auto-9|<tuple|2|4>>
+    <associate|bib-AhrendtEtAl2007|<tuple|1|17>>
+    <associate|bib-AhrendtEtAl2009|<tuple|2|17>>
+    <associate|bib-Beck1989|<tuple|3|17>>
+    <associate|bib-Beckert01|<tuple|4|17>>
+    <associate|bib-BeckertEtAl2008|<tuple|7|17>>
+    <associate|bib-BeckertGladisch2007|<tuple|4|17>>
+    <associate|bib-BubelEtAl2009|<tuple|6|17>>
+    <associate|bib-DBLP:conf/pts/2010|<tuple|24|17>>
+    <associate|bib-Engel2006|<tuple|11|17>>
+    <associate|bib-EngelEtAl2008|<tuple|12|17>>
+    <associate|bib-EngelHaehnle07|<tuple|13|17>>
+    <associate|bib-Gladisch2008|<tuple|16|17>>
+    <associate|bib-Gladisch2008_TAP|<tuple|15|17>>
+    <associate|bib-Gladisch2010|<tuple|17|17>>
+    <associate|bib-Gladisch2012|<tuple|18|17>>
+    <associate|bib-HahnleEtAl2010|<tuple|19|17>>
+    <associate|bib-JML-Ref-Manual|<tuple|21|17>>
+    <associate|bib-JMLwebsite|<tuple|8|17>>
+    <associate|bib-KeYwebsite|<tuple|9|17>>
+    <associate|bib-Paganelli2010|<tuple|14|17>>
+    <associate|bib-SoftwareEngineering9|<tuple|25|17>>
+    <associate|bib-TestNGwebsite|<tuple|5|17>>
+    <associate|bib-TestPatterns2007|<tuple|23|17>>
+    <associate|bib-dowson1997ariane|<tuple|10|17>>
+    <associate|bib-jazequel1997design|<tuple|20|17>>
+    <associate|bib-lions1996ariane|<tuple|22|17>>
+    <associate|footnote-1|<tuple|1|1>>
+    <associate|footnote-10|<tuple|10|3>>
+    <associate|footnote-11|<tuple|11|3>>
+    <associate|footnote-12|<tuple|12|4>>
+    <associate|footnote-13|<tuple|13|5>>
+    <associate|footnote-14|<tuple|14|6>>
+    <associate|footnote-15|<tuple|15|6>>
+    <associate|footnote-16|<tuple|16|7>>
+    <associate|footnote-17|<tuple|17|8>>
+    <associate|footnote-18|<tuple|18|15>>
+    <associate|footnote-2|<tuple|2|1>>
+    <associate|footnote-3|<tuple|3|2>>
+    <associate|footnote-4|<tuple|4|2>>
+    <associate|footnote-5|<tuple|5|2>>
+    <associate|footnote-6|<tuple|6|2>>
+    <associate|footnote-7|<tuple|7|2>>
+    <associate|footnote-8|<tuple|8|2>>
+    <associate|footnote-9|<tuple|9|2>>
+    <associate|footnr-1|<tuple|1|1>>
+    <associate|footnr-10|<tuple|10|2>>
+    <associate|footnr-11|<tuple|11|3>>
+    <associate|footnr-12|<tuple|12|4>>
+    <associate|footnr-13|<tuple|13|5>>
+    <associate|footnr-14|<tuple|14|6>>
+    <associate|footnr-15|<tuple|15|6>>
+    <associate|footnr-16|<tuple|16|7>>
+    <associate|footnr-17|<tuple|17|8>>
+    <associate|footnr-18|<tuple|18|15>>
+    <associate|footnr-2|<tuple|2|1>>
+    <associate|footnr-3|<tuple|3|2>>
+    <associate|footnr-4|<tuple|4|2>>
+    <associate|footnr-5|<tuple|5|2>>
+    <associate|footnr-6|<tuple|6|2>>
+    <associate|footnr-7|<tuple|7|2>>
+    <associate|footnr-8|<tuple|8|2>>
+    <associate|footnr-9|<tuple|9|2>>
   </collection>
 </references>
 
@@ -1539,6 +1690,20 @@
 
       lions1996ariane
 
+      EngelHaehnle07
+
+      Engel2006
+
+      BeckertGladisch2007
+
+      Gladisch2008_TAP
+
+      Gladisch2008
+
+      Paganelli2010
+
+      EngelHaehnle07
+
       JMLwebsite
 
       JML-Ref-Manual
@@ -1547,13 +1712,9 @@
 
       TestPatterns2007
 
-      BeckertGladisch2007
+      Beck1989
 
-      Engel2006
-
-      EngelHaehnle07
-
-      Beckert01
+      Ingalls1978
 
       KeYwebsite
 
@@ -1592,141 +1753,177 @@
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-1><vspace|0.5fn>
 
-      <with|par-left|<quote|1.5fn>|1.1<space|2spc>The pursuit of correctness
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1.5fn>|1.1<space|2spc>Motivation: the pursuit of
+      correctness <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-2>>
 
-      <with|par-left|<quote|1.5fn>|1.2<space|2spc>Scope of this work
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1.5fn>|1.2<space|2spc>Software testing as a means
+      to correctness <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-3>>
 
-      <with|par-left|<quote|1.5fn>|1.3<space|2spc>Organization
+      <with|par-left|<quote|1.5fn>|1.3<space|2spc>Scope of this work
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-4>>
 
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|2<space|2spc>Fundamental
-      concepts> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-5><vspace|0.5fn>
+      <with|par-left|<quote|3fn>|1.3.1<space|2spc>Previous work -
+      KeYTestGen(1) <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-5>>
 
-      <with|par-left|<quote|1.5fn>|2.1<space|2spc>A formal look at
-      correctness <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|3fn>|1.3.2<space|2spc>Towards KeYTestGen2
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-6>>
 
-      <with|par-left|<quote|3fn>|2.1.1<space|2spc>The Java Modelling Language
+      <with|par-left|<quote|3fn>|1.3.3<space|2spc>Target platforms
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-7>>
 
-      <with|par-left|<quote|1.5fn>|2.2<space|2spc>Software verification and
-      verification methods <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1.5fn>|1.4<space|2spc>Organization of this work
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-8>>
 
-      <with|par-left|<quote|3fn>|2.2.1<space|2spc>The verification ecosystem
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-9>>
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|2<space|2spc>Fundamental
+      concepts> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-9><vspace|0.5fn>
 
-      <with|par-left|<quote|3fn>|2.2.2<space|2spc>The formal methods
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1.5fn>|2.1<space|2spc>Specifications -
+      formalizing correctness <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-10>>
 
-      <with|par-left|<quote|3fn>|2.2.3<space|2spc>Software testing
+      <with|par-left|<quote|3fn>|2.1.1<space|2spc>The Java Modelling Language
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-11>>
 
-      <with|par-left|<quote|1.5fn>|2.3<space|2spc>Unit testing
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1.5fn>|2.2<space|2spc>Software verification and
+      verification methods <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-12>>
 
-      <with|par-left|<quote|1.5fn>|2.4<space|2spc>Test cases and test suites
+      <with|par-left|<quote|3fn>|2.2.1<space|2spc>The verification ecosystem
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-13>>
 
-      <with|par-left|<quote|1.5fn>|2.5<space|2spc>Automating testing
+      <with|par-left|<quote|3fn>|2.2.2<space|2spc>The formal methods
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-14>>
 
-      <with|par-left|<quote|1.5fn>|2.6<space|2spc>Automating test case
-      generation <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|3fn>|2.2.3<space|2spc>Software testing
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-15>>
 
-      <with|par-left|<quote|3fn>|2.6.1<space|2spc>Black box test generation
+      <with|par-left|<quote|1.5fn>|2.3<space|2spc>Unit testing
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-16>>
 
-      <with|par-left|<quote|3fn>|2.6.2<space|2spc>White box test generation
+      <with|par-left|<quote|1.5fn>|2.4<space|2spc>Test frameworks
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-17>>
 
-      <with|par-left|<quote|3fn>|2.6.3<space|2spc>White box vs black box
+      <with|par-left|<quote|3fn>|2.4.1<space|2spc>xUnit
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-18>>
 
-      <with|par-left|<quote|1.5fn>|2.7<space|2spc>A metric for test quality:
-      code coverage <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1.5fn>|2.5<space|2spc>Coverage criteria - a
+      metric for test quality <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-19>>
 
-      <with|par-left|<quote|3fn>|2.7.1<space|2spc>Logic coverage
+      <with|par-left|<quote|3fn>|2.5.1<space|2spc>Logic coverage
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-20>>
 
-      <with|par-left|<quote|3fn>|2.7.2<space|2spc>Graph coverage
+      <with|par-left|<quote|3fn>|2.5.2<space|2spc>Graph coverage
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-21>>
 
-      <with|par-left|<quote|1.5fn>|2.8<space|2spc>Symbolic execution
+      <with|par-left|<quote|1.5fn>|2.6<space|2spc>Automating testing
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-22>>
 
+      <with|par-left|<quote|1.5fn>|2.7<space|2spc>Automating test case
+      generation <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-23>>
+
+      <with|par-left|<quote|3fn>|2.7.1<space|2spc>Black box test generators
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-24>>
+
+      <with|par-left|<quote|3fn>|2.7.2<space|2spc>White box test generators
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-25>>
+
+      <with|par-left|<quote|3fn>|2.7.3<space|2spc>White box vs black box
+      generators <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-26>>
+
+      <with|par-left|<quote|1.5fn>|2.8<space|2spc>Symbolic execution
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-27>>
+
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|3<space|2spc>Background>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-23><vspace|0.5fn>
-
-      <with|par-left|<quote|1.5fn>|3.1<space|2spc>Early work - KeY and the
-      Verification Based Test Generator <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-24>>
+      <no-break><pageref|auto-28><vspace|0.5fn>
 
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|4<space|2spc>The
       KeY system> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-25><vspace|0.5fn>
+      <no-break><pageref|auto-29><vspace|0.5fn>
 
       <with|par-left|<quote|1.5fn>|4.1<space|2spc>KeY - an overview
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-26>>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|5<space|2spc>KeYTestGen2>
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-27><vspace|0.5fn>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|6<space|2spc>Conclusion
-      and future work> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-28><vspace|0.5fn>
-
-      <with|par-left|<quote|1.5fn>|6.1<space|2spc>Reflections
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-29>>
-
-      <with|par-left|<quote|1.5fn>|6.2<space|2spc>Future work
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-30>>
 
-      <with|par-left|<quote|3fn>|6.2.1<space|2spc>Code coverage
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-31>>
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|5<space|2spc>Implementation
+      of KeYTestGen2> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-31><vspace|0.5fn>
 
-      <with|par-left|<quote|3fn>|6.2.2<space|2spc>Improved user feedback
+      <with|par-left|<quote|1.5fn>|5.1<space|2spc>Overview
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-32>>
 
-      <with|par-left|<quote|3fn>|6.2.3<space|2spc>KeY integration
+      <with|par-left|<quote|3fn>|5.1.1<space|2spc>Core
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-33>>
 
-      <with|par-left|<quote|3fn>|6.2.4<space|2spc>Support for more frameworks
+      <with|par-left|<quote|3fn>|5.1.2<space|2spc>Backend
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-34>>
 
+      <with|par-left|<quote|3fn>|5.1.3<space|2spc>Frontend
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-35>>
+
+      <with|par-left|<quote|1.5fn>|5.2<space|2spc>
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-36>>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|6<space|2spc>Conclusion
+      and future work> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-37><vspace|0.5fn>
+
+      <with|par-left|<quote|1.5fn>|6.1<space|2spc>Reflections
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-38>>
+
+      <with|par-left|<quote|1.5fn>|6.2<space|2spc>Current and future work
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-39>>
+
+      <with|par-left|<quote|3fn>|6.2.1<space|2spc>Code coverage
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-40>>
+
+      <with|par-left|<quote|3fn>|6.2.2<space|2spc>Improved user feedback
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-41>>
+
+      <with|par-left|<quote|3fn>|6.2.3<space|2spc>KeY integration
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-42>>
+
+      <with|par-left|<quote|3fn>|6.2.4<space|2spc>Support for more frameworks
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-43>>
+
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|Bibliography>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-35><vspace|0.5fn>
+      <no-break><pageref|auto-44><vspace|0.5fn>
     </associate>
   </collection>
 </auxiliary>

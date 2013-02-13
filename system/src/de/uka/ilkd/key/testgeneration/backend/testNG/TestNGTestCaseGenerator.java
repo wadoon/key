@@ -3,8 +3,10 @@ package de.uka.ilkd.key.testgeneration.backend.testNG;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.backend.AbstractTestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.INodeTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.TestGenerationInterface;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 
 /**
@@ -14,7 +16,14 @@ import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
  * @author christopher
  * 
  */
-public class TestNGTestCaseGenerator extends AbstractTestCaseGenerator {
+public class TestNGTestCaseGenerator implements ITestCaseGenerator,
+        INodeTestCaseGenerator {
+
+    /**
+     * KeYTestGen services for this test generation session.
+     */
+    TestGenerationInterface testGenerationInterface = TestGenerationInterface
+            .getDefaultTestGenerationInterface();
 
     /**
      * {@inheritDoc}

@@ -303,7 +303,7 @@ public class ModelGenerator implements IModelGenerator {
      * @throws ModelGeneratorException
      *             in the event that there was a failure to generate the Model
      */
-    public IModel generateModel(IExecutionNode node, ModelMediator mediator)
+    public Model generateModel(IExecutionNode node, ModelMediator mediator)
             throws ModelGeneratorException {
 
         try {
@@ -360,7 +360,7 @@ public class ModelGenerator implements IModelGenerator {
      * FIXME: BAD!
      */
     @Override
-    public IModel generateModel(IExecutionNode node)
+    public Model generateModel(IExecutionNode node)
             throws ModelGeneratorException {
 
         return generateModel(node, new ModelMediator());

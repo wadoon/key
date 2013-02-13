@@ -8,19 +8,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
-import de.uka.ilkd.key.testgeneration.backend.TestCase;
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.TestCase;
 import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.PostconditionTools;
-import de.uka.ilkd.key.testgeneration.core.parsers.AbstractTermParser;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveSDPsTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
 

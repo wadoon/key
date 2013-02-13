@@ -3,8 +3,8 @@ package de.uka.ilkd.key.testgeneration.backend.testNG;
 import java.util.List;
 
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
-import de.uka.ilkd.key.testgeneration.backend.TestCase;
 import de.uka.ilkd.key.testgeneration.backend.junit.JUnitGenerator;
+import de.uka.ilkd.key.testgeneration.core.TestCase;
 
 /**
  * This singleton provides the functionality needed to produce test suites for

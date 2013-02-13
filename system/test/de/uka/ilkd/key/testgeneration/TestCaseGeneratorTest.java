@@ -11,10 +11,10 @@ import org.junit.Test;
 import de.uka.ilkd.key.java.statement.Assert;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
+import de.uka.ilkd.key.testgeneration.backend.xml.XMLGeneratorException;
 import de.uka.ilkd.key.testgeneration.backend.xml.XMLTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.xml.XMLGeneratorException;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 public class TestCaseGeneratorTest {

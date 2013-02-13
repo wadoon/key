@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgeneration.core.model;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 
 /**
  * Objects implementing this interface are used in order to create
@@ -12,6 +13,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  */
 public interface IModelGenerator {
 
-    public IModel generateModel(IExecutionNode node)
+    public Model generateModel(IExecutionNode node)
             throws ModelGeneratorException;
 }

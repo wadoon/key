@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.keyinterface;
+package de.uka.ilkd.key.testgeneration.core;
 
 import java.util.List;
 

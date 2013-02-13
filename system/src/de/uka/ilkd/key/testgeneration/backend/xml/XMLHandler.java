@@ -1,10 +1,10 @@
-package de.uka.ilkd.key.testgeneration.core.xml;
+package de.uka.ilkd.key.testgeneration.backend.xml;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Contains various constants and utility methods related to handling XML in
+ * Contains various constants and utility methods related to handling and generating XML in
  * KeYTestGen2.
  * 
  * @author christopher

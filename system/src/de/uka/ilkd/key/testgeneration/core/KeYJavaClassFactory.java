@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.keyinterface;
+package de.uka.ilkd.key.testgeneration.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +16,8 @@ import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.parsers.JavaSourceParser;
@@ -33,12 +35,6 @@ public enum KeYJavaClassFactory {
      * KeY runtime.
      */
     private final KeYInterface keyInterface = KeYInterface.INSTANCE;
-
-    /**
-     * Used in order to extract {@link FunctionalOperationContract} information
-     * for Java methods
-     */
-    private final ContractExtractor contractExtractor = ContractExtractor.INSTANCE;
 
     /**
      * Manufactures an instance of {@link KeYJavaClass}.
@@ -112,23 +108,6 @@ public enum KeYJavaClassFactory {
 
         return new KeYJavaClass(packageDeclaration, name, mainClass, methods,
                 javaFile);
-    }
-
-    /**
-     * Retrieve a {@link File} reference to the .java file selected by the user.
-     * 
-     * @param path
-     * @return
-     * @throws TestGeneratorException
-     * @throws IOException
-     */
-    private File loadFile(String path) throws IOException {
-
-        File javaFile = new File(path);
-        if (!javaFile.exists()) {
-            throw new IOException("FATAL: no such file or directory: " + path);
-        }
-        return javaFile;
     }
 
     /**
