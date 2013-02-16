@@ -42,22 +42,15 @@ public class Sandbox extends KeYTestGenTest {
             IOException, XMLGeneratorException, ProblemLoaderException,
             IllegalFormulaException, TermTransformerException {
 
-        String method = "midOneProxyOneInstance";
+        String method = "mid";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
         List<IExecutionNode> nodes = retrieveNode(environment.getBuilder()
                 .getStartNode(), "mid=x");
 
         for (IExecutionNode node : nodes) {
-            RemoveSDPsTransformer sdpRemovingTransformer = new RemoveSDPsTransformer("_dot_");
-            Term oldTerm = node.getPathCondition();
-            Term newTerm = sdpRemovingTransformer
-                    .removeSortDependingFunctions(node.getPathCondition());
-            // Term newNewTerm = new
-            // TermSimplificationTransformer().simplifyTerm(newTerm);
-            System.out.println(oldTerm);
-            System.out.println(newTerm);
-           // System.out.println(newNewTerm);
+
+                System.out.println(node.getFormatedPathCondition());
         }
     }
     

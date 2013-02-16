@@ -12,7 +12,6 @@ import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClassFactory;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
-import de.uka.ilkd.key.testgeneration.core.TestCase;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelMediator;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.ContractExtractor;
+import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {

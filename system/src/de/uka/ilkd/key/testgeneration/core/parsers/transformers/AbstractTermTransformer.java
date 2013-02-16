@@ -41,7 +41,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      * @param term
      * @return
      */
-    public Term transformTerm(Term term) throws TermTransformerException {
+    public Term transformTerm(final Term term) throws TermTransformerException {
 
         /*
          * Order matters here, since SortedOperator is a subclass of Operator.
@@ -69,7 +69,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformIfExThenElse(Term term) {
+    protected Term transformIfExThenElse(final Term term) {
 
         return term;
     }
@@ -82,7 +82,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformIfThenElse(Term term) {
+    protected Term transformIfThenElse(final Term term) {
 
         return term;
     }
@@ -95,7 +95,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformSortedOperator(Term term)
+    protected Term transformSortedOperator(final Term term)
             throws TermTransformerException {
 
         if (isFunction(term)) {
@@ -126,7 +126,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformProgramVariable(Term term)
+    protected Term transformProgramVariable(final Term term)
             throws TermTransformerException {
 
         if (isLocationVariable(term)) {
@@ -145,7 +145,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformLocationVariable(Term term) {
+    protected Term transformLocationVariable(final Term term) {
 
         return term;
     }
@@ -158,7 +158,8 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformFunction(Term term) throws TermTransformerException {
+    protected Term transformFunction(final Term term)
+            throws TermTransformerException {
 
         /*
          * Order is crucial for proper resolution here, as the precise,
@@ -202,12 +203,12 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformNull(Term term) {
+    protected Term transformNull(final Term term) {
 
         return term;
     }
 
-    private Term transformUnaryFunction(Term term)
+    private Term transformUnaryFunction(final Term term)
             throws TermTransformerException {
 
         Term child = transformTerm(term.sub(0));
@@ -227,7 +228,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformBinaryFunction(Term term)
+    protected Term transformBinaryFunction(final Term term)
             throws TermTransformerException {
 
         Term firstChild = transformTerm(term.sub(0));
@@ -239,7 +240,8 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
         return newTerm;
     }
 
-    protected Term transformLiteral(Term term) throws TermTransformerException {
+    protected Term transformLiteral(final Term term)
+            throws TermTransformerException {
 
         /*
          * Literals may or may not declare children, such as 1(#);
@@ -261,12 +263,12 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
      *            the term
      * @return the transformed term
      */
-    protected Term transformSortDependentFunction(Term term) {
+    protected Term transformSortDependentFunction(final Term term) {
 
         return term;
     }
 
-    protected Term transformObserverFunction(Term term) {
+    protected Term transformObserverFunction(final Term term) {
 
         if (isProgramMethod(term)) {
             return transformProgramMethod(term);
@@ -275,12 +277,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
         return term;
     }
 
-    protected Term transformProgramMethod(Term term) {
+    protected Term transformProgramMethod(final Term term) {
 
         return term;
     }
 
-    protected Term transformJunctor(Term term) throws TermTransformerException {
+    protected Term transformJunctor(final Term term)
+            throws TermTransformerException {
 
         if (isAnd(term)) {
             return transformAnd(term);
@@ -299,14 +302,16 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
                 + term.op().name());
     }
 
-    protected Term transformNot(Term term) throws TermTransformerException {
+    protected Term transformNot(final Term term)
+            throws TermTransformerException {
 
         Term newChild = transformTerm(term.sub(0));
 
         return termFactory.createTerm(Junctor.NOT, newChild);
     }
 
-    protected Term transformAnd(Term term) throws TermTransformerException {
+    protected Term transformAnd(final Term term)
+            throws TermTransformerException {
 
         Term firstChild = transformTerm(term.sub(0));
         Term secondChild = transformTerm(term.sub(1));
@@ -314,7 +319,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
         return termFactory.createTerm(Junctor.AND, firstChild, secondChild);
     }
 
-    protected Term transformOr(Term term) throws TermTransformerException {
+    protected Term transformOr(final Term term) throws TermTransformerException {
 
         Term firstChild = transformTerm(term.sub(0));
         Term secondChild = transformTerm(term.sub(1));
@@ -322,7 +327,8 @@ public abstract class AbstractTermTransformer extends AbstractTermParser {
         return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
     }
 
-    protected Term transformEquals(Term term) throws TermTransformerException {
+    protected Term transformEquals(final Term term)
+            throws TermTransformerException {
 
         Term firstChild = transformTerm(term.sub(0));
         Term secondChild = transformTerm(term.sub(1));

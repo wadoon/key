@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.testgeneration.backend.custom;
 
-import de.uka.ilkd.key.testgeneration.core.xmlparser.XMLParserException;
 
 /**
  * Classes implementing this interface are capable of producing concrete test

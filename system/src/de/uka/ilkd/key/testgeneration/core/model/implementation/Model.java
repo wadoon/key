@@ -48,7 +48,7 @@ public class Model implements IModel {
      *            the instance the variable will point to. Can be
      *            <code>null</code>.
      */
-    public void add(ModelVariable variable, Object instance) {
+    public void add(final ModelVariable variable, final Object instance) {
 
         /*
          * TODO: This should throw an exception, not fail silently.
@@ -109,7 +109,7 @@ public class Model implements IModel {
      * @param variable
      *            the variable to add
      */
-    private void addVariableNoDuplicates(ModelVariable variable) {
+    private void addVariableNoDuplicates(final ModelVariable variable) {
 
         if (!variables.contains(variable)) {
             variables.add(variable);
@@ -179,7 +179,7 @@ public class Model implements IModel {
      * @param variable
      *            the variable to lookup
      */
-    private ModelVariable lookupVariable(ModelVariable variable) {
+    private ModelVariable lookupVariable(final ModelVariable variable) {
 
         int index = variables.indexOf(variable);
         return index >= 0 ? variables.get(index) : null;
@@ -190,7 +190,7 @@ public class Model implements IModel {
      */
     @SafeVarargs
     @Override
-    public final List<IModelObject> getVariables(IModelFilter... filters) {
+    public final List<IModelObject> getVariables(final IModelFilter... filters) {
 
         LinkedList<IModelObject> filteredVariables = new LinkedList<IModelObject>();
 
@@ -209,7 +209,7 @@ public class Model implements IModel {
      */
     @Override
     public Map<String, IModelObject> getVariableNameMapping(
-            IModelFilter... filters) {
+            final IModelFilter... filters) {
 
         List<IModelObject> filteredVariables = getFilteredVariables(filters);
 
@@ -230,7 +230,7 @@ public class Model implements IModel {
      * @return the found instance, null if no instance is found with the
      *         specified reference
      */
-    public ModelVariable getVariableByReference(String reference) {
+    public ModelVariable getVariableByReference(final String reference) {
 
         for (ModelVariable variable : variables) {
 
@@ -304,7 +304,7 @@ public class Model implements IModel {
      *            the filters to check against
      * @return
      */
-    private boolean satisfiesFilters(ModelVariable variable,
+    private boolean satisfiesFilters(final ModelVariable variable,
             IModelFilter[] filters) {
 
         for (IModelFilter filter : filters) {
@@ -315,7 +315,7 @@ public class Model implements IModel {
         return true;
     }
 
-    private List<IModelObject> getFilteredVariables(IModelFilter[] filters) {
+    private List<IModelObject> getFilteredVariables(final IModelFilter[] filters) {
 
         LinkedList<IModelObject> filteredVariables = new LinkedList<IModelObject>();
 
@@ -344,7 +344,7 @@ public class Model implements IModel {
         }
 
         @Override
-        public boolean satisfies(IModelObject object) {
+        public boolean satisfies(final IModelObject object) {
 
             return object.getName().equals(name);
         }

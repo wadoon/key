@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.junit.JUnitGenerator;
-import de.uka.ilkd.key.testgeneration.core.TestCase;
+import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestCase;
 
 /**
  * This singleton provides the functionality needed to produce test suites for

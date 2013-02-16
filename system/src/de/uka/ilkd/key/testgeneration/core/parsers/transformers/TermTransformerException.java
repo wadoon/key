@@ -6,7 +6,7 @@ public class TermTransformerException extends KeYTestGenException {
 
     private static final long serialVersionUID = -2825761961260283914L;
 
-    public TermTransformerException(String message) {
+    public TermTransformerException(final String message) {
         super(message);
         // TODO Auto-generated constructor stub
     }

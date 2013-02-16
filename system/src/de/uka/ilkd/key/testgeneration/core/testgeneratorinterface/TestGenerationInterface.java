@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core;
+package de.uka.ilkd.key.testgeneration.core.testgeneratorinterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaClassFactory;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
@@ -111,7 +114,7 @@ public final class TestGenerationInterface {
      *             in the event that there is a failure in the KeYInterface, or
      *             if there is a problem finding or reading the source file.
      */
-    public KeYJavaClass extractKeYJavaClass(String source)
+    public KeYJavaClass extractKeYJavaClass(final String source)
             throws TestGeneratorException {
 
         try {
@@ -139,9 +142,9 @@ public final class TestGenerationInterface {
 
     }
 
-    public LinkedList<TestCase> createTestCases(KeYJavaClass targetClass,
-            ICodeCoverageParser codeCoverageParser,
-            KeYTestGenMediator mediator, String... methods)
+    public LinkedList<TestCase> createTestCases(final KeYJavaClass targetClass,
+            final ICodeCoverageParser codeCoverageParser,
+            final KeYTestGenMediator mediator, String... methods)
             throws TestGeneratorException {
 
         try {
@@ -200,8 +203,8 @@ public final class TestGenerationInterface {
      * @throws TestGeneratorException
      *             in the event there was a failure to generate a test case
      */
-    private List<TestCase> createTestCasesForMethod(KeYJavaMethod method,
-            KeYTestGenMediator mediator, List<IExecutionNode> nodes)
+    private List<TestCase> createTestCasesForMethod(final KeYJavaMethod method,
+            final KeYTestGenMediator mediator, final List<IExecutionNode> nodes)
             throws TestGeneratorException {
 
         List<TestCase> testCases = new LinkedList<TestCase>();
@@ -284,7 +287,8 @@ public final class TestGenerationInterface {
          */
         TestCase testCase = null;
 
-        public ModelCapsule(IExecutionNode node, ModelMediator modelMediator) {
+        public ModelCapsule(final IExecutionNode node,
+                final ModelMediator modelMediator) {
 
             this.node = node;
             this.modelMediator = modelMediator;

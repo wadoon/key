@@ -57,7 +57,7 @@ public class ModelMediator {
      * @param mainClass
      *            the mainClass to set
      */
-    public void setMainClass(KeYJavaClass mainClass) {
+    public void setMainClass(final KeYJavaClass mainClass) {
         this.mainClass = mainClass;
     }
 
@@ -72,7 +72,7 @@ public class ModelMediator {
      * @param method
      *            the method to set
      */
-    public void setMethod(KeYJavaMethod method) {
+    public void setMethod(final KeYJavaMethod method) {
         this.method = method;
     }
 }

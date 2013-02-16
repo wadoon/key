@@ -13,10 +13,10 @@ public abstract class KeYTestGenTermVisitor extends AbstractTermParser
         implements Visitor {
 
     @Override
-    public void subtreeEntered(Term subtreeRoot) {
+    public void subtreeEntered(final Term subtreeRoot) {
     }
 
     @Override
-    public void subtreeLeft(Term subtreeRoot) {
+    public void subtreeLeft(final Term subtreeRoot) {
     }
 }

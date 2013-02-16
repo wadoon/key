@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.testgeneration.core;
+package de.uka.ilkd.key.testgeneration.core.testgeneratorinterface;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.model.IModel;
 
 /**
@@ -60,7 +61,8 @@ public class TestCase implements Comparable<TestCase> {
      */
     private final Term oracle;
 
-    public TestCase(KeYJavaMethod method, IModel model, Term oracle) {
+    public TestCase(final KeYJavaMethod method, final IModel model,
+            final Term oracle) {
 
         this.method = method;
         this.model = model;
@@ -105,7 +107,7 @@ public class TestCase implements Comparable<TestCase> {
     }
 
     @Override
-    public int compareTo(TestCase o) {
+    public int compareTo(final TestCase o) {
 
         String ownName = method.getProgramMethod().getName();
         String otherName = o.getMethod().getProgramMethod().getName();
@@ -121,9 +123,10 @@ public class TestCase implements Comparable<TestCase> {
     }
 
     /**
-     * @param node the node to set
+     * @param node
+     *            the node to set
      */
-    public void setNode(IExecutionNode node) {
+    public void setNode(final IExecutionNode node) {
         this.node = node;
     }
 

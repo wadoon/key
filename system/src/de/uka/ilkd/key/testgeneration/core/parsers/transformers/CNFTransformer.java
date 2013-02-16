@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.Term;
  */
 public class CNFTransformer {
 
-    public Term TermToCNF(Term term) {
+    public Term TermToCNF(final Term term) {
 
         return null;
     }

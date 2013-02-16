@@ -3,8 +3,9 @@ package de.uka.ilkd.key.testgeneration.backend;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 
 /**
- * Represents the core interface for KeYTestGen2. Implementations can be
- * provided based on which framework (if any) they target.
+ * Implementors of this interface represent KeYTestGen2 backend modules, i.e.
+ * they represent test case generators for a specific test framework, making use
+ * of the KeYTestGen2 runtime.
  * 
  * The API supports the following basic modes of operation:
  * <ul>
@@ -37,7 +38,7 @@ public interface ITestCaseGenerator {
      *            code coverage critera to be satisfied by the generated test
      *            cases. May be <code>nulll</code>, in which case a default
      *            statement coverage is used.
-     * @return The JUnit test class, containing all test cases for the method
+     * @return a test suite for the framework targeted by the implementor.
      */
     public String generatePartialTestSuite(final String source,
             final ICodeCoverageParser coverage, final String... methods)
@@ -60,8 +61,7 @@ public interface ITestCaseGenerator {
      * @param includeNative
      *            set to true to generate test cases also for methods inherited
      *            from <code>java.lang.Object</code>.
-     * @return A String representing the test suite, containing all test cases
-     *         for all methods in the file.
+     * @return a test suite for the framework targeted by the implementor.
      */
     public String generateFullTestSuite(final String source,
             final ICodeCoverageParser coverage, final boolean includeProtected,

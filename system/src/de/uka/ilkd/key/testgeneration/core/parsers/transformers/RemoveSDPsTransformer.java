@@ -24,14 +24,14 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
      *            the term
      * @return the term with all SortDependingFunctions removed
      */
-    public Term removeSortDependingFunctions(Term term)
+    public Term removeSortDependingFunctions(final Term term)
             throws TermTransformerException {
 
         return transformTerm(term);
     }
 
     @Override
-    protected Term transformSortDependentFunction(Term term) {
+    protected Term transformSortDependentFunction(final Term term) {
 
         ProgramElementName resolvedVariableName = new ProgramElementName(
                 resolveIdentifierString(term, SEPARATOR));

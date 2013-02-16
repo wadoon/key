@@ -5,17 +5,14 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
-import de.uka.ilkd.key.testgeneration.backend.AbstractConcurrentTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.INodeTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
-import de.uka.ilkd.key.testgeneration.core.TestCase;
-import de.uka.ilkd.key.testgeneration.core.TestGenerationInterface;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestCase;
+import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestGenerationInterface;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 /**

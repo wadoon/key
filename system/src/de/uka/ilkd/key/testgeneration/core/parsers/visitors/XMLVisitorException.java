@@ -6,12 +6,12 @@ public class XMLVisitorException extends KeYTestGenException {
 
     private static final long serialVersionUID = -286893052052896384L;
 
-    public XMLVisitorException(String message) {
+    public XMLVisitorException(final String message) {
 
         super(message);
     }
 
-    public XMLVisitorException(String message, Throwable cause) {
+    public XMLVisitorException(final String message, final Throwable cause) {
         super(message, cause);
 
     }

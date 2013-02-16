@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 public class ModelInstance implements IHeapObject {
 
     private boolean debug;
-    
+
     /**
      * @return the debug
      */
@@ -26,7 +26,8 @@ public class ModelInstance implements IHeapObject {
     }
 
     /**
-     * @param debug the debug to set
+     * @param debug
+     *            the debug to set
      */
     public void setDebug(boolean debug) {
         this.debug = debug;
@@ -48,7 +49,6 @@ public class ModelInstance implements IHeapObject {
      */
     private final List<ModelVariable> referees = new LinkedList<ModelVariable>();
 
-    
     /**
      * Concrete values for a subset of the fields bound to this instance.
      */
@@ -61,7 +61,7 @@ public class ModelInstance implements IHeapObject {
      * @param type
      *            the type of the instance
      */
-    public ModelInstance(KeYJavaType keYJavaType) {
+    public ModelInstance(final KeYJavaType keYJavaType) {
 
         this.type = keYJavaType;
         this.identifier = Integer.toString(hashCode());
@@ -79,7 +79,7 @@ public class ModelInstance implements IHeapObject {
     public String getTypeName() {
 
         String fullName = type.getJavaType().getFullName();
-        return fullName.substring(fullName.lastIndexOf('.')+1);
+        return fullName.substring(fullName.lastIndexOf('.') + 1);
     }
 
     /**
@@ -90,7 +90,7 @@ public class ModelInstance implements IHeapObject {
         return new LinkedList<ModelVariable>(fields);
     }
 
-    public void addField(ModelVariable variable) {
+    public void addField(final ModelVariable variable) {
 
         if (!fields.contains(variable)) {
             fields.add(variable);
@@ -105,8 +105,6 @@ public class ModelInstance implements IHeapObject {
 
     /*
      * FIXME: the abstraction is broken here
-     * 
-     * @see de.uka.ilkd.key.testgeneration.model.IModelObject#getValue()
      */
     @Override
     public Object getValue() {
@@ -119,11 +117,11 @@ public class ModelInstance implements IHeapObject {
 
         return identifier;
     }
-    
-    public void addReferee(ModelVariable referee) {
+
+    public void addReferee(final ModelVariable referee) {
         referees.add(referee);
     }
-    
+
     public List<ModelVariable> getReferees() {
         return referees;
     }
@@ -133,7 +131,7 @@ public class ModelInstance implements IHeapObject {
      * reference equality in Java).
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
 
         if (this == obj) {
             return true;

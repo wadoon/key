@@ -55,7 +55,8 @@ public class ModelGenerator implements IModelGenerator {
      * @param settings
      *            the settings for the used solvers
      */
-    private ModelGenerator(SMTSettings settings, SolverType... solvers) {
+    private ModelGenerator(final SMTSettings settings,
+            final SolverType... solvers) {
 
         this.solvers = solvers;
         this.settings = settings;
@@ -115,7 +116,8 @@ public class ModelGenerator implements IModelGenerator {
      * @throws ModelGeneratorException
      *             in the event that the instantiation went wrong
      */
-    private Model instantiateModel(Model model, SMTSolverResult smtResult) {
+    private Model instantiateModel(final Model model,
+            final SMTSolverResult smtResult) {
 
         String modelOutput = consolidateModelOutput(smtResult.getOutput());
         model.consumeSMTOutput(modelOutput);
@@ -226,7 +228,7 @@ public class ModelGenerator implements IModelGenerator {
      * @param solvers
      * @throws ModelGeneratorException
      */
-    private static void verifySolverAvailability(SolverType... solvers)
+    private static void verifySolverAvailability(final SolverType... solvers)
             throws ModelGeneratorException {
 
         for (SolverType solver : solvers) {
@@ -253,8 +255,8 @@ public class ModelGenerator implements IModelGenerator {
      * @return the SMT solver result
      * @throws ModelGeneratorException
      */
-    private SMTSolverResult instantiatePathCondition(Term pathCondition,
-            Services services) throws ModelGeneratorException {
+    private SMTSolverResult instantiatePathCondition(final Term pathCondition,
+            final Services services) throws ModelGeneratorException {
 
         try {
 
@@ -303,8 +305,8 @@ public class ModelGenerator implements IModelGenerator {
      * @throws ModelGeneratorException
      *             in the event that there was a failure to generate the Model
      */
-    public Model generateModel(IExecutionNode node, ModelMediator mediator)
-            throws ModelGeneratorException {
+    public Model generateModel(final IExecutionNode node,
+            final ModelMediator mediator) throws ModelGeneratorException {
 
         try {
 
@@ -347,7 +349,7 @@ public class ModelGenerator implements IModelGenerator {
      *            the ouput of the solver
      * @return the consolidated String
      */
-    private String consolidateModelOutput(List<String> output) {
+    private String consolidateModelOutput(final List<String> output) {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (String substring : output) {
@@ -360,7 +362,7 @@ public class ModelGenerator implements IModelGenerator {
      * FIXME: BAD!
      */
     @Override
-    public Model generateModel(IExecutionNode node)
+    public Model generateModel(final IExecutionNode node)
             throws ModelGeneratorException {
 
         return generateModel(node, new ModelMediator());
