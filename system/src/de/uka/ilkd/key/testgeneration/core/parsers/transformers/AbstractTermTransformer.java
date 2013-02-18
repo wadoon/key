@@ -25,7 +25,8 @@ import de.uka.ilkd.key.testgeneration.core.parsers.AbstractTermParser;
  * @author christopher
  * 
  */
-public abstract class AbstractTermTransformer extends AbstractTermParser {
+public abstract class AbstractTermTransformer extends AbstractTermParser
+        implements ITermTransformer {
 
     /**
      * Used for constructing new {@link Term} instances.

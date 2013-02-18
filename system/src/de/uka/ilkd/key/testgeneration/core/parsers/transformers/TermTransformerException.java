@@ -8,6 +8,5 @@ public class TermTransformerException extends KeYTestGenException {
 
     public TermTransformerException(final String message) {
         super(message);
-        // TODO Auto-generated constructor stub
     }
 }

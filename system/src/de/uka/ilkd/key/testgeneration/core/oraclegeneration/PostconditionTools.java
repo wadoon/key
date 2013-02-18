@@ -20,12 +20,13 @@ public class PostconditionTools {
     public static Term simplifyPostCondition(Term term, String separator)
             throws TermTransformerException {
 
-        return new SimplifyPostConditionTransformer().simplifyPostCondition(
-                term, separator);
+        return new SimplifyPostConditionTransformer(separator).transform(term);
     }
 
     private static class SimplifyPostConditionTransformer extends
             AbstractTermTransformer {
+
+        private final String separator;
 
         /**
          * Simplifies a postcondition by removing {@link SortDependingFunction}
@@ -41,16 +42,20 @@ public class PostconditionTools {
          *             in the event of a parse error (including structural
          *             errors in the Term itself.
          */
-        public Term simplifyPostCondition(Term term, String separator)
-                throws TermTransformerException {
+        @Override
+        public Term transform(Term term) throws TermTransformerException {
 
             /*
              * Remove all SortDependingFunction instances from the Term.
              */
             Term termWithoutSDFs = new RemoveSDPsTransformer(separator)
-                    .removeSortDependingFunctions(term);
+                    .transform(term);
 
             return transformTerm(termWithoutSDFs);
+        }
+
+        public SimplifyPostConditionTransformer(String separator) {
+            this.separator = separator;
         }
 
         /**

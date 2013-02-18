@@ -9,11 +9,6 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
 
     private final String SEPARATOR;
 
-    public RemoveSDPsTransformer(String separator) {
-
-        this.SEPARATOR = separator;
-    }
-
     /**
      * Removes all instances of {@link SortDependingFunction} nodes in a given
      * term, replacing them with {@link LocationVariable} instances whose names
@@ -24,10 +19,15 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
      *            the term
      * @return the term with all SortDependingFunctions removed
      */
-    public Term removeSortDependingFunctions(final Term term)
-            throws TermTransformerException {
+    @Override
+    public Term transform(Term term) throws TermTransformerException {
 
         return transformTerm(term);
+    }
+
+    public RemoveSDPsTransformer(String separator) {
+
+        this.SEPARATOR = separator;
     }
 
     @Override

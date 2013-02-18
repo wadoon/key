@@ -23,10 +23,11 @@ import de.uka.ilkd.key.logic.Term;
  * @author christopher
  * 
  */
-public class CNFTransformer {
+public class CNFTransformer extends AbstractTermTransformer {
 
-    public Term TermToCNF(final Term term) {
-
+    @Override
+    public Term transform(Term term) throws TermTransformerException {
+        // TODO Auto-generated method stub
         return null;
     }
 }

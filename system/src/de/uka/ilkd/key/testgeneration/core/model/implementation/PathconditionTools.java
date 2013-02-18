@@ -80,7 +80,7 @@ public class PathconditionTools {
     public static Term simplifyTerm(Term targetNodeCondition)
             throws TermTransformerException {
 
-        return termSimplificationTransformer.simplifyTerm(targetNodeCondition);
+        return termSimplificationTransformer.transform(targetNodeCondition);
     }
 
     /**
@@ -138,7 +138,8 @@ public class PathconditionTools {
          * @return the simplified term
          * @throws ModelGeneratorException
          */
-        public Term simplifyTerm(Term term) throws TermTransformerException {
+        @Override
+        public Term transform(Term term) throws TermTransformerException {
 
             return transformTerm(term);
         }
