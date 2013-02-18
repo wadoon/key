@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 public class Benchmark {
 
-    private static final boolean toggleBenchmark = false;
+    private static final boolean toggleBenchmark = true;
 
     private static final HashMap<String, Long> readings = new HashMap<String, Long>();
 

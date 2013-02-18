@@ -2,15 +2,20 @@ package de.uka.ilkd.key.testgeneration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map.Entry;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.IFrameworkConverter;
+import de.uka.ilkd.key.testgeneration.backend.TestGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.backend.junit.JUnitTestCaseGenerator;
+import de.uka.ilkd.key.testgeneration.backend.junit.JUnitConverter;
 import de.uka.ilkd.key.testgeneration.backend.xml.XMLGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
+import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
@@ -26,12 +31,14 @@ public class TestJUnitTestCaseGenerator {
                 "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java")
                 .exists());
 
-        ITestCaseGenerator testCaseGenerator = new JUnitTestCaseGenerator();
+        TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
+        IFrameworkConverter junitConverter = new JUnitConverter();
+        ICodeCoverageParser codeCoverageParser = new StatementCoverageParser();
 
-        String output = testCaseGenerator
+        List<String> output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        null, "mid");
+                        codeCoverageParser, junitConverter, "midOneProxyOneInstance");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(

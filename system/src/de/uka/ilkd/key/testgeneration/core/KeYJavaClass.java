@@ -39,14 +39,13 @@ public final class KeYJavaClass {
      * Maps the name of a method to its corresponding {@link KeYJavaMethod}
      * instance.
      */
-    private final HashMap<String, KeYJavaMethod> methods;
+    private final HashMap<String, KeYJavaMethod> methods = new HashMap<String, KeYJavaMethod>();
 
     KeYJavaClass(String packageDeclaration, String name, KeYJavaType type,
-            HashMap<String, KeYJavaMethod> methodMappings, File source) {
+            File source) {
         this.packageDeclaration = packageDeclaration;
         this.name = name;
         this.type = type;
-        this.methods = methodMappings;
         this.source = source;
     }
 
@@ -92,5 +91,17 @@ public final class KeYJavaClass {
      */
     public String getPackageDeclaration() {
         return packageDeclaration;
+    }
+
+    /**
+     * Add a method for this class. Package access due to encapsulation concerns
+     * (probably an antipattern).
+     * 
+     * @param methodName
+     * @param method
+     */
+    void addMethodMapping(String methodName, KeYJavaMethod method) {
+
+        methods.put(methodName, method);
     }
 }

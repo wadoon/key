@@ -13,6 +13,7 @@ import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.IFrameworkConverter;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
 import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
@@ -32,13 +33,6 @@ import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisito
  */
 public class JUnitConverter implements IFrameworkConverter {
 
-    public String generateJUnitSources(KeYJavaClass klass,
-            LinkedList<TestCase> testCases) throws JUnitGeneratorException {
-
-        return new JUnitGeneratorWorker().serviceConvertToJUnit(klass,
-                testCases);
-    }
-
     /**
      * Worker which services invocations of
      * {@link JUnitConverter#convertToJUnit(List)}.
@@ -56,9 +50,9 @@ public class JUnitConverter implements IFrameworkConverter {
     }
 
     @Override
-    public String convert(TestSuite testSuite) {
+    public String convert(TestSuite testSuite) throws JUnitConverterException {
 
-        return new JUnitGeneratorWorker2().serviceConvert(testSuite);
+        return new JUnitGeneratorWorker().serviceConvert(testSuite);
     }
 
     /**
@@ -110,79 +104,42 @@ public class JUnitConverter implements IFrameworkConverter {
          * @param testCases
          *            the test cases to generate
          * @return a JUnit source file in String format
-         * @throws JUnitGeneratorException
+         * @throws JUnitConverterException
          */
-        public String serviceConvertToJUnit(KeYJavaClass klass,
-                LinkedList<TestCase> testCases) throws JUnitGeneratorException {
+        public String serviceConvert(TestSuite testSuite)
+                throws JUnitConverterException {
+
+            List<TestCase> testCases = testSuite.getTestCases();
+            KeYJavaClass klass = testSuite.getJavaClass();
+            KeYJavaMethod method = testSuite.getMethod();
+
+            className = testSuite.getClass().getName();
+
+            String methodName = testCases.get(0).getMethodName();
 
             /*
-             * Safeguard
+             * Print the new class header
              */
-            if (testCases.isEmpty()) {
-                return "";
-            }
-
-            className = klass.getName();
+            writeClassHeader(null, "public", "", "Test_" + klass.getName()
+                    + "_" + methodName);
 
             /*
-             * Main processing loop
+             * Create one test method for each test case.
              */
-            while (!testCases.isEmpty()) {
+            for (TestCase testCase : testCases) {
 
-                /*
-                 * Handle the test cases in parititions according to which
-                 * method they deal with. We let a linked list hold the test
-                 * cases that are to be included in the current class.
-                 */
-                LinkedList<TestCase> currentTests = new LinkedList<TestCase>();
-                currentTests.add(testCases.pollFirst());
-                while (!testCases.isEmpty()) {
-
-                    /*
-                     * Check if the next test case deals with the current
-                     * method. If it does not, put it back and the queue and
-                     * proceed to process the test cases we have extracted so
-                     * far.
-                     */
-                    TestCase nextTestCase = testCases.pollFirst();
-                    TestCase lastTestCase = currentTests.peekFirst();
-
-                    if (nextTestCase.compareTo(lastTestCase) == 0) {
-
-                        currentTests.add(nextTestCase);
-                    } else {
-
-                        testCases.addFirst(nextTestCase);
-                        break;
-                    }
-                }
-
-                String methodName = currentTests.get(0).getMethodName();
-
-                /*
-                 * Print the new class header
-                 */
-                writeClassHeader(null, "public", "", "Test_" + klass.getName()
-                        + "_" + methodName);
-
-                /*
-                 * Create one test method for each test case.
-                 */
-                for (TestCase testCase : currentTests) {
-
-                    writeTestMethod(testCase);
-                }
-
-                /*
-                 * Create the fixutre repository for this class
-                 */
-                createFixtureRepository(currentTests);
-
-                /*
-                 * Close the class body.
-                 */
-                writeClosingBrace();
+                writeTestMethod(testCase);
             }
+
+            /*
+             * Create the fixutre repository for this class
+             */
+            createFixtureRepository(testCases);
+
+            /*
+             * Close the class body.
+             */
+            writeClosingBrace();
 
             return getCurrentOutput();
         }
@@ -194,10 +151,10 @@ public class JUnitConverter implements IFrameworkConverter {
          * a single test method).
          * 
          * @param testCase
-         * @throws JUnitGeneratorException
+         * @throws JUnitConverterException
          */
         private void writeTestMethod(TestCase testCase)
-                throws JUnitGeneratorException {
+                throws JUnitConverterException {
 
             writeLine(NEWLINE);
 
@@ -336,7 +293,7 @@ public class JUnitConverter implements IFrameworkConverter {
          * @param testCases
          *            the test cases for the test class.
          */
-        private void createFixtureRepository(LinkedList<TestCase> testCases) {
+        private void createFixtureRepository(List<TestCase> testCases) {
 
             /*
              * Safeguard from first invocation errors.
@@ -400,10 +357,10 @@ public class JUnitConverter implements IFrameworkConverter {
          * 
          * @param testCase
          *            the test case
-         * @throws JUnitGeneratorException
+         * @throws JUnitConverterException
          */
         private void writeTestOracle(TestCase testCase)
-                throws JUnitGeneratorException {
+                throws JUnitConverterException {
 
             /*
              * Delegate oracle generation to the Term visitor.
@@ -426,7 +383,7 @@ public class JUnitConverter implements IFrameworkConverter {
          * @param testCases
          */
         private void writeCreateInstanceRepositoryMethod(
-                LinkedList<TestCase> testCases) {
+                List<TestCase> testCases) {
 
             writeComment(
                     "This method will set up the entire repository of object instances needed to execute the test cases declared above.",
@@ -446,7 +403,7 @@ public class JUnitConverter implements IFrameworkConverter {
              * Write the object instantiations and the routines for storing them
              * in the instance Map.
              */
-            LinkedList<ModelInstance> instances = collectInstances(testCases);
+            List<ModelInstance> instances = collectInstances(testCases);
 
             /*
              * Write the instantiation of the instances.
@@ -485,10 +442,9 @@ public class JUnitConverter implements IFrameworkConverter {
          *            the test cases
          * @return a list of all instances declared in all test cases models
          */
-        private LinkedList<ModelInstance> collectInstances(
-                LinkedList<TestCase> testCases) {
+        private List<ModelInstance> collectInstances(List<TestCase> testCases) {
 
-            LinkedList<ModelInstance> instances = new LinkedList<ModelInstance>();
+            List<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (TestCase testCase : testCases) {
                 List<ModelInstance> collectedInstances = extractInstancesFromModel((Model) testCase
                         .getModel());
@@ -507,7 +463,7 @@ public class JUnitConverter implements IFrameworkConverter {
          */
         private List<ModelInstance> extractInstancesFromModel(Model model) {
 
-            LinkedList<ModelInstance> instances = new LinkedList<ModelInstance>();
+            List<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (IModelObject object : model.getVariables()) {
                 ModelVariable variable = (ModelVariable) object;
                 if (variable
@@ -658,10 +614,10 @@ public class JUnitConverter implements IFrameworkConverter {
          * @param fieldName
          *            the field to find a setter for
          * @return true if a setter was found, false otherwise
-         * @throws JUnitGeneratorException
+         * @throws JUnitConverterException
          */
         private boolean hasSetMethodForField(Object object, String fieldName)
-                throws JUnitGeneratorException {
+                throws JUnitConverterException {
 
             try {
 
@@ -695,7 +651,7 @@ public class JUnitConverter implements IFrameworkConverter {
                 stringBuilder.append(object.getClass());
                 stringBuilder
                         .append(" please review your Java security settings!");
-                throw new JUnitGeneratorException(stringBuilder.toString());
+                throw new JUnitConverterException(stringBuilder.toString());
             }
 
             return true;
@@ -762,7 +718,7 @@ public class JUnitConverter implements IFrameworkConverter {
                 }
             }
 
-            public List<String> generateOracle() throws JUnitGeneratorException {
+            public List<String> generateOracle() throws JUnitConverterException {
 
                 try {
 
@@ -786,7 +742,7 @@ public class JUnitConverter implements IFrameworkConverter {
                      */
                     String assertionString = processBuffer();
                     String[] assertionArray = assertionString.split(NEWLINE);
-                    LinkedList<String> assertions = new LinkedList<String>();
+                    List<String> assertions = new LinkedList<String>();
                     for (String assertion : assertionArray) {
                         assertions.add(assertion);
                     }
@@ -795,7 +751,7 @@ public class JUnitConverter implements IFrameworkConverter {
 
                 } catch (TermTransformerException e) {
 
-                    throw new JUnitGeneratorException(e.getMessage());
+                    throw new JUnitConverterException(e.getMessage());
                 }
             }
 

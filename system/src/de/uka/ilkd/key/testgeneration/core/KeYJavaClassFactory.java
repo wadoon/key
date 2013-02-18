@@ -29,8 +29,7 @@ public enum KeYJavaClassFactory {
     INSTANCE;
 
     /**
-     * The singleton {@link KeYInterface}, used in order to communicate with the
-     * KeY runtime.
+     * Interface to the KeY runtime.
      */
     private final KeYInterface keyInterface = KeYInterface.INSTANCE;
 
@@ -77,13 +76,17 @@ public enum KeYJavaClassFactory {
                 .getPackageDeclaration(javaFile);
 
         /*
+         * Setup the class
+         */
+        KeYJavaClass javaClass = new KeYJavaClass(packageDeclaration, name,
+                mainClass, javaFile);
+
+        /*
          * Extract all methods declared in this class (including the ones
          * provided in Java.lang.Object, even if these have not been
          * overridden), and create name-value mappings for them. Exclude
          * implicit methods (i.e. <create>, <init> etc).
          */
-        HashMap<String, KeYJavaMethod> methods = new HashMap<String, KeYJavaMethod>();
-
         for (IProgramMethod method : javaInfo.getAllProgramMethods(mainClass)) {
             if (!method.getFullName().startsWith("<")) {
 
@@ -96,16 +99,16 @@ public enum KeYJavaClassFactory {
                 List<ContractWrapper> contracts = getContracts(method, services);
                 for (ContractWrapper contract : contracts) {
 
-                    KeYJavaMethod keYJavaMethod = new KeYJavaMethod(method,
-                            initConfig, contract);
+                    KeYJavaMethod keYJavaMethod = new KeYJavaMethod(javaClass,
+                            method, initConfig, contract);
 
-                    methods.put(method.getFullName(), keYJavaMethod);
+                    javaClass.addMethodMapping(method.getFullName(),
+                            keYJavaMethod);
                 }
             }
         }
 
-        return new KeYJavaClass(packageDeclaration, name, mainClass, methods,
-                javaFile);
+        return javaClass;
     }
 
     /**

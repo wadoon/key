@@ -67,6 +67,7 @@ public enum KeYInterface {
     public InitConfig loadJavaFile(File javaFile) throws KeYInterfaceException {
 
         try {
+            
             lock.lock();
 
             DefaultProblemLoader loader = userInterface.load(javaFile, null,
@@ -77,8 +78,10 @@ public enum KeYInterface {
             return initConfig;
 
         } catch (ProblemLoaderException e) {
+        
             throw new KeYInterfaceException(e.getMessage());
         } finally {
+            
             lock.unlock();
         }
     }

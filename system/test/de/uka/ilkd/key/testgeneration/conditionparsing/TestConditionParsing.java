@@ -42,7 +42,7 @@ public class TestConditionParsing extends KeYTestGenTest {
 
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = createSymbolicExecutionEnvironment(
                 keyRepDirectory, javaPathInBaseDir, containerTypeName, "max",
-                null, false);
+                null, false, false, false);
 
         Proof proof = environment.getProof();
 

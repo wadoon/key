@@ -3,6 +3,7 @@ package de.uka.ilkd.key.testgeneration.core.coreinterface;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 
 /**
@@ -15,6 +16,11 @@ import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 public class TestSuite {
 
     /**
+     * The class for which this TestSuite is testing a method.
+     */
+    private final KeYJavaClass javaClass;
+
+    /**
      * The method the test cases in this suite have been created for,
      * represented by a {@link KeYJavaMethod} instance.
      */
@@ -25,8 +31,10 @@ public class TestSuite {
      */
     private final List<TestCase> testCases = new LinkedList<TestCase>();
 
-    public TestSuite(final KeYJavaMethod method, final List<TestCase> testCases) {
+    public TestSuite(final KeYJavaClass javaClass, final KeYJavaMethod method,
+            final List<TestCase> testCases) {
 
+        this.javaClass = javaClass;
         this.method = method;
         this.testCases.addAll(testCases);
     }
@@ -43,5 +51,12 @@ public class TestSuite {
      */
     public List<TestCase> getTestCases() {
         return testCases;
+    }
+
+    /**
+     * @return the {@link KeYJavaClass} associated with this test suite.
+     */
+    public KeYJavaClass getJavaClass() {
+        return javaClass;
     }
 }

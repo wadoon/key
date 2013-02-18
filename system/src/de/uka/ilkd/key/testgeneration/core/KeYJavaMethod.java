@@ -19,6 +19,11 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 public class KeYJavaMethod {
 
     /**
+     * The class declaring this method.
+     */
+    private final KeYJavaClass declaringClass;
+
+    /**
      * The {@link IProgramMethod} instance for this method, containing the
      * KeY-specific data for it.
      */
@@ -38,9 +43,10 @@ public class KeYJavaMethod {
      */
     private final ContractWrapper functionalContract;
 
-    KeYJavaMethod(IProgramMethod programMethod, InitConfig initConfig,
-            ContractWrapper functionalContract) {
+    KeYJavaMethod(KeYJavaClass declaringClass, IProgramMethod programMethod,
+            InitConfig initConfig, ContractWrapper functionalContract) {
 
+        this.declaringClass = declaringClass;
         this.programMethod = programMethod;
         this.initConfig = initConfig;
         this.functionalContract = functionalContract;
@@ -106,5 +112,9 @@ public class KeYJavaMethod {
     public String getReturnType() {
 
         return programMethod.getReturnType().getName();
+    }
+
+    public KeYJavaClass getDeclaringClass() {
+        return declaringClass;
     }
 }

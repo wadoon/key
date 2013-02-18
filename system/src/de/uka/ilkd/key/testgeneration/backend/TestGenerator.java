@@ -85,6 +85,8 @@ public enum TestGenerator {
 
         } catch (CoreInterfaceException e) {
             throw new TestGeneratorException(e.getMessage());
+        } catch (FrameworkConverterException e) {
+            throw new TestGeneratorException(e.getMessage());
         }
     }
 

@@ -171,7 +171,7 @@ public enum CoreInterface {
                     targetMethod, targetNodes);
             Benchmark.finishBenchmarking("create test case abstractions");
 
-            return new TestSuite(targetMethod, testCases);
+            return new TestSuite(targetClass, targetMethod, testCases);
 
         } catch (KeYInterfaceException e) {
             throw new CoreInterfaceException(e.getMessage());

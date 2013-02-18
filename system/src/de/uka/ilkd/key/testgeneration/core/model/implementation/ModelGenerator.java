@@ -200,6 +200,7 @@ public class ModelGenerator implements IModelGenerator {
                                 + Benchmark.readStopWatch() + " milliseconds");
             }
 
+            if(attempts > 1) System.out.println("New attempt: " + attempts);
             attempts++;
 
         } while (result.isValid().equals(ThreeValuedTruth.UNKNOWN)

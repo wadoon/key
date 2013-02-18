@@ -77,7 +77,8 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
             throws ProofInputException, IOException, ProblemLoaderException {
 
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(
-                keyRepDirectory, rootFolder, resourceFile, method, null, false);
+                keyRepDirectory, rootFolder, resourceFile, method, null, false,
+                false, false);
 
         assertNotNull(env);
 

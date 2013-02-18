@@ -11,5 +11,6 @@ import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
  */
 public interface IFrameworkConverter {
 
-    public String convert(TestSuite testSuite);
+    public String convert(TestSuite testSuite)
+            throws FrameworkConverterException;
 }
