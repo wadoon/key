@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Junctor;
 
 /**
  * This parser is used in order to put a Term into Conjunctive Normal Form.
@@ -15,19 +16,101 @@ import de.uka.ilkd.key.logic.Term;
  * C ::= D | D AND T
  * </pre>
  * 
- * The algorithm used in this particular implementation was taken from:
- * <p>
- * (Huth and Ryan, <i>Logic in Computer Science</i>, 2nd Ed. Cambridge
- * University press, 2008)
- * 
  * @author christopher
- * 
  */
 public class CNFTransformer extends AbstractTermTransformer {
 
+    private final NNFTransformer nnfTransformer = new NNFTransformer();
+
+    /**
+     * Puts a Term into Conjunctive Normal Form, using the following algorithm:
+     * 
+     * <pre>
+     * Pre: x is implication free and in Negation Normal Form
+     * Post: CNF(x) computes and equivalent CNF for(x)
+     * function CNF(x):
+     * begin function
+     *     case
+     *         x is a literal : return x
+     *         x is x1 AND x2 : return CNF(x1) and CNF(x2)
+     *         x is x1 AND x2 : return CNF(x1) and CNF(x2)
+     *     end case
+     * end function
+     * </pre>
+     * 
+     * The algorithm was taken from:
+     * <p>
+     * (Huth and Ryan, <i>Logic in Computer Science</i>, 2nd Ed. Cambridge
+     * University press, 2008)
+     */
     @Override
     public Term transform(Term term) throws TermTransformerException {
-        // TODO Auto-generated method stub
-        return null;
+
+        /*
+         * Put the term into Negation Normal Form
+         */
+        Term nnfTerm = nnfTransformer.transform(term);
+
+        return transformTerm(nnfTerm);
+    }
+
+    @Override
+    protected Term transformOr(Term term) throws TermTransformerException {
+
+        Term firstTransformedTerm = transformTerm(term.sub(0));
+        Term secondTransformedTerm = transformTerm(term.sub(1));
+        return distribute(firstTransformedTerm, secondTransformedTerm);
+    }
+
+    /**
+     * Implements the DISTR routine of the CNF algorithm. It is defined as
+     * follows:
+     * 
+     * <pre>
+     * 
+     * Pre: n1 and n2 are in CNF
+     * Post: DISTR(n1,n2) computes a CNF for n1 OR n2
+     * 
+     * function DISTR(n1, n2):
+     * begin function
+     *     case
+     *         n1 is n1-1 AND n1-2 : return DISTR(n1-1,n2) AND DISTR(n1-2,n2)
+     *         n2 is n2-1 AND n2-2 : return DISTR(n1,n2-1) AND DISTR(n1,n2-2)
+     *         otherwise : return n1 OR n2
+     *     end case
+     * end function
+     * 
+     * </pre>
+     * 
+     * @param firstTerm
+     * @param secondTerm
+     * @return
+     */
+    private Term distribute(Term firstTerm, Term secondTerm) {
+
+        if (isAnd(firstTerm)) {
+
+            Term firstDistributedChild = distribute(firstTerm.sub(0),
+                    secondTerm);
+            Term secondDistributedChild = distribute(firstTerm.sub(1),
+                    secondTerm);
+
+            return termFactory.createTerm(Junctor.AND, firstDistributedChild,
+                    secondDistributedChild);
+
+        } else if (isAnd(secondTerm)) {
+
+            Term firstDistributedChild = distribute(firstTerm,
+                    secondTerm.sub(0));
+            Term secondDistributedChild = distribute(firstTerm,
+                    secondTerm.sub(1));
+
+            return termFactory.createTerm(Junctor.AND, firstDistributedChild,
+                    secondDistributedChild);
+
+        } else {
+
+            return termFactory.createTerm(Junctor.OR, firstTerm, secondTerm);
+        }
     }
 }
