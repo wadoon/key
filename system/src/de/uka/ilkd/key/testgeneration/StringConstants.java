@@ -9,12 +9,8 @@ package de.uka.ilkd.key.testgeneration;
  */
 public enum StringConstants {
 
-    SELF("self"),
-    NEWLINE("\n"),
-    TAB("    "),
-    FIELD_SEPARATOR("_");
+    SELF("self"), NEWLINE("\n"), TAB("    "), FIELD_SEPARATOR("_");
     ;
-    
 
     private StringConstants(String keyWord) {
         this.keyWord = keyWord;

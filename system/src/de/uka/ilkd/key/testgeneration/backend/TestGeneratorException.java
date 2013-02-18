@@ -10,5 +10,4 @@ public class TestGeneratorException extends KeYTestGenException {
         super(message);
         // TODO Auto-generated constructor stub
     }
-
 }

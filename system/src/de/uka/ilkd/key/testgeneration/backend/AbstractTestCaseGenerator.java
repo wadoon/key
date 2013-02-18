@@ -205,7 +205,7 @@ public abstract class AbstractTestCaseGenerator implements ITestCaseGenerator {
                         System.out.println(node.getFormatedPathCondition());
                         System.out.println(node.getPathCondition().toString());
                     } catch (Exception e) {
-                        
+
                     }
                     model = modelGenerator.generateModel(node, modelMediator);
 

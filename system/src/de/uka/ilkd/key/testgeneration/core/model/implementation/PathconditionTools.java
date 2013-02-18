@@ -100,7 +100,7 @@ public class PathconditionTools {
     public static Model termToModel(Term pathCondition, Services services,
             ModelMediator mediator) {
 
-        return pathToTermParser.createModel(pathCondition, services, mediator);
+        return PathToTermParser.createModel(pathCondition, services, mediator);
     }
 
     private static class TermSimplificationTransformer extends

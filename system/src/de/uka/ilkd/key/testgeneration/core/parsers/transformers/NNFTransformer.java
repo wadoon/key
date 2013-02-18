@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 public class NNFTransformer extends AbstractTermTransformer {
 
     public Term TermToNNF(final Term term) {
-        
+
         return null;
     }
 }

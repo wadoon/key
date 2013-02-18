@@ -12,8 +12,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import recoder.util.FileUtils;
-
 /**
  * This parser can be used in order to extract information from (and about)
  * syntactically correct Java source files. Only the public class declared in

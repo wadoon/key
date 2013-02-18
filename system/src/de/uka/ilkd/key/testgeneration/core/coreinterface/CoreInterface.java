@@ -14,10 +14,10 @@ import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClassFactory;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
+import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.model.IModel;
-import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelMediator;
@@ -36,8 +36,8 @@ import de.uka.ilkd.key.testgeneration.util.Benchmark;
  * @author christopher
  * 
  */
-public final class CoreInterface {
-
+public enum CoreInterface {
+    INSTANCE;
     /**
      * A list of native methods (i.e. those part of any type with {@link Object}
      * as its supertype). We use this list in the event that we wish to ignore
@@ -60,7 +60,8 @@ public final class CoreInterface {
      * concrete fixtures for test cases. Default implementation based on SMT
      * solvers is available, but the user can choose to use her own.
      */
-    protected final ModelGenerator modelGenerator;
+    protected final ModelGenerator modelGenerator = ModelGenerator
+            .getDefaultModelGenerator();
 
     /**
      * Used in order to communicate with and request services from the KeY
@@ -79,29 +80,6 @@ public final class CoreInterface {
      */
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.INSTANCE;
 
-    private CoreInterface() {
-        this(ModelGenerator.getDefaultModelGenerator());
-    }
-
-    public static CoreInterface getDefaultTestGenerationInterface() {
-        return new CoreInterface();
-    }
-
-    /*
-     * public static TestGenerationInterface getCustomTestGenerationInterface(
-     * IModelGenerator modelGenerator) { return new
-     * TestGenerationInterface(modelGenerator); }
-     */
-
-    /**
-     * Creates a concurrent test case generator with a custom model generator.
-     * 
-     * @param modelGenerator
-     */
-    private CoreInterface(ModelGenerator modelGenerator) {
-        this.modelGenerator = modelGenerator;
-    }
-
     /**
      * This helper method will construct a {@link KeYJavaClass} instance for the
      * public class in a given Java source file.
@@ -114,8 +92,8 @@ public final class CoreInterface {
      *             in the event that there is a failure in the KeYInterface, or
      *             if there is a problem finding or reading the source file.
      */
-    public KeYJavaClass extractKeYJavaClass(final String source)
-            throws TestGeneratorException {
+    private KeYJavaClass extractKeYJavaClass(final String source)
+            throws CoreInterfaceException {
 
         try {
 
@@ -135,54 +113,83 @@ public final class CoreInterface {
             return keYJavaClass;
 
         } catch (KeYInterfaceException e) {
-            throw new TestGeneratorException(e.getMessage());
+            throw new CoreInterfaceException(e.getMessage());
         } catch (IOException e) {
-            throw new TestGeneratorException(e.getMessage());
+            throw new CoreInterfaceException(e.getMessage());
         }
-
     }
 
-    public LinkedList<TestCase> createTestCases(final KeYJavaClass targetClass,
+    public TestSuite createTestSuite(final String path,
+            final String methodName, ICodeCoverageParser codeCoverageParser)
+            throws CoreInterfaceException {
+
+        /*
+         * If no coverage criteria are specificed, use default.
+         */
+        if (codeCoverageParser == null) {
+            codeCoverageParser = new StatementCoverageParser();
+        }
+
+        /*
+         * Get the abstract representation of the class.
+         */
+        KeYJavaClass keYJavaClass = extractKeYJavaClass(path);
+
+        /*
+         * Internally generate and return the test suite for the class.
+         */
+        return createTestSuite(keYJavaClass, codeCoverageParser, methodName);
+    }
+
+    private TestSuite createTestSuite(final KeYJavaClass targetClass,
             final ICodeCoverageParser codeCoverageParser,
-            final KeYTestGenMediator mediator, String... methods)
-            throws TestGeneratorException {
+            final String methodName) throws CoreInterfaceException {
 
         try {
 
-            LinkedList<TestCase> testCases = new LinkedList<TestCase>();
+            KeYJavaMethod targetMethod = targetClass.getMethod(methodName);
 
-            for (String method : methods) {
+            /*
+             * Retrieve the symbolic execution tree for the method, and extract
+             * from it the nodes needed in order to reach the desired level of
+             * code coverage.
+             */
+            Benchmark.startBenchmarking("getting code coverage nodes");
+            IExecutionStartNode root = keYInterface
+                    .getSymbolicExecutionTree(targetMethod);
 
-                KeYJavaMethod targetMethod = targetClass.getMethod(method);
+            List<IExecutionNode> targetNodes = codeCoverageParser
+                    .retrieveNodes(root);
+            Benchmark.finishBenchmarking("getting code coverage nodes");
 
-                /*
-                 * Retrieve the symbolic execution tree for the method, and
-                 * extract from it the nodes needed in order to reach the
-                 * desired level of code coverage.
-                 */
-                Benchmark.startBenchmarking("getting code coverage nodes");
-                IExecutionStartNode root = keYInterface
-                        .getSymbolicExecutionTree(targetMethod);
+            /*
+             * Extract the postcondition for the method, and generate test cases
+             * for each of the nodes.
+             */
+            Benchmark.startBenchmarking("create test case abstractions");
+            List<TestCase> testCases = createTestCasesForMethod(targetClass,
+                    targetMethod, targetNodes);
+            Benchmark.finishBenchmarking("create test case abstractions");
 
-                List<IExecutionNode> targetNodes = codeCoverageParser
-                        .retrieveNodes(root);
-                Benchmark.finishBenchmarking("getting code coverage nodes");
-
-                /*
-                 * Extract the postcondition for the method, and generate test
-                 * cases for each of the nodes.
-                 */
-                Benchmark.startBenchmarking("create test case abstractions");
-                testCases.addAll(createTestCasesForMethod(targetMethod,
-                        mediator, targetNodes));
-                Benchmark.finishBenchmarking("create test case abstractions");
-            }
-
-            return testCases;
+            return new TestSuite(targetMethod, testCases);
 
         } catch (KeYInterfaceException e) {
-            throw new TestGeneratorException(e.getMessage());
+            throw new CoreInterfaceException(e.getMessage());
         }
+    }
+
+    public List<TestSuite> createTestSuites(final String path,
+            final ICodeCoverageParser codeCoverageParser, String... methods)
+            throws CoreInterfaceException {
+
+        List<TestSuite> testSuites = new LinkedList<TestSuite>();
+        for (String method : methods) {
+
+            TestSuite testSuite = createTestSuite(path, method,
+                    codeCoverageParser);
+            testSuites.add(testSuite);
+        }
+        return testSuites;
     }
 
     /**
@@ -191,7 +198,6 @@ public final class CoreInterface {
      * 
      * @param method
      *            the method for which test cases will be generated
-     * @param mediator
      * @param oracle
      *            the test oracle (corresponding to the postcondition) of the
      *            method
@@ -202,10 +208,11 @@ public final class CoreInterface {
      * @return a collection of {@link TestCase} instances for the method
      * @throws TestGeneratorException
      *             in the event there was a failure to generate a test case
+     * @throws CoreInterfaceException
      */
-    private List<TestCase> createTestCasesForMethod(final KeYJavaMethod method,
-            final KeYTestGenMediator mediator, final List<IExecutionNode> nodes)
-            throws TestGeneratorException {
+    private List<TestCase> createTestCasesForMethod(
+            final KeYJavaClass declaringClass, final KeYJavaMethod method,
+            final List<IExecutionNode> nodes) throws CoreInterfaceException {
 
         List<TestCase> testCases = new LinkedList<TestCase>();
         List<ModelCapsule> capsules = new LinkedList<ModelCapsule>();
@@ -218,7 +225,7 @@ public final class CoreInterface {
          * for.
          */
         ModelMediator modelMediator = new ModelMediator();
-        modelMediator.setMainClass(mediator.getMainClass());
+        modelMediator.setMainClass(declaringClass);
         modelMediator.setMethod(method);
         LinkedList<String> methodParameters = new LinkedList<String>();
         for (IProgramVariable programVariable : method.getParameters()) {
@@ -253,7 +260,8 @@ public final class CoreInterface {
             }
 
         } catch (InterruptedException ie) {
-            System.err.println("INTERRUPTED!");
+
+            throw new CoreInterfaceException(ie.getMessage());
         }
 
         Benchmark.finishBenchmarking("generating models");

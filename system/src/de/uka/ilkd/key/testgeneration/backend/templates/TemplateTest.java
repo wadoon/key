@@ -15,7 +15,7 @@ public class TemplateTest {
         st.add("type", "bool");
         st.add("type", "float");
         st.add("name", "x");
-        //st.add("value", 0);
+        // st.add("value", 0);
         String result = st.render(); // yields "int x = 0;"
         System.out.println(result);
 

@@ -1,8 +1,14 @@
 package de.uka.ilkd.key.testgeneration.backend;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterface;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterfaceException;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
 
 /**
  * This singleton represents the principal API of KeYTestGen2. It supports the
@@ -15,7 +21,7 @@ import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
  * <li>Generate a test suite only for a single {@link IExecutionNode}.</li>
  * </ul>
  * For any of the options above the user can supply an implementation of
- * {@link ITestSuiteConverter} in order to specify in what format the resulting
+ * {@link IFrameworkConverter} in order to specify in what format the resulting
  * test suite(s) should be returned. If none is supplied (i.e. if the parameter
  * is <code>null</code>), then KeYTestGen2 will use its internal XML format by
  * default.
@@ -32,6 +38,11 @@ public enum TestGenerator {
     INSTANCE;
 
     /**
+     * Interface to the KeYTestGen2 Core system.
+     */
+    private final CoreInterface coreInterface = CoreInterface.INSTANCE;
+
+    /**
      * Generates a test suite covering a subset of methods in a Java source
      * file.
      * 
@@ -45,11 +56,36 @@ public enum TestGenerator {
      *            statement coverage is used.
      * @return a test suite for the framework targeted by the implementor.
      */
-    public String generatePartialTestSuite(final String source,
-            final ICodeCoverageParser coverage, final String... methods)
-            throws TestGeneratorException {
+    public List<String> generatePartialTestSuite(final String source,
+            final ICodeCoverageParser coverage,
+            final IFrameworkConverter frameworkConverter,
+            final String... methods) throws TestGeneratorException {
 
-        return null;
+        try {
+
+            /*
+             * Create abstract test suites for the selected methods.
+             */
+            List<TestSuite> testSuites = coreInterface.createTestSuites(source,
+                    coverage, methods);
+
+            /*
+             * Convert the abstract test suites to the desired final format.
+             */
+            List<String> convertedTestSuites = new LinkedList<String>();
+            for (TestSuite testSuite : testSuites) {
+
+                String convertedTestSuite = frameworkConverter
+                        .convert(testSuite);
+
+                convertedTestSuites.add(convertedTestSuite);
+            }
+
+            return convertedTestSuites;
+
+        } catch (CoreInterfaceException e) {
+            throw new TestGeneratorException(e.getMessage());
+        }
     }
 
     /**

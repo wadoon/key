@@ -10,7 +10,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 
 import de.uka.ilkd.key.testgeneration.backend.custom.ITestCaseParser;
-import de.uka.ilkd.key.testgeneration.backend.xml.XMLTestCaseGenerator;
 
 /**
  * Provides a CLI interface for KeYTestGen2.
@@ -42,7 +41,7 @@ public final class CommandLineInterface {
          * The {@link XMLTestCaseGenerator} to use for the session serviced by
          * this worker.
          */
-        private XMLTestCaseGenerator testCaseGenerator = null;
+        // private XMLTestCaseGenerator testCaseGenerator = null;
 
         /**
          * The {@link CommandParser} and {@link JCommander} processor to use for
@@ -57,7 +56,8 @@ public final class CommandLineInterface {
         public CommandLineInterfaceWorker() {
 
             try {
-                testCaseGenerator = XMLTestCaseGenerator.getDefaultInstance();
+                // testCaseGenerator =
+                // XMLTestCaseGenerator.getDefaultInstance();
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);

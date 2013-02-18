@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.testgeneration.backend.custom.ITestCaseParser;
 
-
 /**
  * Shared resources for the KeyTestGen CLI.
  * 
