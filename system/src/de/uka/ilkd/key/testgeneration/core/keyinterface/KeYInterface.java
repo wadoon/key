@@ -28,7 +28,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * <p>
  * Use of this singleton is synchronized in order to make sure that no thread is
  * able to request services of the KeY runtime until another one has completely
- * finished doing so.
+ * finished doing so, due to concerns about the thread safety of KeY itself.
  * 
  * @author christopher
  */
@@ -38,8 +38,8 @@ public enum KeYInterface {
     /**
      * Main interface to the KeY system itself.
      */
-    private final CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
-            false);
+    private final CustomConsoleUserInterface userInterface = 
+            new CustomConsoleUserInterface(false);
 
     /**
      * The public methods of this singleton must use this {@link ReentrantLock}
@@ -69,9 +69,9 @@ public enum KeYInterface {
         try {
             lock.lock();
 
-            DefaultProblemLoader loader = userInterface.load(javaFile, null,
-                    null);
-            
+            DefaultProblemLoader loader = 
+                    userInterface.load(javaFile, null, null);
+
             InitConfig initConfig = loader.getInitConfig();
 
             return initConfig;
@@ -137,9 +137,12 @@ public enum KeYInterface {
             assertNotNull(rootNode, "FATAL: unable to initialize proof tree");
 
             return builder.getStartNode();
+
         } catch (ProofInputException e) {
+
             throw new KeYInterfaceException("FATAL: could not create proof: "
                     + e.getMessage());
+
         } finally {
             lock.unlock();
         }

@@ -11,8 +11,8 @@ import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
-import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestCase;
-import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestGenerationInterface;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterface;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 /**
@@ -28,7 +28,7 @@ public class JUnitTestCaseGenerator implements ITestCaseGenerator,
     /**
      * KeYTestGen services for this test generation session.
      */
-    TestGenerationInterface testGenerationInterface = TestGenerationInterface
+    CoreInterface testGenerationInterface = CoreInterface
             .getDefaultTestGenerationInterface();
 
     /**

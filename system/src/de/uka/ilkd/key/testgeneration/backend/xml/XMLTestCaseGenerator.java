@@ -13,11 +13,11 @@ import de.uka.ilkd.key.testgeneration.backend.custom.ITestCaseParser;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterface;
 import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
-import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestCase;
-import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestGenerationInterface;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 /**
@@ -34,7 +34,7 @@ public class XMLTestCaseGenerator implements ITestCaseGenerator,
     /**
      * KeYTestGen services for this test generation session.
      */
-    private final TestGenerationInterface testGenerationInterface;
+    private final CoreInterface testGenerationInterface;
 
     /**
      * Instances are generated through the
@@ -47,7 +47,7 @@ public class XMLTestCaseGenerator implements ITestCaseGenerator,
     public XMLTestCaseGenerator(ModelGenerator modelGenerator)
             throws XMLGeneratorException {
 
-        testGenerationInterface = TestGenerationInterface
+        testGenerationInterface = CoreInterface
                 .getDefaultTestGenerationInterface();
     }
 

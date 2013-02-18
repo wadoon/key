@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.testgeneratorinterface;
+package de.uka.ilkd.key.testgeneration.core.coreinterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import de.uka.ilkd.key.testgeneration.util.Benchmark;
  * @author christopher
  * 
  */
-public final class TestGenerationInterface {
+public final class CoreInterface {
 
     /**
      * A list of native methods (i.e. those part of any type with {@link Object}
@@ -79,12 +79,12 @@ public final class TestGenerationInterface {
      */
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.INSTANCE;
 
-    private TestGenerationInterface() {
+    private CoreInterface() {
         this(ModelGenerator.getDefaultModelGenerator());
     }
 
-    public static TestGenerationInterface getDefaultTestGenerationInterface() {
-        return new TestGenerationInterface();
+    public static CoreInterface getDefaultTestGenerationInterface() {
+        return new CoreInterface();
     }
 
     /*
@@ -98,7 +98,7 @@ public final class TestGenerationInterface {
      * 
      * @param modelGenerator
      */
-    private TestGenerationInterface(ModelGenerator modelGenerator) {
+    private CoreInterface(ModelGenerator modelGenerator) {
         this.modelGenerator = modelGenerator;
     }
 

@@ -2,9 +2,9 @@ package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
 
 import junit.framework.Assert;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.PostconditionTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
-import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestCase;
 
 /**
  * Instances of this class represent JUnit test cases, i.e. methods annotated

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.testgeneratorinterface;
+package de.uka.ilkd.key.testgeneration.core.coreinterface;
 
 /**
  * This singleton provides services on behalf of the KeYTestGen2 core related to

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.testgeneratorinterface;
+package de.uka.ilkd.key.testgeneration.core.coreinterface;
 
 import java.util.LinkedList;
 import java.util.List;

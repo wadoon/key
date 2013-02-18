@@ -7,7 +7,7 @@ import de.uka.ilkd.key.testgeneration.backend.INodeTestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.ITestCaseGenerator;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
-import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestGenerationInterface;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterface;
 
 /**
  * Instances of this implementation of {@link ITestCaseGenerator} generate test
@@ -22,7 +22,7 @@ public class TestNGTestCaseGenerator implements ITestCaseGenerator,
     /**
      * KeYTestGen services for this test generation session.
      */
-    TestGenerationInterface testGenerationInterface = TestGenerationInterface
+    CoreInterface testGenerationInterface = CoreInterface
             .getDefaultTestGenerationInterface();
 
     /**

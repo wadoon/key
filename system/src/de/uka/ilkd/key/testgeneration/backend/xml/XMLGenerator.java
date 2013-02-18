@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.backend.custom.ITestCaseParser;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
+import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.model.IModel;
 import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
 import de.uka.ilkd.key.testgeneration.core.parsers.visitors.XMLVisitorException;
-import de.uka.ilkd.key.testgeneration.core.testgeneratorinterface.TestCase;
 
 /**
  * Provides functionality for turning a set of {@link TestCase} instances into a

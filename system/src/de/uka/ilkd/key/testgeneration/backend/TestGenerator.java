@@ -1,0 +1,99 @@
+package de.uka.ilkd.key.testgeneration.backend;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
+
+/**
+ * This singleton represents the principal API of KeYTestGen2. It supports the
+ * following modes of operation:
+ * <ul>
+ * <li>Generate a test suite only for a subset case methods in a class.</li>
+ * <li>Generate a test suite for all methods in a class, with the option of
+ * including protected, private and methods inherited from
+ * <code>java.lang.Object</code>.</li>
+ * <li>Generate a test suite only for a single {@link IExecutionNode}.</li>
+ * </ul>
+ * For any of the options above the user can supply an implementation of
+ * {@link ITestSuiteConverter} in order to specify in what format the resulting
+ * test suite(s) should be returned. If none is supplied (i.e. if the parameter
+ * is <code>null</code>), then KeYTestGen2 will use its internal XML format by
+ * default.
+ * <p>
+ * For any of the options above, the user has the option deciding the level of
+ * code coverage to be provided, by supplying an instance of
+ * {@link ICodeCoverageParser}. By default. Statement Coverage should be
+ * targeted.
+ * 
+ * @author christopher
+ * 
+ */
+public enum TestGenerator {
+    INSTANCE;
+
+    /**
+     * Generates a test suite covering a subset of methods in a Java source
+     * file.
+     * 
+     * @param source
+     *            path to the Java source file
+     * @param methods
+     *            the methods to generate the test cases for.
+     * @param coverage
+     *            code coverage critera to be satisfied by the generated test
+     *            cases. May be <code>nulll</code>, in which case a default
+     *            statement coverage is used.
+     * @return a test suite for the framework targeted by the implementor.
+     */
+    public String generatePartialTestSuite(final String source,
+            final ICodeCoverageParser coverage, final String... methods)
+            throws TestGeneratorException {
+
+        return null;
+    }
+
+    /**
+     * Generates a set of JUnit test cases for a subset of methods in a Java
+     * source file.
+     * 
+     * @param source
+     *            path to the Java source file.
+     * @param coverage
+     *            code coverage critera to be satisfied by the generated test
+     *            cases. May be <code>nulll</code>, in which case a default
+     *            statement coverage is used.
+     * @param includeProtected
+     *            set to true to generate test cases also for protected methods.
+     * @param includePrivate
+     *            set to true to generate test cases also for private methods.
+     * @param includeNative
+     *            set to true to generate test cases also for methods inherited
+     *            from <code>java.lang.Object</code>.
+     * @return a test suite for the framework targeted by the implementor.
+     */
+    public String generateFullTestSuite(final String source,
+            final ICodeCoverageParser coverage, final boolean includeProtected,
+            final boolean includePrivate, final boolean includeNative)
+            throws TestGeneratorException {
+
+        return null;
+    }
+
+    /**
+     * Generates a test case for a single {@link IExecutionNode} instance,
+     * corresponding to a single statement in a single method.
+     * 
+     * @param targetNode
+     *            the target program node
+     * @param services
+     *            {@link Services} instance for the execution node
+     * @return the entire test suite as a String.
+     * @throws TestGeneratorException
+     *             in the event that something went wrong.
+     */
+    public String generateTestCase(final IExecutionNode targetNode,
+            final Services services) throws TestGeneratorException {
+
+        return null;
+    }
+}
