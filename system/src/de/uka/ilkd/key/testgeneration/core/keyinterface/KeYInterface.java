@@ -38,8 +38,8 @@ public enum KeYInterface {
     /**
      * Main interface to the KeY system itself.
      */
-    private final CustomConsoleUserInterface userInterface = 
-            new CustomConsoleUserInterface(false);
+    private final CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
+            false);
 
     /**
      * The public methods of this singleton must use this {@link ReentrantLock}
@@ -69,8 +69,8 @@ public enum KeYInterface {
         try {
             lock.lock();
 
-            DefaultProblemLoader loader = 
-                    userInterface.load(javaFile, null, null);
+            DefaultProblemLoader loader = userInterface.load(javaFile, null,
+                    null);
 
             InitConfig initConfig = loader.getInitConfig();
 
@@ -199,7 +199,8 @@ public enum KeYInterface {
         SymbolicExecutionEnvironment
                 .configureProofForSymbolicExecution(
                         proof,
-                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
+                        true, true);
 
         return proof;
     }
