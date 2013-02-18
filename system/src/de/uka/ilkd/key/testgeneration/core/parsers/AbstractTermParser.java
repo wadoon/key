@@ -519,4 +519,14 @@ public abstract class AbstractTermParser {
         String[] splitName = name.split("::\\$");
         return splitName[splitName.length - 1].replaceAll("[^A-Za-z0-9]", "");
     }
+
+    /**
+     * @param term
+     *            the Term to check
+     * @return true if the term has children, false otherwise.
+     */
+    protected boolean hasChildren(Term term) {
+
+        return term.subs().size() != 0;
+    }
 }
