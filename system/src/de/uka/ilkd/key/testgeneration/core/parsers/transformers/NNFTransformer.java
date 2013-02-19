@@ -9,17 +9,33 @@ import de.uka.ilkd.key.logic.op.Junctor;
  * A Term is in NNF iff. the only negations it contains are negations of logical
  * atoms.
  * 
- * The algorithm used in this particular implementation was taken from:
- * <p>
- * (Huth and Ryan, <i>Logic in Computer Science</i>, 2nd Ed. Cambridge
- * University press, 2008)
- * 
  * @author christopher
  */
 public class NNFTransformer extends AbstractTermTransformer {
 
     /**
-     * Puts a Term into NNF.
+     * Puts a Term into Negation Normal Form, using the following algorithm:
+     * 
+     * <pre>
+     * Pre: x is implication free and in Negation Normal Form
+     * Post: NNF(x) computes and equivalent NNF for x
+     * function NNF(x):
+     * begin function
+     *     case
+     *         x is a literal : return x
+     *         x is !!x1 : return NNF(x)
+     *         x is x1 AND x2 : return NNF(x1) AND NNF(x2)
+     *         x is x1 OR x2 : return NNF(x1) OR NNF(x2)
+     *         x is !(x1 AND x2) : return NNF(!x1) OR NNF(!x2)
+     *         x is !(x1 OR x2) : return NNF(!x1) AND NNF(!x2)
+     *     end case
+     * end function
+     * </pre>
+     * 
+     * The algorithm was taken from:
+     * <p>
+     * (Huth and Ryan, <i>Logic in Computer Science</i>, page 62, 2nd Ed. Cambridge
+     * University press, 2008)
      */
     @Override
     public Term transform(Term term) throws TermTransformerException {

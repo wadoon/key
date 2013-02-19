@@ -33,15 +33,15 @@ public class CNFTransformer extends AbstractTermTransformer {
      *     case
      *         x is a literal : return x
      *         x is x1 AND x2 : return CNF(x1) and CNF(x2)
-     *         x is x1 AND x2 : return CNF(x1) and CNF(x2)
+     *         x is x1 OR x2 : return DISTR(CNF(x1) and CNF(x2))
      *     end case
      * end function
      * </pre>
      * 
      * The algorithm was taken from:
      * <p>
-     * (Huth and Ryan, <i>Logic in Computer Science</i>, 2nd Ed. Cambridge
-     * University press, 2008)
+     * (Huth and Ryan, <i>Logic in Computer Science</i>, pages 60-61, 2nd Ed.
+     * Cambridge University press, 2008)
      */
     @Override
     public Term transform(Term term) throws TermTransformerException {
