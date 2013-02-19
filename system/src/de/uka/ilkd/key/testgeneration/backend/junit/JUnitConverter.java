@@ -49,6 +49,13 @@ public class JUnitConverter implements IFrameworkConverter {
         }
     }
 
+    /**
+     * Convert an abstract test suite into a JUnit test suite.
+     * 
+     * @param the
+     *            test suite to convert
+     * @return the resulting JUnit test suite
+     */
     @Override
     public String convert(TestSuite testSuite) throws JUnitConverterException {
 
@@ -728,6 +735,9 @@ public class JUnitConverter implements IFrameworkConverter {
                     Term oracle = testCase.getOracle();
                     Term simplifiedOracle = PostconditionTools
                             .simplifyPostCondition(oracle, SEPARATOR);
+
+                    simplifiedOracle = PostconditionTools
+                            .termToCNF(simplifiedOracle);
 
                     /*
                      * Traverse the postcondition(s) in the testcase, filling

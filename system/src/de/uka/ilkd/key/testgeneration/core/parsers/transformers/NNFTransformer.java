@@ -34,13 +34,12 @@ public class NNFTransformer extends AbstractTermTransformer {
      * 
      * The algorithm was taken from:
      * <p>
-     * (Huth and Ryan, <i>Logic in Computer Science</i>, page 62, 2nd Ed. Cambridge
-     * University press, 2008)
+     * (Huth and Ryan, <i>Logic in Computer Science</i>, page 62, 2nd Ed.
+     * Cambridge University press, 2008)
      */
     @Override
     public Term transform(Term term) throws TermTransformerException {
-        // TODO Auto-generated method stub
-        return null;
+        return transformTerm(term);
     }
 
     @Override

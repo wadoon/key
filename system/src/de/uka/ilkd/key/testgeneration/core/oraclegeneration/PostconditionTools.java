@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveSDPsTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 
@@ -17,10 +18,32 @@ import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerE
  */
 public class PostconditionTools {
 
+    /**
+     * Used for turning terms to CNF
+     */
+    private static final CNFTransformer cnfTransformer = new CNFTransformer();
+
+    /**
+     * Simplifies a postCondition, removing {@link SortDependingFunction} and
+     * {@link ObserverFunction} instances.
+     * 
+     * @param term
+     *            the term to simplify
+     * @param separator
+     *            separator do be used for constructing names for
+     *            {@link SortDependingFunction} resolution.
+     * @return the simplified postcondition
+     * @throws TermTransformerException
+     */
     public static Term simplifyPostCondition(Term term, String separator)
             throws TermTransformerException {
 
         return new SimplifyPostConditionTransformer(separator).transform(term);
+    }
+
+    public static Term termToCNF(Term term) throws TermTransformerException {
+
+        return cnfTransformer.transform(term);
     }
 
     private static class SimplifyPostConditionTransformer extends

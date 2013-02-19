@@ -42,6 +42,10 @@ public class CNFTransformer extends AbstractTermTransformer {
      * <p>
      * (Huth and Ryan, <i>Logic in Computer Science</i>, pages 60-61, 2nd Ed.
      * Cambridge University press, 2008)
+     * 
+     * @param term
+     *            the term to transform
+     * @return the transformed term
      */
     @Override
     public Term transform(Term term) throws TermTransformerException {
@@ -83,8 +87,10 @@ public class CNFTransformer extends AbstractTermTransformer {
      * </pre>
      * 
      * @param firstTerm
+     *            n1
      * @param secondTerm
-     * @return
+     *            n2
+     * @return the distributed term
      */
     private Term distribute(Term firstTerm, Term secondTerm) {
 

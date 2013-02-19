@@ -561,7 +561,7 @@
 
     While KeYTestGen2 aims to be novel in its implementation, the concepts it
     is based on have been well understood for a long time. Below, we give a
-    brief overciew of <em|KeYTestGen>, the precursor of KeYTestGen2, and then
+    brief overview of <em|KeYTestGen>, the precursor of KeYTestGen2, and then
     explain how KeYTestGen2 improves ont this previous work.\ 
 
     \;
@@ -577,7 +577,7 @@
     of research by Dr. Christoph Gladisch, Dr. Bernhard Beckert, and others
     <cite|EngelHaehnle07><cite|Engel2006><cite|BeckertGladisch2007><cite|Gladisch2008_TAP><cite|Gladisch2008>.
     This system was subsequently adopted and further developed by researchers
-    at Chalmers University of Technolgy, where it was also (re-)branded as
+    at Chalmers University of Technology, where it was also (re-)branded as
     <em|KeYTestGen> <cite|Paganelli2010>.
 
     \;
