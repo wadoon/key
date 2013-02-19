@@ -21,6 +21,10 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.PostconditionTools;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.OrderOperandsTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
 
@@ -120,7 +124,7 @@ public class JUnitConverter implements IFrameworkConverter {
             KeYJavaClass klass = testSuite.getJavaClass();
             KeYJavaMethod method = testSuite.getMethod();
 
-            className = testSuite.getClass().getName();
+            className = klass.getName();
 
             String methodName = testCases.get(0).getMethodName();
 
@@ -736,8 +740,23 @@ public class JUnitConverter implements IFrameworkConverter {
                     Term simplifiedOracle = PostconditionTools
                             .simplifyPostCondition(oracle, SEPARATOR);
 
-                    simplifiedOracle = PostconditionTools
-                            .termToCNF(simplifiedOracle);
+                    /*
+                     * Put it into Conjunctive Normal Form
+                     */
+                    simplifiedOracle = new CNFTransformer()
+                            .transform(simplifiedOracle);
+
+                    /*
+                     * Simplify the disjunctions in the postcondition
+                     */
+                    simplifiedOracle = new SimplifyDisjunctionTransformer()
+                            .transform(simplifiedOracle);
+
+                    /*
+                     * Simplify the remaining conjunctions
+                     */
+                    // simplifiedOracle = new SimplifyConjunctionTransformer()
+                    // .transform(simplifiedOracle);
 
                     /*
                      * Traverse the postcondition(s) in the testcase, filling

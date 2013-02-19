@@ -1,18 +1,13 @@
 package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
 
 import java.util.HashSet;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 
-/**
- * This Transformer simplifies the disjunctions present in a Term.
- * 
- * @author christopher
- * 
- */
-public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
+public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
 
     /**
      * Simplifies all the disjunctions present in the term.
@@ -20,13 +15,13 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
      * For example, given the following Term (human-readable):
      * 
      * <pre>
-     * (a &amp; b) | c | x | c | (a &amp; b)
+     * (a | b) &amp; c &amp; x &amp; c &amp; (a | b)
      * </pre>
      * 
      * this Transformer will produce the following:
      * 
      * <pre>
-     * x | c | (a &amp; b)
+     * x &amp; c &amp; (a | b)
      * </pre>
      * 
      * @param term
@@ -35,11 +30,12 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(Term term) throws TermTransformerException {
 
-        return transformTerm(term);
+        Term orderedTerm = new OrderOperandsTransformer().transform(term);
+        return transformTerm(orderedTerm);
     }
 
     @Override
-    protected Term transformOr(Term term) throws TermTransformerException {
+    protected Term transformAnd(Term term) throws TermTransformerException {
 
         Term firstChild = term.sub(0);
         Term secondChild = term.sub(1);
@@ -64,21 +60,8 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
         } else {
             Term transformedSimplifiedFirstChild = transformTerm(simplifiedFirstChild);
             Term transformedRightChild = transformTerm(secondChild);
-            return termFactory.createTerm(Junctor.OR,
+            return termFactory.createTerm(Junctor.AND,
                     transformedSimplifiedFirstChild, transformedRightChild);
-        }
-    }
-
-    private void collectLiterals(Term term, Set<String> literals) {
-
-        if (isOr(term)) {
-
-            collectLiterals(term.sub(0), literals);
-            collectLiterals(term.sub(1), literals);
-        } else {
-
-            String termName = term.toString().trim();
-            literals.add(termName);
         }
     }
 
@@ -99,7 +82,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
          * If the term represents an OR statement, we simplify each child, and
          * return based on the outcome of this.
          */
-        if (isOr(term)) {
+        if (isAnd(term)) {
 
             Term firstChild = simplify(term.sub(0), literals);
             Term secondChild = simplify(term.sub(1), literals);
@@ -113,7 +96,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
             }
 
             if (firstChild != null && secondChild != null) {
-                return termFactory.createTerm(Junctor.OR, firstChild,
+                return termFactory.createTerm(Junctor.AND, firstChild,
                         secondChild);
             }
 
@@ -128,6 +111,19 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
 
             String termName = term.toString().trim();
             return literals.contains(termName) ? null : term;
+        }
+    }
+
+    private void collectLiterals(Term term, Set<String> literals) {
+
+        if (isAnd(term)) {
+
+            collectLiterals(term.sub(0), literals);
+            collectLiterals(term.sub(1), literals);
+        } else {
+
+            String termName = term.toString().trim();
+            literals.add(termName);
         }
     }
 }
