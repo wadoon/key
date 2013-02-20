@@ -1,7 +1,14 @@
 package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * Transformer which rebuilds a Term in such a way that all Junctors having the
@@ -15,7 +22,7 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(Term term) throws TermTransformerException {
 
-        return transformTerm(term);
+        return transformTree(term);
     }
 
     @Override
@@ -73,5 +80,77 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
             return termFactory.createTerm(term.op(), transformedFirstChild,
                     transformedSecondChild);
         }
+    }
+
+    private Term transformTree(Term term) {
+
+        if (isOr(term) || isAnd(term)) {
+
+            Map<String, Term> identifierMapping = new HashMap<String, Term>();
+            PriorityQueue<String> sortedIdentifiers = new PriorityQueue<String>();
+            List<Term> literals = new LinkedList<Term>();
+
+            /*
+             * For all subtrees of this term of the same sort, gather all
+             * literals they have as children.
+             */
+            Operator operator = term.op();
+            collectLiteralsFromTree(term, operator, literals);
+
+            /*
+             * Recursively transform all the gathered literals, sort their
+             * identifiers, and put them into the mapping.
+             */
+            for (Term literal : literals) {
+                Term transformedLiteral = transformTree(literal);
+                String identifier = transformedLiteral.toString();
+
+                identifierMapping.put(identifier, transformedLiteral);
+                sortedIdentifiers.add(identifier);
+            }
+
+            /*
+             * Construct a new tree with the transformed literals.
+             */
+            Term newTerm = constructTree(sortedIdentifiers, identifierMapping, operator);
+            return newTerm;
+        } else {
+
+            return term;
+        }
+    }
+
+    private Term constructTree(PriorityQueue<String> sortedIdentifiers,
+            Map<String, Term> mappings, Operator operator) {
+
+        String leftIdentifier = sortedIdentifiers.poll();
+        Term leftChild = mappings.get(leftIdentifier);
+        Term rightChild = null;
+
+        if (sortedIdentifiers.size() > 1) {
+            rightChild = constructTree(sortedIdentifiers, mappings, operator);
+
+        } else {
+            String rightIdentifier = sortedIdentifiers.poll();
+            rightChild = mappings.get(rightIdentifier);
+        }
+
+        return termFactory.createTerm(operator, leftChild, rightChild);
+    }
+
+    private void collectLiteralsFromTree(Term term, Operator operator,
+            List<Term> literals) {
+
+        if (representsOperator(term, operator)) {
+            collectLiteralsFromTree(term.sub(0), operator, literals);
+            collectLiteralsFromTree(term.sub(1), operator, literals);
+        } else {
+            literals.add(term);
+        }
+    }
+
+    private boolean representsOperator(Term term, Operator operator) {
+
+        return term.op().name().toString().equals(operator.name().toString());
     }
 }

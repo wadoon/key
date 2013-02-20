@@ -755,8 +755,8 @@ public class JUnitConverter implements IFrameworkConverter {
                     /*
                      * Simplify the remaining conjunctions
                      */
-                    // simplifiedOracle = new SimplifyConjunctionTransformer()
-                    // .transform(simplifiedOracle);
+                    simplifiedOracle = new SimplifyConjunctionTransformer()
+                            .transform(simplifiedOracle);
 
                     /*
                      * Traverse the postcondition(s) in the testcase, filling
@@ -825,7 +825,7 @@ public class JUnitConverter implements IFrameworkConverter {
                                     + NEWLINE;
 
                         } else if (next.equals(LESS_OR_EQUALS)) {
-                            return "(" + lefthand + " >= " + righthand + ")"
+                            return "(" + lefthand + " <= " + righthand + ")"
                                     + NEWLINE;
 
                         } else if (next.equals(GREATER_THAN)) {

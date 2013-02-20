@@ -34,15 +34,17 @@ public class PostconditionTools {
     public static Term simplifyPostCondition(Term term, String separator)
             throws TermTransformerException {
 
-        Term orderedTerm = new OrderOperandsTransformer().transform(term);
-        return new SimplifyPostConditionTransformer(separator)
-                .transform(orderedTerm);
+        return new SimplifyPostConditionTransformer(separator).transform(term);
     }
 
     private static class SimplifyPostConditionTransformer extends
             AbstractTermTransformer {
 
         private final String separator;
+
+        public SimplifyPostConditionTransformer(String separator) {
+            this.separator = separator;
+        }
 
         /**
          * Simplifies a postcondition by removing {@link SortDependingFunction}
@@ -64,14 +66,16 @@ public class PostconditionTools {
             /*
              * Remove all SortDependingFunction instances from the Term.
              */
-            Term termWithoutSDFs = new RemoveSDPsTransformer(separator)
+            Term preProcessedTerm = new RemoveSDPsTransformer(separator)
                     .transform(term);
 
-            return transformTerm(termWithoutSDFs);
-        }
+            /*
+             * Order the operands of the term
+             */
+            preProcessedTerm = new OrderOperandsTransformer()
+                    .transform(preProcessedTerm);
 
-        public SimplifyPostConditionTransformer(String separator) {
-            this.separator = separator;
+            return transformTerm(preProcessedTerm);
         }
 
         /**
@@ -176,20 +180,26 @@ public class PostconditionTools {
         protected Term transformEquals(Term term)
                 throws TermTransformerException {
 
-            Term firstChild = transformTerm(term.sub(0));
-            Term secondChild = transformTerm(term.sub(1));
+            /*
+             * Handle the special case where the child is the exception type.
+             */
+            if (!isExceptionSort(term.sub(0))) {
 
-            if (firstChild != null && secondChild == null) {
-                return firstChild;
-            }
+                Term firstChild = transformTerm(term.sub(0));
+                Term secondChild = transformTerm(term.sub(1));
 
-            if (firstChild == null && secondChild != null) {
-                return secondChild;
-            }
+                if (firstChild != null && secondChild == null) {
+                    return firstChild;
+                }
 
-            if (firstChild != null && secondChild != null) {
-                return termFactory.createTerm(term.op(), firstChild,
-                        secondChild);
+                if (firstChild == null && secondChild != null) {
+                    return secondChild;
+                }
+
+                if (firstChild != null && secondChild != null) {
+                    return termFactory.createTerm(term.op(), firstChild,
+                            secondChild);
+                }
             }
 
             return null;
