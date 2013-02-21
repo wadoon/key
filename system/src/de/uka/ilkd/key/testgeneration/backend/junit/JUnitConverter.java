@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.IFrameworkConverter;
+import de.uka.ilkd.key.testgeneration.backend.junit.abstraction.JUnitTestSuite;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
@@ -36,22 +37,6 @@ import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisito
  * 
  */
 public class JUnitConverter implements IFrameworkConverter {
-
-    /**
-     * Worker which services invocations of
-     * {@link JUnitConverter#convertToJUnit(List)}.
-     * 
-     * @author christopher
-     * 
-     */
-    private static class JUnitGeneratorWorker2 extends
-            AbstractJavaSourceGenerator {
-
-        public String serviceConvert(TestSuite testSuite) {
-
-            return null;
-        }
-    }
 
     /**
      * Convert an abstract test suite into a JUnit test suite.

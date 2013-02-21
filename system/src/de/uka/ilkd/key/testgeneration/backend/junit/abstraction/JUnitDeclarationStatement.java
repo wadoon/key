@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
 
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
+
 /**
  * Instances of this class represent standard Java variable declaration
  * statements in a JUnit test class, of the following form:
@@ -37,6 +40,19 @@ public class JUnitDeclarationStatement {
         this.type = type;
         this.identifier = identifier;
         this.value = value;
+    }
+
+    public JUnitDeclarationStatement(ModelVariable variable) {
+        this.type = variable.getType();
+        this.identifier = variable.getIdentifier();
+
+        Object value = variable.getValue();
+        if (value instanceof ModelInstance) {
+            ModelInstance instance = (ModelInstance) value;
+            this.value = "new " + instance.getType() + "()";
+        } else {
+            this.value = value.toString();
+        }
     }
 
     /**

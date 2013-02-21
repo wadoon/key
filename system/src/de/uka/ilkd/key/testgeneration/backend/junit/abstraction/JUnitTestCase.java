@@ -4,7 +4,11 @@ import junit.framework.Assert;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.PostconditionTools;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.CNFTermChecker;
 
 /**
  * Instances of this class represent JUnit test cases, i.e. methods annotated
@@ -56,10 +60,24 @@ public class JUnitTestCase {
          */
         if (oracle == null) {
 
+            /*
+             * Prepare the raw postcondition to become an Oracle: simplify it,
+             * put it in CNF, order the operands, and simplify all conjunctions
+             * and disjunctions.
+             */
             Term simplifiedPostcondition = PostconditionTools
                     .simplifyPostCondition(wrappedTestCase.getOracle(), "_");
 
-            Term cnf_postCondition = simplifiedPostcondition;
+            simplifiedPostcondition = new CNFTransformer()
+                    .transform(simplifiedPostcondition);
+
+            simplifiedPostcondition = new SimplifyDisjunctionTransformer()
+                    .transform(simplifiedPostcondition);
+
+            simplifiedPostcondition = new SimplifyConjunctionTransformer()
+                    .transform(simplifiedPostcondition);
+
+            oracle = simplifiedPostcondition;
         }
 
         return oracle;
