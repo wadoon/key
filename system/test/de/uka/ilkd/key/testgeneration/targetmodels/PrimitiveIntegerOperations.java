@@ -36,7 +36,7 @@ public class PrimitiveIntegerOperations {
     /*
      * Local refernce variables to simulate work with associated classes
      */
-    public ClassProxy proxy = new ClassProxy();
+    private ClassProxy proxy = new ClassProxy();
 
     public int maxProxyStatic(int x) {
 

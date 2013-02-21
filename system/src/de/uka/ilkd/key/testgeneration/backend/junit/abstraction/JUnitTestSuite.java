@@ -484,12 +484,6 @@ public class JUnitTestSuite {
             List<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (IModelObject object : model.getVariables()) {
                 ModelVariable variable = (ModelVariable) object;
-                if (variable
-                        .getIdentifier()
-                        .equals("self_dot_proxy_dot_nestedProxy_dot_nestedProxy_dot_nestedProxy")) {
-                    System.out.println();
-                    ((ModelInstance) variable.getValue()).setDebug(true);
-                }
                 if (variable.getValue() instanceof ModelInstance) {
                     instances.add((ModelInstance) variable.getValue());
                 }

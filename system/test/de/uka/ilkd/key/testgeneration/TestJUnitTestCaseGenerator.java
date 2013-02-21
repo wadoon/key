@@ -38,7 +38,7 @@ public class TestJUnitTestCaseGenerator {
         List<String> output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        codeCoverageParser, junitConverter, "mid");
+                        codeCoverageParser, junitConverter, "midOneProxyOneInstance");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(

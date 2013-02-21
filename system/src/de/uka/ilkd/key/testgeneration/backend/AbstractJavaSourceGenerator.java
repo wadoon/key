@@ -12,7 +12,7 @@ public abstract class AbstractJavaSourceGenerator {
     /**
      * 4-space tab
      */
-    private static final String TAB = "    ";
+    protected static final String TAB = "    ";
 
     /**
      * A newline

@@ -309,6 +309,11 @@ public class JUnitConverter implements IFrameworkConverter {
             writeGetObjectInstanceMethod();
 
             /*
+             * Write the method for setting fields of objects.
+             */
+            writeSetFieldMethod();
+
+            /*
              * Write the main init method for creating the repository of Object
              * instances.
              */
@@ -366,10 +371,21 @@ public class JUnitConverter implements IFrameworkConverter {
 
             String[] conjunctions = oracleString.split("&&");
             for (String conjunction : conjunctions) {
-                writeLine("Assert.assertTrue(" + conjunction.trim() + ");" + NEWLINE);
+
+                writeLine("Assert.assertTrue(" + NEWLINE);
+                String[] disjunctions = conjunction.split("\\|\\|");
+
+                for (int i = 0; i < disjunctions.length; i++) {
+
+                    String toWrite = TAB + disjunctions[i].trim();
+                    if (i + 1 != disjunctions.length) {
+                        toWrite += " ||";
+                    }
+                    writeLine(toWrite + NEWLINE);
+                }
+                writeLine(")" + NEWLINE);
             }
             writeLine(NEWLINE);
-
         }
 
         /**
@@ -406,7 +422,7 @@ public class JUnitConverter implements IFrameworkConverter {
              * Write the instantiation of the instances.
              */
             writeComment(
-                    "Instantiate and insert the raw object instances into the repository. ",
+                    "Instantiate and insert the raw object instances into the repository. After this, finalize the repository setup by setting up the relevant fields of each object instance as necessary ",
                     false);
             for (ModelInstance instance : instances) {
                 String toImport = instance.getType();
@@ -418,14 +434,32 @@ public class JUnitConverter implements IFrameworkConverter {
              * Write the field-instantiations for the same instances, concluding
              * the fixture setup procedure.
              */
-            writeComment(
-                    "Finalize the repository setup by setting up the relevant fields of each object instance.. ",
-                    false);
             for (ModelInstance instance : instances) {
                 if (!instance.getFields().isEmpty()) {
                     writeObjectFieldInstantiation(instance);
                 }
             }
+
+            writeClosingBrace();
+        }
+
+        /**
+         * Writes the setField method.
+         */
+        private void writeSetFieldMethod() {
+
+            writeComment("Sets a field of some object to a given value", true);
+            writeMethodHeader(null, "private", new String[] { "static" },
+                    "void", "setFieldValue", new String[] { "Object instance",
+                            "String fieldName", "Object value" }, new String[] {
+                            "NoSuchFieldException", "SecurityException",
+                            "IllegalArgumentException",
+                            "IllegalAccessException" });
+
+            writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
+                    + NEWLINE);
+            writeLine("field.setAccessible(true);" + NEWLINE);
+            writeLine("field.set(instance, value );" + NEWLINE);
 
             writeClosingBrace();
         }
@@ -515,12 +549,6 @@ public class JUnitConverter implements IFrameworkConverter {
             for (ModelVariable field : instance.getFields()) {
 
                 if (!field.isParameter()) {
-                    String variableName = field.getName();
-                    writeLine(NEWLINE);
-                    writeLine("Field " + variableName + " = "
-                            + "instance.getClass().getDeclaredField(" + "\""
-                            + variableName + "\"" + ");\n");
-                    writeLine(variableName + ".setAccessible(true);" + NEWLINE);
 
                     /*
                      * When it comes to setting the value, different courses of
@@ -530,17 +558,20 @@ public class JUnitConverter implements IFrameworkConverter {
                      * method. Primitive types will simply be encoded in terms
                      * of their primitive values.
                      */
+                    String variableName = field.getName();
                     if (field.getValue() instanceof ModelInstance) {
 
                         ModelInstance instanceField = (ModelInstance) field
                                 .getValue();
-                        writeLine(variableName + ".set(instance, "
+                        writeLine("setFieldValue(instance, " + "\""
+                                + variableName + "\"" + ", "
                                 + "getObjectInstance("
                                 + instanceField.getIdentifier() + ") " + ");"
                                 + NEWLINE);
                     } else {
-                        writeLine(variableName + ".set(instance, "
-                                + field.getValue() + ");" + NEWLINE);
+                        writeLine("setFieldValue(instance, " + "\""
+                                + variableName + "\"" + ", " + field.getValue()
+                                + ");" + NEWLINE);
                     }
                 }
             }

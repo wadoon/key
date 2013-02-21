@@ -4,11 +4,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.OrderOperandsTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveSDPsTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 
 /**
@@ -18,6 +21,45 @@ import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerE
  * @author christopher
  */
 public class PostconditionTools {
+
+    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
+            .toString();
+
+    /**
+     * Transforms a Term into an equivalent Term representing an Oracle. The
+     * semantics of the Term remain unchanged.
+     * 
+     * @param term
+     * @return
+     * @throws TermTransformerException
+     */
+    public static Term termToOracle(Term term) throws TermTransformerException {
+
+        /*
+         * Simplify the postcondition
+         */
+        Term simplifiedOracle = PostconditionTools.simplifyPostCondition(term,
+                SEPARATOR);
+
+        /*
+         * Put it into Conjunctive Normal Form
+         */
+        simplifiedOracle = new CNFTransformer().transform(simplifiedOracle);
+
+        /*
+         * Simplify the disjunctions in the postcondition
+         */
+        simplifiedOracle = new SimplifyDisjunctionTransformer()
+                .transform(simplifiedOracle);
+
+        /*
+         * Simplify the remaining conjunctions
+         */
+        simplifiedOracle = new SimplifyConjunctionTransformer()
+                .transform(simplifiedOracle);
+
+        return simplifiedOracle;
+    }
 
     /**
      * Simplifies a postCondition, removing {@link SortDependingFunction} and
