@@ -361,14 +361,15 @@ public class JUnitConverter implements IFrameworkConverter {
             /*
              * Delegate oracle generation to the Term visitor.
              */
-            List<String> assertions = new OracleGenerationVisitor(testCase)
+            String oracleString = new OracleGenerationVisitor(testCase)
                     .generateOracle();
 
-            writeLine("Assert.assertTrue(" + NEWLINE);
-            for (String assertion : assertions) {
-                writeLine(assertion + NEWLINE);
+            String[] conjunctions = oracleString.split("&&");
+            for (String conjunction : conjunctions) {
+                writeLine("Assert.assertTrue(" + conjunction.trim() + ");" + NEWLINE);
             }
-            writeLine(");" + NEWLINE);
+            writeLine(NEWLINE);
+
         }
 
         /**
@@ -714,7 +715,7 @@ public class JUnitConverter implements IFrameworkConverter {
                 }
             }
 
-            public List<String> generateOracle() throws JUnitConverterException {
+            public String generateOracle() throws JUnitConverterException {
 
                 try {
 
@@ -749,19 +750,7 @@ public class JUnitConverter implements IFrameworkConverter {
                      */
                     simplifiedOracle.execPreOrder(this);
 
-                    /*
-                     * Process and turn the buffer into a String of boolean Java
-                     * statements. Split this assertion into units, and store
-                     * them as a linked list. Return the resulting list.
-                     */
-                    String assertionString = processBuffer();
-                    String[] assertionArray = assertionString.split(NEWLINE);
-                    List<String> assertions = new LinkedList<String>();
-                    for (String assertion : assertionArray) {
-                        assertions.add(assertion);
-                    }
-
-                    return assertions;
+                    return processBuffer();
 
                 } catch (TermTransformerException e) {
 
@@ -802,40 +791,31 @@ public class JUnitConverter implements IFrameworkConverter {
                             return lefthand + " || " + righthand;
 
                         } else if (next.equals(EQUALS)) {
-                            return "(" + lefthand + " == " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " == " + righthand + ")";
 
                         } else if (next.equals(GREATER_OR_EQUALS)) {
-                            return "(" + lefthand + " >= " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " >= " + righthand + ")";
 
                         } else if (next.equals(LESS_OR_EQUALS)) {
-                            return "(" + lefthand + " <= " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " <= " + righthand + ")";
 
                         } else if (next.equals(GREATER_THAN)) {
-                            return "(" + lefthand + " > " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " > " + righthand + ")";
 
                         } else if (next.equals(LESS_THAN)) {
-                            return "(" + lefthand + " < " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " < " + righthand + ")";
 
                         } else if (next.equals(ADDITION)) {
-                            return "(" + lefthand + " < " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " < " + righthand + ")";
 
                         } else if (next.equals(SUBTRACTION)) {
-                            return "(" + lefthand + " < " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " < " + righthand + ")";
 
                         } else if (next.equals(DIVISION)) {
-                            return "(" + lefthand + " < " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " < " + righthand + ")";
 
                         } else if (next.equals(MULTIPLICATION)) {
-                            return "(" + lefthand + " < " + righthand + ")"
-                                    + NEWLINE;
+                            return "(" + lefthand + " < " + righthand + ")";
                         }
 
                         /*

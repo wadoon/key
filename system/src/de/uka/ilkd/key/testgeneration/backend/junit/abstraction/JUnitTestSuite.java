@@ -220,7 +220,6 @@ public class JUnitTestSuite {
                 JUnitDeclarationStatement declarationStatement = new JUnitDeclarationStatement(
                         variable);
 
-                
                 if (isSelf(variable) || variable.isParameter()) {
                     writeVariableDeclaration(variable);
                 }
