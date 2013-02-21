@@ -323,7 +323,7 @@ public class JUnitConverter implements IFrameworkConverter {
 
             writeLine(NEWLINE);
             writeComment(
-                    "KeYTestGen put me here to keep track of your object instances! Don't mind me :)",
+                    "KeYTestGen2 put me here to keep track of your object instances! Don't mind me :)",
                     true);
             writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>();"
                     + NEWLINE + NEWLINE);
@@ -463,12 +463,6 @@ public class JUnitConverter implements IFrameworkConverter {
             List<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (IModelObject object : model.getVariables()) {
                 ModelVariable variable = (ModelVariable) object;
-                if (variable
-                        .getIdentifier()
-                        .equals("self_dot_proxy_dot_nestedProxy_dot_nestedProxy_dot_nestedProxy")) {
-                    System.out.println();
-                    ((ModelInstance) variable.getValue()).setDebug(true);
-                }
                 if (variable.getValue() instanceof ModelInstance) {
                     instances.add((ModelInstance) variable.getValue());
                 }

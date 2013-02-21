@@ -425,30 +425,16 @@ public class PathconditionTools {
             public ContextVisitor(Model model, Services services,
                     ModelMediator mediator) {
 
-                /*
-                 * TODO: Hack to make test cases pass. Kill it.
-                 */
-                if (mediator == null) {
-                    this.mediator = new ModelMediator();
-                } else {
-                    this.mediator = mediator;
-                }
-
                 this.model = model;
+                this.mediator = mediator;
                 javaInfo = services.getJavaInfo();
 
                 /*
-                 * Construct the default base class. TODO: Even more hacks.
-                 * Remove.
+                 * Construct the default base class.
                  */
-                ProgramElementName name = null;
-                if (mediator == null || mediator.getMainClass() == null) {
-                    name = new ProgramElementName("UnitTestingClass");
-                } else {
-                    KeYJavaClass klass = mediator.getMainClass();
-                    name = new ProgramElementName(klass.getPackageDeclaration()
-                            + "." + klass.getName());
-                }
+                KeYJavaClass klass = mediator.getMainClass();
+                ProgramElementName name = new ProgramElementName(
+                        klass.getPackageDeclaration() + "." + klass.getName());
 
                 ClassDeclaration baseType = new ClassDeclaration(
                         new Modifier[0], name, null, name, null,

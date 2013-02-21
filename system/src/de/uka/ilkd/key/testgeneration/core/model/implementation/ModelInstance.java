@@ -16,22 +16,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
  */
 public class ModelInstance implements IHeapObject {
 
-    private boolean debug;
-
     /**
-     * @return the debug
+     * Used for generating unique IDs for model instances.
      */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * @param debug
-     *            the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
+    private static int ID = 0;
 
     /**
      * The type of which this instance is an instance.
@@ -64,7 +52,7 @@ public class ModelInstance implements IHeapObject {
     public ModelInstance(final KeYJavaType keYJavaType) {
 
         this.type = keYJavaType;
-        this.identifier = Integer.toString(hashCode());
+        this.identifier = Integer.toString(++ID);
     }
 
     /**
