@@ -6,7 +6,14 @@ final class PrefixSumRec {
     //@ invariant isPow2(a.length);
     //@ accessible \inv: \singleton(a);
     
-    //@ axiom (\forall int x, y; even(x); even(x+y) == even(y));
+    //@ axiom lemma();
+    
+    /*@ normal_behavior
+      @ ensures (\forall int x, y; even(x); even(x+y) == even(y));
+      @ accessible \nothing;
+      @ strictly_pure helper
+      @*/
+    private static boolean lemma() { return true; }
 
     PrefixSumRec(int [] a) {
 	this.a = a;
@@ -69,7 +76,9 @@ final class PrefixSumRec {
       @   ensures !(\exists int k; leftMost(left, right) <= k && k <= right && even(k);
       @             a[k] != \old(a[k]));
       @   measured_by right - left + 1;
-      @   assignable a[*];
+      @   assignable \infinite_union(int k; 
+      @                  (2*left-right+1 <= k && k <= right && !even(k)) ?
+      @                      \singleton(a[k]): \empty);
       @*/
     public void upsweep(int left, int right) {
         int space = right - left;
