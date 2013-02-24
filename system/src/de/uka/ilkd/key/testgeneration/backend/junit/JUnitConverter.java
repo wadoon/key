@@ -383,7 +383,7 @@ public class JUnitConverter implements IFrameworkConverter {
                     }
                     writeLine(toWrite + NEWLINE);
                 }
-                writeLine(")" + NEWLINE);
+                writeLine(");" + NEWLINE);
             }
             writeLine(NEWLINE);
         }

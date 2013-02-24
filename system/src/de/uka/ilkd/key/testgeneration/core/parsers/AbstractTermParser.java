@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 
 /**
  * Children of this class represent parsers which can be used to in various ways
@@ -67,6 +68,9 @@ public abstract class AbstractTermParser {
     protected static final String AND = "and";
     protected static final String OR = "or";
     protected static final String NOT = "not";
+
+    protected static final String TRUE = "TRUE";
+    protected static final String FALSE = "FALSE";
 
     protected static final String GREATER_OR_EQUALS = "geq";
     protected static final String LESS_OR_EQUALS = "leq";
@@ -528,5 +532,41 @@ public abstract class AbstractTermParser {
     protected boolean hasChildren(Term term) {
 
         return term.subs().size() != 0;
+    }
+
+    protected boolean isBoolean(Term term) {
+        return term.sort().name().toString().equals(BOOLEAN);
+    }
+
+    protected boolean isBooleanTrue(Term term) throws TermTransformerException {
+        if (isBoolean(term)) {
+            return term.op().name().toString().equals(TRUE);
+        } else {
+            throw new TermTransformerException(
+                    "Attempted to apply boolean operation to non-boolean literal");
+        }
+    }
+
+    protected boolean isBooleanConstant(Term term) throws TermParserException {
+        return isBooleanFalse(term) || isBooleanTrue(term);
+    }
+
+    protected boolean isBooleanFalse(Term term) throws TermParserException {
+        if (isBoolean(term)) {
+            return term.op().name().toString().equals(FALSE);
+        } else {
+            throw new TermTransformerException(
+                    "Attempted to apply boolean operation to non-boolean literal");
+        }
+    }
+
+    protected boolean translateToJavaBoolean(Term term)
+            throws TermParserException {
+        if (isBoolean(term)) {
+            return isBooleanTrue(term) ? true : false;
+        } else {
+            throw new TermTransformerException(
+                    "Attempted to apply boolean operation to non-boolean literal");
+        }
     }
 }

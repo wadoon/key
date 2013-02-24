@@ -36,7 +36,7 @@ public class PrimitiveIntegerOperations {
     /*
      * Local refernce variables to simulate work with associated classes
      */
-    private ClassProxy proxy = new ClassProxy();
+    public ClassProxy proxy = new ClassProxy();
 
     public int maxProxyStatic(int x) {
 
@@ -108,12 +108,12 @@ public class PrimitiveIntegerOperations {
      @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) && (\result <= x )) || ((\result <= x) && (\result <= z ));      
      @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) && (\result >= x )) || ((\result >= x) && (\result >= z ));      
      @*/
-    public static int mid(int x, int y, int z) {
+    public static int mid(int x, int y, int z, boolean k, boolean l) {
 
         int mid = z;
 
         if (y < z) {
-            if (x < y) {
+            if (x < y && k || l) {
                 mid = y;
             } else if (x < z) {
 

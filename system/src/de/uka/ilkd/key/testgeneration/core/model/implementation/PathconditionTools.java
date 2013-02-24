@@ -19,7 +19,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.parsers.TermParserException;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.DistributeNegationsTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveIfThenElseTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
 
@@ -35,8 +38,6 @@ public class PathconditionTools {
             .toString();
 
     private static final TermSimplificationTransformer termSimplificationTransformer = new TermSimplificationTransformer();
-
-    private static final PathToTermParser pathToTermParser = new PathToTermParser();
 
     /**
      * Allow only static access
@@ -96,11 +97,12 @@ public class PathconditionTools {
      * @param mediator
      *            session mediator
      * @return the Model instance built from the Term
+     * @throws TermTransformerException
      */
     public static Model termToModel(Term pathCondition, Services services,
-            ModelMediator mediator) {
+            ModelMediator mediator) throws TermTransformerException {
 
-        return PathToTermParser.createModel(pathCondition, services, mediator);
+        return TermToModelParser.createModel(pathCondition, services, mediator);
     }
 
     private static class TermSimplificationTransformer extends
@@ -142,6 +144,22 @@ public class PathconditionTools {
         public Term transform(Term term) throws TermTransformerException {
 
             return transformTerm(term);
+        }
+
+        /**
+         * Simplifying ordinary Terms only amounts to removing all Boolean typed
+         * variables and constants in the Term.
+         */
+        @Override
+        public Term transformTerm(Term term) throws TermTransformerException {
+
+            /*
+             * Booleans are removed without reservation
+             */
+            if (isBoolean(term) || isIfThenElse(term)) {
+                return null;
+            }
+            return super.transformTerm(term);
         }
 
         /**
@@ -313,44 +331,9 @@ public class PathconditionTools {
             return null;
         }
 
-        /**
-         * Constructs a new binary {@link Junctor} depending on the kind of
-         * Junctor represented by the input {@link Term}.
-         * 
-         * @param term
-         *            the original Term
-         * @param firstChild
-         *            first subterm of the original Term
-         * @param secondChild
-         *            second subterm of the original Term
-         * @return
-         * @throws ModelGeneratorException
-         */
-        private Term createBinaryJunctor(Term term, Term firstChild,
-                Term secondChild) throws ModelGeneratorException {
-
-            String junctorName = term.op().name().toString();
-
-            if (junctorName.equals("and")) {
-                return termFactory.createTerm(Junctor.AND, firstChild,
-                        secondChild);
-            }
-
-            if (junctorName.equals("or")) {
-                return termFactory.createTerm(Junctor.OR, firstChild,
-                        secondChild);
-            }
-
-            if (junctorName.equals("equals")) {
-                return termFactory.createTerm(term.op(), firstChild,
-                        secondChild);
-            }
-
-            throw new ModelGeneratorException("Parse error");
-        }
     }
 
-    private static class PathToTermParser {
+    private static class TermToModelParser {
 
         /**
          * Creates a skeletal {@link Model} instance from a {@link Term}. The
@@ -366,11 +349,17 @@ public class PathconditionTools {
          * @param mediator
          *            session mediator
          * @return the Model instance built from the Term
+         * @throws TermTransformerException
          */
         public static Model createModel(Term term, Services services,
-                ModelMediator mediator) {
+                ModelMediator mediator) throws TermTransformerException {
 
             Model model = new Model();
+
+            /*
+             * Remove if-then-else statements from the pathcondition
+             */
+            term = new RemoveIfThenElseTransformer().transform(term);
 
             /*
              * Construct the initial Model, containing representation of all the
@@ -380,13 +369,21 @@ public class PathconditionTools {
             ContextVisitor modelVisitor = new ContextVisitor(model, services,
                     mediator);
             term.execPostOrder(modelVisitor);
+            
+            /*
+             * Distribute negations and remove conjunctions
+             */
+            term = new DistributeNegationsTransformer().transform(term);
+
+            System.out.println(term);
 
             /*
              * Setup all reference relationships expressed in the Term. Done
              * preorder to correctly handle non-assigning operations, such as
              * not-equals.
              */
-            ReferenceVisitor referenceVisitor = new ReferenceVisitor(model);
+            VariableAssignmentResolvingVisitor referenceVisitor = new VariableAssignmentResolvingVisitor(
+                    model);
             term.execPreOrder(referenceVisitor);
 
             return modelVisitor.getModel();
@@ -559,7 +556,7 @@ public class PathconditionTools {
                  * a static field of its declaring class. In this case, it is
                  * not part of any instance, and we let the parent remain null.
                  */
-                if (term.op().getClass() == SortDependingFunction.class) {
+                if (isSortDependingFunction(term)) {
 
                     ProgramVariable parentVariable = getVariable(term.sub(1));
 
@@ -753,7 +750,8 @@ public class PathconditionTools {
          * 
          * @author christopher
          */
-        private static class ReferenceVisitor extends KeYTestGenTermVisitor {
+        private static class VariableAssignmentResolvingVisitor extends
+                KeYTestGenTermVisitor {
 
             /**
              * Flag to indicate if we have seen a Not operator.
@@ -767,7 +765,7 @@ public class PathconditionTools {
              */
             private final Model model;
 
-            public ReferenceVisitor(Model model) {
+            public VariableAssignmentResolvingVisitor(Model model) {
 
                 this.model = model;
             }
@@ -777,7 +775,7 @@ public class PathconditionTools {
 
                 if (isNot(visited)) {
                     sawNot = true;
-                } else if (isEquals(visited) && !sawNot) {
+                } else if (isEquals(visited)) {
                     parseEquals(visited);
                     sawNot = false;
                 } else if (isBinaryFunction2(visited) && sawNot) {
@@ -792,9 +790,11 @@ public class PathconditionTools {
              * <p>
              * If the variable is <strong>primitve</strong>, equality, in our
              * abstraction, implies a value assignment: equals(a,b) simply means
-             * that the value of b is copied into a. There is no need to do this
-             * explicitly here, since the SMT interface will taking care of
-             * this, and we would thus only be performing the same work twice.
+             * that the value of b is copied into a. For Integer types, there is
+             * no need to do this explicitly, since the SMT interface will be
+             * taking care of this, and we would thus only be performing the
+             * same work twice. For Boolean types, however, which are not
+             * resolved by the SMT interface, we do this explicitly.
              * <p>
              * If the variable is a <strong>reference</strong> type, things get
              * more interesting, since equality in this case implies that the
@@ -809,26 +809,72 @@ public class PathconditionTools {
              */
             private void parseEquals(Term term) {
 
-                Term leftOperand = term.sub(0);
-                Term rightOperand = term.sub(1);
+                try {
 
-                /*
-                 * The left-hand operator is a reference type
-                 */
-                if (!isPrimitiveType(term)) {
+                    Term leftOperand = term.sub(0);
+                    Term rightOperand = term.sub(1);
 
-                    String leftOperandIdentifier = resolveIdentifierString(
-                            leftOperand, SEPARATOR);
-                    String rightOperandIdentifier = resolveIdentifierString(
-                            rightOperand, SEPARATOR);
+                    String leftOperandIdentifier;
+                    String rightOperandIdentifier;
 
-                    ModelVariable leftModelVariable = model
-                            .getVariableByReference(leftOperandIdentifier);
+                    /*
+                     * Process primitive variables.
+                     */
+                    if (isPrimitiveType(leftOperand)) {
 
-                    ModelVariable rightModelVariable = model
-                            .getVariableByReference(rightOperandIdentifier);
+                        /*
+                         * If the left-hand hand is a boolean, configure it
+                         * accordingly.
+                         */
+                        if (isBoolean(leftOperand)) {
 
-                    model.assignPointer(leftModelVariable, rightModelVariable);
+                            leftOperandIdentifier = resolveIdentifierString(
+                                    leftOperand, SEPARATOR);
+
+                            /*
+                             * If the right-hand operator is a boolean constant
+                             * (TRUE or FALSE), we need to create a new such
+                             * value and assign it to the variable.
+                             */
+                            if (isBooleanConstant(rightOperand)) {
+
+                                ModelVariable modelVariable = model
+                                        .getVariableByReference(leftOperandIdentifier);
+
+                                boolean value = isBooleanTrue(rightOperand);
+                                value = (sawNot) ? !value : value;
+                                model.add(modelVariable, value);
+                            } else {
+                                // Breakpoint hook - should never happen.
+                                int dummy = 1;
+                                dummy++;
+                            }
+
+                            /*
+                             * Process reference variables.
+                             */
+                        } else if (!sawNot) {
+
+                            leftOperandIdentifier = resolveIdentifierString(
+                                    leftOperand, SEPARATOR);
+                            rightOperandIdentifier = resolveIdentifierString(
+                                    rightOperand, SEPARATOR);
+
+                            ModelVariable leftModelVariable = model
+                                    .getVariableByReference(leftOperandIdentifier);
+
+                            ModelVariable rightModelVariable = model
+                                    .getVariableByReference(rightOperandIdentifier);
+
+                            model.assignPointer(leftModelVariable,
+                                    rightModelVariable);
+                        }
+                    }
+
+                } catch (TermParserException e) {
+                    // Should never happen. Caught only because
+                    // AbstractTermParser requires it.
+                    return;
                 }
             }
         }

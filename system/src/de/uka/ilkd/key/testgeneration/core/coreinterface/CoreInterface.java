@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.testgeneration.KeYTestGenMediator;
@@ -265,6 +266,15 @@ public enum CoreInterface {
              * Setup the module generation capsules for each node.
              */
             for (IExecutionNode node : nodes) {
+                
+                /*
+                try {
+                    System.out.println(node.getFormatedPathCondition() + "\n\n");
+                } catch (ProofInputException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }*/
+                
                 ModelCapsule capsule = new ModelCapsule(node, modelMediator);
                 capsules.add(capsule);
             }
@@ -360,7 +370,8 @@ public enum CoreInterface {
                     model = modelGenerator.generateModel(node, modelMediator);
 
                 } catch (ModelGeneratorException e) {
-                    System.err.println("WARNING: Model generation failed!");
+                    System.err.println(e.getMessage());
+                    break;
                 }
             }
         }

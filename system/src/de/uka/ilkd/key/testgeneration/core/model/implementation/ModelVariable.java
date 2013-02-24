@@ -37,11 +37,6 @@ public class ModelVariable implements IHeapObject {
     private final String identifier;
 
     /**
-     * The {@link ProgramVariable} instance wrapped by this variable
-     */
-    private final ProgramVariable wrappedProgramVariable;
-
-    /**
      * The value bound to this object. Primitive types are represented by their
      * wrapper types ( {@link Integer}, {@link Boolean} etc).
      */
@@ -69,31 +64,48 @@ public class ModelVariable implements IHeapObject {
     private boolean isParameter = false;
 
     /**
+     * Indicates whether this variable is declared static.
+     */
+    private final boolean isStatic;
+
+    /**
+     * Indicates whether this variable is declared as final or not.
+     */
+    private final boolean isFinal;
+
+    /**
+     * The type of the variable.
+     */
+    private final String type;
+
+
+    /**
      * Create a ModelVariable from an existing {@link ProgramVariable},
      * effectively encapsulating it, but we maintain the type hierarchy for the
      * sake of consistency.
      * 
      * @param programVariable
      */
-    public ModelVariable(ProgramVariable programVariable, String path,
+    public ModelVariable(ProgramVariable programVariable, String identifier,
             ModelInstance referedInstance) {
 
-        this.wrappedProgramVariable = programVariable;
-        this.identifier = path;
+        this.identifier = identifier;
         this.boundValue = referedInstance;
+        this.type = programVariable.getKeYJavaType().getJavaType()
+                .getFullName();
+        this.isStatic = programVariable.isStatic();
+        this.isFinal = programVariable.isFinal();
     }
 
-    public ModelVariable(ProgramVariable programVariable, String path) {
+    public ModelVariable(ProgramVariable programVariable, String identifier) {
 
-        this(programVariable, path, null);
+        this(programVariable, identifier, null);
     }
 
     @Override
     public String getName() {
 
-        String parentName = wrappedProgramVariable.name().toString();
-        String[] splitParentName = parentName.split("::");
-        return splitParentName[splitParentName.length - 1];
+        return identifier;
     }
 
     /**
@@ -103,18 +115,7 @@ public class ModelVariable implements IHeapObject {
     @Override
     public String getType() {
 
-        return wrappedProgramVariable.getKeYJavaType().getJavaType()
-                .getFullName();
-    }
-
-    /**
-     * Gets the actual {@link KeYJavaType} for this variable.
-     * 
-     * @return the {@link KeYJavaType}
-     */
-    public KeYJavaType getKeYJavaType() {
-
-        return wrappedProgramVariable.getKeYJavaType();
+        return type;
     }
 
     /**
@@ -178,8 +179,7 @@ public class ModelVariable implements IHeapObject {
     @Override
     public String toString() {
 
-        return wrappedProgramVariable.getKeYJavaType().getFullName() + " : "
-                + identifier;
+        return type + " : " + identifier;
     }
 
     /**
@@ -208,7 +208,7 @@ public class ModelVariable implements IHeapObject {
      */
     public boolean isStatic() {
 
-        return wrappedProgramVariable.isStatic();
+        return isStatic();
     }
 
     /**
@@ -216,7 +216,7 @@ public class ModelVariable implements IHeapObject {
      */
     public boolean isFinal() {
 
-        return wrappedProgramVariable.isFinal();
+        return isFinal();
     }
 
     /**

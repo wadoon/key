@@ -76,7 +76,7 @@
                   available to give me guidance in all things related to the
                   project. I especially wish to thank Dr. Reiner Hähnle, Dr.
                   Richard Bubel, Martin Hentschel and their colleagues at the
-                  Darmstadt University of Technology, for letting me stay and
+                  Darmstadt University of Technology for letting me stay and
                   work with them leading up to the 2012 KeY Symposium.\ 
 
                   \;
@@ -309,61 +309,73 @@
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-58>>
 
-      <with|par-left|1.5fn|5.2<space|2spc>Future work
+      <with|par-left|1.5fn|5.2<space|2spc>Could we create useful test suites?
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-59>>
 
-      <with|par-left|3fn|5.2.1<space|2spc>Code coverage
+      <with|par-left|3fn|5.2.1<space|2spc>Code readability
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-60>>
 
-      <with|par-left|3fn|5.2.2<space|2spc>Improved user feedback
+      <with|par-left|1.5fn|5.3<space|2spc>Future work
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-61>>
 
-      <with|par-left|3fn|5.2.3<space|2spc>KeY integration
+      <with|par-left|3fn|5.3.1<space|2spc>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-62>>
 
-      <with|par-left|3fn|5.2.4<space|2spc>Support for more frameworks and
-      test granularities <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|3fn|5.3.2<space|2spc>Code coverage
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-63>>
+
+      <with|par-left|3fn|5.3.3<space|2spc>Improved user feedback
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-64>>
+
+      <with|par-left|3fn|5.3.4<space|2spc>KeY integration
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-65>>
+
+      <with|par-left|3fn|5.3.5<space|2spc>Support for more frameworks and
+      test granularities <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-66>>
 
       <vspace*|1fn><with|font-series|bold|math-font-series|bold|6<space|2spc>Conclusion>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-64><vspace|0.5fn>
+      <no-break><pageref|auto-67><vspace|0.5fn>
 
       <vspace*|1fn><with|font-series|bold|math-font-series|bold|7<space|2spc>Appendix
       A - KeYTestGen requirements.> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-65><vspace|0.5fn>
+      <no-break><pageref|auto-68><vspace|0.5fn>
 
       <with|par-left|1.5fn|7.1<space|2spc>Test Case Inputs
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-66>>
+      <no-break><pageref|auto-69>>
 
       <with|par-left|3fn|7.1.1<space|2spc>User Requirements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-67>>
+      <no-break><pageref|auto-70>>
 
       <with|par-left|3fn|7.1.2<space|2spc>Technical Requirements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-68>>
+      <no-break><pageref|auto-71>>
 
       <with|par-left|1.5fn|7.2<space|2spc>Test Oracle
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-69>>
+      <no-break><pageref|auto-72>>
 
       <with|par-left|3fn|7.2.1<space|2spc>User Requirements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-70>>
+      <no-break><pageref|auto-73>>
 
       <with|par-left|3fn|7.2.2<space|2spc>Technical Requirements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-71>>
+      <no-break><pageref|auto-74>>
 
       <vspace*|1fn><with|font-series|bold|math-font-series|bold|Bibliography>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-72><vspace|0.5fn>
+      <no-break><pageref|auto-75><vspace|0.5fn>
     </table-of-contents>
 
     <set-this-page-header|>
@@ -691,37 +703,39 @@
     \;
 
     <\with|par-left|1cm>
-      <\framed>
-        <\definition>
-          \;
+      <\with|par-right|1cm>
+        <\framed>
+          <\definition>
+            \;
 
-          \;
+            \;
 
-          A <with|font-series|bold|specification> for some code segment
-          <with|font-series|bold|m> in some software system
-          <with|font-series|bold|s> is a tuple\ 
+            A <with|font-series|bold|specification> for some code segment
+            <with|font-series|bold|m> in some software system
+            <with|font-series|bold|s> is a tuple\ 
 
-          \ \ \ 
+            \ \ \ 
 
-          \ \ \ \ \ \ \ \ (Pre, Post)
+            \ \ \ \ \ \ \ \ (Pre, Post)
 
-          \;
+            \;
 
-          where Pre (or <with|font-series|bold|preconditions>) is a set of
-          constraints on the state of <with|font-series|bold|s> immediately
-          prior to the execution of <with|font-series|bold|m>, and Post
-          (<with|font-series|bold|postconditions>) is a set of constraints on
-          the state of <with|font-series|bold|s> immediately after the
-          execution of <with|font-series|bold|m> terminates, s.t. Pre
-          -\<gtr\> Post (Post always holds given that Pre holds).
+            where Pre (or <with|font-series|bold|preconditions>) is a set of
+            constraints on the state of <with|font-series|bold|s> immediately
+            prior to the execution of <with|font-series|bold|m>, and Post
+            (<with|font-series|bold|postconditions>) is a set of constraints
+            on the state of <with|font-series|bold|s> immediately after the
+            execution of <with|font-series|bold|m> terminates, s.t. Pre
+            -\<gtr\> Post (Post always holds given that Pre holds).
 
-          \;
+            \;
 
-          By ``state of s'' we mean both the internal state of s itself, as
-          well as any external factors which s depends on, such as a
-          database, sensor, etc. <em|>\ 
-        </definition>
-      </framed>
+            By ``state of s'' we mean both the internal state of s itself, as
+            well as any external factors which s depends on, such as a
+            database, sensor, etc. <em|>\ 
+          </definition>
+        </framed>
+      </with>
     </with>
 
     \;
@@ -758,60 +772,63 @@
     \;
 
     <\with|par-left|1cm>
-      <\framed>
-        <\example>
-          \;
+      <\with|par-right|1cm>
+        <\framed>
+          <\example>
+            A formally specified Java method.
 
-          \;
+            \;
 
-          The following is a specification for a simple addition function for
-          positive intergers. The specification is expressed in the JML
-          language.
+            The following is a specification for a simple addition function
+            for positive intergers. The specification is expressed in the JML
+            language.
 
-          \;
+            \;
 
-          <\cpp>
-            <\with|par-left|1cm>
-              /*@ public spec normal_behavior
+            <\cpp>
+              <\with|par-left|1cm>
+                /*@ public spec normal_behavior
 
-              \ \ @ requires x \<gtr\> 0 & y \<gtr\> 0
+                \ \ @ requires x \<gtr\> 0 & y \<gtr\> 0
 
-              \ \ @ ensures \\result == x + y \ & \\result \ \<gtr\> 0
+                \ \ @ ensures \\result == x + y \ & \\result \ \<gtr\> 0
 
-              \ \ @*/
+                \ \ @*/
 
-              public static void addWholePositive(int x, int y) {
+                public static void addWholePositive(int x, int y){
 
-              \ \ \ 
+                \ \ \ 
 
-              \ \ \ if(x \<less\> 0 \|\| y \<less\> 0) {
+                \ \ \ if(x \<less\> 0 \|\| y \<less\> 0) {
 
-              \ \ \ \ \ \ throw new\ 
+                \ \ \ \ \ \ throw new\ 
 
-              \ \ \ \ \ \ \ \ \ IllegalArgumentException("Not a positive
-              whole number");
+                \ \ \ \ \ \ \ \ \ IllegalArgumentException(
 
-              \ \ \ }
+                \ \ \ \ \ \ \ \ \ \ \ \ \ "Not a positive whole number");
 
-              \;
+                \ \ \ }
 
-              \ \ \ return x + y;
+                \;
 
-              }
-            </with>
-          </cpp>
+                \ \ \ return x + y;
 
-          \;
+                }
+              </with>
+            </cpp>
 
-          The <with|font-series|bold|requires> clause here contain the
-          preconditions, while the <with|font-series|bold|ensures> clause
-          contains the postconditions. \\result denotes the value returned by
-          the function. As can be easily seen here, this specification
-          guarantees that the result will equal x+y and be greater than 0, if
-          parameters x and y are both greater than 0 at the time of
-          invocation.
-        </example>
-      </framed>
+            \;
+
+            The <with|font-series|bold|requires> clause here contain the
+            preconditions, while the <with|font-series|bold|ensures> clause
+            contains the postconditions. \\result denotes the value returned
+            by the function. As can be easily seen here, this specification
+            guarantees that the result will equal x+y and be greater than 0,
+            if parameters x and y are both greater than 0 at the time of
+            invocation.
+          </example>
+        </framed>
+      </with>
     </with>
 
     <subsection|Software verification and verification methods>
@@ -967,40 +984,42 @@
     \;
 
     <\with|par-left|1cm>
-      <\framed>
-        <\definition>
-          \;
+      <\with|par-right|1cm>
+        <\framed>
+          <\definition>
+            \;
 
-          \;
+            \;
 
-          A <with|font-series|bold|test case> is a tuple (In, Or), where
+            A <with|font-series|bold|test case> is a tuple (In, Or), where
 
-          <\itemize>
-            <item>In (``input'') is a tuple (P, S), where
+            <\itemize>
+              <item>In (``input'') is a tuple (P, S), where
 
-            <\itemize-minus>
-              <item>P is a set of parameter values to be passed to the unit,
-              and
+              <\itemize-minus>
+                <item>P is a set of parameter values to be passed to the
+                unit, and
 
-              <item>S is the state of the surrounding system as the unit
-              starts executing.
-            </itemize-minus>
+                <item>S is the state of the surrounding system as the unit
+                starts executing.
+              </itemize-minus>
 
-            <item>Or (``oracle'') is a function Or(R, F) -\<gtr\> {true,
-            false}, where\ 
+              <item>Or (``oracle'') is a function Or(R, F) -\<gtr\> {true,
+              false}, where\ 
 
-            <\itemize-minus>
-              <item>R is the return value of the unit (if any), and
+              <\itemize-minus>
+                <item>R is the return value of the unit (if any), and
 
-              <item>F is the state of the system after the unit execution
-              finishes.
-            </itemize-minus>
+                <item>F is the state of the system after the unit execution
+                finishes.
+              </itemize-minus>
 
-            Or returns <strong|true> if R and F match the expected system
-            state after the unit terminates, and <strong|false> otherwise.\ 
-          </itemize>
-        </definition>
-      </framed>
+              Or returns <strong|true> if R and F match the expected system
+              state after the unit terminates, and <strong|false> otherwise.\ 
+            </itemize>
+          </definition>
+        </framed>
+      </with>
     </with>
 
     \;
@@ -1121,55 +1140,58 @@
     \;
 
     <\with|par-left|1cm>
-      <\framed>
-        <\with|par-left|1cm>
-          <\example>
+      <\with|par-right|1cm>
+        <\framed>
+          <\with|par-left|1cm>
+            <\example>
+              \;
+            </example>
+
+            Consider the function:\ 
+
             \;
-          </example>
 
-          Consider the function:\ 
+            <\cpp>
+              \ \ \ int processBranch(int num) {
+
+              \ \ \ \ \ \ switch(num) {
+
+              \ \ \ \ \ \ \ \ \ case 1: return processOne();
+
+              \ \ \ \ \ \ \ \ \ case 2: return processTwo();
+
+              \ \ \ \ \ \ \ \ \ case 3: return processThree();
+
+              \ \ \ \ \ \ }
+
+              \ \ \ }
+            </cpp>
+
+            \;
+
+            We construct the following test suite with some unspecified
+            oracle:
+
+            <with|font-shape|italic| \ T1: >(1,
+            <with|font-shape|italic|oracle>)
+
+            <with|font-shape|italic| \ T2: >(3,
+            <with|font-shape|italic|oracle>)
+
+            \;
+
+            We can visualize the segments of code excercised by the test
+            suite by drawing an execution tree for
+            <with|font-series|bold|processBranch>.\ 
+
+            \;
+
+            <with|font-series|bold|[insert graphic]>\ 
+          </with>
 
           \;
-
-          <\cpp>
-            \ \ \ int processBranch(int num) {
-
-            \ \ \ \ \ \ switch(num) {
-
-            \ \ \ \ \ \ \ \ \ case 1: return processOne();
-
-            \ \ \ \ \ \ \ \ \ case 2: return processTwo();
-
-            \ \ \ \ \ \ \ \ \ case 3: return processThree();
-
-            \ \ \ \ \ \ }
-
-            \ \ \ }
-          </cpp>
-
-          \;
-
-          We construct the following test suite with some unspecified oracle:
-
-          <with|font-shape|italic| \ T1: >(1,
-          <with|font-shape|italic|oracle>)
-
-          <with|font-shape|italic| \ T2: >(3,
-          <with|font-shape|italic|oracle>)
-
-          \;
-
-          We can visualize the segments of code excercised by the test suite
-          by drawing an execution tree for
-          <with|font-series|bold|processBranch>.\ 
-
-          \;
-
-          <with|font-series|bold|[insert graphic]>\ 
-        </with>
-
-        \;
-      </framed>
+        </framed>
+      </with>
     </with>
 
     \;
@@ -1204,39 +1226,19 @@
     \;
 
     <\with|par-left|1cm>
-      <\framed>
-        <\definition>
-          \;
-
-          \;
-
-          A <with|font-series|bold|condition> is an atomic boolean
-          expression, i.e. it cannot be sub-divided into further boolean
-          expressions. In many contemporary languages, examples of such
-          include the standard comparison operators (\<less\>=, \<gtr\>=,
-          \<less\>, \<gtr\>, ==, !=), boolean variables, and boolean
-          functions.
-        </definition>
-      </framed>
-    </with>
-
-    \;
-
-    \;
-
-    <\with|par-mode|left>
-      <\with|par-left|1cm>
+      <\with|par-right|1cm>
         <\framed>
           <\definition>
             \;
 
             \;
 
-            A <with|font-series|bold|decision> is a single condition, or a
-            collection of conditions, connected by the standard logical
-            operators <with|font-series|bold|AND >and
-            <with|font-series|bold|><with|font-series|bold|OR> (often written
-            && and \|\|, respectively).\ 
+            A <with|font-series|bold|condition> is an atomic boolean
+            expression, i.e. it cannot be sub-divided into further boolean
+            expressions. In many contemporary languages, examples of such
+            include the standard comparison operators (\<less\>=, \<gtr\>=,
+            \<less\>, \<gtr\>, ==, !=), boolean variables, and boolean
+            functions.
           </definition>
         </framed>
       </with>
@@ -1246,32 +1248,58 @@
 
     \;
 
+    <\with|par-mode|left>
+      <\with|par-left|1cm>
+        <\with|par-right|1cm>
+          <\framed>
+            <\definition>
+              \;
+
+              \;
+
+              A <with|font-series|bold|decision> is a single condition, or a
+              collection of conditions, connected by the standard logical
+              operators <with|font-series|bold|AND >and
+              <with|font-series|bold|><with|font-series|bold|OR> (often
+              written && and \|\|, respectively).\ 
+            </definition>
+          </framed>
+        </with>
+      </with>
+    </with>
+
+    \;
+
+    \;
+
     <\with|par-left|1cm>
-      <\framed>
-        <\example>
-          \;
+      <\with|par-right|1cm>
+        <\framed>
+          <\example>
+            \;
 
-          In Java, the following is a decision: (a && b) \|\| (!a &&
-          (x\<less\>y)). Analysing its composition, we identify the following
-          conditions:
+            In Java, the following is a decision: (a && b) \|\| (!a &&
+            (x\<less\>y)). Analysing its composition, we identify the
+            following conditions:
 
-          <\itemize-minus>
-            <\itemize-dot>
-              <item>Boolean variables <with|font-series|bold|a> and
-              <with|font-series|bold|b>
+            <\itemize-minus>
+              <\itemize-dot>
+                <item>Boolean variables <with|font-series|bold|a> and
+                <with|font-series|bold|b>
 
-              <item>Comparison x\<less\>y, where x and y are comparable
-              (non-boolean) values.
+                <item>Comparison x\<less\>y, where x and y are comparable
+                (non-boolean) values.
 
-              <item>The negation !a
-            </itemize-dot>
-          </itemize-minus>
+                <item>The negation !a
+              </itemize-dot>
+            </itemize-minus>
 
-          An important observation to make here, is that a and !a are
-          <with|font-series|bold|separate> conditions, even though they both
-          contain the same boolean variable a.
-        </example>
-      </framed>
+            An important observation to make here, is that a and !a are
+            <with|font-series|bold|separate> conditions, even though they
+            both contain the same boolean variable a.
+          </example>
+        </framed>
+      </with>
     </with>
 
     \;
@@ -1286,20 +1314,22 @@
     \;
 
     <\with|par-left|1cm>
-      <\framed>
-        <\definition>
-          \;
+      <\with|par-right|1cm>
+        <\framed>
+          <\definition>
+            \;
 
-          \;
+            \;
 
-          A <with|font-series|bold|control flow graph> is a directed,
-          possibly cyclic graph whose nodes are program statements, and whose
-          edges are transitions between such statements. Each such edge has a
-          <with|font-series|bold|transitional condition>, which is a boolean
-          decision that must hold in the first node of the edge, in order for
-          the transition to be taken. \ 
-        </definition>
-      </framed>
+            A <with|font-series|bold|control flow graph> is a directed,
+            possibly cyclic graph whose nodes are program statements, and
+            whose edges are transitions between such statements. Each such
+            edge has a <with|font-series|bold|transitional condition>, which
+            is a boolean decision that must hold in the first node of the
+            edge, in order for the transition to be taken. \ 
+          </definition>
+        </framed>
+      </with>
     </with>
 
     \;
@@ -2263,12 +2293,315 @@
       I.e. methods not calling other methods, not containing any loop
       structures, and using only primitive and/or user-defined object types
       with no-param constructors.
-    </footnote>
+    </footnote>.
+
+    \;
+
+    <subsection|Could we create useful test suites?>
+
+    Before we go on to discuss other upcoming work, there is one particular
+    issue deserving of special attention. It is the question of whether or
+    not we can really generate <em|useful> test suites in an automatic
+    fashion - an important factor in estimating just how appropriate
+    KeYTestGen2 might be for an industrial context.\ 
+
+    \;
+
+    As can be seen in this work, while the current<\footnote>
+      Here, we mean the output of the resident test suite converters, in
+      particular the JUnit one.
+    </footnote> output of KeYTestGen satisfies many <em|technical> quality
+    measures (such as code coverage), it leaves very much to be desired in
+    terms <em|non-technical> qualities. An example of the latter would be
+    <em|code readability>, which we consider below
+
+    \;
+
+    <subsubsection|Code readability>
+
+    One of the great benefits of unit testing is that test cases can serve as
+    a form of documentation for the system under test. Each test case
+    demonstrates the (correct) operation of a given aspect of the system as a
+    whole (i.e. a unit), and can thus be very helpful both for existing and
+    new developers<\footnote>
+      Or customers, for that matter.
+    </footnote> to learn about how it works. Ideally, just as for normal
+    code, the code of test cases should richly documented<\footnote>
+      In terms of comments and JavaDoc.
+    </footnote> in order to make such understanding even easier.
+
+    \;
+
+    KeYTestGen2 is currently <em|not> able generate such test cases, and this
+    is rooted in the fact that it does not really ``understand'' the way
+    states are formed in the Java code it generates.
+
+    \ 
+
+    This is most visible in the way which KeYTestGen2 translates abstract
+    heap states to concrete ones. As we have shown in section 4, this process
+    is strictly mechanical, and KeYTestGen2 will make use of direct-access
+    tools such as reflection and Objenesis in order to <em|directly> create
+    and manipulate fields of objects on the heap. The problem here is that
+    KeYTestGen2 completely <em|misses> the <em|natural patterns> involved in
+    bringing the system from one state to another. The best it can do is to
+    create an artificial state <em|in situ>.\ 
+
+    The result of this process is code that a human being most likely would
+    <em|never> write, and hence, code which a human being most likely might
+    not find all too useful to read either.
+
+    \;
+
+    To illustrate, consider the simple class below, representing a piece in
+    some board game:
+
+    \;
+
+    <\with|par-left|1cm>
+      <\with|par-right|1cm>
+        <\framed>
+          <\example>
+            A simple game board piece.
+
+            <\cpp-code>
+              public class BoardPiece {
+
+              \ \ \ \ // ...
+
+              \ \ \ \ private int moves;
+
+              \ \ \ \ private int xCord;
+
+              \ \ \ \ private int yCord;
+
+              \;
+
+              \ \ \ \ public BoardPiece() {\ 
+
+              \ \ \ \ \ \ \ \ xCord = yCord = moves = 0;
+
+              \ \ \ \ }
+
+              \;
+
+              \ \ \ \ public moveUp {
+
+              \ \ \ \ \ \ \ \ ++moves;
+
+              \ \ \ \ \ \ \ \ ++yCord;
+
+              \ \ \ \ }
+
+              \;
+
+              \ \ \ \ public moveRight {
+
+              \ \ \ \ \ \ \ \ ++moves;
+
+              \ \ \ \ \ \ \ \ ++xCord
+
+              \ \ \ \ }
+
+              \ \ \ \ // ...
+
+              }
+            </cpp-code>
+          </example>
+        </framed>
+      </with>
+    </with>
+
+    \;
+
+    \;
+
+    Imagine that we want to set up a heap state where this piece has been
+    moved, say, twice right, twice up, and the twice right again. The
+    ``natural'' way of reaching this state is illustrated below, followed by
+    the same state generated by KeYTestGen2.\ 
+
+    \;
+
+    <\with|par-left|1cm>
+      <\with|par-right|1cm>
+        <\framed>
+          <\example>
+            A ``naturally'' created test fixture
+
+            <\cpp-code>
+              @Test
+
+              public void TestBoardPieceMove() {
+
+              \ \ \ \ 
+
+              \ \ \ \ // ...
+
+              \ \ \ \ BoardPiece piece = new BoardPiece();
+
+              \ \ \ \ 
+
+              \ \ \ \ piece.moveRight();
+
+              \ \ \ \ piece.moveRight();
+
+              \ \ \ \ 
+
+              \ \ \ \ piece.moveUp();
+
+              \ \ \ \ piece.moveUp();
+
+              \ \ \ \ 
+
+              \ \ \ \ piece.moveRight();
+
+              \ \ \ \ piece.moveRight();
+
+              \ \ \ \ // ...
+
+              }
+            </cpp-code>
+          </example>
+        </framed>
+      </with>
+    </with>
+
+    \;
+
+    \;
+
+    <\with|par-left|1cm>
+      <\with|par-right|1cm>
+        <\framed>
+          <\example>
+            The same fixture generated by KeYTestGen2.
+
+            <\cpp-code>
+              @Test
+
+              public void TestBoardPieceMove() {
+
+              \ \ \ \ // ...
+
+              \ \ \ \ 
+
+              \ \ \ \ BoardPiece piece = getObjectInstance(41);
+
+              \;
+
+              \ \ \ \ // ...
+
+              }
+
+              \;
+
+              // ...
+
+              \;
+
+              objectInstances.put(41, new BoardPiece());
+
+              \;
+
+              // ...
+
+              \;
+
+              {\ 
+
+              \ \ \ \ Boardpiece instance = getObjectInstance(41); \ \ \ \ \ 
+
+              \ \ \ \ setFieldValue(instance, "xCord", 4);\ 
+
+              \ \ \ \ setFieldValue(instance, "yCord", 2);
+
+              }
+            </cpp-code>
+          </example>
+        </framed>
+      </with>
+    </with>
+
+    \;
+
+    \ \ 
+
+    That the ``natural'' code is more expressive hardly needs justification.
+    It gets worse, however. Notice that the fixture directly generated by
+    KeYTestGen2 does <em|not even set the> <strong|<em|>moves> <em|field>,
+    while the natural code does so as a part of invoking the
+    <strong|moveLeft()> and <strong|moveRight()> methods. In other words, we
+    end up with two states which are <em|not even equivlanent>.
+
+    \;
+
+    This need not be as bad as it seems at first - if KeYTestGen2 had
+    <em|needed> the <strong|moves> field to be set, then it would have
+    discovered this while analysing the path condition during model
+    generation. However, this necessity is only based on the execution run
+    specificed by the path condition - and we are in either case still left
+    with <strong|piece> in a state which at least informally violates its
+    functional contract with regard to its implementation.
+
+    \;
+
+    To overcome these difficulties, we will need to make KeYTestGen
+    ``understand'' how to put a program in a given state, using nothing but
+    the methods the program itself provides in order to do so. While we do
+    not have a clear idea for how this could be done, it will certainly
+    involve deep introspection with regard to the Java code of the system
+    under test, and possibly aspects of machine learning. The potential
+    complexity of enabling this makes it a worthy project on its own,
+    separate from any other developments related to KeYTestGen2
+    itself<\footnote>
+      Yes, I am more or less certain what I will be doing for my master
+      thesis as this is being jotted down.
+    </footnote>. \ 
+
+    \;
+
+    \;
+
+    \;
+
+    \;
+
+    \;
 
     <subsection|Future work>
 
     Below, we outline some of the more interesting aspects of current and
     future work on KeYTestGen2.\ 
+
+    \;
+
+    \;
+
+    <subsubsection|Reducing external dependencies>
+
+    The current implementation of KeYTestGen2 depends on SMT solvers in order
+    to perform model generation. It is desirable to get rid of this
+    dependency, since it occurs an unreasonable overhead<\footnote>
+      The model generation process is currently the most time consuming
+      aspect of the execution cycle of KeYTestGen2, the largest bottleneck
+      being launching, waiting for, and gathering results from external
+      solvers.
+    </footnote> (translation to SMT formulas, launching of OS processes for
+    external solvers<\footnote>
+      One attempt to circumvent this problem was to extend KeY to support
+      <em|embedded> SMT solvers as part of KeY:s SMT interface. Together with
+      this, the SMTInterpol solver was embedded into KeY as a separate
+      project (KeYnterpol) in order to provide a basis for benchmarking.
+      Sadly, this setup turned out to function almost as poorly as its
+      external counterparts in concurrent runs, while being only slightly
+      better in single-threaded performance.
+    </footnote>, etc) for solving what are relatively simple problems,
+    consisting almost exclusively of integer and boolean comparisons.
+
+    \;
+
+    One way to achieve this could be to sc
 
     \;
 
@@ -2280,7 +2613,7 @@
         providing a primitive kind of statement coverage. To make it useful
         in actual development, it is desireable to provide at the very least
         the common forms<\footnote>
-          i.e. statemen, branch, condition and decision coverage.
+          i.e. statement, branch, condition and decision coverage.
         </footnote>, as well as at least one industrial-grade coverage
         criteria, such as MC/DC.\ 
       </with>
@@ -2312,7 +2645,7 @@
       this case (since it only involves transformation), and overall
       performance may as such be better. \ 
 
-      <item>
+      \;
     </itemize-dot>
 
     <subsubsection|Improved user feedback>
@@ -2333,31 +2666,33 @@
     \;
 
     <\with|par-left|1cm>
-      <\framed>
-        <\example>
-          \;
+      <\with|par-right|1cm>
+        <\framed>
+          <\example>
+            \;
 
-          \;
+            \;
 
-          An unreachable statement: <strong|return x;>
+            An unreachable statement: <strong|return x;>
 
-          <\cpp-code>
-            int a = 5;
+            <\cpp-code>
+              int a = 5;
 
-            int b = 4;
+              int b = 4;
 
-            if(a \<gtr\> b) {
+              if(a \<gtr\> b) {
 
-            \ \ \ if(b \<gtr\> a) {
+              \ \ \ if(b \<gtr\> a) {
 
-            \ \ \ \ \ \ return x;
+              \ \ \ \ \ \ return x;
 
-            \ \ \ }
+              \ \ \ }
 
-            }
-          </cpp-code>
-        </example>
-      </framed>
+              }
+            </cpp-code>
+          </example>
+        </framed>
+      </with>
     </with>
 
     \ \ \ 
@@ -2804,7 +3139,7 @@
     <associate|auto-38|<tuple|4.2.2|19>>
     <associate|auto-39|<tuple|4.2.3|19>>
     <associate|auto-4|<tuple|1.2.1|3>>
-    <associate|auto-40|<tuple|4.3|20>>
+    <associate|auto-40|<tuple|4.3|19>>
     <associate|auto-41|<tuple|2|20>>
     <associate|auto-42|<tuple|4.3.1|20>>
     <associate|auto-43|<tuple|4.3.2|21>>
@@ -2827,51 +3162,52 @@
     <associate|auto-59|<tuple|5.2|32>>
     <associate|auto-6|<tuple|1.3|4>>
     <associate|auto-60|<tuple|5.2.1|32>>
-    <associate|auto-61|<tuple|5.2.2|33>>
-    <associate|auto-62|<tuple|5.2.3|34>>
-    <associate|auto-63|<tuple|5.2.4|34>>
-    <associate|auto-64|<tuple|6|35>>
-    <associate|auto-65|<tuple|7|36>>
-    <associate|auto-66|<tuple|7.1|36>>
-    <associate|auto-67|<tuple|7.1.1|36>>
-    <associate|auto-68|<tuple|7.1.2|37>>
-    <associate|auto-69|<tuple|7.2|37>>
+    <associate|auto-61|<tuple|5.3|35>>
+    <associate|auto-62|<tuple|5.3.1|35>>
+    <associate|auto-63|<tuple|5.3.2|35>>
+    <associate|auto-64|<tuple|5.3.3|36>>
+    <associate|auto-65|<tuple|5.3.4|37>>
+    <associate|auto-66|<tuple|5.3.5|37>>
+    <associate|auto-67|<tuple|6|38>>
+    <associate|auto-68|<tuple|7|39>>
+    <associate|auto-69|<tuple|7.1|39>>
     <associate|auto-7|<tuple|1.3.1|4>>
-    <associate|auto-70|<tuple|7.2.1|37>>
-    <associate|auto-71|<tuple|7.2.2|37>>
-    <associate|auto-72|<tuple|<with|mode|<quote|math>|\<bullet\>>|38>>
-    <associate|auto-73|<tuple|8.0.3|?>>
-    <associate|auto-74|<tuple|<with|mode|<quote|math>|\<bullet\>>|?>>
+    <associate|auto-70|<tuple|7.1.1|39>>
+    <associate|auto-71|<tuple|7.1.2|40>>
+    <associate|auto-72|<tuple|7.2|40>>
+    <associate|auto-73|<tuple|7.2.1|40>>
+    <associate|auto-74|<tuple|7.2.2|40>>
+    <associate|auto-75|<tuple|<with|mode|<quote|math>|\<bullet\>>|41>>
     <associate|auto-8|<tuple|1.3.2|4>>
     <associate|auto-9|<tuple|1.3.3|4>>
-    <associate|bib-AhrendtEtAl2007|<tuple|1|38>>
-    <associate|bib-AhrendtEtAl2009|<tuple|2|38>>
-    <associate|bib-Beck1989|<tuple|4|38>>
+    <associate|bib-AhrendtEtAl2007|<tuple|1|41>>
+    <associate|bib-AhrendtEtAl2009|<tuple|2|41>>
+    <associate|bib-Beck1989|<tuple|4|41>>
     <associate|bib-Beckert01|<tuple|4|17>>
-    <associate|bib-BeckertEtAl2008|<tuple|9|38>>
-    <associate|bib-BeckertGladisch2007|<tuple|5|38>>
-    <associate|bib-BubelEtAl2009|<tuple|8|38>>
-    <associate|bib-DBLP:conf/pts/2010|<tuple|26|39>>
-    <associate|bib-Engel2006|<tuple|13|38>>
-    <associate|bib-EngelEtAl2008|<tuple|14|38>>
-    <associate|bib-EngelHaehnle07|<tuple|15|38>>
-    <associate|bib-Gladisch2008|<tuple|18|39>>
-    <associate|bib-Gladisch2008_TAP|<tuple|17|39>>
-    <associate|bib-Gladisch2010|<tuple|19|39>>
-    <associate|bib-Gladisch2012|<tuple|20|39>>
-    <associate|bib-HahnleEtAl2010|<tuple|21|39>>
-    <associate|bib-JCommanderWebsite|<tuple|6|38>>
-    <associate|bib-JML-Ref-Manual|<tuple|23|39>>
-    <associate|bib-JMLUnitNGWebsite|<tuple|3|38>>
-    <associate|bib-JMLwebsite|<tuple|10|38>>
-    <associate|bib-KeYwebsite|<tuple|11|38>>
-    <associate|bib-Paganelli2010|<tuple|16|38>>
-    <associate|bib-SoftwareEngineering9|<tuple|27|39>>
-    <associate|bib-TestNGwebsite|<tuple|7|38>>
-    <associate|bib-TestPatterns2007|<tuple|25|39>>
-    <associate|bib-dowson1997ariane|<tuple|12|38>>
-    <associate|bib-jazequel1997design|<tuple|22|39>>
-    <associate|bib-lions1996ariane|<tuple|24|39>>
+    <associate|bib-BeckertEtAl2008|<tuple|9|41>>
+    <associate|bib-BeckertGladisch2007|<tuple|5|41>>
+    <associate|bib-BubelEtAl2009|<tuple|8|41>>
+    <associate|bib-DBLP:conf/pts/2010|<tuple|26|42>>
+    <associate|bib-Engel2006|<tuple|13|41>>
+    <associate|bib-EngelEtAl2008|<tuple|14|41>>
+    <associate|bib-EngelHaehnle07|<tuple|15|41>>
+    <associate|bib-Gladisch2008|<tuple|18|42>>
+    <associate|bib-Gladisch2008_TAP|<tuple|17|42>>
+    <associate|bib-Gladisch2010|<tuple|19|42>>
+    <associate|bib-Gladisch2012|<tuple|20|42>>
+    <associate|bib-HahnleEtAl2010|<tuple|21|42>>
+    <associate|bib-JCommanderWebsite|<tuple|6|41>>
+    <associate|bib-JML-Ref-Manual|<tuple|23|42>>
+    <associate|bib-JMLUnitNGWebsite|<tuple|3|41>>
+    <associate|bib-JMLwebsite|<tuple|10|41>>
+    <associate|bib-KeYwebsite|<tuple|11|41>>
+    <associate|bib-Paganelli2010|<tuple|16|41>>
+    <associate|bib-SoftwareEngineering9|<tuple|27|42>>
+    <associate|bib-TestNGwebsite|<tuple|7|41>>
+    <associate|bib-TestPatterns2007|<tuple|25|42>>
+    <associate|bib-dowson1997ariane|<tuple|12|41>>
+    <associate|bib-jazequel1997design|<tuple|22|42>>
+    <associate|bib-lions1996ariane|<tuple|24|42>>
     <associate|footnote-1|<tuple|1|2>>
     <associate|footnote-10|<tuple|10|4>>
     <associate|footnote-11|<tuple|11|4>>
@@ -2901,9 +3237,14 @@
     <associate|footnote-33|<tuple|33|31>>
     <associate|footnote-34|<tuple|34|32>>
     <associate|footnote-35|<tuple|35|32>>
-    <associate|footnote-36|<tuple|36|36>>
-    <associate|footnote-37|<tuple|37|37>>
+    <associate|footnote-36|<tuple|36|33>>
+    <associate|footnote-37|<tuple|37|33>>
+    <associate|footnote-38|<tuple|38|35>>
+    <associate|footnote-39|<tuple|39|35>>
     <associate|footnote-4|<tuple|4|2>>
+    <associate|footnote-40|<tuple|40|39>>
+    <associate|footnote-41|<tuple|41|?>>
+    <associate|footnote-42|<tuple|42|?>>
     <associate|footnote-5|<tuple|5|3>>
     <associate|footnote-6|<tuple|6|3>>
     <associate|footnote-7|<tuple|7|4>>
@@ -2938,9 +3279,14 @@
     <associate|footnr-33|<tuple|33|31>>
     <associate|footnr-34|<tuple|34|32>>
     <associate|footnr-35|<tuple|35|32>>
-    <associate|footnr-36|<tuple|36|36>>
-    <associate|footnr-37|<tuple|37|37>>
+    <associate|footnr-36|<tuple|36|32>>
+    <associate|footnr-37|<tuple|37|33>>
+    <associate|footnr-38|<tuple|38|35>>
+    <associate|footnr-39|<tuple|39|35>>
     <associate|footnr-4|<tuple|4|2>>
+    <associate|footnr-40|<tuple|40|39>>
+    <associate|footnr-41|<tuple|41|?>>
+    <associate|footnr-42|<tuple|42|?>>
     <associate|footnr-5|<tuple|5|3>>
     <associate|footnr-6|<tuple|6|3>>
     <associate|footnr-7|<tuple|7|4>>
@@ -3256,61 +3602,73 @@
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-58>>
 
-      <with|par-left|<quote|1.5fn>|5.2<space|2spc>Future work
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1.5fn>|5.2<space|2spc>Could we create useful test
+      suites? <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-59>>
 
-      <with|par-left|<quote|3fn>|5.2.1<space|2spc>Code coverage
+      <with|par-left|<quote|3fn>|5.2.1<space|2spc>Code readability
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-60>>
 
-      <with|par-left|<quote|3fn>|5.2.2<space|2spc>Improved user feedback
+      <with|par-left|<quote|1.5fn>|5.3<space|2spc>Future work
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-61>>
 
-      <with|par-left|<quote|3fn>|5.2.3<space|2spc>KeY integration
+      <with|par-left|<quote|3fn>|5.3.1<space|2spc>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-62>>
 
-      <with|par-left|<quote|3fn>|5.2.4<space|2spc>Support for more frameworks
-      and test granularities <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|3fn>|5.3.2<space|2spc>Code coverage
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-63>>
+
+      <with|par-left|<quote|3fn>|5.3.3<space|2spc>Improved user feedback
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-64>>
+
+      <with|par-left|<quote|3fn>|5.3.4<space|2spc>KeY integration
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-65>>
+
+      <with|par-left|<quote|3fn>|5.3.5<space|2spc>Support for more frameworks
+      and test granularities <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-66>>
 
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|6<space|2spc>Conclusion>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-64><vspace|0.5fn>
+      <no-break><pageref|auto-67><vspace|0.5fn>
 
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|7<space|2spc>Appendix
       A - KeYTestGen requirements.> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-65><vspace|0.5fn>
+      <no-break><pageref|auto-68><vspace|0.5fn>
 
       <with|par-left|<quote|1.5fn>|7.1<space|2spc>Test Case Inputs
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-66>>
+      <no-break><pageref|auto-69>>
 
       <with|par-left|<quote|3fn>|7.1.1<space|2spc>User Requirements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-67>>
+      <no-break><pageref|auto-70>>
 
       <with|par-left|<quote|3fn>|7.1.2<space|2spc>Technical Requirements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-68>>
+      <no-break><pageref|auto-71>>
 
       <with|par-left|<quote|1.5fn>|7.2<space|2spc>Test Oracle
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-69>>
+      <no-break><pageref|auto-72>>
 
       <with|par-left|<quote|3fn>|7.2.1<space|2spc>User Requirements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-70>>
+      <no-break><pageref|auto-73>>
 
       <with|par-left|<quote|3fn>|7.2.2<space|2spc>Technical Requirements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-71>>
+      <no-break><pageref|auto-74>>
 
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|Bibliography>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-72><vspace|0.5fn>
+      <no-break><pageref|auto-75><vspace|0.5fn>
     </associate>
   </collection>
 </auxiliary>

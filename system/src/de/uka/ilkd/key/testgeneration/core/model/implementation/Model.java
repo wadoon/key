@@ -57,8 +57,15 @@ public class Model implements IModel {
             return;
         }
 
+        /*
+         * Check if the variable already exists in the buffer.
+         */
         ModelVariable localVariable = lookupVariable(variable);
 
+        /*
+         * If it does, configure it properly according to the provided value,
+         * and proceed with adding it to the model.
+         */
         if (localVariable == null) {
 
             variable.setValue(instance);
@@ -68,6 +75,11 @@ public class Model implements IModel {
             }
 
             variables.add(variable);
+
+            /*
+             * If it is not, then simply update the value currently pointed to
+             * by the existing variable.
+             */
         } else {
 
             if (instance instanceof ModelInstance) {

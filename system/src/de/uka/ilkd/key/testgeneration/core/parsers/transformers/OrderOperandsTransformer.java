@@ -112,7 +112,8 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
             /*
              * Construct a new tree with the transformed literals.
              */
-            Term newTerm = constructTree(sortedIdentifiers, identifierMapping, operator);
+            Term newTerm = constructTree(sortedIdentifiers, identifierMapping,
+                    operator);
             return newTerm;
         } else {
 
@@ -123,19 +124,21 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
     private Term constructTree(PriorityQueue<String> sortedIdentifiers,
             Map<String, Term> mappings, Operator operator) {
 
-        String leftIdentifier = sortedIdentifiers.poll();
-        Term leftChild = mappings.get(leftIdentifier);
-        Term rightChild = null;
+        if (sortedIdentifiers.size() == 0) {
+            return null;
 
-        if (sortedIdentifiers.size() > 1) {
-            rightChild = constructTree(sortedIdentifiers, mappings, operator);
+        } else if (sortedIdentifiers.size() == 1) {
+            return mappings.get(sortedIdentifiers.poll());
 
         } else {
-            String rightIdentifier = sortedIdentifiers.poll();
-            rightChild = mappings.get(rightIdentifier);
-        }
 
-        return termFactory.createTerm(operator, leftChild, rightChild);
+            String leftIdentifier = sortedIdentifiers.poll();
+            Term leftChild = mappings.get(leftIdentifier);
+            Term rightChild = constructTree(sortedIdentifiers, mappings,
+                    operator);
+
+            return termFactory.createTerm(operator, leftChild, rightChild);
+        }
     }
 
     private void collectLiteralsFromTree(Term term, Operator operator,

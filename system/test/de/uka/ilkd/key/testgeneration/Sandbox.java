@@ -53,13 +53,7 @@ public class Sandbox extends KeYTestGenTest {
                 System.out.println(node.getFormatedPathCondition());
         }
     }
-    
-    @Test
-    public void test2() throws IOException {
-        
-        
-    }
-
+   
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
             String method) throws ProofInputException, ModelGeneratorException,
             IOException, ProblemLoaderException {

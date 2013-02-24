@@ -1,9 +1,12 @@
 package de.uka.ilkd.key.testgeneration;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +41,7 @@ public class TestJUnitTestCaseGenerator {
         List<String> output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        codeCoverageParser, junitConverter, "midOneProxyOneInstance");
+                        codeCoverageParser, junitConverter, "mid");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(
@@ -49,7 +52,12 @@ public class TestJUnitTestCaseGenerator {
             System.out.println(entry.getKey() + " : " + entry.getValue()
                     + " milliseconds");
         }
-        System.out.println(output);
+        
+        String toWrite = output.get(0);
+        File target = new File("/home/christopher/git/key/eclipse/system/test/PrimitiveIntegerOperationsTestClass/Test_PrimitiveIntegerOperations_mid.java");
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(target));
+        bufferedWriter.write(toWrite);
+        bufferedWriter.close();
     }
 
     private <T> T get(Object o) {

@@ -1,7 +1,10 @@
 package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
 
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -11,7 +14,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.testgeneration.core.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.core.parsers.TermParserException;
 
 /**
  * This class provides a lightweight framework for implementing {@link Term}
@@ -162,38 +169,54 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformFunction(final Term term)
             throws TermTransformerException {
 
-        /*
-         * Order is crucial for proper resolution here, as the precise,
-         * legitimate parent-child relationships between various Function-type
-         * terms are not excplicitly spelled out in terms of type relationships.
-         */
-        if (isNullSort(term)) {
-            return transformNull(term);
-        }
+        try {
 
-        if (isSortDependingFunction(term)) {
-            return transformSortDependentFunction(term);
-        }
+            /*
+             * Order is crucial for proper resolution here, as the precise,
+             * legitimate parent-child relationships between various
+             * Function-type terms are not excplicitly spelled out in terms of
+             * type relationships.
+             */
+            if (isNullSort(term)) {
+                return transformNull(term);
+            }
 
-        if (isBinaryFunction(term)) {
-            return transformBinaryFunction(term);
-        }
+            if (isSortDependingFunction(term)) {
+                return transformSortDependentFunction(term);
+            }
 
-        if (isUnaryFunction(term)) {
-            return transformUnaryFunction(term);
-        }
+            if (isBinaryFunction(term)) {
+                return transformBinaryFunction(term);
+            }
 
-        if (isLiteral(term)) {
-            return transformLiteral(term);
-        }
+            if (isUnaryFunction(term)) {
+                return transformUnaryFunction(term);
+            }
 
-        if (isObserverFunction(term)) {
-            return transformObserverFunction(term);
+            if (isLiteral(term)) {
+                return transformLiteral(term);
+            }
 
+            if (isObserverFunction(term)) {
+                return transformObserverFunction(term);
+
+            }
+
+            if (isBooleanConstant(term)) {
+                return transformBooleanConstant(term);
+            }
+
+        } catch (TermParserException e) {
+
+            throw new TermTransformerException(e.getMessage());
         }
 
         throw new TermTransformerException("Unsupported Function: "
                 + term.op().name());
+    }
+
+    private Term transformBooleanConstant(Term term) {
+        return term;
     }
 
     /**
@@ -335,5 +358,20 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         Term secondChild = transformTerm(term.sub(1));
 
         return termFactory.createTerm(term.op(), firstChild, secondChild);
+    }
+
+    protected Term createTrueConstant() {
+
+        Name name = new Name("TRUE");
+        Sort sort = new SortImpl(new Name(BOOLEAN));
+        Function function = new Function(name, sort);
+        return termFactory.createTerm(function);
+    }
+
+    protected Term createFalseConstant() {
+        Name name = new Name("FALSE");
+        Sort sort = new SortImpl(new Name(BOOLEAN));
+        Function function = new Function(name, sort);
+        return termFactory.createTerm(function);
     }
 }

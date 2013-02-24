@@ -268,9 +268,7 @@ public class ModelGenerator implements IModelGenerator {
              * There is hence nothing useful we can do with it, and we just
              * return it as null.
              */
-            Term simplifiedPathCondition;
-
-            simplifiedPathCondition = PathconditionTools
+            Term simplifiedPathCondition = PathconditionTools
                     .simplifyTerm(pathCondition);
 
             if (simplifiedPathCondition == null) {
@@ -317,7 +315,7 @@ public class ModelGenerator implements IModelGenerator {
 
             /*
              * Create the initial Model, without any concrete values assigned to
-             * primitive values in it.
+             * primitive integer values in it.
              */
             Model model = PathconditionTools.termToModel(pathCondition,
                     services, mediator);
@@ -340,6 +338,8 @@ public class ModelGenerator implements IModelGenerator {
                 return model;
             }
         } catch (ProofInputException e) {
+            throw new ModelGeneratorException(e.getMessage());
+        } catch (TermTransformerException e) {
             throw new ModelGeneratorException(e.getMessage());
         }
     }
