@@ -1626,9 +1626,25 @@
     symbolic execution tree we will need to reach in order to reach any of
     the code coverage criteria defined in section 2, and more.
 
+    <subsection|Symbolic Debugging>
+
+    While we have shown that the symbolic execution process of KeY is clearly
+    useful for test case generation, we still have not shown how to tap into
+    this potential.\ 
+
     \;
 
-    <subsection|>
+    The earlier KeYTestGen did so by integrating <em|directly> with the proof
+    process. The approach of KeYTestGen2 is different - rather than
+    interacting directly with the KeY core, we go via an intermediary - the
+    Symbolic Debugger.
+
+    \;
+
+    <subsubsection|Overview>
+
+    The Symbolic Debugger is a project to create, as part of KeY, a
+    sophisticated system for visualizing the execution of Java code.\ 
 
     <new-page*><section|Implementation>
 
@@ -3341,55 +3357,56 @@
     <associate|auto-33|<tuple|1|17>>
     <associate|auto-34|<tuple|3.2.1|19>>
     <associate|auto-35|<tuple|3.3|19>>
-    <associate|auto-36|<tuple|4|19>>
-    <associate|auto-37|<tuple|4.1|20>>
-    <associate|auto-38|<tuple|4.1.1|20>>
-    <associate|auto-39|<tuple|4.2|21>>
+    <associate|auto-36|<tuple|3.3.1|19>>
+    <associate|auto-37|<tuple|4|20>>
+    <associate|auto-38|<tuple|4.1|20>>
+    <associate|auto-39|<tuple|4.1.1|21>>
     <associate|auto-4|<tuple|1.2.1|3>>
-    <associate|auto-40|<tuple|2|21>>
-    <associate|auto-41|<tuple|4.2.1|21>>
-    <associate|auto-42|<tuple|4.2.2|21>>
-    <associate|auto-43|<tuple|4.2.3|22>>
-    <associate|auto-44|<tuple|4.3|22>>
-    <associate|auto-45|<tuple|3|23>>
-    <associate|auto-46|<tuple|4.3.1|25>>
-    <associate|auto-47|<tuple|4.3.2|27>>
-    <associate|auto-48|<tuple|4|27>>
-    <associate|auto-49|<tuple|5|28>>
+    <associate|auto-40|<tuple|4.2|21>>
+    <associate|auto-41|<tuple|2|21>>
+    <associate|auto-42|<tuple|4.2.1|21>>
+    <associate|auto-43|<tuple|4.2.2|22>>
+    <associate|auto-44|<tuple|4.2.3|22>>
+    <associate|auto-45|<tuple|4.3|23>>
+    <associate|auto-46|<tuple|3|25>>
+    <associate|auto-47|<tuple|4.3.1|27>>
+    <associate|auto-48|<tuple|4.3.2|27>>
+    <associate|auto-49|<tuple|4|28>>
     <associate|auto-5|<tuple|1.2.2|3>>
-    <associate|auto-50|<tuple|4.3.3|28>>
-    <associate|auto-51|<tuple|4.3.4|29>>
-    <associate|auto-52|<tuple|4.4|29>>
-    <associate|auto-53|<tuple|6|30>>
-    <associate|auto-54|<tuple|4.4.1|30>>
-    <associate|auto-55|<tuple|4.4.2|30>>
-    <associate|auto-56|<tuple|4.5|30>>
-    <associate|auto-57|<tuple|7|32>>
-    <associate|auto-58|<tuple|4.5.1|32>>
-    <associate|auto-59|<tuple|5|32>>
+    <associate|auto-50|<tuple|5|28>>
+    <associate|auto-51|<tuple|4.3.3|29>>
+    <associate|auto-52|<tuple|4.3.4|29>>
+    <associate|auto-53|<tuple|4.4|30>>
+    <associate|auto-54|<tuple|6|30>>
+    <associate|auto-55|<tuple|4.4.1|30>>
+    <associate|auto-56|<tuple|4.4.2|30>>
+    <associate|auto-57|<tuple|4.5|32>>
+    <associate|auto-58|<tuple|7|32>>
+    <associate|auto-59|<tuple|4.5.1|32>>
     <associate|auto-6|<tuple|1.2.3|4>>
-    <associate|auto-60|<tuple|5.1|34>>
-    <associate|auto-61|<tuple|5.1.1|34>>
-    <associate|auto-62|<tuple|5.1.2|34>>
-    <associate|auto-63|<tuple|5.2|37>>
-    <associate|auto-64|<tuple|5.2.1|37>>
-    <associate|auto-65|<tuple|5.3|38>>
-    <associate|auto-66|<tuple|5.3.1|38>>
-    <associate|auto-67|<tuple|5.3.2|39>>
-    <associate|auto-68|<tuple|5.3.3|39>>
-    <associate|auto-69|<tuple|5.3.4|40>>
+    <associate|auto-60|<tuple|5|34>>
+    <associate|auto-61|<tuple|5.1|34>>
+    <associate|auto-62|<tuple|5.1.1|34>>
+    <associate|auto-63|<tuple|5.1.2|37>>
+    <associate|auto-64|<tuple|5.2|37>>
+    <associate|auto-65|<tuple|5.2.1|38>>
+    <associate|auto-66|<tuple|5.3|38>>
+    <associate|auto-67|<tuple|5.3.1|39>>
+    <associate|auto-68|<tuple|5.3.2|39>>
+    <associate|auto-69|<tuple|5.3.3|40>>
     <associate|auto-7|<tuple|1.3|4>>
-    <associate|auto-70|<tuple|5.3.5|41>>
-    <associate|auto-71|<tuple|6|41>>
-    <associate|auto-72|<tuple|7|41>>
-    <associate|auto-73|<tuple|7.1|42>>
-    <associate|auto-74|<tuple|7.1.1|42>>
-    <associate|auto-75|<tuple|7.1.2|42>>
-    <associate|auto-76|<tuple|7.2|42>>
-    <associate|auto-77|<tuple|7.2.1|43>>
-    <associate|auto-78|<tuple|7.2.2|?>>
-    <associate|auto-79|<tuple|<with|mode|<quote|math>|\<bullet\>>|?>>
+    <associate|auto-70|<tuple|5.3.4|41>>
+    <associate|auto-71|<tuple|5.3.5|41>>
+    <associate|auto-72|<tuple|6|41>>
+    <associate|auto-73|<tuple|7|42>>
+    <associate|auto-74|<tuple|7.1|42>>
+    <associate|auto-75|<tuple|7.1.1|42>>
+    <associate|auto-76|<tuple|7.1.2|42>>
+    <associate|auto-77|<tuple|7.2|43>>
+    <associate|auto-78|<tuple|7.2.1|?>>
+    <associate|auto-79|<tuple|7.2.2|?>>
     <associate|auto-8|<tuple|1.3.1|4>>
+    <associate|auto-80|<tuple|<with|mode|<quote|math>|\<bullet\>>|?>>
     <associate|auto-9|<tuple|1.3.2|5>>
     <associate|bib-AhrendtEtAl2007|<tuple|2|43>>
     <associate|bib-AhrendtEtAl2009|<tuple|3|43>>
