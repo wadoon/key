@@ -19,7 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.PathconditionTools;
+import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -87,7 +87,7 @@ public class TestConditionParsing extends KeYTestGenTest {
         // printDebug(method, targetNode);
 
         System.out
-                .println(PathconditionTools.simplifyTerm(targetNodeCondition));
+                .println(ModelGenerationTools.simplifyTerm(targetNodeCondition));
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

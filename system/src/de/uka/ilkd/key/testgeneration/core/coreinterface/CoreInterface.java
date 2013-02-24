@@ -24,9 +24,9 @@ import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelMediator;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.PathconditionTools;
+import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.ContractExtractor;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.PostconditionTools;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
@@ -300,7 +300,7 @@ public enum CoreInterface {
              * contracts.
              */
             Term postcondition = method.getPostconditions().get(0);
-            oracle = PostconditionTools.termToOracle(postcondition);
+            oracle = OracleGenerationTools.termToOracle(postcondition);
 
         } catch (InterruptedException ie) {
 

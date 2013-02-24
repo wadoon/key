@@ -17,6 +17,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.core.model.IModel;
 import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
@@ -268,7 +269,7 @@ public class ModelGenerator implements IModelGenerator {
              * There is hence nothing useful we can do with it, and we just
              * return it as null.
              */
-            Term simplifiedPathCondition = PathconditionTools
+            Term simplifiedPathCondition = ModelGenerationTools
                     .simplifyTerm(pathCondition);
 
             if (simplifiedPathCondition == null) {
@@ -317,7 +318,7 @@ public class ModelGenerator implements IModelGenerator {
              * Create the initial Model, without any concrete values assigned to
              * primitive integer values in it.
              */
-            Model model = PathconditionTools.termToModel(pathCondition,
+            Model model = ModelGenerationTools.termToModel(pathCondition,
                     services, mediator);
 
             /*

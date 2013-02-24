@@ -21,7 +21,7 @@ import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.PostconditionTools;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
@@ -738,7 +738,7 @@ public class JUnitTestSuite {
                      * Simplify the postcondition
                      */
                     Term oracle = testCase.getOracle();
-                    Term simplifiedOracle = PostconditionTools
+                    Term simplifiedOracle = OracleGenerationTools
                             .simplifyPostCondition(oracle, SEPARATOR);
 
                     /*

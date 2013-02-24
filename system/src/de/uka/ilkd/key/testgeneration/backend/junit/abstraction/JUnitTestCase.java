@@ -3,7 +3,7 @@ package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
 import junit.framework.Assert;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.PostconditionTools;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
@@ -65,7 +65,7 @@ public class JUnitTestCase {
              * put it in CNF, order the operands, and simplify all conjunctions
              * and disjunctions.
              */
-            Term simplifiedPostcondition = PostconditionTools
+            Term simplifiedPostcondition = OracleGenerationTools
                     .simplifyPostCondition(wrappedTestCase.getOracle(), "_");
 
             simplifiedPostcondition = new CNFTransformer()
