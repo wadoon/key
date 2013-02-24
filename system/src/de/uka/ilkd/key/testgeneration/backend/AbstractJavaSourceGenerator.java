@@ -170,8 +170,13 @@ public abstract class AbstractJavaSourceGenerator {
          */
         output.append("(");
         if (parameters != null && parameters.length != 0) {
-            for (String parameter : parameters) {
-                output.append(parameter + " ");
+            for (int i = 0; i < parameters.length; i++) {
+                String parameter = parameters[i];
+                if (i < parameters.length - 1) {
+                    output.append(parameter + ", ");
+                } else {
+                    output.append(parameter);
+                }
             }
         }
         output.append(")");

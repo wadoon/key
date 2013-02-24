@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgeneration.core.model.implementation;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -64,20 +65,9 @@ public class ModelVariable implements IHeapObject {
     private boolean isParameter = false;
 
     /**
-     * Indicates whether this variable is declared static.
-     */
-    private final boolean isStatic;
-
-    /**
-     * Indicates whether this variable is declared as final or not.
-     */
-    private final boolean isFinal;
-
-    /**
      * The type of the variable.
      */
     private final String type;
-
 
     /**
      * Create a ModelVariable from an existing {@link ProgramVariable},
@@ -86,18 +76,17 @@ public class ModelVariable implements IHeapObject {
      * 
      * @param programVariable
      */
-    public ModelVariable(ProgramVariable programVariable, String identifier,
+    public ModelVariable(IProgramVariable programVariable, String identifier,
             ModelInstance referedInstance) {
 
         this.identifier = identifier;
         this.boundValue = referedInstance;
         this.type = programVariable.getKeYJavaType().getJavaType()
                 .getFullName();
-        this.isStatic = programVariable.isStatic();
-        this.isFinal = programVariable.isFinal();
+
     }
 
-    public ModelVariable(ProgramVariable programVariable, String identifier) {
+    public ModelVariable(IProgramVariable programVariable, String identifier) {
 
         this(programVariable, identifier, null);
     }
@@ -201,22 +190,6 @@ public class ModelVariable implements IHeapObject {
     public void setParentModelInstance(ModelInstance parentModelInstance) {
 
         this.parentModelInstance = parentModelInstance;
-    }
-
-    /**
-     * @return true if this variable is declared as static, false otherwise
-     */
-    public boolean isStatic() {
-
-        return isStatic();
-    }
-
-    /**
-     * @return true if this variable is declared as final, false otherwise
-     */
-    public boolean isFinal() {
-
-        return isFinal();
     }
 
     /**

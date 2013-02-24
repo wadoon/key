@@ -83,6 +83,7 @@ public class KeYJavaMethod {
          * TODO: This violates the abstraction in a very ugly way, is there no
          * nicer way to get the parameters?
          */
+        programMethod.getParameters();
         return functionalContract.getParameters();
     }
 

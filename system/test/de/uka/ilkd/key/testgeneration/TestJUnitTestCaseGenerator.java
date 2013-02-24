@@ -53,7 +53,9 @@ public class TestJUnitTestCaseGenerator {
                     + " milliseconds");
         }
         
+        
         String toWrite = output.get(0);
+        System.out.println(toWrite);
         File target = new File("/home/christopher/git/key/eclipse/system/test/PrimitiveIntegerOperationsTestClass/Test_PrimitiveIntegerOperations_mid.java");
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(target));
         bufferedWriter.write(toWrite);
