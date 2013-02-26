@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ContractWrapper;
@@ -47,15 +48,7 @@ public enum KeYJavaClassFactory {
             KeYInterfaceException {
 
         /*
-         * TODO: this is OS specific and makes too many assumptions on file
-         * format. Not good.
-         */
-        String name = javaFile.getAbsolutePath();
-        int delimiter = name.lastIndexOf("/");
-        name = name.substring(delimiter + 1, name.length() - 5);
-
-        /*
-         * Load the file into KeY and set the InitConfig instance for it.
+         * Load the file into KeY and get the InitConfig instance for it.
          */
         InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
 
@@ -69,6 +62,15 @@ public enum KeYJavaClassFactory {
         String fileName = getFileName(javaFile);
         KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
+        /*
+         * TODO: this is OS specific and makes too many assumptions on file
+         * format. Not good.
+         */
+        String name = mainClass.getName();
+        int delimiter = name.lastIndexOf(".");
+        name = name.substring(delimiter + 1);
+
+        
         /*
          * Extract the package of the class
          */
@@ -109,6 +111,11 @@ public enum KeYJavaClassFactory {
         }
 
         return javaClass;
+    }
+    
+    public KeYJavaClass createKeYJavaClass(KeYJavaType classType) {
+        
+        return null;
     }
 
     /**

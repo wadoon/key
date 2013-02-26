@@ -58,7 +58,7 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid1 () {
-        PrimitiveIntegerOperations self = getObjectInstance(6);
+        PrimitiveIntegerOperations self = getObjectInstance(5);
         int x = -1;
         int y = -1;
         int z = 0;
@@ -107,7 +107,7 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid2 () {
-        PrimitiveIntegerOperations self = getObjectInstance(4);
+        PrimitiveIntegerOperations self = getObjectInstance(3);
         int x = 0;
         int y = -1;
         int z = 0;
@@ -205,7 +205,7 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid4 () {
-        PrimitiveIntegerOperations self = getObjectInstance(3);
+        PrimitiveIntegerOperations self = getObjectInstance(4);
         int x = 1;
         int y = 1;
         int z = 0;
@@ -254,7 +254,7 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid5 () {
-        PrimitiveIntegerOperations self = getObjectInstance(5);
+        PrimitiveIntegerOperations self = getObjectInstance(6);
         int x = 0;
         int y = 0;
         int z = 0;
@@ -342,25 +342,17 @@ public  class Test_PrimitiveIntegerOperations_mid {
          * of each object instance as necessary
          */
         objectInstances.put(2, new PrimitiveIntegerOperations());
-        objectInstances.put(6, new PrimitiveIntegerOperations());
-        objectInstances.put(4, new PrimitiveIntegerOperations());
-        objectInstances.put(1, new PrimitiveIntegerOperations());
-        objectInstances.put(3, new PrimitiveIntegerOperations());
         objectInstances.put(5, new PrimitiveIntegerOperations());
+        objectInstances.put(3, new PrimitiveIntegerOperations());
+        objectInstances.put(1, new PrimitiveIntegerOperations());
+        objectInstances.put(4, new PrimitiveIntegerOperations());
+        objectInstances.put(6, new PrimitiveIntegerOperations());
         {
             PrimitiveIntegerOperations instance = getObjectInstance(2);
         }
         
         {
-            PrimitiveIntegerOperations instance = getObjectInstance(6);
-        }
-        
-        {
-            PrimitiveIntegerOperations instance = getObjectInstance(4);
-        }
-        
-        {
-            PrimitiveIntegerOperations instance = getObjectInstance(1);
+            PrimitiveIntegerOperations instance = getObjectInstance(5);
         }
         
         {
@@ -368,7 +360,15 @@ public  class Test_PrimitiveIntegerOperations_mid {
         }
         
         {
-            PrimitiveIntegerOperations instance = getObjectInstance(5);
+            PrimitiveIntegerOperations instance = getObjectInstance(1);
+        }
+        
+        {
+            PrimitiveIntegerOperations instance = getObjectInstance(4);
+        }
+        
+        {
+            PrimitiveIntegerOperations instance = getObjectInstance(6);
         }
         
     }

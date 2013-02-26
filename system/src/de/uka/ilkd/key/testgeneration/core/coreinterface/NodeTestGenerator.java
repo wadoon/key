@@ -29,6 +29,7 @@ public enum NodeTestGenerator {
         KeYJavaType parent = method.getContainerType();
         String packageDeclaration = parent.getJavaType().getFullName();
         
+        KeYJava
 
         return null;
     }
