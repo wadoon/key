@@ -87,12 +87,6 @@ public class ModelGenerationTools {
      * @return the Model instance built from the Term
      * @throws TermTransformerException
      */
-    public static Model termToModel(Term pathCondition, Services services,
-            ModelMediator mediator) throws TermTransformerException {
-
-        return TermToModelConverter.createModel(pathCondition, services,
-                mediator);
-    }
 
     private static class TermSimplificationTransformer extends
             AbstractTermTransformer {

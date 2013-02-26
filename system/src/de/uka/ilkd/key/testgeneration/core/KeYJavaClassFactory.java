@@ -6,17 +6,26 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.PackageReference;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.RuleCollection;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
@@ -96,13 +105,6 @@ public enum KeYJavaClassFactory {
         }
 
         return javaClass;
-    }
-    
-    public KeYJavaClass createKeYJavaClass(KeYJavaType classType, Services services) {
-        
-        
-        
-        return null;
     }
 
     /**

@@ -4,7 +4,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 
-class EliminateConjunctionsTransformer extends AbstractTermTransformer {
+public class EliminateConjunctionsTransformer extends AbstractTermTransformer {
 
     @Override
     public Term transform(Term term) throws TermTransformerException {

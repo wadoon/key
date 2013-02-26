@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
 
 /**
  * Encapsulates logic needed to construct Test Suites directly from individual
@@ -16,7 +17,7 @@ import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
  */
 public enum NodeTestGenerator {
     INSTANCE;
-
+    
     public TestSuite constructTestSuiteFromNode(IExecutionNode node) {
 
         KeYMediator mediator = node.getMediator();
