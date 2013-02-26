@@ -4,10 +4,10 @@ import junit.framework.Assert;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.ConjunctionNormalFormTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.CNFTermChecker;
 
 /**

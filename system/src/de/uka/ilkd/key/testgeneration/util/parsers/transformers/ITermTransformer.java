@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
+package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.TermTransformer;

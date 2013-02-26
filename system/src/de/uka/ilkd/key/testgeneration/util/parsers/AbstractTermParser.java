@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.parsers;
+package de.uka.ilkd.key.testgeneration.util.parsers;
 
 import java.util.LinkedList;
 
@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
 /**
  * Children of this class represent parsers which can be used to in various ways

@@ -22,11 +22,11 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.ConjunctionNormalFormTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
-import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
 /**
  * Represents a JUnit test suite. It consists of a set of {@link JUnitTestCase}

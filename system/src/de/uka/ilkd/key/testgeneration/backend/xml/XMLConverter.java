@@ -31,8 +31,8 @@ import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
-import de.uka.ilkd.key.testgeneration.core.parsers.visitors.XMLVisitorException;
+import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
+import de.uka.ilkd.key.testgeneration.util.parsers.visitors.XMLVisitorException;
 
 /**
  * Provides functionality for turning a set of {@link TestCase} instances into a

@@ -4,10 +4,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.StringConstants;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.ConjunctionNormalFormTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
 /**
  * Contains various methods related to processing the postconditions of methods

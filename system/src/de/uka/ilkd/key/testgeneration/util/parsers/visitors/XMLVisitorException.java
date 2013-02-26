@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.parsers.visitors;
+package de.uka.ilkd.key.testgeneration.util.parsers.visitors;
 
 import de.uka.ilkd.key.testgeneration.KeYTestGenException;
 

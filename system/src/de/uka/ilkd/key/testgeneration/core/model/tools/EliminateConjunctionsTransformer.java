@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.testgeneration.core.model.tools;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.AbstractTermTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
 public class EliminateConjunctionsTransformer extends AbstractTermTransformer {
 

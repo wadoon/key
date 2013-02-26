@@ -1,8 +1,8 @@
-package de.uka.ilkd.key.testgeneration.core.parsers.visitors;
+package de.uka.ilkd.key.testgeneration.util.parsers.visitors;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.testgeneration.core.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
 
 /**
  * Used to define a custom set of {@link Term} visitors used in KeYTestGen.

@@ -10,9 +10,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelMediator;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.AbstractTermTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
 /**
  * Provides various methods for processing the pathconditions for

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
+package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -17,8 +17,8 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.testgeneration.core.parsers.AbstractTermParser;
-import de.uka.ilkd.key.testgeneration.core.parsers.TermParserException;
+import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 
 /**
  * This class provides a lightweight framework for implementing {@link Term}

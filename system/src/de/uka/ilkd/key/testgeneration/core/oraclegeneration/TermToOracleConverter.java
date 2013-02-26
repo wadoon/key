@@ -5,10 +5,10 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.AbstractTermTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.OrderOperandsTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveSDPsTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.AbstractTermTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.OrderOperandsTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.RemoveSDPsTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
 public class TermToOracleConverter extends AbstractTermTransformer {
 

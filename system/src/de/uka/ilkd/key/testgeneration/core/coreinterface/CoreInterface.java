@@ -23,15 +23,14 @@ import de.uka.ilkd.key.testgeneration.core.model.IModel;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelMediator;
 import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.ConjunctionNormalFormTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
 /**
  * Instances of this class provide a single interface between backend modules

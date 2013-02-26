@@ -1,6 +1,6 @@
-package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
+package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 
-import de.uka.ilkd.key.testgeneration.core.parsers.TermParserException;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 
 public class TermTransformerException extends TermParserException {
 

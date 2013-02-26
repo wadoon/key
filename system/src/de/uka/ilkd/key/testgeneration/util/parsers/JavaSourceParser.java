@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.parsers;
+package de.uka.ilkd.key.testgeneration.util.parsers;
 
 import java.io.File;
 import java.io.FileInputStream;

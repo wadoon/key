@@ -20,7 +20,7 @@ import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestConditionParsing extends KeYTestGenTest {

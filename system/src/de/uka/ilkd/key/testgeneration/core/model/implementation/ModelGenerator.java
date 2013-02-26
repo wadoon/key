@@ -35,11 +35,11 @@ import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.tools.EliminateConjunctionsTransformer;
 import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
-import de.uka.ilkd.key.testgeneration.core.parsers.TermParserException;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.NegationNormalFormTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveIfThenElseTransformer;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
-import de.uka.ilkd.key.testgeneration.core.parsers.visitors.KeYTestGenTermVisitor;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.NegationNormalFormTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.RemoveIfThenElseTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default

@@ -29,7 +29,7 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.parsers.JavaSourceParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.JavaSourceParser;
 
 /**
  * Produces instances of {@link KeYJavaClass}.

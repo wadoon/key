@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
+package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -7,7 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.testgeneration.core.parsers.TermParserException;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 
 /**
  * A Transformer which removes {@link IfThenElse} statements from a Term,

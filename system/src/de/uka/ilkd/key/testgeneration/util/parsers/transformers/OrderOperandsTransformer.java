@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.parsers.transformers;
+package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 
 import java.util.HashMap;
 import java.util.LinkedList;
