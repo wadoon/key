@@ -4,7 +4,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.StringConstants;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.ConjunctionNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
@@ -39,7 +39,7 @@ public class OracleGenerationTools {
         /*
          * Put it into Conjunctive Normal Form
          */
-        simplifiedOracle = new CNFTransformer().transform(simplifiedOracle);
+        simplifiedOracle = new ConjunctionNormalFormTransformer().transform(simplifiedOracle);
 
         /*
          * Simplify the disjunctions in the postcondition

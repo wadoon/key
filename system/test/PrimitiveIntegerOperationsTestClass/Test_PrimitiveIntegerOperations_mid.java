@@ -9,13 +9,11 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid0 () {
-        PrimitiveIntegerOperations self = getObjectInstance(1);
+        PrimitiveIntegerOperations self = getObjectInstance(2);
         int x = -1;
         int y = 0;
         int z = 1;
-        boolean k = false;
-        boolean l = false;
-        int result = self.mid(x,y,z,k,l);
+        int result = self.mid(x,y,z);
         Assert.assertTrue(
             (result == x) ||
             (result == y) ||
@@ -64,9 +62,7 @@ public  class Test_PrimitiveIntegerOperations_mid {
         int x = -1;
         int y = -1;
         int z = 0;
-        boolean k = false;
-        boolean l = false;
-        int result = self.mid(x,y,z,k,l);
+        int result = self.mid(x,y,z);
         Assert.assertTrue(
             (result == x) ||
             (result == y) ||
@@ -115,9 +111,7 @@ public  class Test_PrimitiveIntegerOperations_mid {
         int x = 0;
         int y = -1;
         int z = 0;
-        boolean k = false;
-        boolean l = false;
-        int result = self.mid(x,y,z,k,l);
+        int result = self.mid(x,y,z);
         Assert.assertTrue(
             (result == x) ||
             (result == y) ||
@@ -162,13 +156,11 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid3 () {
-        PrimitiveIntegerOperations self = getObjectInstance(2);
+        PrimitiveIntegerOperations self = getObjectInstance(1);
         int x = 1;
         int y = 0;
         int z = 0;
-        boolean k = false;
-        boolean l = false;
-        int result = self.mid(x,y,z,k,l);
+        int result = self.mid(x,y,z);
         Assert.assertTrue(
             (result == x) ||
             (result == y) ||
@@ -213,13 +205,11 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid4 () {
-        PrimitiveIntegerOperations self = getObjectInstance(5);
+        PrimitiveIntegerOperations self = getObjectInstance(3);
         int x = 1;
         int y = 1;
         int z = 0;
-        boolean k = false;
-        boolean l = false;
-        int result = self.mid(x,y,z,k,l);
+        int result = self.mid(x,y,z);
         Assert.assertTrue(
             (result == x) ||
             (result == y) ||
@@ -264,13 +254,11 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid5 () {
-        PrimitiveIntegerOperations self = getObjectInstance(3);
+        PrimitiveIntegerOperations self = getObjectInstance(5);
         int x = 0;
         int y = 0;
         int z = 0;
-        boolean k = false;
-        boolean l = false;
-        int result = self.mid(x,y,z,k,l);
+        int result = self.mid(x,y,z);
         Assert.assertTrue(
             (result == x) ||
             (result == y) ||
@@ -353,14 +341,14 @@ public  class Test_PrimitiveIntegerOperations_mid {
          * this, finalize the repository setup by setting up the relevant fields
          * of each object instance as necessary
          */
-        objectInstances.put(1, new PrimitiveIntegerOperations());
+        objectInstances.put(2, new PrimitiveIntegerOperations());
         objectInstances.put(6, new PrimitiveIntegerOperations());
         objectInstances.put(4, new PrimitiveIntegerOperations());
-        objectInstances.put(2, new PrimitiveIntegerOperations());
-        objectInstances.put(5, new PrimitiveIntegerOperations());
+        objectInstances.put(1, new PrimitiveIntegerOperations());
         objectInstances.put(3, new PrimitiveIntegerOperations());
+        objectInstances.put(5, new PrimitiveIntegerOperations());
         {
-            PrimitiveIntegerOperations instance = getObjectInstance(1);
+            PrimitiveIntegerOperations instance = getObjectInstance(2);
         }
         
         {
@@ -372,15 +360,15 @@ public  class Test_PrimitiveIntegerOperations_mid {
         }
         
         {
-            PrimitiveIntegerOperations instance = getObjectInstance(2);
-        }
-        
-        {
-            PrimitiveIntegerOperations instance = getObjectInstance(5);
+            PrimitiveIntegerOperations instance = getObjectInstance(1);
         }
         
         {
             PrimitiveIntegerOperations instance = getObjectInstance(3);
+        }
+        
+        {
+            PrimitiveIntegerOperations instance = getObjectInstance(5);
         }
         
     }

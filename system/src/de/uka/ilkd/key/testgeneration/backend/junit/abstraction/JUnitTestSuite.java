@@ -22,7 +22,7 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.ConjunctionNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
@@ -744,7 +744,7 @@ public class JUnitTestSuite {
                     /*
                      * Put it into Conjunctive Normal Form
                      */
-                    simplifiedOracle = new CNFTransformer()
+                    simplifiedOracle = new ConjunctionNormalFormTransformer()
                             .transform(simplifiedOracle);
 
                     /*

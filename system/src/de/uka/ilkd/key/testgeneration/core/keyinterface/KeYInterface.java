@@ -38,7 +38,7 @@ public enum KeYInterface {
     /**
      * Main interface to the KeY system itself.
      */
-    private final CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
+    private CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
             false);
 
     /**
@@ -67,7 +67,7 @@ public enum KeYInterface {
     public InitConfig loadJavaFile(File javaFile) throws KeYInterfaceException {
 
         try {
-            
+
             lock.lock();
 
             DefaultProblemLoader loader = userInterface.load(javaFile, null,
@@ -78,10 +78,10 @@ public enum KeYInterface {
             return initConfig;
 
         } catch (ProblemLoaderException e) {
-        
+
             throw new KeYInterfaceException(e.getMessage());
         } finally {
-            
+
             lock.unlock();
         }
     }
@@ -206,5 +206,9 @@ public enum KeYInterface {
                         true, true);
 
         return proof;
+    }
+
+    public void __DEBUG_RESET() {
+        userInterface = new CustomConsoleUserInterface(false);
     }
 }

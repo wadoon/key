@@ -2,11 +2,9 @@ package de.uka.ilkd.key.testgeneration.core.model.tools;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelMediator;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.DistributeNegationsTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.NegationNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.RemoveIfThenElseTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
 
@@ -49,10 +47,8 @@ class TermToModelConverter {
         /*
          * Distribute negations and remove conjunctions
          */
-        term = new DistributeNegationsTransformer().transform(term);
+        term = new NegationNormalFormTransformer().transform(term);
         term = new EliminateConjunctionsTransformer().transform(term);
-
-        System.out.println(term);
 
         /*
          * Setup all reference relationships expressed in the Term. Done

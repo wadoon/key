@@ -9,6 +9,7 @@ import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterface;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
+import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 /**
  * This singleton represents the principal API of KeYTestGen2. It supports the
@@ -61,6 +62,8 @@ public enum TestGenerator {
             final IFrameworkConverter frameworkConverter,
             final String... methods) throws TestGeneratorException {
 
+        Benchmark.startBenchmarking("5. Generate test suite (total time)");
+        
         try {
 
             /*
@@ -72,6 +75,7 @@ public enum TestGenerator {
             /*
              * Convert the abstract test suites to the desired final format.
              */
+            Benchmark.startBenchmarking("4. Write to JUnit");
             List<String> convertedTestSuites = new LinkedList<String>();
             for (TestSuite testSuite : testSuites) {
 
@@ -80,7 +84,9 @@ public enum TestGenerator {
 
                 convertedTestSuites.add(convertedTestSuite);
             }
+            Benchmark.finishBenchmarking("4. Write to JUnit");
 
+            Benchmark.finishBenchmarking("5. Generate test suite (total time)");
             return convertedTestSuites;
 
         } catch (CoreInterfaceException e) {

@@ -108,7 +108,7 @@ public class PrimitiveIntegerOperations {
      @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) && (\result <= x )) || ((\result <= x) && (\result <= z ));      
      @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) && (\result >= x )) || ((\result >= x) && (\result >= z ));      
      @*/
-    public static int mid(int x, int y, int z, boolean k, boolean l) {
+    public static int mid(int x, int y, int z) {
 
         int mid = z;
 

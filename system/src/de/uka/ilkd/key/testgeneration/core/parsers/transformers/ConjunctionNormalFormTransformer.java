@@ -18,9 +18,9 @@ import de.uka.ilkd.key.logic.op.Junctor;
  * 
  * @author christopher
  */
-public class CNFTransformer extends AbstractTermTransformer {
+public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
 
-    private final NNFTransformer nnfTransformer = new NNFTransformer();
+    private static final NegationNormalFormTransformer nnfTransformer = new NegationNormalFormTransformer();
 
     /**
      * Puts a Term into Conjunctive Normal Form, using the following algorithm:

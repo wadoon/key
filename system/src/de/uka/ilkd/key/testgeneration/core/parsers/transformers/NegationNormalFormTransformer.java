@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
  * 
  * @author christopher
  */
-public class NNFTransformer extends AbstractTermTransformer {
+public class NegationNormalFormTransformer extends AbstractTermTransformer {
 
     /**
      * Puts a Term into Negation Normal Form, using the following algorithm:

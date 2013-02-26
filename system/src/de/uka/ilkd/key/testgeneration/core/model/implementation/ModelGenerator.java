@@ -166,24 +166,23 @@ public class ModelGenerator implements IModelGenerator {
          * SMT problem. If not, keep trying until we do
          */
         do {
-            Benchmark.resetStopwatch();
-
-            /*
-             * Set up a SolverLauncher for the purpose of interfacing with the
-             * associated SMT solvers.
-             */
-            SolverLauncher launcher = new SolverLauncher(settings);
 
             /*
              * Start the constraint solving procedure, the solution will be
              * encapsulated in the existing SMTProblem.
              */
             try {
+
+                /*
+                 * Set up a SolverLauncher for the purpose of interfacing with
+                 * the associated SMT solvers.
+                 */
+                SolverLauncher launcher = new SolverLauncher(settings);
+
                 launcher.launch(problem, services, SolverType.Z3_SOLVER);
 
                 result = problem.getFinalResult();
 
-                launcher.stop();
             } catch (RuntimeException re) {
 
                 /*
@@ -196,13 +195,12 @@ public class ModelGenerator implements IModelGenerator {
             }
 
             if (!result.isValid().equals(ThreeValuedTruth.FALSIFIABLE)) {
-                System.err
-                        .println("Failed to retrieve adequate SMT solution, lost "
-                                + Benchmark.readStopWatch() + " milliseconds");
+                System.err.println("Failed to retrieve adequate SMT solution");
             }
 
-            if (attempts > 1)
-                System.out.println("New attempt: " + attempts);
+            if (attempts > 1) {
+                System.err.println("New attempt: " + attempts);
+            }
             attempts++;
 
         } while (result.isValid().equals(ThreeValuedTruth.UNKNOWN)

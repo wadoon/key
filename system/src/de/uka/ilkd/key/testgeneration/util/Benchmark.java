@@ -12,9 +12,9 @@ public class Benchmark {
 
     private static final boolean toggleBenchmark = true;
 
-    private static final HashMap<String, Long> readings = new HashMap<String, Long>();
+    private static final boolean verbose = true;
 
-    public static int[] counters = new int[100];
+    private static  HashMap<String, Long> readings = new HashMap<String, Long>();
 
     private static long stopWatch = 0L;
 
@@ -49,8 +49,11 @@ public class Benchmark {
             long clockValue = readings.get(event);
             long finalClockValue = Calendar.getInstance().getTimeInMillis();
 
-            System.out.println("BENCHMARK: " + event + " took "
-                    + (finalClockValue - clockValue));
+            if (verbose) {
+                System.out.println("BENCHMARK: " + event + " took "
+                        + (finalClockValue - clockValue));
+            }
+            
             readings.put(event, finalClockValue - clockValue);
         }
     }
@@ -58,5 +61,10 @@ public class Benchmark {
     public static HashMap<String, Long> getReadings() {
 
         return new HashMap<String, Long>(readings);
+    }
+
+    public static void reset() {
+        stopWatch = 0L;
+        readings = new HashMap<String, Long>();
     }
 }

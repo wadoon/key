@@ -27,7 +27,7 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelMediator;
 import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.ContractExtractor;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
-import de.uka.ilkd.key.testgeneration.core.parsers.transformers.CNFTransformer;
+import de.uka.ilkd.key.testgeneration.core.parsers.transformers.ConjunctionNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.core.parsers.transformers.TermTransformerException;
@@ -111,13 +111,13 @@ public enum CoreInterface {
              * and the specific method for which we wish to generate test cases.
              */
             Benchmark
-                    .startBenchmarking("setting up class and method abstractions");
+                    .startBenchmarking("1. [KeY] setting up class and method abstractions");
 
             KeYJavaClass keYJavaClass = keYJavaClassFactory
                     .createKeYJavaClass(new File(source));
 
             Benchmark
-                    .finishBenchmarking("setting up class and method abstractions");
+                    .finishBenchmarking("1. [KeY] setting up class and method abstractions");
 
             return keYJavaClass;
 
@@ -163,22 +163,22 @@ public enum CoreInterface {
              * from it the nodes needed in order to reach the desired level of
              * code coverage.
              */
-            Benchmark.startBenchmarking("getting code coverage nodes");
+            Benchmark.startBenchmarking("2. [KeY] Create symbolic execution tree");
             IExecutionStartNode root = keYInterface
                     .getSymbolicExecutionTree(targetMethod);
 
             List<IExecutionNode> targetNodes = codeCoverageParser
                     .retrieveNodes(root);
-            Benchmark.finishBenchmarking("getting code coverage nodes");
+            Benchmark.finishBenchmarking("2. [KeY] Create symbolic execution tree");
 
             /*
              * Extract the postcondition for the method, and generate test cases
              * for each of the nodes.
              */
-            Benchmark.startBenchmarking("create test case abstractions");
+            //Benchmark.startBenchmarking("Create abstract test cases");
             List<TestCase> testCases = createTestCasesForMethod(targetClass,
                     targetMethod, targetNodes);
-            Benchmark.finishBenchmarking("create test case abstractions");
+            //Benchmark.finishBenchmarking("Create abstract test cases");
 
             return new TestSuite(targetClass, targetMethod, testCases);
 
@@ -244,7 +244,7 @@ public enum CoreInterface {
          */
         Term oracle = null;
 
-        Benchmark.startBenchmarking("generating models");
+        Benchmark.startBenchmarking("3. generating models");
 
         /*
          * Create the ModelMediator and initialize instance to be used in each
@@ -319,7 +319,7 @@ public enum CoreInterface {
             testCases.add(testCase);
         }
 
-        Benchmark.finishBenchmarking("generating models");
+        Benchmark.finishBenchmarking("3. generating models");
 
         return testCases;
     }
