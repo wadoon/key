@@ -9,6 +9,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -63,25 +64,9 @@ public enum KeYJavaClassFactory {
         KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
         /*
-         * TODO: this is OS specific and makes too many assumptions on file
-         * format. Not good.
-         */
-        String name = mainClass.getName();
-        int delimiter = name.lastIndexOf(".");
-        name = name.substring(delimiter + 1);
-
-        
-        /*
-         * Extract the package of the class
-         */
-        String packageDeclaration = JavaSourceParser
-                .getPackageDeclaration(javaFile);
-
-        /*
          * Setup the class
          */
-        KeYJavaClass javaClass = new KeYJavaClass(packageDeclaration, name,
-                mainClass, javaFile);
+        KeYJavaClass javaClass = new KeYJavaClass(mainClass);
 
         /*
          * Extract all methods declared in this class (including the ones
@@ -113,7 +98,9 @@ public enum KeYJavaClassFactory {
         return javaClass;
     }
     
-    public KeYJavaClass createKeYJavaClass(KeYJavaType classType) {
+    public KeYJavaClass createKeYJavaClass(KeYJavaType classType, Services services) {
+        
+        
         
         return null;
     }

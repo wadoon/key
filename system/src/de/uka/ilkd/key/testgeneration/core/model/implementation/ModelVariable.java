@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * Instances of this class represent Java program variables during runtime. It's
  * main function is to encapsulate a corresponding instance of
  * {@link ProgramVariable}, which will contain rather complete information about
- * the variable itself. However, it adds an additional layer runtime
+ * the variable itself. However, it adds an additional layer of runtime
  * information, showing exactly which concrete object on the heap this variable
  * points to.
  * <p>
@@ -27,6 +27,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * @author christopher
  */
 public class ModelVariable implements IHeapObject {
+
+    /**
+     * The wrapped {@link ProgramVariable} instance.
+     */
+    private final IProgramVariable variable;
 
     /**
      * Represents a unique identifier for this variable, denoting its relative
@@ -65,11 +70,6 @@ public class ModelVariable implements IHeapObject {
     private boolean isParameter = false;
 
     /**
-     * The type of the variable.
-     */
-    private final String type;
-
-    /**
      * Create a ModelVariable from an existing {@link ProgramVariable},
      * effectively encapsulating it, but we maintain the type hierarchy for the
      * sake of consistency.
@@ -79,10 +79,10 @@ public class ModelVariable implements IHeapObject {
     public ModelVariable(IProgramVariable programVariable, String identifier,
             ModelInstance referedInstance) {
 
+        this.variable = programVariable;
+
         this.identifier = identifier;
         this.boundValue = referedInstance;
-        this.type = programVariable.getKeYJavaType().getJavaType()
-                .getFullName();
 
     }
 
@@ -104,7 +104,7 @@ public class ModelVariable implements IHeapObject {
     @Override
     public String getType() {
 
-        return type;
+        return variable.getKeYJavaType().getName();
     }
 
     /**
@@ -133,7 +133,7 @@ public class ModelVariable implements IHeapObject {
     @Override
     public String getIdentifier() {
 
-        return identifier;
+        return variable.name().toString();
     }
 
     public static boolean isValidValueType(Object object) {
@@ -168,7 +168,7 @@ public class ModelVariable implements IHeapObject {
     @Override
     public String toString() {
 
-        return type + " : " + identifier;
+        return getType() + " : " + identifier;
     }
 
     /**

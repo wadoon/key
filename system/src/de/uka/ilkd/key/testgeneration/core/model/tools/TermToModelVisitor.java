@@ -171,6 +171,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * instead? What other variables (if any) may have nulled sorts?
          */
         ProgramVariable programVariable = getVariable(term);
+
         if (programVariable == null
                 || programVariable.toString().equals("$SELF$")) {
             return;
@@ -189,6 +190,8 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
         Object instance = null;
         if (isPrimitiveType(term)) {
+            System.out.println(programVariable.name());
+            System.out.println(programVariable.getKeYJavaType().createPackagePrefix().toString());
             instance = resolvePrimitiveType(programVariable);
         } else {
             instance = new ModelInstance(programVariable.getKeYJavaType());

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.testgeneration.core;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -15,25 +14,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 public final class KeYJavaClass {
 
     /**
-     * The package declaration for this class.
-     */
-    private final String packageDeclaration;
-
-    /**
-     * The identifier for this class.
-     */
-    private final String name;
-
-    /**
      * The {@link KeYJavaType} instance for this class
      */
     private final KeYJavaType type;
-
-    /**
-     * A reference to the actual source file on disc, whose public class this
-     * instance represents.
-     */
-    File source;
 
     /**
      * Maps the name of a method to its corresponding {@link KeYJavaMethod}
@@ -41,12 +24,8 @@ public final class KeYJavaClass {
      */
     private final HashMap<String, KeYJavaMethod> methods = new HashMap<String, KeYJavaMethod>();
 
-    KeYJavaClass(String packageDeclaration, String name, KeYJavaType type,
-            File source) {
-        this.packageDeclaration = packageDeclaration;
-        this.name = name;
+    KeYJavaClass(KeYJavaType type) {
         this.type = type;
-        this.source = source;
     }
 
     /**
@@ -76,7 +55,7 @@ public final class KeYJavaClass {
      * @return the name
      */
     public String getName() {
-        return name;
+        return type.getName();
     }
 
     /**
@@ -90,7 +69,7 @@ public final class KeYJavaClass {
      * @return the packageDeclaration
      */
     public String getPackageDeclaration() {
-        return packageDeclaration;
+        return type.createPackagePrefix().toString();
     }
 
     /**

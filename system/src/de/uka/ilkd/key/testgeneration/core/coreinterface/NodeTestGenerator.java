@@ -2,6 +2,7 @@ package de.uka.ilkd.key.testgeneration.core.coreinterface;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -29,8 +30,10 @@ public enum NodeTestGenerator {
         KeYJavaType parent = method.getContainerType();
         String packageDeclaration = parent.getJavaType().getFullName();
         
-        KeYJava
-
+        String name = parent.getName();
+        String name2 = parent.getFullName();
+        PackageReference ref = parent.createPackagePrefix();
+String stuff = ref.toString();
         return null;
     }
 

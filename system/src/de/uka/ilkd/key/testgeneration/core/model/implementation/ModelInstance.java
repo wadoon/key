@@ -66,8 +66,7 @@ public class ModelInstance implements IHeapObject {
 
     public String getTypeName() {
 
-        String fullName = type.getJavaType().getFullName();
-        return fullName.substring(fullName.lastIndexOf('.') + 1);
+        return type.getJavaType().getName().toString();
     }
 
     /**
