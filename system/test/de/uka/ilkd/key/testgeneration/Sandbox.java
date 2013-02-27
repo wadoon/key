@@ -31,6 +31,7 @@ import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.RemoveSDPsTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
 
 public class Sandbox extends KeYTestGenTest {
 
@@ -42,6 +43,15 @@ public class Sandbox extends KeYTestGenTest {
             IOException, XMLGeneratorException, ProblemLoaderException,
             IllegalFormulaException, TermTransformerException {
 
+        SMTInterface interfac = SMTInterface.INSTANCE;
+
+        try {
+            Thread.sleep(100000000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         String method = "mid";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
@@ -50,10 +60,10 @@ public class Sandbox extends KeYTestGenTest {
 
         for (IExecutionNode node : nodes) {
 
-                System.out.println(node.getFormatedPathCondition());
+            System.out.println(node.getFormatedPathCondition());
         }
     }
-   
+
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
             String method) throws ProofInputException, ModelGeneratorException,
             IOException, ProblemLoaderException {
