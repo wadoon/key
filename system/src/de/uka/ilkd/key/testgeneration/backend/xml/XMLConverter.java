@@ -26,8 +26,6 @@ import de.uka.ilkd.key.testgeneration.backend.custom.ITestCaseParser;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
-import de.uka.ilkd.key.testgeneration.core.model.IModel;
-import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
@@ -246,7 +244,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @throws XMLStreamException
      *             in case the XML could not be generated
      */
-    private void writeFixture(IModel model) throws XMLStreamException {
+    private void writeFixture(Model model) throws XMLStreamException {
 
         writeStartTag(TESTFIXTURE_ROOT);
 
@@ -254,8 +252,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
          * Write the variables contained in this fixture
          */
         writeStartTag(VARIABLES_ROOT);
-        for (IModelObject variable : model.getVariables()) {
-            ModelVariable modelVariable = (ModelVariable) variable;
+        for (ModelVariable modelVariable : model.getVariables()) {
             writeVariable(modelVariable);
         }
         writeEndTag(VARIABLES_ROOT);
@@ -264,8 +261,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
          * Write the instances contained in this fixture
          */
         writeStartTag(INSTANCES_ROOT);
-        for (IModelObject variable : model.getVariables()) {
-            ModelVariable modelVariable = (ModelVariable) variable;
+        for (ModelVariable modelVariable : model.getVariables()) {
             writeInstance(modelVariable.getValue());
         }
         writeEndTag(INSTANCES_ROOT);

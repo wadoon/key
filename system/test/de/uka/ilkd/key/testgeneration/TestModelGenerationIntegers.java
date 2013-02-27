@@ -11,11 +11,10 @@ import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.testgeneration.core.model.IModel;
-import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
-import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.targetmodels.PrimitiveIntegerOperations;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -29,7 +28,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestModelGenerationIntegers extends KeYTestGenTest {
 
-    private IModelGenerator modelGenerator;
+    private ModelGenerator modelGenerator;
     private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
     private final String containerTypeName = "PrimitiveIntegerOperations";
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment;
@@ -118,20 +117,17 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
             System.out.println("Mid " + variable);
             printSingleNode(node);
 
-            IModel model = modelGenerator.generateModel(node);
+            Model model = modelGenerator.generateModel(node);
 
-            Map<String, ? extends IModelObject> variableMapping = model
-                    .getVariableNameMapping();
-
-            int x = (Integer) variableMapping.get("x").getValue();
-            int y = (Integer) variableMapping.get("y").getValue();
-            int z = (Integer) variableMapping.get("z").getValue();
+            int x = (Integer) model.getVariable("x").getValue();
+            int y = (Integer) model.getVariable("y").getValue();
+            int z = (Integer) model.getVariable("z").getValue();
             int result = PrimitiveIntegerOperations.mid(x, y, z);
 
             System.out.println("Satisfiable assignment: x=" + x + " y=" + y
                     + " z=" + z);
 
-            assertTrue(result == (Integer) variableMapping.get(variable)
+            assertTrue(result == (Integer) model.getVariable(variable)
                     .getValue());
         }
     }
@@ -143,15 +139,12 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
 
         for (IExecutionNode node : nodes) {
 
-            IModel model = modelGenerator.generateModel(node);
+            Model model = modelGenerator.generateModel(node);
 
-            Map<String, ? extends IModelObject> variableMapping = model
-                    .getVariableNameMapping();
-
-            int x = (Integer) variableMapping.get("x").getValue();
-            int y = (Integer) variableMapping.get("self_dollar_instanceY")
+            int x = (Integer) model.getVariable("x").getValue();
+            int y = (Integer) model.getVariable("self_dollar_instanceY")
                     .getValue();
-            int z = (Integer) variableMapping.get("self_dollar_instanceZ")
+            int z = (Integer) model.getVariable("self_dollar_instanceZ")
                     .getValue();
 
             PrimitiveIntegerOperations operations = new PrimitiveIntegerOperations();
@@ -160,10 +153,10 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
 
             int result = operations.midTwoInstance(x);
 
-            for (IModelObject var : model.getVariables()) {
+            for (ModelVariable var : model.getVariables()) {
                 String varName = var.getName();
                 if (varName.endsWith(variable)) {
-                    int varValue = (Integer) variableMapping.get(var.getName())
+                    int varValue = (Integer) model.getVariable(var.getName())
                             .getValue();
                     assertTrue(result == varValue);
                 }
@@ -180,15 +173,12 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
 
         for (IExecutionNode node : nodes) {
 
-            IModel model = modelGenerator.generateModel(node);
+            Model model = modelGenerator.generateModel(node);
 
-            Map<String, ? extends IModelObject> variableMapping = model
-                    .getVariableNameMapping();
-
-            int x = (Integer) variableMapping.get("x").getValue();
-            int y = (Integer) variableMapping.get(
+            int x = (Integer) model.getVariable("x").getValue();
+            int y = (Integer) model.getVariable(
                     "self_dollar_proxy_dollar_instanceInt").getValue();
-            int z = (Integer) variableMapping.get(
+            int z = (Integer) model.getVariable(
                     "self_dollar_proxy_dollar_nestedProxy_dollar_instanceInt")
                     .getValue();
 
@@ -198,10 +188,10 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
 
             int result = operations.midTwoProxy(x);
 
-            for (IModelObject var : model.getVariables()) {
+            for (ModelVariable var : model.getVariables()) {
                 String varName = var.getName();
                 if (varName.endsWith(variable)) {
-                    int varValue = (Integer) variableMapping.get(var.getName())
+                    int varValue = (Integer) model.getVariable(var.getName())
                             .getValue();
                     assertTrue(result == varValue);
                 }
@@ -213,7 +203,7 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
             ModelGeneratorException, IOException, ProblemLoaderException {
 
         if (modelGenerator == null) {
-            modelGenerator = ModelGenerator.getDefaultModelGenerator();
+            modelGenerator = ModelGenerator.INSTANCE;
         }
 
         environment = getPreparedEnvironment(keyRepDirectory,

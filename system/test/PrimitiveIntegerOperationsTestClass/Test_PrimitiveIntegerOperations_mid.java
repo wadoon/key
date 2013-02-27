@@ -335,18 +335,14 @@ public  class Test_PrimitiveIntegerOperations_mid {
          * this, finalize the repository setup by setting up the relevant fields
          * of each object instance as necessary
          */
-        objectInstances.put(2, new PrimitiveIntegerOperations());
-        objectInstances.put(4, new PrimitiveIntegerOperations());
-        objectInstances.put(3, new PrimitiveIntegerOperations());
         objectInstances.put(1, new PrimitiveIntegerOperations());
+        objectInstances.put(3, new PrimitiveIntegerOperations());
+        objectInstances.put(4, new PrimitiveIntegerOperations());
+        objectInstances.put(2, new PrimitiveIntegerOperations());
         objectInstances.put(6, new PrimitiveIntegerOperations());
         objectInstances.put(5, new PrimitiveIntegerOperations());
         {
-            PrimitiveIntegerOperations instance = getObjectInstance(2);
-        }
-        
-        {
-            PrimitiveIntegerOperations instance = getObjectInstance(4);
+            PrimitiveIntegerOperations instance = getObjectInstance(1);
         }
         
         {
@@ -354,7 +350,11 @@ public  class Test_PrimitiveIntegerOperations_mid {
         }
         
         {
-            PrimitiveIntegerOperations instance = getObjectInstance(1);
+            PrimitiveIntegerOperations instance = getObjectInstance(4);
+        }
+        
+        {
+            PrimitiveIntegerOperations instance = getObjectInstance(2);
         }
         
         {

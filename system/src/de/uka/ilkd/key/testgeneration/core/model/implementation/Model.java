@@ -3,18 +3,17 @@ package de.uka.ilkd.key.testgeneration.core.model.implementation;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.testgeneration.core.model.IModel;
-import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 
 /**
- * Default implementation of the {@link IModel} interface
+ * Represents an abstract heap state, consisting of {@link ModelVariable}
+ * instances together with associated {@link ModelInstance} instances. See
+ * separate documentation for both.
  * 
  * @author christopher
  */
-public class Model implements IModel {
+public class Model {
 
     /**
      * Indicates whether this instance will use buffering or not in order to
@@ -200,38 +199,9 @@ public class Model implements IModel {
     /**
      * {@inheritDoc}
      */
-    @SafeVarargs
-    @Override
-    public final List<IModelObject> getVariables(final IModelFilter... filters) {
+    public final List<ModelVariable> getVariables() {
 
-        LinkedList<IModelObject> filteredVariables = new LinkedList<IModelObject>();
-
-        for (ModelVariable variable : variables) {
-
-            if (satisfiesFilters(variable, filters)) {
-
-                filteredVariables.add(variable);
-            }
-        }
-        return filteredVariables;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, IModelObject> getVariableNameMapping(
-            final IModelFilter... filters) {
-
-        List<IModelObject> filteredVariables = getFilteredVariables(filters);
-
-        HashMap<String, IModelObject> variableMapping = new HashMap<String, IModelObject>();
-
-        for (IModelObject variable : filteredVariables) {
-
-            variableMapping.put(variable.getName(), variable);
-        }
-        return variableMapping;
+        return variables;
     }
 
     /**
@@ -242,7 +212,7 @@ public class Model implements IModel {
      * @return the found instance, null if no instance is found with the
      *         specified reference
      */
-    public ModelVariable getVariableByReference(final String reference) {
+    public ModelVariable getVariable(final String reference) {
 
         for (ModelVariable variable : variables) {
 
@@ -298,67 +268,11 @@ public class Model implements IModel {
 
                 Integer value = (negFlag) ? Integer.parseInt(result) * -1
                         : Integer.parseInt(result);
-                ModelVariable variable = getVariableByReference(varName);
+                ModelVariable variable = getVariable(varName);
                 if (variable != null) {
                     variable.setValue(value);
                 }
             }
-        }
-    }
-
-    /**
-     * Determines if a given {@link ModelVariable} satisfied the conditions
-     * postulated in a given set of {@link IModelFilter} instances.
-     * 
-     * @param variable
-     *            the variable to check
-     * @param filters
-     *            the filters to check against
-     * @return
-     */
-    private boolean satisfiesFilters(final ModelVariable variable,
-            IModelFilter[] filters) {
-
-        for (IModelFilter filter : filters) {
-            if (!filter.satisfies(variable)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private List<IModelObject> getFilteredVariables(final IModelFilter[] filters) {
-
-        LinkedList<IModelObject> filteredVariables = new LinkedList<IModelObject>();
-
-        for (ModelVariable variable : variables) {
-
-            if (satisfiesFilters(variable, filters)) {
-
-                filteredVariables.add(variable);
-            }
-        }
-        return filteredVariables;
-    }
-
-    /**
-     * Filter objects according to name.
-     * 
-     * @author christopher
-     */
-    public static class NameFilter implements IModelFilter {
-
-        private String name;
-
-        public NameFilter(String name) {
-
-            this.name = name;
-        }
-
-        @Override
-        public boolean satisfies(final IModelObject object) {
-
-            return object.getName().equals(name);
         }
     }
 }

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
  * 
  * @author christopher
  */
-public class ModelInstance implements IHeapObject {
+public class ModelInstance {
 
     /**
      * Used for generating unique IDs for model instances.
@@ -58,7 +58,6 @@ public class ModelInstance implements IHeapObject {
     /**
      * @return the type
      */
-    @Override
     public String getType() {
 
         return type.getJavaType().getFullName();
@@ -84,22 +83,6 @@ public class ModelInstance implements IHeapObject {
         }
     }
 
-    @Override
-    public String getName() {
-
-        return identifier;
-    }
-
-    /*
-     * FIXME: the abstraction is broken here
-     */
-    @Override
-    public Object getValue() {
-
-        return identifier;
-    }
-
-    @Override
     public String getIdentifier() {
 
         return identifier;

@@ -3,7 +3,7 @@ package de.uka.ilkd.key.testgeneration.core.coreinterface;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
-import de.uka.ilkd.key.testgeneration.core.model.IModel;
+import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 
 /**
  * Formally, a test case is a tuple (m, I, Or), where:
@@ -51,7 +51,7 @@ public class TestCase implements Comparable<TestCase> {
      * state before execution will all be represented as part of the same
      * heapstate.
      */
-    private final IModel model;
+    private final Model model;
 
     /**
      * The Oracle for the method, here represented as a postcondition (i.e. a
@@ -61,7 +61,7 @@ public class TestCase implements Comparable<TestCase> {
      */
     private final Term oracle;
 
-    public TestCase(final KeYJavaMethod method, final IModel model,
+    public TestCase(final KeYJavaMethod method, final Model model,
             final Term oracle) {
 
         this.method = method;
@@ -84,7 +84,7 @@ public class TestCase implements Comparable<TestCase> {
      * 
      * @return
      */
-    public IModel getModel() {
+    public Model getModel() {
 
         return model;
     }

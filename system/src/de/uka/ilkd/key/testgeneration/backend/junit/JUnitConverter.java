@@ -12,18 +12,15 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.IFrameworkConverter;
-import de.uka.ilkd.key.testgeneration.backend.junit.abstraction.JUnitTestSuite;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
-import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
-import de.uka.ilkd.key.testgeneration.util.parsers.transformers.OrderOperandsTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
@@ -197,8 +194,7 @@ public class JUnitConverter implements IFrameworkConverter {
              * variables in this context includes the parameters for the method
              * (if any), as well as the root class itself.
              */
-            for (IModelObject object : testCase.getModel().getVariables()) {
-                ModelVariable variable = (ModelVariable) object;
+            for (ModelVariable variable : testCase.getModel().getVariables()) {
                 if (isSelf(variable) || variable.isParameter()) {
                     writeVariableDeclaration(variable);
                 }
@@ -495,8 +491,7 @@ public class JUnitConverter implements IFrameworkConverter {
         private List<ModelInstance> extractInstancesFromModel(Model model) {
 
             List<ModelInstance> instances = new LinkedList<ModelInstance>();
-            for (IModelObject object : model.getVariables()) {
-                ModelVariable variable = (ModelVariable) object;
+            for (ModelVariable variable : model.getVariables()) {
                 if (variable.getValue() instanceof ModelInstance) {
                     instances.add((ModelInstance) variable.getValue());
                 }

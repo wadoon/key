@@ -17,7 +17,6 @@ import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
-import de.uka.ilkd.key.testgeneration.core.model.IModelObject;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
@@ -210,9 +209,7 @@ public class JUnitTestSuite {
              * variables in this context includes the parameters for the method
              * (if any), as well as the root class itself.
              */
-            for (IModelObject object : testCase.getModel().getVariables()) {
-
-                ModelVariable variable = (ModelVariable) object;
+            for (ModelVariable variable : testCase.getModel().getVariables()) {
 
                 /*
                  * Construct a declaration statement for the variable.
@@ -482,8 +479,7 @@ public class JUnitTestSuite {
         private List<ModelInstance> extractInstancesFromModel(Model model) {
 
             List<ModelInstance> instances = new LinkedList<ModelInstance>();
-            for (IModelObject object : model.getVariables()) {
-                ModelVariable variable = (ModelVariable) object;
+            for (ModelVariable variable : model.getVariables()) {
                 if (variable.getValue() instanceof ModelInstance) {
                     instances.add((ModelInstance) variable.getValue());
                 }

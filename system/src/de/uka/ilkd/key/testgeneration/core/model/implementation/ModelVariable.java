@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * 
  * @author christopher
  */
-public class ModelVariable implements IHeapObject {
+public class ModelVariable {
 
     /**
      * The wrapped {@link ProgramVariable} instance.
@@ -91,7 +91,6 @@ public class ModelVariable implements IHeapObject {
         this(programVariable, identifier, null);
     }
 
-    @Override
     public String getName() {
 
         return identifier;
@@ -101,7 +100,6 @@ public class ModelVariable implements IHeapObject {
      * Returns a String representation of the {@link KeYJavaType} of this
      * variable.
      */
-    @Override
     public String getType() {
 
         return variable.getKeYJavaType().getName();
@@ -111,7 +109,6 @@ public class ModelVariable implements IHeapObject {
      * Returns the value of the variable. Will have to be explicitly converted
      * based on the type of this variable.
      */
-    @Override
     public Object getValue() {
 
         return boundValue;
@@ -130,7 +127,6 @@ public class ModelVariable implements IHeapObject {
     /**
      * A variable is uniquely identified by its identifier.
      */
-    @Override
     public String getIdentifier() {
 
         return variable.name().toString();
