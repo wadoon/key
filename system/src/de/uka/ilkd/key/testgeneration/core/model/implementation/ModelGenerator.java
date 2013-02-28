@@ -1,16 +1,21 @@
 package de.uka.ilkd.key.testgeneration.core.model.implementation;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.SmtLib2Translator;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -18,6 +23,7 @@ import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default
@@ -47,6 +53,10 @@ public enum ModelGenerator implements IModelGenerator {
      */
     private final SMTSettings settings;
 
+    private final Configuration configuration;
+
+    private final SMTInterface smtInterface = SMTInterface.INSTANCE;
+
     /**
      * Constructs a standard model generator.
      * 
@@ -58,7 +68,8 @@ public enum ModelGenerator implements IModelGenerator {
     private ModelGenerator() {
 
         this.solver = SolverType.Z3_SOLVER;
-        this.settings = ModelSettings.getDEFAULT_SMT_SETTINGS();
+        this.settings = ModelSettings.getDefaultSMTSettings();
+        this.configuration = ModelSettings.getDefaultTranslatorConfiguration();
     }
 
     /**
@@ -82,11 +93,9 @@ public enum ModelGenerator implements IModelGenerator {
      * @throws ModelGeneratorException
      *             in the event that the instantiation went wrong
      */
-    private Model instantiateModel(final Model model,
-            final SMTSolverResult smtResult) {
+    private Model instantiateModel(final Model model, final String smtResult) {
 
-        String modelOutput = consolidateModelOutput(smtResult.getOutput());
-        model.consumeSMTOutput(modelOutput);
+        model.consumeSMTOutput(smtResult);
         return model;
     }
 
@@ -114,97 +123,68 @@ public enum ModelGenerator implements IModelGenerator {
 
     }
 
-    private synchronized SMTSolverResult solveSMTProblem(
-            final SMTProblem problem, final Services services)
-            throws ModelGeneratorException {
+    private synchronized String solveSMTProblem(final SMTProblem problem,
+            final Services services) throws ModelGeneratorException {
 
-        SMTSolverResult result = null;
+        try {
 
-        /*
-         * Used for keeping track of the number of attempts at model generation
-         * so far.
-         */
-        int attempts = 1;
-
-        /*
-         * Assert that we could actually find a satisfiable assignment for the
-         * SMT problem. If not, keep trying until we do
-         */
-        do {
+            String result = "";
+            /*
+             * Used for keeping track of the number of attempts at model
+             * generation so far.
+             */
+            int attempts = 1;
 
             /*
-             * Start the constraint solving procedure, the solution will be
-             * encapsulated in the existing SMTProblem.
+             * Assert that we could actually find a satisfiable assignment for
+             * the SMT problem. If not, keep trying until we do
              */
-            try {
+            do {
 
-                /*
-                 * Set up a SolverLauncher for the purpose of interfacing with
-                 * the associated SMT solvers.
-                 */
-                SolverLauncher launcher = new SolverLauncher(settings);
+                String commands = translateToSMTFormat(problem.getTerm(),
+                        services);
 
-                launcher.launch(problem, services, solver);
+                result = smtInterface.startMessageBasedSession(commands)
+                        .replaceAll("success", "").trim();
 
-                result = problem.getFinalResult();
+                attempts++;
 
-            } catch (RuntimeException re) {
+            } while (!isValidResult(result)
+                    && attempts < ModelSettings.getNUMBER_OF_TRIES());
 
-                /*
-                 * In the event that the system fails due launchers being
-                 * reused, dispose of them and create new ones.
-                 */
-                System.err.println(re.getMessage());
-                re.printStackTrace();
-                continue;
-            }
+            return result;
 
-            if (!result.isValid().equals(ThreeValuedTruth.FALSIFIABLE)) {
-                System.err.println("Failed to retrieve adequate SMT solution");
-            }
-
-            if (attempts > 1) {
-                System.err.println("New attempt: " + attempts);
-            }
-            attempts++;
-
-        } while (result.isValid().equals(ThreeValuedTruth.UNKNOWN)
-                && attempts < ModelSettings.getNUMBER_OF_TRIES());
-
-        /*
-         * If the path condition is not satisfiable (should never happen), then
-         * signal this with an exception. Mostly for debug and reliability
-         * reasons.
-         */
-        if (result.isValid().equals(ThreeValuedTruth.UNKNOWN)
-                || result.isValid().equals(ThreeValuedTruth.VALID)) {
-
-            throw new ModelGeneratorException(
-                    "Could not generate model for this path condition: "
-                            + problem.getTerm());
+        } catch (IllegalFormulaException e) {
+            throw new ModelGeneratorException(e.getMessage());
         }
 
-        return result;
     }
 
-    /**
-     * Assert that the solvers associated with the ModelGenerator are
-     * accessible.
-     * 
-     * @param solvers
-     * @throws ModelGeneratorException
-     */
-    private static void verifySolverAvailability(final SolverType... solvers)
-            throws ModelGeneratorException {
+    private boolean isValidResult(String result) {
 
-        for (SolverType solver : solvers) {
-            if (!solver.isInstalled(false)) {
-                throw new ModelGeneratorException(
-                        "Solver "
-                                + solver.getName()
-                                + " is not installed or could not be accessed. Check paths?");
-            }
-        }
+        /*
+         * Very primitive
+         */
+        Pattern consPattern = Pattern.compile("\\(model");
+        Matcher consMatcher = consPattern.matcher(result);
+        return consMatcher.find();
+    }
+
+    private String translateToSMTFormat(Term term, Services services)
+            throws IllegalFormulaException {
+
+        /*
+         * Set up the translator for this term.
+         */
+        SmtLib2Translator translator = new SmtLib2Translator(services,
+                configuration);
+
+        StringBuffer result = translator.translateProblem(term, services,
+                settings);
+
+        result.append("\n(get-model)");
+
+        return result.toString();
     }
 
     /**
@@ -221,7 +201,7 @@ public enum ModelGenerator implements IModelGenerator {
      * @return the SMT solver result
      * @throws ModelGeneratorException
      */
-    private SMTSolverResult instantiatePathCondition(final Term pathCondition,
+    private String instantiatePathCondition(final Term pathCondition,
             final Services services) throws ModelGeneratorException {
 
         try {
@@ -289,8 +269,8 @@ public enum ModelGenerator implements IModelGenerator {
              * Model, extracting them from an SMT solution for the pathcondition
              * for this node.
              */
-            SMTSolverResult solverResult = instantiatePathCondition(
-                    pathCondition, services);
+            String solverResult = instantiatePathCondition(pathCondition,
+                    services);
 
             /*
              * If any such primitive values were found, merge their concrete
@@ -307,21 +287,4 @@ public enum ModelGenerator implements IModelGenerator {
             throw new ModelGeneratorException(e.getMessage());
         }
     }
-
-    /**
-     * Concatenates the output of the SMT solver into a single String.
-     * 
-     * @param output
-     *            the ouput of the solver
-     * @return the consolidated String
-     */
-    private String consolidateModelOutput(final List<String> output) {
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String substring : output) {
-            stringBuilder.append(substring);
-        }
-        return stringBuilder.toString();
-    }
-
 }

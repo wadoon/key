@@ -44,7 +44,7 @@ class TermToModelConverter {
      * @throws TermTransformerException
      * @throws ProofInputException
      */
-    public static Model createModel(IExecutionNode node)
+    public Model createModel(IExecutionNode node)
             throws TermTransformerException, ProofInputException {
 
         Term pathCondition = node.getPathCondition();

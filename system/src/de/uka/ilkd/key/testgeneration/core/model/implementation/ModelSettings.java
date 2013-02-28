@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 import de.uka.ilkd.key.smt.SMTSettings;
 
 /**
@@ -31,6 +32,12 @@ final class ModelSettings {
     private static final DefaultSMTSettings DEFAULT_SMT_SETTINGS = new DefaultSMTSettings();
 
     /**
+     * The default settings for the SMTLIB translator.
+     */
+    private static final Configuration DEFAULT_TRANSLATOR_CONFIGURATION = new Configuration(
+            false, true);
+
+    /**
      * @return the NUMBER_OF_TRIES constant, dictating how many times a Model
      *         Generator should re-attempt to solve an SMT problem whose last
      *         known solution was UNKNOWN.
@@ -43,8 +50,12 @@ final class ModelSettings {
      * @return the DEFAULT_SMT_SETTINGS constant, containing a default set of
      *         settings for SMT solvers used by KeYTestGen.
      */
-    public static DefaultSMTSettings getDEFAULT_SMT_SETTINGS() {
+    public static DefaultSMTSettings getDefaultSMTSettings() {
         return DEFAULT_SMT_SETTINGS;
+    }
+
+    public static Configuration getDefaultTranslatorConfiguration() {
+        return DEFAULT_TRANSLATOR_CONFIGURATION;
     }
 }
 
@@ -136,8 +147,8 @@ class DefaultSMTSettings implements SMTSettings {
     @Override
     public String getLogic() {
 
-        // return "QF_UFLIRA";
-        return "AUFLIA";
+        return "QF_UFLIRA";
+        // return "AUFLIA";
     }
 
     @Override

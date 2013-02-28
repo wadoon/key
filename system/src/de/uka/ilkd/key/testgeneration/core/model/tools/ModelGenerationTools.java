@@ -71,22 +71,6 @@ public class ModelGenerationTools {
         return termSimplificationTransformer.transform(targetNodeCondition);
     }
 
-    /**
-     * Creates a skeletal {@link Model} instance from a {@link Term}. The Term
-     * will be parsed, and all representations of program variables (along with
-     * their relationships to one another) will be used to construct a
-     * "skeletal" Model instance (i.e. no concrete primitive values).
-     * 
-     * @param term
-     *            the Term to process
-     * @param services
-     *            {@link Services} associated with the Term
-     * @param mediator
-     *            session mediator
-     * @return the Model instance built from the Term
-     * @throws TermTransformerException
-     */
-
     private static class TermSimplificationTransformer extends
             AbstractTermTransformer {
 

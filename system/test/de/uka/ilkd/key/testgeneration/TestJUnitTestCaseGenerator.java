@@ -93,7 +93,6 @@ public class TestJUnitTestCaseGenerator {
 
     }
 
-    @Ignore
     @Test
     public void test2() throws IOException, ProofInputException,
             ModelGeneratorException, TestGeneratorException,
