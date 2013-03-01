@@ -16,12 +16,6 @@ import de.uka.ilkd.key.logic.Term;
 public class Model {
 
     /**
-     * Indicates whether this instance will use buffering or not in order to
-     * avoid nullpointerexceptions.
-     */
-    // private final boolean useBuffer;
-
-    /**
      * Buffers variables which currently cannot be inserted due to broken
      * reference dependencies. Primarily, this will occur when the user tries to
      * insert a variable as a field into an instace which currently does'nt
@@ -115,19 +109,6 @@ public class Model {
     }
 
     /**
-     * Adds a new variable without violating uniqueness
-     * 
-     * @param variable
-     *            the variable to add
-     */
-    private void addVariableNoDuplicates(final ModelVariable variable) {
-
-        if (!variables.contains(variable)) {
-            variables.add(variable);
-        }
-    }
-
-    /**
      * Places the variable target as a field of the {@link ModelInstance}
      * referred to by the variable other.
      * 
@@ -159,44 +140,6 @@ public class Model {
     }
 
     /**
-     * Synchronize the buffer by going through each buffered element, and seeing
-     * if it can be inserted into the Model. If the element could be inserted,
-     * remove it from the buffer.
-     */
-    private void synchronizeBuffer() {
-
-        if (!buffer.isEmpty()) {
-
-            for (ModelVariable variable : buffer.keySet()) {
-
-                ModelVariable localVariable = lookupVariable(variable);
-
-                if (localVariable != null) {
-
-                    ModelVariable target = buffer.get(variable);
-
-                    assignField(target, localVariable);
-
-                    buffer.remove(variable);
-                }
-            }
-        }
-    }
-
-    /**
-     * Retrieves the actual in-memory reference to a variable, as represented on
-     * the heap.
-     * 
-     * @param variable
-     *            the variable to lookup
-     */
-    private ModelVariable lookupVariable(final ModelVariable variable) {
-
-        int index = variables.indexOf(variable);
-        return index >= 0 ? variables.get(index) : null;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public final List<ModelVariable> getVariables() {
@@ -224,55 +167,15 @@ public class Model {
     }
 
     /**
-     * Consumes the output of an SMT solver, connecting values to their
-     * corresponding variables.
+     * Retrieves the actual in-memory reference to a variable, as represented on
+     * the heap.
      * 
-     * @param smtOutput
+     * @param variable
+     *            the variable to lookup
      */
-    public void consumeSMTOutput(String smtOutput) {
+    private ModelVariable lookupVariable(final ModelVariable variable) {
 
-        /*
-         * Break the SMT output into individual variable declarations and
-         * process them separately.
-         */
-        String[] definitions = smtOutput.trim().split("\\(define-fun");
-        for (String definition : definitions) {
-
-            if (!definition.isEmpty() && !definition.trim().startsWith("sat")) {
-
-                definition = definition.trim();
-
-                /*
-                 * Extract the variable name
-                 */
-                String varName = definition.substring(0,
-                        definition.lastIndexOf('_'));
-
-                /*
-                 * Extract the value
-                 */
-                String result = "";
-                boolean negFlag = false;
-                for (int i = definition.indexOf(' '); i < definition.length(); i++) {
-
-                    char currentChar = definition.charAt(i);
-
-                    if (!negFlag && currentChar == '-') {
-                        negFlag = true;
-                    }
-
-                    if (Character.isDigit(currentChar)) {
-                        result += currentChar;
-                    }
-                }
-
-                Integer value = (negFlag) ? Integer.parseInt(result) * -1
-                        : Integer.parseInt(result);
-                ModelVariable variable = getVariable(varName);
-                if (variable != null) {
-                    variable.setValue(value);
-                }
-            }
-        }
+        int index = variables.indexOf(variable);
+        return index >= 0 ? variables.get(index) : null;
     }
 }
