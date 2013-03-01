@@ -23,30 +23,23 @@ public class JUnitFixture {
     private final List<JUnitAssignmentStatement> assignments = new LinkedList<JUnitAssignmentStatement>();
 
     /**
-     * Adds a {@link JUnitDeclarationStatement} to the fixture.
-     * 
-     * @param declarationStatement
-     */
-    public void addDeclarationStatement(
-            JUnitDeclarationStatement declarationStatement) {
-        declarations.add(declarationStatement);
-    }
-
-    /**
      * Adds a {@link JUnitAssignmentStatement} to the fixture.
      * 
      * @param declarationStatement
      */
     public void addAssignmentStatement(
-            JUnitAssignmentStatement assignmentStatement) {
+            final JUnitAssignmentStatement assignmentStatement) {
         assignments.add(assignmentStatement);
     }
 
     /**
-     * @return the declarations
+     * Adds a {@link JUnitDeclarationStatement} to the fixture.
+     * 
+     * @param declarationStatement
      */
-    public List<JUnitDeclarationStatement> getDeclarations() {
-        return declarations;
+    public void addDeclarationStatement(
+            final JUnitDeclarationStatement declarationStatement) {
+        declarations.add(declarationStatement);
     }
 
     /**
@@ -54,5 +47,12 @@ public class JUnitFixture {
      */
     public List<JUnitAssignmentStatement> getAssignments() {
         return assignments;
+    }
+
+    /**
+     * @return the declarations
+     */
+    public List<JUnitDeclarationStatement> getDeclarations() {
+        return declarations;
     }
 }

@@ -2,34 +2,21 @@ package de.uka.ilkd.key.testgeneration.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
-import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
-import de.uka.ilkd.key.testgeneration.util.parsers.JavaSourceParser;
 
 /**
  * Produces instances of {@link KeYJavaClass}.
@@ -54,28 +41,28 @@ public enum KeYJavaClassFactory {
      *             if the file could not be found or read
      * @throws KeYInterfaceException
      */
-    public KeYJavaClass createKeYJavaClass(File javaFile) throws IOException,
-            KeYInterfaceException {
+    public KeYJavaClass createKeYJavaClass(final File javaFile)
+            throws IOException, KeYInterfaceException {
 
         /*
          * Load the file into KeY and get the InitConfig instance for it.
          */
-        InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
+        final InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
 
-        Services services = initConfig.getServices();
-        JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+        final Services services = initConfig.getServices();
+        final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
 
         /*
          * Retrieve the KeYJavaType for the top level class declaration in this
          * file
          */
-        String fileName = getFileName(javaFile);
-        KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
+        final String fileName = getFileName(javaFile);
+        final KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
         /*
          * Setup the class
          */
-        KeYJavaClass javaClass = new KeYJavaClass(mainClass);
+        final KeYJavaClass javaClass = new KeYJavaClass(mainClass);
 
         /*
          * Extract all methods declared in this class (including the ones
@@ -83,7 +70,8 @@ public enum KeYJavaClassFactory {
          * overridden), and create name-value mappings for them. Exclude
          * implicit methods (i.e. <create>, <init> etc).
          */
-        for (IProgramMethod method : javaInfo.getAllProgramMethods(mainClass)) {
+        for (final IProgramMethod method : javaInfo
+                .getAllProgramMethods(mainClass)) {
             if (!method.getFullName().startsWith("<")) {
 
                 /*
@@ -92,11 +80,12 @@ public enum KeYJavaClassFactory {
                  * (since each one will effectively represent a unique set of
                  * restrictions on the invocation of the method).
                  */
-                List<ContractWrapper> contracts = getContracts(method, services);
-                for (ContractWrapper contract : contracts) {
+                final List<ContractWrapper> contracts = getContracts(method,
+                        services);
+                for (final ContractWrapper contract : contracts) {
 
-                    KeYJavaMethod keYJavaMethod = new KeYJavaMethod(javaClass,
-                            method, initConfig, contract);
+                    final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(
+                            javaClass, method, initConfig, contract);
 
                     javaClass.addMethodMapping(method.getFullName(),
                             keYJavaMethod);
@@ -105,20 +94,6 @@ public enum KeYJavaClassFactory {
         }
 
         return javaClass;
-    }
-
-    /**
-     * Strips the file extension from a file name
-     * 
-     * @param file
-     *            the file to process
-     * @return the name of the file
-     */
-    private String getFileName(File file) {
-
-        String name = file.getName();
-        int delimiter = name.indexOf('.');
-        return name.substring(0, delimiter);
     }
 
     /**
@@ -134,10 +109,10 @@ public enum KeYJavaClassFactory {
      *             failure to find a contract for the method is always
      *             exceptional
      */
-    private List<ContractWrapper> getContracts(IProgramMethod method,
-            Services services) {
+    private List<ContractWrapper> getContracts(final IProgramMethod method,
+            final Services services) {
 
-        SpecificationRepository specificationRepository = services
+        final SpecificationRepository specificationRepository = services
                 .getSpecificationRepository();
 
         /*
@@ -146,14 +121,28 @@ public enum KeYJavaClassFactory {
          * order to retrieve the specification contracts which exist for the
          * method.
          */
-        KeYJavaType containerClass = method.getContainerType();
-        List<ContractWrapper> contracts = new LinkedList<ContractWrapper>();
-        for (FunctionalOperationContract contract : specificationRepository
+        final KeYJavaType containerClass = method.getContainerType();
+        final List<ContractWrapper> contracts = new LinkedList<ContractWrapper>();
+        for (final FunctionalOperationContract contract : specificationRepository
                 .getOperationContracts(containerClass, method)) {
             contracts.add(new ContractWrapper(
                     (FunctionalOperationContractImpl) contract));
         }
 
         return contracts;
+    }
+
+    /**
+     * Strips the file extension from a file name
+     * 
+     * @param file
+     *            the file to process
+     * @return the name of the file
+     */
+    private String getFileName(final File file) {
+
+        final String name = file.getName();
+        final int delimiter = name.indexOf('.');
+        return name.substring(0, delimiter);
     }
 }

@@ -9,11 +9,11 @@ package de.uka.ilkd.key.testgeneration;
 public class KeYTestGenException extends Exception {
     private static final long serialVersionUID = -4916814485272872541L;
 
-    public KeYTestGenException(String message) {
+    public KeYTestGenException(final String message) {
         super(message);
     }
 
-    public KeYTestGenException(String message, Throwable cause) {
+    public KeYTestGenException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

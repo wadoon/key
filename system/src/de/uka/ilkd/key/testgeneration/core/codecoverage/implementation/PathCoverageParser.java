@@ -32,7 +32,7 @@ public class PathCoverageParser implements ICodeCoverageParser {
      * @return
      */
     @Override
-    public List<IExecutionNode> retrieveNodes(IExecutionStartNode root) {
+    public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
 
         throw new UnsupportedOperationException("Not implemented yet");
     }

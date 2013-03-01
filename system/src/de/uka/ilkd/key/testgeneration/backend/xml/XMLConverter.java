@@ -29,6 +29,7 @@ import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
+import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.XMLVisitorException;
 
@@ -41,6 +42,133 @@ import de.uka.ilkd.key.testgeneration.util.parsers.visitors.XMLVisitorException;
  * @author christopher
  */
 public class XMLConverter extends XMLHandler implements IFrameworkConverter {
+
+    /**
+     * Instances of this class are used to generate an XML representation from a
+     * {@link Term} postcondition.
+     * 
+     * @author christopher
+     */
+    private static class OracleVisitor extends KeYTestGenTermVisitor {
+
+        /**
+         * Since {@link Visitor} does not support exceptional behavior, whereas
+         * the {@link XMLEventWriter} demands it, we use an intermediary buffer
+         * to store events, and write them only after the visitation process is
+         * completed.
+         */
+        private final LinkedList<XMLEvent> elements = new LinkedList<XMLEvent>();
+
+        /**
+         * Use a stack in order to properly determine the order in which start
+         * and end tags should be inserted for XML elements in the Term.
+         */
+        private final Stack<String> elementNames = new Stack<String>();
+
+        /**
+         * Add a tag, together with formatting, to the outputStream.
+         * 
+         * @param tag
+         *            the tag to insert
+         */
+        private void addTag(final XMLEvent tag) {
+
+            for (int i = 0; i < elementNames.size(); i++) {
+                elements.add(XMLConverter.tab);
+            }
+            elements.add(tag);
+            elements.add(XMLConverter.newline);
+        }
+
+        /**
+         * Add a tag, together with formatting, to the outputstream, indented by
+         * a specific number of extra tabs.
+         * 
+         * @param tag
+         *            the tag to insert
+         * @param extraTabs
+         *            number of extra tabs that should be added to the
+         *            indentation of the tag
+         */
+        private void addTag(final XMLEvent tag, final int extraTabs) {
+
+            for (int i = 0; i < extraTabs; i++) {
+                elements.add(XMLConverter.tab);
+            }
+            addTag(tag);
+        }
+
+        /**
+         * Add a node representing a program variable to the outputStream.
+         * 
+         * @param term
+         *            the {@link Term} from which to generate the Node
+         */
+        private void addVariableNode(final Term term) {
+
+            final String variableName = AbstractTermParser
+                    .resolveIdentifierString(term, XMLConverter.SEPARATOR);
+            addTag(XMLConverter.eventFactory.createCharacters(variableName), 1);
+        }
+
+        public List<XMLEvent> getElements() {
+
+            return elements;
+        }
+
+        /**
+         * Whenever a subtree is entered, create a tag corresponding to the type
+         * of the root element, and push the name of the element on the stack in
+         * order to later generate an end tag.
+         */
+        @Override
+        public void subtreeEntered(final Term subtreeRoot) {
+
+            /*
+             * Verify that the operator bound at the current term represents a
+             * concept suitable for putting in a tag
+             */
+            if (isBinaryFunction2(subtreeRoot)) {
+                final String operatorName = subtreeRoot.op().name().toString();
+
+                final XMLEvent startTag = XMLConverter.eventFactory
+                        .createStartElement("", "", operatorName);
+                addTag(startTag);
+
+                elementNames.push(operatorName);
+            }
+        }
+
+        /**
+         * Whenever a subtree is left, generate a closing tag corresponding to
+         * the one that was created when the tree was first entered.
+         */
+        @Override
+        public void subtreeLeft(final Term subtreeRoot) {
+
+            if (isBinaryFunction2(subtreeRoot)) {
+                final String operatorName = elementNames.pop();
+                final XMLEvent endTag = XMLConverter.eventFactory
+                        .createEndElement("", "", operatorName);
+                addTag(endTag);
+            }
+        }
+
+        /**
+         * Generate a textual representation for each relevant node
+         */
+        @Override
+        public void visit(final Term visited) {
+
+            final Operator operator = visited.op();
+
+            if (operator instanceof LocationVariable
+                    || operator instanceof SortDependingFunction
+                    || visited.sort() instanceof NullSort) {
+                addVariableNode(visited);
+            }
+        }
+    }
 
     /**
      * Flag to determine if the XML should be formatted or not.
@@ -69,12 +197,14 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     /**
      * {@link XMLEvent} representing a newline.
      */
-    private static final XMLEvent newline = eventFactory.createDTD("\n");
+    private static final XMLEvent newline = XMLConverter.eventFactory
+            .createDTD("\n");
 
     /**
      * {@link XMLEvent} representing a tab.
      */
-    private static final XMLEvent tab = eventFactory.createDTD("    ");
+    private static final XMLEvent tab = XMLConverter.eventFactory
+            .createDTD("    ");
 
     private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
             .toString();
@@ -102,10 +232,23 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         try {
             eventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(
                     outputStream);
-        } catch (XMLStreamException e) {
+        } catch (final XMLStreamException e) {
             throw new XMLGeneratorException(
                     "FATAL: failed to initialize XMLVisitor" + e.getMessage());
         }
+    }
+
+    private void addIndentation() throws XMLStreamException {
+
+        for (int i = 0; i < indentationCounter; i++) {
+            eventWriter.add(XMLConverter.tab);
+        }
+    }
+
+    @Override
+    public String convert(final TestSuite testSuite) {
+
+        return null;
     }
 
     /**
@@ -120,8 +263,8 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @throws XMLGeneratorException
      *             if XML generation failed
      */
-    public synchronized String createTestSuite(List<TestCase> testCases,
-            boolean format) throws XMLGeneratorException {
+    public synchronized String createTestSuite(final List<TestCase> testCases,
+            final boolean format) throws XMLGeneratorException {
 
         this.format = format;
 
@@ -130,47 +273,247 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
             /*
              * Write the preamble for the document
              */
-            writeDocumentStart(TESTSUITE_ROOT);
+            writeDocumentStart(XMLHandler.TESTSUITE_ROOT);
 
             /*
              * Write the test cases
              */
-            for (TestCase testCase : testCases) {
+            for (final TestCase testCase : testCases) {
                 writeTestCase(testCase);
             }
 
             /*
              * Write the document end
              */
-            writeDocumentEnd(TESTSUITE_ROOT);
+            writeDocumentEnd(XMLHandler.TESTSUITE_ROOT);
 
             return outputStream.toString();
-        } catch (XMLStreamException xse) {
+        } catch (final XMLStreamException xse) {
             throw new XMLGeneratorException(xse.getMessage());
-        } catch (XMLVisitorException xve) {
+        } catch (final XMLVisitorException xve) {
             throw new XMLGeneratorException(xve.getMessage());
         }
     }
 
     /**
-     * Converts a {@link TestCase} instance to KeYTestGens native XML format
+     * Write the closing section of the document.
      * 
-     * @param testCase
-     *            the test case to convert
+     * @param documentName
+     * @throws XMLStreamException
+     */
+    private void writeDocumentEnd(final String documentName)
+            throws XMLStreamException {
+
+        if (format) {
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
+                    documentName));
+            eventWriter.add(XMLConverter.newline);
+            eventWriter.add(XMLConverter.eventFactory.createEndDocument());
+            eventWriter.add(XMLConverter.newline);
+        } else {
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
+                    documentName));
+            eventWriter.add(XMLConverter.eventFactory.createEndDocument());
+        }
+    }
+
+    /**
+     * Write a preamble for the generated XML document.
+     * 
+     * @param documentName
+     *            the root tag of the document
+     * @throws XMLStreamException
+     */
+    private void writeDocumentStart(final String documentName)
+            throws XMLStreamException {
+
+        if (format) {
+            eventWriter.add(XMLConverter.eventFactory.createStartDocument());
+            eventWriter.add(XMLConverter.newline);
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
+                    "", documentName));
+            eventWriter.add(XMLConverter.newline);
+        } else {
+            eventWriter.add(XMLConverter.eventFactory.createStartDocument());
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
+                    "", documentName));
+        }
+    }
+
+    /**
+     * Write a closing tag to the stream, i.e. <\"tag">
+     * 
+     * @param tagName
+     *            the name of the tag to write
+     * @throws XMLStreamException
+     *             in the event there was an error writing the xml
+     */
+    private void writeEndTag(final String tagName) throws XMLStreamException {
+
+        if (format) {
+            addIndentation();
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
+                    tagName));
+            eventWriter.add(XMLConverter.newline);
+            indentationCounter--;
+        } else {
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
+                    tagName));
+        }
+    }
+
+    /**
+     * Converts a {@link Model} instance to KeYTestgens native XML format. In
+     * the context of the test case itself, this represents the test fixture, or
+     * program state prior to the execution of the method.
+     * 
+     * @param model
+     *            the model to convert
      * @throws XMLStreamException
      *             in case the XML could not be generated
-     * @throws XMLVisitorException
      */
-    private void writeTestCase(TestCase testCase) throws XMLStreamException,
-            XMLVisitorException {
+    private void writeFixture(final Model model) throws XMLStreamException {
 
-        writeStartTag(TESTCASE_ROOT);
+        writeStartTag(XMLHandler.TESTFIXTURE_ROOT);
 
-        writeMethodInfo(testCase.getMethod());
-        writeFixture(testCase.getModel());
-        writeOracle(testCase.getOracle());
+        /*
+         * Write the variables contained in this fixture
+         */
+        writeStartTag(XMLHandler.VARIABLES_ROOT);
+        for (final ModelVariable modelVariable : model.getVariables()) {
+            writeVariable(modelVariable);
+        }
+        writeEndTag(XMLHandler.VARIABLES_ROOT);
 
-        writeEndTag(TESTCASE_ROOT);
+        /*
+         * Write the instances contained in this fixture
+         */
+        writeStartTag(XMLHandler.INSTANCES_ROOT);
+        for (final ModelVariable modelVariable : model.getVariables()) {
+            writeInstance(modelVariable.getValue());
+        }
+        writeEndTag(XMLHandler.INSTANCES_ROOT);
+
+        writeEndTag(XMLHandler.TESTFIXTURE_ROOT);
+    }
+
+    private void writeInstance(final Integer instance)
+            throws XMLStreamException {
+
+        final String identifier = Integer.toString(instance.hashCode());
+        final String type = "int";
+
+        /*
+         * Write the identifier of the instance
+         */
+        writeStartTag(XMLHandler.IDENTIFIER_ROOT);
+        writeTextElement(identifier);
+        writeEndTag(XMLHandler.IDENTIFIER_ROOT);
+
+        /*
+         * Write the type
+         */
+        writeStartTag(XMLHandler.TYPE_ROOT);
+        writeTextElement(type);
+        writeEndTag(XMLHandler.TYPE_ROOT);
+
+        /*
+         * Write the fields belonging to this instance
+         */
+        writeStartTag(XMLHandler.FIELD_ROOT);
+        writeTextElement(instance.toString());
+        writeEndTag(XMLHandler.FIELD_ROOT);
+    }
+
+    /**
+     * Writes an instance of {@link ModelInstance} as XML.
+     * 
+     * @param instance
+     *            the instance to write
+     * @throws XMLStreamException
+     *             in case the XML could not be generated
+     */
+    private void writeInstance(final ModelInstance instance)
+            throws XMLStreamException {
+
+        final String identifier = instance.getIdentifier();
+        final String type = instance.getType();
+
+        /*
+         * Write the identifier of the instance
+         */
+        writeStartTag(XMLHandler.IDENTIFIER_ROOT);
+        writeTextElement(identifier);
+        writeEndTag(XMLHandler.IDENTIFIER_ROOT);
+
+        /*
+         * Write the type
+         */
+        writeStartTag(XMLHandler.TYPE_ROOT);
+        writeTextElement(type);
+        writeEndTag(XMLHandler.TYPE_ROOT);
+
+        /*
+         * Write the fields belonging to this instance
+         */
+        writeStartTag(XMLHandler.FIELD_ROOT);
+        for (final ModelVariable child : instance.getFields()) {
+            writeTextElement(child.getIdentifier());
+        }
+        writeEndTag(XMLHandler.FIELD_ROOT);
+    }
+
+    /**
+     * Writes an instance of of some Object to XML
+     * 
+     * @param instance
+     *            the instance to write
+     * @throws XMLStreamException
+     *             in case the XML could not be generated
+     */
+    private void writeInstance(final Object instance) throws XMLStreamException {
+
+        writeStartTag(XMLHandler.INSTANCE_ROOT);
+
+        if (instance instanceof ModelInstance) {
+            writeInstance((ModelInstance) instance);
+        } else if (instance instanceof Integer) {
+            writeInstance((Integer) instance);
+        }
+        writeEndTag(XMLHandler.INSTANCE_ROOT);
+    }
+
+    /**
+     * Write the relevant information contained in the {@link KeYJavaMethod}
+     * instance belonging to the test case.
+     * 
+     * @param method
+     *            the {@link KeYJavaMethod} instance
+     * @throws XMLStreamException
+     *             in case the XML could not be generated
+     */
+    private void writeMethodInfo(final KeYJavaMethod method)
+            throws XMLStreamException {
+
+        writeStartTag(XMLHandler.METHOD_ROOT);
+
+        /*
+         * Write the name of the method
+         */
+        writeStartTag(XMLHandler.NAME_ROOT);
+        writeTextElement(method.getProgramMethod().getFullName());
+        writeEndTag(XMLHandler.NAME_ROOT);
+
+        /*
+         * Write the parameters
+         */
+        writeStartTag(XMLHandler.PARAMETERS_ROOT);
+        for (final IProgramVariable parameter : method.getParameters()) {
+            writeTextElement(parameter.name().toString());
+        }
+        writeEndTag(XMLHandler.PARAMETERS_ROOT);
+
+        writeEndTag(XMLHandler.METHOD_ROOT);
     }
 
     /**
@@ -187,257 +530,18 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @throws XMLStreamException
      *             in case the XML could not be generated
      */
-    private void writeOracle(Term oracle) throws XMLVisitorException,
+    private void writeOracle(final Term oracle) throws XMLVisitorException,
             XMLStreamException {
 
-        OracleVisitor oracleVisitor = new OracleVisitor();
+        final OracleVisitor oracleVisitor = new OracleVisitor();
         oracle.execPreOrder(oracleVisitor);
-        List<XMLEvent> rawOracleXML = oracleVisitor.getElements();
+        final List<XMLEvent> rawOracleXML = oracleVisitor.getElements();
 
-        writeStartTag(ORACLE_ROOT);
-        for (XMLEvent event : rawOracleXML) {
+        writeStartTag(XMLHandler.ORACLE_ROOT);
+        for (final XMLEvent event : rawOracleXML) {
             writeXMLEvent(event);
         }
-        writeEndTag(ORACLE_ROOT);
-    }
-
-    /**
-     * Write the relevant information contained in the {@link KeYJavaMethod}
-     * instance belonging to the test case.
-     * 
-     * @param method
-     *            the {@link KeYJavaMethod} instance
-     * @throws XMLStreamException
-     *             in case the XML could not be generated
-     */
-    private void writeMethodInfo(KeYJavaMethod method)
-            throws XMLStreamException {
-
-        writeStartTag(METHOD_ROOT);
-
-        /*
-         * Write the name of the method
-         */
-        writeStartTag(NAME_ROOT);
-        writeTextElement(method.getProgramMethod().getFullName());
-        writeEndTag(NAME_ROOT);
-
-        /*
-         * Write the parameters
-         */
-        writeStartTag(PARAMETERS_ROOT);
-        for (IProgramVariable parameter : method.getParameters()) {
-            writeTextElement(parameter.name().toString());
-        }
-        writeEndTag(PARAMETERS_ROOT);
-
-        writeEndTag(METHOD_ROOT);
-    }
-
-    /**
-     * Converts a {@link Model} instance to KeYTestgens native XML format. In
-     * the context of the test case itself, this represents the test fixture, or
-     * program state prior to the execution of the method.
-     * 
-     * @param model
-     *            the model to convert
-     * @throws XMLStreamException
-     *             in case the XML could not be generated
-     */
-    private void writeFixture(Model model) throws XMLStreamException {
-
-        writeStartTag(TESTFIXTURE_ROOT);
-
-        /*
-         * Write the variables contained in this fixture
-         */
-        writeStartTag(VARIABLES_ROOT);
-        for (ModelVariable modelVariable : model.getVariables()) {
-            writeVariable(modelVariable);
-        }
-        writeEndTag(VARIABLES_ROOT);
-
-        /*
-         * Write the instances contained in this fixture
-         */
-        writeStartTag(INSTANCES_ROOT);
-        for (ModelVariable modelVariable : model.getVariables()) {
-            writeInstance(modelVariable.getValue());
-        }
-        writeEndTag(INSTANCES_ROOT);
-
-        writeEndTag(TESTFIXTURE_ROOT);
-    }
-
-    /**
-     * Writes an instance of {@link ModelVariable} as XML.
-     * 
-     * @param variable
-     *            the variable to write
-     * @throws XMLStreamException
-     *             in case the XML could not be generated
-     */
-    private void writeVariable(ModelVariable variable)
-            throws XMLStreamException {
-
-        writeStartTag(VARIABLE_ROOT);
-
-        String identifier = variable.getIdentifier();
-        String type = variable.getType();
-
-        /*
-         * Write the identifier of this particular variable
-         */
-        writeStartTag(IDENTIFIER_ROOT);
-        writeTextElement(identifier);
-        writeEndTag(IDENTIFIER_ROOT);
-
-        /*
-         * Write the type of this variable
-         */
-        writeStartTag(TYPE_ROOT);
-        writeTextElement(type);
-        writeEndTag(TYPE_ROOT);
-
-        /*
-         * Write the instance pointed to by this variable FIXME: Abstraction
-         * needs to handle uniqueness in a better way, do not rely on hashCode.
-         */
-        writeStartTag(VALUE_ROOT);
-        writeTextElement(variable.getValue());
-        writeEndTag(VALUE_ROOT);
-
-        writeEndTag(VARIABLE_ROOT);
-    }
-
-    /**
-     * Writes an instance of of some Object to XML
-     * 
-     * @param instance
-     *            the instance to write
-     * @throws XMLStreamException
-     *             in case the XML could not be generated
-     */
-    private void writeInstance(Object instance) throws XMLStreamException {
-
-        writeStartTag(INSTANCE_ROOT);
-
-        if (instance instanceof ModelInstance) {
-            writeInstance((ModelInstance) instance);
-        } else if (instance instanceof Integer) {
-            writeInstance((Integer) instance);
-        }
-        writeEndTag(INSTANCE_ROOT);
-    }
-
-    /**
-     * Writes an instance of {@link ModelInstance} as XML.
-     * 
-     * @param instance
-     *            the instance to write
-     * @throws XMLStreamException
-     *             in case the XML could not be generated
-     */
-    private void writeInstance(ModelInstance instance)
-            throws XMLStreamException {
-
-        String identifier = instance.getIdentifier();
-        String type = instance.getType();
-
-        /*
-         * Write the identifier of the instance
-         */
-        writeStartTag(IDENTIFIER_ROOT);
-        writeTextElement(identifier);
-        writeEndTag(IDENTIFIER_ROOT);
-
-        /*
-         * Write the type
-         */
-        writeStartTag(TYPE_ROOT);
-        writeTextElement(type);
-        writeEndTag(TYPE_ROOT);
-
-        /*
-         * Write the fields belonging to this instance
-         */
-        writeStartTag(FIELD_ROOT);
-        for (ModelVariable child : instance.getFields()) {
-            writeTextElement(child.getIdentifier());
-        }
-        writeEndTag(FIELD_ROOT);
-    }
-
-    private void writeInstance(Integer instance) throws XMLStreamException {
-
-        String identifier = Integer.toString(instance.hashCode());
-        String type = "int";
-
-        /*
-         * Write the identifier of the instance
-         */
-        writeStartTag(IDENTIFIER_ROOT);
-        writeTextElement(identifier);
-        writeEndTag(IDENTIFIER_ROOT);
-
-        /*
-         * Write the type
-         */
-        writeStartTag(TYPE_ROOT);
-        writeTextElement(type);
-        writeEndTag(TYPE_ROOT);
-
-        /*
-         * Write the fields belonging to this instance
-         */
-        writeStartTag(FIELD_ROOT);
-        writeTextElement(instance.toString());
-        writeEndTag(FIELD_ROOT);
-    }
-
-    /**
-     * Write a preamble for the generated XML document.
-     * 
-     * @param documentName
-     *            the root tag of the document
-     * @throws XMLStreamException
-     */
-    private void writeDocumentStart(String documentName)
-            throws XMLStreamException {
-
-        if (format) {
-            eventWriter.add(eventFactory.createStartDocument());
-            eventWriter.add(newline);
-            eventWriter.add(eventFactory.createStartElement("", "",
-                    documentName));
-            eventWriter.add(newline);
-        } else {
-            eventWriter.add(eventFactory.createStartDocument());
-            eventWriter.add(eventFactory.createStartElement("", "",
-                    documentName));
-        }
-    }
-
-    /**
-     * Write the closing section of the document.
-     * 
-     * @param documentName
-     * @throws XMLStreamException
-     */
-    private void writeDocumentEnd(String documentName)
-            throws XMLStreamException {
-
-        if (format) {
-            eventWriter
-                    .add(eventFactory.createEndElement("", "", documentName));
-            eventWriter.add(newline);
-            eventWriter.add(eventFactory.createEndDocument());
-            eventWriter.add(newline);
-        } else {
-            eventWriter
-                    .add(eventFactory.createEndElement("", "", documentName));
-            eventWriter.add(eventFactory.createEndDocument());
-        }
+        writeEndTag(XMLHandler.ORACLE_ROOT);
     }
 
     /**
@@ -448,36 +552,39 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @throws XMLStreamException
      *             in the event there was an error writing the xml
      */
-    private void writeStartTag(String tagName) throws XMLStreamException {
+    private void writeStartTag(final String tagName) throws XMLStreamException {
 
         if (format) {
             indentationCounter++;
             addIndentation();
-            eventWriter.add(eventFactory.createStartElement("", "", tagName));
-            eventWriter.add(newline);
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
+                    "", tagName));
+            eventWriter.add(XMLConverter.newline);
         } else {
-            eventWriter.add(eventFactory.createStartElement("", "", tagName));
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
+                    "", tagName));
         }
     }
 
     /**
-     * Write a closing tag to the stream, i.e. <\"tag">
+     * Converts a {@link TestCase} instance to KeYTestGens native XML format
      * 
-     * @param tagName
-     *            the name of the tag to write
+     * @param testCase
+     *            the test case to convert
      * @throws XMLStreamException
-     *             in the event there was an error writing the xml
+     *             in case the XML could not be generated
+     * @throws XMLVisitorException
      */
-    private void writeEndTag(String tagName) throws XMLStreamException {
+    private void writeTestCase(final TestCase testCase)
+            throws XMLStreamException, XMLVisitorException {
 
-        if (format) {
-            addIndentation();
-            eventWriter.add(eventFactory.createEndElement("", "", tagName));
-            eventWriter.add(newline);
-            indentationCounter--;
-        } else {
-            eventWriter.add(eventFactory.createEndElement("", "", tagName));
-        }
+        writeStartTag(XMLHandler.TESTCASE_ROOT);
+
+        writeMethodInfo(testCase.getMethod());
+        writeFixture(testCase.getModel());
+        writeOracle(testCase.getOracle());
+
+        writeEndTag(XMLHandler.TESTCASE_ROOT);
     }
 
     /**
@@ -501,21 +608,57 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
             indentationCounter++;
             addIndentation();
             indentationCounter--;
-            eventWriter.add(eventFactory.createCharacters(element.toString()));
-            eventWriter.add(newline);
+            eventWriter.add(XMLConverter.eventFactory.createCharacters(element
+                    .toString()));
+            eventWriter.add(XMLConverter.newline);
         } else {
-            eventWriter.add(eventFactory.createCharacters(element.toString()));
+            eventWriter.add(XMLConverter.eventFactory.createCharacters(element
+                    .toString()));
         }
     }
 
-    private void addIndentation() throws XMLStreamException {
+    /**
+     * Writes an instance of {@link ModelVariable} as XML.
+     * 
+     * @param variable
+     *            the variable to write
+     * @throws XMLStreamException
+     *             in case the XML could not be generated
+     */
+    private void writeVariable(final ModelVariable variable)
+            throws XMLStreamException {
 
-        for (int i = 0; i < indentationCounter; i++) {
-            eventWriter.add(tab);
-        }
+        writeStartTag(XMLHandler.VARIABLE_ROOT);
+
+        final String identifier = variable.getIdentifier();
+        final String type = variable.getType();
+
+        /*
+         * Write the identifier of this particular variable
+         */
+        writeStartTag(XMLHandler.IDENTIFIER_ROOT);
+        writeTextElement(identifier);
+        writeEndTag(XMLHandler.IDENTIFIER_ROOT);
+
+        /*
+         * Write the type of this variable
+         */
+        writeStartTag(XMLHandler.TYPE_ROOT);
+        writeTextElement(type);
+        writeEndTag(XMLHandler.TYPE_ROOT);
+
+        /*
+         * Write the instance pointed to by this variable FIXME: Abstraction
+         * needs to handle uniqueness in a better way, do not rely on hashCode.
+         */
+        writeStartTag(XMLHandler.VALUE_ROOT);
+        writeTextElement(variable.getValue());
+        writeEndTag(XMLHandler.VALUE_ROOT);
+
+        writeEndTag(XMLHandler.VARIABLE_ROOT);
     }
 
-    private void writeXMLEvent(XMLEvent event) throws XMLStreamException {
+    private void writeXMLEvent(final XMLEvent event) throws XMLStreamException {
 
         if (event instanceof DTD) {
             if (format) {
@@ -527,137 +670,5 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
             indentationCounter--;
             eventWriter.add(event);
         }
-    }
-
-    /**
-     * Instances of this class are used to generate an XML representation from a
-     * {@link Term} postcondition.
-     * 
-     * @author christopher
-     */
-    private static class OracleVisitor extends KeYTestGenTermVisitor {
-
-        /**
-         * Since {@link Visitor} does not support exceptional behavior, whereas
-         * the {@link XMLEventWriter} demands it, we use an intermediary buffer
-         * to store events, and write them only after the visitation process is
-         * completed.
-         */
-        private LinkedList<XMLEvent> elements = new LinkedList<XMLEvent>();
-
-        /**
-         * Use a stack in order to properly determine the order in which start
-         * and end tags should be inserted for XML elements in the Term.
-         */
-        private Stack<String> elementNames = new Stack<String>();
-
-        public List<XMLEvent> getElements() {
-
-            return elements;
-        }
-
-        /**
-         * Generate a textual representation for each relevant node
-         */
-        @Override
-        public void visit(Term visited) {
-
-            Operator operator = visited.op();
-
-            if (operator instanceof LocationVariable
-                    || operator instanceof SortDependingFunction
-                    || visited.sort() instanceof NullSort) {
-                addVariableNode(visited);
-            }
-        }
-
-        /**
-         * Whenever a subtree is entered, create a tag corresponding to the type
-         * of the root element, and push the name of the element on the stack in
-         * order to later generate an end tag.
-         */
-        @Override
-        public void subtreeEntered(Term subtreeRoot) {
-
-            /*
-             * Verify that the operator bound at the current term represents a
-             * concept suitable for putting in a tag
-             */
-            if (isBinaryFunction2(subtreeRoot)) {
-                String operatorName = subtreeRoot.op().name().toString();
-
-                XMLEvent startTag = eventFactory.createStartElement("", "",
-                        operatorName);
-                addTag(startTag);
-
-                elementNames.push(operatorName);
-            }
-        }
-
-        /**
-         * Whenever a subtree is left, generate a closing tag corresponding to
-         * the one that was created when the tree was first entered.
-         */
-        @Override
-        public void subtreeLeft(Term subtreeRoot) {
-
-            if (isBinaryFunction2(subtreeRoot)) {
-                String operatorName = elementNames.pop();
-                XMLEvent endTag = eventFactory.createEndElement("", "",
-                        operatorName);
-                addTag(endTag);
-            }
-        }
-
-        /**
-         * Add a tag, together with formatting, to the outputStream.
-         * 
-         * @param tag
-         *            the tag to insert
-         */
-        private void addTag(XMLEvent tag) {
-
-            for (int i = 0; i < elementNames.size(); i++) {
-                elements.add(tab);
-            }
-            elements.add(tag);
-            elements.add(newline);
-        }
-
-        /**
-         * Add a tag, together with formatting, to the outputstream, indented by
-         * a specific number of extra tabs.
-         * 
-         * @param tag
-         *            the tag to insert
-         * @param extraTabs
-         *            number of extra tabs that should be added to the
-         *            indentation of the tag
-         */
-        private void addTag(XMLEvent tag, int extraTabs) {
-
-            for (int i = 0; i < extraTabs; i++) {
-                elements.add(tab);
-            }
-            addTag(tag);
-        }
-
-        /**
-         * Add a node representing a program variable to the outputStream.
-         * 
-         * @param term
-         *            the {@link Term} from which to generate the Node
-         */
-        private void addVariableNode(Term term) {
-
-            String variableName = resolveIdentifierString(term, SEPARATOR);
-            addTag(eventFactory.createCharacters(variableName), 1);
-        }
-    }
-
-    @Override
-    public String convert(TestSuite testSuite) {
-
-        return null;
     }
 }

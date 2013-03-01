@@ -12,11 +12,11 @@ public enum StringConstants {
     SELF("self"), NEWLINE("\n"), TAB("    "), FIELD_SEPARATOR("_");
     ;
 
-    private StringConstants(String keyWord) {
+    private final String keyWord;
+
+    private StringConstants(final String keyWord) {
         this.keyWord = keyWord;
     }
-
-    private final String keyWord;
 
     @Override
     public String toString() {

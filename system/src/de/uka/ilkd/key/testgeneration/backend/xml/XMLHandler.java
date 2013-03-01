@@ -13,10 +13,10 @@ public abstract class XMLHandler {
 
     protected static final List<String> primitiveTypes = new LinkedList<String>();
     static {
-        primitiveTypes.add("byte");
-        primitiveTypes.add("int");
-        primitiveTypes.add("long");
-        primitiveTypes.add("boolean");
+        XMLHandler.primitiveTypes.add("byte");
+        XMLHandler.primitiveTypes.add("int");
+        XMLHandler.primitiveTypes.add("long");
+        XMLHandler.primitiveTypes.add("boolean");
     }
 
     /**

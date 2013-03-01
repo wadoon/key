@@ -28,6 +28,15 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class ModelVariable {
 
+    public static boolean isValidValueType(final Object object) {
+
+        return object.getClass() == ModelInstance.class
+                || object.getClass() == Integer.class
+                || object.getClass() == Byte.class
+                || object.getClass() == Long.class
+                || object.getClass() == Boolean.class;
+    }
+
     /**
      * The wrapped {@link ProgramVariable} instance.
      */
@@ -55,19 +64,16 @@ public class ModelVariable {
     private ModelInstance parentModelInstance;
 
     /**
-     * This flag indicates whether or not this variable represents a top level
-     * declaration. What this means in the context of KeYTestGen is that this
-     * variable is declared as part of the class which contains the method being
-     * tested (as opposed to being declared as a field of some other object
-     * which is itself declared by this class, etc.
-     */
-    private boolean isTopLevelVariable = false;
-
-    /**
      * This flag indicates whether or not this variable is declared in the
      * parameter list for a method.
      */
     private boolean isParameter = false;
+
+    public ModelVariable(final IProgramVariable programVariable,
+            final String identifier) {
+
+        this(programVariable, identifier, null);
+    }
 
     /**
      * Create a ModelVariable from an existing {@link ProgramVariable},
@@ -76,24 +82,57 @@ public class ModelVariable {
      * 
      * @param programVariable
      */
-    public ModelVariable(IProgramVariable programVariable, String identifier,
-            ModelInstance referedInstance) {
+    public ModelVariable(final IProgramVariable programVariable,
+            final String identifier, final ModelInstance referedInstance) {
 
-        this.variable = programVariable;
+        variable = programVariable;
 
         this.identifier = identifier;
-        this.boundValue = referedInstance;
+        boundValue = referedInstance;
 
     }
 
-    public ModelVariable(IProgramVariable programVariable, String identifier) {
+    /**
+     * Since we are working with unique Java statements, two
+     * {@link ModelVariable} instances are equal iff. their paths are identical.
+     */
+    @Override
+    public boolean equals(final Object obj) {
 
-        this(programVariable, identifier, null);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ModelVariable other = (ModelVariable) obj;
+        return identifier.equals(other.identifier);
+    }
+
+    /**
+     * A variable is uniquely identified by its identifier.
+     */
+    public String getIdentifier() {
+
+        return variable.name().toString();
     }
 
     public String getName() {
 
         return identifier;
+    }
+
+    /**
+     * Returns the {@link ModelInstance} of which this variable is a field
+     * 
+     * @return
+     */
+    public ModelInstance getParentModelInstance() {
+
+        return parentModelInstance;
     }
 
     /**
@@ -115,80 +154,6 @@ public class ModelVariable {
     }
 
     /**
-     * Sets the value of this variable. TODO: Add type checking?
-     * 
-     * @param value
-     */
-    public void setValue(Object value) {
-
-        this.boundValue = value;
-    }
-
-    /**
-     * A variable is uniquely identified by its identifier.
-     */
-    public String getIdentifier() {
-
-        return variable.name().toString();
-    }
-
-    public static boolean isValidValueType(Object object) {
-
-        return object.getClass() == ModelInstance.class
-                || object.getClass() == Integer.class
-                || object.getClass() == Byte.class
-                || object.getClass() == Long.class
-                || object.getClass() == Boolean.class;
-    }
-
-    /**
-     * Since we are working with unique Java statements, two
-     * {@link ModelVariable} instances are equal iff. their paths are identical.
-     */
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        ModelVariable other = (ModelVariable) obj;
-        return this.identifier.equals(other.identifier);
-    }
-
-    @Override
-    public String toString() {
-
-        return getType() + " : " + identifier;
-    }
-
-    /**
-     * Returns the {@link ModelInstance} of which this variable is a field
-     * 
-     * @return
-     */
-    public ModelInstance getParentModelInstance() {
-
-        return parentModelInstance;
-    }
-
-    /**
-     * Sets the {@link ModelInstance} of which this variable forms a field.
-     * FIXME: this should not be assignable at all, violates abstraction.
-     * 
-     * @param parentModelInstance
-     */
-    public void setParentModelInstance(ModelInstance parentModelInstance) {
-
-        this.parentModelInstance = parentModelInstance;
-    }
-
-    /**
      * @return the isParameter
      */
     public boolean isParameter() {
@@ -199,7 +164,34 @@ public class ModelVariable {
      * @param isParameter
      *            the isParameter to set
      */
-    public void setParameter(boolean isParameter) {
+    public void setParameter(final boolean isParameter) {
         this.isParameter = isParameter;
+    }
+
+    /**
+     * Sets the {@link ModelInstance} of which this variable forms a field.
+     * FIXME: this should not be assignable at all, violates abstraction.
+     * 
+     * @param parentModelInstance
+     */
+    public void setParentModelInstance(final ModelInstance parentModelInstance) {
+
+        this.parentModelInstance = parentModelInstance;
+    }
+
+    /**
+     * Sets the value of this variable. TODO: Add type checking?
+     * 
+     * @param value
+     */
+    public void setValue(final Object value) {
+
+        boundValue = value;
+    }
+
+    @Override
+    public String toString() {
+
+        return getType() + " : " + identifier;
     }
 }

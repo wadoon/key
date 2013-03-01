@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.testgeneration.core.model.tools;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -9,7 +8,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
+import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.AbstractTermTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
@@ -20,56 +19,6 @@ import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerE
  * @author christopher
  */
 public class ModelGenerationTools {
-
-    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
-            .toString();
-
-    private static final TermSimplificationTransformer termSimplificationTransformer = new TermSimplificationTransformer();
-
-    /**
-     * Allow only static access
-     */
-    private ModelGenerationTools() {
-
-    }
-
-    /**
-     * Given an initial {@link Term}, constructs a simpler Term which
-     * "localizes" all occurences of primitive datatypes, by transforming the
-     * instances of {@link SortDependingFunction} which contain them.
-     * <p>
-     * As an example of how this works, consider the case where we have an
-     * instace of some class <code>Base</code> named "base", which as a field
-     * has an instance of some other class <code>Inner</code> named "inner",
-     * which in turn has a local instance of an <code>integer </code> named
-     * "localInt. Normally, simply transforming such a construct to an SMT-LIB
-     * formula would result in a needlesly complex expression and model, which
-     * is a waste of both resources and time invested in developing additional
-     * parsers to understand it.
-     * <p>
-     * What we do instead is to simply transform the construct into a local
-     * variable of our base class, giving it a name corresponding to its nesting
-     * order. In our case, such a name migh be "base$nested$localInt". When all
-     * variables have been processed like this, we end up with a greatly
-     * simplified term which can easily be expressed as an SMT-LIB construct.
-     * <p>
-     * This process will also remove all implied properties of internal objects,
-     * such as not-null requirements, since these are not needed in the
-     * simplified formula, and would only further pollute the SMT-LIB
-     * expression. Further, it will simplify the formula by removing unnecessary
-     * conjuntions.
-     * 
-     * @param term
-     *            the term to process
-     * @return the simplified term
-     * @throws TermTransformerException
-     * @throws ModelGeneratorException
-     */
-    public static Term simplifyTerm(Term targetNodeCondition)
-            throws TermTransformerException {
-
-        return termSimplificationTransformer.transform(targetNodeCondition);
-    }
 
     private static class TermSimplificationTransformer extends
             AbstractTermTransformer {
@@ -107,96 +56,9 @@ public class ModelGenerationTools {
          * @throws ModelGeneratorException
          */
         @Override
-        public Term transform(Term term) throws TermTransformerException {
+        public Term transform(final Term term) throws TermTransformerException {
 
             return transformTerm(term);
-        }
-
-        /**
-         * Simplifying ordinary Terms only amounts to removing all Boolean typed
-         * variables and constants in the Term.
-         */
-        @Override
-        public Term transformTerm(Term term) throws TermTransformerException {
-
-            /*
-             * Booleans are removed without reservation
-             */
-            if (isBoolean(term) || isIfThenElse(term)) {
-                return null;
-            }
-            return super.transformTerm(term);
-        }
-
-        /**
-         * Given an {@link Term} of type {@link SortDependingFunction}, with a
-         * primitive type as its sort, resolve the nesting hierarchy for this
-         * variable, and encode this information as a new local variable, whose
-         * name will depend on the classes involved in the nesting hierarchy.
-         * For example, the int value x in the hiearchy
-         * main.nested.other.yetanother.x will be renamed
-         * "main$nested$other$yetanother$x", and treated simply as a local
-         * variable in the object main.
-         * 
-         * @param term
-         *            the term to process
-         * @return a Term representing the nested variable as a local variable
-         */
-        @Override
-        protected Term transformSortDependentFunction(Term term) {
-
-            String sortName = term.sort().toString();
-
-            /*
-             * Check if the base type of the selection statement is a primitive
-             * type (we do not handle anything else). If so, create an alias for
-             * the nested variable, and return everything else as a new
-             * LocationVariable.
-             */
-            if (primitiveTypes.contains(sortName)) {
-
-                ProgramElementName resolvedVariableName = new ProgramElementName(
-                        resolveIdentifierString(term, SEPARATOR));
-
-                LocationVariable resolvedVariable = new LocationVariable(
-                        resolvedVariableName, term.sort());
-
-                return termFactory.createTerm(resolvedVariable);
-            }
-
-            return null;
-        }
-
-        /**
-         * The transformation of the nulltype is simply to return a null value.
-         */
-        @Override
-        protected Term transformNull(Term term) {
-
-            return null;
-        }
-
-        /**
-         * Simplify a negation. If the child is simplified to null, simply
-         * return null. Otherwise, create a new negation of the simplification
-         * of the child.
-         * 
-         * @param term
-         *            the term (logical negator) to simplify
-         * @return the simplified negation
-         * @throws TermTransformerException
-         * @throws ModelGeneratorException
-         */
-        @Override
-        protected Term transformNot(Term term) throws TermTransformerException {
-
-            Term newChild = transformTerm(term.sub(0));
-
-            if (newChild == null) {
-                return null;
-            }
-
-            return termFactory.createTerm(Junctor.NOT, newChild);
         }
 
         /**
@@ -210,10 +72,11 @@ public class ModelGenerationTools {
          * @throws ModelGeneratorException
          */
         @Override
-        protected Term transformAnd(Term term) throws TermTransformerException {
+        protected Term transformAnd(final Term term)
+                throws TermTransformerException {
 
-            Term firstChild = transformTerm(term.sub(0));
-            Term secondChild = transformTerm(term.sub(1));
+            final Term firstChild = transformTerm(term.sub(0));
+            final Term secondChild = transformTerm(term.sub(1));
 
             if (firstChild != null && secondChild == null) {
                 return firstChild;
@@ -232,6 +95,73 @@ public class ModelGenerationTools {
         }
 
         /**
+         * In terms of logical representation, equality differs from the other
+         * comparators (leq, geq etc) in the sense that it can be applied to
+         * boolean values as well as numeric ones. Thus, it is treated
+         * differently in the sense that we simplify it the same way that we
+         * simplify junctors.
+         * 
+         * @param term
+         * @return
+         * @throws ModelGeneratorException
+         */
+        @Override
+        protected Term transformEquals(final Term term)
+                throws TermTransformerException {
+
+            final Term firstChild = transformTerm(term.sub(0));
+            final Term secondChild = transformTerm(term.sub(1));
+
+            if (firstChild != null && secondChild == null) {
+                return firstChild;
+            }
+
+            if (firstChild == null && secondChild != null) {
+                return secondChild;
+            }
+
+            if (firstChild != null && secondChild != null) {
+                return termFactory.createTerm(term.op(), firstChild,
+                        secondChild);
+            }
+
+            return null;
+        }
+
+        /**
+         * Simplify a negation. If the child is simplified to null, simply
+         * return null. Otherwise, create a new negation of the simplification
+         * of the child.
+         * 
+         * @param term
+         *            the term (logical negator) to simplify
+         * @return the simplified negation
+         * @throws TermTransformerException
+         * @throws ModelGeneratorException
+         */
+        @Override
+        protected Term transformNot(final Term term)
+                throws TermTransformerException {
+
+            final Term newChild = transformTerm(term.sub(0));
+
+            if (newChild == null) {
+                return null;
+            }
+
+            return termFactory.createTerm(Junctor.NOT, newChild);
+        }
+
+        /**
+         * The transformation of the nulltype is simply to return a null value.
+         */
+        @Override
+        protected Term transformNull(final Term term) {
+
+            return null;
+        }
+
+        /**
          * Simplifies an OR junctor by examining the operands. If one of them
          * can be simplified to null, the entire junction can be replaced by the
          * second operand. If both are simplified to null, the entire
@@ -242,10 +172,11 @@ public class ModelGenerationTools {
          * @throws ModelGeneratorException
          */
         @Override
-        protected Term transformOr(Term term) throws TermTransformerException {
+        protected Term transformOr(final Term term)
+                throws TermTransformerException {
 
-            Term firstChild = transformTerm(term.sub(0));
-            Term secondChild = transformTerm(term.sub(1));
+            final Term firstChild = transformTerm(term.sub(0));
+            final Term secondChild = transformTerm(term.sub(1));
 
             if (firstChild != null && secondChild == null) {
                 return firstChild;
@@ -264,38 +195,112 @@ public class ModelGenerationTools {
         }
 
         /**
-         * In terms of logical representation, equality differs from the other
-         * comparators (leq, geq etc) in the sense that it can be applied to
-         * boolean values as well as numeric ones. Thus, it is treated
-         * differently in the sense that we simplify it the same way that we
-         * simplify junctors.
+         * Given an {@link Term} of type {@link SortDependingFunction}, with a
+         * primitive type as its sort, resolve the nesting hierarchy for this
+         * variable, and encode this information as a new local variable, whose
+         * name will depend on the classes involved in the nesting hierarchy.
+         * For example, the int value x in the hiearchy
+         * main.nested.other.yetanother.x will be renamed
+         * "main$nested$other$yetanother$x", and treated simply as a local
+         * variable in the object main.
          * 
          * @param term
-         * @return
-         * @throws ModelGeneratorException
+         *            the term to process
+         * @return a Term representing the nested variable as a local variable
          */
         @Override
-        protected Term transformEquals(Term term)
-                throws TermTransformerException {
+        protected Term transformSortDependentFunction(final Term term) {
 
-            Term firstChild = transformTerm(term.sub(0));
-            Term secondChild = transformTerm(term.sub(1));
+            final String sortName = term.sort().toString();
 
-            if (firstChild != null && secondChild == null) {
-                return firstChild;
-            }
+            /*
+             * Check if the base type of the selection statement is a primitive
+             * type (we do not handle anything else). If so, create an alias for
+             * the nested variable, and return everything else as a new
+             * LocationVariable.
+             */
+            if (AbstractTermParser.primitiveTypes.contains(sortName)) {
 
-            if (firstChild == null && secondChild != null) {
-                return secondChild;
-            }
+                final ProgramElementName resolvedVariableName = new ProgramElementName(
+                        AbstractTermParser.resolveIdentifierString(term,
+                                ModelGenerationTools.SEPARATOR));
 
-            if (firstChild != null && secondChild != null) {
-                return termFactory.createTerm(term.op(), firstChild,
-                        secondChild);
+                final LocationVariable resolvedVariable = new LocationVariable(
+                        resolvedVariableName, term.sort());
+
+                return termFactory.createTerm(resolvedVariable);
             }
 
             return null;
         }
+
+        /**
+         * Simplifying ordinary Terms only amounts to removing all Boolean typed
+         * variables and constants in the Term.
+         */
+        @Override
+        public Term transformTerm(final Term term)
+                throws TermTransformerException {
+
+            /*
+             * Booleans are removed without reservation
+             */
+            if (isBoolean(term) || isIfThenElse(term)) {
+                return null;
+            }
+            return super.transformTerm(term);
+        }
+
+    }
+
+    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
+            .toString();
+
+    private static final TermSimplificationTransformer termSimplificationTransformer = new TermSimplificationTransformer();
+
+    /**
+     * Given an initial {@link Term}, constructs a simpler Term which
+     * "localizes" all occurences of primitive datatypes, by transforming the
+     * instances of {@link SortDependingFunction} which contain them.
+     * <p>
+     * As an example of how this works, consider the case where we have an
+     * instace of some class <code>Base</code> named "base", which as a field
+     * has an instance of some other class <code>Inner</code> named "inner",
+     * which in turn has a local instance of an <code>integer </code> named
+     * "localInt. Normally, simply transforming such a construct to an SMT-LIB
+     * formula would result in a needlesly complex expression and model, which
+     * is a waste of both resources and time invested in developing additional
+     * parsers to understand it.
+     * <p>
+     * What we do instead is to simply transform the construct into a local
+     * variable of our base class, giving it a name corresponding to its nesting
+     * order. In our case, such a name migh be "base$nested$localInt". When all
+     * variables have been processed like this, we end up with a greatly
+     * simplified term which can easily be expressed as an SMT-LIB construct.
+     * <p>
+     * This process will also remove all implied properties of internal objects,
+     * such as not-null requirements, since these are not needed in the
+     * simplified formula, and would only further pollute the SMT-LIB
+     * expression. Further, it will simplify the formula by removing unnecessary
+     * conjuntions.
+     * 
+     * @param term
+     *            the term to process
+     * @return the simplified term
+     * @throws TermTransformerException
+     * @throws ModelGeneratorException
+     */
+    public static Term simplifyTerm(final Term targetNodeCondition)
+            throws TermTransformerException {
+
+        return ModelGenerationTools.termSimplificationTransformer
+                .transform(targetNodeCondition);
+    }
+
+    /**
+     * Allow only static access
+     */
+    private ModelGenerationTools() {
 
     }
 }

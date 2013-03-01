@@ -53,7 +53,7 @@ public class Model {
         /*
          * Check if the variable already exists in the buffer.
          */
-        ModelVariable localVariable = lookupVariable(variable);
+        final ModelVariable localVariable = lookupVariable(variable);
 
         /*
          * If it does, configure it properly according to the provided value,
@@ -84,6 +84,38 @@ public class Model {
     }
 
     /**
+     * Places the variable target as a field of the {@link ModelInstance}
+     * referred to by the variable other.
+     * 
+     * @param target
+     *            the variable to insert as a field
+     * @param other
+     *            the variable pointing to the object instance we are inserting
+     *            into
+     */
+    public void assignField(ModelVariable target, final ModelVariable other) {
+
+        if (!target.equals(other)) {
+            target = lookupVariable(target);
+            final ModelVariable localOther = lookupVariable(other);
+
+            /*
+             * If the other currently does not exist in the Model, buffer it for
+             * subsequent insertion.
+             */
+            if (other == null) {
+                buffer.put(other, target);
+                return;
+            }
+
+            final ModelInstance instance = (ModelInstance) localOther
+                    .getValue();
+            instance.addField(target);
+            target.setParentModelInstance(instance);
+        }
+    }
+
+    /**
      * Links two {@link ModelVariable} instances, causing target to point to the
      * {@link ModelInstance} which other is pointing to.
      * 
@@ -109,34 +141,22 @@ public class Model {
     }
 
     /**
-     * Places the variable target as a field of the {@link ModelInstance}
-     * referred to by the variable other.
+     * Returns the {@link ModelVariable} instance having a specific reference.
      * 
-     * @param target
-     *            the variable to insert as a field
-     * @param other
-     *            the variable pointing to the object instance we are inserting
-     *            into
+     * @param reference
+     *            the reference
+     * @return the found instance, null if no instance is found with the
+     *         specified reference
      */
-    public void assignField(ModelVariable target, ModelVariable other) {
+    public ModelVariable getVariable(final String reference) {
 
-        if (!target.equals(other)) {
-            target = lookupVariable(target);
-            ModelVariable localOther = lookupVariable(other);
+        for (final ModelVariable variable : variables) {
 
-            /*
-             * If the other currently does not exist in the Model, buffer it for
-             * subsequent insertion.
-             */
-            if (other == null) {
-                buffer.put(other, target);
-                return;
+            if (variable.getIdentifier().equals(reference)) {
+                return variable;
             }
-
-            ModelInstance instance = (ModelInstance) localOther.getValue();
-            instance.addField(target);
-            target.setParentModelInstance(instance);
         }
+        return null;
     }
 
     /**
@@ -148,25 +168,6 @@ public class Model {
     }
 
     /**
-     * Returns the {@link ModelVariable} instance having a specific reference.
-     * 
-     * @param reference
-     *            the reference
-     * @return the found instance, null if no instance is found with the
-     *         specified reference
-     */
-    public ModelVariable getVariable(final String reference) {
-
-        for (ModelVariable variable : variables) {
-
-            if (variable.getIdentifier().equals(reference)) {
-                return variable;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Retrieves the actual in-memory reference to a variable, as represented on
      * the heap.
      * 
@@ -175,7 +176,7 @@ public class Model {
      */
     private ModelVariable lookupVariable(final ModelVariable variable) {
 
-        int index = variables.indexOf(variable);
+        final int index = variables.indexOf(variable);
         return index >= 0 ? variables.get(index) : null;
     }
 }

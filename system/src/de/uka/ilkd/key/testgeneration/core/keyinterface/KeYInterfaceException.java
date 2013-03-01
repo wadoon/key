@@ -6,7 +6,7 @@ public class KeYInterfaceException extends KeYTestGenException {
 
     private static final long serialVersionUID = 2393311991899525271L;
 
-    public KeYInterfaceException(String message) {
+    public KeYInterfaceException(final String message) {
         super(message);
     }
 }

@@ -14,62 +14,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
  */
 public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
 
-    /**
-     * Simplifies all the disjunctions present in the term.
-     * <p>
-     * For example, given the following Term (human-readable):
-     * 
-     * <pre>
-     * (a &amp; b) | c | x | c | (a &amp; b)
-     * </pre>
-     * 
-     * this Transformer will produce the following:
-     * 
-     * <pre>
-     * x | c | (a &amp; b)
-     * </pre>
-     * 
-     * @param term
-     *            the term
-     */
-    @Override
-    public Term transform(Term term) throws TermTransformerException {
-
-        return transformTerm(term);
-    }
-
-    @Override
-    protected Term transformOr(Term term) throws TermTransformerException {
-
-        Term firstChild = term.sub(0);
-        Term secondChild = term.sub(1);
-
-        /*
-         * Collect all literals in the right subtree
-         */
-        Set<String> literals = new HashSet<String>();
-        collectLiterals(secondChild, literals);
-
-        /*
-         * Simplify the left subtree
-         */
-        Term simplifiedFirstChild = simplify(firstChild, literals);
-
-        /*
-         * Depending on the outcome of the previous simplification, recursively
-         * transform both subtrees, or just the right one.
-         */
-        if (simplifiedFirstChild == null) {
-            return transform(secondChild);
-        } else {
-            Term transformedSimplifiedFirstChild = transformTerm(simplifiedFirstChild);
-            Term transformedRightChild = transformTerm(secondChild);
-            return termFactory.createTerm(Junctor.OR,
-                    transformedSimplifiedFirstChild, transformedRightChild);
-        }
-    }
-
-    private void collectLiterals(Term term, Set<String> literals) {
+    private void collectLiterals(final Term term, final Set<String> literals) {
 
         if (isOr(term)) {
 
@@ -77,7 +22,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
             collectLiterals(term.sub(1), literals);
         } else {
 
-            String termName = term.toString().trim();
+            final String termName = term.toString().trim();
             literals.add(termName);
         }
     }
@@ -93,7 +38,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
      * @param literals
      * @return
      */
-    private Term simplify(Term term, Set<String> literals) {
+    private Term simplify(final Term term, final Set<String> literals) {
 
         /*
          * If the term represents an OR statement, we simplify each child, and
@@ -101,8 +46,8 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
          */
         if (isOr(term)) {
 
-            Term firstChild = simplify(term.sub(0), literals);
-            Term secondChild = simplify(term.sub(1), literals);
+            final Term firstChild = simplify(term.sub(0), literals);
+            final Term secondChild = simplify(term.sub(1), literals);
 
             if (firstChild != null && secondChild == null) {
                 return firstChild;
@@ -126,8 +71,63 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
          */
         else {
 
-            String termName = term.toString().trim();
+            final String termName = term.toString().trim();
             return literals.contains(termName) ? null : term;
+        }
+    }
+
+    /**
+     * Simplifies all the disjunctions present in the term.
+     * <p>
+     * For example, given the following Term (human-readable):
+     * 
+     * <pre>
+     * (a &amp; b) | c | x | c | (a &amp; b)
+     * </pre>
+     * 
+     * this Transformer will produce the following:
+     * 
+     * <pre>
+     * x | c | (a &amp; b)
+     * </pre>
+     * 
+     * @param term
+     *            the term
+     */
+    @Override
+    public Term transform(final Term term) throws TermTransformerException {
+
+        return transformTerm(term);
+    }
+
+    @Override
+    protected Term transformOr(final Term term) throws TermTransformerException {
+
+        final Term firstChild = term.sub(0);
+        final Term secondChild = term.sub(1);
+
+        /*
+         * Collect all literals in the right subtree
+         */
+        final Set<String> literals = new HashSet<String>();
+        collectLiterals(secondChild, literals);
+
+        /*
+         * Simplify the left subtree
+         */
+        final Term simplifiedFirstChild = simplify(firstChild, literals);
+
+        /*
+         * Depending on the outcome of the previous simplification, recursively
+         * transform both subtrees, or just the right one.
+         */
+        if (simplifiedFirstChild == null) {
+            return transform(secondChild);
+        } else {
+            final Term transformedSimplifiedFirstChild = transformTerm(simplifiedFirstChild);
+            final Term transformedRightChild = transformTerm(secondChild);
+            return termFactory.createTerm(Junctor.OR,
+                    transformedSimplifiedFirstChild, transformedRightChild);
         }
     }
 }

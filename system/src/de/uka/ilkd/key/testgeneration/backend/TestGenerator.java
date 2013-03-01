@@ -44,59 +44,6 @@ public enum TestGenerator {
     private final CoreInterface coreInterface = CoreInterface.INSTANCE;
 
     /**
-     * Generates a test suite covering a subset of methods in a Java source
-     * file.
-     * 
-     * @param source
-     *            path to the Java source file
-     * @param methods
-     *            the methods to generate the test cases for.
-     * @param coverage
-     *            code coverage critera to be satisfied by the generated test
-     *            cases. May be <code>nulll</code>, in which case a default
-     *            statement coverage is used.
-     * @return a test suite for the framework targeted by the implementor.
-     */
-    public List<String> generatePartialTestSuite(final String source,
-            final ICodeCoverageParser coverage,
-            final IFrameworkConverter frameworkConverter,
-            final String... methods) throws TestGeneratorException {
-
-        Benchmark.startBenchmarking("5. Generate test suite (total time)");
-        
-        try {
-
-            /*
-             * Create abstract test suites for the selected methods.
-             */
-            List<TestSuite> testSuites = coreInterface.createTestSuites(source,
-                    coverage, methods);
-
-            /*
-             * Convert the abstract test suites to the desired final format.
-             */
-            Benchmark.startBenchmarking("4. Write to JUnit");
-            List<String> convertedTestSuites = new LinkedList<String>();
-            for (TestSuite testSuite : testSuites) {
-
-                String convertedTestSuite = frameworkConverter
-                        .convert(testSuite);
-
-                convertedTestSuites.add(convertedTestSuite);
-            }
-            Benchmark.finishBenchmarking("4. Write to JUnit");
-
-            Benchmark.finishBenchmarking("5. Generate test suite (total time)");
-            return convertedTestSuites;
-
-        } catch (CoreInterfaceException e) {
-            throw new TestGeneratorException(e.getMessage());
-        } catch (FrameworkConverterException e) {
-            throw new TestGeneratorException(e.getMessage());
-        }
-    }
-
-    /**
      * Generates a set of JUnit test cases for a subset of methods in a Java
      * source file.
      * 
@@ -121,6 +68,59 @@ public enum TestGenerator {
             throws TestGeneratorException {
 
         return null;
+    }
+
+    /**
+     * Generates a test suite covering a subset of methods in a Java source
+     * file.
+     * 
+     * @param source
+     *            path to the Java source file
+     * @param methods
+     *            the methods to generate the test cases for.
+     * @param coverage
+     *            code coverage critera to be satisfied by the generated test
+     *            cases. May be <code>nulll</code>, in which case a default
+     *            statement coverage is used.
+     * @return a test suite for the framework targeted by the implementor.
+     */
+    public List<String> generatePartialTestSuite(final String source,
+            final ICodeCoverageParser coverage,
+            final IFrameworkConverter frameworkConverter,
+            final String... methods) throws TestGeneratorException {
+
+        Benchmark.startBenchmarking("5. Generate test suite (total time)");
+
+        try {
+
+            /*
+             * Create abstract test suites for the selected methods.
+             */
+            final List<TestSuite> testSuites = coreInterface.createTestSuites(
+                    source, coverage, methods);
+
+            /*
+             * Convert the abstract test suites to the desired final format.
+             */
+            Benchmark.startBenchmarking("4. Write to JUnit");
+            final List<String> convertedTestSuites = new LinkedList<String>();
+            for (final TestSuite testSuite : testSuites) {
+
+                final String convertedTestSuite = frameworkConverter
+                        .convert(testSuite);
+
+                convertedTestSuites.add(convertedTestSuite);
+            }
+            Benchmark.finishBenchmarking("4. Write to JUnit");
+
+            Benchmark.finishBenchmarking("5. Generate test suite (total time)");
+            return convertedTestSuites;
+
+        } catch (final CoreInterfaceException e) {
+            throw new TestGeneratorException(e.getMessage());
+        } catch (final FrameworkConverterException e) {
+            throw new TestGeneratorException(e.getMessage());
+        }
     }
 
     /**

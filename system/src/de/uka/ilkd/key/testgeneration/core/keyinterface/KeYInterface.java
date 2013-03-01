@@ -52,38 +52,65 @@ public enum KeYInterface {
     private static final ReentrantLock lock = new ReentrantLock(true);
 
     /**
-     * Load a given file into the KeY system, and return the {@link InitConfig}
-     * instance for it.
+     * Assert that a given object is not null, and generate an exception if it
+     * is.
      * 
-     * @param javaFile
-     *            the file to load
-     * @return the {@link InitConfig} instance for the file
+     * @param object
+     *            the object to check
+     * @param failureMessage
+     *            message to pass in the event that the object is null
      * @throws KeYInterfaceException
-     * @throws ProofInputException
-     *             in case the proof could not be initiated
-     * @throws IOException
-     *             in case the File could not be found, or is not accessible
+     *             the generated exception if the object is null
      */
-    public InitConfig loadJavaFile(File javaFile) throws KeYInterfaceException {
+    private static void assertNotNull(final Object object,
+            final String failureMessage) throws KeYInterfaceException {
 
-        try {
-
-            lock.lock();
-
-            DefaultProblemLoader loader = userInterface.load(javaFile, null,
-                    null);
-
-            InitConfig initConfig = loader.getInitConfig();
-
-            return initConfig;
-
-        } catch (ProblemLoaderException e) {
-
-            throw new KeYInterfaceException(e.getMessage());
-        } finally {
-
-            lock.unlock();
+        if (object == null) {
+            throw new KeYInterfaceException(failureMessage);
         }
+    }
+
+    public void __DEBUG_RESET() {
+        userInterface = new CustomConsoleUserInterface(false);
+    }
+
+    /**
+     * Create a {@link Proof} for a given method.
+     * 
+     * @param initConfig
+     *            the {@link InitConfig} instance for the Java file which the
+     *            method is part of.
+     * @param method
+     *            the method to generate the proof for
+     * @param precondition
+     *            an optional precondition for the method
+     * @return the proof
+     * @throws ProofInputException
+     *             in the event that the proof cannot be created
+     */
+    private Proof getProof(final InitConfig initConfig,
+            final IProgramMethod method, final String precondition)
+            throws ProofInputException {
+
+        final ProofOblInput proofObligationInput = new ProgramMethodPO(
+                initConfig, method.getFullName(), method, precondition, true);
+
+        final Proof proof = userInterface.createProof(initConfig,
+                proofObligationInput);
+        if (proof == null) {
+            throw new ProofInputException("Unable to load proof");
+        }
+
+        /*
+         * Setup a strategy and goal chooser for the proof session
+         */
+        SymbolicExecutionEnvironment
+                .configureProofForSymbolicExecution(
+                        proof,
+                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
+                        true, true);
+
+        return proof;
     }
 
     /**
@@ -97,25 +124,25 @@ public enum KeYInterface {
      *             in the event that a symbolic execution tree cannot be
      *             generated.
      */
-    public IExecutionStartNode getSymbolicExecutionTree(KeYJavaMethod method)
-            throws KeYInterfaceException {
+    public IExecutionStartNode getSymbolicExecutionTree(
+            final KeYJavaMethod method) throws KeYInterfaceException {
 
         try {
 
-            lock.lock();
+            KeYInterface.lock.lock();
 
             /*
              * Setup and prepare the proof session, and retrieve the KeYMediator
              * instance to use.
              */
-            Proof proof = getProof(method.getInitConfig(),
+            final Proof proof = getProof(method.getInitConfig(),
                     method.getProgramMethod(), null);
-            KeYMediator mediator = userInterface.getMediator();
+            final KeYMediator mediator = userInterface.getMediator();
 
             /*
              * Create the symbolic execution tree builder.
              */
-            SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(
+            final SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(
                     mediator, proof, false);
 
             /*
@@ -136,79 +163,55 @@ public enum KeYInterface {
              * exists.
              */
             builder.analyse();
-            IExecutionStartNode rootNode = builder.getStartNode();
-            assertNotNull(rootNode, "FATAL: unable to initialize proof tree");
+            final IExecutionStartNode rootNode = builder.getStartNode();
+            KeYInterface.assertNotNull(rootNode,
+                    "FATAL: unable to initialize proof tree");
 
             return builder.getStartNode();
 
-        } catch (ProofInputException e) {
+        } catch (final ProofInputException e) {
 
             throw new KeYInterfaceException("FATAL: could not create proof: "
                     + e.getMessage());
 
         } finally {
-            lock.unlock();
+            KeYInterface.lock.unlock();
         }
     }
 
     /**
-     * Assert that a given object is not null, and generate an exception if it
-     * is.
+     * Load a given file into the KeY system, and return the {@link InitConfig}
+     * instance for it.
      * 
-     * @param object
-     *            the object to check
-     * @param failureMessage
-     *            message to pass in the event that the object is null
+     * @param javaFile
+     *            the file to load
+     * @return the {@link InitConfig} instance for the file
      * @throws KeYInterfaceException
-     *             the generated exception if the object is null
+     * @throws ProofInputException
+     *             in case the proof could not be initiated
+     * @throws IOException
+     *             in case the File could not be found, or is not accessible
      */
-    private static void assertNotNull(Object object, String failureMessage)
+    public InitConfig loadJavaFile(final File javaFile)
             throws KeYInterfaceException {
 
-        if (object == null) {
-            throw new KeYInterfaceException(failureMessage);
+        try {
+
+            KeYInterface.lock.lock();
+
+            final DefaultProblemLoader loader = userInterface.load(javaFile,
+                    null, null);
+
+            final InitConfig initConfig = loader.getInitConfig();
+
+            return initConfig;
+
+        } catch (final ProblemLoaderException e) {
+
+            throw new KeYInterfaceException(e.getMessage());
+        } finally {
+
+            KeYInterface.lock.unlock();
         }
-    }
-
-    /**
-     * Create a {@link Proof} for a given method.
-     * 
-     * @param initConfig
-     *            the {@link InitConfig} instance for the Java file which the
-     *            method is part of.
-     * @param method
-     *            the method to generate the proof for
-     * @param precondition
-     *            an optional precondition for the method
-     * @return the proof
-     * @throws ProofInputException
-     *             in the event that the proof cannot be created
-     */
-    private Proof getProof(InitConfig initConfig, IProgramMethod method,
-            String precondition) throws ProofInputException {
-
-        ProofOblInput proofObligationInput = new ProgramMethodPO(initConfig,
-                method.getFullName(), method, precondition, true);
-
-        Proof proof = userInterface.createProof(initConfig,
-                proofObligationInput);
-        if (proof == null) {
-            throw new ProofInputException("Unable to load proof");
-        }
-
-        /*
-         * Setup a strategy and goal chooser for the proof session
-         */
-        SymbolicExecutionEnvironment
-                .configureProofForSymbolicExecution(
-                        proof,
-                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                        true, true);
-
-        return proof;
-    }
-
-    public void __DEBUG_RESET() {
-        userInterface = new CustomConsoleUserInterface(false);
     }
 }

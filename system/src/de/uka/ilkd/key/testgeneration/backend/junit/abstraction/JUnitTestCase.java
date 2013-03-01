@@ -8,7 +8,6 @@ import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNorma
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.CNFTermChecker;
 
 /**
  * Instances of this class represent JUnit test cases, i.e. methods annotated
@@ -28,7 +27,7 @@ public class JUnitTestCase {
     /**
      * The TestCase instance wrapped by this JUnitTestCase
      */
-    private TestCase wrappedTestCase;
+    private final TestCase wrappedTestCase;
 
     /**
      * The fixture for this test case.
@@ -40,10 +39,10 @@ public class JUnitTestCase {
      */
     private Term oracle;
 
-    public JUnitTestCase(TestCase testCase) {
+    public JUnitTestCase(final TestCase testCase) {
 
-        assert (testCase != null);
-        this.wrappedTestCase = wrappedTestCase;
+        assert testCase != null;
+        wrappedTestCase = wrappedTestCase;
     }
 
     /**

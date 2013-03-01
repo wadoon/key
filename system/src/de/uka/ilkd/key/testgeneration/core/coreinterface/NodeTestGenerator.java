@@ -1,13 +1,10 @@
 package de.uka.ilkd.key.testgeneration.core.coreinterface;
 
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
 
 /**
  * Encapsulates logic needed to construct Test Suites directly from individual
@@ -17,24 +14,24 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
  */
 public enum NodeTestGenerator {
     INSTANCE;
-    
-    public TestSuite constructTestSuiteFromNode(IExecutionNode node) {
 
-        KeYMediator mediator = node.getMediator();
+    public TestSuite constructTestSuiteFromNode(final IExecutionNode node) {
+
+        node.getMediator();
 
         /*
          * Get and process the method call node
          */
-        IExecutionMethodCall methodCall = getMethodCallNode(node);
+        final IExecutionMethodCall methodCall = getMethodCallNode(node);
 
-        IProgramMethod method = methodCall.getProgramMethod();
-        KeYJavaType parent = method.getContainerType();
-        String packageDeclaration = parent.getJavaType().getFullName();
-        
-        String name = parent.getName();
-        String name2 = parent.getFullName();
-        PackageReference ref = parent.createPackagePrefix();
-String stuff = ref.toString();
+        final IProgramMethod method = methodCall.getProgramMethod();
+        final KeYJavaType parent = method.getContainerType();
+        parent.getJavaType().getFullName();
+
+        parent.getName();
+        parent.getFullName();
+        final PackageReference ref = parent.createPackagePrefix();
+        ref.toString();
         return null;
     }
 
@@ -47,7 +44,7 @@ String stuff = ref.toString();
      *            the node
      * @return
      */
-    private IExecutionMethodCall getMethodCallNode(IExecutionNode node) {
+    private IExecutionMethodCall getMethodCallNode(final IExecutionNode node) {
 
         if (node instanceof IExecutionMethodCall) {
             return (IExecutionMethodCall) node;

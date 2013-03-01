@@ -24,8 +24,33 @@ public final class KeYJavaClass {
      */
     private final HashMap<String, KeYJavaMethod> methods = new HashMap<String, KeYJavaMethod>();
 
-    KeYJavaClass(KeYJavaType type) {
+    KeYJavaClass(final KeYJavaType type) {
         this.type = type;
+    }
+
+    /**
+     * Add a method for this class. Package access due to encapsulation concerns
+     * (probably an antipattern).
+     * 
+     * @param methodName
+     * @param method
+     */
+    void addMethodMapping(final String methodName, final KeYJavaMethod method) {
+
+        methods.put(methodName, method);
+    }
+
+    /**
+     * Retrieves the {@link KeYJavaMethod} instance corresponding to the
+     * provided name, or <code>code</code> if such a method cannot be found.
+     * 
+     * @param name
+     *            the name of the method
+     * @return the {@link KeYJavaType} instance for the method
+     */
+    public KeYJavaMethod getMethod(final String name) {
+
+        return methods.get(name);
     }
 
     /**
@@ -39,30 +64,10 @@ public final class KeYJavaClass {
     }
 
     /**
-     * Retrieves the {@link KeYJavaMethod} instance corresponding to the
-     * provided name, or <code>code</code> if such a method cannot be found.
-     * 
-     * @param name
-     *            the name of the method
-     * @return the {@link KeYJavaType} instance for the method
-     */
-    public KeYJavaMethod getMethod(String name) {
-
-        return methods.get(name);
-    }
-
-    /**
      * @return the name
      */
     public String getName() {
         return type.getName();
-    }
-
-    /**
-     * @return the type
-     */
-    public KeYJavaType getType() {
-        return type;
     }
 
     /**
@@ -73,14 +78,9 @@ public final class KeYJavaClass {
     }
 
     /**
-     * Add a method for this class. Package access due to encapsulation concerns
-     * (probably an antipattern).
-     * 
-     * @param methodName
-     * @param method
+     * @return the type
      */
-    void addMethodMapping(String methodName, KeYJavaMethod method) {
-
-        methods.put(methodName, method);
+    public KeYJavaType getType() {
+        return type;
     }
 }

@@ -23,50 +23,6 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
     private static final NegationNormalFormTransformer nnfTransformer = new NegationNormalFormTransformer();
 
     /**
-     * Puts a Term into Conjunctive Normal Form, using the following algorithm:
-     * 
-     * <pre>
-     * Pre: x is implication free and in Negation Normal Form
-     * Post: CNF(x) computes and equivalent CNF for(x)
-     * function CNF(x):
-     * begin function
-     *     case
-     *         x is a literal : return x
-     *         x is x1 AND x2 : return CNF(x1) and CNF(x2)
-     *         x is x1 OR x2 : return DISTR(CNF(x1) and CNF(x2))
-     *     end case
-     * end function
-     * </pre>
-     * 
-     * The algorithm was taken from:
-     * <p>
-     * (Huth and Ryan, <i>Logic in Computer Science</i>, pages 60-61, 2nd Ed.
-     * Cambridge University press, 2008)
-     * 
-     * @param term
-     *            the term to transform
-     * @return the transformed term
-     */
-    @Override
-    public Term transform(Term term) throws TermTransformerException {
-
-        /*
-         * Put the term into Negation Normal Form
-         */
-        Term nnfTerm = nnfTransformer.transform(term);
-
-        return transformTerm(nnfTerm);
-    }
-
-    @Override
-    protected Term transformOr(Term term) throws TermTransformerException {
-
-        Term firstTransformedTerm = transformTerm(term.sub(0));
-        Term secondTransformedTerm = transformTerm(term.sub(1));
-        return distribute(firstTransformedTerm, secondTransformedTerm);
-    }
-
-    /**
      * Implements the DISTR routine of the CNF algorithm. It is defined as
      * follows:
      * 
@@ -92,13 +48,13 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
      *            n2
      * @return the distributed term
      */
-    private Term distribute(Term firstTerm, Term secondTerm) {
+    private Term distribute(final Term firstTerm, final Term secondTerm) {
 
         if (isAnd(firstTerm)) {
 
-            Term firstDistributedChild = distribute(firstTerm.sub(0),
+            final Term firstDistributedChild = distribute(firstTerm.sub(0),
                     secondTerm);
-            Term secondDistributedChild = distribute(firstTerm.sub(1),
+            final Term secondDistributedChild = distribute(firstTerm.sub(1),
                     secondTerm);
 
             return termFactory.createTerm(Junctor.AND, firstDistributedChild,
@@ -106,9 +62,9 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
 
         } else if (isAnd(secondTerm)) {
 
-            Term firstDistributedChild = distribute(firstTerm,
+            final Term firstDistributedChild = distribute(firstTerm,
                     secondTerm.sub(0));
-            Term secondDistributedChild = distribute(firstTerm,
+            final Term secondDistributedChild = distribute(firstTerm,
                     secondTerm.sub(1));
 
             return termFactory.createTerm(Junctor.AND, firstDistributedChild,
@@ -118,5 +74,50 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
 
             return termFactory.createTerm(Junctor.OR, firstTerm, secondTerm);
         }
+    }
+
+    /**
+     * Puts a Term into Conjunctive Normal Form, using the following algorithm:
+     * 
+     * <pre>
+     * Pre: x is implication free and in Negation Normal Form
+     * Post: CNF(x) computes and equivalent CNF for(x)
+     * function CNF(x):
+     * begin function
+     *     case
+     *         x is a literal : return x
+     *         x is x1 AND x2 : return CNF(x1) and CNF(x2)
+     *         x is x1 OR x2 : return DISTR(CNF(x1) and CNF(x2))
+     *     end case
+     * end function
+     * </pre>
+     * 
+     * The algorithm was taken from:
+     * <p>
+     * (Huth and Ryan, <i>Logic in Computer Science</i>, pages 60-61, 2nd Ed.
+     * Cambridge University press, 2008)
+     * 
+     * @param term
+     *            the term to transform
+     * @return the transformed term
+     */
+    @Override
+    public Term transform(final Term term) throws TermTransformerException {
+
+        /*
+         * Put the term into Negation Normal Form
+         */
+        final Term nnfTerm = ConjunctionNormalFormTransformer.nnfTransformer
+                .transform(term);
+
+        return transformTerm(nnfTerm);
+    }
+
+    @Override
+    protected Term transformOr(final Term term) throws TermTransformerException {
+
+        final Term firstTransformedTerm = transformTerm(term.sub(0));
+        final Term secondTransformedTerm = transformTerm(term.sub(1));
+        return distribute(firstTransformedTerm, secondTransformedTerm);
     }
 }

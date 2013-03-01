@@ -28,7 +28,7 @@ public class StatementCoverageParser implements ICodeCoverageParser {
      * @return
      */
     @Override
-    public List<IExecutionNode> retrieveNodes(IExecutionStartNode root) {
+    public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
 
         /*
          * Due to the way symbolic execution trees are implemented (do not
@@ -36,12 +36,12 @@ public class StatementCoverageParser implements ICodeCoverageParser {
          * return statements should guarantee full statement coverage. See
          * separate proof.
          */
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
                 root);
-        List<IExecutionNode> nodes = new LinkedList<IExecutionNode>();
+        final List<IExecutionNode> nodes = new LinkedList<IExecutionNode>();
 
         while (iterator.hasNext()) {
-            IExecutionNode next = iterator.next();
+            final IExecutionNode next = iterator.next();
             if (next instanceof IExecutionMethodReturn) {
                 nodes.add(next);
             }

@@ -23,42 +23,6 @@ import java.util.regex.Pattern;
 public class JavaSourceParser {
 
     /**
-     * Extracts the package declaration for a Java source file on disk, if any.
-     * 
-     * @param path
-     *            path to the file
-     * @return the package declaration
-     * @throws FileNotFoundException
-     */
-    public static String getPackageDeclaration(File file)
-            throws FileNotFoundException {
-
-        Scanner scanner = new Scanner(file);
-        String packageDeclaration = "";
-        while (scanner.hasNext()) {
-
-            packageDeclaration = scanner.nextLine();
-            if (packageDeclaration != null) {
-
-                /*
-                 * A package declaration has the form "package a.b.c", so split
-                 * it and select the second part.
-                 */
-                return packageDeclaration.replaceAll("package|;", "").trim();
-            }
-        }
-
-        return packageDeclaration;
-    }
-
-    public static String getPackageDeclaration(String path)
-            throws FileNotFoundException {
-
-        File file = new File(path);
-        return getPackageDeclaration(file);
-    }
-
-    /**
      * Checks if the public class of the file declares a no-args constructor.
      * There are only two cases where this is true:
      * 
@@ -77,23 +41,23 @@ public class JavaSourceParser {
      * @return
      * @throws IOException
      */
-    public static boolean declaresNoArgsConstructor(String path)
+    public static boolean declaresNoArgsConstructor(final String path)
             throws IOException {
 
-        long time = Calendar.getInstance().getTimeInMillis();
+        final long time = Calendar.getInstance().getTimeInMillis();
 
-        String source = readFile(path);
+        final String source = JavaSourceParser.readFile(path);
 
         // TODO: make OS agnostic
-        String className = path.substring(path.lastIndexOf("/") + 1,
+        final String className = path.substring(path.lastIndexOf("/") + 1,
                 path.length() - 5);
 
         /*
          * Look for an explicitly declared no-args constructor
          */
-        Pattern consPattern = Pattern.compile("public\\s+" + className
+        final Pattern consPattern = Pattern.compile("public\\s+" + className
                 + "\\s*\\(\\s*\\)");
-        Matcher consMatcher = consPattern.matcher(source);
+        final Matcher consMatcher = consPattern.matcher(source);
         if (consMatcher.find()) {
             return true;
         }
@@ -103,6 +67,49 @@ public class JavaSourceParser {
         System.out.println(Calendar.getInstance().getTimeInMillis() - time);
 
         return true;
+    }
+
+    /**
+     * Extracts the package declaration for a Java source file on disk, if any.
+     * 
+     * @param path
+     *            path to the file
+     * @return the package declaration
+     * @throws FileNotFoundException
+     */
+    public static String getPackageDeclaration(final File file)
+            throws FileNotFoundException {
+
+        final Scanner scanner = new Scanner(file);
+        String packageDeclaration = "";
+        while (scanner.hasNext()) {
+
+            packageDeclaration = scanner.nextLine();
+            if (packageDeclaration != null) {
+
+                /*
+                 * A package declaration has the form "package a.b.c", so split
+                 * it and select the second part.
+                 */
+                return packageDeclaration.replaceAll("package|;", "").trim();
+            }
+        }
+
+        return packageDeclaration;
+    }
+
+    public static String getPackageDeclaration(final String path)
+            throws FileNotFoundException {
+
+        final File file = new File(path);
+        return JavaSourceParser.getPackageDeclaration(file);
+    }
+
+    public static void main(final String[] args) throws IOException {
+
+        System.out
+                .println(JavaSourceParser
+                        .declaresNoArgsConstructor("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"));
     }
 
     /**
@@ -116,22 +123,16 @@ public class JavaSourceParser {
      * @return
      * @throws IOException
      */
-    private static String readFile(String path) throws IOException {
-        FileInputStream stream = new FileInputStream(new File(path));
+    private static String readFile(final String path) throws IOException {
+        final FileInputStream stream = new FileInputStream(new File(path));
         try {
-            FileChannel fc = stream.getChannel();
-            MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0,
-                    fc.size());
+            final FileChannel fc = stream.getChannel();
+            final MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY,
+                    0, fc.size());
             /* Instead of using default, pass in a decoder. */
             return Charset.defaultCharset().decode(bb).toString();
         } finally {
             stream.close();
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-
-        System.out
-                .println(declaresNoArgsConstructor("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"));
     }
 }

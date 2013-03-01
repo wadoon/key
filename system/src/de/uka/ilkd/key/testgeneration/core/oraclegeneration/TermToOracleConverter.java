@@ -14,7 +14,7 @@ public class TermToOracleConverter extends AbstractTermTransformer {
 
     private final String separator;
 
-    public TermToOracleConverter(String separator) {
+    public TermToOracleConverter(final String separator) {
         this.separator = separator;
     }
 
@@ -33,7 +33,7 @@ public class TermToOracleConverter extends AbstractTermTransformer {
      *             the Term itself.
      */
     @Override
-    public Term transform(Term term) throws TermTransformerException {
+    public Term transform(final Term term) throws TermTransformerException {
 
         /*
          * Remove all SortDependingFunction instances from the Term.
@@ -51,29 +51,6 @@ public class TermToOracleConverter extends AbstractTermTransformer {
     }
 
     /**
-     * Simplify a negation. If the child is simplified to null, simply return
-     * null. Otherwise, create a new negation of the simplification of the
-     * child.
-     * 
-     * @param term
-     *            the term (logical negator) to simplify
-     * @return the simplified negation
-     * @throws TermTransformerException
-     * @throws ModelGeneratorException
-     */
-    @Override
-    protected Term transformNot(Term term) throws TermTransformerException {
-
-        Term newChild = transformTerm(term.sub(0));
-
-        if (newChild == null) {
-            return null;
-        }
-
-        return termFactory.createTerm(Junctor.NOT, newChild);
-    }
-
-    /**
      * Simplifies an AND junctor by examining the operands. If one of them can
      * be simplified to null, the entire junction can be replaced by the second
      * operand. If both are simplified to null, the entire conjunction can be
@@ -83,10 +60,11 @@ public class TermToOracleConverter extends AbstractTermTransformer {
      * @throws ModelGeneratorException
      */
     @Override
-    protected Term transformAnd(Term term) throws TermTransformerException {
+    protected Term transformAnd(final Term term)
+            throws TermTransformerException {
 
-        Term firstChild = transformTerm(term.sub(0));
-        Term secondChild = transformTerm(term.sub(1));
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
 
         if (firstChild != null && secondChild == null) {
             return firstChild;
@@ -104,36 +82,6 @@ public class TermToOracleConverter extends AbstractTermTransformer {
     }
 
     /**
-     * Simplifies an OR junctor by examining the operands. If one of them can be
-     * simplified to null, the entire junction can be replaced by the second
-     * operand. If both are simplified to null, the entire conjunction can be
-     * removed (hence this method will return null as well).
-     * 
-     * @param term
-     * @throws ModelGeneratorException
-     */
-    @Override
-    protected Term transformOr(Term term) throws TermTransformerException {
-
-        Term firstChild = transformTerm(term.sub(0));
-        Term secondChild = transformTerm(term.sub(1));
-
-        if (firstChild != null && secondChild == null) {
-            return firstChild;
-        }
-
-        if (firstChild == null && secondChild != null) {
-            return secondChild;
-        }
-
-        if (firstChild != null && secondChild != null) {
-            return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
-        }
-
-        return null;
-    }
-
-    /**
      * In terms of logical representation, equality differs from the other
      * comparators (leq, geq etc) in the sense that it can be applied to boolean
      * values as well as numeric ones. Thus, it is treated differently in the
@@ -144,15 +92,16 @@ public class TermToOracleConverter extends AbstractTermTransformer {
      * @throws ModelGeneratorException
      */
     @Override
-    protected Term transformEquals(Term term) throws TermTransformerException {
+    protected Term transformEquals(final Term term)
+            throws TermTransformerException {
 
         /*
          * Handle the special case where the child is the exception type.
          */
         if (!isExceptionSort(term.sub(0))) {
 
-            Term firstChild = transformTerm(term.sub(0));
-            Term secondChild = transformTerm(term.sub(1));
+            final Term firstChild = transformTerm(term.sub(0));
+            final Term secondChild = transformTerm(term.sub(1));
 
             if (firstChild != null && secondChild == null) {
                 return firstChild;
@@ -172,10 +121,64 @@ public class TermToOracleConverter extends AbstractTermTransformer {
     }
 
     /**
+     * Simplify a negation. If the child is simplified to null, simply return
+     * null. Otherwise, create a new negation of the simplification of the
+     * child.
+     * 
+     * @param term
+     *            the term (logical negator) to simplify
+     * @return the simplified negation
+     * @throws TermTransformerException
+     * @throws ModelGeneratorException
+     */
+    @Override
+    protected Term transformNot(final Term term)
+            throws TermTransformerException {
+
+        final Term newChild = transformTerm(term.sub(0));
+
+        if (newChild == null) {
+            return null;
+        }
+
+        return termFactory.createTerm(Junctor.NOT, newChild);
+    }
+
+    /**
      * Simply remove {@link ObserverFunction} instances.
      */
     @Override
-    protected Term transformObserverFunction(Term term) {
+    protected Term transformObserverFunction(final Term term) {
+
+        return null;
+    }
+
+    /**
+     * Simplifies an OR junctor by examining the operands. If one of them can be
+     * simplified to null, the entire junction can be replaced by the second
+     * operand. If both are simplified to null, the entire conjunction can be
+     * removed (hence this method will return null as well).
+     * 
+     * @param term
+     * @throws ModelGeneratorException
+     */
+    @Override
+    protected Term transformOr(final Term term) throws TermTransformerException {
+
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
+
+        if (firstChild != null && secondChild == null) {
+            return firstChild;
+        }
+
+        if (firstChild == null && secondChild != null) {
+            return secondChild;
+        }
+
+        if (firstChild != null && secondChild != null) {
+            return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
+        }
 
         return null;
     }

@@ -28,7 +28,26 @@ public abstract class AbstractJavaSourceGenerator {
     /**
      * Used for constructing the final output String.
      */
-    private StringBuilder output = new StringBuilder();
+    private final StringBuilder output = new StringBuilder();
+
+    protected void appendToOutput(final String text) {
+        output.append(text);
+    }
+
+    protected String getCurrentOutput() {
+        return output.toString();
+    }
+
+    /**
+     * Inserts a number of tabs according to the current indentation level of
+     * the text.
+     */
+    protected void indent() {
+
+        for (int i = 0; i < indentation; i++) {
+            output.append(AbstractJavaSourceGenerator.TAB);
+        }
+    }
 
     /**
      * Writes the signature head of a Java class declaration with the canonical
@@ -65,12 +84,12 @@ public abstract class AbstractJavaSourceGenerator {
      * @param name
      *            the Name for the class
      */
-    protected void writeClassHeader(String[] annotations, String visibility,
-            String modifier, String name) {
+    protected void writeClassHeader(final String[] annotations,
+            final String visibility, final String modifier, final String name) {
 
         if (annotations != null) {
-            for (String annotation : annotations) {
-                writeLine(annotation + NEWLINE);
+            for (final String annotation : annotations) {
+                writeLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
             }
         }
 
@@ -83,6 +102,70 @@ public abstract class AbstractJavaSourceGenerator {
         output.append(" {\n");
 
         indentation++;
+    }
+
+    /**
+     * Writes a closing brace ("}") to the Java source file. This will decrease
+     * the indentation level for the text.
+     */
+    protected void writeClosingBrace() {
+
+        indentation--;
+        indent();
+        output.append("}\n");
+    }
+
+    /**
+     * Writes a nested Java comment.
+     * 
+     * @param text
+     *            text of comment
+     */
+    protected void writeComment(final String text, final boolean isJavadoc) {
+
+        writeLine(AbstractJavaSourceGenerator.NEWLINE);
+
+        if (isJavadoc) {
+            writeLine("/**\n");
+        } else {
+            writeLine("/*\n");
+        }
+
+        final String[] words = text.split(" ");
+
+        writeLine(" *");
+        int characterCount = 0;
+        for (final String word : words) {
+
+            if (word.trim().isEmpty()) {
+                continue;
+            }
+
+            if (characterCount >= 50) {
+                characterCount = 0;
+                output.append(" " + word + AbstractJavaSourceGenerator.NEWLINE);
+                writeLine(" *");
+                continue;
+            } else {
+                output.append(" " + word);
+                characterCount += word.length();
+            }
+        }
+        output.append(AbstractJavaSourceGenerator.NEWLINE);
+
+        writeLine(" */\n");
+    }
+
+    /**
+     * Writes an indented line of text to the Java source file.
+     * 
+     * @param text
+     *            the text to write
+     */
+    protected void writeLine(final String text) {
+
+        indent();
+        output.append(text);
     }
 
     /**
@@ -135,13 +218,14 @@ public abstract class AbstractJavaSourceGenerator {
      * @param name
      *            the Name for the method
      */
-    protected void writeMethodHeader(String[] annotations, String visibility,
-            String[] modifiers, String returnType, String name,
-            String[] parameters, String[] exceptions) {
+    protected void writeMethodHeader(final String[] annotations,
+            final String visibility, final String[] modifiers,
+            final String returnType, final String name,
+            final String[] parameters, final String[] exceptions) {
 
         if (annotations != null) {
-            for (String annotation : annotations) {
-                writeLine(annotation + NEWLINE);
+            for (final String annotation : annotations) {
+                writeLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
             }
         }
 
@@ -156,7 +240,7 @@ public abstract class AbstractJavaSourceGenerator {
          * Write the modifiers, if any.
          */
         if (modifiers != null && modifiers.length != 0) {
-            for (String modifier : modifiers) {
+            for (final String modifier : modifiers) {
                 output.append(modifier + " ");
             }
         }
@@ -171,7 +255,7 @@ public abstract class AbstractJavaSourceGenerator {
         output.append("(");
         if (parameters != null && parameters.length != 0) {
             for (int i = 0; i < parameters.length; i++) {
-                String parameter = parameters[i];
+                final String parameter = parameters[i];
                 if (i < parameters.length - 1) {
                     output.append(parameter + ", ");
                 } else {
@@ -185,12 +269,12 @@ public abstract class AbstractJavaSourceGenerator {
          * Write the exceptions, if any.
          */
         if (exceptions != null) {
-            output.append(NEWLINE);
+            output.append(AbstractJavaSourceGenerator.NEWLINE);
             indent();
 
             writeLine("throws ");
             for (int i = 0; i < exceptions.length; i++) {
-                String exception = exceptions[i];
+                final String exception = exceptions[i];
                 output.append(exception);
                 if (i != exceptions.length - 1) {
                     output.append(", ");
@@ -206,59 +290,6 @@ public abstract class AbstractJavaSourceGenerator {
     }
 
     /**
-     * Writes an indented line of text to the Java source file.
-     * 
-     * @param text
-     *            the text to write
-     */
-    protected void writeLine(String text) {
-
-        indent();
-        output.append(text);
-    }
-
-    /**
-     * Writes a nested Java comment.
-     * 
-     * @param text
-     *            text of comment
-     */
-    protected void writeComment(String text, boolean isJavadoc) {
-
-        writeLine(NEWLINE);
-
-        if (isJavadoc) {
-            writeLine("/**\n");
-        } else {
-            writeLine("/*\n");
-        }
-
-        String[] words = text.split(" ");
-
-        writeLine(" *");
-        int characterCount = 0;
-        for (String word : words) {
-
-            if (word.trim().isEmpty()) {
-                continue;
-            }
-
-            if (characterCount >= 50) {
-                characterCount = 0;
-                output.append(" " + word + NEWLINE);
-                writeLine(" *");
-                continue;
-            } else {
-                output.append(" " + word);
-                characterCount += word.length();
-            }
-        }
-        output.append(NEWLINE);
-
-        writeLine(" */\n");
-    }
-
-    /**
      * Writes an opening brace ("{") to the Java source file. This will increase
      * the indentation level for the text.
      */
@@ -267,35 +298,5 @@ public abstract class AbstractJavaSourceGenerator {
         indent();
         indentation++;
         output.append("{\n");
-    }
-
-    /**
-     * Writes a closing brace ("}") to the Java source file. This will decrease
-     * the indentation level for the text.
-     */
-    protected void writeClosingBrace() {
-
-        indentation--;
-        indent();
-        output.append("}\n");
-    }
-
-    /**
-     * Inserts a number of tabs according to the current indentation level of
-     * the text.
-     */
-    protected void indent() {
-
-        for (int i = 0; i < indentation; i++) {
-            output.append(TAB);
-        }
-    }
-
-    protected String getCurrentOutput() {
-        return output.toString();
-    }
-
-    protected void appendToOutput(String text) {
-        output.append(text);
     }
 }

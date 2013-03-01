@@ -9,31 +9,12 @@ import java.util.List;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 
-import de.uka.ilkd.key.testgeneration.backend.custom.ITestCaseParser;
-
 /**
  * Provides a CLI interface for KeYTestGen2.
  * 
  * @author christopher
  */
 public final class CommandLineInterface {
-
-    public static void main(String[] args) {
-
-        /*
-         * Default output for no-args invocations.
-         */
-        if (args.length == 0) {
-            System.out
-                    .println("No arguments specified. Type -h or --help for usage instructions");
-            System.exit(0);
-        }
-
-        /*
-         * Create a new worker and chop away.
-         */
-        new CommandLineInterfaceWorker().execute(args);
-    }
 
     private static class CommandLineInterfaceWorker {
 
@@ -44,10 +25,50 @@ public final class CommandLineInterface {
         // private XMLTestCaseGenerator testCaseGenerator = null;
 
         /**
+         * Prints version and copyright information.
+         */
+        private static void printAbout() {
+
+            System.out
+                    .println("\nKeYTestGen version 2.0\n\n"
+                            + "KeYTestGen2 is part of the KeY project, a system for integrated, deductive\n"
+                            + "software design. For more info, please visit: <www.key-project.org>\n\n"
+                            + "Copyright (C) 2013 Christopher Svanefalk\n"
+                            + "This program is free software: you can redistribute it and/or modify\n"
+                            + "it under the terms of the GNU General Public License as published by\n"
+                            + "the Free Software Foundation, either version 3 of the License, or\n"
+                            + "(at your option) any later version.\n\n"
+                            + "This program is distributed in the hope that it will be useful,\n"
+                            + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                            + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                            + "GNU General Public License for more details.\n\n"
+                            + "You should have received a copy of the GNU General Public License\n"
+                            + "along with this program.  If not, see <http://www.gnu.org/licenses/>.");
+        }
+
+        /**
+         * Prints usage information.
+         * 
+         * @param processor
+         */
+        private static void printUsage(final JCommander processor) {
+
+            System.out.println("Usage: ktg [options] [Java source file]");
+            System.out.println("\nOptions:");
+
+            for (final ParameterDescription parameter : processor
+                    .getParameters()) {
+                System.out.println("\t" + parameter.getNames() + "\t"
+                        + parameter.getDescription() + "\n");
+            }
+        }
+
+        /**
          * The {@link CommandParser} and {@link JCommander} processor to use for
          * the session serviced by this worker.
          */
         CommandParser parser = new CommandParser();
+
         JCommander processor = new JCommander(parser);
 
         /**
@@ -58,7 +79,7 @@ public final class CommandLineInterface {
             try {
                 // testCaseGenerator =
                 // XMLTestCaseGenerator.getDefaultInstance();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);
             }
@@ -72,13 +93,13 @@ public final class CommandLineInterface {
          * @param args
          *            user provided parameters.
          */
-        public void execute(String[] args) {
+        public void execute(final String[] args) {
 
             /*
              * Default output for no-args invocations
              */
             if (args.length == 0) {
-                printUsage(processor);
+                CommandLineInterfaceWorker.printUsage(processor);
                 System.exit(0);
             }
 
@@ -93,7 +114,7 @@ public final class CommandLineInterface {
                  * Print help if the user requested this
                  */
                 if (parser.isHelpFlagSet()) {
-                    printUsage(processor);
+                    CommandLineInterfaceWorker.printUsage(processor);
                     System.exit(0);
                 }
 
@@ -101,7 +122,7 @@ public final class CommandLineInterface {
                  * Print about info if the user requested this
                  */
                 if (parser.isAboutFlagSet()) {
-                    printAbout();
+                    CommandLineInterfaceWorker.printAbout();
                     System.exit(0);
                 }
 
@@ -125,10 +146,10 @@ public final class CommandLineInterface {
                  * Generate test suites for each file and each framework
                  * specified by the user, and write them to disc.
                  */
-                for (String framework : parser.getTestFrameworks()) {
+                for (final String framework : parser.getTestFrameworks()) {
                     generateTestCases(framework, parser.getFiles());
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);
             }
@@ -143,29 +164,30 @@ public final class CommandLineInterface {
          *            the files to use
          * @throws IOException
          */
-        private void generateTestCases(String framework, List<File> files)
-                throws IOException {
+        private void generateTestCases(final String framework,
+                final List<File> files) throws IOException {
 
-            ITestCaseParser<String> testCaseParser = CLIResources.INSTANCE
-                    .getFrameworkParser(framework);
+            CLIResources.INSTANCE.getFrameworkParser(framework);
 
             /*
              * Create an output folder for the framework files, and write the
              * generated test suite to it..
              */
-            File directory = new File(framework);
+            final File directory = new File(framework);
             directory.mkdir();
-            for (File file : files) {
+            for (final File file : files) {
 
-                String testSuite = null;
+                final String testSuite = null;
                 // testCaseGenerator.generateTestCases(testCaseParser, file,
                 // true);
 
-                File output = new File(framework + "\\" + file.getName());
+                final File output = new File(framework + "\\" + file.getName());
                 output.createNewFile();
 
-                FileWriter fileWriter = new FileWriter(output.getAbsoluteFile());
-                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                final FileWriter fileWriter = new FileWriter(
+                        output.getAbsoluteFile());
+                final BufferedWriter bufferedWriter = new BufferedWriter(
+                        fileWriter);
                 try {
                     bufferedWriter.write(testSuite);
                 } finally {
@@ -173,43 +195,22 @@ public final class CommandLineInterface {
                 }
             }
         }
+    }
 
-        /**
-         * Prints usage information.
-         * 
-         * @param processor
+    public static void main(final String[] args) {
+
+        /*
+         * Default output for no-args invocations.
          */
-        private static void printUsage(JCommander processor) {
-
-            System.out.println("Usage: ktg [options] [Java source file]");
-            System.out.println("\nOptions:");
-
-            for (ParameterDescription parameter : processor.getParameters()) {
-                System.out.println("\t" + parameter.getNames() + "\t"
-                        + parameter.getDescription() + "\n");
-            }
-        }
-
-        /**
-         * Prints version and copyright information.
-         */
-        private static void printAbout() {
-
+        if (args.length == 0) {
             System.out
-                    .println("\nKeYTestGen version 2.0\n\n"
-                            + "KeYTestGen2 is part of the KeY project, a system for integrated, deductive\n"
-                            + "software design. For more info, please visit: <www.key-project.org>\n\n"
-                            + "Copyright (C) 2013 Christopher Svanefalk\n"
-                            + "This program is free software: you can redistribute it and/or modify\n"
-                            + "it under the terms of the GNU General Public License as published by\n"
-                            + "the Free Software Foundation, either version 3 of the License, or\n"
-                            + "(at your option) any later version.\n\n"
-                            + "This program is distributed in the hope that it will be useful,\n"
-                            + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-                            + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-                            + "GNU General Public License for more details.\n\n"
-                            + "You should have received a copy of the GNU General Public License\n"
-                            + "along with this program.  If not, see <http://www.gnu.org/licenses/>.");
+                    .println("No arguments specified. Type -h or --help for usage instructions");
+            System.exit(0);
         }
+
+        /*
+         * Create a new worker and chop away.
+         */
+        new CommandLineInterfaceWorker().execute(args);
     }
 }

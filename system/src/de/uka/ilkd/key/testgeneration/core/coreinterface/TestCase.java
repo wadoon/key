@@ -69,6 +69,15 @@ public class TestCase implements Comparable<TestCase> {
         this.oracle = oracle;
     }
 
+    @Override
+    public int compareTo(final TestCase o) {
+
+        final String ownName = method.getProgramMethod().getName();
+        final String otherName = o.getMethod().getProgramMethod().getName();
+
+        return ownName.compareTo(otherName);
+    }
+
     /**
      * Retrieve the {@link KeYJavaMethod} this testcase belongs to.
      * 
@@ -77,6 +86,13 @@ public class TestCase implements Comparable<TestCase> {
     public KeYJavaMethod getMethod() {
 
         return method;
+    }
+
+    /**
+     * @return the name of the method handled by this tescase
+     */
+    public String getMethodName() {
+        return method.getProgramMethod().getName();
     }
 
     /**
@@ -90,6 +106,13 @@ public class TestCase implements Comparable<TestCase> {
     }
 
     /**
+     * @return the node
+     */
+    public IExecutionNode getNode() {
+        return node;
+    }
+
+    /**
      * Retrieve the oracle for the test case.
      * 
      * @return
@@ -97,29 +120,6 @@ public class TestCase implements Comparable<TestCase> {
     public Term getOracle() {
 
         return oracle;
-    }
-
-    /**
-     * @return the name of the method handled by this tescase
-     */
-    public String getMethodName() {
-        return method.getProgramMethod().getName();
-    }
-
-    @Override
-    public int compareTo(final TestCase o) {
-
-        String ownName = method.getProgramMethod().getName();
-        String otherName = o.getMethod().getProgramMethod().getName();
-
-        return ownName.compareTo(otherName);
-    }
-
-    /**
-     * @return the node
-     */
-    public IExecutionNode getNode() {
-        return node;
     }
 
     /**

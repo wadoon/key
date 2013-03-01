@@ -27,24 +27,6 @@ import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 public interface ITestCaseGenerator {
 
     /**
-     * Generates a test suite covering a subset of methods in a Java source
-     * file.
-     * 
-     * @param source
-     *            path to the Java source file
-     * @param methods
-     *            the methods to generate the test cases for.
-     * @param coverage
-     *            code coverage critera to be satisfied by the generated test
-     *            cases. May be <code>nulll</code>, in which case a default
-     *            statement coverage is used.
-     * @return a test suite for the framework targeted by the implementor.
-     */
-    public String generatePartialTestSuite(final String source,
-            final ICodeCoverageParser coverage, final String... methods)
-            throws TestGeneratorException;
-
-    /**
      * Generates a set of JUnit test cases for a subset of methods in a Java
      * source file.
      * 
@@ -66,5 +48,23 @@ public interface ITestCaseGenerator {
     public String generateFullTestSuite(final String source,
             final ICodeCoverageParser coverage, final boolean includeProtected,
             final boolean includePrivate, final boolean includeNative)
+            throws TestGeneratorException;
+
+    /**
+     * Generates a test suite covering a subset of methods in a Java source
+     * file.
+     * 
+     * @param source
+     *            path to the Java source file
+     * @param methods
+     *            the methods to generate the test cases for.
+     * @param coverage
+     *            code coverage critera to be satisfied by the generated test
+     *            cases. May be <code>nulll</code>, in which case a default
+     *            statement coverage is used.
+     * @return a test suite for the framework targeted by the implementor.
+     */
+    public String generatePartialTestSuite(final String source,
+            final ICodeCoverageParser coverage, final String... methods)
             throws TestGeneratorException;
 }

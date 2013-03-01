@@ -34,32 +34,25 @@ public class JUnitDeclarationStatement {
      */
     private final String value;
 
-    public JUnitDeclarationStatement(String type, String identifier,
-            String value) {
-        super();
-        this.type = type;
-        this.identifier = identifier;
-        this.value = value;
-    }
+    public JUnitDeclarationStatement(final ModelVariable variable) {
+        type = variable.getType();
+        identifier = variable.getIdentifier();
 
-    public JUnitDeclarationStatement(ModelVariable variable) {
-        this.type = variable.getType();
-        this.identifier = variable.getIdentifier();
-
-        Object value = variable.getValue();
+        final Object value = variable.getValue();
         if (value instanceof ModelInstance) {
-            ModelInstance instance = (ModelInstance) value;
+            final ModelInstance instance = (ModelInstance) value;
             this.value = "new " + instance.getType() + "()";
         } else {
             this.value = value.toString();
         }
     }
 
-    /**
-     * @return the type
-     */
-    public String getType() {
-        return type;
+    public JUnitDeclarationStatement(final String type,
+            final String identifier, final String value) {
+        super();
+        this.type = type;
+        this.identifier = identifier;
+        this.value = value;
     }
 
     /**
@@ -67,6 +60,13 @@ public class JUnitDeclarationStatement {
      */
     public String getIdentifier() {
         return identifier;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
     }
 
     /**

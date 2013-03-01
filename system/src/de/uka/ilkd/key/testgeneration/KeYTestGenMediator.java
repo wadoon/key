@@ -34,7 +34,7 @@ public class KeYTestGenMediator {
      * @param mainClass
      *            the mainClass to set
      */
-    public void setMainClass(KeYJavaClass mainClass) {
+    public void setMainClass(final KeYJavaClass mainClass) {
         this.mainClass = mainClass;
     }
 }

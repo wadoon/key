@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.testgeneration.backend.junit;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,13 +10,13 @@ import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.backend.AbstractJavaSourceGenerator;
 import de.uka.ilkd.key.testgeneration.backend.IFrameworkConverter;
 import de.uka.ilkd.key.testgeneration.core.KeYJavaClass;
-import de.uka.ilkd.key.testgeneration.core.KeYJavaMethod;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
+import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
@@ -36,19 +33,6 @@ import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisito
 public class JUnitConverter implements IFrameworkConverter {
 
     /**
-     * Convert an abstract test suite into a JUnit test suite.
-     * 
-     * @param the
-     *            test suite to convert
-     * @return the resulting JUnit test suite
-     */
-    @Override
-    public String convert(TestSuite testSuite) throws JUnitConverterException {
-
-        return new JUnitGeneratorWorker().serviceConvert(testSuite);
-    }
-
-    /**
      * Worker which services invocations of
      * {@link JUnitConverter#convertToJUnit(List)}.
      * 
@@ -57,640 +41,6 @@ public class JUnitConverter implements IFrameworkConverter {
      */
     private static class JUnitGeneratorWorker extends
             AbstractJavaSourceGenerator {
-
-        /**
-         * Used to differentiate between the names of test cases.
-         */
-        private int ID = 0;
-
-        /**
-         * The name of the class for which the test suite is being generated.
-         * Kept for the purpose of naming and type declaration.
-         */
-        private String className = "X";
-
-        /**
-         * Imports to be included in this test class
-         */
-        private final HashSet<String> imports = new HashSet<String>();
-
-        /**
-         * The name of the root variable (i.e. the variable pointing to the
-         * instane of the object that has the methods to be tested).
-         */
-        private static final String SELF = "self";
-
-        /**
-         * The name of the container for the result value (if any) resulting
-         * from the invocation of a method being tested. This value is used in
-         * the assertion process, and must not conflict with the names of any
-         * parameter values.
-         */
-        private static final String EXECUTION_RESULT = "result";
-
-        /**
-         * Services invocations of
-         * {@link JUnitConverter#generateJUnitSources(KeYJavaClass, List)}
-         * 
-         * @param klass
-         *            the class for which we are generating test cases
-         * @param testCases
-         *            the test cases to generate
-         * @return a JUnit source file in String format
-         * @throws JUnitConverterException
-         */
-        public String serviceConvert(TestSuite testSuite)
-                throws JUnitConverterException {
-
-            List<TestCase> testCases = testSuite.getTestCases();
-            KeYJavaClass klass = testSuite.getJavaClass();
-            KeYJavaMethod method = testSuite.getMethod();
-
-            className = klass.getName();
-
-            String methodName = testCases.get(0).getMethodName();
-
-            /*
-             * Print the new class header
-             */
-            writeClassHeader(null, "public", "", "Test_" + klass.getName()
-                    + "_" + methodName);
-
-            /*
-             * Create one test method for each test case.
-             */
-            for (TestCase testCase : testCases) {
-
-                writeTestMethod(testCase);
-            }
-
-            /*
-             * Create the fixutre repository for this class
-             */
-            createFixtureRepository(testCases);
-
-            /*
-             * Close the class body.
-             */
-            writeClosingBrace();
-
-            return getCurrentOutput();
-        }
-
-        /**
-         * Converts an instance of {@link TestCase} into a corresponding portion
-         * of a JUnit sourcefile. This is the root method for creating actual
-         * test methods (as one testcase in JUnit will essentially correspond to
-         * a single test method).
-         * 
-         * @param testCase
-         * @throws JUnitConverterException
-         */
-        private void writeTestMethod(TestCase testCase)
-                throws JUnitConverterException {
-
-            writeLine(NEWLINE);
-
-            /*
-             * Write the method header.
-             */
-            String methodName = "test"
-                    + testCase.getMethod().getProgramMethod().getName();
-            writeMethodHeader(new String[] { "@Test" }, "public", null, "void",
-                    methodName + ID++, null, null);
-
-            /*
-             * Write the test fixture.
-             */
-            writeTestFixture(testCase);
-
-            /*
-             * Write the invocation of the method itself. If the method return
-             * type is different from void, write a temporary variable to store
-             * the result.
-             */
-            writeMethodInvocation(testCase);
-
-            /*
-             * Write the oracle
-             */
-            writeTestOracle(testCase);
-
-            writeClosingBrace();
-        }
-
-        /**
-         * Writes the fixture portion of a JUnit test method. Primarily, this
-         * involves declaring and instantiating variables and parameter values.
-         * Only variables declared on the top level are considered here.
-         * 
-         * @param model
-         *            {@link Model} instance representing the fixture
-         */
-        private void writeTestFixture(TestCase testCase) {
-
-            /*
-             * Write the text fixture, using all relevant variables. Relevant
-             * variables in this context includes the parameters for the method
-             * (if any), as well as the root class itself.
-             */
-            for (ModelVariable variable : testCase.getModel().getVariables()) {
-                if (isSelf(variable) || variable.isParameter()) {
-                    writeVariableDeclaration(variable);
-                }
-            }
-        }
-
-        /**
-         * Writes the logic needed to invoke the method under test (MUT) for a
-         * given testcase. If the MUT is of non-void type, this logic will
-         * include a temporary variable for storing the result.
-         * 
-         * @param testCase
-         */
-        private void writeMethodInvocation(TestCase testCase) {
-
-            String returnType = testCase.getMethod().getReturnType();
-            String methodInvocation = "";
-            if (!returnType.equals("void")) {
-                methodInvocation += returnType + " " + EXECUTION_RESULT + " = ";
-            }
-
-            methodInvocation += SELF + "." + testCase.getMethodName() + "(";
-            List<IProgramVariable> parameters = testCase.getMethod()
-                    .getParameters();
-
-            for (int i = 0; i < parameters.size(); i++) {
-                String parameterName = parameters.get(i).name().toString();
-                methodInvocation += parameterName;
-                if (i != parameters.size() - 1) {
-                    methodInvocation += ",";
-                }
-            }
-            methodInvocation += ");" + NEWLINE;
-            writeLine(methodInvocation);
-        }
-
-        /**
-         * Writes a variable declaration and instantiation statement to a JUnit
-         * test method.
-         * 
-         * @param variable
-         *            variable to declare and instantiate
-         */
-        private void writeVariableDeclaration(ModelVariable variable) {
-
-            /*
-             * Compile the lefthand side of the declaration. The "self" type
-             * needs special treatment.
-             */
-            String declaration = "";
-            if (isSelf(variable)) {
-                declaration = className + " self";
-            } else {
-                declaration = variable.getType() + " " + variable.getName();
-            }
-
-            /*
-             * Compile the righthand side. What is done here will depend on the
-             * type of the value itself. Primitive types are trivial to process,
-             * and only involve printing the actual value associated with the
-             * variable. References are a different matter and require separate
-             * processing.
-             */
-            String instantiation = "";
-            if (variable.getValue() instanceof ModelInstance) {
-                if (variable.getValue() != null) {
-                    String reference = ((ModelInstance) variable.getValue())
-                            .getIdentifier();
-                    instantiation = "getObjectInstance(" + reference + ")";
-                } else {
-                    instantiation = "null";
-                }
-            } else {
-                instantiation = variable.getValue().toString();
-            }
-
-            /*
-             * Finally, print the complete declaration and instantiation
-             */
-            writeLine(declaration + " = " + instantiation + ";" + NEWLINE);
-        }
-
-        /**
-         * Sets up the fixture repository for a given test class. This
-         * repository will contain the object instances needed for the test
-         * cases to run.
-         * 
-         * @param testCases
-         *            the test cases for the test class.
-         */
-        private void createFixtureRepository(List<TestCase> testCases) {
-
-            /*
-             * Safeguard from first invocation errors.
-             */
-            if (testCases.isEmpty()) {
-                return;
-            }
-
-            /*
-             * Write the HashMap for holding the object instances.
-             */
-            writeObjectInstanceMap();
-
-            /*
-             * Write the method for retrieving the actual test instances.
-             */
-            writeGetObjectInstanceMethod();
-
-            /*
-             * Write the method for setting fields of objects.
-             */
-            writeSetFieldMethod();
-
-            /*
-             * Write the main init method for creating the repository of Object
-             * instances.
-             */
-            writeCreateInstanceRepositoryMethod(testCases);
-        }
-
-        /**
-         * Writes the declaration and initialization of the Map holding the
-         * concrete object instances used in this test class.
-         */
-        private void writeObjectInstanceMap() {
-
-            writeLine(NEWLINE);
-            writeComment(
-                    "KeYTestGen2 put me here to keep track of your object instances! Don't mind me :)",
-                    true);
-            writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>();"
-                    + NEWLINE + NEWLINE);
-        }
-
-        /**
-         * Writes the declaration and definition of the getObjectInstance(int
-         * reference), which allows the test methods in the class to retrieve
-         * the object instances they need in order to set up their fixtures.
-         */
-        private void writeGetObjectInstanceMethod() {
-
-            writeLine(NEWLINE);
-            writeComment(
-                    "This method will retrieve an object instance corresponding to its reference ID.",
-                    true);
-            writeMethodHeader(null, "private",
-                    new String[] { "static", "<T>" }, "T", "getObjectInstance",
-                    new String[] { "int reference" }, null);
-            writeLine("return (T)objectInstances.get(reference);" + NEWLINE);
-            writeClosingBrace();
-        }
-
-        /**
-         * Writes the Java code constituting the test oracle for a given test
-         * case.
-         * 
-         * @param testCase
-         *            the test case
-         * @throws JUnitConverterException
-         */
-        private void writeTestOracle(TestCase testCase)
-                throws JUnitConverterException {
-
-            /*
-             * Delegate oracle generation to the Term visitor.
-             */
-            String oracleString = new OracleGenerationVisitor(testCase)
-                    .generateOracle();
-
-            String[] conjunctions = oracleString.split("&&");
-            for (String conjunction : conjunctions) {
-
-                writeLine("Assert.assertTrue(" + NEWLINE);
-                String[] disjunctions = conjunction.split("\\|\\|");
-
-                for (int i = 0; i < disjunctions.length; i++) {
-
-                    String toWrite = TAB + disjunctions[i].trim();
-                    if (i + 1 != disjunctions.length) {
-                        toWrite += " ||";
-                    }
-                    writeLine(toWrite + NEWLINE);
-                }
-                writeLine(");" + NEWLINE);
-            }
-            writeLine(NEWLINE);
-        }
-
-        /**
-         * Writes the createInstanceRepository() method, which is responsible
-         * for creating and instantiating all the concrete object instances used
-         * in the test fixtures of the test methods.
-         * 
-         * @param testCases
-         */
-        private void writeCreateInstanceRepositoryMethod(
-                List<TestCase> testCases) {
-
-            writeComment(
-                    "This method will set up the entire repository of object instances needed to execute the test cases declared above.",
-                    true);
-
-            /*
-             * Write the method header. Observe the annotation.
-             */
-            writeMethodHeader(new String[] { "@BeforeClass" }, "public",
-                    new String[] { "static" }, "void",
-                    "createFixtureRepository", null, new String[] {
-                            "NoSuchFieldException", "SecurityException",
-                            "IllegalArgumentException",
-                            "IllegalAccessException" });
-
-            /*
-             * Write the object instantiations and the routines for storing them
-             * in the instance Map.
-             */
-            List<ModelInstance> instances = collectInstances(testCases);
-
-            /*
-             * Write the instantiation of the instances.
-             */
-            writeComment(
-                    "Instantiate and insert the raw object instances into the repository. After this, finalize the repository setup by setting up the relevant fields of each object instance as necessary ",
-                    false);
-            for (ModelInstance instance : instances) {
-                String toImport = instance.getType();
-                imports.add(toImport);
-                writeObjectInstantiation(instance);
-            }
-
-            /*
-             * Write the field-instantiations for the same instances, concluding
-             * the fixture setup procedure.
-             */
-            for (ModelInstance instance : instances) {
-                if (!instance.getFields().isEmpty()) {
-                    writeObjectFieldInstantiation(instance);
-                }
-            }
-
-            writeClosingBrace();
-        }
-
-        /**
-         * Writes the setField method.
-         */
-        private void writeSetFieldMethod() {
-
-            writeComment("Sets a field of some object to a given value", true);
-            writeMethodHeader(null, "private", new String[] { "static" },
-                    "void", "setFieldValue", new String[] { "Object instance",
-                            "String fieldName", "Object value" }, new String[] {
-                            "NoSuchFieldException", "SecurityException",
-                            "IllegalArgumentException",
-                            "IllegalAccessException" });
-
-            writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
-                    + NEWLINE);
-            writeLine("field.setAccessible(true);" + NEWLINE);
-            writeLine("field.set(instance, value );" + NEWLINE);
-
-            writeClosingBrace();
-        }
-
-        /**
-         * Given a set of {@link TestCase} instances, this method will extract
-         * put all {@link ModelInstance} declared in the model of each testcase
-         * into a single list.
-         * 
-         * @param testCases
-         *            the test cases
-         * @return a list of all instances declared in all test cases models
-         */
-        private List<ModelInstance> collectInstances(List<TestCase> testCases) {
-
-            List<ModelInstance> instances = new LinkedList<ModelInstance>();
-            for (TestCase testCase : testCases) {
-                List<ModelInstance> collectedInstances = extractInstancesFromModel((Model) testCase
-                        .getModel());
-                instances.addAll(collectedInstances);
-            }
-
-            return instances;
-        }
-
-        /**
-         * Given a {@link Model}, this method will extract all instances of
-         * {@link ModelInstance} from it.
-         * 
-         * @param model
-         * @return
-         */
-        private List<ModelInstance> extractInstancesFromModel(Model model) {
-
-            List<ModelInstance> instances = new LinkedList<ModelInstance>();
-            for (ModelVariable variable : model.getVariables()) {
-                if (variable.getValue() instanceof ModelInstance) {
-                    instances.add((ModelInstance) variable.getValue());
-                }
-            }
-            return instances;
-        }
-
-        /**
-         * Writes the logic needed to instantiate an object and put it into the
-         * instance Map.
-         * 
-         * @param instance
-         *            the object instance to encode
-         */
-        private void writeObjectInstantiation(ModelInstance instance) {
-
-            /*
-             * Indicates whether or not this instance corresponds to the Java
-             * class being tested (as we treat this one separately).
-             */
-
-            writeLine("objectInstances.put(" + instance.getIdentifier() + ","
-                    + " new " + instance.getTypeName() + "());" + NEWLINE);
-        }
-
-        /**
-         * Given an object instance, this method will properly setup this
-         * instances by setting any mentioned fields to their expected values.
-         * 
-         * @param instance
-         */
-        private void writeObjectFieldInstantiation(ModelInstance instance) {
-
-            /*
-             * To avoid any potential namespace clashes, we let each
-             * instantiation take place in its own scope.
-             */
-            writeOpeningBrace();
-
-            /*
-             * Write logic to fetch the actual instance of the instance.
-             */
-            writeLine(instance.getTypeName() + " instance = getObjectInstance("
-                    + instance.getIdentifier() + ");" + NEWLINE);
-
-            /*
-             * Write reflection code for each relevant field of the instance, in
-             * order to set it up properly.
-             */
-            for (ModelVariable field : instance.getFields()) {
-
-                if (!field.isParameter()) {
-
-                    /*
-                     * When it comes to setting the value, different courses of
-                     * action are needed for primitive and reference type
-                     * variables. Reference types will be encoded as a fetch of
-                     * the relevant object instance using the getObjectInstance
-                     * method. Primitive types will simply be encoded in terms
-                     * of their primitive values.
-                     */
-                    String variableName = field.getName();
-                    if (field.getValue() instanceof ModelInstance) {
-
-                        ModelInstance instanceField = (ModelInstance) field
-                                .getValue();
-                        writeLine("setFieldValue(instance, " + "\""
-                                + variableName + "\"" + ", "
-                                + "getObjectInstance("
-                                + instanceField.getIdentifier() + ") " + ");"
-                                + NEWLINE);
-                    } else {
-                        writeLine("setFieldValue(instance, " + "\""
-                                + variableName + "\"" + ", " + field.getValue()
-                                + ");" + NEWLINE);
-                    }
-                }
-            }
-
-            writeClosingBrace();
-            writeLine(NEWLINE);
-        }
-
-        @Override
-        protected String getCurrentOutput() {
-
-            StringBuilder builder = new StringBuilder();
-
-            /*
-             * Write the package declaration.
-             */
-            builder.append("package ");
-            builder.append(className);
-            builder.append("TestClass;\n\n");
-
-            /*
-             * Write the general imports (JUnit libs etc)
-             */
-            builder.append("import ");
-            builder.append("org.junit.*");
-            builder.append(";\n");
-
-            builder.append("import ");
-            builder.append("java.lang.reflect.*");
-            builder.append(";\n");
-
-            builder.append("import ");
-            builder.append("java.util.*");
-            builder.append(";\n");
-
-            /*
-             * Write the specific imports.
-             */
-            for (String importt : imports) {
-                builder.append("import ");
-                builder.append(importt);
-                builder.append(";\n");
-            }
-            builder.append(NEWLINE);
-            builder.append(super.getCurrentOutput());
-
-            return builder.toString();
-        }
-
-        private boolean isSelf(ModelVariable variable) {
-            return variable.getIdentifier().equals("self");
-        }
-
-        /**
-         * Investigates if a given object has a setter for a specific field.
-         * This method will do it's best to find such a method, but in order for
-         * it to return true, it is necessary that the method is appropriately
-         * named.
-         * 
-         * @param object
-         *            the object to check
-         * @param fieldName
-         *            the field to find a setter for
-         * @return true if a setter was found, false otherwise
-         * @throws JUnitConverterException
-         */
-        private boolean hasSetMethodForField(Object object, String fieldName)
-                throws JUnitConverterException {
-
-            try {
-
-                /*
-                 * Get the field itself.
-                 */
-                Field field = object.getClass().getField(fieldName);
-
-                /*
-                 * Attempt to find the setter for the field.
-                 */
-                String setterName = "set"
-                        + fieldName.substring(0, 1).toUpperCase()
-                        + fieldName.substring(1);
-
-                Method setter = object.getClass().getMethod(setterName,
-                        field.getType());
-
-            } catch (NoSuchMethodException e) {
-
-                return false;
-
-            } catch (NoSuchFieldException e) {
-
-                return false;
-
-            } catch (SecurityException e) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder
-                        .append("Security violation when trying to reflect on object of type: ");
-                stringBuilder.append(object.getClass());
-                stringBuilder
-                        .append(" please review your Java security settings!");
-                throw new JUnitConverterException(stringBuilder.toString());
-            }
-
-            return true;
-        }
-
-        /**
-         * Attempts to find a no-args constructor for a target type.
-         * 
-         * @param klass
-         *            the type for which to find the constructor
-         * @return the constructor
-         */
-        private Constructor<?> getNoArgsConstructor(Class<?> klass) {
-
-            for (Constructor<?> constructor : klass.getConstructors()) {
-
-                if (constructor.getParameterTypes().length == 0) {
-                    return constructor;
-                }
-            }
-            return null;
-        }
 
         /**
          * {@link Term} visitor which converts a postcondition, expressed as a
@@ -724,13 +74,13 @@ public class JUnitConverter implements IFrameworkConverter {
              */
             LinkedList<String> buffer = new LinkedList<String>();
 
-            public OracleGenerationVisitor(TestCase testCase) {
+            public OracleGenerationVisitor(final TestCase testCase) {
                 this.testCase = testCase;
 
                 parameterNames = new LinkedList<String>();
-                List<IProgramVariable> variables = testCase.getMethod()
+                final List<IProgramVariable> variables = testCase.getMethod()
                         .getParameters();
-                for (IProgramVariable variable : variables) {
+                for (final IProgramVariable variable : variables) {
                     parameterNames.add(variable.name().toString());
                 }
             }
@@ -742,9 +92,10 @@ public class JUnitConverter implements IFrameworkConverter {
                     /*
                      * Simplify the postcondition
                      */
-                    Term oracle = testCase.getOracle();
+                    final Term oracle = testCase.getOracle();
                     Term simplifiedOracle = OracleGenerationTools
-                            .simplifyPostCondition(oracle, SEPARATOR);
+                            .simplifyPostCondition(oracle,
+                                    OracleGenerationVisitor.SEPARATOR);
 
                     /*
                      * Put it into Conjunctive Normal Form
@@ -772,10 +123,17 @@ public class JUnitConverter implements IFrameworkConverter {
 
                     return processBuffer();
 
-                } catch (TermTransformerException e) {
+                } catch (final TermTransformerException e) {
 
                     throw new JUnitConverterException(e.getMessage());
                 }
+            }
+
+            private boolean isParamaterValue(final Term term) {
+
+                final String name = term.op().name().toString();
+
+                return parameterNames.contains(name);
             }
 
             /**
@@ -788,53 +146,56 @@ public class JUnitConverter implements IFrameworkConverter {
             private String processBuffer() {
 
                 if (!buffer.isEmpty()) {
-                    String next = buffer.pollFirst();
+                    final String next = buffer.pollFirst();
 
                     /*
                      * Process unary operators
                      */
-                    if (next.equals(NOT)) {
-                        String statement = processBuffer();
+                    if (next.equals(AbstractTermParser.NOT)) {
+                        final String statement = processBuffer();
                         return "!(" + statement + ")";
 
                         /*
                          * Process binary operators
                          */
-                    } else if (operators.contains(next)) {
-                        String lefthand = processBuffer();
-                        String righthand = processBuffer();
+                    } else if (AbstractTermParser.operators.contains(next)) {
+                        final String lefthand = processBuffer();
+                        final String righthand = processBuffer();
 
-                        if (next.equals(AND)) {
+                        if (next.equals(AbstractTermParser.AND)) {
                             return lefthand + " && " + righthand;
 
-                        } else if (next.equals(OR)) {
+                        } else if (next.equals(AbstractTermParser.OR)) {
                             return lefthand + " || " + righthand;
 
-                        } else if (next.equals(EQUALS)) {
+                        } else if (next.equals(AbstractTermParser.EQUALS)) {
                             return "(" + lefthand + " == " + righthand + ")";
 
-                        } else if (next.equals(GREATER_OR_EQUALS)) {
+                        } else if (next
+                                .equals(AbstractTermParser.GREATER_OR_EQUALS)) {
                             return "(" + lefthand + " >= " + righthand + ")";
 
-                        } else if (next.equals(LESS_OR_EQUALS)) {
+                        } else if (next
+                                .equals(AbstractTermParser.LESS_OR_EQUALS)) {
                             return "(" + lefthand + " <= " + righthand + ")";
 
-                        } else if (next.equals(GREATER_THAN)) {
+                        } else if (next.equals(AbstractTermParser.GREATER_THAN)) {
                             return "(" + lefthand + " > " + righthand + ")";
 
-                        } else if (next.equals(LESS_THAN)) {
+                        } else if (next.equals(AbstractTermParser.LESS_THAN)) {
                             return "(" + lefthand + " < " + righthand + ")";
 
-                        } else if (next.equals(ADDITION)) {
+                        } else if (next.equals(AbstractTermParser.ADDITION)) {
                             return "(" + lefthand + " < " + righthand + ")";
 
-                        } else if (next.equals(SUBTRACTION)) {
+                        } else if (next.equals(AbstractTermParser.SUBTRACTION)) {
                             return "(" + lefthand + " < " + righthand + ")";
 
-                        } else if (next.equals(DIVISION)) {
+                        } else if (next.equals(AbstractTermParser.DIVISION)) {
                             return "(" + lefthand + " < " + righthand + ")";
 
-                        } else if (next.equals(MULTIPLICATION)) {
+                        } else if (next
+                                .equals(AbstractTermParser.MULTIPLICATION)) {
                             return "(" + lefthand + " < " + righthand + ")";
                         }
 
@@ -844,7 +205,7 @@ public class JUnitConverter implements IFrameworkConverter {
                          */
                     } else {
                         if (next.equals("result")) {
-                            return RESULT;
+                            return AbstractTermParser.RESULT;
                         }
                         return next;
                     }
@@ -860,56 +221,640 @@ public class JUnitConverter implements IFrameworkConverter {
              * Generate a textual representation for each relevant node
              */
             @Override
-            public void visit(Term visited) {
+            public void visit(final Term visited) {
 
                 if (isAnd(visited)) {
-                    buffer.add(AND);
+                    buffer.add(AbstractTermParser.AND);
 
                 } else if (isOr(visited)) {
-                    buffer.add(OR);
+                    buffer.add(AbstractTermParser.OR);
 
                 } else if (isGreaterOrEquals(visited)) {
-                    buffer.add(GREATER_OR_EQUALS);
+                    buffer.add(AbstractTermParser.GREATER_OR_EQUALS);
 
                 } else if (isGreaterThan(visited)) {
-                    buffer.add(GREATER_THAN);
+                    buffer.add(AbstractTermParser.GREATER_THAN);
 
                 } else if (isLessOrEquals(visited)) {
-                    buffer.add(LESS_OR_EQUALS);
+                    buffer.add(AbstractTermParser.LESS_OR_EQUALS);
 
                 } else if (isLessThan(visited)) {
-                    buffer.add(LESS_THAN);
+                    buffer.add(AbstractTermParser.LESS_THAN);
 
                 } else if (isEquals(visited)) {
-                    buffer.add(EQUALS);
+                    buffer.add(AbstractTermParser.EQUALS);
 
                 } else if (isNot(visited)) {
-                    buffer.add(NOT);
+                    buffer.add(AbstractTermParser.NOT);
 
                 } else if (isParamaterValue(visited)) {
                     buffer.add(visited.op().name().toString());
 
                 } else if (isLocationVariable(visited)
-                        && isPrimitiveType(visited)) {
+                        && AbstractTermParser.isPrimitiveType(visited)) {
                     buffer.add(visited.op().name().toString());
 
                 } else if (isSortDependingFunction(visited)) {
-                    String identifier = resolveIdentifierString(visited,
-                            StringConstants.FIELD_SEPARATOR.toString());
+                    final String identifier = AbstractTermParser
+                            .resolveIdentifierString(visited,
+                                    StringConstants.FIELD_SEPARATOR.toString());
                     buffer.add(identifier);
 
                 } else if (isResult(visited)) {
-                    buffer.add(EXECUTION_RESULT);
+                    buffer.add(JUnitGeneratorWorker.EXECUTION_RESULT);
                 }
             }
 
-            private boolean isParamaterValue(Term term) {
+        }
 
-                String name = term.op().name().toString();
+        /**
+         * Used to differentiate between the names of test cases.
+         */
+        private int ID = 0;
 
-                return parameterNames.contains(name);
+        /**
+         * The name of the class for which the test suite is being generated.
+         * Kept for the purpose of naming and type declaration.
+         */
+        private String className = "X";
+
+        /**
+         * Imports to be included in this test class
+         */
+        private final HashSet<String> imports = new HashSet<String>();
+
+        /**
+         * The name of the root variable (i.e. the variable pointing to the
+         * instane of the object that has the methods to be tested).
+         */
+        private static final String SELF = "self";
+
+        /**
+         * The name of the container for the result value (if any) resulting
+         * from the invocation of a method being tested. This value is used in
+         * the assertion process, and must not conflict with the names of any
+         * parameter values.
+         */
+        private static final String EXECUTION_RESULT = "result";
+
+        /**
+         * Given a set of {@link TestCase} instances, this method will extract
+         * put all {@link ModelInstance} declared in the model of each testcase
+         * into a single list.
+         * 
+         * @param testCases
+         *            the test cases
+         * @return a list of all instances declared in all test cases models
+         */
+        private List<ModelInstance> collectInstances(
+                final List<TestCase> testCases) {
+
+            final List<ModelInstance> instances = new LinkedList<ModelInstance>();
+            for (final TestCase testCase : testCases) {
+                final List<ModelInstance> collectedInstances = extractInstancesFromModel(testCase
+                        .getModel());
+                instances.addAll(collectedInstances);
             }
 
+            return instances;
         }
+
+        /**
+         * Sets up the fixture repository for a given test class. This
+         * repository will contain the object instances needed for the test
+         * cases to run.
+         * 
+         * @param testCases
+         *            the test cases for the test class.
+         */
+        private void createFixtureRepository(final List<TestCase> testCases) {
+
+            /*
+             * Safeguard from first invocation errors.
+             */
+            if (testCases.isEmpty()) {
+                return;
+            }
+
+            /*
+             * Write the HashMap for holding the object instances.
+             */
+            writeObjectInstanceMap();
+
+            /*
+             * Write the method for retrieving the actual test instances.
+             */
+            writeGetObjectInstanceMethod();
+
+            /*
+             * Write the method for setting fields of objects.
+             */
+            writeSetFieldMethod();
+
+            /*
+             * Write the main init method for creating the repository of Object
+             * instances.
+             */
+            writeCreateInstanceRepositoryMethod(testCases);
+        }
+
+        /**
+         * Given a {@link Model}, this method will extract all instances of
+         * {@link ModelInstance} from it.
+         * 
+         * @param model
+         * @return
+         */
+        private List<ModelInstance> extractInstancesFromModel(final Model model) {
+
+            final List<ModelInstance> instances = new LinkedList<ModelInstance>();
+            for (final ModelVariable variable : model.getVariables()) {
+                if (variable.getValue() instanceof ModelInstance) {
+                    instances.add((ModelInstance) variable.getValue());
+                }
+            }
+            return instances;
+        }
+
+        @Override
+        protected String getCurrentOutput() {
+
+            final StringBuilder builder = new StringBuilder();
+
+            /*
+             * Write the package declaration.
+             */
+            builder.append("package ");
+            builder.append(className);
+            builder.append("TestClass;\n\n");
+
+            /*
+             * Write the general imports (JUnit libs etc)
+             */
+            builder.append("import ");
+            builder.append("org.junit.*");
+            builder.append(";\n");
+
+            builder.append("import ");
+            builder.append("java.lang.reflect.*");
+            builder.append(";\n");
+
+            builder.append("import ");
+            builder.append("java.util.*");
+            builder.append(";\n");
+
+            /*
+             * Write the specific imports.
+             */
+            for (final String importt : imports) {
+                builder.append("import ");
+                builder.append(importt);
+                builder.append(";\n");
+            }
+            builder.append(AbstractJavaSourceGenerator.NEWLINE);
+            builder.append(super.getCurrentOutput());
+
+            return builder.toString();
+        }
+
+        private boolean isSelf(final ModelVariable variable) {
+            return variable.getIdentifier().equals("self");
+        }
+
+        /**
+         * Services invocations of
+         * {@link JUnitConverter#generateJUnitSources(KeYJavaClass, List)}
+         * 
+         * @param klass
+         *            the class for which we are generating test cases
+         * @param testCases
+         *            the test cases to generate
+         * @return a JUnit source file in String format
+         * @throws JUnitConverterException
+         */
+        public String serviceConvert(final TestSuite testSuite)
+                throws JUnitConverterException {
+
+            final List<TestCase> testCases = testSuite.getTestCases();
+            final KeYJavaClass klass = testSuite.getJavaClass();
+            testSuite.getMethod();
+
+            className = klass.getName();
+
+            final String methodName = testCases.get(0).getMethodName();
+
+            /*
+             * Print the new class header
+             */
+            writeClassHeader(null, "public", "", "Test_" + klass.getName()
+                    + "_" + methodName);
+
+            /*
+             * Create one test method for each test case.
+             */
+            for (final TestCase testCase : testCases) {
+
+                writeTestMethod(testCase);
+            }
+
+            /*
+             * Create the fixutre repository for this class
+             */
+            createFixtureRepository(testCases);
+
+            /*
+             * Close the class body.
+             */
+            writeClosingBrace();
+
+            return getCurrentOutput();
+        }
+
+        /**
+         * Writes the createInstanceRepository() method, which is responsible
+         * for creating and instantiating all the concrete object instances used
+         * in the test fixtures of the test methods.
+         * 
+         * @param testCases
+         */
+        private void writeCreateInstanceRepositoryMethod(
+                final List<TestCase> testCases) {
+
+            writeComment(
+                    "This method will set up the entire repository of object instances needed to execute the test cases declared above.",
+                    true);
+
+            /*
+             * Write the method header. Observe the annotation.
+             */
+            writeMethodHeader(new String[] { "@BeforeClass" }, "public",
+                    new String[] { "static" }, "void",
+                    "createFixtureRepository", null, new String[] {
+                            "NoSuchFieldException", "SecurityException",
+                            "IllegalArgumentException",
+                            "IllegalAccessException" });
+
+            /*
+             * Write the object instantiations and the routines for storing them
+             * in the instance Map.
+             */
+            final List<ModelInstance> instances = collectInstances(testCases);
+
+            /*
+             * Write the instantiation of the instances.
+             */
+            writeComment(
+                    "Instantiate and insert the raw object instances into the repository. After this, finalize the repository setup by setting up the relevant fields of each object instance as necessary ",
+                    false);
+            for (final ModelInstance instance : instances) {
+                final String toImport = instance.getType();
+                imports.add(toImport);
+                writeObjectInstantiation(instance);
+            }
+
+            /*
+             * Write the field-instantiations for the same instances, concluding
+             * the fixture setup procedure.
+             */
+            for (final ModelInstance instance : instances) {
+                if (!instance.getFields().isEmpty()) {
+                    writeObjectFieldInstantiation(instance);
+                }
+            }
+
+            writeClosingBrace();
+        }
+
+        /**
+         * Writes the declaration and definition of the getObjectInstance(int
+         * reference), which allows the test methods in the class to retrieve
+         * the object instances they need in order to set up their fixtures.
+         */
+        private void writeGetObjectInstanceMethod() {
+
+            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            writeComment(
+                    "This method will retrieve an object instance corresponding to its reference ID.",
+                    true);
+            writeMethodHeader(null, "private",
+                    new String[] { "static", "<T>" }, "T", "getObjectInstance",
+                    new String[] { "int reference" }, null);
+            writeLine("return (T)objectInstances.get(reference);"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeClosingBrace();
+        }
+
+        /**
+         * Writes the logic needed to invoke the method under test (MUT) for a
+         * given testcase. If the MUT is of non-void type, this logic will
+         * include a temporary variable for storing the result.
+         * 
+         * @param testCase
+         */
+        private void writeMethodInvocation(final TestCase testCase) {
+
+            final String returnType = testCase.getMethod().getReturnType();
+            String methodInvocation = "";
+            if (!returnType.equals("void")) {
+                methodInvocation += returnType + " "
+                        + JUnitGeneratorWorker.EXECUTION_RESULT + " = ";
+            }
+
+            methodInvocation += JUnitGeneratorWorker.SELF + "."
+                    + testCase.getMethodName() + "(";
+            final List<IProgramVariable> parameters = testCase.getMethod()
+                    .getParameters();
+
+            for (int i = 0; i < parameters.size(); i++) {
+                final String parameterName = parameters.get(i).name()
+                        .toString();
+                methodInvocation += parameterName;
+                if (i != parameters.size() - 1) {
+                    methodInvocation += ",";
+                }
+            }
+            methodInvocation += ");" + AbstractJavaSourceGenerator.NEWLINE;
+            writeLine(methodInvocation);
+        }
+
+        /**
+         * Given an object instance, this method will properly setup this
+         * instances by setting any mentioned fields to their expected values.
+         * 
+         * @param instance
+         */
+        private void writeObjectFieldInstantiation(final ModelInstance instance) {
+
+            /*
+             * To avoid any potential namespace clashes, we let each
+             * instantiation take place in its own scope.
+             */
+            writeOpeningBrace();
+
+            /*
+             * Write logic to fetch the actual instance of the instance.
+             */
+            writeLine(instance.getTypeName() + " instance = getObjectInstance("
+                    + instance.getIdentifier() + ");"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+
+            /*
+             * Write reflection code for each relevant field of the instance, in
+             * order to set it up properly.
+             */
+            for (final ModelVariable field : instance.getFields()) {
+
+                if (!field.isParameter()) {
+
+                    /*
+                     * When it comes to setting the value, different courses of
+                     * action are needed for primitive and reference type
+                     * variables. Reference types will be encoded as a fetch of
+                     * the relevant object instance using the getObjectInstance
+                     * method. Primitive types will simply be encoded in terms
+                     * of their primitive values.
+                     */
+                    final String variableName = field.getName();
+                    if (field.getValue() instanceof ModelInstance) {
+
+                        final ModelInstance instanceField = (ModelInstance) field
+                                .getValue();
+                        writeLine("setFieldValue(instance, " + "\""
+                                + variableName + "\"" + ", "
+                                + "getObjectInstance("
+                                + instanceField.getIdentifier() + ") " + ");"
+                                + AbstractJavaSourceGenerator.NEWLINE);
+                    } else {
+                        writeLine("setFieldValue(instance, " + "\""
+                                + variableName + "\"" + ", " + field.getValue()
+                                + ");" + AbstractJavaSourceGenerator.NEWLINE);
+                    }
+                }
+            }
+
+            writeClosingBrace();
+            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+        }
+
+        /**
+         * Writes the declaration and initialization of the Map holding the
+         * concrete object instances used in this test class.
+         */
+        private void writeObjectInstanceMap() {
+
+            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            writeComment(
+                    "KeYTestGen2 put me here to keep track of your object instances! Don't mind me :)",
+                    true);
+            writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>();"
+                    + AbstractJavaSourceGenerator.NEWLINE
+                    + AbstractJavaSourceGenerator.NEWLINE);
+        }
+
+        /**
+         * Writes the logic needed to instantiate an object and put it into the
+         * instance Map.
+         * 
+         * @param instance
+         *            the object instance to encode
+         */
+        private void writeObjectInstantiation(final ModelInstance instance) {
+
+            /*
+             * Indicates whether or not this instance corresponds to the Java
+             * class being tested (as we treat this one separately).
+             */
+
+            writeLine("objectInstances.put(" + instance.getIdentifier() + ","
+                    + " new " + instance.getTypeName() + "());"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+        }
+
+        /**
+         * Writes the setField method.
+         */
+        private void writeSetFieldMethod() {
+
+            writeComment("Sets a field of some object to a given value", true);
+            writeMethodHeader(null, "private", new String[] { "static" },
+                    "void", "setFieldValue", new String[] { "Object instance",
+                            "String fieldName", "Object value" }, new String[] {
+                            "NoSuchFieldException", "SecurityException",
+                            "IllegalArgumentException",
+                            "IllegalAccessException" });
+
+            writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeLine("field.setAccessible(true);"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeLine("field.set(instance, value );"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+
+            writeClosingBrace();
+        }
+
+        /**
+         * Writes the fixture portion of a JUnit test method. Primarily, this
+         * involves declaring and instantiating variables and parameter values.
+         * Only variables declared on the top level are considered here.
+         * 
+         * @param model
+         *            {@link Model} instance representing the fixture
+         */
+        private void writeTestFixture(final TestCase testCase) {
+
+            /*
+             * Write the text fixture, using all relevant variables. Relevant
+             * variables in this context includes the parameters for the method
+             * (if any), as well as the root class itself.
+             */
+            for (final ModelVariable variable : testCase.getModel()
+                    .getVariables()) {
+                if (isSelf(variable) || variable.isParameter()) {
+                    writeVariableDeclaration(variable);
+                }
+            }
+        }
+
+        /**
+         * Converts an instance of {@link TestCase} into a corresponding portion
+         * of a JUnit sourcefile. This is the root method for creating actual
+         * test methods (as one testcase in JUnit will essentially correspond to
+         * a single test method).
+         * 
+         * @param testCase
+         * @throws JUnitConverterException
+         */
+        private void writeTestMethod(final TestCase testCase)
+                throws JUnitConverterException {
+
+            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+
+            /*
+             * Write the method header.
+             */
+            final String methodName = "test"
+                    + testCase.getMethod().getProgramMethod().getName();
+            writeMethodHeader(new String[] { "@Test" }, "public", null, "void",
+                    methodName + ID++, null, null);
+
+            /*
+             * Write the test fixture.
+             */
+            writeTestFixture(testCase);
+
+            /*
+             * Write the invocation of the method itself. If the method return
+             * type is different from void, write a temporary variable to store
+             * the result.
+             */
+            writeMethodInvocation(testCase);
+
+            /*
+             * Write the oracle
+             */
+            writeTestOracle(testCase);
+
+            writeClosingBrace();
+        }
+
+        /**
+         * Writes the Java code constituting the test oracle for a given test
+         * case.
+         * 
+         * @param testCase
+         *            the test case
+         * @throws JUnitConverterException
+         */
+        private void writeTestOracle(final TestCase testCase)
+                throws JUnitConverterException {
+
+            /*
+             * Delegate oracle generation to the Term visitor.
+             */
+            final String oracleString = new OracleGenerationVisitor(testCase)
+                    .generateOracle();
+
+            final String[] conjunctions = oracleString.split("&&");
+            for (final String conjunction : conjunctions) {
+
+                writeLine("Assert.assertTrue("
+                        + AbstractJavaSourceGenerator.NEWLINE);
+                final String[] disjunctions = conjunction.split("\\|\\|");
+
+                for (int i = 0; i < disjunctions.length; i++) {
+
+                    String toWrite = AbstractJavaSourceGenerator.TAB
+                            + disjunctions[i].trim();
+                    if (i + 1 != disjunctions.length) {
+                        toWrite += " ||";
+                    }
+                    writeLine(toWrite + AbstractJavaSourceGenerator.NEWLINE);
+                }
+                writeLine(");" + AbstractJavaSourceGenerator.NEWLINE);
+            }
+            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+        }
+
+        /**
+         * Writes a variable declaration and instantiation statement to a JUnit
+         * test method.
+         * 
+         * @param variable
+         *            variable to declare and instantiate
+         */
+        private void writeVariableDeclaration(final ModelVariable variable) {
+
+            /*
+             * Compile the lefthand side of the declaration. The "self" type
+             * needs special treatment.
+             */
+            String declaration = "";
+            if (isSelf(variable)) {
+                declaration = className + " self";
+            } else {
+                declaration = variable.getType() + " " + variable.getName();
+            }
+
+            /*
+             * Compile the righthand side. What is done here will depend on the
+             * type of the value itself. Primitive types are trivial to process,
+             * and only involve printing the actual value associated with the
+             * variable. References are a different matter and require separate
+             * processing.
+             */
+            String instantiation = "";
+            if (variable.getValue() instanceof ModelInstance) {
+                if (variable.getValue() != null) {
+                    final String reference = ((ModelInstance) variable
+                            .getValue()).getIdentifier();
+                    instantiation = "getObjectInstance(" + reference + ")";
+                } else {
+                    instantiation = "null";
+                }
+            } else {
+                instantiation = variable.getValue().toString();
+            }
+
+            /*
+             * Finally, print the complete declaration and instantiation
+             */
+            writeLine(declaration + " = " + instantiation + ";"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+        }
+    }
+
+    /**
+     * Convert an abstract test suite into a JUnit test suite.
+     * 
+     * @param the
+     *            test suite to convert
+     * @return the resulting JUnit test suite
+     */
+    @Override
+    public String convert(final TestSuite testSuite)
+            throws JUnitConverterException {
+
+        return new JUnitGeneratorWorker().serviceConvert(testSuite);
     }
 }

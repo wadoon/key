@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.testgeneration.core.oraclegeneration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -36,11 +34,11 @@ public enum ContractExtractor {
      * @throws OracleGeneratorException
      *             failure to locate the method is always exceptional
      */
-    public Term extractPostCondition(IExecutionStartNode root)
+    public Term extractPostCondition(final IExecutionStartNode root)
             throws OracleGeneratorException {
 
-        IExecutionMethodCall methodCallNode = getMethodCallNode(root);
-        FunctionalOperationContract contract = getContracts(methodCallNode);
+        final IExecutionMethodCall methodCallNode = getMethodCallNode(root);
+        final FunctionalOperationContract contract = getContracts(methodCallNode);
 
         /*
          * This is an ugly hack, but for now I do not see any more
@@ -49,12 +47,52 @@ public enum ContractExtractor {
          * FunctionalOperationContract appears to be structured exclusively for
          * use within the Proof context.
          */
-        ContractWrapper contractWrapper = new ContractWrapper(
+        final ContractWrapper contractWrapper = new ContractWrapper(
                 (FunctionalOperationContractImpl) contract);
 
-        List<Term> postconditions = contractWrapper.getPostconditions();
+        contractWrapper.getPostconditions();
 
         return null;
+    }
+
+    /**
+     * Extracts the {@link FunctionalOperationContract} instances for a method
+     * call represented by a specific{@link IExecutionMethodCall} node.
+     * 
+     * @param methodCallNode
+     *            the symbolic execution node corresponding to the method call
+     * @return the contract for the method
+     * @throws OracleGeneratorException
+     *             failure to find a contract for the method is always
+     *             exceptional
+     */
+    private FunctionalOperationContract getContracts(
+            final IExecutionMethodCall methodCallNode)
+            throws OracleGeneratorException {
+
+        final SpecificationRepository specificationRepository = methodCallNode
+                .getServices().getSpecificationRepository();
+
+        /*
+         * Extract the abstract representation of the method itself, as well as
+         * the type of the class which contains it. Use this information in
+         * order to retrieve the specification contracts which exist for the
+         * method.
+         * 
+         * For now, we assume that there will only be one contract per method, I
+         * am not sure how to deal with situations where there is more than one
+         * (or exactly what these extra contracts would mean in practice)
+         */
+        final IProgramMethod programMethod = methodCallNode.getProgramMethod();
+        final KeYJavaType containerClass = programMethod.getContainerType();
+        for (final FunctionalOperationContract contract : specificationRepository
+                .getOperationContracts(containerClass, programMethod)) {
+            return contract;
+        }
+
+        throw new OracleGeneratorException(
+                "FATAL: Unable to find specification contract for method: "
+                        + programMethod);
     }
 
     /**
@@ -70,15 +108,15 @@ public enum ContractExtractor {
      * @throws OracleGeneratorException
      *             failure to locate the method is always exceptional
      */
-    private IExecutionMethodCall getMethodCallNode(IExecutionStartNode root)
-            throws OracleGeneratorException {
+    private IExecutionMethodCall getMethodCallNode(
+            final IExecutionStartNode root) throws OracleGeneratorException {
 
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
                 root);
 
         while (iterator.hasNext()) {
 
-            IExecutionNode next = iterator.next();
+            final IExecutionNode next = iterator.next();
 
             if (next instanceof IExecutionMethodCall) {
                 return (IExecutionMethodCall) next;
@@ -87,46 +125,6 @@ public enum ContractExtractor {
 
         throw new OracleGeneratorException(
                 "FATAL: unable to locate root method");
-    }
-
-    /**
-     * Extracts the {@link FunctionalOperationContract} instances for a method
-     * call represented by a specific{@link IExecutionMethodCall} node.
-     * 
-     * @param methodCallNode
-     *            the symbolic execution node corresponding to the method call
-     * @return the contract for the method
-     * @throws OracleGeneratorException
-     *             failure to find a contract for the method is always
-     *             exceptional
-     */
-    private FunctionalOperationContract getContracts(
-            IExecutionMethodCall methodCallNode)
-            throws OracleGeneratorException {
-
-        SpecificationRepository specificationRepository = methodCallNode
-                .getServices().getSpecificationRepository();
-
-        /*
-         * Extract the abstract representation of the method itself, as well as
-         * the type of the class which contains it. Use this information in
-         * order to retrieve the specification contracts which exist for the
-         * method.
-         * 
-         * For now, we assume that there will only be one contract per method, I
-         * am not sure how to deal with situations where there is more than one
-         * (or exactly what these extra contracts would mean in practice)
-         */
-        IProgramMethod programMethod = methodCallNode.getProgramMethod();
-        KeYJavaType containerClass = programMethod.getContainerType();
-        for (FunctionalOperationContract contract : specificationRepository
-                .getOperationContracts(containerClass, programMethod)) {
-            return contract;
-        }
-
-        throw new OracleGeneratorException(
-                "FATAL: Unable to find specification contract for method: "
-                        + programMethod);
     }
 
 }

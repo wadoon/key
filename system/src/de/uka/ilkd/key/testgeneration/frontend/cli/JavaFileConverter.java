@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgeneration.frontend.cli;
 
 import java.io.File;
+
 import com.beust.jcommander.IStringConverter;
 
 /**
@@ -12,7 +13,7 @@ import com.beust.jcommander.IStringConverter;
 public class JavaFileConverter implements IStringConverter<File> {
 
     @Override
-    public File convert(String path) {
+    public File convert(final String path) {
 
         return new File(path);
     }

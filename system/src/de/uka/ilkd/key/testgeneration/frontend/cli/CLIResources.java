@@ -21,13 +21,13 @@ public enum CLIResources {
         FRAMEWORKS = new HashMap<String, ITestCaseParser<String>>();
     }
 
-    public boolean isSupportedFramework(String framework) {
+    public ITestCaseParser<String> getFrameworkParser(final String framework) {
 
-        return FRAMEWORKS.containsKey(framework);
+        return CLIResources.FRAMEWORKS.get(framework);
     }
 
-    public ITestCaseParser<String> getFrameworkParser(String framework) {
+    public boolean isSupportedFramework(final String framework) {
 
-        return FRAMEWORKS.get(framework);
+        return CLIResources.FRAMEWORKS.containsKey(framework);
     }
 }

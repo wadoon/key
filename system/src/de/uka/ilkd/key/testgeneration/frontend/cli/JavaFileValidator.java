@@ -13,7 +13,7 @@ import com.beust.jcommander.ParameterException;
 public class JavaFileValidator implements IParameterValidator {
 
     @Override
-    public void validate(String parameter, String value)
+    public void validate(final String parameter, final String value)
             throws ParameterException {
 
         /*
@@ -26,7 +26,7 @@ public class JavaFileValidator implements IParameterValidator {
         /*
          * Check that the file exists
          */
-        File file = new File(value);
+        final File file = new File(value);
         if (!file.exists()) {
             throw new ParameterException("no such file: " + value);
         }

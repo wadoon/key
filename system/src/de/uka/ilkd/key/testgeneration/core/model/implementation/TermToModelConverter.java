@@ -1,30 +1,13 @@
 package de.uka.ilkd.key.testgeneration.core.model.implementation;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.model.tools.EliminateConjunctionsTransformer;
-import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.NegationNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.RemoveIfThenElseTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
-import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
 class TermToModelConverter {
 
@@ -44,12 +27,12 @@ class TermToModelConverter {
      * @throws TermTransformerException
      * @throws ProofInputException
      */
-    public Model createModel(IExecutionNode node)
+    public Model createModel(final IExecutionNode node)
             throws TermTransformerException, ProofInputException {
 
         Term pathCondition = node.getPathCondition();
 
-        Model model = new Model();
+        final Model model = new Model();
 
         /*
          * Remove if-then-else statements from the pathcondition
@@ -62,7 +45,8 @@ class TermToModelConverter {
          * variables and values found in the Term. Done postorder to eliminate
          * buffering penalties in the Model.
          */
-        TermToModelVisitor modelVisitor = new TermToModelVisitor(model, node);
+        final TermToModelVisitor modelVisitor = new TermToModelVisitor(model,
+                node);
         pathCondition.execPostOrder(modelVisitor);
 
         /*
@@ -78,7 +62,7 @@ class TermToModelConverter {
          * preorder to correctly handle non-assigning operations, such as
          * not-equals.
          */
-        ResolveAssignmentsVisitor referenceVisitor = new ResolveAssignmentsVisitor(
+        final ResolveAssignmentsVisitor referenceVisitor = new ResolveAssignmentsVisitor(
                 model);
         pathCondition.execPreOrder(referenceVisitor);
 

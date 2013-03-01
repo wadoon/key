@@ -43,8 +43,9 @@ public class KeYJavaMethod {
      */
     private final ContractWrapper functionalContract;
 
-    KeYJavaMethod(KeYJavaClass declaringClass, IProgramMethod programMethod,
-            InitConfig initConfig, ContractWrapper functionalContract) {
+    KeYJavaMethod(final KeYJavaClass declaringClass,
+            final IProgramMethod programMethod, final InitConfig initConfig,
+            final ContractWrapper functionalContract) {
 
         this.declaringClass = declaringClass;
         this.programMethod = programMethod;
@@ -52,24 +53,18 @@ public class KeYJavaMethod {
         this.functionalContract = functionalContract;
     }
 
-    /**
-     * Retrieve the preconditions for the method.
-     * 
-     * @return the preconditions
-     */
-    public List<Term> getPreconditions() {
-
-        return functionalContract.getPreconditions();
+    public KeYJavaClass getDeclaringClass() {
+        return declaringClass;
     }
 
     /**
-     * Retrieve the postconditions for the method.
+     * Return the {@link InitConfig} instance for this method.
      * 
-     * @return the postconditions
+     * @return the initConfig
      */
-    public List<Term> getPostconditions() {
+    public final InitConfig getInitConfig() {
 
-        return functionalContract.getPostconditions();
+        return initConfig;
     }
 
     /**
@@ -88,6 +83,26 @@ public class KeYJavaMethod {
     }
 
     /**
+     * Retrieve the postconditions for the method.
+     * 
+     * @return the postconditions
+     */
+    public List<Term> getPostconditions() {
+
+        return functionalContract.getPostconditions();
+    }
+
+    /**
+     * Retrieve the preconditions for the method.
+     * 
+     * @return the preconditions
+     */
+    public List<Term> getPreconditions() {
+
+        return functionalContract.getPreconditions();
+    }
+
+    /**
      * Retrieve the {@link IProgramMethod} instance for this method.
      * 
      * @return the programMethod
@@ -98,24 +113,10 @@ public class KeYJavaMethod {
     }
 
     /**
-     * Return the {@link InitConfig} instance for this method.
-     * 
-     * @return the initConfig
-     */
-    public final InitConfig getInitConfig() {
-
-        return initConfig;
-    }
-
-    /**
      * @return the return type of the method
      */
     public String getReturnType() {
 
         return programMethod.getReturnType().getName();
-    }
-
-    public KeYJavaClass getDeclaringClass() {
-        return declaringClass;
     }
 }

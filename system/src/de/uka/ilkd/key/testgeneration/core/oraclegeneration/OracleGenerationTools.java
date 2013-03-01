@@ -21,6 +21,24 @@ public class OracleGenerationTools {
             .toString();
 
     /**
+     * Simplifies a postCondition, removing {@link SortDependingFunction} and
+     * {@link ObserverFunction} instances.
+     * 
+     * @param term
+     *            the term to simplify
+     * @param separator
+     *            separator do be used for constructing names for
+     *            {@link SortDependingFunction} resolution.
+     * @return the simplified postcondition
+     * @throws TermTransformerException
+     */
+    public static Term simplifyPostCondition(final Term term,
+            final String separator) throws TermTransformerException {
+
+        return new TermToOracleConverter(separator).transform(term);
+    }
+
+    /**
      * Transforms a Term into an equivalent Term representing an Oracle. The
      * semantics of the Term remain unchanged.
      * 
@@ -28,18 +46,20 @@ public class OracleGenerationTools {
      * @return
      * @throws TermTransformerException
      */
-    public static Term termToOracle(Term term) throws TermTransformerException {
+    public static Term termToOracle(final Term term)
+            throws TermTransformerException {
 
         /*
          * Simplify the postcondition
          */
         Term simplifiedOracle = OracleGenerationTools.simplifyPostCondition(
-                term, SEPARATOR);
+                term, OracleGenerationTools.SEPARATOR);
 
         /*
          * Put it into Conjunctive Normal Form
          */
-        simplifiedOracle = new ConjunctionNormalFormTransformer().transform(simplifiedOracle);
+        simplifiedOracle = new ConjunctionNormalFormTransformer()
+                .transform(simplifiedOracle);
 
         /*
          * Simplify the disjunctions in the postcondition
@@ -54,23 +74,5 @@ public class OracleGenerationTools {
                 .transform(simplifiedOracle);
 
         return simplifiedOracle;
-    }
-
-    /**
-     * Simplifies a postCondition, removing {@link SortDependingFunction} and
-     * {@link ObserverFunction} instances.
-     * 
-     * @param term
-     *            the term to simplify
-     * @param separator
-     *            separator do be used for constructing names for
-     *            {@link SortDependingFunction} resolution.
-     * @return the simplified postcondition
-     * @throws TermTransformerException
-     */
-    public static Term simplifyPostCondition(Term term, String separator)
-            throws TermTransformerException {
-
-        return new TermToOracleConverter(separator).transform(term);
     }
 }

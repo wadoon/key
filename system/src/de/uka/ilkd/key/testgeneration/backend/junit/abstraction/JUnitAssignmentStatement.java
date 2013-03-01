@@ -36,18 +36,11 @@ public class JUnitAssignmentStatement {
      */
     private final String fieldValue;
 
-    public JUnitAssignmentStatement(String objectName, String fieldName,
-            String fieldValue) {
+    public JUnitAssignmentStatement(final String objectName,
+            final String fieldName, final String fieldValue) {
         this.objectName = objectName;
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
-    }
-
-    /**
-     * @return the objectName
-     */
-    public String getObjectName() {
-        return objectName;
     }
 
     /**
@@ -62,5 +55,12 @@ public class JUnitAssignmentStatement {
      */
     public String getFieldValue() {
         return fieldValue;
+    }
+
+    /**
+     * @return the objectName
+     */
+    public String getObjectName() {
+        return objectName;
     }
 }

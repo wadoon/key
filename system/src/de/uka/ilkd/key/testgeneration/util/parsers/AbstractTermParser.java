@@ -100,44 +100,49 @@ public abstract class AbstractTermParser {
     static {
 
         primitiveTypes = new LinkedList<String>();
-        primitiveTypes.add(INTEGER);
-        primitiveTypes.add(BOOLEAN);
-        primitiveTypes.add(LONG);
-        primitiveTypes.add(BYTE);
+        AbstractTermParser.primitiveTypes.add(AbstractTermParser.INTEGER);
+        AbstractTermParser.primitiveTypes.add(AbstractTermParser.BOOLEAN);
+        AbstractTermParser.primitiveTypes.add(AbstractTermParser.LONG);
+        AbstractTermParser.primitiveTypes.add(AbstractTermParser.BYTE);
 
         literals = new LinkedList<String>();
-        literals.add(NUMBERS);
+        AbstractTermParser.literals.add(AbstractTermParser.NUMBERS);
 
         unaryFunctions = new LinkedList<String>();
-        unaryFunctions.add(Z);
-        unaryFunctions.add(NEGATE_LITERAL);
+        AbstractTermParser.unaryFunctions.add(AbstractTermParser.Z);
+        AbstractTermParser.unaryFunctions
+                .add(AbstractTermParser.NEGATE_LITERAL);
 
         binaryFunctions = new LinkedList<String>();
-        binaryFunctions.add(GREATER_OR_EQUALS);
-        binaryFunctions.add(LESS_OR_EQUALS);
-        binaryFunctions.add(GREATER_THAN);
-        binaryFunctions.add(LESS_THAN);
-        binaryFunctions.add(MULTIPLICATION);
-        binaryFunctions.add(DIVISION);
-        binaryFunctions.add(ADDITION);
-        binaryFunctions.add(SUBTRACTION);
+        AbstractTermParser.binaryFunctions
+                .add(AbstractTermParser.GREATER_OR_EQUALS);
+        AbstractTermParser.binaryFunctions
+                .add(AbstractTermParser.LESS_OR_EQUALS);
+        AbstractTermParser.binaryFunctions.add(AbstractTermParser.GREATER_THAN);
+        AbstractTermParser.binaryFunctions.add(AbstractTermParser.LESS_THAN);
+        AbstractTermParser.binaryFunctions
+                .add(AbstractTermParser.MULTIPLICATION);
+        AbstractTermParser.binaryFunctions.add(AbstractTermParser.DIVISION);
+        AbstractTermParser.binaryFunctions.add(AbstractTermParser.ADDITION);
+        AbstractTermParser.binaryFunctions.add(AbstractTermParser.SUBTRACTION);
 
         operators = new LinkedList<String>();
-        operators.add(AND);
-        operators.add(OR);
-        operators.add(NOT);
-        operators.add(GREATER_OR_EQUALS);
-        operators.add(LESS_OR_EQUALS);
-        operators.add(GREATER_THAN);
-        operators.add(LESS_THAN);
-        operators.add(MULTIPLICATION);
-        operators.add(DIVISION);
-        operators.add(ADDITION);
-        operators.add(SUBTRACTION);
-        operators.add(EQUALS);
+        AbstractTermParser.operators.add(AbstractTermParser.AND);
+        AbstractTermParser.operators.add(AbstractTermParser.OR);
+        AbstractTermParser.operators.add(AbstractTermParser.NOT);
+        AbstractTermParser.operators.add(AbstractTermParser.GREATER_OR_EQUALS);
+        AbstractTermParser.operators.add(AbstractTermParser.LESS_OR_EQUALS);
+        AbstractTermParser.operators.add(AbstractTermParser.GREATER_THAN);
+        AbstractTermParser.operators.add(AbstractTermParser.LESS_THAN);
+        AbstractTermParser.operators.add(AbstractTermParser.MULTIPLICATION);
+        AbstractTermParser.operators.add(AbstractTermParser.DIVISION);
+        AbstractTermParser.operators.add(AbstractTermParser.ADDITION);
+        AbstractTermParser.operators.add(AbstractTermParser.SUBTRACTION);
+        AbstractTermParser.operators.add(AbstractTermParser.EQUALS);
 
         exceptionSorts = new LinkedList<String>();
-        exceptionSorts.add(EXCEPTION_BASE);
+        AbstractTermParser.exceptionSorts
+                .add(AbstractTermParser.EXCEPTION_BASE);
     }
 
     /**
@@ -147,10 +152,10 @@ public abstract class AbstractTermParser {
      * @param string
      * @return
      */
-    protected static String extractName(Term term) {
+    protected static String extractName(final Term term) {
 
-        String fullName = term.toString();
-        int splitterIndex = fullName.lastIndexOf('$');
+        final String fullName = term.toString();
+        final int splitterIndex = fullName.lastIndexOf('$');
 
         if (splitterIndex == -1) {
             return term.toString();
@@ -158,6 +163,31 @@ public abstract class AbstractTermParser {
 
         return fullName.substring(splitterIndex + 1).replaceAll("[^A-Za-z0-9]",
                 "");
+    }
+
+    /**
+     * Retrieves the short-hand name of the variable a given Term represents.
+     * For example, in the Term
+     * 
+     * <pre>
+     * com.example.MyClass::$myVariable,
+     * </pre>
+     * 
+     * the returned shorthand is <i>myVariable</i>.
+     * 
+     * @param term
+     *            the Term to process
+     * @return the short-hand name of the variable represented by the Term. If
+     *         the Term does not represent a variable, the regular toString
+     *         output of the Terms {@link Operator} instance is returned.
+     */
+    protected static String getVariableNameForTerm(final Term term) {
+
+        final Operator operator = term.op();
+        final String name = operator.name().toString();
+
+        final String[] splitName = name.split("::\\$");
+        return splitName[splitName.length - 1].replaceAll("[^A-Za-z0-9]", "");
     }
 
     /**
@@ -170,11 +200,11 @@ public abstract class AbstractTermParser {
      * @return true if the Term represents an integer program construct, false
      *         otherwise
      */
-    protected static boolean isPrimitiveType(Term term) {
+    protected static boolean isPrimitiveType(final Term term) {
 
-        String sortName = term.sort().name().toString();
+        final String sortName = term.sort().name().toString();
 
-        return primitiveTypes.contains(sortName);
+        return AbstractTermParser.primitiveTypes.contains(sortName);
     }
 
     /**
@@ -190,9 +220,10 @@ public abstract class AbstractTermParser {
      * @return the identifier String.
      * @see Model
      */
-    protected static String resolveIdentifierString(Term term, String separator) {
+    protected static String resolveIdentifierString(final Term term,
+            final String separator) {
 
-        Operator operator = term.op();
+        final Operator operator = term.op();
 
         /*
          * Base case 1: underlying definition is a LocationVariable and hence
@@ -201,7 +232,7 @@ public abstract class AbstractTermParser {
          */
         if (operator.getClass() == LocationVariable.class) {
 
-            String name = getVariableNameForTerm(term);
+            final String name = AbstractTermParser.getVariableNameForTerm(term);
             return name;
             // return isPrimitiveType(term) ? "self_" + name : name;
         }
@@ -224,30 +255,38 @@ public abstract class AbstractTermParser {
          */
         else {
 
-            return resolveIdentifierString(term.sub(1), separator) + separator
-                    + getVariableNameForTerm(term.sub(2));
+            return AbstractTermParser.resolveIdentifierString(term.sub(1),
+                    separator)
+                    + separator
+                    + AbstractTermParser.getVariableNameForTerm(term.sub(2));
         }
     }
 
-    protected boolean isLiteral(Term term) {
+    /**
+     * @param term
+     *            the Term to check
+     * @return true if the term has children, false otherwise.
+     */
+    protected boolean hasChildren(final Term term) {
 
-        String sortName = term.sort().name().toString();
-
-        return literals.contains(sortName);
+        return term.subs().size() != 0;
     }
 
-    protected boolean isUnaryFunction(Term term) {
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an AND junctor
+     */
+    protected boolean isAnd(final Term term) {
 
-        String sortName = term.op().name().toString();
-
-        return unaryFunctions.contains(sortName);
+        return term.op().name().toString().equals(AbstractTermParser.AND);
     }
 
-    protected boolean isBinaryFunction(Term term) {
+    protected boolean isBinaryFunction(final Term term) {
 
-        String sortName = term.op().name().toString();
+        final String sortName = term.op().name().toString();
 
-        return binaryFunctions.contains(sortName);
+        return AbstractTermParser.binaryFunctions.contains(sortName);
     }
 
     /**
@@ -257,7 +296,7 @@ public abstract class AbstractTermParser {
      * @param term
      * @return
      */
-    protected boolean isBinaryFunction2(Term term) {
+    protected boolean isBinaryFunction2(final Term term) {
 
         /*
          * Since Not also qualifies as a junctor, albeit a unary one, check this
@@ -267,27 +306,69 @@ public abstract class AbstractTermParser {
             return false;
         }
 
-        de.uka.ilkd.key.logic.op.Operator operator = term.op();
+        final de.uka.ilkd.key.logic.op.Operator operator = term.op();
 
         return operator instanceof Junctor || operator instanceof Equality;
     }
 
-    protected boolean isVariable(Term term) {
+    protected boolean isBoolean(final Term term) {
+        return term.sort().name().toString().equals(AbstractTermParser.BOOLEAN);
+    }
 
-        Operator operator = term.op();
+    protected boolean isBooleanConstant(final Term term)
+            throws TermParserException {
+        return isBooleanFalse(term) || isBooleanTrue(term);
+    }
 
-        return operator instanceof Function
-                || operator instanceof ProgramVariable;
+    protected boolean isBooleanFalse(final Term term)
+            throws TermParserException {
+        if (isBoolean(term)) {
+            return term.op().name().toString().equals(AbstractTermParser.FALSE);
+        } else {
+            throw new TermTransformerException(
+                    "Attempted to apply boolean operation to non-boolean literal");
+        }
+    }
+
+    protected boolean isBooleanTrue(final Term term)
+            throws TermTransformerException {
+        if (isBoolean(term)) {
+            return term.op().name().toString().equals(AbstractTermParser.TRUE);
+        } else {
+            throw new TermTransformerException(
+                    "Attempted to apply boolean operation to non-boolean literal");
+        }
     }
 
     /**
      * @param term
      *            the term
-     * @return true iff. the term represents an AND junctor
+     * @return true iff. the term represents an EQUALS junctor
      */
-    protected boolean isAnd(Term term) {
+    protected boolean isEquals(final Term term) {
 
-        return term.op().name().toString().equals(AND);
+        return term.op() instanceof Equality;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a Java Exception
+     */
+    protected boolean isExceptionSort(final Term term) {
+
+        return AbstractTermParser.exceptionSorts.contains(term.sort().name()
+                .toString());
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link Function}
+     */
+    protected boolean isFunction(final Term term) {
+
+        return term.op() instanceof Function;
     }
 
     /**
@@ -295,9 +376,10 @@ public abstract class AbstractTermParser {
      *            the term
      * @return true iff. the term represents a GEQ operator
      */
-    protected boolean isGreaterOrEquals(Term term) {
+    protected boolean isGreaterOrEquals(final Term term) {
 
-        return term.op().name().toString().equals(GREATER_OR_EQUALS);
+        return term.op().name().toString()
+                .equals(AbstractTermParser.GREATER_OR_EQUALS);
     }
 
     /**
@@ -305,9 +387,40 @@ public abstract class AbstractTermParser {
      *            the term
      * @return true iff. the term represents a GREATER_THAN operator
      */
-    protected boolean isGreaterThan(Term term) {
+    protected boolean isGreaterThan(final Term term) {
 
-        return term.op().name().toString().equals(GREATER_THAN);
+        return term.op().name().toString()
+                .equals(AbstractTermParser.GREATER_THAN);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an {@link IfExThenElse} statement.
+     */
+    protected boolean isIfExThenElse(final Term term) {
+
+        return term.op() instanceof IfExThenElse;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an {@link IfThenElse} statement.
+     */
+    protected boolean isIfThenElse(final Term term) {
+
+        return term.op() instanceof IfThenElse;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link Junctor}
+     */
+    protected boolean isJunctor(final Term term) {
+
+        return term.op() instanceof Junctor;
     }
 
     /**
@@ -315,9 +428,10 @@ public abstract class AbstractTermParser {
      *            the term
      * @return true iff. the term represents a LEQ operator
      */
-    protected boolean isLessOrEquals(Term term) {
+    protected boolean isLessOrEquals(final Term term) {
 
-        return term.op().name().toString().equals(LESS_OR_EQUALS);
+        return term.op().name().toString()
+                .equals(AbstractTermParser.LESS_OR_EQUALS);
     }
 
     /**
@@ -325,9 +439,57 @@ public abstract class AbstractTermParser {
      *            the term
      * @return true iff. the term represents a LESS_THAN operator
      */
-    protected boolean isLessThan(Term term) {
+    protected boolean isLessThan(final Term term) {
 
-        return term.op().name().toString().equals(LESS_THAN);
+        return term.op().name().toString().equals(AbstractTermParser.LESS_THAN);
+    }
+
+    protected boolean isLiteral(final Term term) {
+
+        final String sortName = term.sort().name().toString();
+
+        return AbstractTermParser.literals.contains(sortName);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a {@link LocationVariable}.
+     */
+    protected boolean isLocationVariable(final Term term) {
+
+        return term.op() instanceof LocationVariable;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a NOT junctor
+     */
+    protected boolean isNot(final Term term) {
+
+        return term.op().name().toString().equals(AbstractTermParser.NOT);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents the {@link NullSort}
+     */
+    protected boolean isNullSort(final Term term) {
+
+        return term.sort() instanceof NullSort;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an {@link ObserverFunction}
+     *         construct.
+     */
+    protected boolean isObserverFunction(final Term term) {
+
+        return term.op() instanceof ObserverFunction;
     }
 
     /**
@@ -335,11 +497,11 @@ public abstract class AbstractTermParser {
      *            the term
      * @return true iff. the term represents an or junctor
      */
-    protected boolean isOr(Term term) {
+    protected boolean isOr(final Term term) {
 
         if (isBinaryFunction2(term)) {
 
-            return term.op().name().toString().equals(OR);
+            return term.op().name().toString().equals(AbstractTermParser.OR);
 
         } else {
 
@@ -350,51 +512,11 @@ public abstract class AbstractTermParser {
     /**
      * @param term
      *            the term
-     * @return true iff. the term represents an EQUALS junctor
+     * @return true iff. the term represents aa {@link ProgramMethod}.
      */
-    protected boolean isEquals(Term term) {
+    protected boolean isProgramMethod(final Term term) {
 
-        return term.op() instanceof Equality;
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents the RESULT constant
-     */
-    protected boolean isResult(Term term) {
-
-        return term.op().name().equals(RESULT);
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents a NOT junctor
-     */
-    protected boolean isNot(Term term) {
-
-        return term.op().name().toString().equals(NOT);
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents the {@link NullSort}
-     */
-    protected boolean isNullSort(Term term) {
-
-        return term.sort() instanceof NullSort;
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents a Java Exception
-     */
-    protected boolean isExceptionSort(Term term) {
-
-        return exceptionSorts.contains(term.sort().name().toString());
+        return term.op() instanceof ProgramMethod;
     }
 
     /**
@@ -402,7 +524,7 @@ public abstract class AbstractTermParser {
      *            the term
      * @return true iff. the term represents a {@link ProgramVariable}.
      */
-    protected boolean isProgramVariable(Term term) {
+    protected boolean isProgramVariable(final Term term) {
 
         return term.op() instanceof ProgramVariable;
     }
@@ -410,11 +532,11 @@ public abstract class AbstractTermParser {
     /**
      * @param term
      *            the term
-     * @return true iff. the term represents a {@link LocationVariable}.
+     * @return true iff. the term represents the RESULT constant
      */
-    protected boolean isLocationVariable(Term term) {
+    protected boolean isResult(final Term term) {
 
-        return term.op() instanceof LocationVariable;
+        return term.op().name().equals(AbstractTermParser.RESULT);
     }
 
     /**
@@ -422,29 +544,9 @@ public abstract class AbstractTermParser {
      *            the term
      * @return true iff. the term represents a {@link SortDependingFunction}
      */
-    protected boolean isSortDependingFunction(Term term) {
+    protected boolean isSortDependingFunction(final Term term) {
 
         return term.op() instanceof SortDependingFunction;
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents a {@link Function}
-     */
-    protected boolean isFunction(Term term) {
-
-        return term.op() instanceof Function;
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents a {@link Junctor}
-     */
-    protected boolean isJunctor(Term term) {
-
-        return term.op() instanceof Junctor;
     }
 
     /**
@@ -453,114 +555,27 @@ public abstract class AbstractTermParser {
      * @return true iff. the term represents a {@link SortedOperator}, which is
      *         one of the two fundamental base sorts for Terms in KeY.
      */
-    protected boolean isSortedOperator(Term term) {
+    protected boolean isSortedOperator(final Term term) {
 
         return term.op() instanceof SortedOperator;
     }
 
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents an {@link IfExThenElse} statement.
-     */
-    protected boolean isIfExThenElse(Term term) {
+    protected boolean isUnaryFunction(final Term term) {
 
-        return term.op() instanceof IfExThenElse;
+        final String sortName = term.op().name().toString();
+
+        return AbstractTermParser.unaryFunctions.contains(sortName);
     }
 
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents an {@link IfThenElse} statement.
-     */
-    protected boolean isIfThenElse(Term term) {
+    protected boolean isVariable(final Term term) {
 
-        return term.op() instanceof IfThenElse;
+        final Operator operator = term.op();
+
+        return operator instanceof Function
+                || operator instanceof ProgramVariable;
     }
 
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents an {@link ObserverFunction}
-     *         construct.
-     */
-    protected boolean isObserverFunction(Term term) {
-
-        return term.op() instanceof ObserverFunction;
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents aa {@link ProgramMethod}.
-     */
-    protected boolean isProgramMethod(Term term) {
-
-        return term.op() instanceof ProgramMethod;
-    }
-
-    /**
-     * Retrieves the short-hand name of the variable a given Term represents.
-     * For example, in the Term
-     * 
-     * <pre>
-     * com.example.MyClass::$myVariable,
-     * </pre>
-     * 
-     * the returned shorthand is <i>myVariable</i>.
-     * 
-     * @param term
-     *            the Term to process
-     * @return the short-hand name of the variable represented by the Term. If
-     *         the Term does not represent a variable, the regular toString
-     *         output of the Terms {@link Operator} instance is returned.
-     */
-    protected static String getVariableNameForTerm(Term term) {
-
-        Operator operator = term.op();
-        String name = operator.name().toString();
-
-        String[] splitName = name.split("::\\$");
-        return splitName[splitName.length - 1].replaceAll("[^A-Za-z0-9]", "");
-    }
-
-    /**
-     * @param term
-     *            the Term to check
-     * @return true if the term has children, false otherwise.
-     */
-    protected boolean hasChildren(Term term) {
-
-        return term.subs().size() != 0;
-    }
-
-    protected boolean isBoolean(Term term) {
-        return term.sort().name().toString().equals(BOOLEAN);
-    }
-
-    protected boolean isBooleanTrue(Term term) throws TermTransformerException {
-        if (isBoolean(term)) {
-            return term.op().name().toString().equals(TRUE);
-        } else {
-            throw new TermTransformerException(
-                    "Attempted to apply boolean operation to non-boolean literal");
-        }
-    }
-
-    protected boolean isBooleanConstant(Term term) throws TermParserException {
-        return isBooleanFalse(term) || isBooleanTrue(term);
-    }
-
-    protected boolean isBooleanFalse(Term term) throws TermParserException {
-        if (isBoolean(term)) {
-            return term.op().name().toString().equals(FALSE);
-        } else {
-            throw new TermTransformerException(
-                    "Attempted to apply boolean operation to non-boolean literal");
-        }
-    }
-
-    protected boolean translateToJavaBoolean(Term term)
+    protected boolean translateToJavaBoolean(final Term term)
             throws TermParserException {
         if (isBoolean(term)) {
             return isBooleanTrue(term) ? true : false;

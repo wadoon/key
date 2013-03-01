@@ -10,61 +10,24 @@ import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 import de.uka.ilkd.key.smt.SMTSettings;
 
 /**
- * Settings for the model generation subsystem of KeYTestGen.
- * 
- * @author christopher
- * 
- */
-final class ModelSettings {
-
-    /**
-     * The number of times to re-try solving an SMT problem in the event that
-     * "UNKNOWN" is returned, since this usually seems to point to an error
-     * during the execution of the solver, rather than the problem not being
-     * solveable.
-     */
-    private static final int NUMBER_OF_TRIES = 10;
-
-    /**
-     * The default SMT settings to be used with an SMT solver used by
-     * KeYTestGen.
-     */
-    private static final DefaultSMTSettings DEFAULT_SMT_SETTINGS = new DefaultSMTSettings();
-
-    /**
-     * The default settings for the SMTLIB translator.
-     */
-    private static final Configuration DEFAULT_TRANSLATOR_CONFIGURATION = new Configuration(
-            false, true);
-
-    /**
-     * @return the NUMBER_OF_TRIES constant, dictating how many times a Model
-     *         Generator should re-attempt to solve an SMT problem whose last
-     *         known solution was UNKNOWN.
-     */
-    public static int getNUMBER_OF_TRIES() {
-        return NUMBER_OF_TRIES;
-    }
-
-    /**
-     * @return the DEFAULT_SMT_SETTINGS constant, containing a default set of
-     *         settings for SMT solvers used by KeYTestGen.
-     */
-    public static DefaultSMTSettings getDefaultSMTSettings() {
-        return DEFAULT_SMT_SETTINGS;
-    }
-
-    public static Configuration getDefaultTranslatorConfiguration() {
-        return DEFAULT_TRANSLATOR_CONFIGURATION;
-    }
-}
-
-/**
  * Settings to pass to the SMT solver.
  * 
  * @author christopher
  */
 class DefaultSMTSettings implements SMTSettings {
+
+    @Override
+    public boolean checkForSupport() {
+
+        return false;
+    }
+
+    @Override
+    public String getLogic() {
+
+        return "QF_UFLIRA";
+        // return "AUFLIA";
+    }
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -73,9 +36,21 @@ class DefaultSMTSettings implements SMTSettings {
     }
 
     @Override
+    public long getMaximumInteger() {
+
+        return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+    }
+
+    @Override
     public int getMaxNumberOfGenerics() {
 
         return 2;
+    }
+
+    @Override
+    public long getMinimumInteger() {
+
+        return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
     }
 
     @Override
@@ -109,7 +84,7 @@ class DefaultSMTSettings implements SMTSettings {
     }
 
     @Override
-    public boolean useExplicitTypeHierarchy() {
+    public boolean useAssumptionsForBigSmallIntegers() {
 
         return false;
     }
@@ -121,7 +96,7 @@ class DefaultSMTSettings implements SMTSettings {
     }
 
     @Override
-    public boolean useAssumptionsForBigSmallIntegers() {
+    public boolean useExplicitTypeHierarchy() {
 
         return false;
     }
@@ -131,29 +106,54 @@ class DefaultSMTSettings implements SMTSettings {
 
         return false;
     }
+}
 
-    @Override
-    public long getMaximumInteger() {
+/**
+ * Settings for the model generation subsystem of KeYTestGen.
+ * 
+ * @author christopher
+ * 
+ */
+final class ModelSettings {
 
-        return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+    /**
+     * The number of times to re-try solving an SMT problem in the event that
+     * "UNKNOWN" is returned, since this usually seems to point to an error
+     * during the execution of the solver, rather than the problem not being
+     * solveable.
+     */
+    private static final int NUMBER_OF_TRIES = 10;
+
+    /**
+     * The default SMT settings to be used with an SMT solver used by
+     * KeYTestGen.
+     */
+    private static final DefaultSMTSettings DEFAULT_SMT_SETTINGS = new DefaultSMTSettings();
+
+    /**
+     * The default settings for the SMTLIB translator.
+     */
+    private static final Configuration DEFAULT_TRANSLATOR_CONFIGURATION = new Configuration(
+            false, true);
+
+    /**
+     * @return the DEFAULT_SMT_SETTINGS constant, containing a default set of
+     *         settings for SMT solvers used by KeYTestGen.
+     */
+    public static DefaultSMTSettings getDefaultSMTSettings() {
+        return ModelSettings.DEFAULT_SMT_SETTINGS;
     }
 
-    @Override
-    public long getMinimumInteger() {
-
-        return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
+    public static Configuration getDefaultTranslatorConfiguration() {
+        return ModelSettings.DEFAULT_TRANSLATOR_CONFIGURATION;
     }
 
-    @Override
-    public String getLogic() {
-
-        return "QF_UFLIRA";
-        // return "AUFLIA";
-    }
-
-    @Override
-    public boolean checkForSupport() {
-
-        return false;
+    /**
+     * @return the NUMBER_OF_TRIES constant, dictating how many times a Model
+     *         Generator should re-attempt to solve an SMT problem whose last
+     *         known solution was UNKNOWN.
+     */
+    public static int getNUMBER_OF_TRIES() {
+        return ModelSettings.NUMBER_OF_TRIES;
     }
 }

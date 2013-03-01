@@ -7,19 +7,19 @@ import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerE
 public class EliminateConjunctionsTransformer extends AbstractTermTransformer {
 
     @Override
-    public Term transform(Term term) throws TermTransformerException {
+    public Term transform(final Term term) throws TermTransformerException {
 
         return transformTerm(term);
     }
 
     @Override
-    protected Term transformOr(Term term) throws TermTransformerException {
+    protected Term transformOr(final Term term) throws TermTransformerException {
 
-        Term firstChild = term.sub(0);
-        Term secondChild = term.sub(1);
+        final Term firstChild = term.sub(0);
+        final Term secondChild = term.sub(1);
 
-        String firstChildName = firstChild.toString();
-        String secondChildName = secondChild.toString();
+        final String firstChildName = firstChild.toString();
+        final String secondChildName = secondChild.toString();
 
         if (firstChildName.length() < secondChildName.length()) {
             return transformTerm(firstChild);

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.testgeneration.core.model.implementation;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.StringConstants;
+import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
@@ -32,22 +33,9 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
      */
     private final Model model;
 
-    public ResolveAssignmentsVisitor(Model model) {
+    public ResolveAssignmentsVisitor(final Model model) {
 
         this.model = model;
-    }
-
-    @Override
-    public void visit(Term visited) {
-
-        if (isNot(visited)) {
-            sawNot = true;
-        } else if (isEquals(visited)) {
-            parseEquals(visited);
-            sawNot = false;
-        } else if (isBinaryFunction2(visited) && sawNot) {
-            sawNot = false;
-        }
     }
 
     /**
@@ -74,12 +62,12 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
      * @param term
      *            the term to process
      */
-    private void parseEquals(Term term) {
+    private void parseEquals(final Term term) {
 
         try {
 
-            Term leftOperand = term.sub(0);
-            Term rightOperand = term.sub(1);
+            final Term leftOperand = term.sub(0);
+            final Term rightOperand = term.sub(1);
 
             String leftOperandIdentifier;
             String rightOperandIdentifier;
@@ -87,15 +75,16 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
             /*
              * Process primitive variables.
              */
-            if (isPrimitiveType(leftOperand)) {
+            if (AbstractTermParser.isPrimitiveType(leftOperand)) {
 
                 /*
                  * If the left-hand hand is a boolean, configure it accordingly.
                  */
                 if (isBoolean(leftOperand)) {
 
-                    leftOperandIdentifier = resolveIdentifierString(
-                            leftOperand, SEPARATOR);
+                    leftOperandIdentifier = AbstractTermParser
+                            .resolveIdentifierString(leftOperand,
+                                    ResolveAssignmentsVisitor.SEPARATOR);
 
                     /*
                      * If the right-hand operator is a boolean constant (TRUE or
@@ -104,16 +93,13 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                      */
                     if (isBooleanConstant(rightOperand)) {
 
-                        ModelVariable modelVariable = model
+                        final ModelVariable modelVariable = model
                                 .getVariable(leftOperandIdentifier);
 
                         boolean value = isBooleanTrue(rightOperand);
-                        value = (sawNot) ? !value : value;
+                        value = sawNot ? !value : value;
                         model.add(modelVariable, value);
                     } else {
-                        // Breakpoint hook - should never happen.
-                        int dummy = 1;
-                        dummy++;
                     }
 
                     /*
@@ -121,25 +107,40 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                      */
                 } else if (!sawNot) {
 
-                    leftOperandIdentifier = resolveIdentifierString(
-                            leftOperand, SEPARATOR);
-                    rightOperandIdentifier = resolveIdentifierString(
-                            rightOperand, SEPARATOR);
+                    leftOperandIdentifier = AbstractTermParser
+                            .resolveIdentifierString(leftOperand,
+                                    ResolveAssignmentsVisitor.SEPARATOR);
+                    rightOperandIdentifier = AbstractTermParser
+                            .resolveIdentifierString(rightOperand,
+                                    ResolveAssignmentsVisitor.SEPARATOR);
 
-                    ModelVariable leftModelVariable = model
+                    final ModelVariable leftModelVariable = model
                             .getVariable(leftOperandIdentifier);
 
-                    ModelVariable rightModelVariable = model
+                    final ModelVariable rightModelVariable = model
                             .getVariable(rightOperandIdentifier);
 
                     model.assignPointer(leftModelVariable, rightModelVariable);
                 }
             }
 
-        } catch (TermParserException e) {
+        } catch (final TermParserException e) {
             // Should never happen. Caught only because
             // AbstractTermParser requires it.
             return;
+        }
+    }
+
+    @Override
+    public void visit(final Term visited) {
+
+        if (isNot(visited)) {
+            sawNot = true;
+        } else if (isEquals(visited)) {
+            parseEquals(visited);
+            sawNot = false;
+        } else if (isBinaryFunction2(visited) && sawNot) {
+            sawNot = false;
         }
     }
 }
