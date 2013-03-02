@@ -250,7 +250,6 @@ public class ModelGenerationTools {
             }
             return super.transformTerm(term);
         }
-
     }
 
     private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR

@@ -2,7 +2,7 @@ package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
 
 import junit.framework.Assert;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerator;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestCase;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
@@ -43,42 +43,5 @@ public class JUnitTestCase {
 
         assert testCase != null;
         this.wrappedTestCase = testCase;
-    }
-
-    /**
-     * Returns the oracle for the test case, simplified and in conjunctive
-     * normal form.
-     * 
-     * @return
-     * @throws TermTransformerException
-     */
-    public Term getSimplifiedOracle() throws TermTransformerException {
-
-        /*
-         * Lazily instantiate the oracle Term
-         */
-        if (oracle == null) {
-
-            /*
-             * Prepare the raw postcondition to become an Oracle: simplify it,
-             * put it in CNF, order the operands, and simplify all conjunctions
-             * and disjunctions.
-             */
-            Term simplifiedPostcondition = OracleGenerationTools
-                    .simplifyPostCondition(wrappedTestCase.getOracle(), "_");
-
-            simplifiedPostcondition = new ConjunctionNormalFormTransformer()
-                    .transform(simplifiedPostcondition);
-
-            simplifiedPostcondition = new SimplifyDisjunctionTransformer()
-                    .transform(simplifiedPostcondition);
-
-            simplifiedPostcondition = new SimplifyConjunctionTransformer()
-                    .transform(simplifiedPostcondition);
-
-            oracle = simplifiedPostcondition;
-        }
-
-        return oracle;
     }
 }

@@ -244,15 +244,6 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         }
     }
 
-    protected void printModel(HashMap<String, ValueContainer> model) {
-
-        for (ValueContainer container : model.values()) {
-
-            System.out.println("GENERATED MODEL:" + "\nName: "
-                    + container.getName() + "\nType: " + container.getType()
-                    + "\nValue: " + container.getValue() + "\n");
-        }
-    }
 
     protected void printSymbolicExecutionTreePathConditions(
             IExecutionStartNode root) throws ProofInputException {

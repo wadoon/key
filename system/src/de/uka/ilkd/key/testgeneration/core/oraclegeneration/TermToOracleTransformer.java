@@ -6,15 +6,18 @@ import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.AbstractTermTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.OrderOperandsTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.RemoveSDPsTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
+import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
-public class TermToOracleConverter extends AbstractTermTransformer {
+class TermToOracleTransformer extends AbstractTermTransformer {
 
     private final String separator;
 
-    public TermToOracleConverter(final String separator) {
+    public TermToOracleTransformer(final String separator) {
         this.separator = separator;
     }
 
@@ -25,7 +28,7 @@ public class TermToOracleConverter extends AbstractTermTransformer {
      * correctness, and removing them makes the Term much more easy to work
      * with.
      * 
-     * @param term
+     * @param oracleTerm
      *            the Term
      * @return the simplified Term
      * @throws TermTransformerException
@@ -35,19 +38,40 @@ public class TermToOracleConverter extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
+        Term oracleTerm = term;
+
         /*
          * Remove all SortDependingFunction instances from the Term.
          */
-        Term preProcessedTerm = new RemoveSDPsTransformer(separator)
-                .transform(term);
+        oracleTerm = new RemoveSDPsTransformer(separator).transform(oracleTerm);
 
         /*
          * Order the operands of the term
          */
-        preProcessedTerm = new OrderOperandsTransformer()
-                .transform(preProcessedTerm);
+        oracleTerm = new OrderOperandsTransformer().transform(oracleTerm);
 
-        return transformTerm(preProcessedTerm);
+        /*
+         * Do the transformation
+         */
+        oracleTerm = transformTerm(oracleTerm);
+
+        /*
+         * Put it into Conjunctive Normal Form
+         */
+        oracleTerm = new ConjunctionNormalFormTransformer()
+                .transform(oracleTerm);
+
+        /*
+         * Simplify the disjunctions in the postcondition
+         */
+        oracleTerm = new SimplifyDisjunctionTransformer().transform(oracleTerm);
+
+        /*
+         * Simplify the remaining conjunctions
+         */
+        oracleTerm = new SimplifyConjunctionTransformer().transform(oracleTerm);
+
+        return oracleTerm;
     }
 
     /**

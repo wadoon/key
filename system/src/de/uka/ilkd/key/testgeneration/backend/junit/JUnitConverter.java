@@ -13,7 +13,7 @@ import de.uka.ilkd.key.testgeneration.core.classabstraction.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerator;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestCase;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
 import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
@@ -87,46 +87,17 @@ public class JUnitConverter implements IFrameworkConverter {
 
             public String generateOracle() throws JUnitConverterException {
 
-                try {
+                /*
+                 * Simplify the postcondition
+                 */
+                final Term oracle = testCase.getOracle();
+                /*
+                 * Traverse the postcondition(s) in the testcase, filling the
+                 * buffer with the encoded terms.
+                 */
+                oracle.execPreOrder(this);
 
-                    /*
-                     * Simplify the postcondition
-                     */
-                    final Term oracle = testCase.getOracle();
-                    Term simplifiedOracle = OracleGenerationTools
-                            .simplifyPostCondition(oracle,
-                                    OracleGenerationVisitor.SEPARATOR);
-
-                    /*
-                     * Put it into Conjunctive Normal Form
-                     */
-                    simplifiedOracle = new ConjunctionNormalFormTransformer()
-                            .transform(simplifiedOracle);
-
-                    /*
-                     * Simplify the disjunctions in the postcondition
-                     */
-                    simplifiedOracle = new SimplifyDisjunctionTransformer()
-                            .transform(simplifiedOracle);
-
-                    /*
-                     * Simplify the remaining conjunctions
-                     */
-                    simplifiedOracle = new SimplifyConjunctionTransformer()
-                            .transform(simplifiedOracle);
-
-                    /*
-                     * Traverse the postcondition(s) in the testcase, filling
-                     * the buffer with the encoded terms.
-                     */
-                    simplifiedOracle.execPreOrder(this);
-
-                    return processBuffer();
-
-                } catch (final TermTransformerException e) {
-
-                    throw new JUnitConverterException(e.getMessage());
-                }
+                return processBuffer();
             }
 
             private boolean isParamaterValue(final Term term) {

@@ -201,9 +201,9 @@ public  class Test_PrimitiveIntegerOperations_mid {
     
     @Test
     public void testmid4 () {
-        int x = 1;
-        int y = -1;
-        int z = 0;
+        int x = 2;
+        int y = 0;
+        int z = 1;
         int result = self.mid(x,y,z);
         Assert.assertTrue(
             (result == x) ||
@@ -336,17 +336,17 @@ public  class Test_PrimitiveIntegerOperations_mid {
          * of each object instance as necessary
          */
         objectInstances.put(2, new PrimitiveIntegerOperations());
-        objectInstances.put(6, new PrimitiveIntegerOperations());
+        objectInstances.put(5, new PrimitiveIntegerOperations());
         objectInstances.put(4, new PrimitiveIntegerOperations());
         objectInstances.put(1, new PrimitiveIntegerOperations());
-        objectInstances.put(5, new PrimitiveIntegerOperations());
+        objectInstances.put(6, new PrimitiveIntegerOperations());
         objectInstances.put(3, new PrimitiveIntegerOperations());
         {
             PrimitiveIntegerOperations instance = getObjectInstance(2);
         }
         
         {
-            PrimitiveIntegerOperations instance = getObjectInstance(6);
+            PrimitiveIntegerOperations instance = getObjectInstance(5);
         }
         
         {
@@ -358,7 +358,7 @@ public  class Test_PrimitiveIntegerOperations_mid {
         }
         
         {
-            PrimitiveIntegerOperations instance = getObjectInstance(5);
+            PrimitiveIntegerOperations instance = getObjectInstance(6);
         }
         
         {
