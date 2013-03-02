@@ -9,7 +9,7 @@ package de.uka.ilkd.key.testgeneration;
  */
 public enum StringConstants {
 
-    SELF("self"), NEWLINE("\n"), TAB("    "), FIELD_SEPARATOR("_");
+    FIELD_SEPARATOR("_"), NEWLINE("\n"), SELF("self"), TAB("    ");
     ;
 
     private final String keyWord;
@@ -20,6 +20,6 @@ public enum StringConstants {
 
     @Override
     public String toString() {
-        return keyWord;
+        return this.keyWord;
     }
 }

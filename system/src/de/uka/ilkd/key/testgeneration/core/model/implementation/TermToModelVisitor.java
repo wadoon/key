@@ -71,16 +71,16 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
     }
 
     /**
-     * Stores Java specific information related to the {@link Term} we are
-     * working with.
-     */
-    private final JavaInfo javaInfo;
-
-    /**
      * The default root variable, representing a reference to the class instance
      * of which the tested method is part.
      */
     private final LocationVariable default_self;
+
+    /**
+     * Stores Java specific information related to the {@link Term} we are
+     * working with.
+     */
+    private final JavaInfo javaInfo;
 
     /**
      * The {@link Model} to be populated by visiting the associated Term.
@@ -89,11 +89,11 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
     public TermToModelVisitor(final Model model, final IExecutionNode node) {
 
-        final IExecutionMethodCall methodCall = getMethodCallNode(node);
+        final IExecutionMethodCall methodCall = this.getMethodCallNode(node);
 
         this.model = model;
 
-        javaInfo = methodCall.getServices().getJavaInfo();
+        this.javaInfo = methodCall.getServices().getJavaInfo();
 
         /*
          * Construct the default base class.
@@ -101,16 +101,17 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         final KeYJavaType container = methodCall.getProgramMethod()
                 .getContainerType();
 
-        default_self = new LocationVariable(new ProgramElementName("$SELF$"),
-                new KeYJavaType(container));
+        this.default_self = new LocationVariable(new ProgramElementName(
+                "$SELF$"), new KeYJavaType(container));
 
         /*
          * Add the root variable and instance to the Model
          */
-        final ModelInstance selfInstance = new ModelInstance(container);
+        final ModelInstance selfInstance = ModelInstance
+                .constructModelInstance(container);
 
-        final ModelVariable self = new ModelVariable(default_self, "self",
-                selfInstance);
+        final ModelVariable self = ModelVariable.constructModelVariable(
+                this.default_self, "self");
 
         model.add(self, selfInstance);
 
@@ -139,8 +140,9 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                 final IProgramVariable programVariable = new LocationVariable(
                         name, type);
 
-                final ModelVariable modelParameter = new ModelVariable(
-                        programVariable, name.toString());
+                final ModelVariable modelParameter = ModelVariable
+                        .constructModelVariable(programVariable,
+                                name.toString());
 
                 modelParameter.setParameter(true);
 
@@ -173,7 +175,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         if (node instanceof IExecutionMethodCall) {
             return (IExecutionMethodCall) node;
         } else {
-            return getMethodCallNode(node.getParent());
+            return this.getMethodCallNode(node.getParent());
         }
     }
 
@@ -184,7 +186,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
      */
     public Model getModel() {
 
-        return model;
+        return this.model;
     }
 
     /**
@@ -203,7 +205,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         }
 
         final String[] split = term.op().toString().split("::\\$");
-        return javaInfo.getAttribute(split[1], split[0]);
+        return this.javaInfo.getAttribute(split[1], split[0]);
     }
 
     /**
@@ -241,9 +243,9 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                     final ProgramVariable variable = (ProgramVariable) operator;
                     final Type realType = variable.getKeYJavaType()
                             .getJavaType();
-                    default_self.getKeYJavaType().setJavaType(realType);
+                    this.default_self.getKeYJavaType().setJavaType(realType);
 
-                    return default_self;
+                    return this.default_self;
                 } else {
                     return (ProgramVariable) operator;
                 }
@@ -263,9 +265,9 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
                 final ProgramVariable variable = (ProgramVariable) operator;
                 final Type realType = variable.getKeYJavaType().getJavaType();
-                default_self.getKeYJavaType().setJavaType(realType);
+                this.default_self.getKeYJavaType().setJavaType(realType);
 
-                return default_self;
+                return this.default_self;
             }
         }
 
@@ -276,7 +278,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          */
         if (operator.getClass() == SortDependingFunction.class) {
 
-            return getProgramVariableForField(term.sub(2));
+            return this.getProgramVariableForField(term.sub(2));
         }
         return null;
     }
@@ -304,9 +306,9 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * has been found - this is a terribly ugly hack. Check if sort is null
          * instead? What other variables (if any) may have nulled sorts?
          */
-        final ProgramVariable programVariable = getVariable(term);
+        final ProgramVariable programVariable = this.getVariable(term);
 
-        if (programVariable == null
+        if ((programVariable == null)
                 || programVariable.toString().equals("$SELF$")) {
             return;
         }
@@ -321,15 +323,16 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         final String identifier = AbstractTermParser.resolveIdentifierString(
                 term, TermToModelVisitor.SEPARATOR);
 
-        final ModelVariable variable = new ModelVariable(programVariable,
-                identifier);
+        final ModelVariable variable = ModelVariable.constructModelVariable(
+                programVariable, identifier);
 
         Object instance = null;
         if (AbstractTermParser.isPrimitiveType(term)) {
 
             instance = TermToModelVisitor.resolvePrimitiveType(programVariable);
         } else {
-            instance = new ModelInstance(programVariable.getKeYJavaType());
+            instance = ModelInstance.constructModelInstance(programVariable
+                    .getKeYJavaType());
         }
 
         /*
@@ -337,7 +340,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * premature, but must be done to preserve referential integrity and
          * avoiding extra work.
          */
-        model.add(variable, instance);
+        this.model.add(variable, instance);
 
         /*
          * If the term is a SortDependingFunction, we are faced with two
@@ -352,27 +355,32 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * field of its declaring class. In this case, it is not part of any
          * instance, and we let the parent remain null.
          */
-        if (isSortDependingFunction(term)) {
+        if (this.isSortDependingFunction(term)) {
 
-            final ProgramVariable parentVariable = getVariable(term.sub(1));
+            final ProgramVariable parentVariable = this
+                    .getVariable(term.sub(1));
 
             /*
              * The parent is not null, and this variable is hence an instance
              * variable of some class. Connect it to the parent.
              */
             if (parentVariable != null) {
+
                 final String parentIdentifier = AbstractTermParser
                         .resolveIdentifierString(term.sub(1),
                                 TermToModelVisitor.SEPARATOR);
-                final ModelVariable parentModelVariable = new ModelVariable(
-                        parentVariable, parentIdentifier);
 
-                model.assignField(variable, parentModelVariable);
+                final ModelVariable parentModelVariable = ModelVariable
+                        .constructModelVariable(parentVariable,
+                                parentIdentifier);
+
+                this.model.assignField(variable, parentModelVariable);
+
             } else if (!programVariable.isStatic()) {
 
-                final ModelVariable self = new ModelVariable(default_self,
-                        "self");
-                model.assignField(variable, self);
+                final ModelVariable self = ModelVariable
+                        .constructModelVariable(this.default_self, "self");
+                this.model.assignField(variable, self);
             }
         }
 
@@ -389,8 +397,9 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          */
         else {
 
-            final ModelVariable self = new ModelVariable(default_self, "self");
-            model.assignField(variable, self);
+            final ModelVariable self = ModelVariable.constructModelVariable(
+                    this.default_self, "self");
+            this.model.assignField(variable, self);
 
         }
     }
@@ -412,8 +421,8 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
     @Override
     public void visit(final Term visited) {
 
-        if (isVariable(visited)) {
-            parseVariableTerm(visited);
+        if (this.isVariable(visited)) {
+            this.parseVariableTerm(visited);
         }
     }
 }

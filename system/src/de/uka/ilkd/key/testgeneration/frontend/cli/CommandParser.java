@@ -28,32 +28,43 @@ public class CommandParser {
     }
 
     /**
+     * Set to display about information.
+     */
+    @Parameter(names = { "-a", "--about" }, description = "show version and copyright information")
+    private boolean about;
+
+    /**
+     * Select the degree of code coverage to guarantee. Only one option per
+     * session is legal. Default is standard statement coverage.
+     */
+    @Parameter(names = { "-c", "--coverage" }, arity = 1, description = "target degree of code coverage for each method.\n"
+            + CommandParser.INDENT
+            + "Parameters (only one per session):\n"
+            + CommandParser.INDENT
+            + "statement\tstatement coverage (default)\n"
+            + CommandParser.INDENT
+            + "branch\t\tbranch coverage\n"
+            + CommandParser.INDENT
+            + "path\t\tpath coverage\n"
+            + CommandParser.INDENT
+            + "condition\tcondition coverage\n"
+            + CommandParser.INDENT
+            + "decision\tdecision coverage\n"
+            + CommandParser.INDENT
+            + "mcdc\t\tmodified condition/decision coverage")
+    List<String> coverageCriteria = new ArrayList<String>();
+
+    /**
      * Select which Java files to use as a basis for test case generation.
      */
     @Parameter(description = "files", validateWith = JavaFileValidator.class, converter = JavaFileConverter.class)
     private final List<File> files = new ArrayList<File>();
 
     /**
-     * Select top-level output directory for the generated test suite(s).
-     * Default is the current directory at the time o invocation.
+     * Flag to decide if usage help should be shown.
      */
-    @Parameter(names = { "-o", "--output" }, description = "target output directory for generated test suites.\n"
-            + CommandParser.INDENT + "default: current folder (.))", arity = 1)
-    private final String outputDirectory = ".";
-
-    /**
-     * Select which test framework(s) to generate test cases for. Multiple
-     * selections are possible per session, in which case a separate output
-     * folder will be generated for each framework. Default is JUnit4.
-     */
-    @Parameter(names = { "-f", "--framework" }, description = "the test frameworks to use.\n"
-            + CommandParser.INDENT
-            + "Parameters:\n"
-            + CommandParser.INDENT
-            + "[framework]\t specify framework to use\n"
-            + CommandParser.INDENT
-            + "legal frameworks: junit3, junit4")
-    private final Set<String> testFrameworks = new HashSet<String>();
+    @Parameter(names = { "-h", "--help" }, description = "displays usage help")
+    private boolean help;
 
     /**
      * Select what methods to generate test cases for. This can either be done
@@ -79,31 +90,26 @@ public class CommandParser {
     List<String> methods = new ArrayList<String>();
 
     /**
-     * Select the degree of code coverage to guarantee. Only one option per
-     * session is legal. Default is standard statement coverage.
+     * Select top-level output directory for the generated test suite(s).
+     * Default is the current directory at the time o invocation.
      */
-    @Parameter(names = { "-c", "--coverage" }, arity = 1, description = "target degree of code coverage for each method.\n"
-            + CommandParser.INDENT
-            + "Parameters (only one per session):\n"
-            + CommandParser.INDENT
-            + "statement\tstatement coverage (default)\n"
-            + CommandParser.INDENT
-            + "branch\t\tbranch coverage\n"
-            + CommandParser.INDENT
-            + "path\t\tpath coverage\n"
-            + CommandParser.INDENT
-            + "condition\tcondition coverage\n"
-            + CommandParser.INDENT
-            + "decision\tdecision coverage\n"
-            + CommandParser.INDENT
-            + "mcdc\t\tmodified condition/decision coverage")
-    List<String> coverageCriteria = new ArrayList<String>();
+    @Parameter(names = { "-o", "--output" }, description = "target output directory for generated test suites.\n"
+            + CommandParser.INDENT + "default: current folder (.))", arity = 1)
+    private final String outputDirectory = ".";
 
     /**
-     * Flag to decide if usage help should be shown.
+     * Select which test framework(s) to generate test cases for. Multiple
+     * selections are possible per session, in which case a separate output
+     * folder will be generated for each framework. Default is JUnit4.
      */
-    @Parameter(names = { "-h", "--help" }, description = "displays usage help")
-    private boolean help;
+    @Parameter(names = { "-f", "--framework" }, description = "the test frameworks to use.\n"
+            + CommandParser.INDENT
+            + "Parameters:\n"
+            + CommandParser.INDENT
+            + "[framework]\t specify framework to use\n"
+            + CommandParser.INDENT
+            + "legal frameworks: junit3, junit4")
+    private final Set<String> testFrameworks = new HashSet<String>();
 
     /**
      * Set to enable verbose mode.
@@ -112,17 +118,11 @@ public class CommandParser {
     private boolean verbose;
 
     /**
-     * Set to display about information.
-     */
-    @Parameter(names = { "-a", "--about" }, description = "show version and copyright information")
-    private boolean about;
-
-    /**
      * @return the files
      */
     public List<File> getFiles() {
 
-        return files;
+        return this.files;
     }
 
     /**
@@ -130,7 +130,7 @@ public class CommandParser {
      */
     public List<String> getMethods() {
 
-        return methods;
+        return this.methods;
     }
 
     /**
@@ -138,7 +138,7 @@ public class CommandParser {
      */
     public String getOutputDirectory() {
 
-        return outputDirectory;
+        return this.outputDirectory;
     }
 
     /**
@@ -146,7 +146,7 @@ public class CommandParser {
      */
     public Set<String> getTestFrameworks() {
 
-        return testFrameworks;
+        return this.testFrameworks;
     }
 
     /**
@@ -154,7 +154,7 @@ public class CommandParser {
      */
     public boolean isAboutFlagSet() {
 
-        return about;
+        return this.about;
     }
 
     /**
@@ -162,7 +162,7 @@ public class CommandParser {
      */
     public boolean isHelpFlagSet() {
 
-        return help;
+        return this.help;
     }
 
     /**
@@ -170,6 +170,6 @@ public class CommandParser {
      */
     public boolean isVerboseFlagSet() {
 
-        return help;
+        return this.help;
     }
 }

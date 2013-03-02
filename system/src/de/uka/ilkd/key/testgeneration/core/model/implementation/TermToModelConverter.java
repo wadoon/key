@@ -32,7 +32,7 @@ class TermToModelConverter {
 
         Term pathCondition = node.getPathCondition();
 
-        final Model model = new Model();
+        final Model model = Model.constructModel();
 
         /*
          * Remove if-then-else statements from the pathcondition

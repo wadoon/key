@@ -10,10 +10,10 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
 
     private void collectLiterals(final Term term, final Set<String> literals) {
 
-        if (isAnd(term)) {
+        if (this.isAnd(term)) {
 
-            collectLiterals(term.sub(0), literals);
-            collectLiterals(term.sub(1), literals);
+            this.collectLiterals(term.sub(0), literals);
+            this.collectLiterals(term.sub(1), literals);
         } else {
 
             final String termName = term.toString().trim();
@@ -38,21 +38,21 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
          * If the term represents an OR statement, we simplify each child, and
          * return based on the outcome of this.
          */
-        if (isAnd(term)) {
+        if (this.isAnd(term)) {
 
-            final Term firstChild = simplify(term.sub(0), literals);
-            final Term secondChild = simplify(term.sub(1), literals);
+            final Term firstChild = this.simplify(term.sub(0), literals);
+            final Term secondChild = this.simplify(term.sub(1), literals);
 
-            if (firstChild != null && secondChild == null) {
+            if ((firstChild != null) && (secondChild == null)) {
                 return firstChild;
             }
 
-            if (firstChild == null && secondChild != null) {
+            if ((firstChild == null) && (secondChild != null)) {
                 return secondChild;
             }
 
-            if (firstChild != null && secondChild != null) {
-                return termFactory.createTerm(Junctor.AND, firstChild,
+            if ((firstChild != null) && (secondChild != null)) {
+                return this.termFactory.createTerm(Junctor.AND, firstChild,
                         secondChild);
             }
 
@@ -92,7 +92,7 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
     public Term transform(final Term term) throws TermTransformerException {
 
         final Term orderedTerm = new OrderOperandsTransformer().transform(term);
-        return transformTerm(orderedTerm);
+        return this.transformTerm(orderedTerm);
     }
 
     @Override
@@ -106,23 +106,24 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
          * Collect all literals in the right subtree
          */
         final Set<String> literals = new HashSet<String>();
-        collectLiterals(secondChild, literals);
+        this.collectLiterals(secondChild, literals);
 
         /*
          * Simplify the left subtree
          */
-        final Term simplifiedFirstChild = simplify(firstChild, literals);
+        final Term simplifiedFirstChild = this.simplify(firstChild, literals);
 
         /*
          * Depending on the outcome of the previous simplification, recursively
          * transform both subtrees, or just the right one.
          */
         if (simplifiedFirstChild == null) {
-            return transform(secondChild);
+            return this.transform(secondChild);
         } else {
-            final Term transformedSimplifiedFirstChild = transformTerm(simplifiedFirstChild);
-            final Term transformedRightChild = transformTerm(secondChild);
-            return termFactory.createTerm(Junctor.AND,
+            final Term transformedSimplifiedFirstChild = this
+                    .transformTerm(simplifiedFirstChild);
+            final Term transformedRightChild = this.transformTerm(secondChild);
+            return this.termFactory.createTerm(Junctor.AND,
                     transformedSimplifiedFirstChild, transformedRightChild);
         }
     }

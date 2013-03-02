@@ -22,9 +22,23 @@ public class ModelInstance {
     private static int ID = 0;
 
     /**
-     * The type of which this instance is an instance.
+     * Factory method for creating a new {@link ModelInstance} instance.
+     * 
+     * @param keYJavaType
+     *            the {@link KeYJavaType} instance associated with the created
+     *            instance.
+     * @return the created instance.
      */
-    private final KeYJavaType type;
+    public static ModelInstance constructModelInstance(
+            final KeYJavaType keYJavaType) {
+
+        return new ModelInstance(keYJavaType);
+    }
+
+    /**
+     * Concrete values for a subset of the fields bound to this instance.
+     */
+    private final List<ModelVariable> fields = new LinkedList<ModelVariable>();
 
     /**
      * A unique identifier for this particular instance. Think of it as the
@@ -38,32 +52,25 @@ public class ModelInstance {
     private final List<ModelVariable> referees = new LinkedList<ModelVariable>();
 
     /**
-     * Concrete values for a subset of the fields bound to this instance.
+     * The type of which this instance is an instance.
      */
-    private final List<ModelVariable> fields = new LinkedList<ModelVariable>();
+    private final KeYJavaType type;
 
-    /**
-     * Creates a new ModelInstance, corresponding to an object of type
-     * {@link KeYJavaType} together with a unique identifier.
-     * 
-     * @param type
-     *            the type of the instance
-     */
-    public ModelInstance(final KeYJavaType keYJavaType) {
+    private ModelInstance(final KeYJavaType keYJavaType) {
 
-        type = keYJavaType;
-        identifier = Integer.toString(++ModelInstance.ID);
+        this.type = keYJavaType;
+        this.identifier = Integer.toString(++ModelInstance.ID);
     }
 
     public void addField(final ModelVariable variable) {
 
-        if (!fields.contains(variable)) {
-            fields.add(variable);
+        if (!this.fields.contains(variable)) {
+            this.fields.add(variable);
         }
     }
 
     public void addReferee(final ModelVariable referee) {
-        referees.add(referee);
+        this.referees.add(referee);
     }
 
     /**
@@ -79,11 +86,11 @@ public class ModelInstance {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (this.getClass() != obj.getClass()) {
             return false;
         }
         final ModelInstance other = (ModelInstance) obj;
-        return identifier.equals(other.identifier);
+        return this.identifier.equals(other.identifier);
     }
 
     /**
@@ -91,16 +98,16 @@ public class ModelInstance {
      */
     public List<ModelVariable> getFields() {
 
-        return new LinkedList<ModelVariable>(fields);
+        return new LinkedList<ModelVariable>(this.fields);
     }
 
     public String getIdentifier() {
 
-        return identifier;
+        return this.identifier;
     }
 
     public List<ModelVariable> getReferees() {
-        return referees;
+        return this.referees;
     }
 
     /**
@@ -108,17 +115,17 @@ public class ModelInstance {
      */
     public String getType() {
 
-        return type.getJavaType().getFullName();
+        return this.type.getJavaType().getFullName();
     }
 
     public String getTypeName() {
 
-        return type.getJavaType().getName().toString();
+        return this.type.getJavaType().getName().toString();
     }
 
     @Override
     public String toString() {
 
-        return "Instance " + identifier;
+        return "Instance " + this.identifier;
     }
 }

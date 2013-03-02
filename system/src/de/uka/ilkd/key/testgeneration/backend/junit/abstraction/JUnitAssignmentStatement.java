@@ -21,11 +21,6 @@ package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
 public class JUnitAssignmentStatement {
 
     /**
-     * The identifier name of the object which the field belongs to.
-     */
-    private final String objectName;
-
-    /**
      * The identifier name of the field.
      */
     private final String fieldName;
@@ -35,6 +30,11 @@ public class JUnitAssignmentStatement {
      * type) of the value being assigned to the field.
      */
     private final String fieldValue;
+
+    /**
+     * The identifier name of the object which the field belongs to.
+     */
+    private final String objectName;
 
     public JUnitAssignmentStatement(final String objectName,
             final String fieldName, final String fieldValue) {
@@ -47,20 +47,20 @@ public class JUnitAssignmentStatement {
      * @return the fieldName
      */
     public String getFieldName() {
-        return fieldName;
+        return this.fieldName;
     }
 
     /**
      * @return the fieldValue
      */
     public String getFieldValue() {
-        return fieldValue;
+        return this.fieldValue;
     }
 
     /**
      * @return the objectName
      */
     public String getObjectName() {
-        return objectName;
+        return this.objectName;
     }
 }

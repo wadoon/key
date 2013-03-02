@@ -16,6 +16,16 @@ import de.uka.ilkd.key.logic.Term;
 public class Model {
 
     /**
+     * Factory method for creating a new {@link Model} instance.
+     * 
+     * @return the new instance.
+     */
+    public static Model constructModel() {
+
+        return new Model();
+    }
+
+    /**
      * Buffers variables which currently cannot be inserted due to broken
      * reference dependencies. Primarily, this will occur when the user tries to
      * insert a variable as a field into an instace which currently does'nt
@@ -28,6 +38,10 @@ public class Model {
      * The {@link ModelVariable} instances represented on this heap.
      */
     private final LinkedList<ModelVariable> variables = new LinkedList<ModelVariable>();
+
+    private Model() {
+
+    }
 
     /**
      * Adds a variable to the heap, causing it to point to a given object
@@ -53,7 +67,7 @@ public class Model {
         /*
          * Check if the variable already exists in the buffer.
          */
-        final ModelVariable localVariable = lookupVariable(variable);
+        final ModelVariable localVariable = this.lookupVariable(variable);
 
         /*
          * If it does, configure it properly according to the provided value,
@@ -67,7 +81,7 @@ public class Model {
                 ((ModelInstance) instance).addReferee(variable);
             }
 
-            variables.add(variable);
+            this.variables.add(variable);
 
             /*
              * If it is not, then simply update the value currently pointed to
@@ -96,15 +110,15 @@ public class Model {
     public void assignField(ModelVariable target, final ModelVariable other) {
 
         if (!target.equals(other)) {
-            target = lookupVariable(target);
-            final ModelVariable localOther = lookupVariable(other);
+            target = this.lookupVariable(target);
+            final ModelVariable localOther = this.lookupVariable(other);
 
             /*
              * If the other currently does not exist in the Model, buffer it for
              * subsequent insertion.
              */
             if (other == null) {
-                buffer.put(other, target);
+                this.buffer.put(other, target);
                 return;
             }
 
@@ -129,8 +143,8 @@ public class Model {
     public void assignPointer(ModelVariable target, ModelVariable other) {
 
         if (!target.equals(other)) {
-            target = lookupVariable(target);
-            other = lookupVariable(other);
+            target = this.lookupVariable(target);
+            other = this.lookupVariable(other);
 
             if (other != null) {
                 target.setValue(other.getValue());
@@ -150,7 +164,7 @@ public class Model {
      */
     public ModelVariable getVariable(final String reference) {
 
-        for (final ModelVariable variable : variables) {
+        for (final ModelVariable variable : this.variables) {
 
             if (variable.getIdentifier().equals(reference)) {
                 return variable;
@@ -160,11 +174,13 @@ public class Model {
     }
 
     /**
-     * {@inheritDoc}
+     * Gets all the {@link ModelVariable} instances defined in this model.
+     * 
+     * @return
      */
     public final List<ModelVariable> getVariables() {
 
-        return variables;
+        return this.variables;
     }
 
     /**
@@ -176,7 +192,7 @@ public class Model {
      */
     private ModelVariable lookupVariable(final ModelVariable variable) {
 
-        final int index = variables.indexOf(variable);
-        return index >= 0 ? variables.get(index) : null;
+        final int index = this.variables.indexOf(variable);
+        return index >= 0 ? this.variables.get(index) : null;
     }
 }

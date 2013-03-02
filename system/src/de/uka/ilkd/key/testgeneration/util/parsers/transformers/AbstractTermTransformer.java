@@ -41,7 +41,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         final Name name = new Name("FALSE");
         final Sort sort = new SortImpl(new Name(AbstractTermParser.BOOLEAN));
         final Function function = new Function(name, sort);
-        return termFactory.createTerm(function);
+        return this.termFactory.createTerm(function);
     }
 
     protected Term createTrueConstant() {
@@ -49,16 +49,17 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         final Name name = new Name("TRUE");
         final Sort sort = new SortImpl(new Name(AbstractTermParser.BOOLEAN));
         final Function function = new Function(name, sort);
-        return termFactory.createTerm(function);
+        return this.termFactory.createTerm(function);
     }
 
     protected Term transformAnd(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = transformTerm(term.sub(0));
-        final Term secondChild = transformTerm(term.sub(1));
+        final Term firstChild = this.transformTerm(term.sub(0));
+        final Term secondChild = this.transformTerm(term.sub(1));
 
-        return termFactory.createTerm(Junctor.AND, firstChild, secondChild);
+        return this.termFactory
+                .createTerm(Junctor.AND, firstChild, secondChild);
     }
 
     /**
@@ -74,10 +75,10 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformBinaryFunction(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = transformTerm(term.sub(0));
-        final Term secondChild = transformTerm(term.sub(1));
+        final Term firstChild = this.transformTerm(term.sub(0));
+        final Term secondChild = this.transformTerm(term.sub(1));
 
-        final Term newTerm = termFactory.createTerm(term.op(), firstChild,
+        final Term newTerm = this.termFactory.createTerm(term.op(), firstChild,
                 secondChild);
 
         return newTerm;
@@ -90,10 +91,10 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformEquals(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = transformTerm(term.sub(0));
-        final Term secondChild = transformTerm(term.sub(1));
+        final Term firstChild = this.transformTerm(term.sub(0));
+        final Term secondChild = this.transformTerm(term.sub(1));
 
-        return termFactory.createTerm(term.op(), firstChild, secondChild);
+        return this.termFactory.createTerm(term.op(), firstChild, secondChild);
     }
 
     /**
@@ -115,33 +116,33 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
              * Function-type terms are not excplicitly spelled out in terms of
              * type relationships.
              */
-            if (isNullSort(term)) {
-                return transformNull(term);
+            if (this.isNullSort(term)) {
+                return this.transformNull(term);
             }
 
-            if (isSortDependingFunction(term)) {
-                return transformSortDependentFunction(term);
+            if (this.isSortDependingFunction(term)) {
+                return this.transformSortDependentFunction(term);
             }
 
-            if (isBinaryFunction(term)) {
-                return transformBinaryFunction(term);
+            if (this.isBinaryFunction(term)) {
+                return this.transformBinaryFunction(term);
             }
 
-            if (isUnaryFunction(term)) {
-                return transformUnaryFunction(term);
+            if (this.isUnaryFunction(term)) {
+                return this.transformUnaryFunction(term);
             }
 
-            if (isLiteral(term)) {
-                return transformLiteral(term);
+            if (this.isLiteral(term)) {
+                return this.transformLiteral(term);
             }
 
-            if (isObserverFunction(term)) {
-                return transformObserverFunction(term);
+            if (this.isObserverFunction(term)) {
+                return this.transformObserverFunction(term);
 
             }
 
-            if (isBooleanConstant(term)) {
-                return transformBooleanConstant(term);
+            if (this.isBooleanConstant(term)) {
+                return this.transformBooleanConstant(term);
             }
 
         } catch (final TermParserException e) {
@@ -182,17 +183,17 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformJunctor(final Term term)
             throws TermTransformerException {
 
-        if (isAnd(term)) {
-            return transformAnd(term);
+        if (this.isAnd(term)) {
+            return this.transformAnd(term);
 
-        } else if (isOr(term)) {
-            return transformOr(term);
+        } else if (this.isOr(term)) {
+            return this.transformOr(term);
 
-        } else if (isEquals(term)) {
-            return transformEquals(term);
+        } else if (this.isEquals(term)) {
+            return this.transformEquals(term);
 
-        } else if (isNot(term)) {
-            return transformNot(term);
+        } else if (this.isNot(term)) {
+            return this.transformNot(term);
         }
 
         throw new TermTransformerException("Unsupported Junctor: "
@@ -206,8 +207,8 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
          * Literals may or may not declare children, such as 1(#);
          */
         if (!term.subs().isEmpty()) {
-            final Term child = transformTerm(term.sub(0));
-            return termFactory.createTerm(term.op(), child);
+            final Term child = this.transformTerm(term.sub(0));
+            return this.termFactory.createTerm(term.op(), child);
         } else {
             return term;
         }
@@ -229,9 +230,9 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformNot(final Term term)
             throws TermTransformerException {
 
-        final Term newChild = transformTerm(term.sub(0));
+        final Term newChild = this.transformTerm(term.sub(0));
 
-        return termFactory.createTerm(Junctor.NOT, newChild);
+        return this.termFactory.createTerm(Junctor.NOT, newChild);
     }
 
     /**
@@ -249,8 +250,8 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
 
     protected Term transformObserverFunction(final Term term) {
 
-        if (isProgramMethod(term)) {
-            return transformProgramMethod(term);
+        if (this.isProgramMethod(term)) {
+            return this.transformProgramMethod(term);
         }
 
         return term;
@@ -258,10 +259,10 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
 
     protected Term transformOr(final Term term) throws TermTransformerException {
 
-        final Term firstChild = transformTerm(term.sub(0));
-        final Term secondChild = transformTerm(term.sub(1));
+        final Term firstChild = this.transformTerm(term.sub(0));
+        final Term secondChild = this.transformTerm(term.sub(1));
 
-        return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
+        return this.termFactory.createTerm(Junctor.OR, firstChild, secondChild);
     }
 
     protected Term transformProgramMethod(final Term term) {
@@ -280,8 +281,8 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformProgramVariable(final Term term)
             throws TermTransformerException {
 
-        if (isLocationVariable(term)) {
-            return transformLocationVariable(term);
+        if (this.isLocationVariable(term)) {
+            return this.transformLocationVariable(term);
         }
 
         throw new TermTransformerException("Unsupported SortedOperator: "
@@ -313,20 +314,20 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformSortedOperator(final Term term)
             throws TermTransformerException {
 
-        if (isFunction(term)) {
-            return transformFunction(term);
+        if (this.isFunction(term)) {
+            return this.transformFunction(term);
         }
 
-        if (isEquals(term)) {
-            return transformEquals(term);
+        if (this.isEquals(term)) {
+            return this.transformEquals(term);
         }
 
-        if (isJunctor(term)) {
-            return transformJunctor(term);
+        if (this.isJunctor(term)) {
+            return this.transformJunctor(term);
         }
 
-        if (isProgramVariable(term)) {
-            return transformProgramVariable(term);
+        if (this.isProgramVariable(term)) {
+            return this.transformProgramVariable(term);
         }
 
         throw new TermTransformerException("Unsupported SortedOperator: "
@@ -347,14 +348,14 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         /*
          * Order matters here, since SortedOperator is a subclass of Operator.
          */
-        if (isSortedOperator(term)) {
-            return transformSortedOperator(term);
+        if (this.isSortedOperator(term)) {
+            return this.transformSortedOperator(term);
 
-        } else if (isIfExThenElse(term)) {
-            return transformIfExThenElse(term);
+        } else if (this.isIfExThenElse(term)) {
+            return this.transformIfExThenElse(term);
 
-        } else if (isIfThenElse(term)) {
-            return transformIfThenElse(term);
+        } else if (this.isIfThenElse(term)) {
+            return this.transformIfThenElse(term);
 
         }
 
@@ -365,9 +366,9 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     private Term transformUnaryFunction(final Term term)
             throws TermTransformerException {
 
-        final Term child = transformTerm(term.sub(0));
+        final Term child = this.transformTerm(term.sub(0));
 
-        final Term newTerm = termFactory.createTerm(term.op(), child);
+        final Term newTerm = this.termFactory.createTerm(term.op(), child);
 
         return newTerm;
     }

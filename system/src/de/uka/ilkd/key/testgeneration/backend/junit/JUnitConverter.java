@@ -13,14 +13,9 @@ import de.uka.ilkd.key.testgeneration.core.classabstraction.KeYJavaClass;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerator;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestCase;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
 import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
-import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
-import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
-import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
 /**
@@ -54,9 +49,9 @@ public class JUnitConverter implements IFrameworkConverter {
                 KeYTestGenTermVisitor {
 
             /**
-             * Test case associated with this visitor;
+             * Buffer for holding generated Java code
              */
-            private final TestCase testCase;
+            LinkedList<String> buffer = new LinkedList<String>();
 
             /**
              * The names of the parameters declared in the testCase associated
@@ -65,23 +60,18 @@ public class JUnitConverter implements IFrameworkConverter {
             private final List<String> parameterNames;
 
             /**
-             * Separator between instance names, and the names of their fields.
+             * Test case associated with this visitor;
              */
-            private final static String SEPARATOR = "-";
-
-            /**
-             * Buffer for holding generated Java code
-             */
-            LinkedList<String> buffer = new LinkedList<String>();
+            private final TestCase testCase;
 
             public OracleGenerationVisitor(final TestCase testCase) {
                 this.testCase = testCase;
 
-                parameterNames = new LinkedList<String>();
+                this.parameterNames = new LinkedList<String>();
                 final List<IProgramVariable> variables = testCase.getMethod()
                         .getParameters();
                 for (final IProgramVariable variable : variables) {
-                    parameterNames.add(variable.name().toString());
+                    this.parameterNames.add(variable.name().toString());
                 }
             }
 
@@ -90,21 +80,21 @@ public class JUnitConverter implements IFrameworkConverter {
                 /*
                  * Simplify the postcondition
                  */
-                final Term oracle = testCase.getOracle();
+                final Term oracle = this.testCase.getOracle();
                 /*
                  * Traverse the postcondition(s) in the testcase, filling the
                  * buffer with the encoded terms.
                  */
                 oracle.execPreOrder(this);
 
-                return processBuffer();
+                return this.processBuffer();
             }
 
             private boolean isParamaterValue(final Term term) {
 
                 final String name = term.op().name().toString();
 
-                return parameterNames.contains(name);
+                return this.parameterNames.contains(name);
             }
 
             /**
@@ -116,22 +106,22 @@ public class JUnitConverter implements IFrameworkConverter {
              */
             private String processBuffer() {
 
-                if (!buffer.isEmpty()) {
-                    final String next = buffer.pollFirst();
+                if (!this.buffer.isEmpty()) {
+                    final String next = this.buffer.pollFirst();
 
                     /*
                      * Process unary operators
                      */
                     if (next.equals(AbstractTermParser.NOT)) {
-                        final String statement = processBuffer();
+                        final String statement = this.processBuffer();
                         return "!(" + statement + ")";
 
                         /*
                          * Process binary operators
                          */
                     } else if (AbstractTermParser.operators.contains(next)) {
-                        final String lefthand = processBuffer();
-                        final String righthand = processBuffer();
+                        final String lefthand = this.processBuffer();
+                        final String righthand = this.processBuffer();
 
                         if (next.equals(AbstractTermParser.AND)) {
                             return lefthand + " && " + righthand;
@@ -194,71 +184,49 @@ public class JUnitConverter implements IFrameworkConverter {
             @Override
             public void visit(final Term visited) {
 
-                if (isAnd(visited)) {
-                    buffer.add(AbstractTermParser.AND);
+                if (this.isAnd(visited)) {
+                    this.buffer.add(AbstractTermParser.AND);
 
-                } else if (isOr(visited)) {
-                    buffer.add(AbstractTermParser.OR);
+                } else if (this.isOr(visited)) {
+                    this.buffer.add(AbstractTermParser.OR);
 
-                } else if (isGreaterOrEquals(visited)) {
-                    buffer.add(AbstractTermParser.GREATER_OR_EQUALS);
+                } else if (this.isGreaterOrEquals(visited)) {
+                    this.buffer.add(AbstractTermParser.GREATER_OR_EQUALS);
 
-                } else if (isGreaterThan(visited)) {
-                    buffer.add(AbstractTermParser.GREATER_THAN);
+                } else if (this.isGreaterThan(visited)) {
+                    this.buffer.add(AbstractTermParser.GREATER_THAN);
 
-                } else if (isLessOrEquals(visited)) {
-                    buffer.add(AbstractTermParser.LESS_OR_EQUALS);
+                } else if (this.isLessOrEquals(visited)) {
+                    this.buffer.add(AbstractTermParser.LESS_OR_EQUALS);
 
-                } else if (isLessThan(visited)) {
-                    buffer.add(AbstractTermParser.LESS_THAN);
+                } else if (this.isLessThan(visited)) {
+                    this.buffer.add(AbstractTermParser.LESS_THAN);
 
-                } else if (isEquals(visited)) {
-                    buffer.add(AbstractTermParser.EQUALS);
+                } else if (this.isEquals(visited)) {
+                    this.buffer.add(AbstractTermParser.EQUALS);
 
-                } else if (isNot(visited)) {
-                    buffer.add(AbstractTermParser.NOT);
+                } else if (this.isNot(visited)) {
+                    this.buffer.add(AbstractTermParser.NOT);
 
-                } else if (isParamaterValue(visited)) {
-                    buffer.add(visited.op().name().toString());
+                } else if (this.isParamaterValue(visited)) {
+                    this.buffer.add(visited.op().name().toString());
 
-                } else if (isLocationVariable(visited)
+                } else if (this.isLocationVariable(visited)
                         && AbstractTermParser.isPrimitiveType(visited)) {
-                    buffer.add(visited.op().name().toString());
+                    this.buffer.add(visited.op().name().toString());
 
-                } else if (isSortDependingFunction(visited)) {
+                } else if (this.isSortDependingFunction(visited)) {
                     final String identifier = AbstractTermParser
                             .resolveIdentifierString(visited,
                                     StringConstants.FIELD_SEPARATOR.toString());
-                    buffer.add(identifier);
+                    this.buffer.add(identifier);
 
-                } else if (isResult(visited)) {
-                    buffer.add(JUnitGeneratorWorker.EXECUTION_RESULT);
+                } else if (this.isResult(visited)) {
+                    this.buffer.add(JUnitGeneratorWorker.EXECUTION_RESULT);
                 }
             }
 
         }
-
-        /**
-         * Used to differentiate between the names of test cases.
-         */
-        private int ID = 0;
-
-        /**
-         * The name of the class for which the test suite is being generated.
-         * Kept for the purpose of naming and type declaration.
-         */
-        private String className = "X";
-
-        /**
-         * Imports to be included in this test class
-         */
-        private final HashSet<String> imports = new HashSet<String>();
-
-        /**
-         * The name of the root variable (i.e. the variable pointing to the
-         * instane of the object that has the methods to be tested).
-         */
-        private static final String SELF = "self";
 
         /**
          * The name of the container for the result value (if any) resulting
@@ -267,6 +235,28 @@ public class JUnitConverter implements IFrameworkConverter {
          * parameter values.
          */
         private static final String EXECUTION_RESULT = "result";
+
+        /**
+         * The name of the root variable (i.e. the variable pointing to the
+         * instane of the object that has the methods to be tested).
+         */
+        private static final String SELF = "self";
+
+        /**
+         * The name of the class for which the test suite is being generated.
+         * Kept for the purpose of naming and type declaration.
+         */
+        private String className = "X";
+
+        /**
+         * Used to differentiate between the names of test cases.
+         */
+        private int ID = 0;
+
+        /**
+         * Imports to be included in this test class
+         */
+        private final HashSet<String> imports = new HashSet<String>();
 
         /**
          * Given a set of {@link TestCase} instances, this method will extract
@@ -282,8 +272,8 @@ public class JUnitConverter implements IFrameworkConverter {
 
             final List<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (final TestCase testCase : testCases) {
-                final List<ModelInstance> collectedInstances = extractInstancesFromModel(testCase
-                        .getModel());
+                final List<ModelInstance> collectedInstances = this
+                        .extractInstancesFromModel(testCase.getModel());
                 instances.addAll(collectedInstances);
             }
 
@@ -310,23 +300,23 @@ public class JUnitConverter implements IFrameworkConverter {
             /*
              * Write the HashMap for holding the object instances.
              */
-            writeObjectInstanceMap();
+            this.writeObjectInstanceMap();
 
             /*
              * Write the method for retrieving the actual test instances.
              */
-            writeGetObjectInstanceMethod();
+            this.writeGetObjectInstanceMethod();
 
             /*
              * Write the method for setting fields of objects.
              */
-            writeSetFieldMethod();
+            this.writeSetFieldMethod();
 
             /*
              * Write the main init method for creating the repository of Object
              * instances.
              */
-            writeCreateInstanceRepositoryMethod(testCases);
+            this.writeCreateInstanceRepositoryMethod(testCases);
         }
 
         /**
@@ -356,7 +346,7 @@ public class JUnitConverter implements IFrameworkConverter {
              * Write the package declaration.
              */
             builder.append("package ");
-            builder.append(className);
+            builder.append(this.className);
             builder.append("TestClass;\n\n");
 
             /*
@@ -377,7 +367,7 @@ public class JUnitConverter implements IFrameworkConverter {
             /*
              * Write the specific imports.
              */
-            for (final String importt : imports) {
+            for (final String importt : this.imports) {
                 builder.append("import ");
                 builder.append(importt);
                 builder.append(";\n");
@@ -410,14 +400,14 @@ public class JUnitConverter implements IFrameworkConverter {
             final KeYJavaClass klass = testSuite.getJavaClass();
             testSuite.getMethod();
 
-            className = klass.getName();
+            this.className = klass.getName();
 
             final String methodName = testCases.get(0).getMethodName();
 
             /*
              * Print the new class header
              */
-            writeClassHeader(null, "public", "", "Test_" + klass.getName()
+            this.writeClassHeader(null, "public", "", "Test_" + klass.getName()
                     + "_" + methodName);
 
             /*
@@ -425,20 +415,20 @@ public class JUnitConverter implements IFrameworkConverter {
              */
             for (final TestCase testCase : testCases) {
 
-                writeTestMethod(testCase);
+                this.writeTestMethod(testCase);
             }
 
             /*
              * Create the fixutre repository for this class
              */
-            createFixtureRepository(testCases);
+            this.createFixtureRepository(testCases);
 
             /*
              * Close the class body.
              */
-            writeClosingBrace();
+            this.writeClosingBrace();
 
-            return getCurrentOutput();
+            return this.getCurrentOutput();
         }
 
         /**
@@ -451,14 +441,14 @@ public class JUnitConverter implements IFrameworkConverter {
         private void writeCreateInstanceRepositoryMethod(
                 final List<TestCase> testCases) {
 
-            writeComment(
+            this.writeComment(
                     "This method will set up the entire repository of object instances needed to execute the test cases declared above.",
                     true);
 
             /*
              * Write the method header. Observe the annotation.
              */
-            writeMethodHeader(new String[] { "@BeforeClass" }, "public",
+            this.writeMethodHeader(new String[] { "@BeforeClass" }, "public",
                     new String[] { "static" }, "void",
                     "createFixtureRepository", null, new String[] {
                             "NoSuchFieldException", "SecurityException",
@@ -469,18 +459,19 @@ public class JUnitConverter implements IFrameworkConverter {
              * Write the object instantiations and the routines for storing them
              * in the instance Map.
              */
-            final List<ModelInstance> instances = collectInstances(testCases);
+            final List<ModelInstance> instances = this
+                    .collectInstances(testCases);
 
             /*
              * Write the instantiation of the instances.
              */
-            writeComment(
+            this.writeComment(
                     "Instantiate and insert the raw object instances into the repository. After this, finalize the repository setup by setting up the relevant fields of each object instance as necessary ",
                     false);
             for (final ModelInstance instance : instances) {
                 final String toImport = instance.getType();
-                imports.add(toImport);
-                writeObjectInstantiation(instance);
+                this.imports.add(toImport);
+                this.writeObjectInstantiation(instance);
             }
 
             /*
@@ -489,11 +480,11 @@ public class JUnitConverter implements IFrameworkConverter {
              */
             for (final ModelInstance instance : instances) {
                 if (!instance.getFields().isEmpty()) {
-                    writeObjectFieldInstantiation(instance);
+                    this.writeObjectFieldInstantiation(instance);
                 }
             }
 
-            writeClosingBrace();
+            this.writeClosingBrace();
         }
 
         /**
@@ -503,16 +494,16 @@ public class JUnitConverter implements IFrameworkConverter {
          */
         private void writeGetObjectInstanceMethod() {
 
-            writeLine(AbstractJavaSourceGenerator.NEWLINE);
-            writeComment(
+            this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            this.writeComment(
                     "This method will retrieve an object instance corresponding to its reference ID.",
                     true);
-            writeMethodHeader(null, "private",
-                    new String[] { "static", "<T>" }, "T", "getObjectInstance",
+            this.writeMethodHeader(null, "private", new String[] { "static",
+                    "<T>" }, "T", "getObjectInstance",
                     new String[] { "int reference" }, null);
-            writeLine("return (T)objectInstances.get(reference);"
+            this.writeLine("return (T)objectInstances.get(reference);"
                     + AbstractJavaSourceGenerator.NEWLINE);
-            writeClosingBrace();
+            this.writeClosingBrace();
         }
 
         /**
@@ -540,12 +531,12 @@ public class JUnitConverter implements IFrameworkConverter {
                 final String parameterName = parameters.get(i).name()
                         .toString();
                 methodInvocation += parameterName;
-                if (i != parameters.size() - 1) {
+                if (i != (parameters.size() - 1)) {
                     methodInvocation += ",";
                 }
             }
             methodInvocation += ");" + AbstractJavaSourceGenerator.NEWLINE;
-            writeLine(methodInvocation);
+            this.writeLine(methodInvocation);
         }
 
         /**
@@ -560,12 +551,13 @@ public class JUnitConverter implements IFrameworkConverter {
              * To avoid any potential namespace clashes, we let each
              * instantiation take place in its own scope.
              */
-            writeOpeningBrace();
+            this.writeOpeningBrace();
 
             /*
              * Write logic to fetch the actual instance of the instance.
              */
-            writeLine(instance.getTypeName() + " instance = getObjectInstance("
+            this.writeLine(instance.getTypeName()
+                    + " instance = getObjectInstance("
                     + instance.getIdentifier() + ");"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
@@ -590,21 +582,21 @@ public class JUnitConverter implements IFrameworkConverter {
 
                         final ModelInstance instanceField = (ModelInstance) field
                                 .getValue();
-                        writeLine("setFieldValue(instance, " + "\""
+                        this.writeLine("setFieldValue(instance, " + "\""
                                 + variableName + "\"" + ", "
                                 + "getObjectInstance("
                                 + instanceField.getIdentifier() + ") " + ");"
                                 + AbstractJavaSourceGenerator.NEWLINE);
                     } else {
-                        writeLine("setFieldValue(instance, " + "\""
+                        this.writeLine("setFieldValue(instance, " + "\""
                                 + variableName + "\"" + ", " + field.getValue()
                                 + ");" + AbstractJavaSourceGenerator.NEWLINE);
                     }
                 }
             }
 
-            writeClosingBrace();
-            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            this.writeClosingBrace();
+            this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
         }
 
         /**
@@ -613,11 +605,11 @@ public class JUnitConverter implements IFrameworkConverter {
          */
         private void writeObjectInstanceMap() {
 
-            writeLine(AbstractJavaSourceGenerator.NEWLINE);
-            writeComment(
+            this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            this.writeComment(
                     "KeYTestGen2 put me here to keep track of your object instances! Don't mind me :)",
                     true);
-            writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>();"
+            this.writeLine("private static HashMap<Integer, Object> objectInstances = new HashMap<Integer,Object>();"
                     + AbstractJavaSourceGenerator.NEWLINE
                     + AbstractJavaSourceGenerator.NEWLINE);
         }
@@ -636,8 +628,8 @@ public class JUnitConverter implements IFrameworkConverter {
              * class being tested (as we treat this one separately).
              */
 
-            writeLine("objectInstances.put(" + instance.getIdentifier() + ","
-                    + " new " + instance.getTypeName() + "());"
+            this.writeLine("objectInstances.put(" + instance.getIdentifier()
+                    + "," + " new " + instance.getTypeName() + "());"
                     + AbstractJavaSourceGenerator.NEWLINE);
         }
 
@@ -646,22 +638,23 @@ public class JUnitConverter implements IFrameworkConverter {
          */
         private void writeSetFieldMethod() {
 
-            writeComment("Sets a field of some object to a given value", true);
-            writeMethodHeader(null, "private", new String[] { "static" },
+            this.writeComment("Sets a field of some object to a given value",
+                    true);
+            this.writeMethodHeader(null, "private", new String[] { "static" },
                     "void", "setFieldValue", new String[] { "Object instance",
                             "String fieldName", "Object value" }, new String[] {
                             "NoSuchFieldException", "SecurityException",
                             "IllegalArgumentException",
                             "IllegalAccessException" });
 
-            writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
+            this.writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
                     + AbstractJavaSourceGenerator.NEWLINE);
-            writeLine("field.setAccessible(true);"
+            this.writeLine("field.setAccessible(true);"
                     + AbstractJavaSourceGenerator.NEWLINE);
-            writeLine("field.set(instance, value );"
+            this.writeLine("field.set(instance, value );"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
-            writeClosingBrace();
+            this.writeClosingBrace();
         }
 
         /**
@@ -681,8 +674,8 @@ public class JUnitConverter implements IFrameworkConverter {
              */
             for (final ModelVariable variable : testCase.getModel()
                     .getVariables()) {
-                if (isSelf(variable) || variable.isParameter()) {
-                    writeVariableDeclaration(variable);
+                if (this.isSelf(variable) || variable.isParameter()) {
+                    this.writeVariableDeclaration(variable);
                 }
             }
         }
@@ -699,34 +692,34 @@ public class JUnitConverter implements IFrameworkConverter {
         private void writeTestMethod(final TestCase testCase)
                 throws JUnitConverterException {
 
-            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
 
             /*
              * Write the method header.
              */
             final String methodName = "test"
                     + testCase.getMethod().getProgramMethod().getName();
-            writeMethodHeader(new String[] { "@Test" }, "public", null, "void",
-                    methodName + ID++, null, null);
+            this.writeMethodHeader(new String[] { "@Test" }, "public", null,
+                    "void", methodName + this.ID++, null, null);
 
             /*
              * Write the test fixture.
              */
-            writeTestFixture(testCase);
+            this.writeTestFixture(testCase);
 
             /*
              * Write the invocation of the method itself. If the method return
              * type is different from void, write a temporary variable to store
              * the result.
              */
-            writeMethodInvocation(testCase);
+            this.writeMethodInvocation(testCase);
 
             /*
              * Write the oracle
              */
-            writeTestOracle(testCase);
+            this.writeTestOracle(testCase);
 
-            writeClosingBrace();
+            this.writeClosingBrace();
         }
 
         /**
@@ -749,7 +742,7 @@ public class JUnitConverter implements IFrameworkConverter {
             final String[] conjunctions = oracleString.split("&&");
             for (final String conjunction : conjunctions) {
 
-                writeLine("Assert.assertTrue("
+                this.writeLine("Assert.assertTrue("
                         + AbstractJavaSourceGenerator.NEWLINE);
                 final String[] disjunctions = conjunction.split("\\|\\|");
 
@@ -757,14 +750,15 @@ public class JUnitConverter implements IFrameworkConverter {
 
                     String toWrite = AbstractJavaSourceGenerator.TAB
                             + disjunctions[i].trim();
-                    if (i + 1 != disjunctions.length) {
+                    if ((i + 1) != disjunctions.length) {
                         toWrite += " ||";
                     }
-                    writeLine(toWrite + AbstractJavaSourceGenerator.NEWLINE);
+                    this.writeLine(toWrite
+                            + AbstractJavaSourceGenerator.NEWLINE);
                 }
-                writeLine(");" + AbstractJavaSourceGenerator.NEWLINE);
+                this.writeLine(");" + AbstractJavaSourceGenerator.NEWLINE);
             }
-            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
         }
 
         /**
@@ -781,8 +775,8 @@ public class JUnitConverter implements IFrameworkConverter {
              * needs special treatment.
              */
             String declaration = "";
-            if (isSelf(variable)) {
-                declaration = className + " self";
+            if (this.isSelf(variable)) {
+                declaration = this.className + " self";
             } else {
                 declaration = variable.getType() + " " + variable.getName();
             }
@@ -810,7 +804,7 @@ public class JUnitConverter implements IFrameworkConverter {
             /*
              * Finally, print the complete declaration and instantiation
              */
-            writeLine(declaration + " = " + instantiation + ";"
+            this.writeLine(declaration + " = " + instantiation + ";"
                     + AbstractJavaSourceGenerator.NEWLINE);
         }
     }

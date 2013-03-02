@@ -39,14 +39,14 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
      */
     @Override
     public Term transform(final Term term) throws TermTransformerException {
-        return transformTerm(term);
+        return this.transformTerm(term);
     }
 
     @Override
     protected Term transformNot(final Term term)
             throws TermTransformerException {
 
-        if (hasChildren(term)) {
+        if (this.hasChildren(term)) {
             final Term child = term.sub(0);
 
             /*
@@ -54,9 +54,9 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
              * node with the child of that node, and proceed with parsing that
              * node as usual.
              */
-            if (isNot(child)) {
-                if (hasChildren(child)) {
-                    return transformTerm(child.sub(0));
+            if (this.isNot(child)) {
+                if (this.hasChildren(child)) {
+                    return this.transformTerm(child.sub(0));
                 }
             }
 
@@ -64,28 +64,29 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
              * If the child of this node is an AND statement, apply De Morgans
              * laws in order to remove the negation.
              */
-            else if (isAnd(child)) {
+            else if (this.isAnd(child)) {
 
                 /*
                  * Negate the two subterms to the AND operator.
                  */
-                final Term negatedFirstSub = termFactory.createTerm(
+                final Term negatedFirstSub = this.termFactory.createTerm(
                         Junctor.NOT, child.sub(0));
 
-                final Term negatedSecondSub = termFactory.createTerm(
+                final Term negatedSecondSub = this.termFactory.createTerm(
                         Junctor.NOT, child.sub(1));
 
                 /*
                  * Parse them both normally.
                  */
-                final Term parsedFirstSub = transformTerm(negatedFirstSub);
-                final Term parsedSecondSub = transformTerm(negatedSecondSub);
+                final Term parsedFirstSub = this.transformTerm(negatedFirstSub);
+                final Term parsedSecondSub = this
+                        .transformTerm(negatedSecondSub);
 
                 /*
                  * Finally, return an OR operator with the new terms as
                  * subterms.
                  */
-                return termFactory.createTerm(Junctor.OR, parsedFirstSub,
+                return this.termFactory.createTerm(Junctor.OR, parsedFirstSub,
                         parsedSecondSub);
             }
 
@@ -93,27 +94,28 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
              * If the child of this node is an OR statement, we process it using
              * De Morgans laws, just as in the case with AND.
              */
-            else if (isAnd(child)) {
+            else if (this.isAnd(child)) {
 
                 /*
                  * Negate the two subterms.
                  */
-                final Term negatedFirstSub = termFactory.createTerm(
+                final Term negatedFirstSub = this.termFactory.createTerm(
                         Junctor.NOT, child.sub(0));
 
-                final Term negatedSecondSub = termFactory.createTerm(
+                final Term negatedSecondSub = this.termFactory.createTerm(
                         Junctor.NOT, child.sub(1));
 
                 /*
                  * Parse both negated subterms.
                  */
-                final Term parsedFirstSub = transformTerm(negatedFirstSub);
-                final Term parsedSecondSub = transformTerm(negatedSecondSub);
+                final Term parsedFirstSub = this.transformTerm(negatedFirstSub);
+                final Term parsedSecondSub = this
+                        .transformTerm(negatedSecondSub);
 
                 /*
                  * Return the new AND operator.
                  */
-                return termFactory.createTerm(Junctor.AND, parsedFirstSub,
+                return this.termFactory.createTerm(Junctor.AND, parsedFirstSub,
                         parsedSecondSub);
             }
         }

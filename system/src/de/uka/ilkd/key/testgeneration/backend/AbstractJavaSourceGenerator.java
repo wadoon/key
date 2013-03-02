@@ -10,14 +10,14 @@ package de.uka.ilkd.key.testgeneration.backend;
 public abstract class AbstractJavaSourceGenerator {
 
     /**
-     * 4-space tab
-     */
-    protected static final String TAB = "    ";
-
-    /**
      * A newline
      */
     protected static final String NEWLINE = "\n";
+
+    /**
+     * 4-space tab
+     */
+    protected static final String TAB = "    ";
 
     /**
      * Indentation counter, for keeping tabs on how many tabs (hah!) should be
@@ -31,11 +31,11 @@ public abstract class AbstractJavaSourceGenerator {
     private final StringBuilder output = new StringBuilder();
 
     protected void appendToOutput(final String text) {
-        output.append(text);
+        this.output.append(text);
     }
 
     protected String getCurrentOutput() {
-        return output.toString();
+        return this.output.toString();
     }
 
     /**
@@ -44,8 +44,8 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void indent() {
 
-        for (int i = 0; i < indentation; i++) {
-            output.append(AbstractJavaSourceGenerator.TAB);
+        for (int i = 0; i < this.indentation; i++) {
+            this.output.append(AbstractJavaSourceGenerator.TAB);
         }
     }
 
@@ -89,19 +89,19 @@ public abstract class AbstractJavaSourceGenerator {
 
         if (annotations != null) {
             for (final String annotation : annotations) {
-                writeLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
+                this.writeLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
             }
         }
 
-        indent();
+        this.indent();
 
-        output.append(visibility + " ");
-        output.append(modifier + " ");
-        output.append("class" + " ");
-        output.append(name);
-        output.append(" {\n");
+        this.output.append(visibility + " ");
+        this.output.append(modifier + " ");
+        this.output.append("class" + " ");
+        this.output.append(name);
+        this.output.append(" {\n");
 
-        indentation++;
+        this.indentation++;
     }
 
     /**
@@ -110,9 +110,9 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void writeClosingBrace() {
 
-        indentation--;
-        indent();
-        output.append("}\n");
+        this.indentation--;
+        this.indent();
+        this.output.append("}\n");
     }
 
     /**
@@ -123,17 +123,17 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void writeComment(final String text, final boolean isJavadoc) {
 
-        writeLine(AbstractJavaSourceGenerator.NEWLINE);
+        this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
 
         if (isJavadoc) {
-            writeLine("/**\n");
+            this.writeLine("/**\n");
         } else {
-            writeLine("/*\n");
+            this.writeLine("/*\n");
         }
 
         final String[] words = text.split(" ");
 
-        writeLine(" *");
+        this.writeLine(" *");
         int characterCount = 0;
         for (final String word : words) {
 
@@ -143,17 +143,18 @@ public abstract class AbstractJavaSourceGenerator {
 
             if (characterCount >= 50) {
                 characterCount = 0;
-                output.append(" " + word + AbstractJavaSourceGenerator.NEWLINE);
-                writeLine(" *");
+                this.output.append(" " + word
+                        + AbstractJavaSourceGenerator.NEWLINE);
+                this.writeLine(" *");
                 continue;
             } else {
-                output.append(" " + word);
+                this.output.append(" " + word);
                 characterCount += word.length();
             }
         }
-        output.append(AbstractJavaSourceGenerator.NEWLINE);
+        this.output.append(AbstractJavaSourceGenerator.NEWLINE);
 
-        writeLine(" */\n");
+        this.writeLine(" */\n");
     }
 
     /**
@@ -164,8 +165,8 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void writeLine(final String text) {
 
-        indent();
-        output.append(text);
+        this.indent();
+        this.output.append(text);
     }
 
     /**
@@ -225,59 +226,59 @@ public abstract class AbstractJavaSourceGenerator {
 
         if (annotations != null) {
             for (final String annotation : annotations) {
-                writeLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
+                this.writeLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
             }
         }
 
-        indent();
+        this.indent();
 
         /*
          * Write the visibility modifier of the method
          */
-        output.append(visibility + " ");
+        this.output.append(visibility + " ");
 
         /*
          * Write the modifiers, if any.
          */
-        if (modifiers != null && modifiers.length != 0) {
+        if ((modifiers != null) && (modifiers.length != 0)) {
             for (final String modifier : modifiers) {
-                output.append(modifier + " ");
+                this.output.append(modifier + " ");
             }
         }
 
-        output.append(returnType + " ");
+        this.output.append(returnType + " ");
 
-        output.append(name + " ");
+        this.output.append(name + " ");
 
         /*
          * Write the parameters for the method, if any.
          */
-        output.append("(");
-        if (parameters != null && parameters.length != 0) {
+        this.output.append("(");
+        if ((parameters != null) && (parameters.length != 0)) {
             for (int i = 0; i < parameters.length; i++) {
                 final String parameter = parameters[i];
-                if (i < parameters.length - 1) {
-                    output.append(parameter + ", ");
+                if (i < (parameters.length - 1)) {
+                    this.output.append(parameter + ", ");
                 } else {
-                    output.append(parameter);
+                    this.output.append(parameter);
                 }
             }
         }
-        output.append(")");
+        this.output.append(")");
 
         /*
          * Write the exceptions, if any.
          */
         if (exceptions != null) {
-            output.append(AbstractJavaSourceGenerator.NEWLINE);
-            indent();
+            this.output.append(AbstractJavaSourceGenerator.NEWLINE);
+            this.indent();
 
-            writeLine("throws ");
+            this.writeLine("throws ");
             for (int i = 0; i < exceptions.length; i++) {
                 final String exception = exceptions[i];
-                output.append(exception);
-                if (i != exceptions.length - 1) {
-                    output.append(", ");
+                this.output.append(exception);
+                if (i != (exceptions.length - 1)) {
+                    this.output.append(", ");
                 }
             }
         }
@@ -285,8 +286,8 @@ public abstract class AbstractJavaSourceGenerator {
         /*
          * Close the method header.
          */
-        output.append(" {\n");
-        indentation++;
+        this.output.append(" {\n");
+        this.indentation++;
     }
 
     /**
@@ -295,8 +296,8 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void writeOpeningBrace() {
 
-        indent();
-        indentation++;
-        output.append("{\n");
+        this.indent();
+        this.indentation++;
+        this.output.append("{\n");
     }
 }

@@ -28,19 +28,36 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class ModelVariable {
 
+    /**
+     * Factory method for creating a {@link ModelVariable} instance.
+     * 
+     * @param programVariable
+     *            the {@link IProgramVariable} instance which will be wrapped by
+     *            the created instance.
+     * @param identifier
+     *            a unique identifier for the variable.
+     * @return the created instance.
+     */
+    public static ModelVariable constructModelVariable(
+            final IProgramVariable programVariable, final String identifier) {
+
+        return new ModelVariable(programVariable, identifier);
+    }
+
     public static boolean isValidValueType(final Object object) {
 
-        return object.getClass() == ModelInstance.class
-                || object.getClass() == Integer.class
-                || object.getClass() == Byte.class
-                || object.getClass() == Long.class
-                || object.getClass() == Boolean.class;
+        return (object.getClass() == ModelInstance.class)
+                || (object.getClass() == Integer.class)
+                || (object.getClass() == Byte.class)
+                || (object.getClass() == Long.class)
+                || (object.getClass() == Boolean.class);
     }
 
     /**
-     * The wrapped {@link ProgramVariable} instance.
+     * The value bound to this object. Primitive types are represented by their
+     * wrapper types ( {@link Integer}, {@link Boolean} etc).
      */
-    private final IProgramVariable variable;
+    private Object boundValue;
 
     /**
      * Represents a unique identifier for this variable, denoting its relative
@@ -52,10 +69,10 @@ public class ModelVariable {
     private final String identifier;
 
     /**
-     * The value bound to this object. Primitive types are represented by their
-     * wrapper types ( {@link Integer}, {@link Boolean} etc).
+     * This flag indicates whether or not this variable is declared in the
+     * parameter list for a method.
      */
-    private Object boundValue;
+    private boolean isParameter = false;
 
     /**
      * The instance of {@link ModelInstance} in which this particular instance
@@ -64,32 +81,15 @@ public class ModelVariable {
     private ModelInstance parentModelInstance;
 
     /**
-     * This flag indicates whether or not this variable is declared in the
-     * parameter list for a method.
+     * The wrapped {@link ProgramVariable} instance.
      */
-    private boolean isParameter = false;
+    private final IProgramVariable variable;
 
-    public ModelVariable(final IProgramVariable programVariable,
+    private ModelVariable(final IProgramVariable programVariable,
             final String identifier) {
 
-        this(programVariable, identifier, null);
-    }
-
-    /**
-     * Create a ModelVariable from an existing {@link ProgramVariable},
-     * effectively encapsulating it, but we maintain the type hierarchy for the
-     * sake of consistency.
-     * 
-     * @param programVariable
-     */
-    public ModelVariable(final IProgramVariable programVariable,
-            final String identifier, final ModelInstance referedInstance) {
-
-        variable = programVariable;
-
+        this.variable = programVariable;
         this.identifier = identifier;
-        boundValue = referedInstance;
-
     }
 
     /**
@@ -105,11 +105,11 @@ public class ModelVariable {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (this.getClass() != obj.getClass()) {
             return false;
         }
         final ModelVariable other = (ModelVariable) obj;
-        return identifier.equals(other.identifier);
+        return this.identifier.equals(other.identifier);
     }
 
     /**
@@ -117,12 +117,12 @@ public class ModelVariable {
      */
     public String getIdentifier() {
 
-        return variable.name().toString();
+        return this.variable.name().toString();
     }
 
     public String getName() {
 
-        return identifier;
+        return this.identifier;
     }
 
     /**
@@ -132,7 +132,7 @@ public class ModelVariable {
      */
     public ModelInstance getParentModelInstance() {
 
-        return parentModelInstance;
+        return this.parentModelInstance;
     }
 
     /**
@@ -141,7 +141,7 @@ public class ModelVariable {
      */
     public String getType() {
 
-        return variable.getKeYJavaType().getName();
+        return this.variable.getKeYJavaType().getName();
     }
 
     /**
@@ -150,14 +150,14 @@ public class ModelVariable {
      */
     public Object getValue() {
 
-        return boundValue;
+        return this.boundValue;
     }
 
     /**
      * @return the isParameter
      */
     public boolean isParameter() {
-        return isParameter;
+        return this.isParameter;
     }
 
     /**
@@ -186,12 +186,12 @@ public class ModelVariable {
      */
     public void setValue(final Object value) {
 
-        boundValue = value;
+        this.boundValue = value;
     }
 
     @Override
     public String toString() {
 
-        return getType() + " : " + identifier;
+        return this.getType() + " : " + this.identifier;
     }
 }

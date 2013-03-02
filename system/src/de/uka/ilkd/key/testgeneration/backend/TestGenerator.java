@@ -5,8 +5,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.testgeneration.core.CoreInterface;
 import de.uka.ilkd.key.testgeneration.core.CoreException;
+import de.uka.ilkd.key.testgeneration.core.CoreInterface;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
@@ -96,8 +96,8 @@ public enum TestGenerator {
             /*
              * Create abstract test suites for the selected methods.
              */
-            final List<TestSuite> testSuites = coreInterface.createTestSuites(
-                    source, coverage, methods);
+            final List<TestSuite> testSuites = this.coreInterface
+                    .createTestSuites(source, coverage, methods);
 
             /*
              * Convert the abstract test suites to the desired final format.

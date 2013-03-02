@@ -28,13 +28,9 @@ import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerE
  */
 public abstract class AbstractTermParser {
 
-    /**
-     * The names of the various primitive types in Java. As of the
-     * implementation of this class (November 2012), KeY does not support
-     * floating point types (i.e. <b>float</b> and <b>double</b>), and neither
-     * does KeYTestGen2.
-     */
-    protected static final LinkedList<String> primitiveTypes;
+    protected static final String ADDITION = "add";
+
+    protected static final String AND = "and";
 
     /**
      * The sort names of the various binary functions represented in the KeY
@@ -43,59 +39,63 @@ public abstract class AbstractTermParser {
      */
     protected static final LinkedList<String> binaryFunctions;
 
-    /**
-     * The sort names of the unary functions as supported by KeYTestGen.
-     */
-    protected static final LinkedList<String> unaryFunctions;
+    protected static final String BOOLEAN = "boolean";
 
-    /**
-     * The sort names of the literal kinds supported by KeYTestGen.
-     */
-    protected static final LinkedList<String> literals;
+    protected static final String BYTE = "byte";
 
+    protected static final String DIVISION = "div";
+
+    protected static final String EQUALS = "equals";
+    protected static final String EXCEPTION_BASE = "java.lang.Exception";
     /**
      * The sort names for various Java Exceptions, as they are modelled in
      * KeYTestGen
      */
     protected static final LinkedList<String> exceptionSorts;
 
+    protected static final String FALSE = "FALSE";
+    protected static final String GREATER_OR_EQUALS = "geq";
+
+    protected static final String GREATER_THAN = "geq";
+    protected static final String INTEGER = "int";
+    protected static final String LESS_OR_EQUALS = "leq";
+    protected static final String LESS_THAN = "leq";
+    /**
+     * The sort names of the literal kinds supported by KeYTestGen.
+     */
+    protected static final LinkedList<String> literals;
+
+    protected static final String LONG = "long";
+    protected static final String MULTIPLICATION = "mul";
+    protected static final String NEGATE_LITERAL = "neglit";
+    protected static final String NOT = "not";
+
+    protected static final String NUMBERS = "numbers";
     /**
      * Used for storing an index over all operator types currently handled by
      * KeYTestGen
      */
     protected static final LinkedList<String> operators;
 
-    protected static final String AND = "and";
     protected static final String OR = "or";
-    protected static final String NOT = "not";
 
-    protected static final String TRUE = "TRUE";
-    protected static final String FALSE = "FALSE";
-
-    protected static final String GREATER_OR_EQUALS = "geq";
-    protected static final String LESS_OR_EQUALS = "leq";
-    protected static final String GREATER_THAN = "geq";
-    protected static final String LESS_THAN = "leq";
-    protected static final String EQUALS = "equals";
-
-    protected static final String MULTIPLICATION = "mul";
-    protected static final String DIVISION = "div";
-    protected static final String ADDITION = "add";
+    /**
+     * The names of the various primitive types in Java. As of the
+     * implementation of this class (November 2012), KeY does not support
+     * floating point types (i.e. <b>float</b> and <b>double</b>), and neither
+     * does KeYTestGen2.
+     */
+    protected static final LinkedList<String> primitiveTypes;
+    protected static final String RESULT = "result";
     protected static final String SUBTRACTION = "sub";
+    protected static final String TRUE = "TRUE";
+
+    /**
+     * The sort names of the unary functions as supported by KeYTestGen.
+     */
+    protected static final LinkedList<String> unaryFunctions;
 
     protected static final String Z = "Z";
-    protected static final String NEGATE_LITERAL = "neglit";
-
-    protected static final String NUMBERS = "numbers";
-
-    protected static final String INTEGER = "int";
-    protected static final String BOOLEAN = "boolean";
-    protected static final String LONG = "long";
-    protected static final String BYTE = "byte";
-
-    protected static final String EXCEPTION_BASE = "java.lang.Exception";
-
-    protected static final String RESULT = "result";
 
     static {
 
@@ -243,7 +243,7 @@ public abstract class AbstractTermParser {
          * this case we also cannot go any further. We are not interested in the
          * symbolic heap here, so we simply return the root name.
          */
-        else if (operator.getClass() == Function.class
+        else if ((operator.getClass() == Function.class)
                 && !operator.toString().equals("heap")) {
 
             return operator.toString();
@@ -302,13 +302,13 @@ public abstract class AbstractTermParser {
          * Since Not also qualifies as a junctor, albeit a unary one, check this
          * first.
          */
-        if (isNot(term)) {
+        if (this.isNot(term)) {
             return false;
         }
 
         final de.uka.ilkd.key.logic.op.Operator operator = term.op();
 
-        return operator instanceof Junctor || operator instanceof Equality;
+        return (operator instanceof Junctor) || (operator instanceof Equality);
     }
 
     protected boolean isBoolean(final Term term) {
@@ -317,12 +317,12 @@ public abstract class AbstractTermParser {
 
     protected boolean isBooleanConstant(final Term term)
             throws TermParserException {
-        return isBooleanFalse(term) || isBooleanTrue(term);
+        return this.isBooleanFalse(term) || this.isBooleanTrue(term);
     }
 
     protected boolean isBooleanFalse(final Term term)
             throws TermParserException {
-        if (isBoolean(term)) {
+        if (this.isBoolean(term)) {
             return term.op().name().toString().equals(AbstractTermParser.FALSE);
         } else {
             throw new TermTransformerException(
@@ -332,7 +332,7 @@ public abstract class AbstractTermParser {
 
     protected boolean isBooleanTrue(final Term term)
             throws TermTransformerException {
-        if (isBoolean(term)) {
+        if (this.isBoolean(term)) {
             return term.op().name().toString().equals(AbstractTermParser.TRUE);
         } else {
             throw new TermTransformerException(
@@ -499,7 +499,7 @@ public abstract class AbstractTermParser {
      */
     protected boolean isOr(final Term term) {
 
-        if (isBinaryFunction2(term)) {
+        if (this.isBinaryFunction2(term)) {
 
             return term.op().name().toString().equals(AbstractTermParser.OR);
 
@@ -571,14 +571,14 @@ public abstract class AbstractTermParser {
 
         final Operator operator = term.op();
 
-        return operator instanceof Function
-                || operator instanceof ProgramVariable;
+        return (operator instanceof Function)
+                || (operator instanceof ProgramVariable);
     }
 
     protected boolean translateToJavaBoolean(final Term term)
             throws TermParserException {
-        if (isBoolean(term)) {
-            return isBooleanTrue(term) ? true : false;
+        if (this.isBoolean(term)) {
+            return this.isBooleanTrue(term) ? true : false;
         } else {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");

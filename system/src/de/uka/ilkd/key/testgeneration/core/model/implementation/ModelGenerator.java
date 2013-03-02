@@ -36,16 +36,16 @@ public enum ModelGenerator implements IModelGenerator {
     INSTANCE;
 
     /**
-     * The settings for the SMT solvers. These follow a default implementation,
-     * although it is possible for the user to use custom settings.
-     */
-    private final SMTSettings settings;
-
-    /**
      * The Configuration to use for the SMT-LIB2 translator used by the
      * ModelGenerator.
      */
     private final Configuration configuration;
+
+    /**
+     * The settings for the SMT solvers. These follow a default implementation,
+     * although it is possible for the user to use custom settings.
+     */
+    private final SMTSettings settings;
 
     private final SMTInterface smtInterface = SMTInterface.INSTANCE;
 
@@ -59,8 +59,8 @@ public enum ModelGenerator implements IModelGenerator {
      */
     private ModelGenerator() {
 
-        settings = ModelSettings.getDefaultSMTSettings();
-        configuration = ModelSettings.getDefaultTranslatorConfiguration();
+        this.settings = ModelSettings.getDefaultSMTSettings();
+        this.configuration = ModelSettings.getDefaultTranslatorConfiguration();
     }
 
     /**
@@ -98,15 +98,15 @@ public enum ModelGenerator implements IModelGenerator {
              * Model, extracting them from an SMT solution for the pathcondition
              * for this node.
              */
-            final String solverResult = instantiatePathCondition(pathCondition,
-                    services);
+            final String solverResult = this.instantiatePathCondition(
+                    pathCondition, services);
 
             /*
              * If any such primitive values were found, merge their concrete
              * values into the Model
              */
             if (solverResult != null) {
-                insertSMTOutputIntoModel(solverResult, model);
+                this.insertSMTOutputIntoModel(solverResult, model);
             }
 
             return model;
@@ -168,7 +168,7 @@ public enum ModelGenerator implements IModelGenerator {
 
                     final char currentChar = definition.charAt(i);
 
-                    if (!negFlag && currentChar == '-') {
+                    if (!negFlag && (currentChar == '-')) {
                         negFlag = true;
                     }
 
@@ -248,16 +248,17 @@ public enum ModelGenerator implements IModelGenerator {
                  */
                 do {
 
-                    final String commands = translateToSMTLIB2(pathCondition,
-                            services);
+                    final String commands = this.translateToSMTLIB2(
+                            pathCondition, services);
 
-                    result = smtInterface.startMessageBasedSession(commands)
+                    result = this.smtInterface
+                            .startMessageBasedSession(commands)
                             .replaceAll("success", "").trim();
 
                     attempts++;
 
-                } while (!isValidResult(result)
-                        && attempts < ModelSettings.getNUMBER_OF_TRIES());
+                } while (!this.isValidResult(result)
+                        && (attempts < ModelSettings.getNUMBER_OF_TRIES()));
 
                 return result;
             }
@@ -301,10 +302,10 @@ public enum ModelGenerator implements IModelGenerator {
          * Set up the translator for this term.
          */
         final SmtLib2Translator translator = new SmtLib2Translator(services,
-                configuration);
+                this.configuration);
 
         final StringBuffer result = translator.translateProblem(term, services,
-                settings);
+                this.settings);
 
         result.append("\n(get-model)");
 

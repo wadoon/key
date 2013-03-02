@@ -23,15 +23,15 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
             .toString();
 
     /**
-     * Flag to indicate if we have seen a Not operator.
-     */
-    private boolean sawNot;
-
-    /**
      * The {@link Model} instance associated with the Term being visited.
      * Constructed separately by an instance of {@link TermToModelVisitor}.
      */
     private final Model model;
+
+    /**
+     * Flag to indicate if we have seen a Not operator.
+     */
+    private boolean sawNot;
 
     public ResolveAssignmentsVisitor(final Model model) {
 
@@ -80,7 +80,7 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                 /*
                  * If the left-hand hand is a boolean, configure it accordingly.
                  */
-                if (isBoolean(leftOperand)) {
+                if (this.isBoolean(leftOperand)) {
 
                     leftOperandIdentifier = AbstractTermParser
                             .resolveIdentifierString(leftOperand,
@@ -91,21 +91,21 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                      * FALSE), we need to create a new such value and assign it
                      * to the variable.
                      */
-                    if (isBooleanConstant(rightOperand)) {
+                    if (this.isBooleanConstant(rightOperand)) {
 
-                        final ModelVariable modelVariable = model
+                        final ModelVariable modelVariable = this.model
                                 .getVariable(leftOperandIdentifier);
 
-                        boolean value = isBooleanTrue(rightOperand);
-                        value = sawNot ? !value : value;
-                        model.add(modelVariable, value);
+                        boolean value = this.isBooleanTrue(rightOperand);
+                        value = this.sawNot ? !value : value;
+                        this.model.add(modelVariable, value);
                     } else {
                     }
 
                     /*
                      * Process reference variables.
                      */
-                } else if (!sawNot) {
+                } else if (!this.sawNot) {
 
                     leftOperandIdentifier = AbstractTermParser
                             .resolveIdentifierString(leftOperand,
@@ -114,13 +114,14 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                             .resolveIdentifierString(rightOperand,
                                     ResolveAssignmentsVisitor.SEPARATOR);
 
-                    final ModelVariable leftModelVariable = model
+                    final ModelVariable leftModelVariable = this.model
                             .getVariable(leftOperandIdentifier);
 
-                    final ModelVariable rightModelVariable = model
+                    final ModelVariable rightModelVariable = this.model
                             .getVariable(rightOperandIdentifier);
 
-                    model.assignPointer(leftModelVariable, rightModelVariable);
+                    this.model.assignPointer(leftModelVariable,
+                            rightModelVariable);
                 }
             }
 
@@ -134,13 +135,13 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
     @Override
     public void visit(final Term visited) {
 
-        if (isNot(visited)) {
-            sawNot = true;
-        } else if (isEquals(visited)) {
-            parseEquals(visited);
-            sawNot = false;
-        } else if (isBinaryFunction2(visited) && sawNot) {
-            sawNot = false;
+        if (this.isNot(visited)) {
+            this.sawNot = true;
+        } else if (this.isEquals(visited)) {
+            this.parseEquals(visited);
+            this.sawNot = false;
+        } else if (this.isBinaryFunction2(visited) && this.sawNot) {
+            this.sawNot = false;
         }
     }
 }

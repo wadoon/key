@@ -36,12 +36,6 @@ public enum KeYInterface {
     INSTANCE;
 
     /**
-     * Main interface to the KeY system itself.
-     */
-    private CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
-            false);
-
-    /**
      * The public methods of this singleton must use this {@link ReentrantLock}
      * instance in order to guarantee atomic access to the singleton at all
      * times. Private methods need not use the lock. Further, no two public
@@ -70,8 +64,14 @@ public enum KeYInterface {
         }
     }
 
+    /**
+     * Main interface to the KeY system itself.
+     */
+    private CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
+            false);
+
     public void __DEBUG_RESET() {
-        userInterface = new CustomConsoleUserInterface(false);
+        this.userInterface = new CustomConsoleUserInterface(false);
     }
 
     /**
@@ -95,7 +95,7 @@ public enum KeYInterface {
         final ProofOblInput proofObligationInput = new ProgramMethodPO(
                 initConfig, method.getFullName(), method, precondition, true);
 
-        final Proof proof = userInterface.createProof(initConfig,
+        final Proof proof = this.userInterface.createProof(initConfig,
                 proofObligationInput);
         if (proof == null) {
             throw new ProofInputException("Unable to load proof");
@@ -135,9 +135,9 @@ public enum KeYInterface {
              * Setup and prepare the proof session, and retrieve the KeYMediator
              * instance to use.
              */
-            final Proof proof = getProof(method.getInitConfig(),
+            final Proof proof = this.getProof(method.getInitConfig(),
                     method.getProgramMethod(), null);
-            final KeYMediator mediator = userInterface.getMediator();
+            final KeYMediator mediator = this.userInterface.getMediator();
 
             /*
              * Create the symbolic execution tree builder.
@@ -156,7 +156,7 @@ public enum KeYInterface {
                             new ExecutedSymbolicExecutionTreeNodesStopCondition(
                                     ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
 
-            userInterface.startAndWaitForAutoMode(proof);
+            this.userInterface.startAndWaitForAutoMode(proof);
 
             /*
              * Create the symbolic execution tree, and assert that it indeed
@@ -199,8 +199,8 @@ public enum KeYInterface {
 
             KeYInterface.lock.lock();
 
-            final DefaultProblemLoader loader = userInterface.load(javaFile,
-                    null, null);
+            final DefaultProblemLoader loader = this.userInterface.load(
+                    javaFile, null, null);
 
             final InitConfig initConfig = loader.getInitConfig();
 

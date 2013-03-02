@@ -22,9 +22,9 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
     private void collectLiteralsFromTree(final Term term,
             final Operator operator, final List<Term> literals) {
 
-        if (representsOperator(term, operator)) {
-            collectLiteralsFromTree(term.sub(0), operator, literals);
-            collectLiteralsFromTree(term.sub(1), operator, literals);
+        if (this.representsOperator(term, operator)) {
+            this.collectLiteralsFromTree(term.sub(0), operator, literals);
+            this.collectLiteralsFromTree(term.sub(1), operator, literals);
         } else {
             literals.add(term);
         }
@@ -43,10 +43,10 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
 
             final String leftIdentifier = sortedIdentifiers.poll();
             final Term leftChild = mappings.get(leftIdentifier);
-            final Term rightChild = constructTree(sortedIdentifiers, mappings,
-                    operator);
+            final Term rightChild = this.constructTree(sortedIdentifiers,
+                    mappings, operator);
 
-            return termFactory.createTerm(operator, leftChild, rightChild);
+            return this.termFactory.createTerm(operator, leftChild, rightChild);
         }
     }
 
@@ -58,26 +58,26 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        return transformTree(term);
+        return this.transformTree(term);
     }
 
     @Override
     protected Term transformAnd(final Term term)
             throws TermTransformerException {
 
-        final Term transformedFirstChild = transformTerm(term.sub(0));
-        final Term transformedSecondChild = transformTerm(term.sub(1));
+        final Term transformedFirstChild = this.transformTerm(term.sub(0));
+        final Term transformedSecondChild = this.transformTerm(term.sub(1));
 
         final String firstChildName = transformedFirstChild.toString();
         final String secondChildName = transformedSecondChild.toString();
 
         final int comparison = firstChildName.compareTo(secondChildName);
         if (comparison > 0) {
-            return termFactory.createTerm(Junctor.AND, transformedSecondChild,
-                    transformedFirstChild);
+            return this.termFactory.createTerm(Junctor.AND,
+                    transformedSecondChild, transformedFirstChild);
         } else {
-            return termFactory.createTerm(Junctor.AND, transformedFirstChild,
-                    transformedSecondChild);
+            return this.termFactory.createTerm(Junctor.AND,
+                    transformedFirstChild, transformedSecondChild);
         }
     }
 
@@ -85,44 +85,44 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
     protected Term transformEquals(final Term term)
             throws TermTransformerException {
 
-        final Term transformedFirstChild = transformTerm(term.sub(0));
-        final Term transformedSecondChild = transformTerm(term.sub(1));
+        final Term transformedFirstChild = this.transformTerm(term.sub(0));
+        final Term transformedSecondChild = this.transformTerm(term.sub(1));
 
         final String firstChildName = transformedFirstChild.toString();
         final String secondChildName = transformedSecondChild.toString();
 
         final int comparison = firstChildName.compareTo(secondChildName);
         if (comparison > 0) {
-            return termFactory.createTerm(term.op(), transformedSecondChild,
-                    transformedFirstChild);
+            return this.termFactory.createTerm(term.op(),
+                    transformedSecondChild, transformedFirstChild);
         } else {
-            return termFactory.createTerm(term.op(), transformedFirstChild,
-                    transformedSecondChild);
+            return this.termFactory.createTerm(term.op(),
+                    transformedFirstChild, transformedSecondChild);
         }
     }
 
     @Override
     protected Term transformOr(final Term term) throws TermTransformerException {
 
-        final Term transformedFirstChild = transformTerm(term.sub(0));
-        final Term transformedSecondChild = transformTerm(term.sub(1));
+        final Term transformedFirstChild = this.transformTerm(term.sub(0));
+        final Term transformedSecondChild = this.transformTerm(term.sub(1));
 
         final String firstChildName = transformedFirstChild.toString();
         final String secondChildName = transformedSecondChild.toString();
 
         final int comparison = firstChildName.compareTo(secondChildName);
         if (comparison > 0) {
-            return termFactory.createTerm(Junctor.OR, transformedSecondChild,
-                    transformedFirstChild);
+            return this.termFactory.createTerm(Junctor.OR,
+                    transformedSecondChild, transformedFirstChild);
         } else {
-            return termFactory.createTerm(Junctor.OR, transformedFirstChild,
-                    transformedSecondChild);
+            return this.termFactory.createTerm(Junctor.OR,
+                    transformedFirstChild, transformedSecondChild);
         }
     }
 
     private Term transformTree(final Term term) {
 
-        if (isOr(term) || isAnd(term)) {
+        if (this.isOr(term) || this.isAnd(term)) {
 
             final Map<String, Term> identifierMapping = new HashMap<String, Term>();
             final PriorityQueue<String> sortedIdentifiers = new PriorityQueue<String>();
@@ -133,14 +133,14 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
              * literals they have as children.
              */
             final Operator operator = term.op();
-            collectLiteralsFromTree(term, operator, literals);
+            this.collectLiteralsFromTree(term, operator, literals);
 
             /*
              * Recursively transform all the gathered literals, sort their
              * identifiers, and put them into the mapping.
              */
             for (final Term literal : literals) {
-                final Term transformedLiteral = transformTree(literal);
+                final Term transformedLiteral = this.transformTree(literal);
                 final String identifier = transformedLiteral.toString();
 
                 identifierMapping.put(identifier, transformedLiteral);
@@ -150,7 +150,7 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
             /*
              * Construct a new tree with the transformed literals.
              */
-            final Term newTerm = constructTree(sortedIdentifiers,
+            final Term newTerm = this.constructTree(sortedIdentifiers,
                     identifierMapping, operator);
             return newTerm;
         } else {

@@ -14,15 +14,15 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 public final class KeYJavaClass {
 
     /**
-     * The {@link KeYJavaType} instance for this class
-     */
-    private final KeYJavaType type;
-
-    /**
      * Maps the name of a method to its corresponding {@link KeYJavaMethod}
      * instance.
      */
     private final HashMap<String, KeYJavaMethod> methods = new HashMap<String, KeYJavaMethod>();
+
+    /**
+     * The {@link KeYJavaType} instance for this class
+     */
+    private final KeYJavaType type;
 
     KeYJavaClass(final KeYJavaType type) {
         this.type = type;
@@ -37,7 +37,7 @@ public final class KeYJavaClass {
      */
     void addMethodMapping(final String methodName, final KeYJavaMethod method) {
 
-        methods.put(methodName, method);
+        this.methods.put(methodName, method);
     }
 
     /**
@@ -50,7 +50,7 @@ public final class KeYJavaClass {
      */
     public KeYJavaMethod getMethod(final String name) {
 
-        return methods.get(name);
+        return this.methods.get(name);
     }
 
     /**
@@ -60,27 +60,27 @@ public final class KeYJavaClass {
      */
     public Set<String> getMethods() {
 
-        return methods.keySet();
+        return this.methods.keySet();
     }
 
     /**
      * @return the name
      */
     public String getName() {
-        return type.getName();
+        return this.type.getName();
     }
 
     /**
      * @return the packageDeclaration
      */
     public String getPackageDeclaration() {
-        return type.createPackagePrefix().toString();
+        return this.type.createPackagePrefix().toString();
     }
 
     /**
      * @return the type
      */
     public KeYJavaType getType() {
-        return type;
+        return this.type;
     }
 }

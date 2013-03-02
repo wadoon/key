@@ -35,9 +35,21 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 public class TestCase implements Comparable<TestCase> {
 
     /**
-     * DEBUG: the execution node associated with this test case.
+     * Factory method for creating a {@link TestCase} instance.
+     * 
+     * @param method
+     *            the method associated with the test case.
+     * @param model
+     *            the model for the test case.
+     * @param oracle
+     *            the oracle for the test case.
+     * @return the test case.
      */
-    private IExecutionNode node;
+    public static TestCase constructTestCase(final KeYJavaMethod method,
+            final Model model, final Term oracle) {
+
+        return new TestCase(method, model, oracle);
+    }
 
     /**
      * The method for which the test case is being generated.
@@ -54,6 +66,11 @@ public class TestCase implements Comparable<TestCase> {
     private final Model model;
 
     /**
+     * DEBUG: the execution node associated with this test case.
+     */
+    private IExecutionNode node;
+
+    /**
      * The Oracle for the method, here represented as a postcondition (i.e. a
      * set of logical expressions defining under which conditions the Oracle
      * would evaluate to "pass"), here represented in its native {@link Term}
@@ -61,7 +78,7 @@ public class TestCase implements Comparable<TestCase> {
      */
     private final Term oracle;
 
-    public TestCase(final KeYJavaMethod method, final Model model,
+    private TestCase(final KeYJavaMethod method, final Model model,
             final Term oracle) {
 
         this.method = method;
@@ -72,7 +89,7 @@ public class TestCase implements Comparable<TestCase> {
     @Override
     public int compareTo(final TestCase o) {
 
-        final String ownName = method.getProgramMethod().getName();
+        final String ownName = this.method.getProgramMethod().getName();
         final String otherName = o.getMethod().getProgramMethod().getName();
 
         return ownName.compareTo(otherName);
@@ -85,14 +102,14 @@ public class TestCase implements Comparable<TestCase> {
      */
     public KeYJavaMethod getMethod() {
 
-        return method;
+        return this.method;
     }
 
     /**
      * @return the name of the method handled by this tescase
      */
     public String getMethodName() {
-        return method.getProgramMethod().getName();
+        return this.method.getProgramMethod().getName();
     }
 
     /**
@@ -102,14 +119,14 @@ public class TestCase implements Comparable<TestCase> {
      */
     public Model getModel() {
 
-        return model;
+        return this.model;
     }
 
     /**
      * @return the node
      */
     public IExecutionNode getNode() {
-        return node;
+        return this.node;
     }
 
     /**
@@ -119,7 +136,7 @@ public class TestCase implements Comparable<TestCase> {
      */
     public Term getOracle() {
 
-        return oracle;
+        return this.oracle;
     }
 
     /**

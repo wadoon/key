@@ -11,53 +11,14 @@ import java.util.List;
  */
 public abstract class XMLHandler {
 
-    protected static final List<String> primitiveTypes = new LinkedList<String>();
-    static {
-        XMLHandler.primitiveTypes.add("byte");
-        XMLHandler.primitiveTypes.add("int");
-        XMLHandler.primitiveTypes.add("long");
-        XMLHandler.primitiveTypes.add("boolean");
-    }
-
     /**
-     * Root tag name for a test case.
+     * Root tag name for fields
      */
-    protected static final String TESTCASE_ROOT = "testcase";
-
+    protected static final String FIELD_ROOT = "field";
     /**
-     * Root tag name for test suites.
+     * Root tag name for heap object identifiers.
      */
-    protected static final String TESTSUITE_ROOT = "testsuite";
-
-    /**
-     * Root tag name for test fixtures.
-     */
-    protected static final String TESTFIXTURE_ROOT = "fixture";
-
-    /**
-     * Root tag name for methods.
-     */
-    protected static final String METHOD_ROOT = "method";
-
-    /**
-     * Root tag name for names (either for variables or methods).
-     */
-    protected static final String NAME_ROOT = "name";
-
-    /**
-     * Root tag name for parameters.
-     */
-    protected static final String PARAMETERS_ROOT = "parameters";
-
-    /**
-     * Root tag name for variables
-     */
-    protected static final String VARIABLE_ROOT = "variable";
-
-    /**
-     * Root tag name for variables
-     */
-    protected static final String VARIABLES_ROOT = "variables";
+    protected static final String IDENTIFIER_ROOT = "identifier";
 
     /**
      * Root tag name for object instances
@@ -70,19 +31,46 @@ public abstract class XMLHandler {
     protected static final String INSTANCES_ROOT = "instances";
 
     /**
-     * Root tag name for heap object identifiers.
+     * Root tag name for methods.
      */
-    protected static final String IDENTIFIER_ROOT = "identifier";
+    protected static final String METHOD_ROOT = "method";
 
     /**
-     * Root tag name for fields
+     * Root tag name for names (either for variables or methods).
      */
-    protected static final String FIELD_ROOT = "field";
+    protected static final String NAME_ROOT = "name";
+
+    /**
+     * Root tag for oracles
+     */
+    protected static final String ORACLE_ROOT = "oracle";
+
+    /**
+     * Root tag name for parameters.
+     */
+    protected static final String PARAMETERS_ROOT = "parameters";
+
+    protected static final List<String> primitiveTypes = new LinkedList<String>();
 
     /**
      * Root tag name for the base class
      */
     protected static final String SELF_ROOT = "self";
+
+    /**
+     * Root tag name for a test case.
+     */
+    protected static final String TESTCASE_ROOT = "testcase";
+
+    /**
+     * Root tag name for test fixtures.
+     */
+    protected static final String TESTFIXTURE_ROOT = "fixture";
+
+    /**
+     * Root tag name for test suites.
+     */
+    protected static final String TESTSUITE_ROOT = "testsuite";
 
     /**
      * Root tag name for types
@@ -95,8 +83,20 @@ public abstract class XMLHandler {
     protected static final String VALUE_ROOT = "value";
 
     /**
-     * Root tag for oracles
+     * Root tag name for variables
      */
-    protected static final String ORACLE_ROOT = "oracle";
+    protected static final String VARIABLE_ROOT = "variable";
+
+    /**
+     * Root tag name for variables
+     */
+    protected static final String VARIABLES_ROOT = "variables";
+
+    static {
+        XMLHandler.primitiveTypes.add("byte");
+        XMLHandler.primitiveTypes.add("int");
+        XMLHandler.primitiveTypes.add("long");
+        XMLHandler.primitiveTypes.add("boolean");
+    }
 
 }

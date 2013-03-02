@@ -10,13 +10,13 @@ import java.util.HashMap;
  */
 public class Benchmark {
 
-    private static final boolean toggleBenchmark = true;
-
-    private static final boolean verbose = true;
-
     private static HashMap<String, Long> readings = new HashMap<String, Long>();
 
     private static long stopWatch = 0L;
+
+    private static final boolean toggleBenchmark = true;
+
+    private static final boolean verbose = true;
 
     /**
      * Registers the clockValue it took to move from the last clock reading to

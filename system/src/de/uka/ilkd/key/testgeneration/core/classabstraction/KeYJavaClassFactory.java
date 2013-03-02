@@ -47,7 +47,7 @@ public enum KeYJavaClassFactory {
         /*
          * Load the file into KeY and get the InitConfig instance for it.
          */
-        final InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
+        final InitConfig initConfig = this.keyInterface.loadJavaFile(javaFile);
 
         final Services services = initConfig.getServices();
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
@@ -56,7 +56,7 @@ public enum KeYJavaClassFactory {
          * Retrieve the KeYJavaType for the top level class declaration in this
          * file
          */
-        final String fileName = getFileName(javaFile);
+        final String fileName = this.getFileName(javaFile);
         final KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
         /*
@@ -80,8 +80,8 @@ public enum KeYJavaClassFactory {
                  * (since each one will effectively represent a unique set of
                  * restrictions on the invocation of the method).
                  */
-                final List<ContractWrapper> contracts = getContracts(method,
-                        services);
+                final List<ContractWrapper> contracts = this.getContracts(
+                        method, services);
                 for (final ContractWrapper contract : contracts) {
 
                     final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(

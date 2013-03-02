@@ -13,14 +13,14 @@ import java.util.List;
 public class JUnitFixture {
 
     /**
-     * The declarations in the fixture.
-     */
-    private final List<JUnitDeclarationStatement> declarations = new LinkedList<JUnitDeclarationStatement>();
-
-    /**
      * The assignment statements
      */
     private final List<JUnitAssignmentStatement> assignments = new LinkedList<JUnitAssignmentStatement>();
+
+    /**
+     * The declarations in the fixture.
+     */
+    private final List<JUnitDeclarationStatement> declarations = new LinkedList<JUnitDeclarationStatement>();
 
     /**
      * Adds a {@link JUnitAssignmentStatement} to the fixture.
@@ -29,7 +29,7 @@ public class JUnitFixture {
      */
     public void addAssignmentStatement(
             final JUnitAssignmentStatement assignmentStatement) {
-        assignments.add(assignmentStatement);
+        this.assignments.add(assignmentStatement);
     }
 
     /**
@@ -39,20 +39,20 @@ public class JUnitFixture {
      */
     public void addDeclarationStatement(
             final JUnitDeclarationStatement declarationStatement) {
-        declarations.add(declarationStatement);
+        this.declarations.add(declarationStatement);
     }
 
     /**
      * @return the assignments
      */
     public List<JUnitAssignmentStatement> getAssignments() {
-        return assignments;
+        return this.assignments;
     }
 
     /**
      * @return the declarations
      */
     public List<JUnitDeclarationStatement> getDeclarations() {
-        return declarations;
+        return this.declarations;
     }
 }

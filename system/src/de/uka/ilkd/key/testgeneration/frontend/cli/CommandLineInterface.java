@@ -69,7 +69,7 @@ public final class CommandLineInterface {
          */
         CommandParser parser = new CommandParser();
 
-        JCommander processor = new JCommander(parser);
+        JCommander processor = new JCommander(this.parser);
 
         /**
          * Initialize session environment.
@@ -83,7 +83,7 @@ public final class CommandLineInterface {
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);
             }
-            processor.setProgramName("ktg");
+            this.processor.setProgramName("ktg");
         }
 
         /**
@@ -99,7 +99,7 @@ public final class CommandLineInterface {
              * Default output for no-args invocations
              */
             if (args.length == 0) {
-                CommandLineInterfaceWorker.printUsage(processor);
+                CommandLineInterfaceWorker.printUsage(this.processor);
                 System.exit(0);
             }
 
@@ -108,20 +108,20 @@ public final class CommandLineInterface {
                 /*
                  * Parse and validate the input
                  */
-                processor.parse(args);
+                this.processor.parse(args);
 
                 /*
                  * Print help if the user requested this
                  */
-                if (parser.isHelpFlagSet()) {
-                    CommandLineInterfaceWorker.printUsage(processor);
+                if (this.parser.isHelpFlagSet()) {
+                    CommandLineInterfaceWorker.printUsage(this.processor);
                     System.exit(0);
                 }
 
                 /*
                  * Print about info if the user requested this
                  */
-                if (parser.isAboutFlagSet()) {
+                if (this.parser.isAboutFlagSet()) {
                     CommandLineInterfaceWorker.printAbout();
                     System.exit(0);
                 }
@@ -129,7 +129,7 @@ public final class CommandLineInterface {
                 /*
                  * TODO: implement verbose mode
                  */
-                if (parser.isVerboseFlagSet()) {
+                if (this.parser.isVerboseFlagSet()) {
                     System.out.println("Warning: verbose mode not implemented");
                     System.exit(0);
                 }
@@ -137,7 +137,7 @@ public final class CommandLineInterface {
                 /*
                  * TODO: method selection needs to be implemented.
                  */
-                if (!parser.getMethods().isEmpty()) {
+                if (!this.parser.getMethods().isEmpty()) {
                     System.out
                             .println("Warning: method selection not implemented yet");
                 }
@@ -146,8 +146,8 @@ public final class CommandLineInterface {
                  * Generate test suites for each file and each framework
                  * specified by the user, and write them to disc.
                  */
-                for (final String framework : parser.getTestFrameworks()) {
-                    generateTestCases(framework, parser.getFiles());
+                for (final String framework : this.parser.getTestFrameworks()) {
+                    this.generateTestCases(framework, this.parser.getFiles());
                 }
             } catch (final Exception e) {
                 System.out.println("Error: " + e.getMessage());

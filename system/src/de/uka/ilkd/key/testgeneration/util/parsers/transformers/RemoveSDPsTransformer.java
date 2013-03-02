@@ -12,7 +12,7 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
 
     public RemoveSDPsTransformer(final String separator) {
 
-        SEPARATOR = separator;
+        this.SEPARATOR = separator;
     }
 
     /**
@@ -28,18 +28,19 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        return transformTerm(term);
+        return this.transformTerm(term);
     }
 
     @Override
     protected Term transformSortDependentFunction(final Term term) {
 
         final ProgramElementName resolvedVariableName = new ProgramElementName(
-                AbstractTermParser.resolveIdentifierString(term, SEPARATOR));
+                AbstractTermParser
+                        .resolveIdentifierString(term, this.SEPARATOR));
 
         final LocationVariable resolvedVariable = new LocationVariable(
                 resolvedVariableName, term.sort());
 
-        return termFactory.createTerm(resolvedVariable);
+        return this.termFactory.createTerm(resolvedVariable);
     }
 }

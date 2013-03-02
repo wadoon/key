@@ -23,7 +23,7 @@ public enum NodeTestGenerator {
         /*
          * Get and process the method call node
          */
-        final IExecutionMethodCall methodCall = getMethodCallNode(node);
+        final IExecutionMethodCall methodCall = this.getMethodCallNode(node);
 
         final IProgramMethod method = methodCall.getProgramMethod();
         final KeYJavaType parent = method.getContainerType();
@@ -50,7 +50,7 @@ public enum NodeTestGenerator {
         if (node instanceof IExecutionMethodCall) {
             return (IExecutionMethodCall) node;
         } else {
-            return getMethodCallNode(node.getParent());
+            return this.getMethodCallNode(node.getParent());
         }
     }
 }

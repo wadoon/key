@@ -19,21 +19,21 @@ public enum OracleGenerator {
     private final String SEPARATOR = StringConstants.FIELD_SEPARATOR.toString();
 
     private final TermToOracleTransformer TERM_TO_ORACLE_TRANSFORMER = new TermToOracleTransformer(
-            SEPARATOR);
+            this.SEPARATOR);
 
-    public Term createOracleForMethod(KeYJavaMethod method)
+    public Term createOracleForMethod(final KeYJavaMethod method)
             throws OracleGeneratorException {
 
         try {
 
-            Term postCondition = method.getPostconditions().get(0);
+            final Term postCondition = method.getPostconditions().get(0);
             Term oracle;
 
-            oracle = TERM_TO_ORACLE_TRANSFORMER.transform(postCondition);
+            oracle = this.TERM_TO_ORACLE_TRANSFORMER.transform(postCondition);
 
             return oracle;
 
-        } catch (TermTransformerException e) {
+        } catch (final TermTransformerException e) {
 
             throw new OracleGeneratorException(e.getMessage());
         }

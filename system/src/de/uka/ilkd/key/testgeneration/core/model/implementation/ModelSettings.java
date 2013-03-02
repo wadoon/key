@@ -117,14 +117,6 @@ class DefaultSMTSettings implements SMTSettings {
 final class ModelSettings {
 
     /**
-     * The number of times to re-try solving an SMT problem in the event that
-     * "UNKNOWN" is returned, since this usually seems to point to an error
-     * during the execution of the solver, rather than the problem not being
-     * solveable.
-     */
-    private static final int NUMBER_OF_TRIES = 10;
-
-    /**
      * The default SMT settings to be used with an SMT solver used by
      * KeYTestGen.
      */
@@ -135,6 +127,14 @@ final class ModelSettings {
      */
     private static final Configuration DEFAULT_TRANSLATOR_CONFIGURATION = new Configuration(
             false, true);
+
+    /**
+     * The number of times to re-try solving an SMT problem in the event that
+     * "UNKNOWN" is returned, since this usually seems to point to an error
+     * during the execution of the solver, rather than the problem not being
+     * solveable.
+     */
+    private static final int NUMBER_OF_TRIES = 10;
 
     /**
      * @return the DEFAULT_SMT_SETTINGS constant, containing a default set of

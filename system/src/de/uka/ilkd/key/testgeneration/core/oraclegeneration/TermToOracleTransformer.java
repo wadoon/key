@@ -43,7 +43,8 @@ class TermToOracleTransformer extends AbstractTermTransformer {
         /*
          * Remove all SortDependingFunction instances from the Term.
          */
-        oracleTerm = new RemoveSDPsTransformer(separator).transform(oracleTerm);
+        oracleTerm = new RemoveSDPsTransformer(this.separator)
+                .transform(oracleTerm);
 
         /*
          * Order the operands of the term
@@ -53,7 +54,7 @@ class TermToOracleTransformer extends AbstractTermTransformer {
         /*
          * Do the transformation
          */
-        oracleTerm = transformTerm(oracleTerm);
+        oracleTerm = this.transformTerm(oracleTerm);
 
         /*
          * Put it into Conjunctive Normal Form
@@ -87,19 +88,20 @@ class TermToOracleTransformer extends AbstractTermTransformer {
     protected Term transformAnd(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = transformTerm(term.sub(0));
-        final Term secondChild = transformTerm(term.sub(1));
+        final Term firstChild = this.transformTerm(term.sub(0));
+        final Term secondChild = this.transformTerm(term.sub(1));
 
-        if (firstChild != null && secondChild == null) {
+        if ((firstChild != null) && (secondChild == null)) {
             return firstChild;
         }
 
-        if (firstChild == null && secondChild != null) {
+        if ((firstChild == null) && (secondChild != null)) {
             return secondChild;
         }
 
-        if (firstChild != null && secondChild != null) {
-            return termFactory.createTerm(Junctor.AND, firstChild, secondChild);
+        if ((firstChild != null) && (secondChild != null)) {
+            return this.termFactory.createTerm(Junctor.AND, firstChild,
+                    secondChild);
         }
 
         return null;
@@ -122,21 +124,21 @@ class TermToOracleTransformer extends AbstractTermTransformer {
         /*
          * Handle the special case where the child is the exception type.
          */
-        if (!isExceptionSort(term.sub(0))) {
+        if (!this.isExceptionSort(term.sub(0))) {
 
-            final Term firstChild = transformTerm(term.sub(0));
-            final Term secondChild = transformTerm(term.sub(1));
+            final Term firstChild = this.transformTerm(term.sub(0));
+            final Term secondChild = this.transformTerm(term.sub(1));
 
-            if (firstChild != null && secondChild == null) {
+            if ((firstChild != null) && (secondChild == null)) {
                 return firstChild;
             }
 
-            if (firstChild == null && secondChild != null) {
+            if ((firstChild == null) && (secondChild != null)) {
                 return secondChild;
             }
 
-            if (firstChild != null && secondChild != null) {
-                return termFactory.createTerm(term.op(), firstChild,
+            if ((firstChild != null) && (secondChild != null)) {
+                return this.termFactory.createTerm(term.op(), firstChild,
                         secondChild);
             }
         }
@@ -159,13 +161,13 @@ class TermToOracleTransformer extends AbstractTermTransformer {
     protected Term transformNot(final Term term)
             throws TermTransformerException {
 
-        final Term newChild = transformTerm(term.sub(0));
+        final Term newChild = this.transformTerm(term.sub(0));
 
         if (newChild == null) {
             return null;
         }
 
-        return termFactory.createTerm(Junctor.NOT, newChild);
+        return this.termFactory.createTerm(Junctor.NOT, newChild);
     }
 
     /**
@@ -189,19 +191,20 @@ class TermToOracleTransformer extends AbstractTermTransformer {
     @Override
     protected Term transformOr(final Term term) throws TermTransformerException {
 
-        final Term firstChild = transformTerm(term.sub(0));
-        final Term secondChild = transformTerm(term.sub(1));
+        final Term firstChild = this.transformTerm(term.sub(0));
+        final Term secondChild = this.transformTerm(term.sub(1));
 
-        if (firstChild != null && secondChild == null) {
+        if ((firstChild != null) && (secondChild == null)) {
             return firstChild;
         }
 
-        if (firstChild == null && secondChild != null) {
+        if ((firstChild == null) && (secondChild != null)) {
             return secondChild;
         }
 
-        if (firstChild != null && secondChild != null) {
-            return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
+        if ((firstChild != null) && (secondChild != null)) {
+            return this.termFactory.createTerm(Junctor.OR, firstChild,
+                    secondChild);
         }
 
         return null;

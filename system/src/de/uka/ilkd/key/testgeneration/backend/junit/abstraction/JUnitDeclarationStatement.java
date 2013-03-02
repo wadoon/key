@@ -20,14 +20,14 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 public class JUnitDeclarationStatement {
 
     /**
-     * The type for the variable.
-     */
-    private final String type;
-
-    /**
      * The identifier for the variable.
      */
     private final String identifier;
+
+    /**
+     * The type for the variable.
+     */
+    private final String type;
 
     /**
      * The instance pointed to.
@@ -35,8 +35,8 @@ public class JUnitDeclarationStatement {
     private final String value;
 
     public JUnitDeclarationStatement(final ModelVariable variable) {
-        type = variable.getType();
-        identifier = variable.getIdentifier();
+        this.type = variable.getType();
+        this.identifier = variable.getIdentifier();
 
         final Object value = variable.getValue();
         if (value instanceof ModelInstance) {
@@ -59,20 +59,20 @@ public class JUnitDeclarationStatement {
      * @return the identifier
      */
     public String getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 
     /**
      * @return the type
      */
     public String getType() {
-        return type;
+        return this.type;
     }
 
     /**
      * @return the value
      */
     public String getValue() {
-        return value;
+        return this.value;
     }
 }

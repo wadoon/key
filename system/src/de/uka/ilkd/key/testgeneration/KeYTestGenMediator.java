@@ -27,7 +27,7 @@ public class KeYTestGenMediator {
      * @return the mainClass
      */
     public KeYJavaClass getMainClass() {
-        return mainClass;
+        return this.mainClass;
     }
 
     /**

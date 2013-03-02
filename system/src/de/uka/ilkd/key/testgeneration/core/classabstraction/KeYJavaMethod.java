@@ -24,10 +24,12 @@ public class KeYJavaMethod {
     private final KeYJavaClass declaringClass;
 
     /**
-     * The {@link IProgramMethod} instance for this method, containing the
-     * KeY-specific data for it.
+     * A wrapper for the an instance of {@link FunctionalOperationContract}
+     * specific for this method. Through this contract, we can access the
+     * specifications for the method (i.e. mappings between preconditions and
+     * postconditions).
      */
-    private final IProgramMethod programMethod;
+    private final ContractWrapper functionalContract;
 
     /**
      * The {@link InitConfig} instance for the class which this method is part
@@ -36,12 +38,10 @@ public class KeYJavaMethod {
     private final InitConfig initConfig;
 
     /**
-     * A wrapper for the an instance of {@link FunctionalOperationContract}
-     * specific for this method. Through this contract, we can access the
-     * specifications for the method (i.e. mappings between preconditions and
-     * postconditions).
+     * The {@link IProgramMethod} instance for this method, containing the
+     * KeY-specific data for it.
      */
-    private final ContractWrapper functionalContract;
+    private final IProgramMethod programMethod;
 
     KeYJavaMethod(final KeYJavaClass declaringClass,
             final IProgramMethod programMethod, final InitConfig initConfig,
@@ -54,7 +54,7 @@ public class KeYJavaMethod {
     }
 
     public KeYJavaClass getDeclaringClass() {
-        return declaringClass;
+        return this.declaringClass;
     }
 
     /**
@@ -64,7 +64,7 @@ public class KeYJavaMethod {
      */
     public final InitConfig getInitConfig() {
 
-        return initConfig;
+        return this.initConfig;
     }
 
     /**
@@ -78,8 +78,8 @@ public class KeYJavaMethod {
          * TODO: This violates the abstraction in a very ugly way, is there no
          * nicer way to get the parameters?
          */
-        programMethod.getParameters();
-        return functionalContract.getParameters();
+        this.programMethod.getParameters();
+        return this.functionalContract.getParameters();
     }
 
     /**
@@ -89,7 +89,7 @@ public class KeYJavaMethod {
      */
     public List<Term> getPostconditions() {
 
-        return functionalContract.getPostconditions();
+        return this.functionalContract.getPostconditions();
     }
 
     /**
@@ -99,7 +99,7 @@ public class KeYJavaMethod {
      */
     public List<Term> getPreconditions() {
 
-        return functionalContract.getPreconditions();
+        return this.functionalContract.getPreconditions();
     }
 
     /**
@@ -109,7 +109,7 @@ public class KeYJavaMethod {
      */
     public IProgramMethod getProgramMethod() {
 
-        return programMethod;
+        return this.programMethod;
     }
 
     /**
@@ -117,6 +117,6 @@ public class KeYJavaMethod {
      */
     public String getReturnType() {
 
-        return programMethod.getReturnType().getName();
+        return this.programMethod.getReturnType().getName();
     }
 }
