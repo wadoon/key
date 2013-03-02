@@ -1,0 +1,148 @@
+package de.uka.ilkd.key.testgeneration.core.classabstraction;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.ContractWrapper;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
+import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
+import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
+
+/**
+ * Produces instances of {@link KeYJavaClass}.
+ * 
+ * @author christopher
+ */
+public enum KeYJavaClassFactory {
+    INSTANCE;
+
+    /**
+     * Interface to the KeY runtime.
+     */
+    private final KeYInterface keyInterface = KeYInterface.INSTANCE;
+
+    /**
+     * Manufactures an instance of {@link KeYJavaClass}.
+     * 
+     * @param absolutePath
+     *            path to the corresponding .java file on the local file system
+     * @return the {@link KeYJavaClass} instance
+     * @throws IOException
+     *             if the file could not be found or read
+     * @throws KeYInterfaceException
+     */
+    public KeYJavaClass createKeYJavaClass(final File javaFile)
+            throws IOException, KeYInterfaceException {
+
+        /*
+         * Load the file into KeY and get the InitConfig instance for it.
+         */
+        final InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
+
+        final Services services = initConfig.getServices();
+        final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+
+        /*
+         * Retrieve the KeYJavaType for the top level class declaration in this
+         * file
+         */
+        final String fileName = getFileName(javaFile);
+        final KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
+
+        /*
+         * Setup the class
+         */
+        final KeYJavaClass javaClass = new KeYJavaClass(mainClass);
+
+        /*
+         * Extract all methods declared in this class (including the ones
+         * provided in Java.lang.Object, even if these have not been
+         * overridden), and create name-value mappings for them. Exclude
+         * implicit methods (i.e. <create>, <init> etc).
+         */
+        for (final IProgramMethod method : javaInfo
+                .getAllProgramMethods(mainClass)) {
+            if (!method.getFullName().startsWith("<")) {
+
+                /*
+                 * Extract the operational contracts of the method, and create a
+                 * separate abstraction of the method for each one of them
+                 * (since each one will effectively represent a unique set of
+                 * restrictions on the invocation of the method).
+                 */
+                final List<ContractWrapper> contracts = getContracts(method,
+                        services);
+                for (final ContractWrapper contract : contracts) {
+
+                    final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(
+                            javaClass, method, initConfig, contract);
+
+                    javaClass.addMethodMapping(method.getFullName(),
+                            keYJavaMethod);
+                }
+            }
+        }
+
+        return javaClass;
+    }
+
+    /**
+     * Extracts the {@link FunctionalOperationContract} instances for a specific
+     * method. Such contracts represent the concrete specifications for the
+     * method, i.e. a mapping between a precondition (initial heapstate) and
+     * postcondition (postcondition).
+     * 
+     * @param methodCallNode
+     *            the symbolic execution node corresponding to the method call
+     * @return the contract for the method
+     * @throws OracleGeneratorException
+     *             failure to find a contract for the method is always
+     *             exceptional
+     */
+    private List<ContractWrapper> getContracts(final IProgramMethod method,
+            final Services services) {
+
+        final SpecificationRepository specificationRepository = services
+                .getSpecificationRepository();
+
+        /*
+         * Extract the abstract representation of the method itself, as well as
+         * the type of the class which contains it. Use this information in
+         * order to retrieve the specification contracts which exist for the
+         * method.
+         */
+        final KeYJavaType containerClass = method.getContainerType();
+        final List<ContractWrapper> contracts = new LinkedList<ContractWrapper>();
+        for (final FunctionalOperationContract contract : specificationRepository
+                .getOperationContracts(containerClass, method)) {
+            contracts.add(new ContractWrapper(
+                    (FunctionalOperationContractImpl) contract));
+        }
+
+        return contracts;
+    }
+
+    /**
+     * Strips the file extension from a file name
+     * 
+     * @param file
+     *            the file to process
+     * @return the name of the file
+     */
+    private String getFileName(final File file) {
+
+        final String name = file.getName();
+        final int delimiter = name.indexOf('.');
+        return name.substring(0, delimiter);
+    }
+}
