@@ -3,8 +3,8 @@ package de.uka.ilkd.key.testgeneration.backend.testNG;
 import java.util.List;
 
 import de.uka.ilkd.key.testgeneration.backend.IFrameworkConverter;
-import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
-import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
+import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestCase;
+import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
 
 /**
  * This singleton provides the functionality needed to produce test suites for

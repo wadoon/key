@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.testgeneration.backend;
 
-import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
+import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
 
 /**
  * Implementers of this interface are used in order to convert from the abstract

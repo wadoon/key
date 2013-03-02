@@ -3,7 +3,7 @@ package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
+import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
 
 /**
  * Represents a JUnit test suite. It consists of a set of {@link JUnitTestCase}

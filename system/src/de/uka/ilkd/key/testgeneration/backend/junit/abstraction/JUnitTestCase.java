@@ -2,8 +2,8 @@ package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
 
 import junit.framework.Assert;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.testgeneration.core.coreinterface.TestCase;
 import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerationTools;
+import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestCase;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
@@ -42,7 +42,7 @@ public class JUnitTestCase {
     public JUnitTestCase(final TestCase testCase) {
 
         assert testCase != null;
-        wrappedTestCase = wrappedTestCase;
+        this.wrappedTestCase = testCase;
     }
 
     /**

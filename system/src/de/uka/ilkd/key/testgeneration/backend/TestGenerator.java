@@ -5,10 +5,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.testgeneration.core.CoreInterface;
+import de.uka.ilkd.key.testgeneration.core.CoreException;
 import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
-import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterface;
-import de.uka.ilkd.key.testgeneration.core.coreinterface.CoreInterfaceException;
-import de.uka.ilkd.key.testgeneration.core.coreinterface.TestSuite;
+import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 /**
@@ -116,7 +116,7 @@ public enum TestGenerator {
             Benchmark.finishBenchmarking("5. Generate test suite (total time)");
             return convertedTestSuites;
 
-        } catch (final CoreInterfaceException e) {
+        } catch (final CoreException e) {
             throw new TestGeneratorException(e.getMessage());
         } catch (final FrameworkConverterException e) {
             throw new TestGeneratorException(e.getMessage());
