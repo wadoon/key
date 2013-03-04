@@ -9,14 +9,14 @@ import de.uka.ilkd.key.java.reference.MethodName;
 public class ABSAsyncMethodCall extends ABSNonTerminalProgramElement implements
         IABSMethodReference, IABSExpression, IABSStatement {
 
-    private final IABSPureExpression caller;
+    private final IABSPureExpression callee;
     private final MethodName methodName;
     private final IABSPureExpression[] arguments;
 
-    public ABSAsyncMethodCall(IABSPureExpression caller,
+    public ABSAsyncMethodCall(IABSPureExpression callee,
             MethodName methodName, IABSPureExpression[] arguments) {
         super();
-        this.caller = caller;
+        this.callee = callee;
         this.methodName = methodName;
         this.arguments = arguments == null ? new IABSPureExpression[0]
                 : arguments;
@@ -31,7 +31,7 @@ public class ABSAsyncMethodCall extends ABSNonTerminalProgramElement implements
     public ProgramElement getChildAt(int index) {
         switch (index) {
         case 0:
-            return caller;
+            return callee;
         case 1:
             return methodName;
         default:
@@ -55,7 +55,7 @@ public class ABSAsyncMethodCall extends ABSNonTerminalProgramElement implements
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(caller).append("!").append(methodName).append("(");
+        sb.append(callee).append("!").append(methodName).append("(");
 
         for (int i = 0; i < arguments.length; i++) {
             sb.append(arguments[i]);

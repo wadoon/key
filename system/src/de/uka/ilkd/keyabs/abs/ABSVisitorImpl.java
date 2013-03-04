@@ -230,4 +230,10 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     public void performActionOnABSMinusExp(ABSMinusExp x) {
         doDefaultAction(x);
     }
+    
+    @Override
+    public void performActionOnABSFnApp(ABSFnApp x) {
+        doDefaultAction(x);
+    }
+
 }

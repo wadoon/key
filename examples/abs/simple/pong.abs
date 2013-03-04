@@ -1,7 +1,7 @@
 /*
  *
  */
-module MyModule;
+module Pong;
 export *;
 
 interface Variable {

@@ -461,5 +461,25 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             addChild(x);
         }
     }
+    
+    @Override
+    public void performActionOnABSFnApp(ABSFnApp x) {
+	if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            ProgramElementName fctName = children
+                    .removeFirstOccurrence(ProgramElementName.class);
+
+            IABSPureExpression[] arguments = new IABSPureExpression[children
+                    .size()];
+            for (int i = 0; i < children.size(); i++) {
+                arguments[i] = (IABSPureExpression) children.get(i);
+            }
+            addNewChild(new ABSFnApp(fctName, arguments));
+        } else {
+            addChild(x);
+        }
+    }
+
 
 }

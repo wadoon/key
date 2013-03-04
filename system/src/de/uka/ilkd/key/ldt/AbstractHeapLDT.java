@@ -28,7 +28,6 @@ public abstract class AbstractHeapLDT extends LDT implements IHeapLDT {
     public static final Name NAME = new Name("Heap");    
     
     public static final Name SELECT_NAME = new Name("select");
-    public static final Name STORE_NAME = new Name("store");
     public static final Name BASE_HEAP_NAME = new Name("heap");
     
     //null

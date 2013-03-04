@@ -18,8 +18,10 @@ public class ABSReader implements JavaReader {
     private static final String CONCRETE_MODULE = "module "
             + CONCRETE_MODULE_NAME + ";";
 
-    public ABSReader() {
-	
+    public String mainModuleName;
+
+    public ABSReader(String mainModuleName) {
+	    this.mainModuleName = mainModuleName;
     }
     
     @Override
@@ -30,7 +32,8 @@ public class ABSReader implements JavaReader {
     @Override
     public JavaBlock readBlockWithProgramVariables(
             Namespace<IProgramVariable> varns, IServices services, String s) {
-        String blockStr = CONCRETE_MODULE + "\n import * from MyModule; " + s;
+        String blockStr = CONCRETE_MODULE;
+        blockStr += mainModuleName != null ? "\n import * from " + mainModuleName + ";\n " + s : "";
         try {
             Model m = ((ABSServices) services).getProgramInfo().parseInContext(
                     blockStr);
@@ -50,8 +53,8 @@ public class ABSReader implements JavaReader {
             }
             System.out.println(module.getBlock() + " Errors: " + m.getErrors());
             */
-            AbstractABS2KeYABSConverter converter = new ConcreteABS2KeYABSConverter(
-                    varns, services);
+            final AbstractABS2KeYABSConverter converter =
+                    new ConcreteABS2KeYABSConverter(varns, services);
 
             ABSStatementBlock block = converter.convert(module.getBlock());
 

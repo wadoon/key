@@ -63,4 +63,6 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnABSAwaitClaimStatement(ABSAwaitClaimStatement x);
 
+    void performActionOnABSFnApp(ABSFnApp x);
+
 }

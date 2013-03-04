@@ -22,9 +22,9 @@ public class SortBuilder {
 
     // type names of the integer and boolean type in ABS
     public static final Name ABS_ANY_INTERFACE_SORT_NAME = new Name("ABSAnyInterface");
-    public static final Name ABS_BOOLEAN_TYPE_NAME = new Name("ABS.StdLib.Bool");
-    public static final Name ABS_INT_TYPE_NAME = new Name("ABS.StdLib.Int");
-    public static final Name ABS_FUTURE_TYPE_NAME = new Name("ABS.StdLib.Fut");
+    public static final Name ABS_BOOLEAN_TYPE_NAME       = new Name("ABS.StdLib.Bool");
+    public static final Name ABS_INT_TYPE_NAME           = new Name("ABS.StdLib.Int");
+    public static final Name ABS_FUTURE_TYPE_NAME        = new Name("ABS.StdLib.Fut");
 
     private static Sort checkBuiltInType(ABSServices services,
             Name dataType) {
@@ -99,7 +99,8 @@ public class SortBuilder {
         }
 
         // create and register sorts and KeYJavaTypes
-        final Entry<Name, InterfaceDecl>[] interfaces = sortInterfacesAscendingInNumberOfExtendedTypes(absModelInfo
+        final Entry<Name, InterfaceDecl>[] interfaces =
+                sortInterfacesAscendingInNumberOfExtendedTypes(absModelInfo
                 .getInterfaces());
 
         final HashMap<Name, KeYJavaType> names2type = new HashMap<Name, KeYJavaType>();

@@ -68,6 +68,8 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((MinusExp) x);
         } else if (x instanceof AwaitStmt) {
             result = convert((AwaitStmt) x);            
+        } else if (x instanceof FnApp) {
+            result = convert((FnApp)x);
         }
 
         if (result == null) {
@@ -243,6 +245,19 @@ public abstract class AbstractABS2KeYABSConverter {
         return new ABSIntLiteral(new BigInteger(x.getContent()));
     }
 
+    public ABSFnApp convert(FnApp x) {
+        ProgramElementName methodName = new ProgramElementName(x.getName());
+        IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
+
+        int i = 0;
+        for (PureExp arg : x.getParamList()) {
+            arguments[i] = (IABSPureExpression) convert(arg);
+            i++;
+        }
+        return new ABSFnApp(methodName, arguments);
+    }
+
+    
     public IABSPureExpression convert(MinusExp x) {
         if (x.getChild(0) instanceof IntLiteral) {
             return new ABSIntLiteral(new BigInteger("-"

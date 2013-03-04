@@ -108,6 +108,7 @@ options {
     private HashSet usedChoiceCategories = new HashSet();
     private HashMap taclet2Builder;
     private KeYExceptionHandler keh = null;
+    private String module;
 
     // these variables are set if a file is read in step by
     // step. This used when reading in LDTs because of cyclic
@@ -839,7 +840,7 @@ options {
                     parserConfig.namespaces());*/
                 ((SchemaJavaReader)jr).setSVNamespace(variables());
             } else {
-                jr = new ABSReader();
+                jr = new ABSReader(module);
             }
             if (inSchemaMode() || isGlobalDeclTermParser()) {
                 sjb.javaBlock = jr.readBlockWithEmptyContext(s, getServices());
@@ -3727,6 +3728,9 @@ problem returns [ Term a = null ]
         stlist = classPaths 
 
         string = javaSource
+
+        module = mainModule
+
         decls
         { 
             if(parse_includes || onlyWith) return null;
@@ -3806,6 +3810,13 @@ javaSource returns [String result = null]
 :
    (JAVASOURCE 
       result = oneJavaSource
+    SEMI)?
+    ;
+
+mainModule returns [String result = null]
+:
+   (MAINMODULE
+      result = string_literal
     SEMI)?
     ;
 

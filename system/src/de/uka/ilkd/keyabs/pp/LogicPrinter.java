@@ -95,6 +95,7 @@ import de.uka.ilkd.keyabs.abs.CopyAssignment;
 import de.uka.ilkd.keyabs.abs.ThisExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
 import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
 import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
@@ -2062,6 +2063,18 @@ public final class LogicPrinter implements ILogicPrinter {
         }
         layouter.print(";").brk(1);
         layouter.ind().end();
+    }
+
+    public void printABSFnApp(ABSFnApp x) throws IOException {
+        x.getChildAt(0).visit(programPrettyPrinter);
+        layouter.beginC(0).print("(");
+        for (int i = 0; i < x.getArgumentCount(); i++) {
+            if (i != 0)
+                layouter.print(",").brk(1);
+            x.getArgumentAt(i).visit(programPrettyPrinter);
+        }
+        layouter.print(")").end();
+
     }
 
 }

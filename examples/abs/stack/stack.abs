@@ -1,0 +1,25 @@
+/*
+ *
+ */
+module MyModule;
+export *;
+
+interface Stack {
+    Unit push(Int i);
+    Int pop();
+}
+
+class StackImpl implements Stack {
+    List<Int> content;
+
+    Unit push(Int item) {
+       content=append(content, item);
+    }
+
+    Int pop() {
+    	return head(content);
+    }
+
+}
+
+{ }

@@ -166,6 +166,9 @@ tokens {
         LOCSET = "\\locset";
         SEQ = "\\seq";
         BIGINT = "\\bigint";
+
+
+        MAINMODULE= "\\module";
 }
 
 {

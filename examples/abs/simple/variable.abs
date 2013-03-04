@@ -1,7 +1,7 @@
 /*
  *
  */
-module MyModule;
+module VariableModule;
 export *;
 
 interface Variable {

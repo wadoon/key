@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="absfrontend">
+    <CLASSES>
+      <root url="jar://$key_lib$/absfrontend.jar!/" />
+      <root url="jar://$key_lib$/antlr.jar!/" />
+      <root url="jar://$key_lib$/javacc.jar!/" />
+      <root url="jar://$key_lib$/junit.jar!/" />
+      <root url="jar://$key_lib$/recoderKey.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$key_lib$/absfrontend.jar!/" />
+    </SOURCES>
+  </library>
+</component>

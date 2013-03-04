@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="file://antlr.jar" />
+    <libelement value="file://junit.jar" />
+    <libelement value="file://log4j.jar" />
+    <libelement value="file://recoderKey.jar" />
+    <src_description expected_position="0" />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/bin" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library" exported="">
+      <library name="antlr.jar">
+        <CLASSES>
+          <root url="file://antlr.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="junit.jar">
+        <CLASSES>
+          <root url="file://junit.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="log4j.jar">
+        <CLASSES>
+          <root url="file://log4j.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="recoderKey.jar">
+        <CLASSES>
+          <root url="file://recoderKey.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="library" name="ECLIPSE" level="application" />
+  </component>
+</module>
+

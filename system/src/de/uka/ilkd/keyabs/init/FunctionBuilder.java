@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.ABSInfo;
 import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 public class FunctionBuilder {
@@ -31,6 +32,8 @@ public class FunctionBuilder {
         final ABSInfo info = services.getProgramInfo();
         final HistoryLDT historyLDT = services.getTypeConverter()
                 .getHistoryLDT();
+        final HeapLDT heapLDT = services.getTypeConverter()
+                .getHeapLDT();
 
         final Namespace<SortedOperator> funcNS = initConfig.getServices()
                 .getNamespaces().functions();
@@ -76,10 +79,10 @@ public class FunctionBuilder {
         for (ClassDecl clDecl : info.getABSParserInfo().getClasses().values()) {
             for (FieldDecl  field : clDecl.getFields()) {
         	Name fieldName = new ProgramElementName(field.getName(), clDecl.qualifiedName());
-        	Function methodLabel = new Function(fieldName,
-        		historyLDT.getMethodLabelSort(), new Sort[0], null, true);
-        	funcNS.add(methodLabel);
-                System.out.println("Register Method Label Constant " + methodLabel);
+        	Function fieldFct = new Function(fieldName,
+        		heapLDT.getFieldSort(), new Sort[0], null, true);
+        	funcNS.add(fieldFct);
+                System.out.println("Register Field Constant " + fieldFct);
             }
         }
 

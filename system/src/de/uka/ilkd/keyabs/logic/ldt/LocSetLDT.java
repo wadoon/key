@@ -31,9 +31,9 @@ import de.uka.ilkd.key.util.ExtList;
 
 
 public final class LocSetLDT extends LDT {
-    
-    public static final Name NAME = new Name("LocSet");    
-       
+
+    public static final Name NAME = new Name("LocSet");
+
     private final Function empty;
     private final Function allLocs;
     private final Function singleton;
@@ -45,11 +45,11 @@ public final class LocSetLDT extends LDT {
     private final Function allObjects;
     private final Function elementOf;
     private final Function subset;
-    private final Function disjoint;    
-    
-    
+    private final Function disjoint;
+
+
     public LocSetLDT(IServices services) {
-	super(NAME, services);
+        super(NAME, services);
         empty	         = addFunction(services, "empty");
         allLocs          = addFunction(services, "allLocs");
         singleton        = addFunction(services, "singleton");
@@ -63,146 +63,146 @@ public final class LocSetLDT extends LDT {
         subset           = addFunction(services, "subset");
         disjoint         = addFunction(services, "disjoint");
     }
-    
-    
+
+
     public Function getEmpty() {
-	return empty;
+        return empty;
     }
-    
-    
+
+
     public Function getAllLocs() {
-	return allLocs;
+        return allLocs;
     }
-    
-    
+
+
     public Function getSingleton() {
-	return singleton;
+        return singleton;
     }
-    
-    
+
+
     public Function getUnion() {
-	return union;
+        return union;
     }
-    
-    
+
+
     public Function getIntersect() {
-	return intersect;
+        return intersect;
     }
-    
-    
+
+
     public Function getSetMinus() {
-	return setMinus;
+        return setMinus;
     }
-    
-    
+
+
     public Function getInfiniteUnion() {
-	return infiniteUnion;
+        return infiniteUnion;
     }
-    
-    
+
+
     public Function getAllFields() {
-	return allFields;
+        return allFields;
     }
-    
-    
+
+
     public Function getAllObjects() {
-	return allObjects;
-    }    
+        return allObjects;
+    }
 
-    
+
     public Function getElementOf() {
-	return elementOf;
+        return elementOf;
     }
-    
-    
+
+
     public Function getSubset() {
-	return subset;
+        return subset;
     }
-    
-    
+
+
     public Function getDisjoint() {
-	return disjoint;
+        return disjoint;
     }
-    
-    
+
+
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                                 Term[] subs, 
-                                 Services services, 
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
+                                 Term[] subs,
+                                 Services services,
                                  ExecutionContext ec) {
-	return isResponsible(op, (Term)null, services, ec);
-    }
-    
-
-    @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                		 Term left, 
-                		 Term right, 
-                		 Services services, 
-                		 ExecutionContext ec) {
-	return false;
+        return isResponsible(op, (Term)null, services, ec);
     }
 
-    
+
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	    			 Term sub, 
-	    			 IServices services, 
-	    			 ExecutionContext ec) {
-	return op instanceof Singleton
-	       || op instanceof SetUnion
-	       || op instanceof Intersect 
-	       || op instanceof SetMinus
-	       || op instanceof AllFields;
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
+                                 Term left,
+                                 Term right,
+                                 Services services,
+                                 ExecutionContext ec) {
+        return false;
+    }
+
+
+    @Override
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
+                                 Term sub,
+                                 IServices services,
+                                 ExecutionContext ec) {
+        return op instanceof Singleton
+                || op instanceof SetUnion
+                || op instanceof Intersect
+                || op instanceof SetMinus
+                || op instanceof AllFields;
     }
 
 
     @Override
     public Term translateLiteral(Literal lit, IServices services) {
-	assert lit instanceof EmptySetLiteral;
-	return JavaProfile.DF().func(empty);
+        assert lit instanceof EmptySetLiteral;
+        return JavaProfile.DF().func(empty);
     }
-    
+
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
-	    			   Services serv, 
-	    			   ExecutionContext ec) {
-	if(op instanceof Singleton) {
-	    return singleton;
-	} else if(op instanceof SetUnion) {
-	    return union;
-	} else if(op instanceof Intersect) {
-	    return intersect;
-	} else if(op instanceof SetMinus) {
-	    return setMinus;
-	} else if(op instanceof AllFields) {
-	    return allFields;
-	}
-	assert false;
-	return null;
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+                                   Services serv,
+                                   ExecutionContext ec) {
+        if(op instanceof Singleton) {
+            return singleton;
+        } else if(op instanceof SetUnion) {
+            return union;
+        } else if(op instanceof Intersect) {
+            return intersect;
+        } else if(op instanceof SetMinus) {
+            return setMinus;
+        } else if(op instanceof AllFields) {
+            return allFields;
+        }
+        assert false;
+        return null;
     }
 
-    
+
     @Override
     public boolean hasLiteralFunction(Function f) {
-	return f.equals(empty);
+        return f.equals(empty);
     }
 
-    
+
     @Override
     public Expression translateTerm(Term t, ExtList children) {
-	if(t.op().equals(empty)) {
-	    return EmptySetLiteral.INSTANCE;
-	}
-	assert false;
-	return null;
+        if(t.op().equals(empty)) {
+            return EmptySetLiteral.INSTANCE;
+        }
+        assert false;
+        return null;
     }
-    
-    
+
+
     @Override
     public final Type getType(Term t) {
-	assert false;
-	return null;
-    }    
+        assert false;
+        return null;
+    }
 }

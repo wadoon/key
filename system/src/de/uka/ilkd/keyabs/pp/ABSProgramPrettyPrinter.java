@@ -320,4 +320,14 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
         }
     }
 
+    @Override
+    public void performActionOnABSFnApp(ABSFnApp x) {
+        try {
+            lp.printABSFnApp(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
 }
