@@ -118,7 +118,7 @@ public final class JavaInfo {
     private int sortCachedSize = 0;
     
     /**
-     * The default execution context is for the case of program statements on
+     * The default execution context is for the case of program assertions on
      * the top level. It is equivalent to a static class belonging the default 
      * package. This should only be used when using KeY in academic mode, if
      * the verification conditions are generated they "must" start with a 
@@ -1039,7 +1039,7 @@ public final class JavaInfo {
         }
                 
         
-        // the assert statements below are not for fun, some methods rely 
+        // the assert assertions below are not for fun, some methods rely 
         // on the correct order
         ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSubtypes(type);                
         assert !hierarchy.contains(type);

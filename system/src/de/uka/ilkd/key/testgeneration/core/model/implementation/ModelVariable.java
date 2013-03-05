@@ -93,7 +93,7 @@ public class ModelVariable {
     }
 
     /**
-     * Since we are working with unique Java statements, two
+     * Since we are working with unique Java assertions, two
      * {@link ModelVariable} instances are equal iff. their paths are identical.
      */
     @Override

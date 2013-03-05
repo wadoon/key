@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 public class TestDeclarationProgramVariableCollector  extends TestCase {
 
-    // some non sense java blocks with lots of statements and expressions
+    // some non sense java blocks with lots of assertions and expressions
     private static String[] jblocks=new String[]{
 	"{ int j1 = 0; int j2, j3, j4 = 0;}",
 	"{ int j1; { int j2; } { int j3; } for (int j4; j4=0; j4++) {} int j5; }",

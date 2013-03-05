@@ -230,7 +230,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     }
 
     /**
-     * method-call-statements are expanded to method-frames
+     * method-call-assertions are expanded to method-frames
      */
     public MethodFrame convert(de.uka.ilkd.key.java.recoderext.RMethodCallStatement l) {
         ProgramVariableSVWrapper svw = l.getVariableSV();
@@ -241,7 +241,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     }
 
     /**
-     * translate method body statements.
+     * translate method body assertions.
      */
     public MethodBodyStatement convert(
             de.uka.ilkd.key.java.recoderext.RMethodBodyStatement l) {

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oraclegeneration;
+package de.uka.ilkd.key.testgeneration.core.oracle.generator;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.StringConstants;

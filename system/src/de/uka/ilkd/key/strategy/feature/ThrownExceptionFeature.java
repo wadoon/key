@@ -42,7 +42,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
     private final Sort[] filteredExceptions;
 
     /**
-     * creates a feature filtering first active throw statements where the
+     * creates a feature filtering first active throw assertions where the
      * thrown exception is of one of the given types (or their subtypes)
      * 
      * @param p_filteredExceptions

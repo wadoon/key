@@ -103,7 +103,7 @@ public class DelayedCutProcessor implements Runnable {
         for(DelayedCutListener listener : listeners){
             listener.eventCutting();
         }
-         // do not change the order of the following two statements!
+         // do not change the order of the following two assertions!
          RuleApp firstAppliedRuleApp = node.getAppliedRuleApp(); 
          ImmutableList<Node> subtrees = proof.pruneProof(node,false);
          

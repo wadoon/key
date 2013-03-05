@@ -11,7 +11,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.oracle.generator.OracleGeneratorException;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.XMLVisitorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 

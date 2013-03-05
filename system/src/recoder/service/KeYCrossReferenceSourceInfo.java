@@ -197,7 +197,7 @@ public class KeYCrossReferenceSourceInfo
             if (ecs != null) {
                 return ecs;
             } else {
-                // must not resolve! qualifying enum constant in case-statements is forbidden!
+                // must not resolve! qualifying enum constant in case-assertions is forbidden!
                 return null;
             }
         }
@@ -215,7 +215,7 @@ public class KeYCrossReferenceSourceInfo
             if (vs != null) {
                 return vs;
             } else {
-                // must not resolve! qualifying enum constant in case-statements is forbidden!
+                // must not resolve! qualifying enum constant in case-assertions is forbidden!
                 return null;
             }
         }

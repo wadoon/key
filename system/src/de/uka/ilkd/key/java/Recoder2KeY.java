@@ -657,7 +657,7 @@ public class Recoder2KeY implements JavaReader {
      * Method bodies are set to null, i.e. all methods are stubs only
      * 
      * TODO remove jml-model methods (or similar) also?
-     * FIXME this does not work if jml set statements are last in a method
+     * FIXME this does not work if jml set assertions are last in a method
      * TODO leave it out all together?
      */
     private void removeCodeFromClasses(CompilationUnit rcu, boolean allowed) {

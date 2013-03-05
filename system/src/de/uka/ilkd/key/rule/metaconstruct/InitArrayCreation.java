@@ -82,16 +82,16 @@ public class InitArrayCreation extends InitArray {
 
 
     /**
-     * creates statements for
+     * creates assertions for
      *   <ol>
      *     <li> evaluation of the dimension expressions, <li>
      *     <li> check if a dimension is non-negative </li>
      *  </ol>
-     * and adds them to given list of statements. Further more the new
+     * and adds them to given list of assertions. Further more the new
      * declared program variables initialised with the evaluated
      * dimension expressions are returned
-     * @param bodyStmnts the LinkedList of statements where the new
-     * statements are inserted
+     * @param bodyStmnts the LinkedList of assertions where the new
+     * assertions are inserted
      * @param dimExpr the ArrayOf<Expression> which describe the array's
      * dimensions
      * @param services the Services object

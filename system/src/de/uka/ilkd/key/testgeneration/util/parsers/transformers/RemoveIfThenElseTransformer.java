@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 
 /**
- * A Transformer which removes {@link IfThenElse} statements from a Term,
+ * A Transformer which removes {@link IfThenElse} assertions from a Term,
  * replacing them with a semantically equivalent conjunction of conditions.
  * 
  * @author christopher
@@ -121,9 +121,9 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
     }
 
     /**
-     * If-then-else statements can be simplified only in the event that we
+     * If-then-else assertions can be simplified only in the event that we
      * understand what their expected outcome is, from KeYs perspective. For
-     * now, the only way I can see to do this is via equals statements.
+     * now, the only way I can see to do this is via equals assertions.
      */
     @Override
     protected Term transformEquals(final Term term)

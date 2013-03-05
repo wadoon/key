@@ -108,8 +108,8 @@ public class Catch extends BranchImp implements ParameterContainer,
     }
 
     /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+     *      Get the number of assertions in this container.
+     *      @return the number of assertions.
      */
     public int getStatementCount() {
         return (body != null) ? 1 : 0;

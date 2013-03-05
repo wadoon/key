@@ -33,7 +33,7 @@ public class StatementCoverageParser implements ICodeCoverageParser {
         /*
          * Due to the way symbolic execution trees are implemented (do not
          * confuse them with standard execution trees), simply gathering all
-         * return statements should guarantee full statement coverage. See
+         * return assertions should guarantee full statement coverage. See
          * separate proof.
          */
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(

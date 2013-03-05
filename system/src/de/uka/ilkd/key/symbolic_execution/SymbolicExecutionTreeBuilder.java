@@ -64,7 +64,7 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
  * </p>
  * <p>
  * A symbolic execution tree consists of {@link IExecutionNode}s which 
- * represents the executed statements and other Java constructs. The root
+ * represents the executed assertions and other Java constructs. The root
  * of a symbolic execution tree is an {@link IExecutionStartNode} which is
  * available via {@link #getProof()}.
  * </p>
@@ -192,7 +192,7 @@ public class SymbolicExecutionTreeBuilder {
     * initial {@link Sequent} contains {@link MethodFrame}s in its modality.
     * </p>
     * <p>
-    * This is required because if a block of statements is executed instead
+    * This is required because if a block of assertions is executed instead
     * of a method the initial {@link Sequent} contains also a {@link MethodFrame}.
     * This initial {@link MethodFrame} is required to simulate an execution
     * context which is required to access class members.

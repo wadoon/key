@@ -13,7 +13,7 @@ import java.util.List;
 public class JUnitFixture {
 
     /**
-     * The assignment statements
+     * The assignment assertions
      */
     private final List<JUnitAssignmentStatement> assignments = new LinkedList<JUnitAssignmentStatement>();
 

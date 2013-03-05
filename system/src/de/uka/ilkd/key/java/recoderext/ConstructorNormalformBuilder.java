@@ -76,7 +76,7 @@ public class ConstructorNormalformBuilder
 
 
     /**
-     * The list of statements is the smallest list that contains a copy
+     * The list of assertions is the smallest list that contains a copy
      * assignment for each instance field initializer of class cd,
      * e.g. <code> i = 0; </code> for <code> public int i = 0; </code> or
      * a reference to the private method

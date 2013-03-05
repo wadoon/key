@@ -57,7 +57,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    /**
     * Stores for each {@link Node} which is a symbolic execution tree node the computed result
     * of {@link #isGoalAllowed(int, long, Proof, IGoalChooser, long, int, Goal)} to make
-    * sure that it is only computed once and that the number of executed set statements is
+    * sure that it is only computed once and that the number of executed set assertions is
     * not increased multiple times for the same {@link Node}.
     */
    private Map<Node, Boolean> goalAllowedResultPerSetNode = new HashMap<Node, Boolean>();

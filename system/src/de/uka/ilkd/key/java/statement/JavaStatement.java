@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- *    Default implementation for non-terminal Java statements.
+ *    Default implementation for non-terminal Java assertions.
  *    @author <TT>AutoDoc</TT>
  */
 

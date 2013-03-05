@@ -143,7 +143,7 @@ public class TestMatchTaclet extends TestCase {
 	SchemaVariable sv = TacletForTests.svLookup("#stmnt_list");
 	assertTrue("Expected list of statement to be instantiated.",
 		   svi.getInstantiations().isInstantiated(sv));
-	assertTrue("The three statements behind the break should be matched.",
+	assertTrue("The three assertions behind the break should be matched.",
 		   ((ImmutableArray<? extends ProgramElement>)svi.getInstantiations().getInstantiation(sv)).size() == 3);
     }
 

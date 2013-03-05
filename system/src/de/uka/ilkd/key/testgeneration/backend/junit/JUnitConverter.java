@@ -100,7 +100,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
             /**
              * Recursively unwind the buffer, turning the order of encoded
-             * statements and identifiers into a semantically equivalent Java
+             * assertions and identifiers into a semantically equivalent Java
              * statement.
              * 
              * @return
@@ -406,7 +406,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             testSuite.getMethod();
 
             /*
-             * Collect the import statements
+             * Collect the import assertions
              */
             final List<ModelInstance> instances = this
                     .collectInstances(testCases);

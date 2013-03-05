@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.ExtList;
 
-/** Miscellaneous static methods related to Java blocks or statements in KeY.
+/** Miscellaneous static methods related to Java blocks or assertions in KeY.
  * Mostly moved from key.util.MiscTools here.
  * @author bruns
  *

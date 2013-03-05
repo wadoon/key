@@ -10,7 +10,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * This class is used to parse function applications with JavaDL escapes within
- * set statements or similar situations.
+ * set assertions or similar situations.
  * 
  * 
  * @author Mattias Ulbrich

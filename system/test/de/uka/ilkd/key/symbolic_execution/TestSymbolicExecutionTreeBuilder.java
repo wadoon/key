@@ -1010,14 +1010,14 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/statements
+    * Tests example: examples/_testcase/set/assertions
     */
    public void testStatements() throws Exception {
       doTest(keyRepDirectory, 
-             "examples/_testcase/set/statements/test/FlatSteps.java", 
+             "examples/_testcase/set/assertions/test/FlatSteps.java", 
              "FlatSteps", 
              "doSomething", 
-             "examples/_testcase/set/statements/oracle/FlatSteps.xml",
+             "examples/_testcase/set/assertions/oracle/FlatSteps.xml",
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,

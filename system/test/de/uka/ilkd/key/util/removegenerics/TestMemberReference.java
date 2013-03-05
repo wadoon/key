@@ -74,7 +74,7 @@ public class TestMemberReference extends ResolveGenericClassTest {
     }
 
     /*
-     * expression statements may not be casted!
+     * expression assertions may not be casted!
      */
     public void testExpressionStatement() throws Exception {
         String before = "class T { void m() { G<B> g = new G<B>(); g.m(); g.m();} }";

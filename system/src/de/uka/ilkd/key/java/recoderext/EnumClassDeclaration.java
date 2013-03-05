@@ -34,7 +34,7 @@ import recoder.list.generic.ASTList;
  * {@link EnumDeclaration} to an EnumClassDeclaration by
  * <ul>
  * <li>adding static fields for the enum constants
- * <li>adding statements in constructors
+ * <li>adding assertions in constructors
  * <li>adding static fields for names and ordinals
  * <li>adding the methods as specified in the JLS 8.9
  * <li>adding "extends Enum" to the ClassDeclaration

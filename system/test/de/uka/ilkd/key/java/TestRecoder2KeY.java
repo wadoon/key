@@ -43,7 +43,7 @@ public class TestRecoder2KeY extends TestCase {
 
     private static Recoder2KeY c2k;
 
-    // some non sense java blocks with lots of statements and expressions
+    // some non sense java blocks with lots of assertions and expressions
     private static String[] jblocks = new String[] {
 	"{int j=7; int i;\n i=1; byte d=0; short f=1; long l=123; \n "
 	+"for (i=0, j=1; (i<42) && (i>0); i++, j--)\n"

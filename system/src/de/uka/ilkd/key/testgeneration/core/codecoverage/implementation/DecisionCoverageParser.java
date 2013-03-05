@@ -17,7 +17,7 @@ public class DecisionCoverageParser implements ICodeCoverageParser {
      * <p>
      * Decision Coverage for a test suite T over a program P is satisfied iff.
      * the execution of each test case t in T will cause each branching
-     * statement in the code (such as if...else statements and the like) to
+     * statement in the code (such as if...else assertions and the like) to
      * evaluate at least once to true, and at least once to false.
      * <p>
      * To illustrate this, consider the following:

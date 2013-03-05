@@ -102,7 +102,7 @@ public class ConstructorCall extends ProgramTransformer {
     }
 
     /**
-     * returns a sequence of statements modelling the Java constructor call semantics explicitly 
+     * returns a sequence of assertions modelling the Java constructor call semantics explicitly 
      */
     protected List<Statement> constructorCallSequence(
             final New constructorReference, final KeYJavaType classType,
@@ -154,7 +154,7 @@ public class ConstructorCall extends ProgramTransformer {
 	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null, 
                new ImmutableArray<Expression>(argumentVariables)); 
 	
-        //   the assignment statements + the method body statement + <allocateArea> for memory areas  
+        //   the assignment assertions + the method body statement + <allocateArea> for memory areas  
 	final ArrayList<Statement> stmnts = new ArrayList<Statement>();
 
 	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {

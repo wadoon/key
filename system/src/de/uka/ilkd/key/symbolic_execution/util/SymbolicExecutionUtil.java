@@ -964,7 +964,7 @@ public final class SymbolicExecutionUtil {
       return ruleApp != null && // Do not handle the open goal node which has no applied rule
              posInfo != null && 
              posInfo.getEndPosition() != Position.UNDEFINED &&
-             posInfo.getEndPosition().getLine() >= 0;  // Filter out statements where source code is missing.
+             posInfo.getEndPosition().getLine() >= 0;  // Filter out assertions where source code is missing.
    }
    
    /**

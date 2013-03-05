@@ -52,7 +52,7 @@ public class Default extends BranchImp {
     * Constructor for the transformation of COMPOST ASTs to KeY.
     * @param children the children of this AST element as KeY classes.
     * May contain: 	Comments,
-    * 		        several of Statement (as the statements for Default)
+    * 		        several of Statement (as the assertions for Default)
     */ 
     public Default(ExtList children) {
 	super(children);
@@ -89,8 +89,8 @@ public class Default extends BranchImp {
     }
 
     /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+     *      Get the number of assertions in this container.
+     *      @return the number of assertions.
      */
     public int getStatementCount() {
         return (body != null) ? body.size() : 0;

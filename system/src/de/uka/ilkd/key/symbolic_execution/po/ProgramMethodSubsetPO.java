@@ -33,14 +33,14 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * <p>
- * This proof obligation executes selected statements of the body
- * of a given {@link IProgramMethod}. The statements are selected by its
- * source location. All statements which ends in the given source range
+ * This proof obligation executes selected assertions of the body
+ * of a given {@link IProgramMethod}. The assertions are selected by its
+ * source location. All assertions which ends in the given source range
  * ]{@code startPosition}, {@code endPosition}] are executed.
  * </p>
  * <p>
- * To select statements by its end position is required, because KeY's recorder
- * includes also leading space and leading comments into a statements position. 
+ * To select assertions by its end position is required, because KeY's recorder
+ * includes also leading space and leading comments into a assertions position. 
  * Another drawback is that the end position of the previous statement is 
  * exactly the start position of the following statement.
  * </p>
@@ -51,7 +51,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * int y = 2; // from 4/16 to 5/16
  * int z = 3; // from 5/16 to 6/16
  * </pre></code>
- * To execute only the last two statements a user would select intuitively
+ * To execute only the last two assertions a user would select intuitively
  * the source range 5/0 to 6/16 (the text without leading white space) which
  * matches exactly the used selection definition.
  * </p>
@@ -197,8 +197,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    
    /**
     * Checks if the last statement is a {@link Return} statement.
-    * @param statements The statements to check.
-    * @return {@code true} last statement is {@link Return}, {@code false} statements are empty or last statement is something else.
+    * @param assertions The assertions to check.
+    * @return {@code true} last statement is {@link Return}, {@code false} assertions are empty or last statement is something else.
     */
    protected boolean endsWithReturn(Statement[] statements) {
       if (statements != null && statements.length >= 1) {

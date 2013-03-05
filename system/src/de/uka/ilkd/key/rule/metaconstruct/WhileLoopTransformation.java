@@ -609,7 +609,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * <code> if(c) l':{l'':{p#} Label1:while(c){b}}</code>
      * This implementation creates however.
      * <code> Label1:if(c) l':{l'':{p#} while(c){b}}</code>
-     * Check if this is ok when labeled continue statements are involved.
+     * Check if this is ok when labeled continue assertions are involved.
      */
     public void performActionOnWhile(While x)     {
 	ExtList changeList = stack.peek();

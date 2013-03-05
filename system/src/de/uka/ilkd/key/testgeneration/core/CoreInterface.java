@@ -19,8 +19,8 @@ import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGenerator;
-import de.uka.ilkd.key.testgeneration.core.oraclegeneration.OracleGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.oracle.generator.OracleGenerator;
+import de.uka.ilkd.key.testgeneration.core.oracle.generator.OracleGeneratorException;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestCase;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
 import de.uka.ilkd.key.testgeneration.util.Benchmark;
@@ -143,7 +143,7 @@ public enum CoreInterface {
      *            the test oracle (corresponding to the postcondition) of the
      *            method
      * @param nodes
-     *            the execution nodes (i.e. program statements) within the
+     *            the execution nodes (i.e. program assertions) within the
      *            method itself for which to generate test cases (one test case
      *            per node will be generated)
      * @return a collection of {@link TestCase} instances for the method

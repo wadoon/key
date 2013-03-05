@@ -139,8 +139,8 @@ public class Case extends BranchImp implements ExpressionContainer {
     }
 
     /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+     *      Get the number of assertions in this container.
+     *      @return the number of assertions.
      */
     public int getStatementCount() {
         return (body != null) ? body.size() : 0;

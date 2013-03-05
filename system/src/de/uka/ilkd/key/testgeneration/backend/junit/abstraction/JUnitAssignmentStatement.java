@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.testgeneration.backend.junit.abstraction;
 
 /**
- * Instances of this class represent field assignment statements in a JUnit test
+ * Instances of this class represent field assignment assertions in a JUnit test
  * class.
  * <p>
  * Given some Object o and field x of o, such a statments assigns a

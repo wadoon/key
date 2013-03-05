@@ -69,7 +69,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
             new HashMap<EnumDeclaration, EnumClassDeclaration>();
     
     /**
-     * a mapping of constant references in switch-statements and their
+     * a mapping of constant references in switch-assertions and their
      * substitutes.
      */
     Map<FieldReference, UncollatedReferenceQualifier> caseSubstitutes = 
@@ -109,7 +109,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
     }
 
     /**
-     * find enumconstants in case statements and mark them for substitution.
+     * find enumconstants in case assertions and mark them for substitution.
      * 
      * Use the cross reference property and find all case usages of enum constants
      * replace them by their fully qualified name, if they are not qualified.
@@ -148,7 +148,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
     protected void makeExplicit(TypeDeclaration td) { }
     
     /**
-     * substitute all case statements that have been recorded earlier.
+     * substitute all case assertions that have been recorded earlier.
      * 
      * call super class to invoke "makeExplicit".
      * 

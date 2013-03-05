@@ -796,7 +796,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     /**
      * This sort represents a type of program schema variables that
-     * match only on statements
+     * match only on assertions
      */    
     private static class StatementSort extends ProgramSVSort{
 
@@ -827,7 +827,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     /**
      * This sort represents a type of program schema variables that
-     * match only on method body statements
+     * match only on method body assertions
      */    
     private static final class MethodBodySort extends ProgramSVSort{
 
@@ -842,7 +842,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     /**
      * This sort represents a type of program schema variables that
-     * match only on method body statements for nonmodel methods for which
+     * match only on method body assertions for nonmodel methods for which
      * an implementation is present.
      */    
     private static final class NonModelMethodBodySort extends ProgramSVSort{

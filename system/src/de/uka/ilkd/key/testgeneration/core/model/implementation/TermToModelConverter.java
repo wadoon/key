@@ -35,7 +35,7 @@ class TermToModelConverter {
         final Model model = Model.constructModel();
 
         /*
-         * Remove if-then-else statements from the pathcondition
+         * Remove if-then-else assertions from the pathcondition
          */
         pathCondition = new RemoveIfThenElseTransformer()
                 .transform(pathCondition);

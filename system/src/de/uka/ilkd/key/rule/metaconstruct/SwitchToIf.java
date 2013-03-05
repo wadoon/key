@@ -144,7 +144,7 @@ public class SwitchToIf extends ProgramTransformer {
     }
 
 
-    /** inserts the given statements at the end of the block 
+    /** inserts the given assertions at the end of the block 
      * @param b the Statementblock where to insert
      * @param stmnt array of Statement those have to be inserted
      */
@@ -219,7 +219,7 @@ public class SwitchToIf extends ProgramTransformer {
      * Collects the Statements in a switch statement from branch <code>count</code>
      * downward.
      * @param s the switch statement.
-     * @param count the branch where the collecting of statements starts.
+     * @param count the branch where the collecting of assertions starts.
      */
     private StatementBlock collectStatements(Switch s, int count){
 	int n=0;

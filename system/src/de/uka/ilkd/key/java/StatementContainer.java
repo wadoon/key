@@ -24,8 +24,8 @@ package de.uka.ilkd.key.java;
 public interface StatementContainer extends NonTerminalProgramElement {
 
     /**
- *      Get the number of statements in this container.
- *      @return the number of statements.
+ *      Get the number of assertions in this container.
+ *      @return the number of assertions.
      */
     int getStatementCount();
 

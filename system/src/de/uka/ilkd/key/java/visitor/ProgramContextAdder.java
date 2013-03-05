@@ -43,7 +43,7 @@ public class ProgramContextAdder {
     private ProgramContextAdder() {}
     
     /**
-     * wraps the context around the statements found in the putIn block   
+     * wraps the context around the assertions found in the putIn block   
      */
     public JavaNonTerminalProgramElement start
 	(JavaNonTerminalProgramElement   context,

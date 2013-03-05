@@ -208,7 +208,7 @@ public abstract class KeYJavaASTFactory {
 	return new EmptyStatement();
     }
 
-    /** inserts the given statements at the begin of the block 
+    /** inserts the given assertions at the begin of the block 
      * @param stmnt array of Statement those have to be inserted
      * @param b the Statementblock where to insert
      */
@@ -222,7 +222,7 @@ public abstract class KeYJavaASTFactory {
 	return new StatementBlock(new ImmutableArray<Statement>(block));	
     }
 
-    /** inserts the given statements at the begin of the block 
+    /** inserts the given assertions at the begin of the block 
      * @param stmnt array of Statement those have to be inserted
      * @param b the Statementblock where to insert
      */

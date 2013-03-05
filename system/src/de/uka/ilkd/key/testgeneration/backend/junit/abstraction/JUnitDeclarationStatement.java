@@ -5,7 +5,7 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 
 /**
  * Instances of this class represent standard Java variable declaration
- * statements in a JUnit test class, of the following form:
+ * assertions in a JUnit test class, of the following form:
  * 
  * <pre>
  * <code>{@literal <}type{@literal >} {@literal <}identifier{@literal >} = {@literal <}value{@literal >}

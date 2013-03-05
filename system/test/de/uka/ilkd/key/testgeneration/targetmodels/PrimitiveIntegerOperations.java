@@ -2,7 +2,7 @@ package de.uka.ilkd.key.testgeneration.targetmodels;
 
 /**
  * This class provides various methods which use primitive integer operations,
- * coupled with control statements of gradually increasing complexity. The
+ * coupled with control assertions of gradually increasing complexity. The
  * methods will excercise all available integer operations, in all feasible
  * combinations.
  * 

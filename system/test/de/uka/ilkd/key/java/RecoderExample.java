@@ -61,7 +61,7 @@ public class RecoderExample {
     }
 
 
-    /** transforms all while statements in a statement block to the wanted
+    /** transforms all while assertions in a statement block to the wanted
      * "if-then-while" statement
      * @param prg the Statementblock to be transformed
      */

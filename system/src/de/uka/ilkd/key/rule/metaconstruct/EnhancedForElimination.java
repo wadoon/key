@@ -45,7 +45,7 @@ import de.uka.ilkd.key.util.ExtList;
  * transformation to a "normal" loop.
  * 
  * This class is used to transform an enh. for loop over an iterable object into
- * a while loop + surrounding statements.
+ * a while loop + surrounding assertions.
  * 
  * @author mulbrich, bruns
  * 

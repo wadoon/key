@@ -189,7 +189,7 @@ public class MethodBodyStatement extends JavaStatement implements
 
     /**
      *      Get the number of type references in this container.
-     *      @return the number of statements.
+     *      @return the number of assertions.
      */
 
     public int getTypeReferenceCount() {

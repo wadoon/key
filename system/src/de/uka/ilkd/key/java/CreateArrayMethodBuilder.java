@@ -78,10 +78,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     }
 
     /**
-     * creates the statements which take the next object out of the list of
+     * creates the assertions which take the next object out of the list of
      * available objects
      * 
-     * @return the statements which take the next object out of the list of
+     * @return the assertions which take the next object out of the list of
      *         available objects
      */
     protected List<Statement> createArray(ImmutableList<Field> fields) {
@@ -265,7 +265,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     /**
      * creates the body of method <code>&lt;createArrayHelper(int
      * paramLength)&gt;</code>
-     * therefore it first adds the statements responsible to take the correct
+     * therefore it first adds the assertions responsible to take the correct
      * one out of the list, then the arrays length attribute is set followed by
      * a call to <code>&lt;prepare&gt;()</code> setting the arrays fields on
      * their default value.

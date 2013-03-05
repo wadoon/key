@@ -83,7 +83,7 @@ public abstract class JavaSourceElement implements SourceElement {
     /**
      *        Finds the source element that occurs first in the source. The default
      *        implementation returns this element, which is correct for all terminal
-     *        program elements, and many non terminals such as statements and prefixed
+     *        program elements, and many non terminals such as assertions and prefixed
      *        operators.
      *        @return the first source element in the syntactical representation of
      *        this element, may be equals to this element.
@@ -99,7 +99,7 @@ public abstract class JavaSourceElement implements SourceElement {
      *        Finds the source element that occurs last in the source.  The
      *        default implementation returns this element, which is correct
      *        for all terminal program elements, and many non terminals such
-     *        as statements and prefixed operators.
+     *        as assertions and prefixed operators.
      *        @return the last source element in the syntactical representation of
      *        this element, may be equals to this element.
      *        @see #toSource()
