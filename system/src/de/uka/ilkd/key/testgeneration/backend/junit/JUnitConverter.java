@@ -25,7 +25,8 @@ import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisito
  * @author christopher
  * 
  */
-public class JUnitConverter implements IFrameworkConverter {
+public class JUnitConverter extends AbstractJavaSourceGenerator implements
+        IFrameworkConverter {
 
     /**
      * Worker which services invocations of
@@ -216,8 +217,7 @@ public class JUnitConverter implements IFrameworkConverter {
                     this.buffer.add(visited.op().name().toString());
 
                 } else if (this.isSortDependingFunction(visited)) {
-                    final String identifier = AbstractTermParser
-                            .resolveIdentifierString(visited,
+                    final String identifier = resolveIdentifierString(visited,
                                     StringConstants.FIELD_SEPARATOR.toString());
                     this.buffer.add(identifier);
 
@@ -300,12 +300,12 @@ public class JUnitConverter implements IFrameworkConverter {
             /*
              * Write the HashMap for holding the object instances.
              */
-            this.writeObjectInstanceMap();
+            // this.writeObjectInstanceMap();
 
             /*
              * Write the method for retrieving the actual test instances.
              */
-            this.writeGetObjectInstanceMethod();
+            // this.writeGetObjectInstanceMethod();
 
             /*
              * Write the method for setting fields of objects.
@@ -313,10 +313,15 @@ public class JUnitConverter implements IFrameworkConverter {
             this.writeSetFieldMethod();
 
             /*
+             * Write the method for getting fields of objects.
+             */
+            this.writeGetFieldMethod();
+
+            /*
              * Write the main init method for creating the repository of Object
              * instances.
              */
-            this.writeCreateInstanceRepositoryMethod(testCases);
+            // this.writeCreateInstanceRepositoryMethod(testCases);
         }
 
         /**
@@ -400,6 +405,19 @@ public class JUnitConverter implements IFrameworkConverter {
             final KeYJavaClass klass = testSuite.getJavaClass();
             testSuite.getMethod();
 
+            /*
+             * Collect the import statements
+             */
+            final List<ModelInstance> instances = this
+                    .collectInstances(testCases);
+            for (final ModelInstance instance : instances) {
+                final String toImport = instance.getType();
+                this.imports.add(toImport);
+            }
+
+            /*
+             * Get the name of the class being tested.
+             */
             this.className = klass.getName();
 
             final String methodName = testCases.get(0).getMethodName();
@@ -498,9 +516,9 @@ public class JUnitConverter implements IFrameworkConverter {
             this.writeComment(
                     "This method will retrieve an object instance corresponding to its reference ID.",
                     true);
-            this.writeMethodHeader(null, "private", new String[] { "static",
-                    "<T>" }, "T", "getObjectInstance",
-                    new String[] { "int reference" }, null);
+            this.writeMethodHeader(null, "private", new String[] { "<T>" },
+                    "T", "getObjectInstance", new String[] { "int reference" },
+                    null);
             this.writeLine("return (T)objectInstances.get(reference);"
                     + AbstractJavaSourceGenerator.NEWLINE);
             this.writeClosingBrace();
@@ -577,20 +595,21 @@ public class JUnitConverter implements IFrameworkConverter {
                      * method. Primitive types will simply be encoded in terms
                      * of their primitive values.
                      */
-                    final String variableName = field.getName();
+                    final String variableIdentifier = field.getIdentifier();
                     if (field.getValue() instanceof ModelInstance) {
 
                         final ModelInstance instanceField = (ModelInstance) field
                                 .getValue();
                         this.writeLine("setFieldValue(instance, " + "\""
-                                + variableName + "\"" + ", "
+                                + variableIdentifier + "\"" + ", "
                                 + "getObjectInstance("
                                 + instanceField.getIdentifier() + ") " + ");"
                                 + AbstractJavaSourceGenerator.NEWLINE);
                     } else {
                         this.writeLine("setFieldValue(instance, " + "\""
-                                + variableName + "\"" + ", " + field.getValue()
-                                + ");" + AbstractJavaSourceGenerator.NEWLINE);
+                                + variableIdentifier + "\"" + ", "
+                                + field.getValue() + ");"
+                                + AbstractJavaSourceGenerator.NEWLINE);
                     }
                 }
             }
@@ -640,8 +659,8 @@ public class JUnitConverter implements IFrameworkConverter {
 
             this.writeComment("Sets a field of some object to a given value",
                     true);
-            this.writeMethodHeader(null, "private", new String[] { "static" },
-                    "void", "setFieldValue", new String[] { "Object instance",
+            this.writeMethodHeader(null, "private", null, "void",
+                    "setFieldValue", new String[] { "Object instance",
                             "String fieldName", "Object value" }, new String[] {
                             "NoSuchFieldException", "SecurityException",
                             "IllegalArgumentException",
@@ -649,9 +668,36 @@ public class JUnitConverter implements IFrameworkConverter {
 
             this.writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
                     + AbstractJavaSourceGenerator.NEWLINE);
+
             this.writeLine("field.setAccessible(true);"
                     + AbstractJavaSourceGenerator.NEWLINE);
+
             this.writeLine("field.set(instance, value );"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+
+            this.writeClosingBrace();
+        }
+
+        /**
+         * Writes the getField method.
+         */
+        private void writeGetFieldMethod() {
+
+            this.writeComment("Gets the field of a given object", true);
+            this.writeMethodHeader(null, "private", new String[] { "<T>" },
+                    "T", "getFieldValue", new String[] { "Object instance",
+                            "String fieldName" }, new String[] {
+                            "NoSuchFieldException", "SecurityException",
+                            "IllegalArgumentException",
+                            "IllegalAccessException" });
+
+            this.writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+
+            this.writeLine("field.setAccessible(true);"
+                    + AbstractJavaSourceGenerator.NEWLINE);
+
+            this.writeLine("return (T)field.get(instance);"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
             this.writeClosingBrace();
@@ -681,6 +727,126 @@ public class JUnitConverter implements IFrameworkConverter {
         }
 
         /**
+         * Writes the fixture portion of a JUnit test method. Primarily, this
+         * involves declaring and instantiating variables and parameter values.
+         * Only variables declared on the top level are considered here.
+         * 
+         * @param model
+         *            {@link Model} instance representing the fixture
+         */
+        private void writeTestFixture2(final TestCase testCase) {
+
+            /*
+             * Begin with declaring all the instance variables needed for the
+             * current test case.
+             */
+            writeComment("Create the values needed for this test case.", false);
+            for (final ModelVariable variable : testCase.getModel()
+                    .getVariables()) {
+
+                if (!variable.isParameter()) {
+                    /*
+                     * Declares and instantiates a reference typed instance.
+                     */
+                    if (variable.getValue() instanceof ModelInstance) {
+                        writeLine(variable.getType() + " "
+                                + variable.getIdentifier() + " = " + "new"
+                                + " " + variable.getType() + "();");
+                    }
+
+                    /*
+                     * Declares and instantiates a primitive typed instance, but
+                     * only if they are parameters (other primitive values will
+                     * be configured as part of the classes they are fields of).
+                     */
+                    else {
+                        writeLine(variable.getType() + " "
+                                + variable.getIdentifier() + " = "
+                                + variable.getValue() + ";");
+                    }
+
+                    writeLine(NEWLINE);
+                }
+            }
+
+            /*
+             * Next, create the method parameters (we do this separately for the
+             * sake of clarity).
+             */
+            writeComment(
+                    "Create the parameter instances to be passed to the method under test.",
+                    false);
+
+            for (final ModelVariable variable : testCase.getModel()
+                    .getVariables()) {
+
+                if (variable.isParameter()) {
+
+                    /*
+                     * Declares and instantiates a reference typed instance.
+                     */
+                    if (variable.getValue() instanceof ModelInstance) {
+                        writeLine(variable.getType() + " "
+                                + variable.getIdentifier() + " = " + "new"
+                                + " " + variable.getType() + "();");
+                    }
+
+                    /*
+                     * Declares and instantiates a primitive typed instance, but
+                     * only if they are parameters (other primitive values will
+                     * be configured as part of the classes they are fields of).
+                     */
+                    else {
+                        writeLine(variable.getType() + " "
+                                + variable.getIdentifier() + " = "
+                                + variable.getValue() + ";");
+                    }
+                    writeLine(NEWLINE);
+                }
+            }
+
+            /*
+             * Next, configure the needed instances properly.
+             */
+            for (final ModelVariable variable : testCase.getModel()
+                    .getVariables()) {
+
+                if (!variable.isParameter()) {
+
+                    Object value = variable.getValue();
+
+                    if (value instanceof ModelInstance) {
+
+                        writeComment(
+                                "Configuring variable: "
+                                        + variable.getIdentifier(), false);
+
+                        String variableIdentifier = variable.getIdentifier();
+                        ModelInstance instance = (ModelInstance) value;
+
+                        for (ModelVariable field : instance.getFields()) {
+
+                            String fieldValueIdentifier = "";
+                            if (field.getValue() instanceof ModelInstance) {;
+                                fieldValueIdentifier = field.getIdentifier();
+                            } else {
+                                Object fieldValue = field.getValue();
+                                fieldValueIdentifier = fieldValue.toString();
+                            }
+
+                            this.writeLine("setFieldValue("
+                                    + variableIdentifier + "," + "\""
+                                    + field.getVariableName() + "\"" + ","
+                                    + fieldValueIdentifier + ");");
+
+                            writeLine(NEWLINE);
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
          * Converts an instance of {@link TestCase} into a corresponding portion
          * of a JUnit sourcefile. This is the root method for creating actual
          * test methods (as one testcase in JUnit will essentially correspond to
@@ -700,12 +866,15 @@ public class JUnitConverter implements IFrameworkConverter {
             final String methodName = "test"
                     + testCase.getMethod().getProgramMethod().getName();
             this.writeMethodHeader(new String[] { "@Test" }, "public", null,
-                    "void", methodName + this.ID++, null, null);
+                    "void", methodName + this.ID++, null, new String[] {
+                            "NoSuchFieldException", "SecurityException",
+                            "IllegalArgumentException",
+                            "IllegalAccessException" });
 
             /*
              * Write the test fixture.
              */
-            this.writeTestFixture(testCase);
+            this.writeTestFixture2(testCase);
 
             /*
              * Write the invocation of the method itself. If the method return
@@ -717,7 +886,7 @@ public class JUnitConverter implements IFrameworkConverter {
             /*
              * Write the oracle
              */
-            this.writeTestOracle(testCase);
+            // this.writeTestOracle(testCase);
 
             this.writeClosingBrace();
         }
@@ -778,7 +947,8 @@ public class JUnitConverter implements IFrameworkConverter {
             if (this.isSelf(variable)) {
                 declaration = this.className + " self";
             } else {
-                declaration = variable.getType() + " " + variable.getName();
+                declaration = variable.getType() + " "
+                        + variable.getIdentifier();
             }
 
             /*

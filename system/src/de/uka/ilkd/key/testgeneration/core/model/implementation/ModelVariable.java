@@ -112,15 +112,22 @@ public class ModelVariable {
         return this.identifier.equals(other.identifier);
     }
 
+    public String getVariableName() {
+
+        String rawName = this.variable.name().toString();
+        int lastColon = rawName.lastIndexOf(':');
+
+        if (lastColon != -1) {
+            return rawName.substring(lastColon + 1);
+        } else {
+            return rawName;
+        }
+    }
+
     /**
      * A variable is uniquely identified by its identifier.
      */
     public String getIdentifier() {
-
-        return this.variable.name().toString();
-    }
-
-    public String getName() {
 
         return this.identifier;
     }
@@ -148,9 +155,9 @@ public class ModelVariable {
      * Returns the value of the variable. Will have to be explicitly converted
      * based on the type of this variable.
      */
-    public Object getValue() {
+    public <T> T getValue() {
 
-        return this.boundValue;
+        return (T) this.boundValue;
     }
 
     /**

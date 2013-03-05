@@ -2,6 +2,8 @@ package de.uka.ilkd.key.testgeneration.util.parsers;
 
 import java.util.LinkedList;
 
+import org.hamcrest.core.IsNull;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -220,10 +222,16 @@ public abstract class AbstractTermParser {
      * @return the identifier String.
      * @see Model
      */
-    protected static String resolveIdentifierString(final Term term,
+    protected String resolveIdentifierString(final Term term,
             final String separator) {
 
         final Operator operator = term.op();
+
+        String termString = term.toString();
+        if (termString
+                .equalsIgnoreCase("int::select(heap,self,de.uka.ilkd.key.testgeneration.targetmodels.ClassProxy::$instanceInt)")) {
+            int x = 10;
+        }
 
         /*
          * Base case 1: underlying definition is a LocationVariable and hence
@@ -233,6 +241,7 @@ public abstract class AbstractTermParser {
         if (operator.getClass() == LocationVariable.class) {
 
             final String name = AbstractTermParser.getVariableNameForTerm(term);
+
             return name;
             // return isPrimitiveType(term) ? "self_" + name : name;
         }
@@ -246,7 +255,7 @@ public abstract class AbstractTermParser {
         else if ((operator.getClass() == Function.class)
                 && !operator.toString().equals("heap")) {
 
-            return operator.toString();
+            return "self";
         }
 
         /*
@@ -255,10 +264,17 @@ public abstract class AbstractTermParser {
          */
         else {
 
-            return AbstractTermParser.resolveIdentifierString(term.sub(1),
-                    separator)
-                    + separator
-                    + AbstractTermParser.getVariableNameForTerm(term.sub(2));
+            if (isNullSort(term.sub(1))) {
+
+                return AbstractTermParser.getVariableNameForTerm(term.sub(2));
+
+            } else {
+
+                return resolveIdentifierString(term.sub(1), separator)
+                        + separator
+                        + AbstractTermParser
+                                .getVariableNameForTerm(term.sub(2));
+            }
         }
     }
 

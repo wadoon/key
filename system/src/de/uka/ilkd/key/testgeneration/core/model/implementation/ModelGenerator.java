@@ -187,8 +187,9 @@ public enum ModelGenerator implements IModelGenerator {
                  * Finally, retrieve the variable corresponding to the name of
                  * the result, and insert the corresponding result into it.
                  */
-                final ModelVariable variable = model.getVariable(varName);
+                final ModelVariable variable = model.getVariable(varName.trim());
                 if (variable != null) {
+              
                     variable.setValue(value);
                 } else {
                     final StringBuilder stringBuilder = new StringBuilder();
@@ -234,6 +235,9 @@ public enum ModelGenerator implements IModelGenerator {
                 return null;
 
             } else {
+                
+                final String commands = this.translateToSMTLIB2(
+                        simplifiedPathCondition, services);
 
                 String result = "";
                 /*
@@ -247,9 +251,6 @@ public enum ModelGenerator implements IModelGenerator {
                  * for the SMT problem. If not, keep trying until we do
                  */
                 do {
-
-                    final String commands = this.translateToSMTLIB2(
-                            pathCondition, services);
 
                     result = this.smtInterface
                             .startMessageBasedSession(commands)

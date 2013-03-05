@@ -101,8 +101,8 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         final KeYJavaType container = methodCall.getProgramMethod()
                 .getContainerType();
 
-        this.default_self = new LocationVariable(new ProgramElementName(
-                "$SELF$"), new KeYJavaType(container));
+        this.default_self = new LocationVariable(
+                new ProgramElementName("self"), new KeYJavaType(container));
 
         /*
          * Add the root variable and instance to the Model
@@ -236,14 +236,10 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
              * variable), we return the default root, although we first properly
              * set the type (which is not needed, but nice to have).
              */
-            if (!operator.toString().equalsIgnoreCase("heap")) {
+            String operatorName = operator.toString();
+            if (!operatorName.equalsIgnoreCase("heap")) {
 
                 if (operator.toString().equalsIgnoreCase("self")) {
-
-                    final ProgramVariable variable = (ProgramVariable) operator;
-                    final Type realType = variable.getKeYJavaType()
-                            .getJavaType();
-                    this.default_self.getKeYJavaType().setJavaType(realType);
 
                     return this.default_self;
                 } else {
@@ -263,10 +259,6 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
             if (operator.toString().equalsIgnoreCase("self")) {
 
-                final ProgramVariable variable = (ProgramVariable) operator;
-                final Type realType = variable.getKeYJavaType().getJavaType();
-                this.default_self.getKeYJavaType().setJavaType(realType);
-
                 return this.default_self;
             }
         }
@@ -280,6 +272,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
             return this.getProgramVariableForField(term.sub(2));
         }
+        
         return null;
     }
 
@@ -309,7 +302,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         final ProgramVariable programVariable = this.getVariable(term);
 
         if ((programVariable == null)
-                || programVariable.toString().equals("$SELF$")) {
+                || programVariable.toString().equals("self")) {
             return;
         }
 
@@ -320,8 +313,16 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * primitive, we simply create a new ModelInstance to hold any reference
          * object.
          */
-        final String identifier = AbstractTermParser.resolveIdentifierString(
+        final String identifier = resolveIdentifierString(
                 term, TermToModelVisitor.SEPARATOR);
+        
+        /*
+         * Check that the variable we found is not already present in the model.
+         */
+        ModelVariable currentVariable = model.getVariable(identifier);
+        if(currentVariable != null && currentVariable.isParameter()) {
+            return;
+        }
 
         final ModelVariable variable = ModelVariable.constructModelVariable(
                 programVariable, identifier);
@@ -329,8 +330,14 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         Object instance = null;
         if (AbstractTermParser.isPrimitiveType(term)) {
 
+            /*
+             * The term is a static variable. Identify and connect it with
+             */
+            
             instance = TermToModelVisitor.resolvePrimitiveType(programVariable);
+       
         } else {
+            
             instance = ModelInstance.constructModelInstance(programVariable
                     .getKeYJavaType());
         }
@@ -366,8 +373,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
              */
             if (parentVariable != null) {
 
-                final String parentIdentifier = AbstractTermParser
-                        .resolveIdentifierString(term.sub(1),
+                final String parentIdentifier = resolveIdentifierString(term.sub(1),
                                 TermToModelVisitor.SEPARATOR);
 
                 final ModelVariable parentModelVariable = ModelVariable

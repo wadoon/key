@@ -42,10 +42,11 @@ public class TestJUnitTestCaseGenerator {
 
         HashMap<String, Double> results = new HashMap<String, Double>();
 
+        String methodName = "midOneProxyOneInstance";
         List<String> output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        codeCoverageParser, junitConverter, "mid");
+                        codeCoverageParser, junitConverter, methodName);
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(
@@ -85,7 +86,8 @@ public class TestJUnitTestCaseGenerator {
         String toWrite = output.get(0);
         System.out.println(toWrite);
         File target = new File(
-                "/home/christopher/git/key/eclipse/system/test/PrimitiveIntegerOperationsTestClass/Test_PrimitiveIntegerOperations_mid.java");
+                "/home/christopher/git/key/eclipse/system/test/PrimitiveIntegerOperationsTestClass/Test_PrimitiveIntegerOperations_"
+                        + methodName + ".java");
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(
                 target));
         bufferedWriter.write(toWrite);
@@ -93,6 +95,7 @@ public class TestJUnitTestCaseGenerator {
 
     }
 
+    @Ignore
     @Test
     public void test2() throws IOException, ProofInputException,
             ModelGeneratorException, TestGeneratorException,

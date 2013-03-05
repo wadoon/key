@@ -154,9 +154,9 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
             int result = operations.midTwoInstance(x);
 
             for (ModelVariable var : model.getVariables()) {
-                String varName = var.getName();
+                String varName = var.getIdentifier();
                 if (varName.endsWith(variable)) {
-                    int varValue = (Integer) model.getVariable(var.getName())
+                    int varValue = (Integer) model.getVariable(var.getIdentifier())
                             .getValue();
                     assertTrue(result == varValue);
                 }
@@ -189,9 +189,9 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
             int result = operations.midTwoProxy(x);
 
             for (ModelVariable var : model.getVariables()) {
-                String varName = var.getName();
+                String varName = var.getIdentifier();
                 if (varName.endsWith(variable)) {
-                    int varValue = (Integer) model.getVariable(var.getName())
+                    int varValue = (Integer) model.getVariable(var.getIdentifier())
                             .getValue();
                     assertTrue(result == varValue);
                 }

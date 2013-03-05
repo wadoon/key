@@ -106,8 +106,8 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
          */
         private void addVariableNode(final Term term) {
 
-            final String variableName = AbstractTermParser
-                    .resolveIdentifierString(term, XMLConverter.SEPARATOR);
+            final String variableName = resolveIdentifierString(term,
+                    XMLConverter.SEPARATOR);
             this.addTag(
                     XMLConverter.eventFactory.createCharacters(variableName), 1);
         }

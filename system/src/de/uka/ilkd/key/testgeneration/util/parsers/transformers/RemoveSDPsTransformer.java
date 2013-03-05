@@ -35,8 +35,7 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
     protected Term transformSortDependentFunction(final Term term) {
 
         final ProgramElementName resolvedVariableName = new ProgramElementName(
-                AbstractTermParser
-                        .resolveIdentifierString(term, this.SEPARATOR));
+                resolveIdentifierString(term, this.SEPARATOR));
 
         final LocationVariable resolvedVariable = new LocationVariable(
                 resolvedVariableName, term.sort());

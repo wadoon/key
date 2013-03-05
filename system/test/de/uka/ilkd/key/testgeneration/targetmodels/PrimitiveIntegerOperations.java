@@ -231,12 +231,12 @@ public class PrimitiveIntegerOperations {
     public int midOneProxyOneInstance(int x) {
 
         int mid = 0;
-
+        
         if (proxy == proxy.nestedProxy && x == proxy.instanceInt
                 && proxy.nestedProxy.nestedProxy == null) {
             mid = 15;
         }
-
+    
         if (proxy == null) {
             mid = 16;
         }

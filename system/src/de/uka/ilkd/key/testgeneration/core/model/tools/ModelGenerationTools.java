@@ -222,7 +222,7 @@ public class ModelGenerationTools {
             if (AbstractTermParser.primitiveTypes.contains(sortName)) {
 
                 final ProgramElementName resolvedVariableName = new ProgramElementName(
-                        AbstractTermParser.resolveIdentifierString(term,
+                        resolveIdentifierString(term,
                                 ModelGenerationTools.SEPARATOR));
 
                 final LocationVariable resolvedVariable = new LocationVariable(

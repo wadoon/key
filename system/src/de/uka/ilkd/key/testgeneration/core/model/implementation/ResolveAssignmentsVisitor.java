@@ -82,9 +82,8 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                  */
                 if (this.isBoolean(leftOperand)) {
 
-                    leftOperandIdentifier = AbstractTermParser
-                            .resolveIdentifierString(leftOperand,
-                                    ResolveAssignmentsVisitor.SEPARATOR);
+                    leftOperandIdentifier = resolveIdentifierString(
+                            leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
 
                     /*
                      * If the right-hand operator is a boolean constant (TRUE or
@@ -107,12 +106,10 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                      */
                 } else if (!this.sawNot) {
 
-                    leftOperandIdentifier = AbstractTermParser
-                            .resolveIdentifierString(leftOperand,
-                                    ResolveAssignmentsVisitor.SEPARATOR);
-                    rightOperandIdentifier = AbstractTermParser
-                            .resolveIdentifierString(rightOperand,
-                                    ResolveAssignmentsVisitor.SEPARATOR);
+                    leftOperandIdentifier = resolveIdentifierString(
+                            leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
+                    rightOperandIdentifier = resolveIdentifierString(
+                            rightOperand, ResolveAssignmentsVisitor.SEPARATOR);
 
                     final ModelVariable leftModelVariable = this.model
                             .getVariable(leftOperandIdentifier);
