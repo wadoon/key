@@ -4642,6 +4642,8 @@
 
     <nocite|Gladisch2012><nocite|Gladisch2010><nocite|Gladisch2010_TAP><nocite|AhrendtEtAl2009><nocite|BubelEtAl2009><nocite|BeckertEtAl2008><nocite|Gladisch2008><nocite|EngelEtAl2008><nocite|Gladisch2008_TAP><nocite|AhrendtEtAl2007><nocite|HahnleEtAl2010><nocite|bass2003software><nocite|huth2004logic>
 
+    <new-page*>
+
     <\bibliography|bib|tm-plain|literature.bib>
       <\bib-list|37>
         <bibitem*|1><label|bib-KeY2005>Wolfgang<nbsp>Ahrendt,
@@ -4867,8 +4869,6 @@
 <\initial>
   <\collection>
     <associate|language|british>
-    <associate|page-bot|3cm>
-    <associate|page-top|3cm>
   </collection>
 </initial>
 
