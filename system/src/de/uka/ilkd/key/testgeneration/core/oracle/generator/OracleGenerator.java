@@ -3,7 +3,9 @@ package de.uka.ilkd.key.testgeneration.core.oracle.generator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.classabstraction.KeYJavaMethod;
+import de.uka.ilkd.key.testgeneration.core.oracle.Oracle;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
 /**
  * API singleton for the oraclegeneration package.
@@ -36,6 +38,37 @@ public enum OracleGenerator {
         } catch (final TermTransformerException e) {
 
             throw new OracleGeneratorException(e.getMessage());
+        }
+    }
+
+    public Oracle createOracle(Term postCondition)
+            throws OracleGeneratorException {
+
+        try {
+
+            /*
+             * Pre-process the postcondition, simplifying and putting it into
+             * conjunctive normal form.
+             */
+            Term processedPostCondition = TERM_TO_ORACLE_TRANSFORMER
+                    .transform(postCondition);
+
+            return null;
+
+        } catch (TermTransformerException e) {
+
+            throw new OracleGeneratorException(e.getMessage());
+        }
+    }
+
+    // ****************** VISITORS ******************
+
+    private static class OracleGenerationVisitor extends KeYTestGenTermVisitor {
+
+        @Override
+        public void visit(Term visited) {
+            // TODO Auto-generated method stub
+            
         }
     }
 }
