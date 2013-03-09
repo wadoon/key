@@ -34,6 +34,9 @@ public class ABSReader implements JavaReader {
             Namespace<IProgramVariable> varns, IServices services, String s) {
         String blockStr = CONCRETE_MODULE;
         blockStr += mainModuleName != null ? "\n import * from " + mainModuleName + ";\n " + s : "";
+
+        System.out.println("Parsing " + blockStr);
+
         try {
             Model m = ((ABSServices) services).getProgramInfo().parseInContext(
                     blockStr);

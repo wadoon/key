@@ -170,7 +170,7 @@ public abstract class FindTaclet extends Taclet {
 			      services,
 			      mc );
 
-	    applyReplacewith( gt,
+        applyReplacewith( gt,
 			      currentGoal,
 			      tacletApp.posInOccurrence(),
 			      services,
@@ -181,14 +181,13 @@ public abstract class FindTaclet extends Taclet {
 			      services,
 			      mc );
 
-	    
-	    applyAddProgVars( gt.addedProgVars(),
-			      currentGoal,
-                              tacletApp.posInOccurrence(),
-                              services,
-			      mc);
-                               
-            currentGoal.setBranchLabel(gt.name());
+        applyAddProgVars( gt.addedProgVars(),
+                currentGoal,
+                tacletApp.posInOccurrence(),
+                services,
+                mc);
+
+        currentGoal.setBranchLabel(gt.name());
 	}
 
 	return newGoals;

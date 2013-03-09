@@ -24,14 +24,8 @@ import de.uka.ilkd.keyabs.init.SortBuilder;
  */
 public class ABSModelParserInfo {
 
-
-    private String createFullyQualifiedName(ClassDecl classDecl) {
-        return classDecl.getModule().getName() + "." + classDecl.getName();
-    }
-
-  
-
-    private HashMap<Name, ClassDecl> classes = new HashMap<Name, ClassDecl>();
+    private HashMap<Name, ClassDescriptor> classes = new HashMap<Name, ClassDescriptor>();
+    private HashMap<Name, FieldDecl> field = new HashMap<>();
     private final HashMap<Name, InterfaceDecl> interfaces = new HashMap<Name, InterfaceDecl>();
     private final DataTypeDescriptor datatypes = new DataTypeDescriptor();
     private final DataTypeDescriptor parametricDatatypes = new DataTypeDescriptor();
@@ -105,7 +99,7 @@ public class ABSModelParserInfo {
      * returns all classes of the ABS model
      * @return all classes
      */
-    public HashMap<Name, ClassDecl> getClasses() {
+    public HashMap<Name, ClassDescriptor> getClasses() {
         return classes;
     }
 
@@ -164,6 +158,20 @@ public class ABSModelParserInfo {
         descr.addDataType2Constructors(dataTypeName, constructors);
     }
 
+
+    private void collectClassMembers(ClassDecl cd) {
+        ClassDescriptor classDescr =
+                new ClassDescriptor(SortBuilder.createFullyQualifiedName(cd), cd);
+
+        for (FieldDecl fd : cd.getFields()) {
+            classDescr.addFields(fd);
+        }
+
+        classes.put(classDescr.name(), classDescr);
+        collectTypesAndFunctionDeclarations(cd);
+    }
+
+
     private void collectTypesAndFunctionDeclarations(ASTNode<?> child) {
         try {
             for (int i = 0; i < child.getNumChild(); i++) {
@@ -184,39 +192,33 @@ public class ABSModelParserInfo {
                         datatypes.addDatatype(dataTypeName, dataType);
                         collectConstructors(dataType, dataTypeName, datatypes);
                     }
-                    collectTypesAndFunctionDeclarations(currentNode);
                 } else if (currentNode instanceof ClassDecl) {
-                    classes.put(new Name(
-                            createFullyQualifiedName((ClassDecl) currentNode)),
-                            (ClassDecl) currentNode);
-                    collectTypesAndFunctionDeclarations(currentNode);
+                    collectClassMembers((ClassDecl) currentNode);
                 } else if (currentNode instanceof FunctionDecl) {
                     FunctionDecl fd = (FunctionDecl) currentNode;
-                    /*
-                     * System.out.println(fd.getName() + ":" +
-                     * fd.qualifiedName() + ":::" + fd.getParamList() + ":::" +
-                     * fd.getTypeUse() + ":::" +
-                     * fd.getTypeUse().getDecl().isTypeParameter());
-                     */
+                    collectTypesAndFunctionDeclarations(currentNode);
                 } else if (currentNode instanceof MethodSig) {
                     MethodSig msig = (MethodSig) currentNode;
                     addMethodSignature(msig);
-                    
+                    collectTypesAndFunctionDeclarations(currentNode);
+
                     System.out.println("Method " + msig.getName() + " declared in " + msig.getContextDecl().getName());
                 } else if (currentNode instanceof VarDecl) {
                     VarDecl vd = (VarDecl) currentNode;
+                    collectTypesAndFunctionDeclarations(currentNode);
                     /*
                      * System.out.println("Local Var " + vd.getName() + " " +
                      * vd.getType() + " " + vd.getInitExp());
                      */
-                } else if (currentNode instanceof FieldDecl) {
-                    
-                } else if (currentNode instanceof MethodImpl) { 
+                } else if (currentNode instanceof MethodImpl) {
                     MethodImpl mImpl = (MethodImpl)currentNode;
-                    
-                } else { 
                     collectTypesAndFunctionDeclarations(currentNode);
-            
+                } else {
+                    if (currentNode instanceof ParametricDataTypeUse) {
+/*                        System.out.println(((TypeUse)currentNode).getDecl().qualifiedName() + "::" +
+                                ((ParametricDataTypeUse)currentNode).getParamList());*/
+                    }
+                    collectTypesAndFunctionDeclarations(currentNode);
                 }
             }
         } catch (Exception e) {

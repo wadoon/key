@@ -57,8 +57,7 @@ public class ABSProblemInitializer extends
 
         envInput.setInitConfig(initConfig);
 
-        ABSModelParserInfo parserInfo = initConfig.getServices()
-                .getProgramInfo().getABSParserInfo();
+        ABSModelParserInfo parserInfo = initConfig.getServices().getProgramInfo().getABSParserInfo();
 
         String absPath = envInput.readJavaPath();
         JavaModel absModelDescription;

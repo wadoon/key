@@ -154,7 +154,6 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
                             "No \\problem or \\chooseContract in the input file!");
                 }
             }
-
             problemHeader = lexer.getText();
             if (problemHeader != null
                     && problemHeader.lastIndexOf(searchS) != -1) {

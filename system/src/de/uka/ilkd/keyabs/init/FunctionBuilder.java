@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.ABSInfo;
 import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.abs.converter.ClassDescriptor;
 import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
@@ -28,15 +29,13 @@ public class FunctionBuilder {
 
     public void createAndRegisterABSFunctions(ABSInitConfig initConfig) {
 
-        final ABSServices services = initConfig.getServices();
-        final ABSInfo info = services.getProgramInfo();
-        final HistoryLDT historyLDT = services.getTypeConverter()
-                .getHistoryLDT();
-        final HeapLDT heapLDT = services.getTypeConverter()
-                .getHeapLDT();
+        final ABSServices services  = initConfig.getServices();
+        final ABSInfo     info      = services.getProgramInfo();
+        final HistoryLDT historyLDT = services.getTypeConverter().getHistoryLDT();
+        final HeapLDT heapLDT       = services.getTypeConverter().getHeapLDT();
 
-        final Namespace<SortedOperator> funcNS = initConfig.getServices()
-                .getNamespaces().functions();
+        final Namespace<SortedOperator> funcNS = initConfig.getServices().getNamespaces().functions();
+
         Collection<List<DataConstructor>> dataType2ConstructorMap = info
                 .getABSParserInfo().getDatatypes()
                 .getDataTypes2dataConstructors().values();
@@ -75,13 +74,14 @@ public class FunctionBuilder {
             }
         }
 
-        System.out.println("Register Fields ");
-        for (ClassDecl clDecl : info.getABSParserInfo().getClasses().values()) {
-            for (FieldDecl  field : clDecl.getFields()) {
-        	Name fieldName = new ProgramElementName(field.getName(), clDecl.qualifiedName());
-        	Function fieldFct = new Function(fieldName,
-        		heapLDT.getFieldSort(), new Sort[0], null, true);
-        	funcNS.add(fieldFct);
+        System.out.println("==> Register Fields ");
+        for (ClassDescriptor classDescriptor : info.getABSParserInfo().getClasses().values()) {
+            for (FieldDecl  field : classDescriptor.getFields()) {
+        	    final Name fieldName = new ProgramElementName(field.getName(),
+                        classDescriptor.name().toString());
+        	    final Function fieldFct = new Function(fieldName,
+        		    heapLDT.getFieldSort(), new Sort[0], null, true);
+        	    funcNS.add(fieldFct);
                 System.out.println("Register Field Constant " + fieldFct);
             }
         }
