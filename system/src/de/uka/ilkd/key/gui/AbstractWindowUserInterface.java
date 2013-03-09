@@ -1,26 +1,25 @@
 package de.uka.ilkd.key.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class AbstractWindowUserInterface<S extends IServices, IC extends InitConfig<S, IC>> extends AbstractUserInterface<S, IC> {
 
@@ -234,7 +233,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
         * {@inheritDoc}
         */
     @Override
-    public IC load(File file, List<File> classPath, File bootClassPath)
+    public DefaultProblemLoader<S, IC> load(File file, List<File> classPath, File bootClassPath)
             throws IOException, ProofInputException {
                   if (file != null) {
                      mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());

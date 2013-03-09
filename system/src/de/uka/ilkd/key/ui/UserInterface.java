@@ -9,10 +9,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -85,7 +82,10 @@ public interface UserInterface<S extends IServices, IC extends InitConfig<S, IC>
     
     DefaultProblemLoader<S, IC> createDefaultProblemLoader(File file, List<File> classPath,
             File bootClassPath, KeYMediator<S, IC> mediator);
-    
+
+    ProblemLoader<S, IC> createProblemLoader(File file, List<File> classPath,
+                                             File bootClassPath, KeYMediator<S, IC> mediator);
+
     /**
      * <p>
      * Creates a new {@link ProblemInitializer} instance which is configured
@@ -106,16 +106,18 @@ public interface UserInterface<S extends IServices, IC extends InitConfig<S, IC>
     KeYMediator<S, IC> getMediator();
     
     /**
-     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link JavaDLInitConfig}
+     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link DefaultProblemLoader}
      * which can be used to instantiated proofs programmatically.
+     *
+     *
      * @param file The java file to open.
-     * @param classPaths The class path entries to use.
+     * @param classPath The class path entries to use.
      * @param bootClassPath The boot class path to use.
-     * @return The opened {@link JavaDLInitConfig}.
+     * @return The opened {@link DefaultProblemLoader}.
      * @throws IOException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    IC load(File file, List<File> classPaths, File bootClassPath) throws IOException, ProofInputException;
+    DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given

@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -40,22 +41,37 @@ import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
     
-    /**
-     * 
-     */
     private static final long serialVersionUID = -4405666868752394532L;
     private static final String KEY_FILE_NAME = "project.key";
     private static final String README_NAME = "README.txt";
     
     private static ExampleChooser instance;
     
-    private final JList<File> exampleList;  
+    private final JList<ShortFile> exampleList;
     private final JTextArea descriptionText;    
     private final JButton loadButton;
     private final JButton cancelButton;
     
     private boolean success = false;
     
+    /**
+     * This class wraps a {@link File} and has a special {@link #toString()} method
+     * only using the short file name w/o path.
+     * 
+     * Used for displaying files in the examples list w/o prefix
+     */
+    private static class ShortFile {
+        private File file;
+
+        public ShortFile(File file) {
+            this.file = file;
+        }
+
+        @Override 
+        public String toString() {
+            return file.getName();
+        }
+    }
     
     //-------------------------------------------------------------------------
     //constructors
@@ -68,11 +84,11 @@ public final class ExampleChooser extends JDialog {
 	
 	//create list panel
 	final JPanel listPanel = new JPanel();
-	listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.X_AXIS));
+	listPanel.setLayout(new BorderLayout());
 	getContentPane().add(listPanel);
 	
 	//create example list
-	final DefaultListModel<File> model = new DefaultListModel<File>();
+	final DefaultListModel<ShortFile> model = new DefaultListModel<ShortFile>();
 	File[] examples = examplesDir.listFiles();
         Arrays.sort(examples, new Comparator<File> () {
             public int compare(File f1, File f2) {
@@ -83,11 +99,11 @@ public final class ExampleChooser extends JDialog {
 	    if(example.isDirectory()) {
 		final File keyfile = new File(example, KEY_FILE_NAME);
 		if(keyfile.isFile()) {
-		    model.addElement(example);
+		    model.addElement(new ShortFile(example));
 		}
 	    }
 	}
-	exampleList = new JList<File>();
+	exampleList = new JList<ShortFile>();
 	exampleList.setModel(model);
 	exampleList.addListSelectionListener(
 		new ListSelectionListener() {
@@ -104,10 +120,7 @@ public final class ExampleChooser extends JDialog {
 	});	
 	final JScrollPane exampleScrollPane = new JScrollPane(exampleList);
 	exampleScrollPane.setBorder(new TitledBorder("Examples"));
-	final Dimension exampleListDim = new Dimension(500, 400);	
-	exampleScrollPane.setPreferredSize(exampleListDim);
-	exampleScrollPane.setMinimumSize(exampleListDim);
-	listPanel.add(exampleScrollPane);
+	listPanel.add(exampleScrollPane, BorderLayout.WEST);
 	
 	//create description label
 	descriptionText = new JTextArea();
@@ -117,10 +130,7 @@ public final class ExampleChooser extends JDialog {
 	final JScrollPane descriptionScrollPane 
 		= new JScrollPane(descriptionText);
 	descriptionScrollPane.setBorder(new TitledBorder("Description"));
-	final Dimension descriptionLabelDim = new Dimension(500, 400);	
-	descriptionScrollPane.setPreferredSize(descriptionLabelDim);
-	descriptionScrollPane.setMinimumSize(descriptionLabelDim);	
-	listPanel.add(descriptionScrollPane);
+	listPanel.add(descriptionScrollPane, BorderLayout.CENTER);
 	
 	//create button panel
 	final JPanel buttonPanel = new JPanel();
@@ -178,8 +188,8 @@ public final class ExampleChooser extends JDialog {
 	//show
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
                                                  BoxLayout.Y_AXIS));	
-	pack();
-	setLocation(20, 20);
+	setSize(800,400);
+	setLocationRelativeTo(MainWindow.getInstance());
     }	
     
     
@@ -209,8 +219,8 @@ public final class ExampleChooser extends JDialog {
     
     
     private void updateDescription() {
-	final File selectedExample = exampleList.getSelectedValue();
-	final File readme = new File(selectedExample, README_NAME);
+	final ShortFile selectedExample = (ShortFile) exampleList.getSelectedValue();
+	final File readme = new File(selectedExample.file, README_NAME);
 	if(readme.isFile()) {
             final BufferedReader br;
             try {
@@ -263,8 +273,8 @@ public final class ExampleChooser extends JDialog {
 	
 	//return result
 	final File result = instance.success 
-        		    ? new File(instance.exampleList
-        			                     .getSelectedValue(), 
+        		    ? new File(((ShortFile)instance.exampleList
+        			                     .getSelectedValue()).file, 
         			       KEY_FILE_NAME) 
         	            : null;	
 	return result;

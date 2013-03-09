@@ -29,114 +29,56 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  * a proof configured by the opened file.
  * @author Martin Hentschel
  */
-public final class ProblemLoader<S extends IServices, IC extends InitConfig<S, IC>> implements Runnable {
-    
-    
-    private final DefaultProblemLoader<S, IC> loader;
-    
-    public int hashCode() {
-        return loader.hashCode();
-    }
+public abstract class ProblemLoader<S extends IServices, IC extends InitConfig<S, IC>> extends DefaultProblemLoader<S,IC> implements Runnable {
 
-    public String load() throws ProofInputException, IOException {
-        return loader.load();
-    }
+   private SwingWorker worker;
+   private ProverTaskListener ptl;
 
-    public boolean equals(Object obj) {
-        return loader.equals(obj);
-    }
+   public ProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
+      super(file, classPath, bootClassPath, mediator);
+   }
 
-    public String toString() {
-        return loader.toString();
-    }
+   public void addTaskListener(ProverTaskListener ptl) {
+      this.ptl = ptl;
+   }    
 
-    public File getFile() {
-        return loader.getFile();
-    }
+   public void run() {
+      /*
+       * Invoking start() on the SwingWorker causes a new Thread to be created
+       * that will call construct(), and then finished(). Note that finished()
+       * is called even if the worker is interrupted because we catch the
+       * InterruptedException in doWork().
+       */
+      worker = new SwingWorker() {
+         private long time;
 
-    public List<File> getClassPath() {
-        return loader.getClassPath();
-    }
+         @Override
+         public Object construct() {
+            time = System.currentTimeMillis();
+            String res = doWork();
+            time = System.currentTimeMillis() - time;
+            return res;
+         }
 
-    public File getBootClassPath() {
-        return loader.getBootClassPath();
-    }
-
-    public KeYMediator<S, IC> getMediator() {
-        return loader.getMediator();
-    }
-
-    public EnvInput<S, IC> getEnvInput() {
-        return loader.getEnvInput();
-    }
-
-    public AbstractProblemInitializer<S, IC> getProblemInitializer() {
-        return loader.getProblemInitializer();
-    }
-
-    public IC getInitConfig() {
-        return loader.getInitConfig();
-    }
-
-    public Proof getProof() {
-        return loader.getProof();
-    }
-
-    private SwingWorker worker;
-    private ProverTaskListener ptl;
-    
-    
-    
-    public ProblemLoader(DefaultProblemLoader<S, IC> loader) {
-        //super(file, classPath, bootClassPath, mediator);
-        this.loader = loader;
-    }
-
-    public void addTaskListener(ProverTaskListener ptl) {
-        this.ptl = ptl;
-    }
-    
-
-    public void run() {
-        /* Invoking start() on the SwingWorker causes a new Thread
-         * to be created that will call construct(), and then
-         * finished().  Note that finished() is called even if
-         * the worker is interrupted because we catch the
-         * InterruptedException in doWork().
-         */
-        worker = new SwingWorker() {
-                private long time;
-		public Object construct() {
-                    time = System.currentTimeMillis();
-                    String res = doWork();
-                    time = System.currentTimeMillis() - time;
-		    return res;
-		}
-		public void finished() {
-		   getMediator().startInterface(true);
-		    final String msg = (String) get();
-		    if (ptl != null) {                        
-                        final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, 
-                                msg, getProof(), time, 
-                                (getProof() != null ? getProof().countNodes() : 0),                                
-                                (getProof() != null ? getProof().countBranches() -
-                                      getProof().openGoals().size() : 0));
-                        ptl.taskFinished(tfi);
-		    }
-		}
-        };
-        getMediator().stopInterface(true);
-        if (ptl != null) { 
-        	ptl.taskStarted("Loading problem ...", 0);
-        }
-        worker.start();
-    }
-    
-    
+         @Override
+         public void finished() {
+            getMediator().startInterface(true);
+            final String msg = (String) get();
+            if (ptl != null) {
+               final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time, (getProof() != null ? getProof().countNodes() : 0), (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
+               ptl.taskFinished(tfi);
+            }
+         }
+      };
+      getMediator().stopInterface(true);
+      if (ptl != null) {
+         ptl.taskStarted("Loading problem ...", 0);
+      }
+      worker.start();
+   }
     
    private String doWork() {
       String status = "";
-      ProofOblInput po = null;
       try {
          try {
             status = load();
@@ -157,20 +99,25 @@ public final class ProblemLoader<S extends IServices, IC extends InitConfig<S, I
          getMediator().getUI().reportStatus(this, errorMessage);
          status = ex.toString();
       }
-      finally {
-         getMediator().resetNrGoalsClosedByHeuristics();
-         if (po instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile) po).close();
-         }
-      }
       return status;
    }
 
    public KeYExceptionHandler getExceptionHandler() {
        return getMediator().getExceptionHandler();
    }
-   
-   protected String selectProofObligation() {
+
+    @Override
+    protected abstract Proof createProof(IPersistablePO.LoadedPOContainer poContainer) throws ProofInputException;
+
+    @Override
+    protected abstract IPersistablePO.LoadedPOContainer createProofObligationContainer() throws IOException;
+
+    @Override
+    protected EnvInput<S, IC> createEnvInput() throws IOException {
+        return null;
+    }
+
+    protected String selectProofObligation() {
       ProofManagementDialog.showInstance(getMediator(), getInitConfig());
       if (ProofManagementDialog.startedProof()) {
          return "";

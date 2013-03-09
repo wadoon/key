@@ -131,6 +131,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     public ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
+        final boolean satisfiabilityGuard = true; // XXX
         LocationVariable heap =
                 services.getTypeConverter().getHeapLDT().getHeap();
         ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
@@ -147,6 +148,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                                                           heap,
                                                           self,
                                                           toLimit,
+                                                          satisfiabilityGuard,
                                                           services);
         } else {
             Taclet taclet =
@@ -156,6 +158,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                                                           target,
                                                           heap,
                                                           self,
+                                                          satisfiabilityGuard,
                                                           services);
             return DefaultImmutableSet.<Taclet>nil().add(taclet);
         }

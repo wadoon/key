@@ -8,14 +8,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -193,7 +186,7 @@ public abstract class AbstractTypeConverter<S extends IServices> {
         } else if (term.op() instanceof Function) {
             for(LDT model : models) {
                 if (model.hasLiteralFunction((Function)term.op())) {
-                    return model.translateTerm(term, null);	       
+                    return model.translateTerm(term, null, services);
                 }
             }
         }
@@ -207,7 +200,7 @@ public abstract class AbstractTypeConverter<S extends IServices> {
         } else if (term.op() instanceof Function) {
             for(LDT model : models) {
                 if (model.containsFunction((Function)term.op())) {             
-                    return model.translateTerm(term, children);
+                    return model.translateTerm(term, children, services);
                 }  
             }
         } 

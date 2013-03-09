@@ -213,14 +213,14 @@ public final class DependencyContractImpl implements DependencyContract {
     
 
     public Term getPre(List<LocationVariable> heapContext,
-                       Term heapTerm,
+                       Map<LocationVariable,Term> heapTerms,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
 	    	       IServices services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
-          final Term p = getPre(heap, heapTerm, selfTerm, paramTerms, atPres, services);
+          final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
           if(result == null) {
             result = p;
           }else{

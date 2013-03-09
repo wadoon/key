@@ -6,17 +6,43 @@ import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
 
 public class DefaultABSDLProblemLoader extends
-        DefaultProblemLoader<ABSServices, ABSInitConfig> {
+        ProblemLoader<ABSServices, ABSInitConfig> {
 
     public DefaultABSDLProblemLoader(File file, List<File> classPath,
             File bootClassPath, KeYMediator<ABSServices, ABSInitConfig> mediator) {
         super(file, classPath, bootClassPath, mediator);
+    }
+
+    @Override
+    protected Proof createProof(IPersistablePO.LoadedPOContainer poContainer) throws ProofInputException {
+        mediator.setProof(problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum()));
+
+        Proof proof = mediator.getSelectedProof();
+        mediator.stopInterface(true); // first stop (above) is not enough
+
+        if (envInput instanceof ABSKeYUserProblemFile) {
+           // problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator),
+             //       (ABSKeYUserProblemFile) envInput);
+        }
+        mediator.getUI().resetStatus(this);
+        return proof;
+    }
+
+    @Override
+    protected IPersistablePO.LoadedPOContainer createProofObligationContainer() throws IOException {
+        if (envInput instanceof ProofOblInput) {
+            return new IPersistablePO.LoadedPOContainer((ProofOblInput)envInput);
+        }
+        return null;
     }
 
     @Override

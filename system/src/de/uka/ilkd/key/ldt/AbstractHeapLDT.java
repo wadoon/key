@@ -38,7 +38,7 @@ public abstract class AbstractHeapLDT extends LDT implements IHeapLDT {
     private final Sort fieldSort;    
     
     //select/store
-    private final SortDependingFunction select;
+    protected final SortDependingFunction select;
     private final Function store;
     private final Function anon;
        
@@ -218,7 +218,7 @@ public abstract class AbstractHeapLDT extends LDT implements IHeapLDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
+    public Expression translateTerm(Term t, ExtList children, IServices services) {
         assert false;
         return null;
     }

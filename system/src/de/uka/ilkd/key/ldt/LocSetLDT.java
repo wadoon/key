@@ -211,7 +211,7 @@ public final class LocSetLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
+    public Expression translateTerm(Term t, ExtList children, IServices services) {
 	if(t.op().equals(empty)) {
 	    return EmptySetLiteral.INSTANCE;
 	}

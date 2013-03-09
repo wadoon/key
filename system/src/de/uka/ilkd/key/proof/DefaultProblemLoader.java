@@ -54,17 +54,17 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
    /**
     * The instantiated {@link EnvInput} which describes the file to load.
     */
-   private EnvInput<S, IC> envInput;
+   protected EnvInput<S, IC> envInput;
    
    /**
     * The instantiated {@link ProblemInitializer} used during the loading process.
     */
-   private  AbstractProblemInitializer<S, IC> problemInitializer;
+   protected AbstractProblemInitializer<S, IC> problemInitializer;
    
    /**
     * The instantiated {@link JavaDLInitConfig} which provides access to the loaded source elements and specifications.
     */
-   private IC initConfig;
+   protected IC initConfig;
    
    /**
     * The instantiate proof or {@code null} if no proof was instantiated during loading process.
@@ -100,15 +100,27 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
       initConfig = createInitConfig();
       // Read proof obligation settings
       LoadedPOContainer poContainer = createProofObligationContainer();
-      if (poContainer == null) {
-         return selectProofObligation();
+      try {
+         if (poContainer == null) {
+            return selectProofObligation();
+         }
+         // Create proof and apply rules again if possible
+         proof = createProof(poContainer);
+         return ""; // Everything fine
       }
-      // Create proof and apply rules again if possible
-      proof = createProof(poContainer);
-      return ""; // Everything fine
+      finally {
+         getMediator().resetNrGoalsClosedByHeuristics();
+         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+            ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+         }  
+      }
    }
 
-   /**
+    protected abstract Proof createProof(LoadedPOContainer poContainer) throws ProofInputException;
+
+    protected abstract LoadedPOContainer createProofObligationContainer() throws IOException;
+
+    /**
     * Instantiates the {@link EnvInput} which represents the file to load.
     * @return The created {@link EnvInput}.
     * @throws IOException Occurred Exception.
@@ -131,77 +143,7 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
    protected IC createInitConfig() throws ProofInputException {
       return problemInitializer.prepare(envInput);
    }
-   
-   /**
-    * Creates a {@link LoadedPOContainer} if available which contains
-    * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
-    * @return The {@link LoadedPOContainer} or {@code null} if not available.
-    * @throws IOException Occurred Exception.
-    */
-   protected LoadedPOContainer createProofObligationContainer() throws IOException {
-      final String chooseContract;
-      final String proofObligation;
-      if (envInput instanceof KeYFile) {
-         KeYFile keyFile = (KeYFile)envInput;
-         chooseContract = keyFile.chooseContract();
-         proofObligation = keyFile.getProofObligation();
-      }
-      else {
-         chooseContract = null;
-         proofObligation = null;
-      }
-      // Instantiate proof obligation
-      if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
-         return new LoadedPOContainer((ProofOblInput)envInput);
-      }
-      else if (chooseContract != null && chooseContract.length() > 0) {
-         int proofNum = 0;
-         String baseContractName = null;
-         int ind = -1;
-         for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-            ind = chooseContract.indexOf("." + tag);
-            if (ind > 0) {
-               break;
-            }
-            proofNum++;
-         }
-         if (ind == -1) {
-            baseContractName = chooseContract;
-            proofNum = 0;
-         }
-         else {
-            baseContractName = chooseContract.substring(0, ind);
-         }
-         final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
-         if (contract == null) {
-            throw new RuntimeException("Contract not found: " + baseContractName);
-         }
-         else {
-            return new LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
-         }
-      }
-      else if (proofObligation != null && proofObligation.length() > 0) {
-         // Load proof obligation settings
-         Properties properties = new Properties();
-         properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
-         String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
-         if (poClass == null || poClass.isEmpty()) {
-            throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
-         }
-         try {
-            // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
-            Class<?> poClassInstance = Class.forName(poClass);
-            Method loadMethod = poClassInstance.getMethod("loadFrom", JavaDLInitConfig.class, Properties.class);
-            return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
-         }
-         catch (Exception e) {
-            throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
-         }
-      }
-      else {
-         return null;
-      }
-   }
+
 
    /**
     * This method is called if no {@link LoadedPOContainer} was created
@@ -213,25 +155,6 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
       return null; // Do nothing
    }
 
-   /**
-    * Creates a {@link Proof} for the given {@link LoadedPOContainer} and
-    * tries to apply rules again.
-    * @param poContainer The {@link LoadedPOContainer} to instantiate a {@link Proof} for.
-    * @return The instantiated {@link Proof}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-      mediator.setProof(problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum()));
-
-      Proof proof = mediator.getSelectedProof();
-      mediator.stopInterface(true); // first stop (above) is not enough
-
-      if (envInput instanceof KeYUserProblemFile) {
-         problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator), (KeYUserProblemFile) envInput);
-      }
-      mediator.getUI().resetStatus(this);
-      return proof;
-   }
 
    /**
     * Returns the file or folder to load.

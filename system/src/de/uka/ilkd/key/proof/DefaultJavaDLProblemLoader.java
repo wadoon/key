@@ -1,24 +1,122 @@
 package de.uka.ilkd.key.proof;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 
 public class DefaultJavaDLProblemLoader extends
-        DefaultProblemLoader<Services, JavaDLInitConfig> {
+        ProblemLoader<Services, JavaDLInitConfig> {
 
     public DefaultJavaDLProblemLoader(File file, List<File> classPath,
             File bootClassPath, KeYMediator<Services, JavaDLInitConfig> mediator) {
         super(file, classPath, bootClassPath, mediator);
     }
+
+
+    /**
+     * Creates a {@link Proof} for the given {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} and
+     * tries to apply rules again.
+     * @param poContainer The {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} to instantiate a {@link Proof} for.
+     * @return The instantiated {@link Proof}.
+     * @throws de.uka.ilkd.key.proof.init.ProofInputException Occurred Exception.
+     */
+    protected Proof createProof(IPersistablePO.LoadedPOContainer poContainer) throws ProofInputException {
+        mediator.setProof(problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum()));
+
+        Proof proof = mediator.getSelectedProof();
+        mediator.stopInterface(true); // first stop (above) is not enough
+
+        if (envInput instanceof KeYUserProblemFile) {
+            problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator), (KeYUserProblemFile) envInput);
+        }
+        mediator.getUI().resetStatus(this);
+        return proof;
+    }
+
+
+    /**
+     * Creates a {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} if available which contains
+     * the {@link de.uka.ilkd.key.proof.init.ProofOblInput} for which a {@link Proof} should be instantiated.
+     * @return The {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} or {@code null} if not available.
+     * @throws IOException Occurred Exception.
+     */
+    protected IPersistablePO.LoadedPOContainer createProofObligationContainer() throws IOException {
+        final String chooseContract;
+        final String proofObligation;
+        if (envInput instanceof KeYFile) {
+            KeYFile keyFile = (KeYFile)envInput;
+            chooseContract = keyFile.chooseContract();
+            proofObligation = keyFile.getProofObligation();
+        }
+        else {
+            chooseContract = null;
+            proofObligation = null;
+        }
+        // Instantiate proof obligation
+        if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
+            return new IPersistablePO.LoadedPOContainer((ProofOblInput)envInput);
+        }
+        else if (chooseContract != null && chooseContract.length() > 0) {
+            int proofNum = 0;
+            String baseContractName = null;
+            int ind = -1;
+            for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+                ind = chooseContract.indexOf("." + tag);
+                if (ind > 0) {
+                    break;
+                }
+                proofNum++;
+            }
+            if (ind == -1) {
+                baseContractName = chooseContract;
+                proofNum = 0;
+            }
+            else {
+                baseContractName = chooseContract.substring(0, ind);
+            }
+            final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+            if (contract == null) {
+                throw new RuntimeException("Contract not found: " + baseContractName);
+            }
+            else {
+                return new IPersistablePO.LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
+            }
+        }
+        else if (proofObligation != null && proofObligation.length() > 0) {
+            // Load proof obligation settings
+            Properties properties = new Properties();
+            properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
+            String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
+            if (poClass == null || poClass.isEmpty()) {
+                throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+            }
+            try {
+                // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
+                Class<?> poClassInstance = Class.forName(poClass);
+                Method loadMethod = poClassInstance.getMethod("loadFrom", JavaDLInitConfig.class, Properties.class);
+                return (IPersistablePO.LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+            }
+            catch (Exception e) {
+                throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
 
     @Override
     protected EnvInput<Services, JavaDLInitConfig> createEnvInput() throws IOException {

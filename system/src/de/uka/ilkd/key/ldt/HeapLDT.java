@@ -11,14 +11,20 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.util.ExtList;
 
 
 /**
@@ -54,7 +60,7 @@ public final class HeapLDT extends AbstractHeapLDT {
     public HeapLDT(IServices services) {
 	super(NAME, services);
 
-	create            = addFunction(services, "create");
+	    create            = addFunction(services, "create");
         memset            = addFunction(services, "memset");
         arr               = addFunction(services, "arr");
         created           = addFunction(services, "java.lang.Object::<created>");
@@ -244,5 +250,71 @@ public final class HeapLDT extends AbstractHeapLDT {
 	return VALID_HEAP_NAMES;
     }
 
+    @Override
+    public final boolean containsFunction(Function op) {
+    	if (super.containsFunction(op)) {
+    		return true;
+    	}
+    	if (op instanceof SortDependingFunction) {
+    		return ((SortDependingFunction) op).isSimilar(select);
+    	}
+    	return op.isUnique() && op.sort() == getFieldSort();
+    }
+    
+    @Override
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+                                 Term[] subs, 
+                                 Services services, 
+                                 ExecutionContext ec) {
+	return false;
+    }
+    
+
+    @Override
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+                		 Term left, 
+                		 Term right, 
+                		 Services services, 
+                		 ExecutionContext ec) {
+	return false;
+    }
+
+
+    @Override
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
+	    			   Services serv, 
+	    			   ExecutionContext ec) {
+	assert false;
+	return null;
+    }
+
+    
+    @Override
+    public boolean hasLiteralFunction(Function f) {
+	return false;
+    }
+
+    
+    @Override
+    public Expression translateTerm(Term t, ExtList children, IServices services) {
+    	if (t.op() instanceof SortDependingFunction && 
+    			((SortDependingFunction)t.op()).isSimilar(select)) {
+    		ProgramVariable heap = (ProgramVariable) children.remove(0);
+    		if (heap != getHeap()) {
+    			throw new IllegalArgumentException("Can only translate field access to base heap.");
+    		}
+    		ReferencePrefix prefix = (ReferencePrefix) children.remove(0);
+    		ProgramVariable field = (ProgramVariable) children.remove(0);
+    		
+    		if (prefix instanceof NullLiteral) {
+    			return new FieldReference(field, null);
+    		}
+    		return new FieldReference(field, prefix);
+    	} else if (t.sort() == getFieldSort() && t.op() instanceof Function && ((Function) t.op()).isUnique()) {
+    		return ((Services)services).getJavaInfo().getAttribute(getPrettyFieldName(t.op()), getClassName((Function) t.op()));
+    	}
+    	throw new IllegalArgumentException("Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
+    }
+    
 
 }

@@ -7,10 +7,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -21,8 +18,8 @@ public abstract class AbstractUserInterface<S extends IServices, IC extends Init
 
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator<S, IC> mediator) {
-		final ProblemLoader<S,IC> pl = new ProblemLoader<S,IC>(createDefaultProblemLoader(file, classPath,
-		        bootClassPath, mediator));
+		final ProblemLoader<S, IC> pl = createProblemLoader(file, classPath,
+                bootClassPath, mediator);
 		pl.addTaskListener(this);
 		pl.run();
 	}
@@ -36,14 +33,18 @@ public abstract class AbstractUserInterface<S extends IServices, IC extends Init
 		return app.complete() ? app : null;
 	}
 
+
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public IC load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
-       DefaultProblemLoader<S, IC> loader = createDefaultProblemLoader(file, classPath, bootClassPath, getMediator());
+    public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
+       getMediator().stopInterface(true);
+       DefaultProblemLoader loader = createDefaultProblemLoader(file, classPath, bootClassPath, getMediator());
        loader.load();
-       return loader.getInitConfig();
+       getMediator().startInterface(true);
+       return loader;
     }
     
     /**

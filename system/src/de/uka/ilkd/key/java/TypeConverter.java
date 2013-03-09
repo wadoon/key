@@ -10,6 +10,8 @@
 package de.uka.ilkd.key.java;
 
 
+import de.uka.ilkd.key.logic.ProgramInLogic;
+import de.uka.ilkd.key.util.ExtList;
 import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -463,6 +465,116 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
     }
 
 
+    public KeYJavaType getBooleanType() {
+	return services.getJavaInfo()
+	               .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+    }
+
+    
+    public Sort getPrimitiveSort(Type t) {
+	return services.getJavaInfo().getKeYJavaType(t).getSort();
+    }
+
+    
+    /** 
+     * Retrieves the static type of the expression. This method may only be called
+     * if the expressions type can be determined without knowledge of context 
+     * information, i.e. it must not be a expression with an ex-/or implicit this 
+     * reference like this.a or a methodcall whose value can only be determined
+     * when one knows the exact invocation context. 
+     * 
+     * For these cases please use @link #getKeYJavaType(Expression, ExecutionContext)
+     * 
+     * This method behaves same as invoking <code>getKeYJavaType(e, null)</code>
+     */
+    public KeYJavaType getKeYJavaType(Expression e){
+	return getKeYJavaType(e, null);
+    }
+    
+
+    /** 
+     * retrieves the type of the expression <tt>e</tt> with respect to 
+     * the context in which it is evaluated
+     * @param e the Expression whose type has to be retrieved
+     * @param ec the ExecutionContext of expression <tt>e</tt>
+     * @return the KeYJavaType of expression <tt>e</tt>
+     */
+    public KeYJavaType getKeYJavaType(Expression e, ExecutionContext ec) {
+	if(e instanceof ThisReference){
+	    return ec.getTypeReference().getKeYJavaType();
+	}	
+	return e.getKeYJavaType(services, ec);
+    }
+
+    
+    /**
+     * converts a logical term to an AST node if possible. If this fails
+     * it throws a runtime exception.
+     * @param term the Term to be converted
+     * @return the Term as an program AST node of type expression
+     * @throws RuntimeException iff a conversion is not possible
+     */
+    public Expression convertToProgramElement(Term term) {
+	assert term != null;
+	if (term.op() == heapLDT.getNull()) {
+	    return NullLiteral.NULL;
+	} else if (term.op() instanceof Function) {
+	    for(LDT model : models) {
+                if (model.hasLiteralFunction((Function)term.op())) {
+                    return model.translateTerm(term, null, services);	       
+                }
+            }
+	}
+        
+	final ExtList children = new ExtList();
+	for (int i=0; i<term.arity(); i++) {
+	    children.add(convertToProgramElement(term.sub(i)));
+	}
+	if (term.op() instanceof ProgramInLogic) {
+	    return ((ProgramInLogic)term.op()).convertToProgram(term, children);
+	} else if (term.op() instanceof Function) {
+	    for(LDT model : models) {
+                if (model.containsFunction((Function)term.op())) {             
+                    return model.translateTerm(term, children, services);
+                }  
+	    }
+	} 
+	throw new RuntimeException("Cannot convert term to program: "+term
+				   +" "+term.op().getClass());
+    }
+
+    
+    public KeYJavaType getKeYJavaType(Term t) {
+	KeYJavaType result = null;
+	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+	    result = services.getJavaInfo().getKeYJavaType(t.sort());
+	} else if(t.op() instanceof Function) {
+	    for(LDT ldt : models) {
+		if(ldt.containsFunction((Function)t.op())) {
+		    Type type = ldt.getType(t);
+		    result = services.getJavaInfo().getKeYJavaType(type);
+		    break;
+		}
+	    }
+	}
+	
+        if(result == null) {
+            //HACK
+            result = services.getJavaInfo().getKeYJavaType(t.sort().toString()); 
+        }
+        if (result == null) {
+           result = getKeYJavaType(convertToProgramElement(t));
+        }
+ 
+	return result;
+    }
+
+    
+    public KeYJavaType getKeYJavaType(Type t) { 
+	return services.getJavaInfo().getKeYJavaType(t);
+    }
+
+
     /** These methods are taken from recoder (and modified) */
     public boolean isWidening(PrimitiveType from, PrimitiveType to) {
 	// we do not handle null's
@@ -824,9 +936,4 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
 	return tc;
     }
 
-    @Override
-    public KeYJavaType getBooleanType() {
-        return services.getJavaInfo()
-                       .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
-    }
 }
