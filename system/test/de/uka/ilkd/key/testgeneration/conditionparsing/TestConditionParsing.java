@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,14 +42,18 @@ public class TestConditionParsing extends KeYTestGenTest {
     public void testSimpleBuilderExtraction() throws ProofInputException,
             TestGeneratorException, IOException, ProblemLoaderException {
 
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = createSymbolicExecutionEnvironment(
-                keyRepDirectory, javaPathInBaseDir, containerTypeName, "max",
+        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = 
+                createSymbolicExecutionEnvironment(
+                keyRepDirectory, javaPathInBaseDir, 
+                containerTypeName, "max",
                 null, false, false, false);
 
         Proof proof = environment.getProof();
 
-        ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+        ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = 
+                new ExecutedSymbolicExecutionTreeNodesStopCondition(
+                ExecutedSymbolicExecutionTreeNodesStopCondition.
+                MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
 
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
@@ -78,16 +84,15 @@ public class TestConditionParsing extends KeYTestGenTest {
             TermTransformerException {
 
         String method = "maxProxyInstance";
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
+        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = 
+                getEnvironmentForMethod(method);
 
         IExecutionStartNode start = environment.getBuilder().getStartNode();
         IExecutionNode targetNode = retrieveNode(start, "return x").get(0);
         Term targetNodeCondition = targetNode.getPathCondition();
 
-        // printDebug(method, targetNode);
-
-        System.out
-                .println(ModelGenerationTools.simplifyTerm(targetNodeCondition));
+        Term result = ModelGenerationTools.simplifyTerm(targetNodeCondition);
+        Assert.assertFalse(result == null);
     }
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(

@@ -8,7 +8,7 @@ import java.util.Set;
  * of a program following the execution of a test case.
  * <p>
  * An Oracle is essentially a FOL formula in conjunctive normal form - it
- * consists of a set of sub-formulas ({@link OracleAssertion} instances) joined
+ * consists of a set of sub-formulas ({@link OracleClause} instances) joined
  * only by conjunction.
  * 
  * @author christopher
@@ -16,5 +16,5 @@ import java.util.Set;
  */
 public class Oracle {
 
-    Set<OracleAssertion> assertions = new HashSet<OracleAssertion>();
+    Set<OracleClause> assertions = new HashSet<OracleClause>();
 }
