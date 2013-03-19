@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.testgeneration.core.oracle;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
