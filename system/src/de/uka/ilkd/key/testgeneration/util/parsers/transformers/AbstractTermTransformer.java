@@ -3,11 +3,14 @@ package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedOperator;
@@ -37,6 +40,9 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
      */
     protected final TermFactory termFactory = TermFactory.DEFAULT;
 
+    /**
+     * @return a {@link Term} representation of the boolean constant FALSE.
+     */
     protected Term createFalseConstant() {
         final Name name = new Name("FALSE");
         final Sort sort = new SortImpl(new Name(AbstractTermParser.BOOLEAN));
@@ -44,6 +50,9 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         return this.termFactory.createTerm(function);
     }
 
+    /**
+     * @return a {@link Term} representation of the boolean constant TRUE.
+     */
     protected Term createTrueConstant() {
 
         final Name name = new Name("TRUE");
@@ -52,6 +61,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         return this.termFactory.createTerm(function);
     }
 
+    /**
+     * Transforms a {@link Term} representing the AND junctor.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
     protected Term transformAnd(final Term term)
             throws TermTransformerException {
 
@@ -88,6 +104,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         return term;
     }
 
+    /**
+     * Transforms a {@link Term} representing {@link Equality}.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
     protected Term transformEquals(final Term term)
             throws TermTransformerException {
 
@@ -180,6 +203,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         return term;
     }
 
+    /**
+     * Transforms a {@link Term} representing a Junctor, i.e. AND, OR, NOT.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
     protected Term transformJunctor(final Term term)
             throws TermTransformerException {
 
@@ -200,6 +230,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
                 + term.op().name());
     }
 
+    /**
+     * Transforms a {@link Term} representing a Literal.
+     * 
+     * @param term
+     * @return
+     * @throws TermTransformerException
+     */
     protected Term transformLiteral(final Term term)
             throws TermTransformerException {
 
@@ -227,6 +264,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         return term;
     }
 
+    /**
+     * Transforms a {@link Term} representing a the NOT junctor.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
     protected Term transformNot(final Term term)
             throws TermTransformerException {
 
@@ -248,6 +292,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         return term;
     }
 
+    /**
+     * Transforms a {@link Term} representing an {@link ObserverFunction}.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
     protected Term transformObserverFunction(final Term term) {
 
         if (this.isProgramMethod(term)) {
@@ -257,6 +308,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         return term;
     }
 
+    /**
+     * Transforms a {@link Term} representing an OR-junctor.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
     protected Term transformOr(final Term term) throws TermTransformerException {
 
         final Term firstChild = this.transformTerm(term.sub(0));
@@ -265,6 +323,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         return this.termFactory.createTerm(Junctor.OR, firstChild, secondChild);
     }
 
+    /**
+     * Transforms a {@link Term} representing a {@link ProgramMethod}.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
     protected Term transformProgramMethod(final Term term) {
 
         return term;
@@ -363,6 +428,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
                 + term.op().name());
     }
 
+    /**
+     * Transforms a {@link Term} representing a unary function, such as NOT.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
     private Term transformUnaryFunction(final Term term)
             throws TermTransformerException {
 
