@@ -4,7 +4,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 
 public class RemoveSDPsTransformer extends AbstractTermTransformer {
 
@@ -35,7 +35,7 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
     protected Term transformSortDependentFunction(final Term term) {
 
         final ProgramElementName resolvedVariableName = new ProgramElementName(
-                resolveIdentifierString(term, this.SEPARATOR));
+                TermParserTools.resolveIdentifierString(term, this.SEPARATOR));
 
         final LocationVariable resolvedVariable = new LocationVariable(
                 resolvedVariableName, term.sort());

@@ -29,7 +29,7 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestCase;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
-import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.XMLVisitorException;
 
@@ -106,8 +106,8 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
          */
         private void addVariableNode(final Term term) {
 
-            final String variableName = resolveIdentifierString(term,
-                    XMLConverter.SEPARATOR);
+            final String variableName = TermParserTools
+                    .resolveIdentifierString(term, XMLConverter.SEPARATOR);
             this.addTag(
                     XMLConverter.eventFactory.createCharacters(variableName), 1);
         }
@@ -129,7 +129,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
              * Verify that the operator bound at the current term represents a
              * concept suitable for putting in a tag
              */
-            if (this.isBinaryFunction2(subtreeRoot)) {
+            if (TermParserTools.isBinaryFunction2(subtreeRoot)) {
                 final String operatorName = subtreeRoot.op().name().toString();
 
                 final XMLEvent startTag = XMLConverter.eventFactory
@@ -147,7 +147,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         @Override
         public void subtreeLeft(final Term subtreeRoot) {
 
-            if (this.isBinaryFunction2(subtreeRoot)) {
+            if (TermParserTools.isBinaryFunction2(subtreeRoot)) {
                 final String operatorName = this.elementNames.pop();
                 final XMLEvent endTag = XMLConverter.eventFactory
                         .createEndElement("", "", operatorName);

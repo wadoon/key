@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.AbstractTermTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 
@@ -211,18 +211,16 @@ public class ModelGenerationTools {
         @Override
         protected Term transformSortDependentFunction(final Term term) {
 
-            final String sortName = term.sort().toString();
-
             /*
              * Check if the base type of the selection statement is a primitive
              * type (we do not handle anything else). If so, create an alias for
              * the nested variable, and return everything else as a new
              * LocationVariable.
              */
-            if (AbstractTermParser.primitiveTypes.contains(sortName)) {
+            if (TermParserTools.isPrimitiveType(term)) {
 
                 final ProgramElementName resolvedVariableName = new ProgramElementName(
-                        resolveIdentifierString(term,
+                        TermParserTools.resolveIdentifierString(term,
                                 ModelGenerationTools.SEPARATOR));
 
                 final LocationVariable resolvedVariable = new LocationVariable(
@@ -245,7 +243,8 @@ public class ModelGenerationTools {
             /*
              * Booleans are removed without reservation
              */
-            if (this.isBoolean(term) || this.isIfThenElse(term)) {
+            if (TermParserTools.isBoolean(term)
+                    || TermParserTools.isIfThenElse(term)) {
                 return null;
             }
             return super.transformTerm(term);

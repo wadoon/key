@@ -2,6 +2,7 @@ package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 
 /**
  * This transformer brings a Term into Negation Normal Form.
@@ -46,7 +47,7 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
     protected Term transformNot(final Term term)
             throws TermTransformerException {
 
-        if (this.hasChildren(term)) {
+        if (TermParserTools.hasChildren(term)) {
             final Term child = term.sub(0);
 
             /*
@@ -54,8 +55,8 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
              * node with the child of that node, and proceed with parsing that
              * node as usual.
              */
-            if (this.isNot(child)) {
-                if (this.hasChildren(child)) {
+            if (TermParserTools.isNot(child)) {
+                if (TermParserTools.hasChildren(child)) {
                     return this.transformTerm(child.sub(0));
                 }
             }
@@ -64,7 +65,7 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
              * If the child of this node is an AND statement, apply De Morgans
              * laws in order to remove the negation.
              */
-            else if (this.isAnd(child)) {
+            else if (TermParserTools.isAnd(child)) {
 
                 /*
                  * Negate the two subterms to the AND operator.
@@ -94,7 +95,7 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
              * If the child of this node is an OR statement, we process it using
              * De Morgans laws, just as in the case with AND.
              */
-            else if (this.isAnd(child)) {
+            else if (TermParserTools.isAnd(child)) {
 
                 /*
                  * Negate the two subterms.

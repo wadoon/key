@@ -5,12 +5,13 @@ import java.util.Set;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 
 public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
 
     private void collectLiterals(final Term term, final Set<String> literals) {
 
-        if (this.isAnd(term)) {
+        if (TermParserTools.isAnd(term)) {
 
             this.collectLiterals(term.sub(0), literals);
             this.collectLiterals(term.sub(1), literals);
@@ -38,7 +39,7 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
          * If the term represents an OR statement, we simplify each child, and
          * return based on the outcome of this.
          */
-        if (this.isAnd(term)) {
+        if (TermParserTools.isAnd(term)) {
 
             final Term firstChild = this.simplify(term.sub(0), literals);
             final Term secondChild = this.simplify(term.sub(1), literals);

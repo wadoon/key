@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.testgeneration.StringConstants;
-import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
 /**
@@ -151,7 +151,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                  */
 
                 Object value = null;
-                if (AbstractTermParser.primitiveTypes.contains(modelParameter
+                if (TermParserTools.isPrimitiveType(modelParameter
                         .getType())) {
                     value = TermToModelVisitor
                             .resolvePrimitiveType(programVariable);
@@ -272,7 +272,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
             return this.getProgramVariableForField(term.sub(2));
         }
-        
+
         return null;
     }
 
@@ -313,14 +313,14 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * primitive, we simply create a new ModelInstance to hold any reference
          * object.
          */
-        final String identifier = resolveIdentifierString(
-                term, TermToModelVisitor.SEPARATOR);
-        
+        final String identifier = TermParserTools.resolveIdentifierString(term,
+                TermToModelVisitor.SEPARATOR);
+
         /*
          * Check that the variable we found is not already present in the model.
          */
         ModelVariable currentVariable = model.getVariable(identifier);
-        if(currentVariable != null && currentVariable.isParameter()) {
+        if (currentVariable != null && currentVariable.isParameter()) {
             return;
         }
 
@@ -328,16 +328,16 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                 programVariable, identifier);
 
         Object instance = null;
-        if (AbstractTermParser.isPrimitiveType(term)) {
+        if (TermParserTools.isPrimitiveType(term)) {
 
             /*
              * The term is a static variable. Identify and connect it with
              */
-            
+
             instance = TermToModelVisitor.resolvePrimitiveType(programVariable);
-       
+
         } else {
-            
+
             instance = ModelInstance.constructModelInstance(programVariable
                     .getKeYJavaType());
         }
@@ -362,7 +362,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * field of its declaring class. In this case, it is not part of any
          * instance, and we let the parent remain null.
          */
-        if (this.isSortDependingFunction(term)) {
+        if (TermParserTools.isSortDependingFunction(term)) {
 
             final ProgramVariable parentVariable = this
                     .getVariable(term.sub(1));
@@ -373,7 +373,8 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
              */
             if (parentVariable != null) {
 
-                final String parentIdentifier = resolveIdentifierString(term.sub(1),
+                final String parentIdentifier = TermParserTools
+                        .resolveIdentifierString(term.sub(1),
                                 TermToModelVisitor.SEPARATOR);
 
                 final ModelVariable parentModelVariable = ModelVariable
@@ -427,7 +428,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
     @Override
     public void visit(final Term visited) {
 
-        if (this.isVariable(visited)) {
+        if (TermParserTools.isVariable(visited)) {
             this.parseVariableTerm(visited);
         }
     }

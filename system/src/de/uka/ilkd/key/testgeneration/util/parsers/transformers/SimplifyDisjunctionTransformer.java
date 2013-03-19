@@ -5,6 +5,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 
 /**
  * This Transformer simplifies the disjunctions present in a Term.
@@ -16,7 +17,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
 
     private void collectLiterals(final Term term, final Set<String> literals) {
 
-        if (this.isOr(term)) {
+        if (TermParserTools.isOr(term)) {
 
             this.collectLiterals(term.sub(0), literals);
             this.collectLiterals(term.sub(1), literals);
@@ -44,7 +45,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
          * If the term represents an OR statement, we simplify each child, and
          * return based on the outcome of this.
          */
-        if (this.isOr(term)) {
+        if (TermParserTools.isOr(term)) {
 
             final Term firstChild = this.simplify(term.sub(0), literals);
             final Term secondChild = this.simplify(term.sub(1), literals);

@@ -9,6 +9,7 @@ import java.util.PriorityQueue;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 
 /**
  * Transformer which rebuilds a Term in such a way that all Junctors having the
@@ -122,7 +123,7 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
 
     private Term transformTree(final Term term) {
 
-        if (this.isOr(term) || this.isAnd(term)) {
+        if (TermParserTools.isOr(term) || TermParserTools.isAnd(term)) {
 
             final Map<String, Term> identifierMapping = new HashMap<String, Term>();
             final PriorityQueue<String> sortedIdentifiers = new PriorityQueue<String>();

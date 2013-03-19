@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.AbstractTermTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.OrderOperandsTransformer;
@@ -124,7 +125,7 @@ class TermToOracleTransformer extends AbstractTermTransformer {
         /*
          * Handle the special case where the child is the exception type.
          */
-        if (!this.isExceptionSort(term.sub(0))) {
+        if (!TermParserTools.isExceptionSort(term.sub(0))) {
 
             final Term firstChild = this.transformTerm(term.sub(0));
             final Term secondChild = this.transformTerm(term.sub(1));

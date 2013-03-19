@@ -3,7 +3,7 @@ package de.uka.ilkd.key.testgeneration.core.model.implementation;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.testgeneration.StringConstants;
-import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
@@ -75,27 +75,29 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
             /*
              * Process primitive variables.
              */
-            if (AbstractTermParser.isPrimitiveType(leftOperand)) {
+            if (TermParserTools.isPrimitiveType(leftOperand)) {
 
                 /*
                  * If the left-hand hand is a boolean, configure it accordingly.
                  */
-                if (this.isBoolean(leftOperand)) {
+                if (TermParserTools.isBoolean(leftOperand)) {
 
-                    leftOperandIdentifier = resolveIdentifierString(
-                            leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
+                    leftOperandIdentifier = TermParserTools
+                            .resolveIdentifierString(leftOperand,
+                                    ResolveAssignmentsVisitor.SEPARATOR);
 
                     /*
                      * If the right-hand operator is a boolean constant (TRUE or
                      * FALSE), we need to create a new such value and assign it
                      * to the variable.
                      */
-                    if (this.isBooleanConstant(rightOperand)) {
+                    if (TermParserTools.isBooleanConstant(rightOperand)) {
 
                         final ModelVariable modelVariable = this.model
                                 .getVariable(leftOperandIdentifier);
 
-                        boolean value = this.isBooleanTrue(rightOperand);
+                        boolean value = TermParserTools
+                                .isBooleanTrue(rightOperand);
                         value = this.sawNot ? !value : value;
                         this.model.add(modelVariable, value);
                     } else {
@@ -106,10 +108,12 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                      */
                 } else if (!this.sawNot) {
 
-                    leftOperandIdentifier = resolveIdentifierString(
-                            leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
-                    rightOperandIdentifier = resolveIdentifierString(
-                            rightOperand, ResolveAssignmentsVisitor.SEPARATOR);
+                    leftOperandIdentifier = TermParserTools
+                            .resolveIdentifierString(leftOperand,
+                                    ResolveAssignmentsVisitor.SEPARATOR);
+                    rightOperandIdentifier = TermParserTools
+                            .resolveIdentifierString(rightOperand,
+                                    ResolveAssignmentsVisitor.SEPARATOR);
 
                     final ModelVariable leftModelVariable = this.model
                             .getVariable(leftOperandIdentifier);
@@ -124,7 +128,7 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
 
         } catch (final TermParserException e) {
             // Should never happen. Caught only because
-            // AbstractTermParser requires it.
+            // TermParserTools requires it.
             return;
         }
     }
@@ -132,12 +136,12 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
     @Override
     public void visit(final Term visited) {
 
-        if (this.isNot(visited)) {
+        if (TermParserTools.isNot(visited)) {
             this.sawNot = true;
-        } else if (this.isEquals(visited)) {
+        } else if (TermParserTools.isEquals(visited)) {
             this.parseEquals(visited);
             this.sawNot = false;
-        } else if (this.isBinaryFunction2(visited) && this.sawNot) {
+        } else if (TermParserTools.isBinaryFunction2(visited) && this.sawNot) {
             this.sawNot = false;
         }
     }

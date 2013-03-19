@@ -15,7 +15,7 @@ import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelInstance;
 import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestCase;
 import de.uka.ilkd.key.testgeneration.core.testsuiteabstraction.TestSuite;
-import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 
 /**
@@ -113,51 +113,49 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                     /*
                      * Process unary operators
                      */
-                    if (next.equals(AbstractTermParser.NOT)) {
+                    if (next.equals(TermParserTools.NOT)) {
                         final String statement = this.processBuffer();
                         return "!(" + statement + ")";
 
                         /*
                          * Process binary operators
                          */
-                    } else if (AbstractTermParser.operators.contains(next)) {
+                    } else if (TermParserTools.operators.contains(next)) {
                         final String lefthand = this.processBuffer();
                         final String righthand = this.processBuffer();
 
-                        if (next.equals(AbstractTermParser.AND)) {
+                        if (next.equals(TermParserTools.AND)) {
                             return lefthand + " && " + righthand;
 
-                        } else if (next.equals(AbstractTermParser.OR)) {
+                        } else if (next.equals(TermParserTools.OR)) {
                             return lefthand + " || " + righthand;
 
-                        } else if (next.equals(AbstractTermParser.EQUALS)) {
+                        } else if (next.equals(TermParserTools.EQUALS)) {
                             return "(" + lefthand + " == " + righthand + ")";
 
                         } else if (next
-                                .equals(AbstractTermParser.GREATER_OR_EQUALS)) {
+                                .equals(TermParserTools.GREATER_OR_EQUALS)) {
                             return "(" + lefthand + " >= " + righthand + ")";
 
-                        } else if (next
-                                .equals(AbstractTermParser.LESS_OR_EQUALS)) {
+                        } else if (next.equals(TermParserTools.LESS_OR_EQUALS)) {
                             return "(" + lefthand + " <= " + righthand + ")";
 
-                        } else if (next.equals(AbstractTermParser.GREATER_THAN)) {
+                        } else if (next.equals(TermParserTools.GREATER_THAN)) {
                             return "(" + lefthand + " > " + righthand + ")";
 
-                        } else if (next.equals(AbstractTermParser.LESS_THAN)) {
+                        } else if (next.equals(TermParserTools.LESS_THAN)) {
                             return "(" + lefthand + " < " + righthand + ")";
 
-                        } else if (next.equals(AbstractTermParser.ADDITION)) {
+                        } else if (next.equals(TermParserTools.ADDITION)) {
                             return "(" + lefthand + " < " + righthand + ")";
 
-                        } else if (next.equals(AbstractTermParser.SUBTRACTION)) {
+                        } else if (next.equals(TermParserTools.SUBTRACTION)) {
                             return "(" + lefthand + " < " + righthand + ")";
 
-                        } else if (next.equals(AbstractTermParser.DIVISION)) {
+                        } else if (next.equals(TermParserTools.DIVISION)) {
                             return "(" + lefthand + " < " + righthand + ")";
 
-                        } else if (next
-                                .equals(AbstractTermParser.MULTIPLICATION)) {
+                        } else if (next.equals(TermParserTools.MULTIPLICATION)) {
                             return "(" + lefthand + " < " + righthand + ")";
                         }
 
@@ -167,7 +165,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                          */
                     } else {
                         if (next.equals("result")) {
-                            return AbstractTermParser.RESULT;
+                            return TermParserTools.RESULT;
                         }
                         return next;
                     }
@@ -186,39 +184,39 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             public void visit(final Term visited) {
 
                 if (this.isAnd(visited)) {
-                    this.buffer.add(AbstractTermParser.AND);
+                    this.buffer.add(TermParserTools.AND);
 
                 } else if (this.isOr(visited)) {
-                    this.buffer.add(AbstractTermParser.OR);
+                    this.buffer.add(TermParserTools.OR);
 
                 } else if (this.isGreaterOrEquals(visited)) {
-                    this.buffer.add(AbstractTermParser.GREATER_OR_EQUALS);
+                    this.buffer.add(TermParserTools.GREATER_OR_EQUALS);
 
                 } else if (this.isGreaterThan(visited)) {
-                    this.buffer.add(AbstractTermParser.GREATER_THAN);
+                    this.buffer.add(TermParserTools.GREATER_THAN);
 
                 } else if (this.isLessOrEquals(visited)) {
-                    this.buffer.add(AbstractTermParser.LESS_OR_EQUALS);
+                    this.buffer.add(TermParserTools.LESS_OR_EQUALS);
 
                 } else if (this.isLessThan(visited)) {
-                    this.buffer.add(AbstractTermParser.LESS_THAN);
+                    this.buffer.add(TermParserTools.LESS_THAN);
 
                 } else if (this.isEquals(visited)) {
-                    this.buffer.add(AbstractTermParser.EQUALS);
+                    this.buffer.add(TermParserTools.EQUALS);
 
                 } else if (this.isNot(visited)) {
-                    this.buffer.add(AbstractTermParser.NOT);
+                    this.buffer.add(TermParserTools.NOT);
 
                 } else if (this.isParamaterValue(visited)) {
                     this.buffer.add(visited.op().name().toString());
 
                 } else if (this.isLocationVariable(visited)
-                        && AbstractTermParser.isPrimitiveType(visited)) {
+                        && TermParserTools.isPrimitiveType(visited)) {
                     this.buffer.add(visited.op().name().toString());
 
                 } else if (this.isSortDependingFunction(visited)) {
                     final String identifier = resolveIdentifierString(visited,
-                                    StringConstants.FIELD_SEPARATOR.toString());
+                            StringConstants.FIELD_SEPARATOR.toString());
                     this.buffer.add(identifier);
 
                 } else if (this.isResult(visited)) {
@@ -827,7 +825,8 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                         for (ModelVariable field : instance.getFields()) {
 
                             String fieldValueIdentifier = "";
-                            if (field.getValue() instanceof ModelInstance) {;
+                            if (field.getValue() instanceof ModelInstance) {
+                                ;
                                 fieldValueIdentifier = field.getIdentifier();
                             } else {
                                 Object fieldValue = field.getValue();

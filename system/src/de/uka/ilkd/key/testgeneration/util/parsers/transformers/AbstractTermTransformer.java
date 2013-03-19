@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.testgeneration.util.parsers.AbstractTermParser;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 
 /**
@@ -32,8 +32,7 @@ import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
  * @author christopher
  * 
  */
-public abstract class AbstractTermTransformer extends AbstractTermParser
-        implements ITermTransformer {
+public abstract class AbstractTermTransformer implements ITermTransformer {
 
     /**
      * Used for constructing new {@link Term} instances.
@@ -45,7 +44,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
      */
     protected Term createFalseConstant() {
         final Name name = new Name("FALSE");
-        final Sort sort = new SortImpl(new Name(AbstractTermParser.BOOLEAN));
+        final Sort sort = new SortImpl(new Name(TermParserTools.BOOLEAN));
         final Function function = new Function(name, sort);
         return this.termFactory.createTerm(function);
     }
@@ -56,7 +55,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term createTrueConstant() {
 
         final Name name = new Name("TRUE");
-        final Sort sort = new SortImpl(new Name(AbstractTermParser.BOOLEAN));
+        final Sort sort = new SortImpl(new Name(TermParserTools.BOOLEAN));
         final Function function = new Function(name, sort);
         return this.termFactory.createTerm(function);
     }
@@ -139,32 +138,32 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
              * Function-type terms are not excplicitly spelled out in terms of
              * type relationships.
              */
-            if (this.isNullSort(term)) {
+            if (TermParserTools.isNullSort(term)) {
                 return this.transformNull(term);
             }
 
-            if (this.isSortDependingFunction(term)) {
+            if (TermParserTools.isSortDependingFunction(term)) {
                 return this.transformSortDependentFunction(term);
             }
 
-            if (this.isBinaryFunction(term)) {
+            if (TermParserTools.isBinaryFunction(term)) {
                 return this.transformBinaryFunction(term);
             }
 
-            if (this.isUnaryFunction(term)) {
+            if (TermParserTools.isUnaryFunction(term)) {
                 return this.transformUnaryFunction(term);
             }
 
-            if (this.isLiteral(term)) {
+            if (TermParserTools.isLiteral(term)) {
                 return this.transformLiteral(term);
             }
 
-            if (this.isObserverFunction(term)) {
+            if (TermParserTools.isObserverFunction(term)) {
                 return this.transformObserverFunction(term);
 
             }
 
-            if (this.isBooleanConstant(term)) {
+            if (TermParserTools.isBooleanConstant(term)) {
                 return this.transformBooleanConstant(term);
             }
 
@@ -213,16 +212,16 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformJunctor(final Term term)
             throws TermTransformerException {
 
-        if (this.isAnd(term)) {
+        if (TermParserTools.isAnd(term)) {
             return this.transformAnd(term);
 
-        } else if (this.isOr(term)) {
+        } else if (TermParserTools.isOr(term)) {
             return this.transformOr(term);
 
-        } else if (this.isEquals(term)) {
+        } else if (TermParserTools.isEquals(term)) {
             return this.transformEquals(term);
 
-        } else if (this.isNot(term)) {
+        } else if (TermParserTools.isNot(term)) {
             return this.transformNot(term);
         }
 
@@ -301,7 +300,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
      */
     protected Term transformObserverFunction(final Term term) {
 
-        if (this.isProgramMethod(term)) {
+        if (TermParserTools.isProgramMethod(term)) {
             return this.transformProgramMethod(term);
         }
 
@@ -346,7 +345,7 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformProgramVariable(final Term term)
             throws TermTransformerException {
 
-        if (this.isLocationVariable(term)) {
+        if (TermParserTools.isLocationVariable(term)) {
             return this.transformLocationVariable(term);
         }
 
@@ -379,19 +378,19 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
     protected Term transformSortedOperator(final Term term)
             throws TermTransformerException {
 
-        if (this.isFunction(term)) {
+        if (TermParserTools.isFunction(term)) {
             return this.transformFunction(term);
         }
 
-        if (this.isEquals(term)) {
+        if (TermParserTools.isEquals(term)) {
             return this.transformEquals(term);
         }
 
-        if (this.isJunctor(term)) {
+        if (TermParserTools.isJunctor(term)) {
             return this.transformJunctor(term);
         }
 
-        if (this.isProgramVariable(term)) {
+        if (TermParserTools.isProgramVariable(term)) {
             return this.transformProgramVariable(term);
         }
 
@@ -413,13 +412,13 @@ public abstract class AbstractTermTransformer extends AbstractTermParser
         /*
          * Order matters here, since SortedOperator is a subclass of Operator.
          */
-        if (this.isSortedOperator(term)) {
+        if (TermParserTools.isSortedOperator(term)) {
             return this.transformSortedOperator(term);
 
-        } else if (this.isIfExThenElse(term)) {
+        } else if (TermParserTools.isIfExThenElse(term)) {
             return this.transformIfExThenElse(term);
 
-        } else if (this.isIfThenElse(term)) {
+        } else if (TermParserTools.isIfThenElse(term)) {
             return this.transformIfThenElse(term);
 
         }

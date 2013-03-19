@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 
 /**
  * A Transformer which removes {@link IfThenElse} assertions from a Term,
@@ -37,7 +38,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
     }
 
     private boolean isEndBranch(final Term term) {
-        return !this.isIfThenElse(term);
+        return !TermParserTools.isIfThenElse(term);
     }
 
     private void resolveIfThenElse(final Term term,
@@ -66,7 +67,8 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
              * Process the Then branch in the fashion described above.
              */
             if (this.isEndBranch(thenBranch)) {
-                realOutcome = this.translateToJavaBoolean(thenBranch);
+                realOutcome = TermParserTools
+                        .translateToJavaBoolean(thenBranch);
                 if (realOutcome == expectedOutcome) {
                     conditions.add(condition);
                     return;
@@ -82,7 +84,8 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
              * Process the Else branch in the same fashion.
              */
             if (this.isEndBranch(elseBranch)) {
-                realOutcome = this.translateToJavaBoolean(elseBranch);
+                realOutcome = TermParserTools
+                        .translateToJavaBoolean(elseBranch);
                 if (realOutcome == expectedOutcome) {
                     conditions.add(this.termFactory.createTerm(Junctor.NOT,
                             condition));
@@ -133,7 +136,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
             final Term firstChild = term.sub(0);
             final Term secondChild = term.sub(1);
 
-            if (this.isIfThenElse(firstChild)) {
+            if (TermParserTools.isIfThenElse(firstChild)) {
 
                 /*
                  * The conditions which will be generated from this
@@ -146,7 +149,8 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                  * The expected outcome of the evaluation of the if-then-else
                  * statement. May be choosen arbitrarily, see below.
                  */
-                boolean outcome = this.translateToJavaBoolean(secondChild);
+                boolean outcome = TermParserTools
+                        .translateToJavaBoolean(secondChild);
 
                 /*
                  * If the second operand is a boolean, it can only (?) be a
@@ -155,10 +159,11 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                  * statement. If it is a variable, then we instea assume true as
                  * the desired outcome, and assign true to this variable.
                  */
-                if (this.isBoolean(secondChild)) {
+                if (TermParserTools.isBoolean(secondChild)) {
 
-                    if (this.isBooleanConstant(secondChild)) {
-                        outcome = this.translateToJavaBoolean(secondChild);
+                    if (TermParserTools.isBooleanConstant(secondChild)) {
+                        outcome = TermParserTools
+                                .translateToJavaBoolean(secondChild);
                     } else {
                         outcome = true;
                         this.createTrueConstant();

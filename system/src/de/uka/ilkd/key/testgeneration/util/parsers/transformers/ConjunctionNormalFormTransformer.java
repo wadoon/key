@@ -2,6 +2,7 @@ package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 
 /**
  * This parser is used in order to put a Term into Conjunctive Normal Form.
@@ -50,7 +51,7 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
      */
     private Term distribute(final Term firstTerm, final Term secondTerm) {
 
-        if (this.isAnd(firstTerm)) {
+        if (TermParserTools.isAnd(firstTerm)) {
 
             final Term firstDistributedChild = this.distribute(
                     firstTerm.sub(0), secondTerm);
@@ -60,7 +61,7 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
             return this.termFactory.createTerm(Junctor.AND,
                     firstDistributedChild, secondDistributedChild);
 
-        } else if (this.isAnd(secondTerm)) {
+        } else if (TermParserTools.isAnd(secondTerm)) {
 
             final Term firstDistributedChild = this.distribute(firstTerm,
                     secondTerm.sub(0));
