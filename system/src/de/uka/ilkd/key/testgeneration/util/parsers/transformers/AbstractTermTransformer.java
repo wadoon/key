@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 
@@ -44,7 +45,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      */
     protected Term createFalseConstant() {
         final Name name = new Name("FALSE");
-        final Sort sort = new SortImpl(new Name(TermParserTools.BOOLEAN));
+        final Sort sort = new SortImpl(new Name(StringConstants.BOOLEAN));
         final Function function = new Function(name, sort);
         return this.termFactory.createTerm(function);
     }
@@ -55,7 +56,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term createTrueConstant() {
 
         final Name name = new Name("TRUE");
-        final Sort sort = new SortImpl(new Name(TermParserTools.BOOLEAN));
+        final Sort sort = new SortImpl(new Name(StringConstants.BOOLEAN));
         final Function function = new Function(name, sort);
         return this.termFactory.createTerm(function);
     }

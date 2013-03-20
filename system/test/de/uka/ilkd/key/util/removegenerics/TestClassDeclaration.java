@@ -21,7 +21,7 @@ public class TestClassDeclaration extends ResolveGenericClassTest {
     protected void setUp() throws Exception {
         registerCU("package java.lang; class Object {}");
         registerCU("package java.lang; class Comparable<T extends Comparable<T>>  { public int compareTo(T o); }");
-        registerCU("package java.lang; interface Comparator<T> { public int compare(T o1, T o2); }");
+        registerCU("package java.lang; interface ReferenceComparatorType<T> { public int compare(T o1, T o2); }");
         registerCU("class C { C methodC() { return null; }}");
     }
 
@@ -72,9 +72,9 @@ public class TestClassDeclaration extends ResolveGenericClassTest {
     
     /* from java.util.Collections */
     public void testComparable() throws Exception {
-        String before = "class ReverseComparator<T> implements Comparator<Comparable<Object>> {" +
+        String before = "class ReverseComparator<T> implements ReferenceComparatorType<Comparable<Object>> {" +
         "   public int compare(Comparable<Object> c1, Comparable<Object> c2) { return c2.compareTo(c1); } }";
-        String after = "class ReverseComparator implements Comparator { " +
+        String after = "class ReverseComparator implements ReferenceComparatorType { " +
         "//--- This method has been created due to generics removal\n" +
         "   public int compare(java.lang.Object arg1, java.lang.Object arg2) { return this.compare((java.lang.Comparable)arg1, (java.lang.Comparable)arg2); }"+
         "   public int compare(Comparable c1, Comparable c2) { return c2.compareTo(c1); } }";

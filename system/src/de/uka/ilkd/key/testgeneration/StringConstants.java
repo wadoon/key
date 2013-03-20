@@ -7,19 +7,11 @@ package de.uka.ilkd.key.testgeneration;
  * @author christopher
  * 
  */
-public enum StringConstants {
+public final class StringConstants {
 
-    FIELD_SEPARATOR("_"), NEWLINE("\n"), SELF("self"), TAB("    ");
-    ;
-
-    private final String keyWord;
-
-    private StringConstants(final String keyWord) {
-        this.keyWord = keyWord;
-    }
-
-    @Override
-    public String toString() {
-        return this.keyWord;
-    }
+    public final static String FIELD_SEPARATOR = "_";
+    public final static String NEWLINE = "\n";
+    public final static String SELF = "self";
+    public final static String TAB = "    ";
+    public static final String BOOLEAN = "boolean";
 }

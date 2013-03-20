@@ -151,8 +151,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                  */
 
                 Object value = null;
-                if (TermParserTools.isPrimitiveType(modelParameter
-                        .getType())) {
+                if (TermParserTools.isPrimitiveType(modelParameter.getType())) {
                     value = TermToModelVisitor
                             .resolvePrimitiveType(programVariable);
                 }
