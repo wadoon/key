@@ -42,7 +42,7 @@ public class TestJUnitTestCaseGenerator {
 
         HashMap<String, Double> results = new HashMap<String, Double>();
 
-        String methodName = "midOneProxyOneInstance";
+        String methodName = "doStuff";
         List<String> output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",

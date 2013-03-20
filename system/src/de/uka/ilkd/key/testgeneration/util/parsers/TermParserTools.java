@@ -2,8 +2,6 @@ package de.uka.ilkd.key.testgeneration.util.parsers;
 
 import java.util.LinkedList;
 
-import org.hamcrest.core.IsNull;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -11,10 +9,12 @@ import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -31,7 +31,6 @@ import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerE
 public final class TermParserTools {
 
     private static final String ADDITION = "add";
-
     private static final String AND = "and";
 
     /**
@@ -40,25 +39,24 @@ public final class TermParserTools {
      * since it is represented by its own operational type {@link Equality}.
      */
     private static final LinkedList<String> binaryFunctions;
-
     private static final String BOOLEAN = "boolean";
-
     private static final String BYTE = "byte";
-
     private static final String DIVISION = "div";
-
     private static final String EQUALS = "equals";
     private static final String EXCEPTION_BASE = "java.lang.Exception";
+
     /**
      * The sort names for various Java Exceptions, as they are modelled in
      * KeYTestGen
      */
     private static final LinkedList<String> exceptionSorts;
-
+    private static final String EXISTS = "exists";
     private static final String FALSE = "FALSE";
+    private static final String FORALL = "all";
     private static final String GREATER_OR_EQUALS = "geq";
-
     private static final String GREATER_THAN = "geq";
+    private static final String IMPLIES = "imp";
+
     private static final String INTEGER = "int";
     private static final String LESS_OR_EQUALS = "leq";
     private static final String LESS_THAN = "leq";
@@ -66,21 +64,20 @@ public final class TermParserTools {
      * The sort names of the literal kinds supported by KeYTestGen.
      */
     private static final LinkedList<String> literals;
-
     private static final String LONG = "long";
     private static final String MULTIPLICATION = "mul";
-    private static final String NEGATE_LITERAL = "neglit";
-    private static final String NOT = "not";
 
+    private static final String NEGATE_LITERAL = "neglit";
+
+    private static final String NOT = "not";
     private static final String NUMBERS = "numbers";
+
     /**
      * Used for storing an index over all operator types currently handled by
      * KeYTestGen
      */
     private static final LinkedList<String> operators;
-
     private static final String OR = "or";
-
     /**
      * The names of the various primitive types in Java. As of the
      * implementation of this class (November 2012), KeY does not support
@@ -88,15 +85,20 @@ public final class TermParserTools {
      * does KeYTestGen2.
      */
     private static final LinkedList<String> primitiveTypes;
-    private static final String RESULT = "result";
-    private static final String SUBTRACTION = "sub";
-    private static final String TRUE = "TRUE";
+    /**
+     * The names of the quantifiers supported by KeY: forall and exists
+     */
+    private static final LinkedList<String> quantifiers;
 
+    private static final String RESULT = "result";
+
+    private static final String SUBTRACTION = "sub";
+
+    private static final String TRUE = "TRUE";
     /**
      * The sort names of the unary functions as supported by KeYTestGen.
      */
     private static final LinkedList<String> unaryFunctions;
-
     private static final String Z = "Z";
 
     static {
@@ -137,9 +139,14 @@ public final class TermParserTools {
         TermParserTools.operators.add(TermParserTools.ADDITION);
         TermParserTools.operators.add(TermParserTools.SUBTRACTION);
         TermParserTools.operators.add(TermParserTools.EQUALS);
+        TermParserTools.operators.add(TermParserTools.IMPLIES);
 
         exceptionSorts = new LinkedList<String>();
         TermParserTools.exceptionSorts.add(TermParserTools.EXCEPTION_BASE);
+
+        quantifiers = new LinkedList<String>();
+        TermParserTools.quantifiers.add(TermParserTools.FORALL);
+        TermParserTools.quantifiers.add(TermParserTools.EXISTS);
     }
 
     /**
@@ -188,91 +195,6 @@ public final class TermParserTools {
     }
 
     /**
-     * Check if the given term represents a program construct with a supported
-     * primitive type as its base type, such as a method or local variable
-     * declaration.
-     * 
-     * @param term
-     *            the term to check
-     * @return true if the Term represents an integer program construct, false
-     *         otherwise
-     */
-    public static boolean isPrimitiveType(final Term term) {
-
-        final String sortName = term.sort().name().toString();
-
-        return TermParserTools.primitiveTypes.contains(sortName);
-    }
-
-    /**
-     * Generate an identifier String for a variable. Such an identifier is used
-     * in order to uniquely distinguish an instance of a {@link ModelVariable}.
-     * <p>
-     * If the variable is defined by a {@link SortDependingFunction}, the
-     * identifier will be generated by recursively exploring the nesting
-     * hierarchy this variable is a part of.
-     * 
-     * @param term
-     *            the {@link Term} representing the variable
-     * @return the identifier String.
-     * @see Model
-     */
-    public static String resolveIdentifierString(final Term term,
-            final String separator) {
-
-        final Operator operator = term.op();
-
-        String termString = term.toString();
-        if (termString
-                .equalsIgnoreCase("int::select(heap,self,de.uka.ilkd.key.testgeneration.targetmodels.ClassProxy::$instanceInt)")) {
-            int x = 10;
-        }
-
-        /*
-         * Base case 1: underlying definition is a LocationVariable and hence
-         * does not consist of any more nested recursions, so we just extract
-         * the current variable name and go back.
-         */
-        if (operator.getClass() == LocationVariable.class) {
-
-            final String name = TermParserTools.getVariableNameForTerm(term);
-
-            return name;
-            // return isPrimitiveType(term) ? "self_" + name : name;
-        }
-
-        /*
-         * Base case 2: underlying definition is a Function, and hence either
-         * represents the symbolic heap or the root object instance ("self"). In
-         * this case we also cannot go any further. We are not interested in the
-         * symbolic heap here, so we simply return the root name.
-         */
-        else if ((operator.getClass() == Function.class)
-                && !operator.toString().equals("heap")) {
-
-            return "self";
-        }
-
-        /*
-         * Recursive case: underlying definition is still recursively defined,
-         * so keep unwinding it.
-         */
-        else {
-
-            if (isNullSort(term.sub(1))) {
-
-                return TermParserTools.getVariableNameForTerm(term.sub(2));
-
-            } else {
-
-                return resolveIdentifierString(term.sub(1), separator)
-                        + separator
-                        + TermParserTools.getVariableNameForTerm(term.sub(2));
-            }
-        }
-    }
-
-    /**
      * @param term
      *            the Term to check
      * @return true if the term has children, false otherwise.
@@ -312,7 +234,7 @@ public final class TermParserTools {
          * Since Not also qualifies as a junctor, albeit a unary one, check this
          * first.
          */
-        if (isNot(term)) {
+        if (TermParserTools.isNot(term)) {
             return false;
         }
 
@@ -327,12 +249,13 @@ public final class TermParserTools {
 
     public static boolean isBooleanConstant(final Term term)
             throws TermParserException {
-        return isBooleanFalse(term) || isBooleanTrue(term);
+        return TermParserTools.isBooleanFalse(term)
+                || TermParserTools.isBooleanTrue(term);
     }
 
     public static boolean isBooleanFalse(final Term term)
             throws TermParserException {
-        if (isBoolean(term)) {
+        if (TermParserTools.isBoolean(term)) {
             return term.op().name().toString().equals(TermParserTools.FALSE);
         } else {
             throw new TermTransformerException(
@@ -342,7 +265,7 @@ public final class TermParserTools {
 
     public static boolean isBooleanTrue(final Term term)
             throws TermTransformerException {
-        if (isBoolean(term)) {
+        if (TermParserTools.isBoolean(term)) {
             return term.op().name().toString().equals(TermParserTools.TRUE);
         } else {
             throw new TermTransformerException(
@@ -369,6 +292,16 @@ public final class TermParserTools {
 
         return TermParserTools.exceptionSorts.contains(term.sort().name()
                 .toString());
+    }
+
+    public static boolean isExistsQuantifier(final Term term) {
+
+        return term.op().name().toString().equals(TermParserTools.EXISTS);
+    }
+
+    public static boolean isForAllQuantifier(final Term term) {
+
+        return term.op().name().toString().equals(TermParserTools.FORALL);
     }
 
     /**
@@ -508,7 +441,7 @@ public final class TermParserTools {
      */
     public static boolean isOr(final Term term) {
 
-        if (isBinaryFunction2(term)) {
+        if (TermParserTools.isBinaryFunction2(term)) {
 
             return term.op().name().toString().equals(TermParserTools.OR);
 
@@ -516,6 +449,27 @@ public final class TermParserTools {
 
             return false;
         }
+    }
+
+    public static boolean isPrimitiveType(final String type) {
+        return TermParserTools.primitiveTypes.contains(type);
+    }
+
+    /**
+     * Check if the given term represents a program construct with a supported
+     * primitive type as its base type, such as a method or local variable
+     * declaration.
+     * 
+     * @param term
+     *            the term to check
+     * @return true if the Term represents an integer program construct, false
+     *         otherwise
+     */
+    public static boolean isPrimitiveType(final Term term) {
+
+        final String sortName = term.sort().name().toString();
+
+        return TermParserTools.primitiveTypes.contains(sortName);
     }
 
     /**
@@ -536,6 +490,11 @@ public final class TermParserTools {
     public static boolean isProgramVariable(final Term term) {
 
         return term.op() instanceof ProgramVariable;
+    }
+
+    public static boolean isQuantifier(final Term term) {
+
+        return term.op() instanceof Quantifier;
     }
 
     /**
@@ -584,17 +543,88 @@ public final class TermParserTools {
                 || (operator instanceof ProgramVariable);
     }
 
+    /**
+     * Generate an identifier String for a variable. Such an identifier is used
+     * in order to uniquely distinguish an instance of a {@link ModelVariable}.
+     * <p>
+     * If the variable is defined by a {@link SortDependingFunction}, the
+     * identifier will be generated by recursively exploring the nesting
+     * hierarchy this variable is a part of.
+     * 
+     * @param term
+     *            the {@link Term} representing the variable
+     * @return the identifier String.
+     * @see Model
+     */
+    public static String resolveIdentifierString(final Term term,
+            final String separator) {
+
+        final Operator operator = term.op();
+
+        term.toString();
+
+        /*
+         * Base case 1: underlying definition is a LocationVariable and hence
+         * does not consist of any more nested recursions, so we just extract
+         * the current variable name and go back.
+         */
+        if (operator.getClass() == LocationVariable.class) {
+
+            final String name = TermParserTools.getVariableNameForTerm(term);
+
+            return name;
+            // return isPrimitiveType(term) ? "self_" + name : name;
+        }
+
+        /*
+         * Base case 2: underlying definition is a Function, and hence either
+         * represents the symbolic heap or the root object instance ("self"). In
+         * this case we also cannot go any further. We are not interested in the
+         * symbolic heap here, so we simply return the root name.
+         */
+        else if ((operator.getClass() == Function.class)
+                && !operator.toString().equals("heap")) {
+
+            return "self";
+        }
+
+        /*
+         * Recursive case: underlying definition is still recursively defined,
+         * so keep unwinding it.
+         */
+        else {
+
+            if (TermParserTools.isNullSort(term.sub(1))) {
+
+                return TermParserTools.getVariableNameForTerm(term.sub(2));
+
+            } else {
+
+                return TermParserTools.resolveIdentifierString(term.sub(1),
+                        separator)
+                        + separator
+                        + TermParserTools.getVariableNameForTerm(term.sub(2));
+            }
+        }
+    }
+
     public static boolean translateToJavaBoolean(final Term term)
             throws TermParserException {
-        if (isBoolean(term)) {
-            return isBooleanTrue(term) ? true : false;
+        if (TermParserTools.isBoolean(term)) {
+            return TermParserTools.isBooleanTrue(term) ? true : false;
         } else {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
         }
     }
 
-    public static boolean isPrimitiveType(String type) {
-        return primitiveTypes.contains(type);
+    public static boolean isImplication(Term term) {
+
+        return term.op().name().toString().equals(TermParserTools.IMPLIES);
+    }
+
+    public static boolean isLogicVariable(Term term) {
+
+        return term.op() instanceof LogicVariable;
     }
 }

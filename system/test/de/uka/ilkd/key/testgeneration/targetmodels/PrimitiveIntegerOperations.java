@@ -55,6 +55,19 @@ public class PrimitiveIntegerOperations {
             return proxy.nestedProxy.instanceInt;
         }
     }
+    
+  /*@ public normal_behavior
+    @ requires true;
+    @ ensures (\forall int i;
+    @                  (i != 10);
+    @                  (i != 20)) && (\result == 1);
+    @*/
+    public int doStuff(int i) {
+        
+        int x = 0;
+        x = 1;
+        return x;
+    }
 
     /*@ public normal_behavior
      @ requires (a > b);

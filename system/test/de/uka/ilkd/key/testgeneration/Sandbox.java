@@ -35,7 +35,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
 
 public class Sandbox extends KeYTestGenTest {
 
-    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
+    private final String javaPathInBaseDir = "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
     private final String containerTypeName = "PrimitiveIntegerOperations";
 
     @Test
@@ -45,18 +45,11 @@ public class Sandbox extends KeYTestGenTest {
 
         SMTInterface interfac = SMTInterface.INSTANCE;
 
-        try {
-            Thread.sleep(100000000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        String method = "mid";
+        String method = "doStuff";
         SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
         List<IExecutionNode> nodes = retrieveNode(environment.getBuilder()
-                .getStartNode(), "mid=x");
+                .getStartNode(), "x=1");
 
         for (IExecutionNode node : nodes) {
 

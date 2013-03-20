@@ -100,7 +100,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
         return newTerm;
     }
 
-    private Term transformBooleanConstant(final Term term) {
+    protected Term transformBooleanConstant(final Term term) {
         return term;
     }
 
@@ -139,6 +139,10 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
              * Function-type terms are not excplicitly spelled out in terms of
              * type relationships.
              */
+            if (term.arity() > 0) {
+                return this.transformMethodInvocation(term);
+            }
+
             if (TermParserTools.isNullSort(term)) {
                 return this.transformNull(term);
             }
@@ -175,6 +179,11 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         throw new TermTransformerException("Unsupported Function: "
                 + term.op().name());
+    }
+
+    private Term transformMethodInvocation(Term term) {
+
+        return term;
     }
 
     /**
@@ -224,10 +233,19 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         } else if (TermParserTools.isNot(term)) {
             return this.transformNot(term);
+
+        } else if (TermParserTools.isImplication(term)) {
+            return this.transformImplication(term);
         }
 
         throw new TermTransformerException("Unsupported Junctor: "
                 + term.op().name());
+    }
+
+    private Term transformImplication(Term term)
+            throws TermTransformerException {
+
+        return transformTerm(term.sub(0));
     }
 
     /**
@@ -395,8 +413,46 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             return this.transformProgramVariable(term);
         }
 
+        if (TermParserTools.isLogicVariable(term)) {
+            return this.transformLogicVariable(term);
+        }
+
+        if (TermParserTools.isQuantifier(term)) {
+            return this.transformQuantifier(term);
+        }
+
         throw new TermTransformerException("Unsupported SortedOperator: "
                 + term.op().name());
+    }
+
+    private Term transformLogicVariable(Term term) {
+        return term;
+    }
+
+    private Term transformQuantifier(Term term) throws TermTransformerException {
+
+        if (TermParserTools.isExistsQuantifier(term)) {
+            return this.transformExistsQuantifier(term);
+        }
+
+        if (TermParserTools.isForAllQuantifier(term)) {
+            return this.transformForAllQuantifier(term);
+        }
+
+        throw new TermTransformerException("Unsupported quantifier: "
+                + term.op().name());
+    }
+
+    private Term transformForAllQuantifier(Term term)
+            throws TermTransformerException {
+
+        return transform(term.sub(0));
+    }
+
+    private Term transformExistsQuantifier(Term term)
+            throws TermTransformerException {
+
+        return transform(term.sub(0));
     }
 
     /**
@@ -408,7 +464,8 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term
      * @return
      */
-    public Term transformTerm(final Term term) throws TermTransformerException {
+    protected Term transformTerm(final Term term)
+            throws TermTransformerException {
 
         /*
          * Order matters here, since SortedOperator is a subclass of Operator.
@@ -435,7 +492,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      *            the term
      * @return the transformed term
      */
-    private Term transformUnaryFunction(final Term term)
+    protected Term transformUnaryFunction(final Term term)
             throws TermTransformerException {
 
         final Term child = this.transformTerm(term.sub(0));
