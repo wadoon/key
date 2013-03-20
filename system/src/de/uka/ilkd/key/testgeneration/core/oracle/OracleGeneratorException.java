@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oracle.generator;
+package de.uka.ilkd.key.testgeneration.core.oracle;
 
 public class OracleGeneratorException extends Exception {
 

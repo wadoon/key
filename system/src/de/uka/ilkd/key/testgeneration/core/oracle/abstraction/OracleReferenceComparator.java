@@ -1,6 +1,6 @@
-package de.uka.ilkd.key.testgeneration.core.oracle;
+package de.uka.ilkd.key.testgeneration.core.oracle.abstraction;
 
-import de.uka.ilkd.key.testgeneration.core.oracle.types.ReferenceComparatorType;
+import de.uka.ilkd.key.testgeneration.core.oracle.abstraction.types.ReferenceComparatorType;
 
 public class OracleReferenceComparator extends OracleBooleanExpression {
 

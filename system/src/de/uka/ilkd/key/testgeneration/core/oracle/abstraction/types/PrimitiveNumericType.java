@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oracle.types;
+package de.uka.ilkd.key.testgeneration.core.oracle.abstraction.types;
 
 /**
  * The possible primitve types for a numeric expression.

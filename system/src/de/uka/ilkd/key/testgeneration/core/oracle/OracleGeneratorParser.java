@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oracle.generator;
+package de.uka.ilkd.key.testgeneration.core.oracle;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,8 +17,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.testgeneration.core.oracle.OracleBooleanExpression;
-import de.uka.ilkd.key.testgeneration.core.oracle.OracleClause;
+import de.uka.ilkd.key.testgeneration.core.oracle.abstraction.OracleBooleanExpression;
+import de.uka.ilkd.key.testgeneration.core.oracle.abstraction.OracleClause;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserException;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 

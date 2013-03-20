@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oracle.generator;
+package de.uka.ilkd.key.testgeneration.core.oracle;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;

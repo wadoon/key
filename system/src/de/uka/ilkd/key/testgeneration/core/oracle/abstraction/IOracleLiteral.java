@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oracle;
+package de.uka.ilkd.key.testgeneration.core.oracle.abstraction;
 
 public interface IOracleLiteral {
 

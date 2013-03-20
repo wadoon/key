@@ -16,7 +16,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
 import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
-import de.uka.ilkd.key.testgeneration.core.oracle.generator.OracleGeneratorException;
+import de.uka.ilkd.key.testgeneration.core.oracle.OracleGeneratorException;
 
 /**
  * Produces instances of {@link KeYJavaClass}.

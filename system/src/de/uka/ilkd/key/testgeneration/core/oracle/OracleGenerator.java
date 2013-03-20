@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oracle.generator;
+package de.uka.ilkd.key.testgeneration.core.oracle;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,9 +10,6 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.testgeneration.StringConstants;
 import de.uka.ilkd.key.testgeneration.core.classabstraction.KeYJavaMethod;
-import de.uka.ilkd.key.testgeneration.core.oracle.Oracle;
-import de.uka.ilkd.key.testgeneration.core.oracle.OracleClause;
-import de.uka.ilkd.key.testgeneration.core.oracle.OracleBooleanExpression;
 import de.uka.ilkd.key.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;

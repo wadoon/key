@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oracle.types;
+package de.uka.ilkd.key.testgeneration.core.oracle.abstraction.types;
 
 public enum ReferenceComparatorType {
     EQUALS("=="), NOT_EQUALS("!=");

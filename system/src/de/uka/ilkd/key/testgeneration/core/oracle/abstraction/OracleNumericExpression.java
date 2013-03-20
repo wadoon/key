@@ -1,6 +1,6 @@
-package de.uka.ilkd.key.testgeneration.core.oracle;
+package de.uka.ilkd.key.testgeneration.core.oracle.abstraction;
 
-import de.uka.ilkd.key.testgeneration.core.oracle.types.NumericType;
+import de.uka.ilkd.key.testgeneration.core.oracle.abstraction.types.NumericType;
 
 public abstract class OracleNumericExpression {
 

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.core.oracle.types;
+package de.uka.ilkd.key.testgeneration.core.oracle.abstraction.types;
 
 public enum NumericComparatorType {
     EQUALS("=="), NOT_EQUALS("!="), GREATER_THAN(">"), GREATER_OR_EQUALS(">="), LESS_THAN(
