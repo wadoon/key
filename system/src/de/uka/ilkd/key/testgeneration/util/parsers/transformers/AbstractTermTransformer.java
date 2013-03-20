@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.testgeneration.util.parsers.transformers;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -8,6 +10,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -100,6 +103,15 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
         return newTerm;
     }
 
+    /**
+     * Transforms a {@link Term} corresponding to a boolean constant, i.e. TRUE
+     * or FALSE.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
     protected Term transformBooleanConstant(final Term term) {
         return term;
     }
@@ -181,7 +193,15 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
                 + term.op().name());
     }
 
-    private Term transformMethodInvocation(Term term) {
+    /**
+     * Transforms a {@link Term} corresponding to a method invocation.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformMethodInvocation(Term term) {
 
         return term;
     }
@@ -242,10 +262,25 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
                 + term.op().name());
     }
 
-    private Term transformImplication(Term term)
+    /**
+     * Transforms a {@link Term} corresponding to a logical implication.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformImplication(Term term)
             throws TermTransformerException {
 
-        return transformTerm(term.sub(0));
+        Term newFirstChild = transformTerm(term.sub(0));
+        Term newSecondChild = transformTerm(term.sub(1));
+
+        ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
+                newFirstChild, newSecondChild);
+
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
     }
 
     /**
@@ -425,11 +460,20 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
                 + term.op().name());
     }
 
-    private Term transformLogicVariable(Term term) {
+    /**
+     * Transforms a {@link Term} corresponding to a {@link LogicVariable}.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformLogicVariable(Term term) {
         return term;
     }
 
-    private Term transformQuantifier(Term term) throws TermTransformerException {
+    protected Term transformQuantifier(Term term)
+            throws TermTransformerException {
 
         if (TermParserTools.isExistsQuantifier(term)) {
             return this.transformExistsQuantifier(term);
@@ -443,16 +487,42 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
                 + term.op().name());
     }
 
-    private Term transformForAllQuantifier(Term term)
+    /**
+     * Transforms a {@link Term} corresponding to the for-all quantifier.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformForAllQuantifier(Term term)
             throws TermTransformerException {
 
-        return transform(term.sub(0));
+        Term newChild = transformTerm(term.sub(0));
+        ImmutableArray<Term> newChildren = new ImmutableArray<Term>(newChild);
+
+        Term toReturn = termFactory.createTerm(term.op(), newChildren,
+                term.boundVars(), term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
     }
 
-    private Term transformExistsQuantifier(Term term)
+    /**
+     * Transforms a {@link Term} corresponding to the exists quantifier.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformExistsQuantifier(Term term)
             throws TermTransformerException {
 
-        return transform(term.sub(0));
+        Term newChild = transformTerm(term.sub(0));
+        ImmutableArray<Term> newChildren = new ImmutableArray<Term>(newChild);
+
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
     }
 
     /**
