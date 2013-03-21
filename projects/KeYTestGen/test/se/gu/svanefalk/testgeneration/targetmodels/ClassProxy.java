@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.targetmodels;
+package se.gu.svanefalk.testgeneration.targetmodels;
 
 /**
  * Some other class, for the purpose of working with variables resident to

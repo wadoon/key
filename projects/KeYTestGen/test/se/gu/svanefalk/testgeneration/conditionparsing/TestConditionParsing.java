@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.conditionparsing;
+package se.gu.svanefalk.testgeneration.conditionparsing;
 
 import java.io.IOException;
 
@@ -7,6 +7,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.KeYTestGenTest;
 import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
@@ -21,7 +22,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestConditionParsing extends KeYTestGenTest {

@@ -1,9 +1,10 @@
-package de.uka.ilkd.key.testgeneration.codecoverage;
+package se.gu.svanefalk.testgeneration.codecoverage;
 
 import java.io.IOException;
 
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.KeYTestGenTest;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -17,7 +18,6 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class PathAnalyzerTest extends KeYTestGenTest {

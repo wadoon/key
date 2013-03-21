@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration.targetmodels;
+package se.gu.svanefalk.testgeneration.targetmodels;
 
 /**
  * This class provides various methods which use primitive integer operations,

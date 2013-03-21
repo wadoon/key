@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration;
+package se.gu.svanefalk.testgeneration;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,12 +12,12 @@ import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
+import se.gu.svanefalk.testgeneration.targetmodels.PrimitiveIntegerOperations;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.testgeneration.targetmodels.PrimitiveIntegerOperations;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**

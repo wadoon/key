@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.testgeneration;
+package se.gu.svanefalk.testgeneration;
 
 import java.io.File;
 import java.io.IOException;
