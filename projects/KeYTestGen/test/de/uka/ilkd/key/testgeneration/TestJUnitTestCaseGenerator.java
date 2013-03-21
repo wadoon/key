@@ -23,7 +23,6 @@ import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
-
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class TestJUnitTestCaseGenerator {
@@ -37,14 +36,14 @@ public class TestJUnitTestCaseGenerator {
                 "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java")
                 .exists());
 
-        TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
-        IFrameworkConverter junitConverter = new JUnitConverter();
-        ICodeCoverageParser codeCoverageParser = new StatementCoverageParser();
+        final TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
+        final IFrameworkConverter junitConverter = new JUnitConverter();
+        final ICodeCoverageParser codeCoverageParser = new StatementCoverageParser();
 
-        HashMap<String, Double> results = new HashMap<String, Double>();
+        final HashMap<String, Double> results = new HashMap<String, Double>();
 
-        String methodName = "mid";
-        List<String> output = testCaseGenerator
+        final String methodName = "mid";
+        final List<String> output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
                         codeCoverageParser, junitConverter, methodName);
@@ -59,18 +58,18 @@ public class TestJUnitTestCaseGenerator {
          * Discard outliers
          */
 
-        PriorityQueue<String> queue = new PriorityQueue<String>();
-        HashMap<String, Long> readings = Benchmark.getReadings();
-        for (String name : readings.keySet()) {
+        final PriorityQueue<String> queue = new PriorityQueue<String>();
+        final HashMap<String, Long> readings = Benchmark.getReadings();
+        for (final String name : readings.keySet()) {
             queue.add(name);
         }
         while (!queue.isEmpty()) {
-            String next = queue.poll();
-            Long value = readings.get(next);
+            final String next = queue.poll();
+            final Long value = readings.get(next);
 
             System.out.println(next + " : " + value + " milliseconds");
 
-            double formatted = value;
+            final double formatted = value;
             results.put(next, formatted / 1000);
         }
 
@@ -79,18 +78,18 @@ public class TestJUnitTestCaseGenerator {
         KeYInterface.INSTANCE.__DEBUG_RESET();
 
         System.out.println("RESULTS:");
-        for (String id : results.keySet()) {
-            double value = results.get(id);
+        for (final String id : results.keySet()) {
+            final double value = results.get(id);
             System.out.println(id + " : " + value + " milliseconds");
         }
 
-        String toWrite = output.get(0);
+        final String toWrite = output.get(0);
         System.out.println(toWrite);
-        File target = new File(
+        final File target = new File(
                 "/home/christopher/git/key/eclipse/system/test/PrimitiveIntegerOperationsTestClass/Test_PrimitiveIntegerOperations_"
                         + methodName + ".java");
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(
-                target));
+        final BufferedWriter bufferedWriter = new BufferedWriter(
+                new FileWriter(target));
         bufferedWriter.write(toWrite);
         bufferedWriter.close();
 
@@ -106,16 +105,16 @@ public class TestJUnitTestCaseGenerator {
                 "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java")
                 .exists());
 
-        TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
-        IFrameworkConverter junitConverter = new JUnitConverter();
-        ICodeCoverageParser codeCoverageParser = new StatementCoverageParser();
+        final TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
+        final IFrameworkConverter junitConverter = new JUnitConverter();
+        final ICodeCoverageParser codeCoverageParser = new StatementCoverageParser();
 
         final int RUNS = 100;
-        HashMap<String, Double> results = new HashMap<String, Double>();
+        final HashMap<String, Double> results = new HashMap<String, Double>();
 
         for (int i = 0; i < RUNS; i++) {
 
-            List<String> output = testCaseGenerator
+            testCaseGenerator
                     .generatePartialTestSuite(
                             "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
                             codeCoverageParser, junitConverter, "mid");
@@ -130,18 +129,18 @@ public class TestJUnitTestCaseGenerator {
              * Discard outliers
              */
 
-            PriorityQueue<String> queue = new PriorityQueue<String>();
-            HashMap<String, Long> readings = Benchmark.getReadings();
-            for (String name : readings.keySet()) {
+            final PriorityQueue<String> queue = new PriorityQueue<String>();
+            final HashMap<String, Long> readings = Benchmark.getReadings();
+            for (final String name : readings.keySet()) {
                 queue.add(name);
             }
             while (!queue.isEmpty()) {
-                String next = queue.poll();
-                Long value = readings.get(next);
+                final String next = queue.poll();
+                final Long value = readings.get(next);
 
                 System.out.println(next + " : " + value + " milliseconds");
 
-                double formatted = value;
+                final double formatted = value;
                 results.put(next, formatted / 1000);
             }
 
@@ -151,8 +150,8 @@ public class TestJUnitTestCaseGenerator {
         }
 
         System.out.println("RESULTS:");
-        for (String id : results.keySet()) {
-            double value = results.get(id);
+        for (final String id : results.keySet()) {
+            final double value = results.get(id);
             System.out.println(id + " : " + value + " milliseconds");
         }
 
@@ -164,9 +163,5 @@ public class TestJUnitTestCaseGenerator {
          * FileWriter(target)); bufferedWriter.write(toWrite);
          * bufferedWriter.close();
          */
-    }
-
-    private <T> T get(Object o) {
-        return (T) o;
     }
 }

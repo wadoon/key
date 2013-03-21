@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 
+import junit.framework.Assert;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -45,316 +45,21 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
 
-    /**
-     * Creates a {@link SymbolicExecutionEnvironment} which consists of loading
-     * a file to load, finding the method to proof, instantiation of proof and
-     * creation with configuration of {@link SymbolicExecutionTreeBuilder}.
-     * 
-     * @param baseDir
-     *            The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir
-     *            The path to the java file inside the base directory.
-     * @param containerTypeName
-     *            The name of the type which contains the method.
-     * @param methodFullName
-     *            The method name to search.
-     * @param precondition
-     *            An optional precondition to use.
-     * @param mergeBranchConditions
-     *            Merge branch conditions?
-     * @return The created {@link SymbolicExecutionEnvironment}.
-     * @throws ProofInputException
-     *             Occurred Exception.
-     * @author Martin Hentschel (mods by Christopher)
-     * @throws IOException
-     * @throws ProblemLoaderException
-     */
-    protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getPreparedEnvironment(
-            File keyRepo, String rootFolder, String resourceFile,
-            String method, String precondition, boolean mergeBranchConditions)
-            throws ProofInputException, IOException, ProblemLoaderException {
-
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(
-                keyRepDirectory, rootFolder, resourceFile, method, null, false,
-                false, false);
-
-        assertNotNull(env);
-
-        Proof proof = env.getProof();
-
-        ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
-
-        proof.getSettings().getStrategySettings()
-                .setCustomApplyStrategyStopCondition(stopCondition);
-
-        env.getUi().startAndWaitForAutoMode(proof);
-
-        env.getBuilder().analyse();
-
-        return env;
-    }
-
-    /**
-     * Retrieve all nodes corresponding to a given program statement.
-     * 
-     * @param rootNode
-     *            starting node for the symbolic execution tree
-     * @param statement
-     *            the statement to search for
-     * @return
-     * @throws ProofInputException
-     */
-    protected ArrayList<IExecutionNode> retrieveNode(
-            IExecutionStartNode rootNode, String statement)
-            throws ProofInputException {
-
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                rootNode);
-
-        ArrayList<IExecutionNode> nodes = new ArrayList<IExecutionNode>();
-
-        while (iterator.hasNext()) {
-            IExecutionNode next = iterator.next();
-            if (next.getName().trim().equalsIgnoreCase(statement + ";")) {
-                nodes.add(next);
-            }
-        }
-
-        return nodes;
-    }
-
-    protected void printSymbolicExecutionTree(IExecutionStartNode root)
-            throws ProofInputException {
-
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
-
-        while (iterator.hasNext()) {
-
-            IExecutionNode next = iterator.next();
-
-            printSingleNode(next);
-        }
-    }
-
-    protected IExecutionMethodCall getMethodCallNode(IExecutionStartNode root) {
-
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
-
-        while (iterator.hasNext()) {
-
-            IExecutionNode next = iterator.next();
-
-            if (next instanceof IExecutionMethodCall) {
-                return (IExecutionMethodCall) next;
-            }
-        }
-        return null;
-    }
-
-    protected void printBranchNodes(IExecutionStartNode root)
-            throws ProofInputException {
-
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
-
-        while (iterator.hasNext()) {
-
-            IExecutionNode next = iterator.next();
-
-            if (next instanceof IExecutionBranchNode) {
-                System.out.println(((IExecutionBranchNode) next)
-                        .getActivePositionInfo());
-                System.out.println(((IExecutionBranchNode) next)
-                        .getActiveStatement());
-                printSingleNode(next);
-            }
-        }
-    }
-
-    protected void printJavaInfo(IExecutionStartNode root) {
-
-        JavaInfo info = root.getMediator().getJavaInfo();
-
-        for (KeYJavaType type : info.getAllKeYJavaTypes()) {
-            System.out
-                    .println(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-
-        }
-    }
-
-    protected void printExecutionStatementNodes(IExecutionStartNode root)
-            throws ProofInputException {
-
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
-
-        while (iterator.hasNext()) {
-
-            IExecutionNode next = iterator.next();
-
-            if (next instanceof IExecutionStatement) {
-                printSingleNode(next);
-                IExecutionStatement statement = (IExecutionStatement) next;
-            }
-        }
-    }
-
-    protected void printExecutionStateNodes(IExecutionStartNode root)
-            throws ProofInputException {
-
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
-
-        while (iterator.hasNext()) {
-
-            IExecutionNode next = iterator.next();
-
-            if (next instanceof IExecutionStateNode<?>) {
-                printSingleNode(next);
-                IExecutionStateNode<SourceElement> stuff = (IExecutionStateNode<SourceElement>) next;
-                for (IExecutionVariable var : SymbolicExecutionUtil
-                        .createExecutionVariables(stuff)) {
-                    System.out.println("\n" + var.getProgramVariable());
-                    for (IExecutionValue val : var.getValues()) {
-
-                        System.out.println("\t" + val.getValueString());
-                        System.out.println("\t" + val.getTypeString());
-                    }
-                }
-            }
-        }
-    }
-
-    protected void printExecutionReturnStatementNodes(IExecutionStartNode root)
-            throws ProofInputException {
-
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
-
-        while (iterator.hasNext()) {
-
-            IExecutionNode next = iterator.next();
-
-            if (next instanceof ExecutionMethodReturn) {
-                printSingleNode(next);
-            }
-        }
-    }
-
-
-    protected void printSymbolicExecutionTreePathConditions(
-            IExecutionStartNode root) throws ProofInputException {
-
-        ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
-
-        while (iterator.hasNext()) {
-
-            IExecutionNode next = iterator.next();
-
-            if (next instanceof IExecutionStateNode<?>) {
-
-                IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>) next;
-                System.out.println("Node "
-                        + stateNode.getName()
-                        + "\nPath condition "
-                        + stateNode.getPathCondition()
-                        + "\nHuman readable: "
-                        + stateNode.getFormatedPathCondition().replaceAll(
-                                "\n|\t", "") + "\n");
-            }
-        }
-    }
-
-    protected void printSingleNode(IExecutionNode node)
-            throws ProofInputException {
-
-        System.out.println("\nNode " + node.getName() + "\nType: "
-                + node.getClass() + "\nPath condition "
-                + node.getPathCondition() + "\nHuman readable: "
-                + node.getFormatedPathCondition().replaceAll("\n|\t", "")
-                + "\nAddress: " + node.hashCode());
-
-        System.out.println("Children:");
-        for (IExecutionNode child : node.getChildren()) {
-            System.out.println("\t" + child.getName());
-            System.out.println("\t" + child.getClass());
-            System.out.println("\t" + child.getFormatedPathCondition());
-        }
-    }
-
-    protected void printVars(Term term) {
-
-        if (term.op() instanceof LocationVariable)
-            System.out.println(term);
-
-        for (int i = 0; i < term.arity(); i++) {
-            printVars(term.sub(i));
-        }
-
-    }
-
-    protected void printTermAST(Term term) {
-
-        System.out.println("\nTerm: " + term + "\nhas runtime class: "
-                + term.getClass() + "\nand sort: "
-                + term.sort().declarationString() + "\n\twith runtime type: "
-                + term.sort().getClass() + "\nand op: " + term.op()
-                + "\n\twith runtime type: " + term.op().getClass() + "\n"
-                + "Number of subs: " + term.arity() + "\n");
-
-        for (int i = 0; i < term.arity(); i++) {
-
-            for (QuantifiableVariable variable : term.varsBoundHere(i)) {
-                System.out.println(term + " has bound variable: " + variable);
-            }
-        }
-
-        for (int i = 0; i < term.arity(); i++) {
-            System.out.println("Printing child " + i + " of current node");
-            printTermAST(term.sub(i));
-        }
-    }
-
-    protected void printNamespaceProgramVariables(
-            SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
-
-        int i = 0;
-        Namespace namespace = environment.getInitConfig().progVarNS();
-
-        while (namespace != null) {
-
-            System.out.println("**Namespace level: " + i + "**");
-            for (Named named : namespace.elements()) {
-                System.out.println(named);
-            }
-
-            namespace = namespace.parent();
-        }
-    }
-
-    protected void printNamespaceVariables(
-            SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
-
-        int i = 0;
-        Namespace namespace = environment.getInitConfig().varNS();
-
-        while (namespace != null) {
-
-            System.out.println("**Namespace level: " + i + "**");
-            for (Named named : namespace.elements()) {
-                System.out.println(named);
-            }
-
-            namespace = namespace.parent();
-        }
-    }
-
     protected static class SMTSettings implements
             de.uka.ilkd.key.smt.SMTSettings {
+
+        @Override
+        public boolean checkForSupport() {
+
+            return false;
+
+        }
+
+        @Override
+        public String getLogic() {
+
+            return "AUFLIA";
+        }
 
         @Override
         public int getMaxConcurrentProcesses() {
@@ -363,9 +68,21 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         }
 
         @Override
+        public long getMaximumInteger() {
+
+            return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+        }
+
+        @Override
         public int getMaxNumberOfGenerics() {
 
             return 2;
+        }
+
+        @Override
+        public long getMinimumInteger() {
+
+            return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
         }
 
         @Override
@@ -400,7 +117,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         }
 
         @Override
-        public boolean useExplicitTypeHierarchy() {
+        public boolean useAssumptionsForBigSmallIntegers() {
 
             return false;
         }
@@ -412,7 +129,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         }
 
         @Override
-        public boolean useAssumptionsForBigSmallIntegers() {
+        public boolean useExplicitTypeHierarchy() {
 
             return false;
         }
@@ -422,30 +139,316 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
 
             return false;
         }
+    }
 
-        @Override
-        public long getMaximumInteger() {
+    protected IExecutionMethodCall getMethodCallNode(
+            final IExecutionStartNode root) {
 
-            return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                root);
+
+        while (iterator.hasNext()) {
+
+            final IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionMethodCall) {
+                return (IExecutionMethodCall) next;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates a {@link SymbolicExecutionEnvironment} which consists of loading
+     * a file to load, finding the method to proof, instantiation of proof and
+     * creation with configuration of {@link SymbolicExecutionTreeBuilder}.
+     * 
+     * @param baseDir
+     *            The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *            The path to the java file inside the base directory.
+     * @param containerTypeName
+     *            The name of the type which contains the method.
+     * @param methodFullName
+     *            The method name to search.
+     * @param precondition
+     *            An optional precondition to use.
+     * @param mergeBranchConditions
+     *            Merge branch conditions?
+     * @return The created {@link SymbolicExecutionEnvironment}.
+     * @throws ProofInputException
+     *             Occurred Exception.
+     * @author Martin Hentschel (mods by Christopher)
+     * @throws IOException
+     * @throws ProblemLoaderException
+     */
+    protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getPreparedEnvironment(
+            final File keyRepo, final String rootFolder,
+            final String resourceFile, final String method,
+            final String precondition, final boolean mergeBranchConditions)
+            throws ProofInputException, IOException, ProblemLoaderException {
+
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = AbstractSymbolicExecutionTestCase
+                .createSymbolicExecutionEnvironment(
+                        AbstractSymbolicExecutionTestCase.keyRepDirectory,
+                        rootFolder, resourceFile, method, null, false, false,
+                        false);
+
+        Assert.assertNotNull(env);
+
+        final Proof proof = env.getProof();
+
+        final ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
+                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+
+        proof.getSettings().getStrategySettings()
+                .setCustomApplyStrategyStopCondition(stopCondition);
+
+        env.getUi().startAndWaitForAutoMode(proof);
+
+        env.getBuilder().analyse();
+
+        return env;
+    }
+
+    protected void printBranchNodes(final IExecutionStartNode root)
+            throws ProofInputException {
+
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                root);
+
+        while (iterator.hasNext()) {
+
+            final IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionBranchNode) {
+                System.out.println(((IExecutionBranchNode) next)
+                        .getActivePositionInfo());
+                System.out.println(((IExecutionBranchNode) next)
+                        .getActiveStatement());
+                this.printSingleNode(next);
+            }
+        }
+    }
+
+    protected void printExecutionReturnStatementNodes(
+            final IExecutionStartNode root) throws ProofInputException {
+
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                root);
+
+        while (iterator.hasNext()) {
+
+            final IExecutionNode next = iterator.next();
+
+            if (next instanceof ExecutionMethodReturn) {
+                this.printSingleNode(next);
+            }
+        }
+    }
+
+    protected void printExecutionStatementNodes(final IExecutionStartNode root)
+            throws ProofInputException {
+
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                root);
+
+        while (iterator.hasNext()) {
+
+            final IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionStatement) {
+                this.printSingleNode(next);
+            }
+        }
+    }
+
+    protected void printExecutionStateNodes(final IExecutionStartNode root)
+            throws ProofInputException {
+
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                root);
+
+        while (iterator.hasNext()) {
+
+            final IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionStateNode<?>) {
+                this.printSingleNode(next);
+                final IExecutionStateNode<SourceElement> stuff = (IExecutionStateNode<SourceElement>) next;
+                for (final IExecutionVariable var : SymbolicExecutionUtil
+                        .createExecutionVariables(stuff)) {
+                    System.out.println("\n" + var.getProgramVariable());
+                    for (final IExecutionValue val : var.getValues()) {
+
+                        System.out.println("\t" + val.getValueString());
+                        System.out.println("\t" + val.getTypeString());
+                    }
+                }
+            }
+        }
+    }
+
+    protected void printJavaInfo(final IExecutionStartNode root) {
+
+        final JavaInfo info = root.getMediator().getJavaInfo();
+
+        for (final KeYJavaType type : info.getAllKeYJavaTypes()) {
+            System.out
+                    .println(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+
+        }
+    }
+
+    protected void printNamespaceProgramVariables(
+            final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
+
+        final int i = 0;
+        Namespace namespace = environment.getInitConfig().progVarNS();
+
+        while (namespace != null) {
+
+            System.out.println("**Namespace level: " + i + "**");
+            for (final Named named : namespace.elements()) {
+                System.out.println(named);
+            }
+
+            namespace = namespace.parent();
+        }
+    }
+
+    protected void printNamespaceVariables(
+            final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
+
+        final int i = 0;
+        Namespace namespace = environment.getInitConfig().varNS();
+
+        while (namespace != null) {
+
+            System.out.println("**Namespace level: " + i + "**");
+            for (final Named named : namespace.elements()) {
+                System.out.println(named);
+            }
+
+            namespace = namespace.parent();
+        }
+    }
+
+    protected void printSingleNode(final IExecutionNode node)
+            throws ProofInputException {
+
+        System.out.println("\nNode " + node.getName() + "\nType: "
+                + node.getClass() + "\nPath condition "
+                + node.getPathCondition() + "\nHuman readable: "
+                + node.getFormatedPathCondition().replaceAll("\n|\t", "")
+                + "\nAddress: " + node.hashCode());
+
+        System.out.println("Children:");
+        for (final IExecutionNode child : node.getChildren()) {
+            System.out.println("\t" + child.getName());
+            System.out.println("\t" + child.getClass());
+            System.out.println("\t" + child.getFormatedPathCondition());
+        }
+    }
+
+    protected void printSymbolicExecutionTree(final IExecutionStartNode root)
+            throws ProofInputException {
+
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                root);
+
+        while (iterator.hasNext()) {
+
+            final IExecutionNode next = iterator.next();
+
+            this.printSingleNode(next);
+        }
+    }
+
+    protected void printSymbolicExecutionTreePathConditions(
+            final IExecutionStartNode root) throws ProofInputException {
+
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                root);
+
+        while (iterator.hasNext()) {
+
+            final IExecutionNode next = iterator.next();
+
+            if (next instanceof IExecutionStateNode<?>) {
+
+                final IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>) next;
+                System.out.println("Node "
+                        + stateNode.getName()
+                        + "\nPath condition "
+                        + stateNode.getPathCondition()
+                        + "\nHuman readable: "
+                        + stateNode.getFormatedPathCondition().replaceAll(
+                                "\n|\t", "") + "\n");
+            }
+        }
+    }
+
+    protected void printTermAST(final Term term) {
+
+        System.out.println("\nTerm: " + term + "\nhas runtime class: "
+                + term.getClass() + "\nand sort: "
+                + term.sort().declarationString() + "\n\twith runtime type: "
+                + term.sort().getClass() + "\nand op: " + term.op()
+                + "\n\twith runtime type: " + term.op().getClass() + "\n"
+                + "Number of subs: " + term.arity() + "\n");
+
+        for (int i = 0; i < term.arity(); i++) {
+
+            for (final QuantifiableVariable variable : term.varsBoundHere(i)) {
+                System.out.println(term + " has bound variable: " + variable);
+            }
         }
 
-        @Override
-        public long getMinimumInteger() {
+        for (int i = 0; i < term.arity(); i++) {
+            System.out.println("Printing child " + i + " of current node");
+            this.printTermAST(term.sub(i));
+        }
+    }
 
-            return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
+    protected void printVars(final Term term) {
+
+        if (term.op() instanceof LocationVariable) {
+            System.out.println(term);
         }
 
-        @Override
-        public String getLogic() {
-
-            return "AUFLIA";
+        for (int i = 0; i < term.arity(); i++) {
+            this.printVars(term.sub(i));
         }
 
-        @Override
-        public boolean checkForSupport() {
+    }
 
-            return false;
+    /**
+     * Retrieve all nodes corresponding to a given program statement.
+     * 
+     * @param rootNode
+     *            starting node for the symbolic execution tree
+     * @param statement
+     *            the statement to search for
+     * @return
+     * @throws ProofInputException
+     */
+    protected ArrayList<IExecutionNode> retrieveNode(
+            final IExecutionStartNode rootNode, final String statement)
+            throws ProofInputException {
 
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
+                rootNode);
+
+        final ArrayList<IExecutionNode> nodes = new ArrayList<IExecutionNode>();
+
+        while (iterator.hasNext()) {
+            final IExecutionNode next = iterator.next();
+            if (next.getName().trim().equalsIgnoreCase(statement + ";")) {
+                nodes.add(next);
+            }
         }
+
+        return nodes;
     }
 }

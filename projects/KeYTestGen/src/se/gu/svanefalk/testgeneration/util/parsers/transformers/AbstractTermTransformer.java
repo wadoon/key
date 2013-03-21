@@ -4,7 +4,6 @@ import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -133,6 +132,46 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     }
 
     /**
+     * Transforms a {@link Term} corresponding to the exists quantifier.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformExistsQuantifier(final Term term)
+            throws TermTransformerException {
+
+        final Term newChild = this.transformTerm(term.sub(0));
+        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
+                newChild);
+
+        return this.termFactory.createTerm(term.op(), newChildren,
+                term.boundVars(), term.javaBlock());
+    }
+
+    /**
+     * Transforms a {@link Term} corresponding to the for-all quantifier.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformForAllQuantifier(final Term term)
+            throws TermTransformerException {
+
+        final Term newChild = this.transformTerm(term.sub(0));
+        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
+                newChild);
+
+        this.termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
+        return this.termFactory.createTerm(term.op(), newChildren,
+                term.boundVars(), term.javaBlock());
+    }
+
+    /**
      * Transforms a {@link Term} which represents some instance of a
      * {@link Function}.
      * 
@@ -194,19 +233,6 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     }
 
     /**
-     * Transforms a {@link Term} corresponding to a method invocation.
-     * 
-     * @param term
-     *            the term
-     * @return the transformed term
-     * @throws TermTransformerException
-     */
-    protected Term transformMethodInvocation(Term term) {
-
-        return term;
-    }
-
-    /**
      * Transforms a {@link Term} which represents an {@link IfExThenElse}
      * structure (i.e. its {@link Operator} is of this type).
      * 
@@ -230,6 +256,27 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformIfThenElse(final Term term) {
 
         return term;
+    }
+
+    /**
+     * Transforms a {@link Term} corresponding to a logical implication.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformImplication(final Term term)
+            throws TermTransformerException {
+
+        final Term newFirstChild = this.transformTerm(term.sub(0));
+        final Term newSecondChild = this.transformTerm(term.sub(1));
+
+        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
+                newFirstChild, newSecondChild);
+
+        return this.termFactory.createTerm(term.op(), newChildren,
+                term.boundVars(), term.javaBlock());
     }
 
     /**
@@ -263,27 +310,6 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     }
 
     /**
-     * Transforms a {@link Term} corresponding to a logical implication.
-     * 
-     * @param term
-     *            the term
-     * @return the transformed term
-     * @throws TermTransformerException
-     */
-    protected Term transformImplication(Term term)
-            throws TermTransformerException {
-
-        Term newFirstChild = transformTerm(term.sub(0));
-        Term newSecondChild = transformTerm(term.sub(1));
-
-        ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
-                newFirstChild, newSecondChild);
-
-        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
-                term.javaBlock());
-    }
-
-    /**
      * Transforms a {@link Term} representing a Literal.
      * 
      * @param term
@@ -313,6 +339,31 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @return the transformed term
      */
     protected Term transformLocationVariable(final Term term) {
+
+        return term;
+    }
+
+    /**
+     * Transforms a {@link Term} corresponding to a {@link LogicVariable}.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformLogicVariable(final Term term) {
+        return term;
+    }
+
+    /**
+     * Transforms a {@link Term} corresponding to a method invocation.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    protected Term transformMethodInvocation(final Term term) {
 
         return term;
     }
@@ -407,6 +458,21 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
                 + term.op().name());
     }
 
+    protected Term transformQuantifier(final Term term)
+            throws TermTransformerException {
+
+        if (TermParserTools.isExistsQuantifier(term)) {
+            return this.transformExistsQuantifier(term);
+        }
+
+        if (TermParserTools.isForAllQuantifier(term)) {
+            return this.transformForAllQuantifier(term);
+        }
+
+        throw new TermTransformerException("Unsupported quantifier: "
+                + term.op().name());
+    }
+
     /**
      * Transforms a {@link Term} which represents an
      * {@link SortDependingFunction} structure (i.e. its {@link Operator} is of
@@ -458,71 +524,6 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         throw new TermTransformerException("Unsupported SortedOperator: "
                 + term.op().name());
-    }
-
-    /**
-     * Transforms a {@link Term} corresponding to a {@link LogicVariable}.
-     * 
-     * @param term
-     *            the term
-     * @return the transformed term
-     * @throws TermTransformerException
-     */
-    protected Term transformLogicVariable(Term term) {
-        return term;
-    }
-
-    protected Term transformQuantifier(Term term)
-            throws TermTransformerException {
-
-        if (TermParserTools.isExistsQuantifier(term)) {
-            return this.transformExistsQuantifier(term);
-        }
-
-        if (TermParserTools.isForAllQuantifier(term)) {
-            return this.transformForAllQuantifier(term);
-        }
-
-        throw new TermTransformerException("Unsupported quantifier: "
-                + term.op().name());
-    }
-
-    /**
-     * Transforms a {@link Term} corresponding to the for-all quantifier.
-     * 
-     * @param term
-     *            the term
-     * @return the transformed term
-     * @throws TermTransformerException
-     */
-    protected Term transformForAllQuantifier(Term term)
-            throws TermTransformerException {
-
-        Term newChild = transformTerm(term.sub(0));
-        ImmutableArray<Term> newChildren = new ImmutableArray<Term>(newChild);
-
-        Term toReturn = termFactory.createTerm(term.op(), newChildren,
-                term.boundVars(), term.javaBlock());
-        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
-                term.javaBlock());
-    }
-
-    /**
-     * Transforms a {@link Term} corresponding to the exists quantifier.
-     * 
-     * @param term
-     *            the term
-     * @return the transformed term
-     * @throws TermTransformerException
-     */
-    protected Term transformExistsQuantifier(Term term)
-            throws TermTransformerException {
-
-        Term newChild = transformTerm(term.sub(0));
-        ImmutableArray<Term> newChildren = new ImmutableArray<Term>(newChild);
-
-        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
-                term.javaBlock());
     }
 
     /**

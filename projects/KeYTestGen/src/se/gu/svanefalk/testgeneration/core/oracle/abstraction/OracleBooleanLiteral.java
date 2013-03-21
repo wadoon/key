@@ -11,7 +11,8 @@ public class OracleBooleanLiteral extends OracleBooleanExpression implements
 
     private final String identifier;
 
-    public OracleBooleanLiteral(String identifier, boolean truthValue) {
+    public OracleBooleanLiteral(final String identifier,
+            final boolean truthValue) {
         super(truthValue);
 
         this.identifier = identifier;
@@ -20,7 +21,8 @@ public class OracleBooleanLiteral extends OracleBooleanExpression implements
     /**
      * @return the identifier
      */
+    @Override
     public String getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 }

@@ -11,7 +11,6 @@ import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleClause;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -39,11 +38,6 @@ public enum OracleGenerator {
     INSTANCE;
 
     /**
-     * Separator to use when resolving {@link SortDependingFunction} instances.
-     */
-    private final String SEPARATOR = StringConstants.FIELD_SEPARATOR.toString();
-
-    /**
      * Transformer used in order to transform {@link Term} instances
      * representing postconditions into a form suitable for turning them into
      * Oracles.
@@ -52,49 +46,12 @@ public enum OracleGenerator {
             this.SEPARATOR);
 
     /**
-     * Creates a Test Oracle for the provided method. The Oracle will be
-     * generated based on the {@link FunctionalOperationContract} present for
-     * the method, if any. If no such contract exists, a trivial Oracle is
-     * generated with no inherent semantic value.
-     * 
-     * @param method
-     *            the method
-     * @return an Oracle for the method
-     * @throws OracleGeneratorException
+     * Separator to use when resolving {@link SortDependingFunction} instances.
      */
-    public Oracle createOracleForMethod(final KeYJavaMethod method)
-            throws OracleGeneratorException {
+    private final String SEPARATOR = StringConstants.FIELD_SEPARATOR.toString();
 
-        try {
-
-            /*
-             * Extract the postcondition of the method
-             */
-            final Term postCondition = method.getPostconditions().get(0);
-            Term simplifiedPostCondition;
-
-            /*
-             * Simplify the postcondition
-             */
-            simplifiedPostCondition = this.oracleTermTransformer
-                    .transform(postCondition);
-
-            /*
-             * Create and return the Oracle.
-             */
-            Set<OracleClause> oracleClauses = new HashSet<OracleClause>();
-            constructClause(simplifiedPostCondition, oracleClauses);
-
-            return new Oracle(oracleClauses);
-
-        } catch (final TermTransformerException e) {
-
-            throw new OracleGeneratorException(e.getMessage());
-        }
-    }
-
-    private void constructClause(Term term, Set<OracleClause> clauses)
-            throws OracleGeneratorException {
+    private void constructClause(final Term term,
+            final Set<OracleClause> clauses) throws OracleGeneratorException {
 
         /*
          * The clause to be constructed.
@@ -104,7 +61,7 @@ public enum OracleGenerator {
         /*
          * Expressions belonging to the Clause.
          */
-        Set<OracleBooleanExpression> expressions = new HashSet<OracleBooleanExpression>();
+        final Set<OracleBooleanExpression> expressions = new HashSet<OracleBooleanExpression>();
 
         /*
          * Since the formula is in CNF, all occurences of AND junctions will be
@@ -120,41 +77,40 @@ public enum OracleGenerator {
          * this case we simply resolve the expressions represented by both
          * children and return.
          */
-        Term firstChild = term.sub(0);
-        Term secondChild = term.sub(1);
+        final Term firstChild = term.sub(0);
+        final Term secondChild = term.sub(1);
 
         if (TermParserTools.isAnd(firstChild)) {
-            constructClause(firstChild, clauses);
-            constructExpressions(secondChild, expressions);
+            this.constructClause(firstChild, clauses);
+            this.constructExpressions(secondChild, expressions);
 
         } else if (TermParserTools.isAnd(secondChild)) {
-            constructClause(secondChild, clauses);
-            constructExpressions(firstChild, expressions);
+            this.constructClause(secondChild, clauses);
+            this.constructExpressions(firstChild, expressions);
 
         } else {
-            constructExpressions(firstChild, expressions);
-            constructExpressions(secondChild, expressions);
+            this.constructExpressions(firstChild, expressions);
+            this.constructExpressions(secondChild, expressions);
         }
 
         clause = new OracleClause(expressions);
         clauses.add(clause);
     }
 
-    private void constructExpressions(Term term,
-            Set<OracleBooleanExpression> expressions)
+    /**
+     * Transforms a {@link Term} representing the AND junctor.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
+    protected OracleBooleanExpression constructExpressionFromAnd(final Term term)
             throws OracleGeneratorException {
-
         /*
-         * If the Term is an Or-term, resolve both sub-expressions recursively
+         * final Term firstChild = this.transformTerm(term.sub(0)); final Term
+         * secondChild = this.transformTerm(term.sub(1));
          */
-        if (TermParserTools.isOr(term)) {
-            constructExpressions(term.sub(0), expressions);
-            constructExpressions(term.sub(1), expressions);
-        } else {
-
-            OracleBooleanExpression expression = constructExpressionFromTerm(term);
-            expressions.add(expression);
-        }
+        return null;
     }
 
     /**
@@ -256,22 +212,6 @@ public enum OracleGenerator {
 
         throw new OracleGeneratorException("Unsupported Function: "
                 + term.op().name());
-    }
-
-    /**
-     * Transforms a {@link Term} representing the AND junctor.
-     * 
-     * @param term
-     *            the term
-     * @return the transformed term
-     */
-    protected OracleBooleanExpression constructExpressionFromAnd(final Term term)
-            throws OracleGeneratorException {
-        /*
-         * final Term firstChild = this.transformTerm(term.sub(0)); final Term
-         * secondChild = this.transformTerm(term.sub(1));
-         */
-        return null;
     }
 
     /**
@@ -551,5 +491,65 @@ public enum OracleGenerator {
         // final Term child = this.constructExpressionFromTerm(term.sub(0));
 
         return null;
+    }
+
+    private void constructExpressions(final Term term,
+            final Set<OracleBooleanExpression> expressions)
+            throws OracleGeneratorException {
+
+        /*
+         * If the Term is an Or-term, resolve both sub-expressions recursively
+         */
+        if (TermParserTools.isOr(term)) {
+            this.constructExpressions(term.sub(0), expressions);
+            this.constructExpressions(term.sub(1), expressions);
+        } else {
+
+            final OracleBooleanExpression expression = this
+                    .constructExpressionFromTerm(term);
+            expressions.add(expression);
+        }
+    }
+
+    /**
+     * Creates a Test Oracle for the provided method. The Oracle will be
+     * generated based on the {@link FunctionalOperationContract} present for
+     * the method, if any. If no such contract exists, a trivial Oracle is
+     * generated with no inherent semantic value.
+     * 
+     * @param method
+     *            the method
+     * @return an Oracle for the method
+     * @throws OracleGeneratorException
+     */
+    public Oracle createOracleForMethod(final KeYJavaMethod method)
+            throws OracleGeneratorException {
+
+        try {
+
+            /*
+             * Extract the postcondition of the method
+             */
+            final Term postCondition = method.getPostconditions().get(0);
+            Term simplifiedPostCondition;
+
+            /*
+             * Simplify the postcondition
+             */
+            simplifiedPostCondition = this.oracleTermTransformer
+                    .transform(postCondition);
+
+            /*
+             * Create and return the Oracle.
+             */
+            final Set<OracleClause> oracleClauses = new HashSet<OracleClause>();
+            this.constructClause(simplifiedPostCondition, oracleClauses);
+
+            return new Oracle(oracleClauses);
+
+        } catch (final TermTransformerException e) {
+
+            throw new OracleGeneratorException(e.getMessage());
+        }
     }
 }

@@ -1,6 +1,5 @@
 package se.gu.svanefalk.testgeneration.util.parsers.visitors;
 
-import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 

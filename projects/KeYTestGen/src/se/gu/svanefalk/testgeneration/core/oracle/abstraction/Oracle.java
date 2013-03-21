@@ -1,6 +1,5 @@
 package se.gu.svanefalk.testgeneration.core.oracle.abstraction;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -16,9 +15,6 @@ import java.util.Set;
  */
 public class Oracle {
 
-    private final Set<OracleClause> assertions;
-
-    public Oracle(Set<OracleClause> assertions) {
-        this.assertions = assertions;
+    public Oracle(final Set<OracleClause> assertions) {
     }
 }

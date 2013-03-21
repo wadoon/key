@@ -22,8 +22,6 @@ import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
-
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 

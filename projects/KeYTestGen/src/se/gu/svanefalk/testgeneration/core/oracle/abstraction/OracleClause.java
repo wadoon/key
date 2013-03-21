@@ -10,10 +10,6 @@ import java.util.Set;
  */
 public class OracleClause {
 
-    private final Set<OracleBooleanExpression> disjunctions;
-
-    public OracleClause(Set<OracleBooleanExpression> expressions) {
-
-        this.disjunctions = expressions;
+    public OracleClause(final Set<OracleBooleanExpression> expressions) {
     }
 }

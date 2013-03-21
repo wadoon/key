@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 

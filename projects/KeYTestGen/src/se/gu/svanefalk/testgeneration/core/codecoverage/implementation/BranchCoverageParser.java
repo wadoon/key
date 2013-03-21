@@ -3,7 +3,6 @@ package se.gu.svanefalk.testgeneration.core.codecoverage.implementation;
 import java.util.List;
 
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
-
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 

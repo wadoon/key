@@ -8,7 +8,6 @@ import java.util.List;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

@@ -8,9 +8,9 @@ public class OracleNumericComparator extends OracleBooleanExpression {
     private final OracleNumericExpression firstOperand;
     private final Number secondOperand;
 
-    public OracleNumericComparator(NumericComparatorType comparator,
-            OracleNumericExpression firstOperand, Number secondOperand,
-            boolean truthValue) {
+    public OracleNumericComparator(final NumericComparatorType comparator,
+            final OracleNumericExpression firstOperand,
+            final Number secondOperand, final boolean truthValue) {
         super(truthValue);
 
         this.comparator = comparator;
@@ -18,18 +18,18 @@ public class OracleNumericComparator extends OracleBooleanExpression {
         this.secondOperand = secondOperand;
     }
 
-    public NumericComparatorType getOperation() {
-
-        return comparator;
-    }
-
     public OracleNumericExpression getFirstOperand() {
 
-        return firstOperand;
+        return this.firstOperand;
+    }
+
+    public NumericComparatorType getOperation() {
+
+        return this.comparator;
     }
 
     public Number getSecondOperand() {
 
-        return secondOperand;
+        return this.secondOperand;
     }
 }

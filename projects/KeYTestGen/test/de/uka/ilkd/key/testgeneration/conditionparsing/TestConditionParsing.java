@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.testgeneration.conditionparsing;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -13,12 +11,12 @@ import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
@@ -28,117 +26,22 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestConditionParsing extends KeYTestGenTest {
 
-    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
     private final String containerTypeName = "PrimitiveIntegerOperations";
+    private final boolean debug = true;
 
-    private boolean debug = true;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-
-    }
-
-    @Test
-    public void testSimpleBuilderExtraction() throws ProofInputException,
-            TestGeneratorException, IOException, ProblemLoaderException {
-
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = 
-                createSymbolicExecutionEnvironment(
-                keyRepDirectory, javaPathInBaseDir, 
-                containerTypeName, "max",
-                null, false, false, false);
-
-        Proof proof = environment.getProof();
-
-        ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = 
-                new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                ExecutedSymbolicExecutionTreeNodesStopCondition.
-                MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
-
-        proof.getSettings().getStrategySettings()
-                .setCustomApplyStrategyStopCondition(stopCondition);
-
-        environment.getUi().startAndWaitForAutoMode(proof);
-
-        environment.getBuilder().analyse();
-
-        printSymbolicExecutionTree(environment.getBuilder().getStartNode());
-    }
-
-    @Test
-    public void testProofNodeExtraction() throws ProofInputException,
-            ModelGeneratorException, IOException, ProblemLoaderException {
-
-        String method = "max";
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
-
-        IExecutionStartNode start = environment.getBuilder().getStartNode();
-        // IExecutionNode targetNode = retrieveNode(start, "return max").get(0);
-
-        System.out.println(environment.getBuilder().getProof());
-    }
-
-    @Test
-    public void testASTProcessing() throws ProofInputException,
-            ModelGeneratorException, IOException, ProblemLoaderException,
-            TermTransformerException {
-
-        String method = "maxProxyInstance";
-        SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = 
-                getEnvironmentForMethod(method);
-
-        IExecutionStartNode start = environment.getBuilder().getStartNode();
-        IExecutionNode targetNode = retrieveNode(start, "return x").get(0);
-        Term targetNodeCondition = targetNode.getPathCondition();
-
-        Term result = ModelGenerationTools.simplifyTerm(targetNodeCondition);
-        Assert.assertFalse(result == null);
-    }
+    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
-            String method) throws ProofInputException, ModelGeneratorException,
-            IOException, ProblemLoaderException {
+            final String method) throws ProofInputException,
+            ModelGeneratorException, IOException, ProblemLoaderException {
 
-        return getPreparedEnvironment(keyRepDirectory, javaPathInBaseDir,
-                containerTypeName, method, null, false);
+        return this.getPreparedEnvironment(
+                AbstractSymbolicExecutionTestCase.keyRepDirectory,
+                this.javaPathInBaseDir, this.containerTypeName, method, null,
+                false);
     }
 
-    private void printDebug(String method, IExecutionNode node)
-            throws ProofInputException {
-
-        if (!debug) {
-            return;
-        }
-
-        System.out.println("\n\n************" + method + "************\n");
-        printSingleNode(node);
-        printTermAST(node.getPathCondition());
-        // printVars(term);
-
-    }
-
-    private List<Term> extractVariables(Term term) {
-
-        LinkedList<Term> toReturn = new LinkedList<Term>();
-        LinkedList<Term> toVisit = new LinkedList<Term>();
-        toVisit.add(term);
-        while (!toVisit.isEmpty()) {
-
-            Term currentTerm = toVisit.poll();
-
-            /*
-             * Queue child elements of the current term for visition
-             */
-            for (Term nextTerm : term.subs()) {
-                toReturn.add(nextTerm);
-            }
-        }
-
-        return null;
-    }
-
-    protected void printInstance(Term term) {
+    protected void printInstance(final Term term) {
 
         if (term.op() instanceof SortedOperator) {
             System.out.println("\nTerm: " + term + "\nhas runtime class: "
@@ -150,8 +53,72 @@ public class TestConditionParsing extends KeYTestGenTest {
         }
 
         for (int i = 0; i < term.arity(); i++) {
-            printInstance(term.sub(i));
+            this.printInstance(term.sub(i));
         }
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+
+    }
+
+    @Test
+    public void testASTProcessing() throws ProofInputException,
+            ModelGeneratorException, IOException, ProblemLoaderException,
+            TermTransformerException {
+
+        final String method = "maxProxyInstance";
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = this
+                .getEnvironmentForMethod(method);
+
+        final IExecutionStartNode start = environment.getBuilder()
+                .getStartNode();
+        final IExecutionNode targetNode = this.retrieveNode(start, "return x")
+                .get(0);
+        final Term targetNodeCondition = targetNode.getPathCondition();
+
+        final Term result = ModelGenerationTools
+                .simplifyTerm(targetNodeCondition);
+        Assert.assertFalse(result == null);
+    }
+
+    @Test
+    public void testProofNodeExtraction() throws ProofInputException,
+            ModelGeneratorException, IOException, ProblemLoaderException {
+
+        final String method = "max";
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = this
+                .getEnvironmentForMethod(method);
+
+        environment.getBuilder().getStartNode();
+
+        System.out.println(environment.getBuilder().getProof());
+    }
+
+    @Test
+    public void testSimpleBuilderExtraction() throws ProofInputException,
+            TestGeneratorException, IOException, ProblemLoaderException {
+
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = AbstractSymbolicExecutionTestCase
+                .createSymbolicExecutionEnvironment(
+                        AbstractSymbolicExecutionTestCase.keyRepDirectory,
+                        this.javaPathInBaseDir, this.containerTypeName, "max",
+                        null, false, false, false);
+
+        final Proof proof = environment.getProof();
+
+        final ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
+                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+
+        proof.getSettings().getStrategySettings()
+                .setCustomApplyStrategyStopCondition(stopCondition);
+
+        environment.getUi().startAndWaitForAutoMode(proof);
+
+        environment.getBuilder().analyse();
+
+        this.printSymbolicExecutionTree(environment.getBuilder().getStartNode());
     }
 
 }

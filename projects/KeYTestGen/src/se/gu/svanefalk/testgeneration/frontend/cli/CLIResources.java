@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import se.gu.svanefalk.testgeneration.backend.custom.ITestCaseParser;
 
-
 /**
  * Shared resources for the KeyTestGen CLI.
  * 

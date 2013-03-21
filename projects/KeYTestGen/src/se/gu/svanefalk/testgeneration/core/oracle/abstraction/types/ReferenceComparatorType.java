@@ -5,11 +5,12 @@ public enum ReferenceComparatorType {
 
     private final String identifier;
 
-    private ReferenceComparatorType(String identifier) {
+    private ReferenceComparatorType(final String identifier) {
         this.identifier = identifier;
     }
 
+    @Override
     public String toString() {
-        return identifier;
+        return this.identifier;
     }
 }

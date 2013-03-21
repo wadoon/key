@@ -8,9 +8,10 @@ public class OracleReferenceComparator extends OracleBooleanExpression {
     private final OracleReferenceExpression firstOperand;
     private final OracleReferenceExpression secondOperand;
 
-    public OracleReferenceComparator(ReferenceComparatorType comparator,
-            OracleReferenceExpression firstOperand,
-            OracleReferenceExpression secondOperand, boolean truthValue) {
+    public OracleReferenceComparator(final ReferenceComparatorType comparator,
+            final OracleReferenceExpression firstOperand,
+            final OracleReferenceExpression secondOperand,
+            final boolean truthValue) {
         super(truthValue);
 
         this.comparator = comparator;
@@ -18,18 +19,18 @@ public class OracleReferenceComparator extends OracleBooleanExpression {
         this.secondOperand = secondOperand;
     }
 
-    public ReferenceComparatorType getOperation() {
-
-        return comparator;
-    }
-
     public OracleReferenceExpression getFirstOperand() {
 
-        return firstOperand;
+        return this.firstOperand;
+    }
+
+    public ReferenceComparatorType getOperation() {
+
+        return this.comparator;
     }
 
     public OracleReferenceExpression getSecondOperand() {
 
-        return secondOperand;
+        return this.secondOperand;
     }
 }

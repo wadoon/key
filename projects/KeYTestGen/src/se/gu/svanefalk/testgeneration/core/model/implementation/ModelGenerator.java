@@ -7,7 +7,6 @@ import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -188,9 +187,10 @@ public enum ModelGenerator implements IModelGenerator {
                  * Finally, retrieve the variable corresponding to the name of
                  * the result, and insert the corresponding result into it.
                  */
-                final ModelVariable variable = model.getVariable(varName.trim());
+                final ModelVariable variable = model
+                        .getVariable(varName.trim());
                 if (variable != null) {
-              
+
                     variable.setValue(value);
                 } else {
                     final StringBuilder stringBuilder = new StringBuilder();
@@ -236,7 +236,7 @@ public enum ModelGenerator implements IModelGenerator {
                 return null;
 
             } else {
-                
+
                 final String commands = this.translateToSMTLIB2(
                         simplifiedPathCondition, services);
 

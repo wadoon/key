@@ -112,18 +112,6 @@ public class ModelVariable {
         return this.identifier.equals(other.identifier);
     }
 
-    public String getVariableName() {
-
-        String rawName = this.variable.name().toString();
-        int lastColon = rawName.lastIndexOf(':');
-
-        if (lastColon != -1) {
-            return rawName.substring(lastColon + 1);
-        } else {
-            return rawName;
-        }
-    }
-
     /**
      * A variable is uniquely identified by its identifier.
      */
@@ -158,6 +146,18 @@ public class ModelVariable {
     public <T> T getValue() {
 
         return (T) this.boundValue;
+    }
+
+    public String getVariableName() {
+
+        final String rawName = this.variable.name().toString();
+        final int lastColon = rawName.lastIndexOf(':');
+
+        if (lastColon != -1) {
+            return rawName.substring(lastColon + 1);
+        } else {
+            return rawName;
+        }
     }
 
     /**

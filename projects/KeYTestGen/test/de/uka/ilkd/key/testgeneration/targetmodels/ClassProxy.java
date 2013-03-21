@@ -7,41 +7,34 @@ package de.uka.ilkd.key.testgeneration.targetmodels;
 public class ClassProxy {
 
     public static int staticInt;
-    public int instanceInt;
-    public ClassProxy nestedProxy;
 
     /**
      * @return the staticInt
      */
     public static final int getStaticInt() {
 
-        return staticInt;
+        return ClassProxy.staticInt;
     }
 
     /**
      * @param staticInt
      *            the staticInt to set
      */
-    public static final void setStaticInt(int staticInt) {
+    public static final void setStaticInt(final int staticInt) {
 
         ClassProxy.staticInt = staticInt;
     }
+
+    public int instanceInt;
+
+    public ClassProxy nestedProxy;
 
     /**
      * @return the instanceInt
      */
     public final int getInstanceInt() {
 
-        return instanceInt;
-    }
-
-    /**
-     * @param instanceInt
-     *            the instanceInt to set
-     */
-    public final void setInstanceInt(int instanceInt) {
-
-        this.instanceInt = instanceInt;
+        return this.instanceInt;
     }
 
     /**
@@ -49,14 +42,23 @@ public class ClassProxy {
      */
     public final ClassProxy getNestedProxy() {
 
-        return nestedProxy;
+        return this.nestedProxy;
+    }
+
+    /**
+     * @param instanceInt
+     *            the instanceInt to set
+     */
+    public final void setInstanceInt(final int instanceInt) {
+
+        this.instanceInt = instanceInt;
     }
 
     /**
      * @param nestedProxy
      *            the nestedProxy to set
      */
-    public final void setNestedProxy(ClassProxy nestedProxy) {
+    public final void setNestedProxy(final ClassProxy nestedProxy) {
 
         this.nestedProxy = nestedProxy;
     }

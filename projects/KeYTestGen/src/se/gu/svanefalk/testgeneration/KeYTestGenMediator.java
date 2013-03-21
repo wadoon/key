@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 
-
 /**
  * Bucket class meant to carry shared data around in a single KeYTestGen
  * session.

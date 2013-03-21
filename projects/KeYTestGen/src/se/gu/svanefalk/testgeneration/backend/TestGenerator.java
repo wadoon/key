@@ -8,7 +8,6 @@ import se.gu.svanefalk.testgeneration.core.CoreInterface;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 

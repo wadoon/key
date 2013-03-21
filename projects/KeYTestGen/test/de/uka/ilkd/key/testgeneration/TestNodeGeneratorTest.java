@@ -9,9 +9,9 @@ import se.gu.svanefalk.testgeneration.core.NodeTestGenerator;
 import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
-
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -19,10 +19,23 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestNodeGeneratorTest extends KeYTestGenTest {
 
-    private IModelGenerator modelGenerator;
-    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
     private final String containerTypeName = "PrimitiveIntegerOperations";
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment;
+    private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
+    private IModelGenerator modelGenerator;
+
+    private void setup(final String method) throws ProofInputException,
+            ModelGeneratorException, IOException, ProblemLoaderException {
+
+        if (this.modelGenerator == null) {
+            this.modelGenerator = ModelGenerator.INSTANCE;
+        }
+
+        this.environment = this.getPreparedEnvironment(
+                AbstractSymbolicExecutionTestCase.keyRepDirectory,
+                this.javaPathInBaseDir, this.containerTypeName, method, null,
+                false);
+    }
 
     /**
      * Test model instantiation for the standard mid method.
@@ -32,23 +45,13 @@ public class TestNodeGeneratorTest extends KeYTestGenTest {
     @Test
     public void testMid() throws Exception {
 
-        setup("mid");
-        IExecutionStartNode root = environment.getBuilder().getStartNode();
-        List<IExecutionNode> nodes = retrieveNode(root, "mid=x");
+        this.setup("mid");
+        final IExecutionStartNode root = this.environment.getBuilder()
+                .getStartNode();
+        final List<IExecutionNode> nodes = this.retrieveNode(root, "mid=x");
 
-        for (IExecutionNode node : nodes) {
+        for (final IExecutionNode node : nodes) {
             NodeTestGenerator.INSTANCE.constructTestSuiteFromNode(node);
         }
-    }
-
-    private void setup(String method) throws ProofInputException,
-            ModelGeneratorException, IOException, ProblemLoaderException {
-
-        if (modelGenerator == null) {
-            modelGenerator = ModelGenerator.INSTANCE;
-        }
-
-        environment = getPreparedEnvironment(keyRepDirectory,
-                javaPathInBaseDir, containerTypeName, method, null, false);
     }
 }

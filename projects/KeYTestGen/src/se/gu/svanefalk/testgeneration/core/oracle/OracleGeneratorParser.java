@@ -1,13 +1,10 @@
 package se.gu.svanefalk.testgeneration.core.oracle;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleBooleanExpression;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleClause;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -24,68 +21,20 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 
 public class OracleGeneratorParser {
 
-    private void constructClause(Term term, Set<OracleClause> clauses)
+    /**
+     * Transforms a {@link Term} representing the AND junctor.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     */
+    protected OracleBooleanExpression constructExpressionFromAnd(final Term term)
             throws OracleGeneratorException {
-
         /*
-         * The clause to be constructed.
+         * final Term firstChild = this.transformTerm(term.sub(0)); final Term
+         * secondChild = this.transformTerm(term.sub(1));
          */
-        OracleClause clause = null;
-
-        /*
-         * Expressions belonging to the Clause.
-         */
-        Set<OracleBooleanExpression> expressions = new HashSet<OracleBooleanExpression>();
-
-        /*
-         * Since the formula is in CNF, all occurences of AND junctions will be
-         * in direct parent-child relationships with one another.
-         * 
-         * We hence start by checking if either of the children is an AND
-         * junctor. If either is, we recursively continue to construct
-         * Conjunctions for that child, while at the same time completing the
-         * Conjunction for the current node by resolving the expression related
-         * to it, which will in this case be present in the other child.
-         * 
-         * The base case is if neither of the children represent an AND-node. In
-         * this case we simply resolve the expressions represented by both
-         * children and return.
-         */
-        Term firstChild = term.sub(0);
-        Term secondChild = term.sub(1);
-
-        if (TermParserTools.isAnd(firstChild)) {
-            constructClause(firstChild, clauses);
-            constructExpressions(secondChild, expressions);
-
-        } else if (TermParserTools.isAnd(secondChild)) {
-            constructClause(secondChild, clauses);
-            constructExpressions(firstChild, expressions);
-
-        } else {
-            constructExpressions(firstChild, expressions);
-            constructExpressions(secondChild, expressions);
-        }
-
-        clause = new OracleClause(expressions);
-        clauses.add(clause);
-    }
-
-    private void constructExpressions(Term term,
-            Set<OracleBooleanExpression> expressions)
-            throws OracleGeneratorException {
-
-        /*
-         * If the Term is an Or-term, resolve both sub-expressions recursively
-         */
-        if (TermParserTools.isOr(term)) {
-            constructExpressions(term.sub(0), expressions);
-            constructExpressions(term.sub(1), expressions);
-        } else {
-
-            OracleBooleanExpression expression = constructExpressionFromTerm(term);
-            expressions.add(expression);
-        }
+        return null;
     }
 
     /**
@@ -187,22 +136,6 @@ public class OracleGeneratorParser {
 
         throw new OracleGeneratorException("Unsupported Function: "
                 + term.op().name());
-    }
-
-    /**
-     * Transforms a {@link Term} representing the AND junctor.
-     * 
-     * @param term
-     *            the term
-     * @return the transformed term
-     */
-    protected OracleBooleanExpression constructExpressionFromAnd(final Term term)
-            throws OracleGeneratorException {
-        /*
-         * final Term firstChild = this.transformTerm(term.sub(0)); final Term
-         * secondChild = this.transformTerm(term.sub(1));
-         */
-        return null;
     }
 
     /**
@@ -482,5 +415,23 @@ public class OracleGeneratorParser {
         // final Term child = this.constructExpressionFromTerm(term.sub(0));
 
         return null;
+    }
+
+    private void constructExpressions(final Term term,
+            final Set<OracleBooleanExpression> expressions)
+            throws OracleGeneratorException {
+
+        /*
+         * If the Term is an Or-term, resolve both sub-expressions recursively
+         */
+        if (TermParserTools.isOr(term)) {
+            this.constructExpressions(term.sub(0), expressions);
+            this.constructExpressions(term.sub(1), expressions);
+        } else {
+
+            final OracleBooleanExpression expression = this
+                    .constructExpressionFromTerm(term);
+            expressions.add(expression);
+        }
     }
 }

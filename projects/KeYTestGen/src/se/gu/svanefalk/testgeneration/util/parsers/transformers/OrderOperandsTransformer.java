@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;

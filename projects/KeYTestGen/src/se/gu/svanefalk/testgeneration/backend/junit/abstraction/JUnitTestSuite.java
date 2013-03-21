@@ -5,7 +5,6 @@ import java.util.List;
 
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 
-
 /**
  * Represents a JUnit test suite. It consists of a set of {@link JUnitTestCase}
  * instances, a set of imports, and a set of utility methods and state

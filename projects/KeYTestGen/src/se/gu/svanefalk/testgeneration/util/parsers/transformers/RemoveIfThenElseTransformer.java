@@ -5,7 +5,6 @@ import java.util.Queue;
 
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;

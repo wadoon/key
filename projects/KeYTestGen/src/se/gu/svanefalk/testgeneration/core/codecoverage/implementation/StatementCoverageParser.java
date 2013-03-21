@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
-
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;

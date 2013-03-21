@@ -7,7 +7,6 @@ import se.gu.svanefalk.testgeneration.core.CoreException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 
-
 /**
  * Instances of this class represent a Test Suite, that is, a set of
  * {@link TestCase} instances for a given {@link KeYJavaMethod}.

@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -356,6 +355,11 @@ public final class TermParserTools {
         return term.op() instanceof IfThenElse;
     }
 
+    public static boolean isImplication(final Term term) {
+
+        return term.op().name().toString().equals(TermParserTools.IMPLIES);
+    }
+
     /**
      * @param term
      *            the term
@@ -402,6 +406,11 @@ public final class TermParserTools {
     public static boolean isLocationVariable(final Term term) {
 
         return term.op() instanceof LocationVariable;
+    }
+
+    public static boolean isLogicVariable(final Term term) {
+
+        return term.op() instanceof LogicVariable;
     }
 
     /**
@@ -617,15 +626,5 @@ public final class TermParserTools {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
         }
-    }
-
-    public static boolean isImplication(Term term) {
-
-        return term.op().name().toString().equals(TermParserTools.IMPLIES);
-    }
-
-    public static boolean isLogicVariable(Term term) {
-
-        return term.op() instanceof LogicVariable;
     }
 }

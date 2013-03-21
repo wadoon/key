@@ -25,7 +25,6 @@ import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import se.gu.svanefalk.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 import se.gu.svanefalk.testgeneration.util.parsers.visitors.XMLVisitorException;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -521,34 +520,6 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     }
 
     /**
-     * Writes the {@link Term} AST representing the Oracle of a given test case
-     * as XML. To do so, a {@link Visitor} instance is used to walk the AST,
-     * substituting concrete names for Terms representing variables in the tree,
-     * in order to make things more clean and readable (and more importantly,
-     * more easy to refere to for the parser).
-     * 
-     * @param oracle
-     *            the Oracle
-     * @throws XMLVisitorException
-     *             in case there was a problem during the visitation process
-     * @throws XMLStreamException
-     *             in case the XML could not be generated
-     */
-    private void writeOracle(final Term oracle) throws XMLVisitorException,
-            XMLStreamException {
-
-        final OracleVisitor oracleVisitor = new OracleVisitor();
-        oracle.execPreOrder(oracleVisitor);
-        final List<XMLEvent> rawOracleXML = oracleVisitor.getElements();
-
-        this.writeStartTag(XMLHandler.ORACLE_ROOT);
-        for (final XMLEvent event : rawOracleXML) {
-            this.writeXMLEvent(event);
-        }
-        this.writeEndTag(XMLHandler.ORACLE_ROOT);
-    }
-
-    /**
      * Write an opening tag to the stream, i.e. <\"tag">
      * 
      * @param tagName
@@ -586,7 +557,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
 
         this.writeMethodInfo(testCase.getMethod());
         this.writeFixture(testCase.getModel());
-        //this.writeOracle(testCase.getOracle());
+        // this.writeOracle(testCase.getOracle());
 
         this.writeEndTag(XMLHandler.TESTCASE_ROOT);
     }

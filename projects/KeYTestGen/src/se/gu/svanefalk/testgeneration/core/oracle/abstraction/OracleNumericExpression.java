@@ -6,12 +6,8 @@ public abstract class OracleNumericExpression {
 
     private final NumericType type;
 
-    public OracleNumericExpression(NumericType type) {
+    public OracleNumericExpression(final NumericType type) {
         this.type = type;
-    }
-
-    private final NumericType getType() {
-        return type;
     }
 }
 

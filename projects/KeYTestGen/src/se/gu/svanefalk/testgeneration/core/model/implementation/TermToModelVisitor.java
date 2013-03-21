@@ -6,7 +6,6 @@ import se.gu.svanefalk.testgeneration.util.parsers.visitors.KeYTestGenTermVisito
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -235,7 +234,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
              * variable), we return the default root, although we first properly
              * set the type (which is not needed, but nice to have).
              */
-            String operatorName = operator.toString();
+            final String operatorName = operator.toString();
             if (!operatorName.equalsIgnoreCase("heap")) {
 
                 if (operator.toString().equalsIgnoreCase("self")) {
@@ -318,8 +317,9 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         /*
          * Check that the variable we found is not already present in the model.
          */
-        ModelVariable currentVariable = model.getVariable(identifier);
-        if (currentVariable != null && currentVariable.isParameter()) {
+        final ModelVariable currentVariable = this.model
+                .getVariable(identifier);
+        if ((currentVariable != null) && currentVariable.isParameter()) {
             return;
         }
 

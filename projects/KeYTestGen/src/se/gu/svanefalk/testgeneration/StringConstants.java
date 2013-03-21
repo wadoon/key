@@ -9,9 +9,9 @@ package se.gu.svanefalk.testgeneration;
  */
 public final class StringConstants {
 
+    public static final String BOOLEAN = "boolean";
     public final static String FIELD_SEPARATOR = "_";
     public final static String NEWLINE = "\n";
     public final static String SELF = "self";
     public final static String TAB = "    ";
-    public static final String BOOLEAN = "boolean";
 }

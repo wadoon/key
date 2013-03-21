@@ -4,11 +4,11 @@ public abstract class OracleBooleanExpression {
 
     private final boolean truthValue;
 
-    public OracleBooleanExpression(boolean truthValue) {
+    public OracleBooleanExpression(final boolean truthValue) {
         this.truthValue = truthValue;
     }
 
     public final boolean isTrue() {
-        return truthValue;
+        return this.truthValue;
     }
 }

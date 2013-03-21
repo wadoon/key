@@ -1,7 +1,7 @@
 package se.gu.svanefalk.testgeneration.backend.junit.abstraction;
 
-import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import junit.framework.Assert;
+import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 
 /**
  * Instances of this class represent JUnit test cases, i.e. methods annotated

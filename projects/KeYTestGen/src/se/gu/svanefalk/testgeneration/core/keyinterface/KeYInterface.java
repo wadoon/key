@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
-
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;

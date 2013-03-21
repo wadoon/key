@@ -2,11 +2,12 @@ package se.gu.svanefalk.testgeneration.core.oracle.abstraction;
 
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.types.NumericType;
 
-public class OracleNumericLiteral extends OracleNumericExpression implements IOracleLiteral{
+public class OracleNumericLiteral extends OracleNumericExpression implements
+        IOracleLiteral {
 
     private final String identifier;
 
-    public OracleNumericLiteral(String identifier, NumericType type) {
+    public OracleNumericLiteral(final String identifier, final NumericType type) {
         super(type);
 
         this.identifier = identifier;
@@ -15,7 +16,8 @@ public class OracleNumericLiteral extends OracleNumericExpression implements IOr
     /**
      * @return the identifier
      */
+    @Override
     public String getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 }
