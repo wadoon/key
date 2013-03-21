@@ -70,6 +70,8 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((AwaitStmt) x);            
         } else if (x instanceof FnApp) {
             result = convert((FnApp)x);
+        } else if (x instanceof GetExp) {
+            result = convert((GetExp)x);
         }
 
         if (result == null) {
@@ -292,6 +294,10 @@ public abstract class AbstractABS2KeYABSConverter {
         }
         return new ABSVariableDeclarationStatement(new ABSTypeReference(type),
                 localVar, initExp);
+    }
+
+    public ABSGetExp convert(GetExp x) {
+        return new ABSGetExp((IABSPureExpression)convert(x.getPureExp()));
     }
 
     protected KeYJavaType lookupType(String qualifiedName) {

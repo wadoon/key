@@ -481,5 +481,16 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         }
     }
 
+    @Override
+    public void performActionOnABSGetExp(ABSGetExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSGetExp((IABSPureExpression) children.get(0)));
+        } else {
+            addChild(x);
+        }
+    }
+
 
 }

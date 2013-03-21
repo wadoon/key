@@ -32,7 +32,7 @@ public abstract class ABSProgramSVSort extends AbstractSort implements IProgramS
 
     public static final IProgramSVSort<ABSServices> ABS_PUREEXPRESSION = new ABSPureExpSV();
     public static final IProgramSVSort<ABSServices> ABS_VARIABLE = new ABSVariableSV();
-    public static final IProgramSVSort<ABSServices> ABS_Field = new ABSFieldSV();
+    public static final IProgramSVSort<ABSServices> ABS_FIELD = new ABSFieldSV();
     public static final IProgramSVSort<ABSServices> ABS_STATEMENT = new ABSStatementSV();
     public static final IProgramSVSort<ABSServices> ABS_TYPEREF = new ABSTypeReferenceSV();
     public static final IProgramSVSort<ABSServices> ABS_INTERFACE_TYPEREF = new ABSInterfaceTypeReferenceSV();

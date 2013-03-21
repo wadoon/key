@@ -17,7 +17,9 @@ class VariableImpl implements Variable {
     }
 
     Unit test() {
-    	 this.value = 1; 
+    	 Fut<Int> r = this!send(1);
+ 	 Int i = r.get();
+	 this.value = 1; 
 	 this.value = this.value + 1;
     }
 }

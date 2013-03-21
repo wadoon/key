@@ -79,20 +79,7 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
-import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
-import de.uka.ilkd.keyabs.abs.ABSAwaitClaimStatement;
-import de.uka.ilkd.keyabs.abs.ABSAwaitStatement;
-import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
-import de.uka.ilkd.keyabs.abs.ABSFieldReference;
-import de.uka.ilkd.keyabs.abs.ABSIfStatement;
-import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
-import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
-import de.uka.ilkd.keyabs.abs.ABSTypeReference;
-import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
-import de.uka.ilkd.keyabs.abs.ABSWhileStatement;
-import de.uka.ilkd.keyabs.abs.CopyAssignment;
-import de.uka.ilkd.keyabs.abs.ThisExpression;
+import de.uka.ilkd.keyabs.abs.*;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
@@ -1918,7 +1905,7 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSFieldReference(ABSFieldReference x) throws IOException {
-        layouter.print("this.").print(((ProgramElementName)x.getField().name()).getProgramName());
+        layouter.print("this.").print(((ProgramElementName) x.getField().name()).getProgramName());
     }
 
     public void printABSLocalVariableReference(ABSLocalVariableReference x)
@@ -2076,5 +2063,12 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.print(")").end();
 
     }
+
+    public void printABSGetExp(ABSGetExp x) throws IOException {
+        x.getChildAt(0).visit(programPrettyPrinter);
+        layouter.print(".get()");
+    }
+
+
 
 }

@@ -77,7 +77,7 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         if (var instanceof SchemaVariable) {
             if (var.sort() == ABSProgramSVSort.ABS_PUREEXPRESSION) {
                 return (ProgramSV) var;
-            } else if (var.sort() == ABSProgramSVSort.ABS_Field) {
+            } else if (var.sort() == ABSProgramSVSort.ABS_FIELD) {
                 return new ABSFieldReference(var);
             }
         }
