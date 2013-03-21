@@ -9,6 +9,11 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
+import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
@@ -19,10 +24,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
-import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.model.tools.ModelGenerationTools;
-import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestConditionParsing extends KeYTestGenTest {

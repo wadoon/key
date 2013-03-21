@@ -4,15 +4,16 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
+import se.gu.svanefalk.testgeneration.util.parsers.visitors.XMLVisitorException;
+
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.oracle.OracleGeneratorException;
-import de.uka.ilkd.key.testgeneration.util.parsers.visitors.XMLVisitorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class OracleGeneratorTest extends KeYTestGenTest {

@@ -12,18 +12,19 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.backend.IFrameworkConverter;
+import se.gu.svanefalk.testgeneration.backend.TestGenerator;
+import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
+import se.gu.svanefalk.testgeneration.backend.junit.JUnitConverter;
+import se.gu.svanefalk.testgeneration.backend.xml.XMLGeneratorException;
+import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
+import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
+import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
+import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+import se.gu.svanefalk.testgeneration.util.Benchmark;
+
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.testgeneration.backend.IFrameworkConverter;
-import de.uka.ilkd.key.testgeneration.backend.TestGenerator;
-import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.backend.junit.JUnitConverter;
-import de.uka.ilkd.key.testgeneration.backend.xml.XMLGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.codecoverage.ICodeCoverageParser;
-import de.uka.ilkd.key.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterface;
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 public class TestJUnitTestCaseGenerator {
 

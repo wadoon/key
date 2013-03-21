@@ -8,6 +8,11 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.backend.xml.XMLGeneratorException;
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+import se.gu.svanefalk.testgeneration.util.parsers.transformers.RemoveSDPsTransformer;
+import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+
 import com.sun.org.apache.bcel.internal.classfile.JavaClass;
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
@@ -26,10 +31,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.testgeneration.backend.xml.XMLGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.util.parsers.transformers.RemoveSDPsTransformer;
-import de.uka.ilkd.key.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
 

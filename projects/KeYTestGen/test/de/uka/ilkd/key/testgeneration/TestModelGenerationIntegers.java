@@ -7,14 +7,15 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
+import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
+import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
+
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.Model;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelVariable;
 import de.uka.ilkd.key.testgeneration.targetmodels.PrimitiveIntegerOperations;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 

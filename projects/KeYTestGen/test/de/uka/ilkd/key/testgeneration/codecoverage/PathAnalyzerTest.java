@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -16,7 +18,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.testgeneration.KeYTestGenTest;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class PathAnalyzerTest extends KeYTestGenTest {
@@ -56,7 +57,7 @@ public class PathAnalyzerTest extends KeYTestGenTest {
                 + info.getTypeByClassName("PrimitiveIntegerOperations"));
         System.out
                 .println(info
-                        .getTypeByName("de.uka.ilkd.key.testgeneration.targetmodels.PrimitiveIntegerOperations"));
+                        .getTypeByName("se.gu.svanefalk.testgeneration.targetmodels.PrimitiveIntegerOperations"));
         System.out.println(programMethod.getType());
         KeYJavaType methodType = programMethod.getType();
         for (FunctionalOperationContract contract : repo.getOperationContracts(

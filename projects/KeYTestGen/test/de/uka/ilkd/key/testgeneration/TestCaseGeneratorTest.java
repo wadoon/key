@@ -8,12 +8,13 @@ import java.util.Map.Entry;
 
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
+import se.gu.svanefalk.testgeneration.backend.xml.XMLGeneratorException;
+import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+import se.gu.svanefalk.testgeneration.util.Benchmark;
+
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.testgeneration.backend.TestGeneratorException;
-import de.uka.ilkd.key.testgeneration.backend.xml.XMLGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.keyinterface.KeYInterfaceException;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.util.Benchmark;
 
 public class TestCaseGeneratorTest {
 

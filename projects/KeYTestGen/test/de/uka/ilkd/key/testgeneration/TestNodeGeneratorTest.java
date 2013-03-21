@@ -5,15 +5,16 @@ import java.util.List;
 
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.core.NodeTestGenerator;
+import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
+
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.testgeneration.core.NodeTestGenerator;
-import de.uka.ilkd.key.testgeneration.core.model.IModelGenerator;
-import de.uka.ilkd.key.testgeneration.core.model.ModelGeneratorException;
-import de.uka.ilkd.key.testgeneration.core.model.implementation.ModelGenerator;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class TestNodeGeneratorTest extends KeYTestGenTest {
