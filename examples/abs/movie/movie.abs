@@ -1,0 +1,46 @@
+/*
+ *
+ */
+module SeatBooking;
+export *;
+
+interface Theatre {
+
+    Fut<Int> block(Int i);
+    Unit free(Int id);
+    Unit buy(Int id);
+
+}
+
+class TheatreImpl implements Variable {
+    Int seats;
+    Map<Int, Int> blocked;
+    Int id;
+
+    Fut<Int> block(Int i) {
+    	Int reqId = -1;
+
+	if (seats >= i) {
+	   id    = id + 1;
+	   reqId = id;
+	   this.blocked = concat(map, id, i);
+	   this.seats   = seats - i;
+	} 
+
+	return reqId;	
+    }
+
+    Unit free(Int id) {
+    	 el    = map.get(id);
+	 map   = map.remove(id);
+	 seats = seats + el;
+    }
+
+    Unit buy(Int id) {
+    	 el  = map.get(id);
+	 map = map.remove(id);
+   }
+
+}
+
+{ }

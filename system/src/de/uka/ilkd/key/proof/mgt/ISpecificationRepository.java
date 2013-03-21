@@ -96,7 +96,7 @@ public interface ISpecificationRepository {
     /**
      * Registers the passed class invariants.
      */
-    public abstract void addClassInvariants(ImmutableSet<ClassInvariant> toAdd);
+    public abstract void addClassInvariants(ImmutableSet<? extends ClassInvariant> toAdd);
 
     /**
      * Registers the passed class axiom.
