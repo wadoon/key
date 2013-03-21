@@ -77,6 +77,8 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         if (var instanceof SchemaVariable) {
             if (var.sort() == ABSProgramSVSort.ABS_PUREEXPRESSION) {
                 return (ProgramSV) var;
+            } else if (var.sort() == ABSProgramSVSort.ABS_Field) {
+                return new ABSFieldReference(var);
             }
         }
         return new ABSLocalVariableReference(var);
@@ -109,7 +111,7 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
     }
 
     @Override
-    protected IProgramVariable lookupFieldVariable(String name) {
+    protected IProgramVariable lookupFieldVariable(String className, String name) {
         return lookup(name);
     }
 }

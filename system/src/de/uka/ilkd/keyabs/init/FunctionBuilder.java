@@ -10,9 +10,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.ABSInfo;
@@ -40,6 +38,7 @@ public class FunctionBuilder {
         final HeapLDT heapLDT       = services.getTypeConverter().getHeapLDT();
 
         final Namespace<SortedOperator> funcNS = initConfig.getServices().getNamespaces().functions();
+        final Namespace<IProgramVariable> progVarNS = initConfig.getServices().getNamespaces().programVariables();
 
         Collection<List<DataConstructor>> dataType2ConstructorMap = info
                 .getABSParserInfo().getDatatypes()
@@ -104,10 +103,14 @@ public class FunctionBuilder {
         System.out.println("==> Register Fields ");
         for (ClassDescriptor classDescriptor : info.getABSParserInfo().getClasses().values()) {
             for (FieldDecl  field : classDescriptor.getFields()) {
-                final Name fieldName = new ProgramElementName(field.getName(),
+                final ProgramElementName fieldName = new ProgramElementName(field.getName(),
                         classDescriptor.name().toString());
                 final Function fieldFct = new Function(fieldName,
                         heapLDT.getFieldSort(), new Sort[0], null, true);
+                progVarNS.add(new LocationVariable(fieldName,
+                        services.getJavaInfo().getKeYJavaType(field.getType().getQualifiedName()),
+                        new KeYJavaType(),
+                        false, false));
                 funcNS.add(fieldFct);
             }
         }

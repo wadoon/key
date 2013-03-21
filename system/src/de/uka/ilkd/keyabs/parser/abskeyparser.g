@@ -2152,12 +2152,29 @@ term60 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
+methodcall returns [Term a = null]
+{
+   String className;
+   String methodName;
+}
+:
+  LBRACKET
+      className = simple_ident_dots
+      methodName=simple_ident LPAREN RPAREN RBRACKET  a = term60
+  {
+    ABSStatementBlock block = getServices().getProgramInfo().getMethodImpl(className, methodName);
+
+    a = tf.createTerm(Modality.BOX, new Term[]{a}, null, JavaBlock.createJavaBlock(block));
+  }
+;
+
 unary_formula returns [Term a = null] 
 { Term a1; }
     :  
         NOT a1  = term60 { a = tf.createTerm(Junctor.NOT,new Term[]{a1}); }
     |	a = quantifierterm 
     |   a = modality_dl_term
+    |   a = methodcall
 ; exception
         catch [TermCreationException ex] {
               keh.reportException

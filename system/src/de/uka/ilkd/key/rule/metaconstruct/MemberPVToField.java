@@ -20,10 +20,10 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
 
-
-public final class MemberPVToField extends AbstractTermTransformer {  
+public final class MemberPVToField extends AbstractTermTransformer {
 
     public MemberPVToField() {
         super(new Name("#memberPVToField"), 1);
@@ -34,7 +34,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
     public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  IServices services ) {
-        HeapLDT heapLDT = ((Services)services).getTypeConverter().getHeapLDT();	
+        IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
  	
  	    
  	Operator op = term.sub(0).op();

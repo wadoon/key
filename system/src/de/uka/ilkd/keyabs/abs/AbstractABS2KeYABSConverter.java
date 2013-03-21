@@ -182,7 +182,7 @@ public abstract class AbstractABS2KeYABSConverter {
 
     
     public ABSFieldReference convert(FieldUse fieldUse) {
-        IProgramVariable var = lookupFieldVariable(fieldUse.getName());
+        IProgramVariable var = lookupFieldVariable(fieldUse.getDecl().getContextDecl().qualifiedName(), fieldUse.getName());
         return new ABSFieldReference(var);
     }
 
@@ -300,6 +300,6 @@ public abstract class AbstractABS2KeYABSConverter {
 
     protected abstract IProgramVariable lookupLocalVariable(String name);
 
-    protected abstract IProgramVariable lookupFieldVariable(String name);
+    protected abstract IProgramVariable lookupFieldVariable(String className, String name);
 
 }

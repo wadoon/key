@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Named;
 public interface IProgramVariable extends TerminalProgramElement, 
 				          Named, 
 				          SortedOperator {
+
     KeYJavaType getKeYJavaType();
     KeYJavaType getKeYJavaType(IServices javaServ);
     KeYJavaType getKeYJavaType(IServices javaServ, ExecutionContext ec);

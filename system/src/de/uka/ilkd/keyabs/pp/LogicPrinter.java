@@ -1918,7 +1918,7 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSFieldReference(ABSFieldReference x) throws IOException {
-        layouter.print("this.").print(x.getField().name().toString());
+        layouter.print("this.").print(((ProgramElementName)x.getField().name()).getProgramName());
     }
 
     public void printABSLocalVariableReference(ABSLocalVariableReference x)

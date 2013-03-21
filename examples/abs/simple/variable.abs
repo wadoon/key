@@ -16,7 +16,10 @@ class VariableImpl implements Variable {
     	return i;
     }
 
-    Unit test(List<Int> l) {}
+    Unit test() {
+    	 this.value = 1; 
+	 this.value = this.value + 1;
+    }
 }
 
 { }

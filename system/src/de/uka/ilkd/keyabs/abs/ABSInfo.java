@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import abs.backend.coreabs.CoreAbsBackend;
+import abs.frontend.ast.MethodImpl;
 import abs.frontend.ast.Model;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IProgramInfo;
@@ -14,8 +15,13 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
@@ -61,6 +67,19 @@ public class ABSInfo implements IProgramInfo {
         return new ABSInfo((ABSServices) serv, program2key.copy(), absInfo);
     }
 
+    public ABSStatementBlock getMethodImpl(String className, String methodName) {
+        for (MethodImpl m : absInfo.getClasses().get(new Name(className)).getMethods()) {
+              if (methodName.equals(m.getMethodSig().getName())) {
+                  ConcreteABS2KeYABSConverter conv =
+                          new ConcreteABS2KeYABSConverter(services.getNamespaces().programVariables(),
+                                                          services);
+                  ABSStatementBlock body = conv.convert(m.getBlock());
+                  return body;
+              }
+        }
+        return null;
+    }
+
     public ABSModelParserInfo getABSParserInfo() {
         return absInfo;
     }
@@ -82,13 +101,11 @@ public class ABSInfo implements IProgramInfo {
     @Override
     public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(
             KeYJavaType kjt) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType type) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -166,6 +183,11 @@ public class ABSInfo implements IProgramInfo {
     @Override
     public boolean isReferenceSort(Sort sort) {
         return sort.extendsTrans(getAnyInterfaceSort());
+    }
+
+    @Override
+    public ProgramVariable getAttribute(String attributeName, String className) {
+        return (ProgramVariable) services.getNamespaces().programVariables().lookup(new ProgramElementName(attributeName, className));
     }
 
     public Sort getAnyInterfaceSort() {

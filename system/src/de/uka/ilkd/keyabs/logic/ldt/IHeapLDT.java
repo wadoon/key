@@ -43,4 +43,5 @@ public interface IHeapLDT {
 
     public abstract String getPrettyFieldName(Named op);
 
+    Function getFieldSymbolForPV(LocationVariable fieldPV, IServices services);
 }

@@ -26,7 +26,6 @@ import de.uka.ilkd.keyabs.init.SortBuilder;
 public class ABSModelParserInfo {
 
     private HashMap<Name, ClassDescriptor> classes = new HashMap<Name, ClassDescriptor>();
-    private HashMap<Name, FieldDecl> field = new HashMap<>();
     private final HashMap<Name, InterfaceDecl> interfaces = new HashMap<Name, InterfaceDecl>();
     private final HashMap<Name, FunctionDecl> functions = new HashMap<>();
     private final DataTypeDescriptor datatypes = new DataTypeDescriptor();
@@ -162,14 +161,18 @@ public class ABSModelParserInfo {
 
 
     private void collectClassMembers(ClassDecl cd) {
-        ClassDescriptor classDescr =
+        ClassDescriptor classDescription =
                 new ClassDescriptor(SortBuilder.createFullyQualifiedName(cd), cd);
 
         for (FieldDecl fd : cd.getFields()) {
-            classDescr.addFields(fd);
+            classDescription.addFields(fd);
         }
 
-        classes.put(classDescr.name(), classDescr);
+        for (MethodImpl md : cd.getMethodList()) {
+            classDescription.addMethod(md);
+        }
+
+        classes.put(classDescription.name(), classDescription);
         collectTypesAndFunctionDeclarations(cd);
     }
 
@@ -228,15 +231,8 @@ public class ABSModelParserInfo {
         }
     }
 
- 
-    
- 
-    
-    
-
     private void addMethodSignature(MethodSig msig) {
         // TODO Auto-generated method stub
-        
     }
 
     public HashMap<Name, FunctionDecl> getFunctions() {

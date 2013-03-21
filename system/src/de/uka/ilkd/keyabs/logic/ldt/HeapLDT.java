@@ -13,6 +13,8 @@ package de.uka.ilkd.keyabs.logic.ldt;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.AbstractHeapLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
@@ -51,7 +53,7 @@ public final class HeapLDT extends AbstractHeapLDT {
 	    int index = fieldPV.toString().indexOf("::");
 	    assert index > 0;
 	    return fieldPVName.substring(0, index)
-	    	   + "::$" 
+	    	   + "."
 	    	   + fieldPVName.substring(index + 2);
 	}
     }
@@ -61,8 +63,12 @@ public final class HeapLDT extends AbstractHeapLDT {
     public Name[] getAllHeapNames() {
 	return VALID_HEAP_NAMES;
     }
-    
-    
+
+    public Function getFieldSymbolForPV(LocationVariable variable, IServices services) {
+        return (Function) services.getNamespaces().functions().lookup(variable.getProgramElementName());
+    }
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------

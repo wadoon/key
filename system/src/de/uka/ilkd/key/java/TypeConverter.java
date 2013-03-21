@@ -215,14 +215,14 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
 	final ProgramVariable var = fr.getProgramVariable();
 	if(var instanceof ProgramConstant) {
 	    return TB.var(var);
-	} else if(var == getServices().getJavaInfo().getArrayLength()) {
+	} else if (var == getServices().getJavaInfo().getArrayLength()) {
 	    return TB.dotLength(getServices(), convertReferencePrefix(prefix, ec));
-	} else if(var.isStatic()) {
+	} else if (var.isStatic()) {
 	    final Function fieldSymbol 
 	    	= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, getServices());
 	    return TB.staticDot(getServices(), var.sort(), fieldSymbol);
-	} else if(prefix == null) {
-	    if(var.isMember()) {
+	} else if (prefix == null) {
+	    if (var.isMember()) {
 		final Function fieldSymbol 
 			= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, 
 						      getServices());

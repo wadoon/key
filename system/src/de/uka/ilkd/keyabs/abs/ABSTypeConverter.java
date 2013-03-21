@@ -9,11 +9,13 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
@@ -65,13 +67,21 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 	} else {
 	    ABSTermBuilder TB = getServices().getTermBuilder();
 	    if (pe instanceof IABSLocationReference) {
-		return TB.var(((IABSLocationReference) pe).getVariable());
-	    } /*else if (pe instanceof MethodName) {
+		    if (pe instanceof IABSFieldReference) {
+                IABSFieldReference field = (IABSFieldReference) pe;
+                return TB.dot(services, field.getVariable().sort(),
+                        TB.var(services.getNamespaces().programVariables().lookup(new ProgramElementName("this"))),
+                        getHeapLDT().getFieldSymbolForPV((LocationVariable) field.getVariable(),services));
+            } else {
+		        return TB.var(((IABSLocationReference) pe).getVariable());
+            }
+        } /*else if (pe instanceof MethodName) {
 		return TB.func((Function) getServices().getNamespaces()
 			.functions().lookup((Name) pe));
 	    }*/ else if (pe instanceof IProgramVariable) {
-		return TB.var((IProgramVariable) pe);
-	    } else {
+            return TB.var((IProgramVariable) pe);
+
+        } else {
 		final TermBuilder tb = services.getTermBuilder();
 		if (pe instanceof ABSBinaryOperatorPureExp) {
 		    Term left = convertToLogicElement(

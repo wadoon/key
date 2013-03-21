@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public interface IProgramInfo {
@@ -152,4 +153,5 @@ public interface IProgramInfo {
 
 	public abstract boolean isReferenceSort(Sort sort);
 
+    ProgramVariable getAttribute(String attributeName, String className);
 }

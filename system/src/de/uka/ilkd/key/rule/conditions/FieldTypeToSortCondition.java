@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -32,7 +33,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * The condition can only be fulfilled if the given field term is constant of
  * which the referred type is known.
  */
-public final class FieldTypeToSortCondition implements VariableCondition<Services> {
+public final class FieldTypeToSortCondition implements VariableCondition<IServices> {
 
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort sort;
@@ -60,7 +61,7 @@ public final class FieldTypeToSortCondition implements VariableCondition<Service
     public MatchConditions check(SchemaVariable var,
                                  SVSubstitute svSubst,
                                  MatchConditions matchCond,
-                                 Services services) {
+                                 IServices services) {
             
         if (var != exprOrTypeSV) {
             return matchCond;

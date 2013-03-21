@@ -51,7 +51,6 @@ public class ABSTacletGenerator {
         SchemaVariable heapSV = SchemaVariableFactory.createTermSV(new Name("heapSV"),
                 services.getTypeConverter().getHeapLDT().targetSort());
   */
-
         SchemaVariable thisObjSV = SchemaVariableFactory.createTermSV(new Name("thisObjSV"),
                 Sort.ANY);
 

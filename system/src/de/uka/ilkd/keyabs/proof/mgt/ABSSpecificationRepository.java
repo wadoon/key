@@ -1,14 +1,9 @@
 package de.uka.ilkd.keyabs.proof.mgt;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -20,8 +15,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ABSSpecificationRepository implements ISpecificationRepository {
 
