@@ -1,0 +1,1 @@
+decl(type, name, value) ::= "<type; separator=\", \"> <name><init(value)>;"

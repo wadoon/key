@@ -3,5 +3,15 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/key-devel"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SmtInterpol"/>
+	<classpathentry kind="lib" path="/key-devel/KeYExternalLibraries/antlr.jar"/>
+	<classpathentry kind="lib" path="/key-devel/KeYExternalLibraries/java-cup-12joho.jar"/>
+	<classpathentry kind="lib" path="/key-devel/KeYExternalLibraries/junit.jar"/>
+	<classpathentry kind="lib" path="/key-devel/KeYExternalLibraries/KeYnterpol.jar"/>
+	<classpathentry kind="lib" path="/key-devel/KeYExternalLibraries/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="/key-devel/KeYExternalLibraries/recoderKey.jar"/>
+	<classpathentry kind="lib" path="/home/christopher/git/key/key-ext-jars/beust-jcommander.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
