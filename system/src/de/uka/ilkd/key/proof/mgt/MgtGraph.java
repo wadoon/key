@@ -68,7 +68,7 @@
 //	        classRank = classRank+" "+ node(o);
 //	    else if (o instanceof FunctionalOperationContract)
 //	        specRank = specRank +" " + node(o);
-//	    else if (o instanceof ClassInvariant)
+//	    else if (o instanceof ABSClassInvariant)
 //	        specRank = specRank +" " + node(o);
 //	}
 //	
@@ -185,8 +185,8 @@
 //	else if (o instanceof FunctionalOperationContract)
 //	    return "\""+((FunctionalOperationContract)o).getName().
 //	        replace("normal_behavior operation contract", "ct")+"\"";
-//	else if (o instanceof ClassInvariant)
-//	    return "\""+((ClassInvariant)o).getDisplayName().
+//	else if (o instanceof ABSClassInvariant)
+//	    return "\""+((ABSClassInvariant)o).getDisplayName().
 //	        replace("class invariant","inv")+"\"";
 //	else if (o instanceof KeYJavaType) 
 //	    return "\""+((KeYJavaType)o).getName()+"\"";

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.keyabs.abs.ABSServices;
 
 public class HistoryLDT extends LDT {
 
@@ -95,4 +96,7 @@ public class HistoryLDT extends LDT {
         return futureSort;
     }
 
+    public Function getClassLabel(Name className, ABSServices services) {
+        return (Function) services.getNamespaces().functions().lookup(className);
+    }
 }

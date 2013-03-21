@@ -24,9 +24,9 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
 /**
- * Standard implementation of the ClassInvariant interface. 
+ * Standard implementation of the ABSClassInvariant interface.
  */
-public final class ClassInvariantImpl implements ClassInvariant {
+public final class ClassInvariantImpl implements JavaClassInvariant {
     
     private final String name;
     private final String displayName;
@@ -131,8 +131,13 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public Term getOriginalInv() {
         return originalInv;
     }
-    
- 
+
+    @Override
+    public String getClassName() {
+        return getKJT().getFullName();
+    }
+
+
     @Override
     public boolean isStatic() {
 	return isStatic;

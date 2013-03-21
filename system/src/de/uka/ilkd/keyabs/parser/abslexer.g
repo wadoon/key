@@ -169,6 +169,8 @@ tokens {
 
 
         MAINMODULE= "\\module";
+                MAINCLASS= "\\class";
+
 }
 
 {

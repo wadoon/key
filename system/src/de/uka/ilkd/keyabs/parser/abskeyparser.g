@@ -42,7 +42,10 @@ header {
  
   import de.uka.ilkd.key.speclang.*;
 
-  import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
+  import de.uka.ilkd.keyabs.speclang.dl.DLSpecFactory;
+  import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
+  import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
+
 
   import de.uka.ilkd.key.util.*;
 
@@ -109,6 +112,7 @@ options {
     private HashMap taclet2Builder;
     private KeYExceptionHandler keh = null;
     private String module;
+    private String mainClass;
 
     // these variables are set if a file is read in step by
     // step. This used when reading in LDTs because of cyclic
@@ -141,7 +145,8 @@ options {
 
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
     private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
-    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
+    private ImmutableSet<InterfaceInvariant> invs = DefaultImmutableSet.<InterfaceInvariant>nil();
+    private ImmutableSet<ABSClassInvariant> cinvs = DefaultImmutableSet.<ABSClassInvariant>nil();
 
     private ParserConfig<ABSServices> schemaConfig;
     private ParserConfig<ABSServices> normalConfig;
@@ -400,10 +405,14 @@ options {
         return contracts;
     }
     
-    public ImmutableSet<ClassInvariant> getInvariants(){
+    public ImmutableSet<InterfaceInvariant> getInterfaceInvariants(){
     	return invs;
     }
-    
+
+    public ImmutableSet<ABSClassInvariant> getClassInvariants(){
+        return cinvs;
+    }
+
     public HashMap<String, String> getCategory2Default(){
         return category2Default;
     }
@@ -2013,7 +2022,7 @@ simple_sort_name returns [String name = ""]
 
 sort_name returns [String name = null]
     :
-        name = simple_sort_name     
+        name = simple_sort_name
         (brackets:EMPTYBRACKETS {name += brackets.getText();} )*
 ;
 
@@ -3634,11 +3643,11 @@ contracts
 
 invariants
 {
-  QuantifiableVariable selfVar;
+  QuantifiableVariable selfVar = null;
   Namespace orig = variables();  
 }
 :
-   INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
+   INVARIANTS (LPAREN selfVar=one_logic_bound_variable RPAREN)?
        LBRACE {
 	    switchToNormalMode();
        }
@@ -3688,21 +3697,23 @@ one_invariant[ParsableVariable selfVar]
   Term fma = null;
   String displayName = null;
   String invName = null;
+  String itfOrClass = null;
 }
 :
-     invName = simple_ident LBRACE 
+     invName = simple_ident COLON itfOrClass = simple_sort_name LBRACE
      fma = formula
      (DISPLAYNAME displayName = string_literal)?
      {
-       /* DLSpecFactory dsf = new DLSpecFactory(getServices());
+       DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
-         invs = invs.add(dsf.createDLClassInvariant(invName,
-                                                    displayName,
-                                                    selfVar,
-                                                    fma));
+         if (selfVar == null) {
+            invs = invs.add(dsf.createDLInterfaceInvariant(invName, displayName, itfOrClass, fma));
+         } else {
+            cinvs = cinvs.add(dsf.createDLClassInvariant(invName, displayName, itfOrClass, fma, selfVar));
+         }
        } catch(ProofInputException e) {
          semanticError(e.getMessage());
-       }*/
+       }
      } RBRACE SEMI
 ;
 
@@ -3730,6 +3741,8 @@ problem returns [ Term a = null ]
         string = javaSource
 
         module = mainModule
+
+        mainClass = mainClass
 
         decls
         { 
@@ -3816,6 +3829,13 @@ javaSource returns [String result = null]
 mainModule returns [String result = null]
 :
    (MAINMODULE
+      result = string_literal
+    SEMI)?
+    ;
+
+mainClass returns [String result = null]
+:
+   (MAINCLASS
       result = string_literal
     SEMI)?
     ;

@@ -11,6 +11,7 @@ import abs.backend.coreabs.CoreAbsBackend;
 import abs.frontend.ast.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.keyabs.init.FunctionBuilder;
 import de.uka.ilkd.keyabs.init.SortBuilder;
 
 /**
@@ -27,6 +28,7 @@ public class ABSModelParserInfo {
     private HashMap<Name, ClassDescriptor> classes = new HashMap<Name, ClassDescriptor>();
     private HashMap<Name, FieldDecl> field = new HashMap<>();
     private final HashMap<Name, InterfaceDecl> interfaces = new HashMap<Name, InterfaceDecl>();
+    private final HashMap<Name, FunctionDecl> functions = new HashMap<>();
     private final DataTypeDescriptor datatypes = new DataTypeDescriptor();
     private final DataTypeDescriptor parametricDatatypes = new DataTypeDescriptor();
 
@@ -196,12 +198,12 @@ public class ABSModelParserInfo {
                     collectClassMembers((ClassDecl) currentNode);
                 } else if (currentNode instanceof FunctionDecl) {
                     FunctionDecl fd = (FunctionDecl) currentNode;
+                    functions.put(FunctionBuilder.createNameFor(fd), fd);
                     collectTypesAndFunctionDeclarations(currentNode);
                 } else if (currentNode instanceof MethodSig) {
                     MethodSig msig = (MethodSig) currentNode;
                     addMethodSignature(msig);
                     collectTypesAndFunctionDeclarations(currentNode);
-
                     System.out.println("Method " + msig.getName() + " declared in " + msig.getContextDecl().getName());
                 } else if (currentNode instanceof VarDecl) {
                     VarDecl vd = (VarDecl) currentNode;
@@ -237,10 +239,9 @@ public class ABSModelParserInfo {
         
     }
 
-
-
-
-
+    public HashMap<Name, FunctionDecl> getFunctions() {
+        return functions;
+    }
 
 
     public class DataTypeDescriptor {

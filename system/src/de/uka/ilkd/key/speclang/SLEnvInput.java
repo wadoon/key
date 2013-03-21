@@ -269,7 +269,7 @@ public final class SLEnvInput extends AbstractEnvInput<Services, JavaDLInitConfi
             // there is an explicit static invariant present.
             boolean staticInvPresent = false;
             for (SpecificationElement s: classSpecs){
-                if (s instanceof ClassInvariant && ((ClassInvariant)s).isStatic()) {
+                if (s instanceof JavaClassInvariant && ((JavaClassInvariant)s).isStatic()) {
                     staticInvPresent = true;
                     break;
                 }

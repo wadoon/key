@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.DeclPicker;
 import de.uka.ilkd.key.parser.ParserConfig;
@@ -15,11 +18,18 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
+import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
+import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
+import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
 public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
 
@@ -94,6 +104,7 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
                     new ABSKeYLexer(getNewStream(), initConfig.getServices()
                             .getExceptionHandler()), file.toString(), pc, pc,
                     null, null);
+
             problemParser.parseWith();
 
             settings.getChoiceSettings().updateWith(
@@ -120,6 +131,40 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
         super.read();
     }
 
+    public ImmutableSet<Taclet> collectInterfaceInvariantTaclets(ABSServices services) {
+        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+        ABSSpecificationRepository repository = services.getSpecificationRepository();
+
+        for (KeYJavaType type : services.getProgramInfo().getAllKeYJavaTypes()) {
+            ImmutableSet<InterfaceInvariant> invs = repository.getInterfaceInvariants(type);
+            if (!invs.isEmpty() && type.getJavaType() instanceof ABSInterfaceType) {
+                Term invAxiom = ABSTermBuilder.TB.tt();
+
+                for (InterfaceInvariant inv : invs) {
+                    invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInvariant());
+                }
+
+                ABSTacletGenerator tg = new ABSTacletGenerator();
+                result = result.add(tg.generateTacletForInterfaceInvariant(type, invAxiom, services));
+            }
+        }
+        return result;
+    }
+
+    public ImmutableSet<Taclet> getClassInvariantTaclet(ABSServices services) {
+        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+
+        ABSSpecificationRepository repository = services.getSpecificationRepository();
+        ImmutableSet<ClassInvariant> cinvs = repository.getClassInvariants(getMainClassName());
+
+        if (!cinvs.isEmpty()) {
+            ABSTacletGenerator tg = new ABSTacletGenerator();
+            result = result.add(tg.generateTacletForClassInvariant(getMainClassName(),
+                    cinvs, services));
+        }
+        return result;
+    }
+
     @Override
     public void readProblem() throws ProofInputException {
         if (initConfig == null) {
@@ -142,6 +187,13 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
                     lexer, file.toString(), schemaConfig, normalConfig,
                     initConfig.getTaclet2Builder(), initConfig.getTaclets());
             problemTerm = problemParser.parseProblem();
+
+            ImmutableSet<Taclet> iinvs =
+                    collectInterfaceInvariantTaclets(initConfig.getServices());
+
+            ImmutableSet<Taclet> cinvs =
+                    getClassInvariantTaclet(initConfig.getServices());
+
             String searchS = "\\problem";
 
             if (problemTerm == null) {
@@ -160,7 +212,7 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
                 problemHeader = problemHeader.substring(0,
                         problemHeader.lastIndexOf(searchS));
             }
-            initConfig.setTaclets(problemParser.getTaclets());
+            initConfig.setTaclets(problemParser.getTaclets().union(iinvs).union(cinvs));
             lastParser = problemParser;
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);

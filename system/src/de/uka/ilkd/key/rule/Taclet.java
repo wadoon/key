@@ -1127,9 +1127,7 @@ public abstract class Taclet implements Rule, Named {
                     = (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
             final VariableNamer vn = services.getVariableNamer();
 
-            System.out.println(inst.getProgramElementName());
             inst = vn.rename(inst, goal, posOfFind);
-            System.out.println("==>" + inst.getProgramElementName());
             final RenamingTable rt =
                     RenamingTable.getRenamingTable(vn.getRenamingMap());
             if (rt != null) {

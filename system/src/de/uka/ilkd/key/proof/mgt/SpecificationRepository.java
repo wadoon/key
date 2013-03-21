@@ -195,7 +195,7 @@ public final class SpecificationRepository implements ISpecificationRepository {
     public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
 	ImmutableSet<ClassInvariant> result = invs.get(kjt);
 	return result == null 
-	       ? DefaultImmutableSet.<ClassInvariant>nil() 
+	       ? DefaultImmutableSet.<ClassInvariant>nil()
                : result;
     }    
     
@@ -692,10 +692,12 @@ public final class SpecificationRepository implements ISpecificationRepository {
     
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassInvariant(de.uka.ilkd.key.speclang.ClassInvariant)
+     * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassInvariant(de.uka.ilkd.key.speclang.ABSClassInvariant)
      */
     @Override
-    public void addClassInvariant(ClassInvariant inv) {
+    public void addClassInvariant(ClassInvariant cinv) {
+        JavaClassInvariant inv = (JavaClassInvariant) cinv;
+
         final KeYJavaType kjt = inv.getKJT();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
         
@@ -720,7 +722,7 @@ public final class SpecificationRepository implements ISpecificationRepository {
      * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassInvariants(de.uka.ilkd.key.collection.ImmutableSet)
      */
     @Override
-    public void addClassInvariants(ImmutableSet<ClassInvariant> toAdd) {
+    public void addClassInvariants(ImmutableSet<? extends ClassInvariant> toAdd) {
         for(ClassInvariant inv : toAdd) {
             addClassInvariant(inv);
         }
@@ -1060,8 +1062,8 @@ public final class SpecificationRepository implements ISpecificationRepository {
 	for(SpecificationElement spec : specs) {
 	    if(spec instanceof Contract) {
 		addContract((Contract)spec);
-	    } else if(spec instanceof ClassInvariant) {
-		addClassInvariant((ClassInvariant)spec);
+	    } else if(spec instanceof JavaClassInvariant) {
+		addClassInvariant((JavaClassInvariant)spec);
 	    } else if(spec instanceof InitiallyClause){
 	        addInitiallyClause((InitiallyClause)spec);
 	    } else if(spec instanceof ClassAxiom) {

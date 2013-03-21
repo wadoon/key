@@ -1,7 +1,9 @@
 package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.java.AbstractServices;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.parser.ABSDefaultTermParser;
 import de.uka.ilkd.key.parser.TermParser;
 import de.uka.ilkd.key.pp.UIConfiguration;
@@ -127,4 +129,11 @@ public class ABSServices extends AbstractServices {
         nameRecorder = new NameRecorder();
     }
 
+    public Function getIInvFor(KeYJavaType type) {
+        return (Function) namespaces.functions().lookup(new Name(type.getFullName()+"$IInv"));
+    }
+
+    public Function getCInv() {
+        return (Function) namespaces.functions().lookup(new Name("CInv"));
+    }
 }

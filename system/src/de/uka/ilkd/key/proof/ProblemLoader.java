@@ -90,7 +90,6 @@ public abstract class ProblemLoader<S extends IServices, IC extends InitConfig<S
          catch (Throwable thr) {
             getExceptionHandler().reportException(thr);
             status = thr.getMessage();
-            System.err.println("2");
          }
       }
       catch (ExceptionHandlerException ex) {

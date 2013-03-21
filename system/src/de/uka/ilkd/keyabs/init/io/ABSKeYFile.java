@@ -10,16 +10,10 @@
 
 package de.uka.ilkd.keyabs.init.io;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -35,6 +29,14 @@ import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
+import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /** 
@@ -67,6 +69,13 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
     // when parsing the key file store the boot class path here (or null if none given)
     private String bootClassPath;
 
+    // main module
+    private String mainModule;
+
+    // main class
+    private String mainClass;
+
+
     private Includes includes;
     
     //-------------------------------------------------------------------------
@@ -93,7 +102,7 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
     public ABSKeYFile(String name, 
                    File file, 
                    ProgressMonitor monitor) {
-	this(name, RuleSource.initRuleFile(file), monitor);
+	    this(name, RuleSource.initRuleFile(file), monitor);
     }
     
 
@@ -159,7 +168,14 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
     public String name() {
         return name;
     }
-    
+
+    public String getMainModule() {
+        return mainModule;
+    }
+
+    public String getMainClassName() {
+        return mainClass;
+    }
     
     @Override
     public int getNumberOfChars() {
@@ -258,8 +274,11 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
 
             bootClassPath = problemParser.bootClassPath();
             classPaths = problemParser.classPaths();
-            javaPath = problemParser.javaSource(); 
-            
+            javaPath = problemParser.javaSource();
+
+            mainModule = problemParser.mainModule();
+            mainClass  = mainModule + "." + problemParser.mainClass();
+
             if(javaPath != null) {
                 File cfile = new File(javaPath);
                 if (!cfile.isAbsolute()) { // test relative pathname
@@ -325,12 +344,13 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
 
                 initConfig.setTaclets(st);
 
-                /*SpecificationRepository specRepos 
+                ABSSpecificationRepository specRepos
                 = initConfig.getServices().getSpecificationRepository();
-                
-                specRepos.addContracts(problemParser.getContracts());
-                specRepos.addClassInvariants(problemParser.getInvariants());
-                chooseContract = problemParser.getChooseContract();*/
+                specRepos.addInterfaceInvariants(problemParser.getInterfaceInvariants());
+                specRepos.addClassInvariants(problemParser.getClassInvariants());
+                //specRepos.addContracts(problemParser.getContracts());
+                //specRepos.addClassInvariants(problemParser.getInvariants());
+                //chooseContract = problemParser.getChooseContract();
                 Debug.out("Read ABSKeY file   ", file);
             } finally {
                 cinp.close();

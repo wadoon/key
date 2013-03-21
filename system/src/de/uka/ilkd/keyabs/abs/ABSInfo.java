@@ -51,9 +51,9 @@ public class ABSInfo implements IProgramInfo {
 
     ABSInfo(ABSServices services, KeYABSMapping program2key,
             ABSModelParserInfo absInfo) {
-        this.services = services;
+        this.services    = services;
         this.program2key = program2key;
-        this.absInfo = absInfo;
+        this.absInfo     = absInfo;
     }
 
     @Override
@@ -165,7 +165,11 @@ public class ABSInfo implements IProgramInfo {
 
     @Override
     public boolean isReferenceSort(Sort sort) {
-        return sort.extendsTrans(services.getNamespaces().sorts().lookup(SortBuilder.ABS_ANY_INTERFACE_SORT_NAME));
+        return sort.extendsTrans(getAnyInterfaceSort());
+    }
+
+    public Sort getAnyInterfaceSort() {
+        return services.getNamespaces().sorts().lookup(SortBuilder.ABS_ANY_INTERFACE_SORT_NAME);
     }
 
     @Override

@@ -8,6 +8,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -16,22 +17,33 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.SpecificationElement;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
+import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
 public class ABSSpecificationRepository implements ISpecificationRepository {
 
     private HashMap<ProofOblInput,ImmutableSet<Proof>> proofs = new HashMap<ProofOblInput,ImmutableSet<Proof>>();
+    private HashMap<KeYJavaType, ImmutableSet<InterfaceInvariant>> interfaceInvariants = new HashMap<>();
+    private HashMap<String, ImmutableSet<ClassInvariant>> classInvariants = new HashMap<>();
+
     private final ABSServices services;
     
     public ABSSpecificationRepository(ABSServices absServices) {
         this.services = absServices;
+    }
+
+
+    public ImmutableSet<ClassInvariant> getClassInvariants(String className) {
+        ImmutableSet<ClassInvariant> result = classInvariants.get(className);
+        return result == null ? DefaultImmutableSet.<ClassInvariant>nil() : result;
+    }
+
+    public ImmutableSet<InterfaceInvariant> getInterfaceInvariants(KeYJavaType kjt) {
+        ImmutableSet<InterfaceInvariant> result = interfaceInvariants.get(kjt);
+        return result == null ? DefaultImmutableSet.<InterfaceInvariant>nil() : result;
     }
 
     @Override
@@ -41,14 +53,12 @@ public class ABSSpecificationRepository implements ISpecificationRepository {
 
     @Override
     public ImmutableSet<Contract> getAllContracts() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ImmutableSet<Contract> getContracts(KeYJavaType kjt,
             IObserverFunction target) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -111,15 +121,39 @@ public class ABSSpecificationRepository implements ISpecificationRepository {
 
     @Override
     public void addClassInvariant(ClassInvariant inv) {
-        // TODO Auto-generated method stub
-
+        ImmutableSet<ClassInvariant> invariants = classInvariants.get(inv.getClassName());
+        if (invariants == null) {
+            invariants = DefaultImmutableSet.<ClassInvariant>nil();
+        }
+        classInvariants.put(inv.getClassName(), invariants.add(inv));
     }
 
     @Override
-    public void addClassInvariants(ImmutableSet<ClassInvariant> toAdd) {
-        // TODO Auto-generated method stub
-
+    public void addClassInvariants(ImmutableSet<? extends ClassInvariant> toAdd) {
+        if (toAdd != null) {
+            for (ClassInvariant inv : toAdd) {
+                addClassInvariant(inv);
+            }
+        }
     }
+
+    public void addInterfaceInvariant(InterfaceInvariant inv) {
+        ImmutableSet<InterfaceInvariant> invariants = interfaceInvariants.get(inv.getKJT());
+        if (invariants == null) {
+            invariants = DefaultImmutableSet.<InterfaceInvariant>nil();
+        }
+
+        interfaceInvariants.put(inv.getKJT(), invariants.add(inv));
+    }
+
+    public void addInterfaceInvariants(ImmutableSet<InterfaceInvariant> toAdd) {
+        if (toAdd != null) {
+            for (InterfaceInvariant inv : toAdd) {
+                addInterfaceInvariant(inv);
+            }
+        }
+    }
+
 
     @Override
     public void addClassAxiom(ClassAxiom ax) {

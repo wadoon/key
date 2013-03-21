@@ -2,14 +2,10 @@ package de.uka.ilkd.keyabs.init;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-import abs.frontend.ast.ClassDecl;
-import abs.frontend.ast.ConstructorArg;
-import abs.frontend.ast.DataConstructor;
-import abs.frontend.ast.FieldDecl;
-import abs.frontend.ast.InterfaceDecl;
-import abs.frontend.ast.MethodSig;
-import abs.frontend.ast.ParamDecl;
+import abs.frontend.ast.*;
+import abs.frontend.typechecker.Type;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -26,6 +22,15 @@ import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
 public class FunctionBuilder {
+
+
+    private Sort getType(Type t, ABSInfo info) {
+        if (t.isTypeParameter()) {
+            return Sort.ANY;
+        } else {
+            return info.getTypeByName(t.getQualifiedName()).getSort();
+        }
+    }
 
     public void createAndRegisterABSFunctions(ABSInitConfig initConfig) {
 
@@ -46,13 +51,35 @@ public class FunctionBuilder {
                 .getParametricDatatypes().getDataTypes2dataConstructors()
                 .values());
 
-        System.out.println("Register Interface Label Constants");
+
+        System.out.println("Register Global Functions");
+        for (Map.Entry<Name, FunctionDecl> func : info.getABSParserInfo().getFunctions().entrySet()) {
+
+            final Sort[] argSorts = new Sort[func.getValue().getNumParam()];
+            int count = 0;
+            for (ParamDecl arg : func.getValue().getParamList()) {
+                argSorts[count++] = getType(arg.getType(), info);
+            }
+
+            Function function = new Function(func.getKey(),
+                    getType(func.getValue().getType(), info),
+                    argSorts, null, false);
+
+            funcNS.add(function);
+        }
+
+
+        System.out.println("Register Interface Label Constants and Invariant Symbols");
 
         for (Name itf : info.getABSParserInfo().getInterfaces().keySet()) {
             Function interfaceLabel = new Function(itf,
                     services.getTypeConverter().getHistoryLDT()
                             .getInterfaceLabelSort(), new Sort[0], null, true);
             funcNS.add(interfaceLabel);
+
+            Function iinv = new Function(new Name(itf.toString() + "$IInv"),
+                    Sort.FORMULA, new Sort[0], null, false);
+            funcNS.add(iinv);
         }
 
         System.out.println("Register Class Label Constants");
@@ -61,32 +88,31 @@ public class FunctionBuilder {
             Function classLabel = new Function(className,
                     historyLDT.getClassLabelSort(), new Sort[0], null, true);
             funcNS.add(classLabel);
+
         }
 
         System.out.println("Register Method Label Constants");
         for (InterfaceDecl itfDecl : info.getABSParserInfo().getInterfaces().values()) {
             for (MethodSig  msig : itfDecl.getBodys()) {
-        	Name methodName = createNameFor(msig, itfDecl);
-        	Function methodLabel = new Function(methodName,
-        		historyLDT.getMethodLabelSort(), new Sort[0], null, true);
-        	funcNS.add(methodLabel);
-                System.out.println("Register Method Label Constant " + methodLabel);
+                Name methodName = createNameFor(msig, itfDecl);
+                Function methodLabel = new Function(methodName,
+                        historyLDT.getMethodLabelSort(), new Sort[0], null, true);
+                funcNS.add(methodLabel);
             }
         }
 
         System.out.println("==> Register Fields ");
         for (ClassDescriptor classDescriptor : info.getABSParserInfo().getClasses().values()) {
             for (FieldDecl  field : classDescriptor.getFields()) {
-        	    final Name fieldName = new ProgramElementName(field.getName(),
+                final Name fieldName = new ProgramElementName(field.getName(),
                         classDescriptor.name().toString());
-        	    final Function fieldFct = new Function(fieldName,
-        		    heapLDT.getFieldSort(), new Sort[0], null, true);
-        	    funcNS.add(fieldFct);
-                System.out.println("Register Field Constant " + fieldFct);
+                final Function fieldFct = new Function(fieldName,
+                        heapLDT.getFieldSort(), new Sort[0], null, true);
+                funcNS.add(fieldFct);
             }
         }
 
-        
+
         // Register ABS functions
 
         System.out.println("Register future getters");
@@ -105,19 +131,23 @@ public class FunctionBuilder {
 
     }
 
+    public static Name createNameFor(FunctionDecl fd) {
+        return new ProgramElementName(fd.getName(), fd.getModule().getName());
+    }
+
+
     public static Name createNameFor(MethodSig msig, InterfaceDecl itfDecl) {
-	String base = msig.getName();
-	
-	for (ParamDecl p : msig.getParamList()) {
-	    base += "#" + p.getType().getQualifiedName();
-	}
-	
-	return new ProgramElementName(base, itfDecl.qualifiedName());
+        String base = msig.getName();
+
+        for (ParamDecl p : msig.getParamList()) {
+            base += "#" + p.getType().getQualifiedName();
+        }
+        return new ProgramElementName(base, itfDecl.qualifiedName());
     }
 
     private void createConstructorFunctions(final ABSInfo info,
-            final Namespace<SortedOperator> funcNS,
-            Collection<List<DataConstructor>> dataType2ConstructorMap) {
+                                            final Namespace<SortedOperator> funcNS,
+                                            Collection<List<DataConstructor>> dataType2ConstructorMap) {
         for (final List<DataConstructor> constructors : dataType2ConstructorMap) {
             for (DataConstructor c : constructors) {
                 final Sort[] argSorts = new Sort[c.getConstructorArgList()
@@ -135,21 +165,20 @@ public class FunctionBuilder {
                     }
                     if (count == argSorts.length) {
                         // create unique function symbol
-                        final String fullyQualifiedName = c.getModule()
-                                .getName()
+                        final String fullyQualifiedName = c.getModule().getName()
                                 + "."
                                 + c.getDataTypeDecl().getName();
 
                         final ProgramElementName funcName = new ProgramElementName(c.getName(),
                                 fullyQualifiedName);
-                        
-                        if (funcNS.lookup(funcName) == null) { 
+
+                        if (funcNS.lookup(funcName) == null) {
                             Sort returnSort = info.getTypeByName(
-                        	    c.getType().getQualifiedName()).getSort();
+                                    c.getType().getQualifiedName()).getSort();
                             Function constructorFct = new Function(
-                        	    new ProgramElementName(c.getName(),
-                        		    fullyQualifiedName), returnSort,
-                        		    argSorts, null, true);
+                                    new ProgramElementName(c.getName(),
+                                            fullyQualifiedName), returnSort,
+                                    argSorts, null, true);
 
                             funcNS.add(constructorFct);
                         }
