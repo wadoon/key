@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 
 /**
@@ -30,7 +29,10 @@ public class DLSpecFactory {
                                                      String displayName,
                                                      String typeName,
                                                      Term inv,
-                                                     ParsableVariable selfVar)
+                                                     ParsableVariable historyVar,
+                                                     ParsableVariable heapVar,
+                                                     ParsableVariable selfVar
+                                                    )
             throws ProofInputException {
 
         assert name != null;
@@ -45,7 +47,7 @@ public class DLSpecFactory {
         return new ABSClassInvariantImpl(name,
                 displayName,
                 typeName,
-                inv, selfVar);
+                inv, historyVar, heapVar, selfVar);
     }
 
     public InterfaceInvariant createDLInterfaceInvariant(String name,

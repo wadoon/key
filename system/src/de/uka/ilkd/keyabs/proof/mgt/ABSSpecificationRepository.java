@@ -15,17 +15,18 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ABSSpecificationRepository implements ISpecificationRepository {
+public class ABSSpecificationRepository implements ISpecificationRepository<ABSClassInvariant> {
 
     private HashMap<ProofOblInput,ImmutableSet<Proof>> proofs = new HashMap<ProofOblInput,ImmutableSet<Proof>>();
     private HashMap<KeYJavaType, ImmutableSet<InterfaceInvariant>> interfaceInvariants = new HashMap<>();
-    private HashMap<String, ImmutableSet<ClassInvariant>> classInvariants = new HashMap<>();
+    private HashMap<String, ImmutableSet<ABSClassInvariant>> classInvariants = new HashMap<>();
 
     private final ABSServices services;
     
@@ -34,9 +35,9 @@ public class ABSSpecificationRepository implements ISpecificationRepository {
     }
 
 
-    public ImmutableSet<ClassInvariant> getClassInvariants(String className) {
-        ImmutableSet<ClassInvariant> result = classInvariants.get(className);
-        return result == null ? DefaultImmutableSet.<ClassInvariant>nil() : result;
+    public ImmutableSet<ABSClassInvariant> getClassInvariants(String className) {
+        ImmutableSet<ABSClassInvariant> result = classInvariants.get(className);
+        return result == null ? DefaultImmutableSet.<ABSClassInvariant>nil() : result;
     }
 
     public ImmutableSet<InterfaceInvariant> getInterfaceInvariants(KeYJavaType kjt) {
@@ -45,7 +46,7 @@ public class ABSSpecificationRepository implements ISpecificationRepository {
     }
 
     @Override
-    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
+    public ImmutableSet<ABSClassInvariant> getClassInvariants(KeYJavaType kjt) {
         return null;
     }
 
@@ -118,18 +119,18 @@ public class ABSSpecificationRepository implements ISpecificationRepository {
     }
 
     @Override
-    public void addClassInvariant(ClassInvariant inv) {
-        ImmutableSet<ClassInvariant> invariants = classInvariants.get(inv.getClassName());
+    public void addClassInvariant(ABSClassInvariant inv) {
+        ImmutableSet<ABSClassInvariant> invariants = classInvariants.get(inv.getClassName());
         if (invariants == null) {
-            invariants = DefaultImmutableSet.<ClassInvariant>nil();
+            invariants = DefaultImmutableSet.<ABSClassInvariant>nil();
         }
         classInvariants.put(inv.getClassName(), invariants.add(inv));
     }
 
     @Override
-    public void addClassInvariants(ImmutableSet<? extends ClassInvariant> toAdd) {
+    public void addClassInvariants(ImmutableSet<? extends ABSClassInvariant> toAdd) {
         if (toAdd != null) {
-            for (ClassInvariant inv : toAdd) {
+            for (ABSClassInvariant inv : toAdd) {
                 addClassInvariant(inv);
             }
         }

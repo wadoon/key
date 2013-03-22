@@ -29,6 +29,7 @@ import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
 import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
+import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
 public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
@@ -155,7 +156,7 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 
         ABSSpecificationRepository repository = services.getSpecificationRepository();
-        ImmutableSet<ClassInvariant> cinvs = repository.getClassInvariants(getMainClassName());
+        ImmutableSet<ABSClassInvariant> cinvs = repository.getClassInvariants(getMainClassName());
 
         if (!cinvs.isEmpty()) {
             ABSTacletGenerator tg = new ABSTacletGenerator();

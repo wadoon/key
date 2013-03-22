@@ -23,17 +23,23 @@ public class ABSClassInvariantImpl implements ABSClassInvariant {
     private final Term inv;
     private final String name;
     private final String displayname;
+    private final ParsableVariable originalHistoryVar;
+    private final ParsableVariable originalHeapVar;
     private final ParsableVariable originalSelfVar;
     private final String className;
 
 
     public ABSClassInvariantImpl(String name, String displayname, String className,
                                  Term inv,
+                                 ParsableVariable originalHistoryVar,
+                                 ParsableVariable originalHeapVar,
                                  ParsableVariable originalSelfVar) {
         this.name = name;
         this.displayname = displayname;
         this.className = className;
         this.inv = inv;
+        this.originalHistoryVar = originalHistoryVar;
+        this.originalHeapVar = originalHeapVar;
         this.originalSelfVar = originalSelfVar;
     }
 
@@ -52,22 +58,26 @@ public class ABSClassInvariantImpl implements ABSClassInvariant {
     }
 
     @Override
-    public Term getInv(ParsableVariable selfVar, IServices services) {
+    public Term getInv(ParsableVariable historyVar, ParsableVariable heapVar,
+                       ParsableVariable selfVar, IServices services) {
         final Map<Operator, Operator> replaceMap
-                = getReplaceMap(selfVar, services);
+                = getReplaceMap(historyVar, heapVar, selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
         Term res = or.replace(inv);
         res = services.getTermBuilder().convertToFormula(res, services);
         return res;
     }
 
-    private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, IServices services) {
+    private Map<Operator, Operator> getReplaceMap(ParsableVariable historyVar, ParsableVariable heapVar, ParsableVariable selfVar, IServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
 
         if(selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
             result.put(originalSelfVar, selfVar);
         }
+        result.put(originalHistoryVar, historyVar);
+        result.put(originalHeapVar, heapVar);
+
 
         return result;
     }

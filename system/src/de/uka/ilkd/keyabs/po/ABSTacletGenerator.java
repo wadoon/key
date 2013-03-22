@@ -8,13 +8,12 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
+import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,19 +37,19 @@ public class ABSTacletGenerator {
     }
 
     public Taclet generateTacletForClassInvariant(String className,
-                                                  ImmutableSet<ClassInvariant> invAxioms,
+                                                  ImmutableSet<ABSClassInvariant> invAxioms,
                                                   ABSServices services) {
         RewriteTacletBuilder rw = new RewriteTacletBuilder();
 
         Function func = services.getCInv();
         rw.setName(new Name("insertClassInvariantFor<"+className+">"));
 
-/*        SchemaVariable historySV = SchemaVariableFactory.createTermSV(new Name("historySV"),
+        SchemaVariable historySV = SchemaVariableFactory.createTermSV(new Name("historySV"),
                 services.getTypeConverter().getHistoryLDT().targetSort());
 
         SchemaVariable heapSV = SchemaVariableFactory.createTermSV(new Name("heapSV"),
                 services.getTypeConverter().getHeapLDT().targetSort());
-  */
+
         SchemaVariable thisObjSV = SchemaVariableFactory.createTermSV(new Name("thisObjSV"),
                 Sort.ANY);
 
@@ -58,13 +57,12 @@ public class ABSTacletGenerator {
         ABSTermBuilder TB = services.getTermBuilder();
         Term invAxiom = TB.tt();
 
-        for (ClassInvariant inv : invAxioms) {
-            invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInv(thisObjSV, services));
+        for (ABSClassInvariant inv : invAxioms) {
+            invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInv(historySV, heapSV, thisObjSV, services));
         }
 
-        rw.setFind(TB.func(func, TB.var(thisObjSV)));
+        rw.setFind(TB.func(func, TB.var(historySV), TB.var(heapSV), TB.var(thisObjSV)));
         rw.addTacletGoalTemplate(new RewriteTacletGoalTemplate(invAxiom));
-
 
         return rw.getRewriteTaclet();
     }

@@ -151,7 +151,7 @@ public final class ClassInvariantImpl implements JavaClassInvariant {
     
     
     @Override
-    public ClassInvariant setKJT(KeYJavaType newKjt) {
+    public JavaClassInvariant setKJT(KeYJavaType newKjt) {
         String newName = name.replaceFirst(kjt.getName(), newKjt.getName());
 	return new ClassInvariantImpl(newName, 
                                       displayName,

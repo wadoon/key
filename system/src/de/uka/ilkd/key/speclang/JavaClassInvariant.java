@@ -10,7 +10,10 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 
 /**
@@ -21,6 +24,12 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
  * actually used in proofs.
  */
 public interface JavaClassInvariant extends ClassInvariant {
+
+    /**
+     * Returns the invariant formula without implicit all-quantification over
+     * the receiver object.
+     */
+    Term getInv(ParsableVariable selfVar, IServices services);
 
 
     /**
@@ -33,5 +42,5 @@ public interface JavaClassInvariant extends ClassInvariant {
      * Returns another class invariant like this one, except that it refers to the 
      * passed KeYJavaType.
      */    
-    public ClassInvariant setKJT(KeYJavaType kjt);
+    public JavaClassInvariant setKJT(KeYJavaType kjt);
 }

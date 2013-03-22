@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public final class PartialInvAxiom extends ClassAxiom {
     
-    private final ClassInvariant inv;
+    private final JavaClassInvariant inv;
     private final IObserverFunction target;
     
     /** Creates a new class axiom.

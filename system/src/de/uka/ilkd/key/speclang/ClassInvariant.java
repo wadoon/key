@@ -9,11 +9,6 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
  *
  */
 public interface ClassInvariant extends SpecificationElement {
-    /**
-     * Returns the invariant formula without implicit all-quantification over
-     * the receiver object.
-     */
-    Term getInv(ParsableVariable selfVar, IServices services);
 
     /**
      * Returns the invariant formula without implicit all-quantification over

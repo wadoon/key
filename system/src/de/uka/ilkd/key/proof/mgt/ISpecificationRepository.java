@@ -13,12 +13,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 
-public interface ISpecificationRepository {
+public interface ISpecificationRepository<CINV extends ClassInvariant> {
 
     /**
      * Returns all known class invariants for the passed type.
      */
-    public abstract ImmutableSet<ClassInvariant> getClassInvariants(
+    public abstract ImmutableSet<? extends CINV> getClassInvariants(
             KeYJavaType kjt);
 
     /**
@@ -91,12 +91,12 @@ public interface ISpecificationRepository {
      * Registers the passed class invariant, and inherits it to all
      * subclasses if it is public or protected.
      */
-    public abstract void addClassInvariant(ClassInvariant inv);
+    public abstract void addClassInvariant(CINV inv);
 
     /**
      * Registers the passed class invariants.
      */
-    public abstract void addClassInvariants(ImmutableSet<? extends ClassInvariant> toAdd);
+    public abstract void addClassInvariants(ImmutableSet<? extends CINV> toAdd);
 
     /**
      * Registers the passed class axiom.

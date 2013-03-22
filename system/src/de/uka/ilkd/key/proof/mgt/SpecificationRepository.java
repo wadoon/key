@@ -11,8 +11,6 @@
 package de.uka.ilkd.key.proof.mgt;
 
 
-import java.util.*;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -41,13 +39,15 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
+import java.util.*;
+
 
 /**
  * Central storage for all specification elements, such as contracts, class 
  * axioms, and loop invariants. Provides methods for adding such elements to the
  * repository, and for retrieving them afterwards.
  */
-public final class SpecificationRepository implements ISpecificationRepository {
+public final class SpecificationRepository implements ISpecificationRepository<JavaClassInvariant> {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private static final JavaDLTermBuilder TB = JavaProfile.DF();
@@ -61,8 +61,8 @@ public final class SpecificationRepository implements ISpecificationRepository {
                 = new LinkedHashMap<String,Contract>();
     private final Map<KeYJavaType,ImmutableSet<IObserverFunction>> contractTargets
     		= new LinkedHashMap<KeYJavaType,ImmutableSet<IObserverFunction>>();    
-    private final Map<KeYJavaType,ImmutableSet<ClassInvariant>> invs
-    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>(); 
+    private final Map<KeYJavaType,ImmutableSet<JavaClassInvariant>> invs
+    		= new LinkedHashMap<>();
     private final Map<KeYJavaType,ImmutableSet<ClassAxiom>> axioms
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
     private final Map<KeYJavaType,ImmutableSet<InitiallyClause>> initiallyClauses
@@ -192,10 +192,10 @@ public final class SpecificationRepository implements ISpecificationRepository {
      * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#getClassInvariants(de.uka.ilkd.key.java.abstraction.KeYJavaType)
      */
     @Override
-    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
-	ImmutableSet<ClassInvariant> result = invs.get(kjt);
+    public ImmutableSet<JavaClassInvariant> getClassInvariants(KeYJavaType kjt) {
+	ImmutableSet<JavaClassInvariant> result = invs.get(kjt);
 	return result == null 
-	       ? DefaultImmutableSet.<ClassInvariant>nil()
+	       ? DefaultImmutableSet.<JavaClassInvariant>nil()
                : result;
     }    
     
@@ -695,8 +695,7 @@ public final class SpecificationRepository implements ISpecificationRepository {
      * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassInvariant(de.uka.ilkd.key.speclang.ABSClassInvariant)
      */
     @Override
-    public void addClassInvariant(ClassInvariant cinv) {
-        JavaClassInvariant inv = (JavaClassInvariant) cinv;
+    public void addClassInvariant(JavaClassInvariant inv) {
 
         final KeYJavaType kjt = inv.getKJT();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
@@ -711,7 +710,7 @@ public final class SpecificationRepository implements ISpecificationRepository {
             final ImmutableList<KeYJavaType> subs 
             	= services.getJavaInfo().getAllSubtypes(kjt);
             for(KeYJavaType sub : subs) {
-        	ClassInvariant subInv = inv.setKJT(sub);
+        	JavaClassInvariant subInv = inv.setKJT(sub);
         	invs.put(sub, getClassInvariants(sub).add(subInv));
             }
         }
@@ -722,8 +721,8 @@ public final class SpecificationRepository implements ISpecificationRepository {
      * @see de.uka.ilkd.key.proof.mgt.ISpecificationRepository#addClassInvariants(de.uka.ilkd.key.collection.ImmutableSet)
      */
     @Override
-    public void addClassInvariants(ImmutableSet<? extends ClassInvariant> toAdd) {
-        for(ClassInvariant inv : toAdd) {
+    public void addClassInvariants(ImmutableSet<? extends JavaClassInvariant> toAdd) {
+        for(JavaClassInvariant inv : toAdd) {
             addClassInvariant(inv);
         }
     }
@@ -789,10 +788,10 @@ public final class SpecificationRepository implements ISpecificationRepository {
 	}
 	
 	//add invariant axiom for own class
-	final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
+	final ImmutableSet<JavaClassInvariant> myInvs = getClassInvariants(kjt);
 	final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
 	Term invDef = TB.tt();
-	for(ClassInvariant inv : myInvs) {
+	for(JavaClassInvariant inv : myInvs) {
 	    invDef = TB.and(invDef, inv.getInv(selfVar, services));
 	}
 	invDef = TB.tf().createTerm(Equality.EQV, 
