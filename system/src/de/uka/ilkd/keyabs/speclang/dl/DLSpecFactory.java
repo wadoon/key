@@ -53,7 +53,8 @@ public class DLSpecFactory {
     public InterfaceInvariant createDLInterfaceInvariant(String name,
                                                          String displayName,
                                                          String typeName,
-                                                         Term inv)
+                                                         Term inv,
+                                                         ParsableVariable historyVar)
             throws ProofInputException {
 
         assert name != null;
@@ -72,7 +73,7 @@ public class DLSpecFactory {
         return new InterfaceInvariantImpl(name,
                 displayName,
                 kjt,
-                inv);
+                inv, historyVar);
     }
 
 

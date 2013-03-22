@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.*;
 
 public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
@@ -487,6 +488,22 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             ExtList children = stack.peek();
             children.removeFirst();
             addNewChild(new ABSGetExp((IABSPureExpression) children.get(0)));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSReturnStatement(ABSReturnStatement x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+
+            IABSPureExpression retExp = null;
+            if (x.getChildCount() > 0) {
+                retExp = (IABSPureExpression) children.get(0);
+            }
+            addNewChild(new ABSReturnStatement(retExp));
         } else {
             addChild(x);
         }

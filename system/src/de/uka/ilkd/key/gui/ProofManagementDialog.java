@@ -83,7 +83,7 @@ public final class ProofManagementDialog extends JDialog {
 
     private InitConfig<?,?> initConfig;
     private IServices services;
-    private ISpecificationRepository specRepos;
+    private ISpecificationRepository<?> specRepos;
 
     private JTabbedPane tabbedPane;
     private Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons;

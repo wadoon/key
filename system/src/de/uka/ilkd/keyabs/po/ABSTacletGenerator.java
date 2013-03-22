@@ -12,18 +12,10 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
-/**
- * Created with IntelliJ IDEA.
- * User: bubel
- * Date: 20.03.13
- * Time: 17:18
- * To change this template use File | Settings | File Templates.
- */
 public class ABSTacletGenerator {
 
 
@@ -40,7 +32,7 @@ public class ABSTacletGenerator {
         Term invAxiom = ABSTermBuilder.TB.tt();
 
         for (InterfaceInvariant inv : invs) {
-            invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInvariant(historySV));
+            invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInvariant(historySV, services));
         }
 
 

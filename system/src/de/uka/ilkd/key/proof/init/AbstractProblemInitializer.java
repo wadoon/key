@@ -183,7 +183,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
             }
 
             // sanity check
-            assert initConfig.varNS().allElements().size() == 0;
+            assert initConfig.varNS().allElements().size() == 0 : initConfig.varNS().allElements();
             for (Named n : initConfig.sortNS().allElements()) {
                 assert n instanceof Sort && !(n instanceof GenericSort);
             }

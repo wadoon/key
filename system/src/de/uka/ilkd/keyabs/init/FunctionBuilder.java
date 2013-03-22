@@ -77,7 +77,7 @@ public class FunctionBuilder {
             funcNS.add(interfaceLabel);
 
             Function iinv = new Function(new Name(itf.toString() + "$IInv"),
-                    Sort.FORMULA, new Sort[0], null, false);
+                    Sort.FORMULA, new Sort[]{services.getTypeConverter().getHistoryLDT().targetSort()}, null, false);
             funcNS.add(iinv);
         }
 

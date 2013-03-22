@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.*;
 
 public abstract class AbstractABS2KeYABSConverter {
@@ -72,6 +73,8 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((FnApp)x);
         } else if (x instanceof GetExp) {
             result = convert((GetExp)x);
+        } else if (x instanceof ReturnStmt) {
+            result = convert((ReturnStmt)x);
         }
 
         if (result == null) {
@@ -298,6 +301,10 @@ public abstract class AbstractABS2KeYABSConverter {
 
     public ABSGetExp convert(GetExp x) {
         return new ABSGetExp((IABSPureExpression)convert(x.getPureExp()));
+    }
+
+    public ABSReturnStatement convert(ReturnStmt x) {
+        return new ABSReturnStatement((IABSExpression)convert(x.getRetExp()));
     }
 
     protected KeYJavaType lookupType(String qualifiedName) {

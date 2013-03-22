@@ -80,6 +80,7 @@ import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 import de.uka.ilkd.keyabs.abs.*;
+import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
@@ -2067,6 +2068,16 @@ public final class LogicPrinter implements ILogicPrinter {
     public void printABSGetExp(ABSGetExp x) throws IOException {
         x.getChildAt(0).visit(programPrettyPrinter);
         layouter.print(".get()");
+    }
+
+    public void printABSReturnStatement(ABSReturnStatement x) throws IOException{
+        layouter.print("return").brk(1);
+        if (x.getChildCount() > 0) {
+            layouter.beginC(0);
+            x.getChildAt(0).visit(programPrettyPrinter);
+            layouter.end();
+        }
+        layouter.print(";");
     }
 
 

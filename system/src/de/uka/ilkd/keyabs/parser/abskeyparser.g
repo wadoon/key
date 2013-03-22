@@ -3660,15 +3660,21 @@ contracts
 
 invariants
 {
+  QuantifiableVariable historyVar = null;
+  QuantifiableVariable heapVar = null;
   QuantifiableVariable selfVar = null;
-  Namespace orig = variables();  
+  Namespace orig = variables();
 }
 :
-   INVARIANTS (LPAREN selfVar=one_logic_bound_variable RPAREN)?
+   INVARIANTS (LPAREN
+                historyVar = one_logic_bound_variable
+                (COMMA heapVar = one_logic_bound_variable (COMMA selfVar=one_logic_bound_variable)? )?
+               RPAREN)?
        LBRACE {
 	    switchToNormalMode();
        }
-       ( one_invariant[(ParsableVariable)selfVar] )*
+       ( one_invariant[(ParsableVariable)historyVar,
+                       (ParsableVariable)heapVar, (ParsableVariable)selfVar] )*
        RBRACE  {
            unbindVars(orig);
        }
@@ -3709,7 +3715,7 @@ one_contract
      }
 ;
 
-one_invariant[ParsableVariable selfVar]
+one_invariant[ParsableVariable historyVar, ParsableVariable heapVar, ParsableVariable selfVar]
 {
   Term fma = null;
   String displayName = null;
@@ -3724,9 +3730,11 @@ one_invariant[ParsableVariable selfVar]
        DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
          if (selfVar == null) {
-            invs = invs.add(dsf.createDLInterfaceInvariant(invName, displayName, itfOrClass, fma));
+            invs = invs.add(dsf.createDLInterfaceInvariant(invName, displayName, itfOrClass, fma,
+                            historyVar));
          } else {
-            cinvs = cinvs.add(dsf.createDLClassInvariant(invName, displayName, itfOrClass, fma, selfVar));
+            cinvs = cinvs.add(dsf.createDLClassInvariant(invName, displayName,
+                itfOrClass, fma, historyVar, heapVar, selfVar));
          }
        } catch(ProofInputException e) {
          semanticError(e.getMessage());
