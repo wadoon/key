@@ -1,6 +1,8 @@
 package de.uka.ilkd.keyabs.speclang.dl;
 
+import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 
 /**
@@ -12,7 +14,7 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
  */
 public interface InterfaceInvariant extends SpecificationElement {
 
-    Term getInvariant();
+    Term getInvariant(SchemaVariable historySV, IServices services);
 
     Term getOriginalInvariant();
 

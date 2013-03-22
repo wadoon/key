@@ -12,8 +12,10 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
+import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,12 +27,27 @@ import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 public class ABSTacletGenerator {
 
 
-    public Taclet generateTacletForInterfaceInvariant(KeYJavaType type, Term invAxiom, ABSServices services) {
+    public Taclet generateTacletForInterfaceInvariant(KeYJavaType type,
+                                                      ImmutableSet<InterfaceInvariant> invs,
+                                                      ABSServices services) {
         RewriteTacletBuilder rw = new RewriteTacletBuilder();
 
         Function func = services.getIInvFor(type);
+
+        SchemaVariable historySV = SchemaVariableFactory.createTermSV(new Name("historySV"),
+                services.getTypeConverter().getHistoryLDT().targetSort());
+
+        Term invAxiom = ABSTermBuilder.TB.tt();
+
+        for (InterfaceInvariant inv : invs) {
+            invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInvariant(historySV));
+        }
+
+
         rw.setName(new Name("insertInvariantFor<" + type.getFullName() + ">"));
-        rw.setFind(services.getTermBuilder().func(func));
+        rw.setFind(services.getTermBuilder().func(func, services.getTermBuilder().var(historySV)));
+
+
         rw.addTacletGoalTemplate(new RewriteTacletGoalTemplate(invAxiom));
 
         return rw.getRewriteTaclet();

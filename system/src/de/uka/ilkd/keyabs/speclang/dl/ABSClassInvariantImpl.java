@@ -68,7 +68,10 @@ public class ABSClassInvariantImpl implements ABSClassInvariant {
         return res;
     }
 
-    private Map<Operator, Operator> getReplaceMap(ParsableVariable historyVar, ParsableVariable heapVar, ParsableVariable selfVar, IServices services) {
+    private Map<Operator, Operator> getReplaceMap(ParsableVariable historyVar,
+                                                  ParsableVariable heapVar,
+                                                  ParsableVariable selfVar,
+                                                  IServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
 
         if(selfVar != null && originalSelfVar != null) {

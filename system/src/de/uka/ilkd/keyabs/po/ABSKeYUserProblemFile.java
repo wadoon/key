@@ -1,9 +1,5 @@
 package de.uka.ilkd.keyabs.po;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -18,19 +14,20 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
-import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
 import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
 import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
 
@@ -139,14 +136,8 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
         for (KeYJavaType type : services.getProgramInfo().getAllKeYJavaTypes()) {
             ImmutableSet<InterfaceInvariant> invs = repository.getInterfaceInvariants(type);
             if (!invs.isEmpty() && type.getJavaType() instanceof ABSInterfaceType) {
-                Term invAxiom = ABSTermBuilder.TB.tt();
-
-                for (InterfaceInvariant inv : invs) {
-                    invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInvariant());
-                }
-
                 ABSTacletGenerator tg = new ABSTacletGenerator();
-                result = result.add(tg.generateTacletForInterfaceInvariant(type, invAxiom, services));
+                result = result.add(tg.generateTacletForInterfaceInvariant(type, invs, services));
             }
         }
         return result;
