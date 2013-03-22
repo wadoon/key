@@ -1,0 +1,52 @@
+
+
+module CV;
+
+
+interface AdmI{String req();}
+
+interface ProfI{Fut<String> ask();}
+
+interface StudI{String getCV();}
+
+
+class Adm(ProfI p) implements AdmI{
+	String req() {
+		Fut<Fut<String>> fr = p!ask(); 
+		await fr?;
+		Fut<String>  mb = fr.get; 
+		await mb?;
+		String cv = mb.get;
+		return cv;
+	}
+}
+
+
+class Prof(StudI s) implements ProfI{
+	Fut<String> ask() {
+		Fut<String> mb = s!getCV(); 
+		return mb;
+	}
+}
+
+
+class Stud(String cv) implements StudI{ 
+	String getCV() {
+		return cv;
+	}
+}
+
+
+class Application{
+	Unit run(){
+		StudI s = new Stud("cv");
+		ProfI p = new Prof(s);
+		AdmI a = new Adm(p);
+		a.req();
+	}
+}
+
+
+{
+	new Application();
+}
