@@ -102,19 +102,13 @@ public class PrimitiveIntegerOperations {
         return PrimitiveIntegerOperations.staticZ;
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
+    /*@ public normal_behavior
+      @ ensures (\result == x) || (\result == y) || (\result == z );
+      @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+          (\result <= x )) || ((\result <= x) && (\result <= z ));
+      @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+          (\result >= x )) || ((\result >= x) && (\result >= z ));
+      @*/
     public static int mid(final int x, final int y, final int z) {
 
         int mid = z;
@@ -209,19 +203,12 @@ public class PrimitiveIntegerOperations {
     (final String a, final String b) {
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ requires true;
-     * 
-     * @ ensures (\forall int i;
-     * 
-     * @ (i != 10);
-     * 
-     * @ (i != 20)) && (\result == 1);
-     * 
-     * @
-     */
+    /*@ public normal_behavior 
+      @ requires true;
+      @ ensures (\forall int i;
+      @ (i != 10);
+      @ (i != 20)) && (\result == 1);
+     @*/
     public int doStuff(final int i) {
 
         int x = 0;
@@ -330,22 +317,16 @@ public class PrimitiveIntegerOperations {
         return max;
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ ensures (\result == x) || (\result == proxy.nestedProxy.instanceInt) ||
-     * (\result == instanceZ );
-     * 
-     * @ ensures ((\result <= proxy.nestedProxy.instanceInt) && (\result <=
-     * instanceZ )) || ((\result <= proxy.nestedProxy.instanceInt) && (\result
-     * <= x )) || ((\result <= x) && (\result <= instanceZ));
-     * 
-     * @ ensures ((\result >= proxy.nestedProxy.instanceInt) && (\result >=
-     * instanceZ )) || ((\result >= proxy.nestedProxy.instanceInt) && (\result
-     * >= x )) || ((\result >= x) && (\result >= instanceZ));
-     * 
-     * @
-     */
+    /*@ public normal_behavior
+      @ ensures (\result == x) || (\result == proxy.nestedProxy.instanceInt) ||
+          (\result == instanceZ );
+      @ ensures ((\result <= proxy.nestedProxy.instanceInt) && (\result <=
+          instanceZ )) || ((\result <= proxy.nestedProxy.instanceInt) && (\result
+          <= x )) || ((\result <= x) && (\result <= instanceZ));
+     @ ensures ((\result >= proxy.nestedProxy.instanceInt) && (\result >=
+          instanceZ )) || ((\result >= proxy.nestedProxy.instanceInt) && (\result
+          >= x )) || ((\result >= x) && (\result >= instanceZ));
+      @*/
     public int midOneProxyOneInstance(final int x) {
 
         int mid = 0;

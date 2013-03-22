@@ -81,7 +81,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     }
 
     /**
-     * Transforms a {@link Term} which represents a binary comparator. Such
+     * Transforms a {@link Term} which represen ts a binary comparator. Such
      * functions include GreaterOrEquals, GreaterThan, LessOrEquals, and
      * LessThan. These are no explicitly defined as KeY operators, and are as
      * such recognized by their sorts.
@@ -190,9 +190,6 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
              * Function-type terms are not excplicitly spelled out in terms of
              * type relationships.
              */
-            if (term.arity() > 0) {
-                return this.transformMethodInvocation(term);
-            }
 
             if (TermParserTools.isNullSort(term)) {
                 return this.transformNull(term);
@@ -219,9 +216,15 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
             }
 
+            if (term.arity() > 0) {
+                return this.transformMethodInvocation(term);
+            }
+            
             if (TermParserTools.isBooleanConstant(term)) {
                 return this.transformBooleanConstant(term);
             }
+
+       
 
         } catch (final TermParserException e) {
 

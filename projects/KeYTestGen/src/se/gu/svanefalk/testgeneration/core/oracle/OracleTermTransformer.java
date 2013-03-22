@@ -16,12 +16,6 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 class OracleTermTransformer extends AbstractTermTransformer {
 
-    private final String separator;
-
-    public OracleTermTransformer(final String separator) {
-        this.separator = separator;
-    }
-
     /**
      * Simplifies a postcondition by removing {@link SortDependingFunction}
      * instances, {@link ObserverFunction} instances, as well as exception and
@@ -44,7 +38,7 @@ class OracleTermTransformer extends AbstractTermTransformer {
         /*
          * Remove all SortDependingFunction instances from the Term.
          */
-        oracleTerm = new RemoveSDPsTransformer(this.separator)
+        oracleTerm = new RemoveSDPsTransformer()
                 .transform(oracleTerm);
 
         /*

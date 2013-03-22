@@ -1,5 +1,6 @@
 package se.gu.svanefalk.testgeneration.util.parsers.transformers;
 
+import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -7,13 +8,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 public class RemoveSDPsTransformer extends AbstractTermTransformer {
-
-    private final String SEPARATOR;
-
-    public RemoveSDPsTransformer(final String separator) {
-
-        this.SEPARATOR = separator;
-    }
 
     /**
      * Removes all instances of {@link SortDependingFunction} nodes in a given
@@ -35,7 +29,7 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
     protected Term transformSortDependentFunction(final Term term) {
 
         final ProgramElementName resolvedVariableName = new ProgramElementName(
-                TermParserTools.resolveIdentifierString(term, this.SEPARATOR));
+                TermParserTools.resolveIdentifierString(term, StringConstants.FIELD_SEPARATOR));
 
         final LocationVariable resolvedVariable = new LocationVariable(
                 resolvedVariableName, term.sort());

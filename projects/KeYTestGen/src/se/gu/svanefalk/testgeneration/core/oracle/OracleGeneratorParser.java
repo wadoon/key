@@ -2,7 +2,7 @@ package se.gu.svanefalk.testgeneration.core.oracle;
 
 import java.util.Set;
 
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleBooleanExpression;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleExpression;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.logic.Term;
@@ -28,7 +28,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the transformed term
      */
-    protected OracleBooleanExpression constructExpressionFromAnd(final Term term)
+    protected OracleExpression constructExpressionFromAnd(final Term term)
             throws OracleGeneratorException {
         /*
          * final Term firstChild = this.transformTerm(term.sub(0)); final Term
@@ -47,7 +47,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromBinaryFunction(
+    private OracleExpression constructExpressionFromBinaryFunction(
             final Term term) throws OracleGeneratorException {
         /*
          * final Term newTerm = this.termFactory.createTerm(term.op(),
@@ -56,7 +56,7 @@ public class OracleGeneratorParser {
         return null;
     }
 
-    private OracleBooleanExpression constructExpressionFromBooleanConstant(
+    private OracleExpression constructExpressionFromBooleanConstant(
             final Term term) {
         return null;
     }
@@ -68,7 +68,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromEquals(
+    private OracleExpression constructExpressionFromEquals(
             final Term term) throws OracleGeneratorException {
         /*
          * final Term firstChild =
@@ -89,7 +89,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromFunction(
+    private OracleExpression constructExpressionFromFunction(
             final Term term) throws OracleGeneratorException {
 
         try {
@@ -146,7 +146,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromIfExThenElse(
+    private OracleExpression constructExpressionFromIfExThenElse(
             final Term term) {
 
         return null;
@@ -160,7 +160,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromIfThenElse(
+    private OracleExpression constructExpressionFromIfThenElse(
             final Term term) {
 
         return null;
@@ -174,7 +174,7 @@ public class OracleGeneratorParser {
      * @return the constructExpressionFromed term
      * @throws OracleGeneratorException
      */
-    private OracleBooleanExpression constructExpressionFromJunctor(
+    private OracleExpression constructExpressionFromJunctor(
             final Term term) throws OracleGeneratorException,
             OracleGeneratorException {
 
@@ -202,7 +202,7 @@ public class OracleGeneratorParser {
      * @return
      * @throws OracleGeneratorException
      */
-    private OracleBooleanExpression constructExpressionFromLiteral(
+    private OracleExpression constructExpressionFromLiteral(
             final Term term) throws OracleGeneratorException {
 
         /*
@@ -224,7 +224,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromLocationVariable(
+    private OracleExpression constructExpressionFromLocationVariable(
             final Term term) {
 
         return null;
@@ -237,7 +237,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromNot(final Term term)
+    private OracleExpression constructExpressionFromNot(final Term term)
             throws OracleGeneratorException {
 
         // final Term newChild = this.constructExpressionFromTerm(term.sub(0));
@@ -253,7 +253,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromNull(final Term term) {
+    private OracleExpression constructExpressionFromNull(final Term term) {
 
         return null;
     }
@@ -265,7 +265,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromObserverFunction(
+    private OracleExpression constructExpressionFromObserverFunction(
             final Term term) {
 
         if (TermParserTools.isProgramMethod(term)) {
@@ -282,7 +282,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromOr(final Term term)
+    private OracleExpression constructExpressionFromOr(final Term term)
             throws OracleGeneratorException {
         /*
          * final Term firstChild =
@@ -299,7 +299,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromProgramMethod(
+    private OracleExpression constructExpressionFromProgramMethod(
             final Term term) {
 
         return null;
@@ -313,7 +313,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromProgramVariable(
+    private OracleExpression constructExpressionFromProgramVariable(
             final Term term) throws OracleGeneratorException {
 
         if (TermParserTools.isLocationVariable(term)) {
@@ -333,7 +333,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromSortDependentFunction(
+    private OracleExpression constructExpressionFromSortDependentFunction(
             final Term term) {
 
         return null;
@@ -347,7 +347,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromSortedOperator(
+    private OracleExpression constructExpressionFromSortedOperator(
             final Term term) throws OracleGeneratorException {
 
         if (TermParserTools.isFunction(term)) {
@@ -380,7 +380,7 @@ public class OracleGeneratorParser {
      * @return
      * @throws OracleGeneratorException
      */
-    public OracleBooleanExpression constructExpressionFromTerm(final Term term)
+    public OracleExpression constructExpressionFromTerm(final Term term)
             throws OracleGeneratorException {
 
         /*
@@ -409,7 +409,7 @@ public class OracleGeneratorParser {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromUnaryFunction(
+    private OracleExpression constructExpressionFromUnaryFunction(
             final Term term) throws OracleGeneratorException {
 
         // final Term child = this.constructExpressionFromTerm(term.sub(0));
@@ -418,7 +418,7 @@ public class OracleGeneratorParser {
     }
 
     private void constructExpressions(final Term term,
-            final Set<OracleBooleanExpression> expressions)
+            final Set<OracleExpression> expressions)
             throws OracleGeneratorException {
 
         /*
@@ -429,7 +429,7 @@ public class OracleGeneratorParser {
             this.constructExpressions(term.sub(1), expressions);
         } else {
 
-            final OracleBooleanExpression expression = this
+            final OracleExpression expression = this
                     .constructExpressionFromTerm(term);
             expressions.add(expression);
         }

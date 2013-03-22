@@ -2,6 +2,7 @@ package se.gu.svanefalk.testgeneration.util.parsers;
 
 import java.util.LinkedList;
 
+import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
@@ -30,54 +31,28 @@ import de.uka.ilkd.key.logic.sort.NullSort;
  */
 public final class TermParserTools {
 
-    private static final String ADDITION = "add";
-    private static final String AND = "and";
-
     /**
      * The sort names of the various binary functions represented in the KeY
      * {@link Term} hierarchy. Note that equality is not a part of this list,
      * since it is represented by its own operational type {@link Equality}.
      */
     private static final LinkedList<String> binaryFunctions;
-    private static final String BOOLEAN = "boolean";
-    private static final String BYTE = "byte";
-    private static final String DIVISION = "div";
-    private static final String EQUALS = "equals";
-    private static final String EXCEPTION_BASE = "java.lang.Exception";
 
     /**
      * The sort names for various Java Exceptions, as they are modelled in
      * KeYTestGen
      */
     private static final LinkedList<String> exceptionSorts;
-    private static final String EXISTS = "exists";
-    private static final String FALSE = "FALSE";
-    private static final String FORALL = "all";
-    private static final String GREATER_OR_EQUALS = "geq";
-    private static final String GREATER_THAN = "geq";
-    private static final String IMPLIES = "imp";
 
-    private static final String INTEGER = "int";
-    private static final String LESS_OR_EQUALS = "leq";
-    private static final String LESS_THAN = "leq";
     /**
      * The sort names of the literal kinds supported by KeYTestGen.
      */
     private static final LinkedList<String> literals;
-    private static final String LONG = "long";
-    private static final String MULTIPLICATION = "mul";
-
-    private static final String NEGATE_LITERAL = "neglit";
-
-    private static final String NOT = "not";
-    private static final String NUMBERS = "numbers";
-
     /**
      * Used for storing an index over all operator types currently handled by
      * KeYTestGen
      */
     private static final LinkedList<String> operators;
-    private static final String OR = "or";
     /**
      * The names of the various primitive types in Java. As of the
      * implementation of this class (November 2012), KeY does not support
@@ -90,63 +65,57 @@ public final class TermParserTools {
      */
     private static final LinkedList<String> quantifiers;
 
-    private static final String RESULT = "result";
-
-    private static final String SUBTRACTION = "sub";
-
-    private static final String TRUE = "TRUE";
     /**
      * The sort names of the unary functions as supported by KeYTestGen.
      */
     private static final LinkedList<String> unaryFunctions;
-    private static final String Z = "Z";
 
     static {
 
         primitiveTypes = new LinkedList<String>();
-        TermParserTools.primitiveTypes.add(TermParserTools.INTEGER);
-        TermParserTools.primitiveTypes.add(TermParserTools.BOOLEAN);
-        TermParserTools.primitiveTypes.add(TermParserTools.LONG);
-        TermParserTools.primitiveTypes.add(TermParserTools.BYTE);
+        TermParserTools.primitiveTypes.add(StringConstants.INTEGER);
+        TermParserTools.primitiveTypes.add(StringConstants.BOOLEAN);
+        TermParserTools.primitiveTypes.add(StringConstants.LONG);
+        TermParserTools.primitiveTypes.add(StringConstants.BYTE);
 
         literals = new LinkedList<String>();
-        TermParserTools.literals.add(TermParserTools.NUMBERS);
+        TermParserTools.literals.add(StringConstants.NUMBERS);
 
         unaryFunctions = new LinkedList<String>();
-        TermParserTools.unaryFunctions.add(TermParserTools.Z);
-        TermParserTools.unaryFunctions.add(TermParserTools.NEGATE_LITERAL);
+        TermParserTools.unaryFunctions.add(StringConstants.Z);
+        TermParserTools.unaryFunctions.add(StringConstants.NEGATE_LITERAL);
 
         binaryFunctions = new LinkedList<String>();
-        TermParserTools.binaryFunctions.add(TermParserTools.GREATER_OR_EQUALS);
-        TermParserTools.binaryFunctions.add(TermParserTools.LESS_OR_EQUALS);
-        TermParserTools.binaryFunctions.add(TermParserTools.GREATER_THAN);
-        TermParserTools.binaryFunctions.add(TermParserTools.LESS_THAN);
-        TermParserTools.binaryFunctions.add(TermParserTools.MULTIPLICATION);
-        TermParserTools.binaryFunctions.add(TermParserTools.DIVISION);
-        TermParserTools.binaryFunctions.add(TermParserTools.ADDITION);
-        TermParserTools.binaryFunctions.add(TermParserTools.SUBTRACTION);
+        TermParserTools.binaryFunctions.add(StringConstants.GREATER_OR_EQUALS);
+        TermParserTools.binaryFunctions.add(StringConstants.LESS_OR_EQUALS);
+        TermParserTools.binaryFunctions.add(StringConstants.GREATER_THAN);
+        TermParserTools.binaryFunctions.add(StringConstants.LESS_THAN);
+        TermParserTools.binaryFunctions.add(StringConstants.MULTIPLICATION);
+        TermParserTools.binaryFunctions.add(StringConstants.DIVISION);
+        TermParserTools.binaryFunctions.add(StringConstants.ADDITION);
+        TermParserTools.binaryFunctions.add(StringConstants.SUBTRACTION);
 
         operators = new LinkedList<String>();
-        TermParserTools.operators.add(TermParserTools.AND);
-        TermParserTools.operators.add(TermParserTools.OR);
-        TermParserTools.operators.add(TermParserTools.NOT);
-        TermParserTools.operators.add(TermParserTools.GREATER_OR_EQUALS);
-        TermParserTools.operators.add(TermParserTools.LESS_OR_EQUALS);
-        TermParserTools.operators.add(TermParserTools.GREATER_THAN);
-        TermParserTools.operators.add(TermParserTools.LESS_THAN);
-        TermParserTools.operators.add(TermParserTools.MULTIPLICATION);
-        TermParserTools.operators.add(TermParserTools.DIVISION);
-        TermParserTools.operators.add(TermParserTools.ADDITION);
-        TermParserTools.operators.add(TermParserTools.SUBTRACTION);
-        TermParserTools.operators.add(TermParserTools.EQUALS);
-        TermParserTools.operators.add(TermParserTools.IMPLIES);
+        TermParserTools.operators.add(StringConstants.AND);
+        TermParserTools.operators.add(StringConstants.OR);
+        TermParserTools.operators.add(StringConstants.NOT);
+        TermParserTools.operators.add(StringConstants.GREATER_OR_EQUALS);
+        TermParserTools.operators.add(StringConstants.LESS_OR_EQUALS);
+        TermParserTools.operators.add(StringConstants.GREATER_THAN);
+        TermParserTools.operators.add(StringConstants.LESS_THAN);
+        TermParserTools.operators.add(StringConstants.MULTIPLICATION);
+        TermParserTools.operators.add(StringConstants.DIVISION);
+        TermParserTools.operators.add(StringConstants.ADDITION);
+        TermParserTools.operators.add(StringConstants.SUBTRACTION);
+        TermParserTools.operators.add(StringConstants.EQUALS);
+        TermParserTools.operators.add(StringConstants.IMPLIES);
 
         exceptionSorts = new LinkedList<String>();
-        TermParserTools.exceptionSorts.add(TermParserTools.EXCEPTION_BASE);
+        TermParserTools.exceptionSorts.add(StringConstants.EXCEPTION_BASE);
 
         quantifiers = new LinkedList<String>();
-        TermParserTools.quantifiers.add(TermParserTools.FORALL);
-        TermParserTools.quantifiers.add(TermParserTools.EXISTS);
+        TermParserTools.quantifiers.add(StringConstants.FORALL);
+        TermParserTools.quantifiers.add(StringConstants.EXISTS);
     }
 
     /**
@@ -211,7 +180,7 @@ public final class TermParserTools {
      */
     public static boolean isAnd(final Term term) {
 
-        return term.op().name().toString().equals(TermParserTools.AND);
+        return term.op().name().toString().equals(StringConstants.AND);
     }
 
     public static boolean isBinaryFunction(final Term term) {
@@ -244,7 +213,7 @@ public final class TermParserTools {
     }
 
     public static boolean isBoolean(final Term term) {
-        return term.sort().name().toString().equals(TermParserTools.BOOLEAN);
+        return term.sort().name().toString().equals(StringConstants.BOOLEAN);
     }
 
     public static boolean isBooleanConstant(final Term term)
@@ -256,7 +225,7 @@ public final class TermParserTools {
     public static boolean isBooleanFalse(final Term term)
             throws TermParserException {
         if (TermParserTools.isBoolean(term)) {
-            return term.op().name().toString().equals(TermParserTools.FALSE);
+            return term.op().name().toString().equals(StringConstants.FALSE);
         } else {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
@@ -266,7 +235,7 @@ public final class TermParserTools {
     public static boolean isBooleanTrue(final Term term)
             throws TermTransformerException {
         if (TermParserTools.isBoolean(term)) {
-            return term.op().name().toString().equals(TermParserTools.TRUE);
+            return term.op().name().toString().equals(StringConstants.TRUE);
         } else {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
@@ -296,12 +265,12 @@ public final class TermParserTools {
 
     public static boolean isExistsQuantifier(final Term term) {
 
-        return term.op().name().toString().equals(TermParserTools.EXISTS);
+        return term.op().name().toString().equals(StringConstants.EXISTS);
     }
 
     public static boolean isForAllQuantifier(final Term term) {
 
-        return term.op().name().toString().equals(TermParserTools.FORALL);
+        return term.op().name().toString().equals(StringConstants.FORALL);
     }
 
     /**
@@ -317,12 +286,24 @@ public final class TermParserTools {
     /**
      * @param term
      *            the term
+     * @return true iff. the term represents an arithmetic comparator, i.e. GEQ,
+     *         GREATER_THAN, LEQ, or LESS_THAN.
+     */
+    public static boolean isArithmeticComparator(final Term term) {
+
+        return isGreaterOrEquals(term) || isGreaterThan(term)
+                || isLessOrEquals(term) || isLessThan(term);
+    }
+
+    /**
+     * @param term
+     *            the term
      * @return true iff. the term represents a GEQ operator
      */
     public static boolean isGreaterOrEquals(final Term term) {
 
         return term.op().name().toString()
-                .equals(TermParserTools.GREATER_OR_EQUALS);
+                .equals(StringConstants.GREATER_OR_EQUALS);
     }
 
     /**
@@ -332,7 +313,7 @@ public final class TermParserTools {
      */
     public static boolean isGreaterThan(final Term term) {
 
-        return term.op().name().toString().equals(TermParserTools.GREATER_THAN);
+        return term.op().name().toString().equals(StringConstants.GREATER_THAN);
     }
 
     /**
@@ -357,7 +338,7 @@ public final class TermParserTools {
 
     public static boolean isImplication(final Term term) {
 
-        return term.op().name().toString().equals(TermParserTools.IMPLIES);
+        return term.op().name().toString().equals(StringConstants.IMPLIES);
     }
 
     /**
@@ -378,7 +359,7 @@ public final class TermParserTools {
     public static boolean isLessOrEquals(final Term term) {
 
         return term.op().name().toString()
-                .equals(TermParserTools.LESS_OR_EQUALS);
+                .equals(StringConstants.LESS_OR_EQUALS);
     }
 
     /**
@@ -388,7 +369,7 @@ public final class TermParserTools {
      */
     public static boolean isLessThan(final Term term) {
 
-        return term.op().name().toString().equals(TermParserTools.LESS_THAN);
+        return term.op().name().toString().equals(StringConstants.LESS_THAN);
     }
 
     public static boolean isLiteral(final Term term) {
@@ -420,7 +401,7 @@ public final class TermParserTools {
      */
     public static boolean isNot(final Term term) {
 
-        return term.op().name().toString().equals(TermParserTools.NOT);
+        return term.op().name().toString().equals(StringConstants.NOT);
     }
 
     /**
@@ -453,7 +434,7 @@ public final class TermParserTools {
 
         if (TermParserTools.isBinaryFunction2(term)) {
 
-            return term.op().name().toString().equals(TermParserTools.OR);
+            return term.op().name().toString().equals(StringConstants.OR);
 
         } else {
 
@@ -514,7 +495,7 @@ public final class TermParserTools {
      */
     public static boolean isResult(final Term term) {
 
-        return term.op().name().equals(TermParserTools.RESULT);
+        return term.op().name().equals(StringConstants.RESULT);
     }
 
     /**

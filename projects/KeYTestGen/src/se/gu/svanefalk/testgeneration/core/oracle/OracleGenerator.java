@@ -3,14 +3,18 @@ package se.gu.svanefalk.testgeneration.core.oracle;
 import java.util.HashSet;
 import java.util.Set;
 
-import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleBooleanExpression;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleClause;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleComparator;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleComparator.ComparatorType;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleExpression;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleLiteral;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleType;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -38,17 +42,11 @@ public enum OracleGenerator {
     INSTANCE;
 
     /**
-     * Transformer used in order to transform {@link Term} instances
-     * representing postconditions into a form suitable for turning them into
-     * Oracles.
+     * Transformer used in order to constructExpressionFrom {@link Term}
+     * instances representing postconditions into a form suitable for turning
+     * them into Oracles.
      */
-    private final OracleTermTransformer oracleTermTransformer = new OracleTermTransformer(
-            this.SEPARATOR);
-
-    /**
-     * Separator to use when resolving {@link SortDependingFunction} instances.
-     */
-    private final String SEPARATOR = StringConstants.FIELD_SEPARATOR.toString();
+    private final OracleTermTransformer oracleTermTransformer = new OracleTermTransformer();
 
     private void constructClause(final Term term,
             final Set<OracleClause> clauses) throws OracleGeneratorException {
@@ -61,7 +59,7 @@ public enum OracleGenerator {
         /*
          * Expressions belonging to the Clause.
          */
-        final Set<OracleBooleanExpression> expressions = new HashSet<OracleBooleanExpression>();
+        final Set<OracleExpression> expressions = new HashSet<OracleExpression>();
 
         /*
          * Since the formula is in CNF, all occurences of AND junctions will be
@@ -102,38 +100,42 @@ public enum OracleGenerator {
      * 
      * @param term
      *            the term
-     * @return the transformed term
-     */
-    protected OracleBooleanExpression constructExpressionFromAnd(final Term term)
-            throws OracleGeneratorException {
-        /*
-         * final Term firstChild = this.transformTerm(term.sub(0)); final Term
-         * secondChild = this.transformTerm(term.sub(1));
-         */
-        return null;
-    }
-
-    /**
-     * Transforms a {@link Term} which represents a binary comparator. Such
-     * functions include GreaterOrEquals, GreaterThan, LessOrEquals, and
-     * LessThan. These are no explicitly defined as KeY operators, and are as
-     * such recognized by their sorts.
-     * 
-     * @param term
-     *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromBinaryFunction(
-            final Term term) throws OracleGeneratorException {
+    protected OracleExpression constructExpressionFromAnd(final Term term,
+            final boolean negate) throws OracleGeneratorException {
+
         /*
-         * final Term newTerm = this.termFactory.createTerm(term.op(),
-         * firstChild, secondChild);
+         * final Term firstChild =
+         * this.constructExpressionFromTerm(term.sub(0)); final Term secondChild
+         * = this.constructExpressionFromTerm(term.sub(1));
          */
         return null;
     }
 
-    private OracleBooleanExpression constructExpressionFromBooleanConstant(
-            final Term term) {
+    private OracleExpression constructExpressionFromBinaryFunction(
+            final Term term, boolean negate) throws OracleGeneratorException {
+
+        /*
+         * Retrieve a comparator for the Oracle expression
+         */
+        ComparatorType comparator = OracleGenerationTools.getOracleComparator(
+                term, negate);
+
+        OracleExpression firstOperand = constructExpressionFromTerm(
+                term.sub(0), negate);
+
+        OracleExpression secondOperand = constructExpressionFromTerm(
+                term.sub(1), negate);
+
+        OracleComparator numericComparator = new OracleComparator(comparator,
+                firstOperand, secondOperand);
+
+        return numericComparator;
+    }
+
+    private OracleExpression constructExpressionFromBooleanConstant(
+            final Term term, boolean negate) {
         return null;
     }
 
@@ -144,8 +146,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromEquals(
-            final Term term) throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromEquals(final Term term,
+            final boolean negate) throws OracleGeneratorException {
         /*
          * final Term firstChild =
          * this.constructExpressionFromTerm(term.sub(0)); final Term secondChild
@@ -165,8 +167,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromFunction(
-            final Term term) throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromFunction(final Term term,
+            boolean negate) throws OracleGeneratorException {
 
         try {
 
@@ -177,32 +179,35 @@ public enum OracleGenerator {
              * type relationships.
              */
             if (TermParserTools.isNullSort(term)) {
-                return this.constructExpressionFromNull(term);
+                return this.constructExpressionFromNull(term, negate);
             }
 
             if (TermParserTools.isSortDependingFunction(term)) {
-                return this.constructExpressionFromSortDependentFunction(term);
+                return this.constructExpressionFromSortDependentFunction(term,
+                        negate);
             }
 
             if (TermParserTools.isBinaryFunction(term)) {
-                return this.constructExpressionFromBinaryFunction(term);
+                return this.constructExpressionFromBinaryFunction(term, negate);
             }
 
             if (TermParserTools.isUnaryFunction(term)) {
-                return this.constructExpressionFromUnaryFunction(term);
+                return this.constructExpressionFromUnaryFunction(term, negate);
             }
 
             if (TermParserTools.isLiteral(term)) {
-                return this.constructExpressionFromLiteral(term);
+                return this.constructExpressionFromLiteral(term, negate);
             }
 
             if (TermParserTools.isObserverFunction(term)) {
-                return this.constructExpressionFromObserverFunction(term);
+                return this.constructExpressionFromObserverFunction(term,
+                        negate);
 
             }
 
             if (TermParserTools.isBooleanConstant(term)) {
-                return this.constructExpressionFromBooleanConstant(term);
+                return this
+                        .constructExpressionFromBooleanConstant(term, negate);
             }
 
         } catch (final TermParserException e) {
@@ -222,8 +227,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromIfExThenElse(
-            final Term term) {
+    private OracleExpression constructExpressionFromIfExThenElse(
+            final Term term, boolean negate) {
 
         return null;
     }
@@ -236,8 +241,7 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromIfThenElse(
-            final Term term) {
+    private OracleExpression constructExpressionFromIfThenElse(final Term term) {
 
         return null;
     }
@@ -250,25 +254,42 @@ public enum OracleGenerator {
      * @return the constructExpressionFromed term
      * @throws OracleGeneratorException
      */
-    private OracleBooleanExpression constructExpressionFromJunctor(
-            final Term term) throws OracleGeneratorException,
+    private OracleExpression constructExpressionFromJunctor(final Term term,
+            final boolean negate) throws OracleGeneratorException,
             OracleGeneratorException {
 
         if (TermParserTools.isAnd(term)) {
-            return this.constructExpressionFromAnd(term);
+            return this.constructExpressionFromAnd(term, negate);
 
         } else if (TermParserTools.isOr(term)) {
-            return this.constructExpressionFromOr(term);
+            return this.constructExpressionFromOr(term, negate);
 
         } else if (TermParserTools.isEquals(term)) {
-            return this.constructExpressionFromEquals(term);
+            return this.constructExpressionFromEquals(term, negate);
 
         } else if (TermParserTools.isNot(term)) {
-            return this.constructExpressionFromNot(term);
+            return this.constructExpressionFromNot(term, negate);
+        }
+
+        else if (TermParserTools.isImplication(term)) {
+            return this.constructExpressionFromImplication(term, negate);
         }
 
         throw new OracleGeneratorException("Unsupported Junctor: "
                 + term.op().name());
+    }
+
+    private OracleExpression constructExpressionFromImplication(
+            final Term term, final boolean negate)
+            throws OracleGeneratorException {
+
+        final OracleExpression newFirstChild = this
+                .constructExpressionFromTerm(term.sub(0), negate);
+        
+        final OracleExpression newSecondChild = this
+                .constructExpressionFromTerm(term.sub(1), negate);
+
+        return null;
     }
 
     /**
@@ -278,8 +299,8 @@ public enum OracleGenerator {
      * @return
      * @throws OracleGeneratorException
      */
-    private OracleBooleanExpression constructExpressionFromLiteral(
-            final Term term) throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromLiteral(final Term term,
+            boolean negate) throws OracleGeneratorException {
 
         /*
          * Literals may or may not declare children, such as 1(#);
@@ -293,17 +314,19 @@ public enum OracleGenerator {
     }
 
     /**
-     * Transforms a {@link Term} which represents an {@link LocationVariable}
-     * structure (i.e. its {@link Operator} is of this type).
+     * Constructs an {@link OracleLiteral} from a {@link LocationVariable}.
      * 
      * @param term
-     *            the term
-     * @return the constructExpressionFromed term
+     *            the term representing the variable
+     * @return the literal
      */
-    private OracleBooleanExpression constructExpressionFromLocationVariable(
+    private OracleExpression constructExpressionFromLocationVariable(
             final Term term) {
 
-        return null;
+        OracleType type = OracleGenerationTools.getOracleType(term);
+        String identifier = term.toString();
+        return new OracleLiteral(type, identifier);
+
     }
 
     /**
@@ -313,12 +336,10 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromNot(final Term term)
-            throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromNot(final Term term,
+            final boolean negate) throws OracleGeneratorException {
 
-        // final Term newChild = this.constructExpressionFromTerm(term.sub(0));
-
-        return null;
+        return constructExpressionFromTerm(term.sub(0), true);
     }
 
     /**
@@ -329,7 +350,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromNull(final Term term) {
+    private OracleExpression constructExpressionFromNull(final Term term,
+            final boolean negate) {
 
         return null;
     }
@@ -341,11 +363,11 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromObserverFunction(
-            final Term term) {
+    private OracleExpression constructExpressionFromObserverFunction(
+            final Term term, boolean negate) {
 
         if (TermParserTools.isProgramMethod(term)) {
-            return this.constructExpressionFromProgramMethod(term);
+            return this.constructExpressionFromProgramMethod(term, negate);
         }
 
         return null;
@@ -358,8 +380,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromOr(final Term term)
-            throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromOr(final Term term,
+            final boolean negate) throws OracleGeneratorException {
         /*
          * final Term firstChild =
          * this.constructExpressionFromTerm(term.sub(0)); final Term secondChild
@@ -375,8 +397,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromProgramMethod(
-            final Term term) {
+    private OracleExpression constructExpressionFromProgramMethod(
+            final Term term, boolean negate) {
 
         return null;
     }
@@ -389,8 +411,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromProgramVariable(
-            final Term term) throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromProgramVariable(
+            final Term term, boolean negate) throws OracleGeneratorException {
 
         if (TermParserTools.isLocationVariable(term)) {
             return this.constructExpressionFromLocationVariable(term);
@@ -409,8 +431,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromSortDependentFunction(
-            final Term term) {
+    private OracleExpression constructExpressionFromSortDependentFunction(
+            final Term term, boolean negate) {
 
         return null;
     }
@@ -423,50 +445,86 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromSortedOperator(
-            final Term term) throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromSortedOperator(
+            final Term term, boolean negate) throws OracleGeneratorException {
 
         if (TermParserTools.isFunction(term)) {
-            return this.constructExpressionFromFunction(term);
+            return this.constructExpressionFromFunction(term, negate);
         }
 
         if (TermParserTools.isEquals(term)) {
-            return this.constructExpressionFromEquals(term);
+            return this.constructExpressionFromBinaryFunction(term, negate);
         }
 
         if (TermParserTools.isJunctor(term)) {
-            return this.constructExpressionFromJunctor(term);
+            return this.constructExpressionFromJunctor(term, negate);
         }
 
         if (TermParserTools.isProgramVariable(term)) {
-            return this.constructExpressionFromProgramVariable(term);
+            return this.constructExpressionFromProgramVariable(term, negate);
+        }
+
+        if (TermParserTools.isLogicVariable(term)) {
+            return this.constructExpressionFromLogicVariable(term, negate);
+        }
+
+        if (TermParserTools.isQuantifier(term)) {
+            return this.constructExpressionFromQuantifier(term, negate);
         }
 
         throw new OracleGeneratorException("Unsupported SortedOperator: "
                 + term.op().name());
     }
 
-    /**
-     * The top level function for constructExpressionFroming a {@link Term}
-     * instance. This function will do a preliminary check to see whether the
-     * top-level operator of the Term is a basic {@link Operator} or a
-     * {@link SortedOperator}, and proceed with parsing from there.
-     * 
-     * @param term
-     * @return
-     * @throws OracleGeneratorException
-     */
-    public OracleBooleanExpression constructExpressionFromTerm(final Term term)
+    private OracleExpression constructExpressionFromLogicVariable(
+            final Term term, final boolean negate) {
+
+        return null;
+    }
+
+    private OracleExpression constructExpressionFromQuantifier(final Term term,
+            final boolean negate) throws OracleGeneratorException {
+
+        if (TermParserTools.isExistsQuantifier(term)) {
+            return this.constructExpressionFromExistsQuantifier(term, negate);
+        }
+
+        if (TermParserTools.isForAllQuantifier(term)) {
+            return this.constructExpressionFromForAllQuantifier(term, negate);
+        }
+
+        throw new OracleGeneratorException("Unsupported quantifier: "
+                + term.op().name());
+    }
+
+    private OracleExpression constructExpressionFromForAllQuantifier(
+            final Term term, final boolean negate)
             throws OracleGeneratorException {
 
-        /*
-         * Order matters here, since SortedOperator is a subclass of Operator.
-         */
+        final OracleExpression newChild = this.constructExpressionFromTerm(
+                term.sub(0), negate);
+
+        return null;
+    }
+
+    private OracleExpression constructExpressionFromExistsQuantifier(
+            final Term term, final boolean negate)
+            throws OracleGeneratorException {
+
+        final OracleExpression newChild = this.constructExpressionFromTerm(
+                term.sub(0), negate);
+
+        return null;
+    }
+
+    private OracleExpression constructExpressionFromTerm(final Term term,
+            final boolean negate) throws OracleGeneratorException {
+
         if (TermParserTools.isSortedOperator(term)) {
-            return this.constructExpressionFromSortedOperator(term);
+            return this.constructExpressionFromSortedOperator(term, negate);
 
         } else if (TermParserTools.isIfExThenElse(term)) {
-            return this.constructExpressionFromIfExThenElse(term);
+            return this.constructExpressionFromIfExThenElse(term, negate);
 
         } else if (TermParserTools.isIfThenElse(term)) {
             return this.constructExpressionFromIfThenElse(term);
@@ -485,8 +543,8 @@ public enum OracleGenerator {
      *            the term
      * @return the constructExpressionFromed term
      */
-    private OracleBooleanExpression constructExpressionFromUnaryFunction(
-            final Term term) throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromUnaryFunction(
+            final Term term, boolean negate) throws OracleGeneratorException {
 
         // final Term child = this.constructExpressionFromTerm(term.sub(0));
 
@@ -494,7 +552,7 @@ public enum OracleGenerator {
     }
 
     private void constructExpressions(final Term term,
-            final Set<OracleBooleanExpression> expressions)
+            final Set<OracleExpression> expressions)
             throws OracleGeneratorException {
 
         /*
@@ -505,8 +563,8 @@ public enum OracleGenerator {
             this.constructExpressions(term.sub(1), expressions);
         } else {
 
-            final OracleBooleanExpression expression = this
-                    .constructExpressionFromTerm(term);
+            final OracleExpression expression = this
+                    .constructExpressionFromTerm(term, false);
             expressions.add(expression);
         }
     }
@@ -531,12 +589,11 @@ public enum OracleGenerator {
              * Extract the postcondition of the method
              */
             final Term postCondition = method.getPostconditions().get(0);
-            Term simplifiedPostCondition;
 
             /*
              * Simplify the postcondition
              */
-            simplifiedPostCondition = this.oracleTermTransformer
+            Term simplifiedPostCondition = this.oracleTermTransformer
                     .transform(postCondition);
 
             /*
