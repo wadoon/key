@@ -20,7 +20,10 @@ public class JavaLDTInput extends LDTInput<Services, JavaDLInitConfig> {
                 .prepend(new LocSetLDT(services))
                 .prepend(new HeapLDT(services))
                 .prepend(new SeqLDT(services))
+                .prepend(new FreeLDT(services))
                 .prepend(new CharListLDT(services));
+
+
     }
 
 }

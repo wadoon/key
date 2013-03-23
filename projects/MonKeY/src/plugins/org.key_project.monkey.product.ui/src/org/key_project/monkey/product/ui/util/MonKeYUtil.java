@@ -10,21 +10,19 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
 import org.key_project.monkey.product.ui.model.MonKeYProofResult;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides static utility methods for MonKeY.
@@ -55,12 +53,17 @@ public final class MonKeYUtil {
          monitor = new NullProgressMonitor();
       }
       monitor.beginTask("Loading in KeY", IProgressMonitor.UNKNOWN);
-      InitConfig init = KeYUtil.internalLoad(location, null, bootClassPath, showKeYMainWindow);
-      Services services = init.getServices();
+      KeYEnvironment<?> environment;
+      if (showKeYMainWindow) {
+         environment = KeYEnvironment.loadInMainWindow(location, null, bootClassPath, true);
+      }
+      else {
+         environment = KeYEnvironment.load(location, null, bootClassPath);
+      }
       boolean skipLibraryClasses = true;
       // get all classes
       SWTUtil.checkCanceled(monitor);
-      final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+      final Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
       monitor.beginTask("Filtering types", kjts.size());
       final Iterator<KeYJavaType> it = kjts.iterator();
       while (it.hasNext()) {
@@ -90,11 +93,11 @@ public final class MonKeYUtil {
       monitor.beginTask("Analysing types", kjtsarr.length);
       for (KeYJavaType type : kjtsarr) {
           SWTUtil.checkCanceled(monitor);
-          ImmutableSet<IObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
+          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
           for (IObserverFunction target : targets) {
-              ImmutableSet<Contract> contracts = services.getSpecificationRepository().getContracts(type, target);
+              ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
               for (Contract contract : contracts) {
-                  proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(services, contract.getTarget()), contract.getDisplayName(), init, contract));
+                  proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(environment.getServices(), contract.getTarget()), contract.getDisplayName(), environment, contract));
               }
           }
           monitor.worked(1);
@@ -113,6 +116,7 @@ public final class MonKeYUtil {
       long nodes = 0;
       long time = 0;
       int closedCount = 0;
+      int reusedProofsCount = 0;
       for (MonKeYProof proof : proofs) {
          branches += proof.getBranches();
          nodes += proof.getNodes();
@@ -120,8 +124,11 @@ public final class MonKeYUtil {
          if (MonKeYProofResult.CLOSED.equals(proof.getResult())) {
             closedCount ++;
          }
+         if (proof.isReused()) {
+            reusedProofsCount ++;
+         }
       }
-      return new MonKeYProofSums(branches, nodes, time, closedCount, proofs.size());
+      return new MonKeYProofSums(branches, nodes, time, closedCount, proofs.size(), reusedProofsCount);
    }
    
    /**
@@ -155,23 +162,31 @@ public final class MonKeYUtil {
       private int proofsCount;
       
       /**
+       * The number of reused proofs.
+       */
+      private int reusedProofsCount;
+      
+      /**
        * Constructor.
        * @param branches The accumulated number of branches.
        * @param nodes The accumulated number of nodes.
        * @param time The accumulated time.
        * @param closedCount The number of closed proofs.
        * @param proofsCount The number of proofs.
+       * @param reusedProofsCount The number of reused proofs.
        */
       public MonKeYProofSums(long branches, 
                              long nodes, 
                              long time, 
                              int closedCount, 
-                             int proofsCount) {
+                             int proofsCount,
+                             int reusedProofsCount) {
          this.branches = branches;
          this.nodes = nodes;
          this.time = time;
          this.closedCount = closedCount;
          this.proofsCount = proofsCount;
+         this.reusedProofsCount = reusedProofsCount;
       }
 
       /**
@@ -212,6 +227,14 @@ public final class MonKeYUtil {
        */
       public int getProofsCount() {
          return proofsCount;
+      }
+
+      /**
+       * Returns the number of reused proofs.
+       * @return The number of reused proofs.
+       */
+      public int getReusedProofsCount() {
+         return reusedProofsCount;
       }
    }
 }

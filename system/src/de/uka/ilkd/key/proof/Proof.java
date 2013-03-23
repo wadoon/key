@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof;
 
@@ -23,6 +27,7 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.java.IServices;
@@ -80,7 +85,7 @@ public class Proof implements Named {
     private String problemHeader = "";
 
     /** the java information object: JavaInfo+TypeConverter */
-    private final IServices services;
+    private IServices services;
 
     /** maps the Abbreviations valid for this proof to their corresponding terms.*/
     private AbbrevMap abbreviations = new AbbrevMap();
@@ -94,7 +99,7 @@ public class Proof implements Named {
     private BasicTask task;
     
     private ProofSettings settings;
-
+    private ProofIndependentSettings pis;
     /**
      * when different users load and save a proof this vector fills up with
      * Strings containing the user names.
@@ -111,15 +116,29 @@ public class Proof implements Named {
     
     private Strategy activeStrategy;
     
+    private SettingsListener settingsListener;
+    
+    /**
+     * Set to true if the proof has been abandoned and the dispose method has
+     * been called on this object.
+     */
+    private boolean disposed = false;
+    
 
     /** constructs a new empty proof with name */
     private Proof(Name name, IServices services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
 	this.services = services.copyProofSpecific(this);
-        this.settings = settings;
-
-        addStrategyListener ();
+        settingsListener =
+                new SettingsListener () {
+                    @Override
+                    public void settingsChanged ( GUIEvent config ) {
+                        updateStrategyOnGoals();
+                    }
+                };
+        setSettings(settings);
+        pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
 
     /**
@@ -230,6 +249,42 @@ public class Proof implements Named {
     }
          
 
+    /**
+     * Cut off all reference such that it does not lead to a big memory leak
+     * if someone still holds a refernce to this proof object. 
+     */
+    public void dispose() {
+        // remove setting listener from settings
+        setSettings(null);
+        // set every reference (except the name) to null
+        root = null;
+        listenerList = null;
+        openGoals = null;
+        problemHeader = null;
+        services = null;
+        abbreviations = null;
+        proofEnv = null;
+        localMgt = null;
+        task = null;
+        settings = null;
+        userLog = null;
+        keyVersionLog = null;
+        activeStrategy = null;
+        settingsListener = null;
+        disposed = true;
+    }
+    
+    
+    /**
+     * Returns true if the proof has been abandoned and the dispose method has
+     * been called on this object. Should be asserted before proof object is
+     * accessed.
+     */
+    public boolean isDisposed() {
+        return disposed;
+    }
+    
+            
     /** 
      * returns the name of the proof. Describes in short what has to be proved.     
      * @return the name of the proof
@@ -316,14 +371,7 @@ public class Proof implements Named {
         while ( it.hasNext () )
             it.next ().setGoalStrategy(ourStrategy);
     }
-    private void addStrategyListener () {
-        getSettings().getStrategySettings()
-            .addSettingsListener ( new SettingsListener () {
-                public void settingsChanged ( GUIEvent config ) {
-                    updateStrategyOnGoals();
-                }
-            });
-    }
+    
 
     public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
@@ -372,16 +420,25 @@ public class Proof implements Named {
     }
     
     
-    public void setSettings(ProofSettings newSettings) {
+    public final void setSettings(ProofSettings newSettings) {
+        if (settings != null ){
+            // deregister settings listener
+            settings.getStrategySettings().removeSettingsListener(settingsListener);
+        }
         settings = newSettings;
-        addStrategyListener ();
+        if (settings != null ){
+            // register settings listener
+            settings.getStrategySettings().addSettingsListener (settingsListener);
+        }
     }
     
     
     public ProofSettings getSettings() {
         return settings;
     }
-
+    public ProofIndependentSettings getProofIndependentSettings(){
+    	return pis;
+    }
 
     /** 
      * returns the list of open goals
@@ -804,9 +861,11 @@ public class Proof implements Named {
      */
     public synchronized void removeProofTreeListener
 	(ProofTreeListener listener) {
-	synchronized(listenerList) {
-	    listenerList.remove(listener);
-	}
+       if (listenerList != null) {
+          synchronized(listenerList) {
+             listenerList.remove(listener);
+         }
+       }
     }
     
     

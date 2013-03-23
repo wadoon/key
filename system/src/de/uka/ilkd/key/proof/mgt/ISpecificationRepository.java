@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.mgt;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -153,8 +154,6 @@ public interface ISpecificationRepository<CINV extends ClassInvariant> {
 
     public abstract LoopInvariant getLoopInvariant(LoopStatement node);
 
-    public abstract void setLoopInvariant(LoopInvariant newInv);
-
     public abstract ImmutableSet<Contract> splitContract(Contract contract);
 
     public abstract IObserverFunction unlimitObs(IObserverFunction target);
@@ -168,4 +167,14 @@ public interface ISpecificationRepository<CINV extends ClassInvariant> {
 
     public abstract void createContractsFromInitiallyClauses();
 
+    public void addBlockContract(final BlockContract contract);
+
+    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block);
+
+    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block, final Modality modality);
+
+
+    public void addLoopInvariant(LoopInvariant newInv);
+
+    public void copyLoopInvariant(LoopStatement x, LoopStatement newLoop);
 }

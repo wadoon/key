@@ -62,6 +62,13 @@
                   type="org.eclipse.ui.views.properties.IPropertySheetPage">
             </adapter>
          </factory>
+         <factory
+               adaptableType="org.key_project.sed.core.model.ISEDVariable"
+               class="org.key_project.sed.ui.adapter.SEDVariableAdapterFactory">
+            <adapter
+                  type="org.eclipse.debug.internal.ui.viewers.model.provisional.IElementLabelProvider">
+            </adapter>
+         </factory>
       </extension>
       <extension
           point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
@@ -128,5 +135,12 @@
                id="org.key_project.sed.ui.preference.page.symbolic_debug"
                name="Symbolic Execution Debugger (SED)">
          </page>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views">
+         <category
+               id="org.key_project.sed.ui.category"
+               name="Symbolic Execution Debugger (SED)">
+         </category>
       </extension>  
 </plugin>

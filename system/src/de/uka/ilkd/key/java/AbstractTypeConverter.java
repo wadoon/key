@@ -54,6 +54,7 @@ public abstract class AbstractTypeConverter<S extends IServices> {
     protected LocSetLDT locSetLDT;
     protected IHeapLDT heapLDT;
     protected SeqLDT seqLDT;
+    protected FreeLDT genLDT;
     @SuppressWarnings("unused")
     private FloatLDT floatLDT;
     @SuppressWarnings("unused")
@@ -68,7 +69,7 @@ public abstract class AbstractTypeConverter<S extends IServices> {
     /**
      * initializes the type converter with an LDT
      */
-    public void init(LDT ldt) {	
+    public void init(LDT ldt) {
         if (ldt instanceof IntegerLDT) {
             this.integerLDT = (IntegerLDT) ldt;
         } else if (ldt instanceof BooleanLDT) {
@@ -79,6 +80,8 @@ public abstract class AbstractTypeConverter<S extends IServices> {
             this.heapLDT = (IHeapLDT) ldt;
         } else if (ldt instanceof SeqLDT) {
             this.seqLDT = (SeqLDT) ldt;
+        } else if (ldt instanceof FreeLDT){
+            this.genLDT = (FreeLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
             this.floatLDT = (FloatLDT) ldt;
         } else if (ldt instanceof DoubleLDT) {
@@ -86,7 +89,8 @@ public abstract class AbstractTypeConverter<S extends IServices> {
         } else if (ldt instanceof CharListLDT) {
             this.charListLDT = (CharListLDT) ldt;
         }
-    
+
+
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
     }
@@ -129,6 +133,9 @@ public abstract class AbstractTypeConverter<S extends IServices> {
 
     public IHeapLDT getHeapLDT() {
         return heapLDT;
+    }
+    public FreeLDT getGenLDT(){
+        return genLDT;
     }
 
     public SeqLDT getSeqLDT() {

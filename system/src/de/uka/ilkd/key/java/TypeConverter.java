@@ -1,80 +1,41 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.logic.ProgramInLogic;
-import de.uka.ilkd.key.util.ExtList;
-import recoder.service.ConstantEvaluator;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.NullType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
-import de.uka.ilkd.key.java.expression.operator.BinaryNot;
-import de.uka.ilkd.key.java.expression.operator.BinaryOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
-import de.uka.ilkd.key.java.expression.operator.Conditional;
-import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.Divide;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Minus;
-import de.uka.ilkd.key.java.expression.operator.Modulo;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.Plus;
-import de.uka.ilkd.key.java.expression.operator.PostDecrement;
-import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.java.expression.operator.PreDecrement;
-import de.uka.ilkd.key.java.expression.operator.PreIncrement;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
-import de.uka.ilkd.key.java.expression.operator.ShiftRight;
-import de.uka.ilkd.key.java.expression.operator.Times;
+import de.uka.ilkd.key.java.expression.literal.*;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.ArrayReference;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MetaClassReference;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.reference.VariableReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.JavaDLTermBuilder;
+import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.Debug;
-
+import de.uka.ilkd.key.util.ExtList;
+import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter extends AbstractTypeConverter<Services> {
-    
+
     private static final JavaDLTermBuilder TB = JavaProfile.DF();
 
     public TypeConverter(Services s){
@@ -110,19 +71,25 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
 	    responsibleLDT = locSetLDT;
 	} else if(seqLDT.isResponsible(op, subs, getServices(), ec)) {
 	    responsibleLDT = seqLDT;
+	} else if(genLDT.isResponsible(op, subs, getServices(), ec)) {
+	    responsibleLDT = genLDT;
 	} else if(charListLDT.isResponsible(op, subs, getServices(), ec)) {
 	    responsibleLDT = charListLDT;
     	} else if(op instanceof Equals) {
 	    assert subs.length == 2;
 	    return TB.equals(subs[0], subs[1]);
+    	} else if(op instanceof NotEquals) {
+	    assert subs.length == 2;
+	    return TB.not(TB.equals(subs[0], subs[1]));
 	} else if(op instanceof Conditional) {
 	    assert subs.length == 3;
 	    return TB.ife(subs[0], subs[1], subs[2]);
 	} else if(op instanceof DLEmbeddedExpression) {
 	    DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
-	    Function f = emb.getFunctionSymbol();
-	    // TODO make a sensible error recovery
-	    return TB.func(f, subs);
+	    return emb.makeTerm(heapLDT.getHeap(), subs, services);
+	} else if(op instanceof TypeCast) {
+	    TypeCast tc = (TypeCast) op;
+	    return TB.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
 	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
@@ -325,7 +292,7 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
 	    return translateOperator
 		((de.uka.ilkd.key.java.expression.Operator)pe, ec);
-	} else if (pe instanceof PrimitiveType) {
+	} else if (pe instanceof recoder.abstraction.PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
 	} else if (pe instanceof MetaClassReference) {
@@ -515,35 +482,63 @@ public final class TypeConverter extends AbstractTypeConverter<Services> {
      * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
-	assert term != null;
-	if (term.op() == heapLDT.getNull()) {
-	    return NullLiteral.NULL;
-	} else if (term.op() instanceof Function) {
-	    for(LDT model : models) {
-                if (model.hasLiteralFunction((Function)term.op())) {
+        assert term != null;
+        if (term.op() == heapLDT.getNull()) {
+            return NullLiteral.NULL;
+        } else if (term.op() instanceof Function) {
+            Function function = (Function)term.op();
+            for(LDT model : models) {
+                if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);	       
                 }
             }
-	}
-        
-	final ExtList children = new ExtList();
-	for (int i=0; i<term.arity(); i++) {
-	    children.add(convertToProgramElement(term.sub(i)));
-	}
-	if (term.op() instanceof ProgramInLogic) {
-	    return ((ProgramInLogic)term.op()).convertToProgram(term, children);
-	} else if (term.op() instanceof Function) {
-	    for(LDT model : models) {
-                if (model.containsFunction((Function)term.op())) {             
+        }
+
+        final ExtList children = new ExtList();
+        for (int i=0; i<term.arity(); i++) {
+            children.add(convertToProgramElement(term.sub(i)));
+        }
+
+        if (term.op() instanceof ProgramInLogic) {
+            return ((ProgramInLogic)term.op()).convertToProgram(term, children);
+        } else if (term.op() instanceof Function) {
+            Function function = (Function)term.op();
+            for(LDT model : models) {
+                if (model.containsFunction(function)) {             
                     return model.translateTerm(term, children, services);
-                }  
-	    }
-	} 
-	throw new RuntimeException("Cannot convert term to program: "+term
-				   +" "+term.op().getClass());
+                }
+            }
+            Expression tryTranslate = translateJavaCast(term, children);
+            if(tryTranslate != null) {
+                return tryTranslate;
+            }
+        }
+        throw new RuntimeException("Cannot convert term to program: "+term
+                +" "+term.op().getClass());
     }
 
     
+    private Expression translateJavaCast(Term term, ExtList children) {
+        if (term.op() instanceof Function) {
+            Function function = (Function)term.op();
+            if (function instanceof SortDependingFunction) {
+                SortDependingFunction sdf = (SortDependingFunction) function;
+                SortDependingFunction castFunction = 
+                        SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
+                if(sdf.isSimilar(castFunction)) {
+                    Sort s = sdf.getSortDependingOn();
+                    KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
+                    if(kjt != null) {
+                        children.add(new TypeRef(kjt));
+                        return new ParenthesizedExpression(new TypeCast(children));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
     public KeYJavaType getKeYJavaType(Term t) {
 	KeYJavaType result = null;
 	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {

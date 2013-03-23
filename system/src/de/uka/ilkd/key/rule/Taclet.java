@@ -1,16 +1,18 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule;
-
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.IContextStatementBlock;
@@ -19,6 +21,7 @@ import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.proof.init.IProgramVisitorProvider;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
@@ -26,6 +29,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 
 /**
@@ -123,11 +129,6 @@ public abstract class Taclet implements Rule, Named {
     protected final ImmutableList<RuleSet> ruleSets;
 
     /**
-     * should taclet be applied by strategies only 
-     */
-    private final boolean noninteractive;
-
-    /**
      * map from a schemavariable to its prefix. The prefix is used to test
      * correct instantiations of the schemavariables by resolving/avoiding
      * collisions. Mainly the prefix consists of a list of all variables that
@@ -187,11 +188,9 @@ public abstract class Taclet implements Rule, Named {
         variableConditions = applPart.getVariableConditions();
         this.goalTemplates = goalTemplates;
         this.ruleSets      = ruleSets;
-        noninteractive     = attrs.noninteractive();
         this.choices       = choices;
         this.prefixMap     = prefixMap;
-        this.displayName   = attrs.displayName() == null ?
-                name.toString() : attrs.displayName();
+        this.displayName   = attrs.displayName() == null ? name.toString() : attrs.displayName();
     }
 
     protected void cacheMatchInfo() {
@@ -740,14 +739,6 @@ public abstract class Taclet implements Rule, Named {
         return ruleSets;
     }
 
-    /**
-     * returns true iff the Taclet is to be applied only noninteractive
-     */
-    public boolean noninteractive() {
-        return noninteractive;
-    }
-
-
     public ImmutableMap<SchemaVariable,TacletPrefix> prefixMap() {
         return prefixMap;
     }
@@ -1122,21 +1113,32 @@ public abstract class Taclet implements Rule, Named {
                                     IServices services,
                                     MatchConditions matchCond) {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
-        for (final SchemaVariable sv : pvs) {
-            ProgramVariable inst
-                    = (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
-            final VariableNamer vn = services.getVariableNamer();
-
-            inst = vn.rename(inst, goal, posOfFind);
-            final RenamingTable rt =
-                    RenamingTable.getRenamingTable(vn.getRenamingMap());
-            if (rt != null) {
+    	for (final SchemaVariable sv : pvs) {
+	    ProgramVariable inst
+		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
+	    //if the goal already contains the variable to be added 
+	    //(not just a variable with the same name), then there is nothing to do
+	    if(goal.getGlobalProgVars().contains(inst)) {
+		continue;
+	    }
+	    
+	    final VariableNamer vn = services.getVariableNamer();
+	    ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
+	    goal.addProgramVariable(renamedInst);
+	    goal.proof().getServices().addNameProposal(renamedInst.name());
+            
+            HashMap<ProgramVariable, ProgramVariable> renamingMap =
+                    vn.getRenamingMap();
+            if (!renamingMap.isEmpty()) {        
+                //execute renaming
+                ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
+                pvr.replace(goal);
+                final RenamingTable rt = 
+                RenamingTable.getRenamingTable(vn.getRenamingMap());
                 renamings = renamings.append(rt);
             }
-            goal.addProgramVariable(inst);
-            goal.proof().getServices().addNameProposal(inst.name());
-        }
-        goal.node().setRenamings(renamings);
+	}
+	goal.node().setRenamings(renamings);
     }
 
 
@@ -1345,8 +1347,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
     StringBuffer toStringAttribs(StringBuffer sb) {
-        if (noninteractive()) sb = sb.append(" \\noninteractive");
-        return sb;
+	return sb;
     }
 
     /**
@@ -1380,11 +1381,6 @@ public abstract class Taclet implements Rule, Named {
     }
 
     protected boolean admissibleInteractive(ImmutableList<RuleSet> notAdmissibleRuleSets) {
-        if (noninteractive()) {
-            for (final RuleSet tacletRuleSet : getRuleSets() ) {
-                if ( notAdmissibleRuleSets.contains ( tacletRuleSet ) ) return false;
-            }
-        }
         return true;
     }
 

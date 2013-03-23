@@ -1005,7 +1005,7 @@ options {
             return new NoFindTacletBuilder();
         } else if ( find instanceof Term ) {
             return new RewriteTacletBuilder().setFind((Term)find)
-                .setStateRestriction(stateRestriction);
+                .setApplicationRestriction(stateRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
             if ( findSeq.isEmpty() ) {

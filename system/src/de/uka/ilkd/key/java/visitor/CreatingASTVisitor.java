@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.java.visitor;
 
@@ -76,14 +80,7 @@ import de.uka.ilkd.key.java.expression.operator.Times;
 import de.uka.ilkd.key.java.expression.operator.TimesAssignment;
 import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -130,6 +127,7 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.keyabs.abs.IProgramASTModifyingVisitor;
 
@@ -207,10 +205,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor
         doDefaultAction(x);
     }
 
-    public void performActionOnStatementBlock(StatementBlock x) {
+    public void performActionOnStatementBlock(final StatementBlock x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
-                return new StatementBlock(changeList);
+                StatementBlock newBlock = new StatementBlock(changeList);
+                performActionOnBlockContract(x, newBlock);
+                return newBlock;
             }
         };
         def.doAction(x);
@@ -225,12 +225,14 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor
         def.doAction(x);
     }
 
-    
+    protected void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock) {
+        //do nothing
+    }
+
     protected void performActionOnLoopInvariant(LoopStatement oldLoop, 
                                                 LoopStatement newLoop) {
         //do nothing
     }
-
     
 
     // eee
@@ -1344,6 +1346,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor
         def.doAction(x);	
     }     
     
+    @Override
+    public void performActionOnSeqLength(SeqLength x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqLength(changeList);
+            }
+        };
+        def.doAction(x);        
+    }
 
     /**
      * returns the position of pe2 in the virtual child array of pe1

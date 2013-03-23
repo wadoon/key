@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 /** this class offers some methods for assertions, debug output and so
  * on */
@@ -19,11 +23,12 @@ import javax.swing.JOptionPane;
 
 public final class Debug implements DebugMBean {
 
-    private Debug() {
-    }
+//    private Debug() {
+//    }
 
     /** has to be set in order to enable assertion */
-    public static boolean ENABLE_ASSERTION = true;
+    public static boolean ENABLE_ASSERTION =
+            Boolean.valueOf(System.getProperty("KeyAssertionFlag", "true"));
 
     /** has to be set in order to enable debugging */
     public static boolean ENABLE_DEBUG = "on".equals(System
@@ -35,15 +40,16 @@ public final class Debug implements DebugMBean {
      * output.
      * 
      * For example:
-     *    runProver -Dkey.debug.prefix=de.uka.ilkd.key.java:de.uka.ilkd.key.proof.ProblemLoader
+     *    runProver -Dkey.debug.prefix=de.uka.ilkd.key.java,de.uka.ilkd.key.proof.ProblemLoader
      *    
      * will display all debug outputs either coming from package de...java
      * (or any subpackage) or from the class ProblemLoader.
      * 
      * Stacktraces will always be printed.
+     * The colon as splitting character is supported for legacy reasons.
      */
     public static String[] showOnlyPrefixes = 
-	System.getProperty("key.debug.prefix", "").split(":");
+	System.getProperty("key.debug.prefix", "").split("[:,]");
 
     /**
      * prints given string if in debug mode

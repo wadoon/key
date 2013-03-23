@@ -6,7 +6,7 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.DefaultProofFileParser;
+import de.uka.ilkd.key.proof.io.DefaultProofFileParser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -129,7 +129,7 @@ class StdPredicateEstimator implements PredicateEstimator{
     }
     
     private static Term translate(String estimation, IServices services){
-        return DefaultProofFileParser.parseTerm(estimation, services, services.getNamespaces().variables(), 
+        return DefaultProofFileParser.parseTerm(estimation, services, services.getNamespaces().variables(),
                 services.getNamespaces().programVariables());   
     }
     

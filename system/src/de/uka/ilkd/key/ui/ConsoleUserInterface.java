@@ -1,15 +1,13 @@
 package de.uka.ilkd.key.ui;
 
-import java.io.File;
-import java.util.List;
-
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.DefaultJavaDLProblemLoader;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+
+import java.io.File;
+import java.util.List;
 
 public class ConsoleUserInterface extends AbstractConsoleUserInterface<Services, JavaDLInitConfig> {
 
@@ -36,4 +34,14 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface<Services,
         return  new DefaultJavaDLProblemLoader(file, classPath, bootClassPath, mediator);
     }
 
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProof(Proof proof) {
+      if (proof != null) {
+         proof.dispose();
+      }
+   }
 }

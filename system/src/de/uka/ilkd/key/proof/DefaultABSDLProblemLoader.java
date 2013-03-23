@@ -22,6 +22,18 @@ public class DefaultABSDLProblemLoader extends
         super(file, classPath, bootClassPath, mediator);
     }
 
+    /**
+     * Creates a {@link Proof} for the given {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} and
+     * tries to apply rules again.
+     * @param poContainer The {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} to instantiate a {@link Proof} for.
+     * @return The instantiated {@link Proof}.
+     * @throws ProofInputException Occurred Exception.
+     */
+    protected Proof createProof(IPersistablePO.LoadedPOContainer poContainer) throws ProofInputException {
+        return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
+    }
+
+/*
     @Override
     protected Proof createProof(IPersistablePO.LoadedPOContainer poContainer) throws ProofInputException {
         mediator.setProof(problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum()));
@@ -36,6 +48,7 @@ public class DefaultABSDLProblemLoader extends
         mediator.getUI().resetStatus(this);
         return proof;
     }
+*/
 
     @Override
     protected IPersistablePO.LoadedPOContainer createProofObligationContainer() throws IOException {

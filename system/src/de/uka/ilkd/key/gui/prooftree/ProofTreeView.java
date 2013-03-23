@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.prooftree;
 
@@ -14,6 +18,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +38,7 @@ import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -43,6 +49,7 @@ public class ProofTreeView extends JPanel {
     
     private static final long serialVersionUID = 3732875161168302809L;
     private static final Color PASTEL_COLOR = new Color(255,255,204);
+    private static final Color GRAY_COLOR = Color.DARK_GRAY;
     private static final Color BISQUE_COLOR = new Color(240,228,196);
     private static final Color PALE_RED_COLOR = new Color(255,153,153);
     private static final Color LIGHT_BLUE_COLOR = new Color(230,230,255);
@@ -70,7 +77,7 @@ public class ProofTreeView extends JPanel {
     private GUIProofTreeGUIListener guiListener;
 
     /** KeYStroke for the search panel */
-    private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
+    private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 
     private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
                                             public void configChanged(ConfigChangeEvent e) {
@@ -307,7 +314,7 @@ public class ProofTreeView extends JPanel {
     public void makeNodeVisible(Node n) {
         if (n == null) return;
 	
-        final GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+        final GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
         if (node==null) return;
  	
         TreeNode[] obs=node.getPath();
@@ -321,7 +328,7 @@ public class ProofTreeView extends JPanel {
 
 
     protected void makeNodeExpanded(Node n) {
-	GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+	GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
  	if (node==null) return;
  	TreeNode[] obs=node.getPath();
  	TreePath tp = new TreePath(obs);
@@ -440,6 +447,7 @@ public class ProofTreeView extends JPanel {
 
     public void showSearchPanel() {
         proofTreeSearchPanel.setVisible(true);
+        proofTreeSearchPanel.requestFocus();
     }
 
 
@@ -580,19 +588,20 @@ public class ProofTreeView extends JPanel {
 
 	    
 	    GUIAbstractTreeNode treeNode = 
-		((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
-		 getLastPathComponent());
-	    if (treeNode instanceof GUIProofTreeNode) {		
-		Node node = treeNode.getNode();
-		Goal selected = proof.getGoal(node);
-		if (selected != null) {
-		    mediator.goalChosen(selected);
-		} else {
-		    mediator.nonGoalNodeChosen(node);
-		}
-	    } else if (treeNode instanceof GUIBranchNode) {
-                selectBranchNode((GUIBranchNode)treeNode);
-            }
+	            ((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
+	                    getLastPathComponent());
+	    if (treeNode instanceof GUIBranchNode) {
+	        selectBranchNode((GUIBranchNode)treeNode);
+	    } else {
+	        Node node = treeNode.getNode();
+	        Goal selected = proof.getGoal(node);
+	        if (selected != null) {
+	            mediator.goalChosen(selected);
+	        } else {
+	            mediator.nonGoalNodeChosen(node);
+	        }
+	    }
+
 	    // catching NullPointerException occurring when renaming root node
 	    if (treeNode instanceof GUIBranchNode && treeNode
 			.getNode().parent() != null) {
@@ -611,7 +620,7 @@ public class ProofTreeView extends JPanel {
          * 
          */
         private static final long serialVersionUID = -4990023575036168279L;
-    private Icon keyHole20x20 = IconFactory.keyHole(20, 20);       
+        private Icon keyHole20x20 = IconFactory.keyHole(20, 20);       
             
 	public Component getTreeCellRendererComponent(JTree tree,
 						      Object value,
@@ -625,24 +634,31 @@ public class ProofTreeView extends JPanel {
 	        return super.getTreeCellRendererComponent(tree, value, sel, 
 	                expanded, leaf, row, hasFocus);
 	    }
-	    
-            if (!(value instanceof GUIProofTreeNode)) {
-		super.getTreeCellRendererComponent
-		    (tree, value, sel, expanded, leaf, row, hasFocus);
-		setBackgroundNonSelectionColor(BISQUE_COLOR);
-		if (value instanceof GUIBranchNode) {
-		    if ( ((GUIBranchNode)value).getNode().isClosed() ) {
-			// all goals below this node are closed
-			this.setIcon(IconFactory.provedFolderIcon());
-		    }
-		}
-		return this;
-	    }
-	    Node node = ((GUIProofTreeNode)value).getNode();
+
+	    if (value instanceof GUIBranchNode) {
+	        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                setBackgroundNonSelectionColor(BISQUE_COLOR);
+                if ( ((GUIBranchNode)value).getNode().isClosed() ) {
+                    // all goals below this node are closed
+                    this.setIcon(IconFactory.provedFolderIcon());
+                }
+                return this;
+            }
+
+	    if (value instanceof GUIOneStepChildTreeNode) {
+	        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                setForeground(GRAY_COLOR);
+                setIcon(IconFactory.oneStepSimplifier(16));
+                setText(value.toString());
+                return this;
+            }
+
+            // now GUIProofTreeNode / GUIOneStepSimpTreeNode
+	    Node node = ((GUIAbstractTreeNode)value).getNode();
 	    String nodeText = node.serialNr()+":"+node.name();
 	    boolean isBranch = false;
 	    {
-                final Node child = ((GUIProofTreeNode)value).findChild( node );
+                final Node child = ((GUIAbstractTreeNode)value).findChild( node );
                 if ( child != null && child.getNodeInfo()
                     .getBranchLabel () != null ) {
                     isBranch = true;
@@ -793,7 +809,9 @@ public class ProofTreeView extends JPanel {
 	            }
 	        }
 	    }
-	    this.add(delayedCut);
+	    if (de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE.active())
+	        this.add(delayedCut);
+	    
 	    this.add(new JSeparator());
 
 	    
@@ -834,6 +852,11 @@ public class ProofTreeView extends JPanel {
 	    // enable goals
 	    this.add(new SetGoalsBelowEnableStatus(true));
 
+	    ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, null);
+	    if(!macroMenu.isEmpty()) {
+	        this.add(new JSeparator());
+	        this.add(macroMenu);
+	    }
 
 //	    if (branch != path) {
 //                this.add(new JSeparator());
@@ -895,7 +918,7 @@ public class ProofTreeView extends JPanel {
 		Node n;
 		while ( it.hasNext () ) {
 		    n = it.next ().node ();		  
-		    GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+		    GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
 		    if (node==null) break;
 		    TreeNode[] obs=node.getPath();
 		    TreePath tp = new TreePath(obs);

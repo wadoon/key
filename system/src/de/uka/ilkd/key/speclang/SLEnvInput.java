@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.speclang;
 
@@ -18,10 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -29,12 +30,14 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -79,8 +82,10 @@ public final class SLEnvInput extends AbstractEnvInput<Services, JavaDLInitConfi
     //-------------------------------------------------------------------------
     
     private static String getLanguage() {
-        GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+//        GeneralSettings gs 
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();        
+    	GeneralSettings gs 
+        = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         if(gs.useJML() && gs.useOCL()) {
             return "JML/OCL";
         } else if(gs.useJML()) {
@@ -293,7 +298,26 @@ public final class SLEnvInput extends AbstractEnvInput<Services, JavaDLInitConfi
                 	    			pm, 
                         			(LoopStatement) loop);
                     if(inv != null) {
-                        specRepos.setLoopInvariant(inv);
+                        specRepos.addLoopInvariant(inv);
+                    }
+                }
+                
+                //block contracts
+                final JavaASTCollector blockCollector = new JavaASTCollector(pm.getBody(), StatementBlock.class);
+                blockCollector.start();
+                for (ProgramElement block : blockCollector.getNodes()) {
+                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+                    for (BlockContract specification : blockContracts) {
+                    	specRepos.addBlockContract(specification);
+                    }
+                }
+
+                final JavaASTCollector labeledCollector = new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+                labeledCollector.start();
+                for (ProgramElement labeled : labeledCollector.getNodes()) {
+                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
+                    for (BlockContract specification : blockContracts) {
+                        specRepos.addBlockContract(specification);
                     }
                 }
             }
@@ -331,8 +355,10 @@ public final class SLEnvInput extends AbstractEnvInput<Services, JavaDLInitConfi
             throw new IllegalStateException("InitConfig not set.");
         }
             
-        final GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        final GeneralSettings gs
+        = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(getInitConfig().getServices()));
         }

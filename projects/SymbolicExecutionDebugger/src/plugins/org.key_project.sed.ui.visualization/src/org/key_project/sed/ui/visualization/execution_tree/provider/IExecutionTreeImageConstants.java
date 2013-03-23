@@ -10,6 +10,8 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
 
 /**
  * <p>
@@ -75,6 +77,36 @@ public interface IExecutionTreeImageConstants {
    public static final String IMG_TERMINATION = PREFIX + "termination";
 
    /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT = PREFIX + "useOperationContract";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_NPC = PREFIX + "useOperationContractNotNpc";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_PRE = PREFIX + "useOperationContractNotPre";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC = PREFIX + "useOperationContractNotPreAndNotNpc";
+
+   /**
+    * Key of the image for {@link ISEDUseLoopInvariant}s.
+    */
+   public static final String IMG_USE_LOOP_INVARIANT = PREFIX + "useLoopInvariant";
+
+   /**
+    * Key of the image for {@link ISEDUseLoopInvariant}s.
+    */
+   public static final String IMG_USE_LOOP_INVARIANT_INITIALLY_INVALID = PREFIX + "useLoopInvariantInitiallyInvalid";
+   
+   /**
     * Key of the image for {@link ISEDThread}s.
     */
    public static final String IMG_THREAD = PREFIX + "thread";
@@ -108,4 +140,9 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for terminate action.
     */
    public static final String IMG_TERMINATE = PREFIX + "terminate";
+
+   /**
+    * Key of the image for visualize state action.
+    */
+   public static final String IMG_VISUALIZE_STATE = PREFIX + "visualizeState";
 }

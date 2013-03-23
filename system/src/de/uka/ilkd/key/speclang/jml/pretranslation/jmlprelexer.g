@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 header {
     package de.uka.ilkd.key.speclang.jml.pretranslation;
@@ -38,6 +42,9 @@ tokens {
     AXIOM                       = "axiom";
     BEHAVIOR 			= "behavior";
     BEHAVIOUR 			= "behaviour";
+	BREAKS				= "breaks";
+	BREAK_BEHAVIOR 	    = "break_behavior";
+    BREAK_BEHAVIOUR 	= "break_behaviour";
     CAPTURES 			= "captures";
     CAPTURES_RED 		= "captures_redundantly";
     CODE 			= "code";
@@ -47,6 +54,9 @@ tokens {
     CONST 			= "const";
     CONSTRAINT			= "constraint";
     CONSTRAINT_RED		= "constraint_redundantly";
+	CONTINUES			= "continues";
+	CONTINUE_BEHAVIOR 	= "continue_behavior";
+    CONTINUE_BEHAVIOUR 	= "continue_behaviour";
     DECREASES  			= "decreases";
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";
@@ -105,6 +115,9 @@ tokens {
     REPRESENTS_RED		= "represents_redundantly";
     REQUIRES 			= "requires";
     REQUIRES_RED 		= "requires_redundantly";
+	RETURNS				= "returns";
+	RETURN_BEHAVIOR 	= "return_behavior";
+    RETURN_BEHAVIOUR 	= "return_behaviour";
     SCOPE_SAFE 			= "scopeSafe";
     ARBITRARY_SCOPE             = "arbitraryScope";
     ARBITRARY_SCOPE_THIS        = "arbitraryScopeThis";

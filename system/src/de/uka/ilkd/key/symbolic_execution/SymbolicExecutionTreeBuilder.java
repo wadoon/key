@@ -8,27 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.IStatementBlock;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
@@ -53,6 +42,8 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionUseLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -186,7 +177,7 @@ public class SymbolicExecutionTreeBuilder {
       this.mediator = mediator;
       this.proof = proof;
       this.mergeBranchConditions = mergeBranchConditions;
-      this.exceptionVariable = extractExceptionVariable(proof);
+      this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(proof);
       this.startNode = new ExecutionStartNode(mediator, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);
       initMethodCallStack(proof.root(), proof.getServices());
@@ -210,7 +201,7 @@ public class SymbolicExecutionTreeBuilder {
       // Find all modalities in the succedent
       final List<Term> modalityTerms = new LinkedList<Term>();
       for (SequentFormula sequentFormula : root.sequent().succedent()) {
-         sequentFormula.formula().execPreOrder(new Visitor() {
+         sequentFormula.formula().execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
                if (visited.op() instanceof Modality) {
@@ -243,44 +234,6 @@ public class SymbolicExecutionTreeBuilder {
             }
          }.run();
       }
-   }
-
-   /**
-    * Extracts the exception variable which is used to check if the executed program in proof terminates normally.
-    * @param proof The {@link Proof} to extract variable from.
-    * @return The extract variable.
-    */
-   protected IProgramVariable extractExceptionVariable(Proof proof) {
-      Node root = proof.root();
-      if (root.sequent().succedent().size() == 1) {
-         Term succedent = root.sequent().succedent().getFirst().formula(); // Succedent term
-         if (succedent.subs().size() == 2) {
-            Term updateApplication = succedent.subs().get(1);
-            if (updateApplication.subs().size() == 2) {
-               ProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
-               if (updateContent instanceof IStatementBlock) { // try catch inclusive
-                  ImmutableArray<? extends Statement> updateContentBody = ((IStatementBlock)updateContent).getBody();
-                  if (updateContentBody.size() == 2 && updateContentBody.get(1) instanceof Try) {
-                     Try tryStatement = (Try)updateContentBody.get(1);
-                     if (tryStatement.getBranchCount() == 1 && tryStatement.getBranchList().get(0) instanceof Catch) {
-                        Catch catchStatement = (Catch)tryStatement.getBranchList().get(0);
-                        if (catchStatement.getBody() instanceof IStatementBlock) {
-                           IStatementBlock  catchBlock = (IStatementBlock)catchStatement.getBody();
-                           if (catchBlock.getBody().size() == 1 && catchBlock.getBody().get(0) instanceof Assignment) {
-                              Assignment assignment = (Assignment)catchBlock.getBody().get(0);
-                              if (assignment.getFirstElement() instanceof IProgramVariable) {
-                                 IProgramVariable var = (IProgramVariable)assignment.getFirstElement();
-                                 return var;
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-      throw new IllegalStateException("Can't extract exception variable from proof.");
    }
    
    /**
@@ -514,7 +467,7 @@ public class SymbolicExecutionTreeBuilder {
          }
          // Check if loop condition is available
          if (SymbolicExecutionUtil.hasLoopCondition(node, node.getAppliedRuleApp(), statement)) {
-            if (((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &
+            if (((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &&
                 !SymbolicExecutionUtil.isDoWhileLoopCondition(node, statement) && 
                 !SymbolicExecutionUtil.isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
                ExecutionLoopCondition condition = keyNodeLoopConditionMapping.get(node);
@@ -596,6 +549,12 @@ public class SymbolicExecutionTreeBuilder {
          else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             result = new ExecutionStatement(mediator, node);
          }
+      }
+      else if (SymbolicExecutionUtil.isUseOperationContract(node, node.getAppliedRuleApp())) {
+         result = new ExecutionUseOperationContract(mediator, node);
+      }
+      else if (SymbolicExecutionUtil.isUseLoopInvariant(node, node.getAppliedRuleApp())) {
+         result = new ExecutionUseLoopInvariant(mediator, node);
       }
       return result;
    }

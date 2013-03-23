@@ -1,24 +1,28 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof.io;
-
-import java.io.File;
-import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+
+import java.io.File;
+import java.util.List;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these
@@ -43,7 +47,7 @@ public abstract class LDTInput<S extends IServices, IC extends InitConfig<S, IC>
     /** creates a representation of the LDT files to be used as input
      * to the KeY prover.
      * @param keyFiles an array containing the LDT .key files
-     * @param main the main class used to report the progress of reading
+     * @param listener the listener class used to report the progress of reading
      */
     protected LDTInput(IKeYFile<S, IC>[] keyFiles, LDTInputListener listener) {
 	this.keyFiles = keyFiles;
@@ -122,24 +126,26 @@ public abstract class LDTInput<S extends IServices, IC extends InitConfig<S, IC>
      */
     @Override
     public void read() throws ProofInputException {
-    	if (initConfig==null) {
-    		throw new IllegalStateException("LDTInput: InitConfig not set.");
-    	}
-
-    	for (int i=0; i<keyFiles.length; i++) {
-    		keyFiles[i].readSorts();	    
-    	}
-    	for (int i=0; i<keyFiles.length; i++) {
-    		keyFiles[i].readFuncAndPred();
-    	}
-    	for (int i=0; i<keyFiles.length; i++) {
-    		if (listener != null) {
-    			listener.reportStatus("Reading " + keyFiles[i].name(), 
-    					keyFiles[i].getNumberOfChars());
-    		}
-    		keyFiles[i].readRulesAndProblem();
-    	}
-    	initConfig.getServices().getTypeConverter().init(createLDTList(initConfig.getServices()));
+	if (initConfig==null) {
+	    throw new IllegalStateException("LDTInput: InitConfig not set.");
+	}
+		
+	for (int i=0; i<keyFiles.length; i++) {
+	    keyFiles[i].readSorts();	    
+	}
+	for (int i=0; i<keyFiles.length; i++) {
+	    keyFiles[i].readFuncAndPred();
+	}
+	for (int i=0; i<keyFiles.length; i++) {
+	    if (listener != null) {
+		listener.reportStatus("Reading " + keyFiles[i].name(), 
+				   keyFiles[i].getNumberOfChars());
+	    }
+	    keyFiles[i].readRulesAndProblem();
+	}
+		
+	//create LDT objects
+    initConfig.getServices().getTypeConverter().init(createLDTList(initConfig.getServices()));
     }
   
     

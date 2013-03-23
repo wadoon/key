@@ -2,7 +2,6 @@ package de.uka.ilkd.keyabs.logic.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -37,14 +36,14 @@ public class HistoryLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services,
+    public boolean isResponsible(Operator op, Term[] subs, IServices services,
                                  ExecutionContext ec) {
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, Term left, Term right,
-                                 Services services, ExecutionContext ec) {
+                                 IServices services, ExecutionContext ec) {
         return false;
     }
 
@@ -60,7 +59,7 @@ public class HistoryLDT extends LDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services services,
+    public Function getFunctionFor(Operator op, IServices services,
                                    ExecutionContext ec) {
         return null;
     }

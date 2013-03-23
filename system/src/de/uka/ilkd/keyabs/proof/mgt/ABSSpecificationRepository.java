@@ -2,6 +2,7 @@ package de.uka.ilkd.keyabs.proof.mgt;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -259,12 +260,6 @@ public class ABSSpecificationRepository implements ISpecificationRepository<ABSC
     }
 
     @Override
-    public void setLoopInvariant(LoopInvariant newInv) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public ImmutableSet<Contract> splitContract(Contract contract) {
         // TODO Auto-generated method stub
         return null;
@@ -301,7 +296,32 @@ public class ABSSpecificationRepository implements ISpecificationRepository<ABSC
         
     }
 
-	@Override
+    @Override
+    public void addBlockContract(BlockContract contract) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block, Modality modality) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void addLoopInvariant(LoopInvariant newInv) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void copyLoopInvariant(LoopStatement x, LoopStatement newLoop) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
 	public ProofOblInput getProofOblInput(Proof proof) {
 		// TODO Auto-generated method stub
 		return null;

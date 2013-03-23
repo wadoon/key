@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 /**
@@ -31,10 +35,7 @@ import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.IProgramReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -57,7 +58,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
-public final class SyntacticalReplaceVisitor extends Visitor { 	
+public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 
 	private final SVInstantiations svInst;
 	@Deprecated
@@ -259,9 +260,9 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 			}
 		}
 
-		return newLhs == originalLhs 
-				? op 
-						: ElementaryUpdate.getInstance(newLhs); 
+        return newLhs == originalLhs
+                ? op
+                : ElementaryUpdate.getInstance(newLhs);
 	}
 
 
@@ -271,119 +272,117 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 		return newOp;
 	}
 
-	private Operator instantiateOperator(Operator op) {	
-		if (op instanceof ModalOperatorSV){	 
+	private Operator instantiateOperator(Operator op) {
+		if (op instanceof ModalOperatorSV){
 			return instantiateOperatorSV((ModalOperatorSV) op);
 		} else if (op instanceof SortDependingFunction) {
 			return handleSortDependingSymbol((SortDependingFunction)op);
-		} else if (op instanceof ElementaryUpdate) {        
-			return instantiateElementaryUpdate((ElementaryUpdate)op);       
+		} else if (op instanceof ElementaryUpdate) {
+			return instantiateElementaryUpdate((ElementaryUpdate)op);
 		}  else if (op instanceof ProgramSV && ((ProgramSV)op).isListSV()){
 			return op;
 		} else if (op instanceof SchemaVariable) {
 			return (Operator)svInst.getInstantiation((SchemaVariable)op);
-		} 
+		}
 		return op;
 	}
 
-	private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(Term visited) {
-		final ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
-		final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)? 
-				new QuantifiableVariable[vBoundVars.size()]
-						: EMPTY_QUANTIFIABLE_VARS;
-				boolean varsChanged = false;
+    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(Term visited) {
+        final ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
+        final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)?
+                new QuantifiableVariable[vBoundVars.size()]
+                : EMPTY_QUANTIFIABLE_VARS;
+        boolean varsChanged = false;
 
-				for(int j = 0, size = vBoundVars.size(); j < size; j++) {                 
-					QuantifiableVariable boundVar = vBoundVars.get(j);
-					if (boundVar instanceof SchemaVariable) {
-						final SchemaVariable boundSchemaVariable = 
-								(SchemaVariable) boundVar;
-						if (svInst.isInstantiated(boundSchemaVariable)) {
-							boundVar = ((QuantifiableVariable) ((Term) svInst
-									.getInstantiation(boundSchemaVariable))
-									.op());
-						} else {        	  
-							// this case may happen for PO generation of
-							// taclets
-							boundVar = (QuantifiableVariable)boundSchemaVariable;        	    
-						}
-						varsChanged = true;
-					} 
-					newVars[j] = boundVar;                    
-				}
+        for(int j = 0, size = vBoundVars.size(); j < size; j++) {
+            QuantifiableVariable boundVar = vBoundVars.get(j);
+            if (boundVar instanceof SchemaVariable) {
+                final SchemaVariable boundSchemaVariable =
+                        (SchemaVariable) boundVar;
+                if (svInst.isInstantiated(boundSchemaVariable)) {
+                    boundVar = ((QuantifiableVariable) ((Term) svInst
+                            .getInstantiation(boundSchemaVariable))
+                            .op());
+                } else {
+                    // this case may happen for PO generation of
+                    // taclets
+                    boundVar = (QuantifiableVariable)boundSchemaVariable;
+                }
+                varsChanged = true;
+            }
+            newVars[j] = boundVar;
+        }
 
-				return  varsChanged                     
-						? new ImmutableArray<QuantifiableVariable>(newVars) 
-								: vBoundVars;                
-	}
-
-
-	/**
-	 * performs the syntactic replacement of schemavariables with their instantiations	
-	 */
-	public void visit(Term visited) {
-		// Sort equality has to be ensured before calling this method
-		final Operator visitedOp = visited.op();
-		if (visitedOp instanceof SchemaVariable
-				&& visitedOp.arity() == 0
-				&& svInst.isInstantiated((SchemaVariable) visitedOp)
-				&& (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {                
-			pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
-		} else if((visitedOp instanceof Metavariable)
-				&& metavariableInst.getInstantiation((Metavariable) visitedOp) != visitedOp) {
-			pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
-		} else {
-			Operator newOp = instantiateOperator(visitedOp);
-
-			if (newOp == null) {
-				// only partial instantiation information available
-				// use original op
-				newOp = visitedOp;
-			}
-
-			boolean operatorInst = (newOp != visitedOp);
+        return  varsChanged
+                ? new ImmutableArray<QuantifiableVariable>(newVars)
+                : vBoundVars;
+    }
 
 
-			// instantiation of java block
-			boolean jblockChanged = false;
-			JavaBlock jb = visited.javaBlock();
+    /**
+     * performs the syntactic replacement of schemavariables with their instantiations
+     */
+    public void visit(Term visited) {
+        // Sort equality has to be ensured before calling this method
+        final Operator visitedOp = visited.op();
+        if (visitedOp instanceof SchemaVariable
+                && visitedOp.arity() == 0
+                && svInst.isInstantiated((SchemaVariable) visitedOp)
+                && (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
+            pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
+        } else if((visitedOp instanceof Metavariable)
+                && metavariableInst.getInstantiation((Metavariable) visitedOp).op() != visitedOp) {
+            pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
+        } else {
+            Operator newOp = instantiateOperator(visitedOp);
 
-			if (jb != JavaBlock.EMPTY_JAVABLOCK) {
-				jb = replacePrg(svInst, jb);
-				if (jb != visited.javaBlock()) {
-					jblockChanged = true;
-				}
-			}
+            if (newOp == null) {
+                // only partial instantiation information available
+                // use original op
+                newOp = visitedOp;
+            }
+
+            boolean operatorInst = (newOp != visitedOp);
 
 
+            // instantiation of java block
+            boolean jblockChanged = false;
+            JavaBlock jb = visited.javaBlock();
 
-			// instantiate bound variables            
-			final ImmutableArray<QuantifiableVariable> boundVars = 
-					instantiateBoundVariables(visited);
+            if (jb != JavaBlock.EMPTY_JAVABLOCK) {
+                jb = replacePrg(svInst, jb);
+                if (jb != visited.javaBlock()) {
+                    jblockChanged = true;
+                }
+            }
 
-			Term[] neededsubs = neededSubs(newOp.arity());
-			if(visitedOp instanceof ElementaryUpdate 
-					&& elementaryUpdateLhs != null) {
-				assert neededsubs.length == 1;
-				Term newTerm = services.getTermBuilder().elementary(services, 
-						elementaryUpdateLhs, 
-						neededsubs[0]);
-				pushNew(newTerm);
-			} else if(boundVars != visited.boundVars() 
-					|| jblockChanged 
-					|| operatorInst
-					|| (!subStack.empty() && subStack.peek() == newMarker)) {
-				Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
-				pushNew(resolveSubst(newTerm));
-			} else {
-				final Term t = resolveSubst(visited);
-				if (t == visited)
-					subStack.push(t);
-				else
-					pushNew(t);
-			}
-		}
-	}
+            // instantiate bound variables
+            final ImmutableArray<QuantifiableVariable> boundVars =
+                    instantiateBoundVariables(visited);
+
+            Term[] neededsubs = neededSubs(newOp.arity());
+            if(visitedOp instanceof ElementaryUpdate
+                    && elementaryUpdateLhs != null) {
+                assert neededsubs.length == 1;
+                Term newTerm = services.getTermBuilder().elementary(services,
+                        elementaryUpdateLhs,
+                        neededsubs[0]);
+                pushNew(newTerm);
+            } else if(boundVars != visited.boundVars()
+                    || jblockChanged
+                    || operatorInst
+                    || (!subStack.empty() && subStack.peek() == newMarker)) {
+                Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
+                pushNew(resolveSubst(newTerm));
+            } else {
+                final Term t = resolveSubst(visited);
+                if (t == visited)
+                    subStack.push(t);
+                else
+                    pushNew(t);
+            }
+        }
+    }
 
 	private Operator handleSortDependingSymbol (SortDependingFunction depOp) {
 		final Sort depSort = depOp.getSortDependingOn ();
@@ -442,19 +441,19 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 
 
 
-	/**
-	 * this method is called in execPreOrder and execPostOrder in class Term
-	 * when leaving the subtree rooted in the term subtreeRoot.
-	 * Default implementation is to do nothing. Subclasses can
-	 * override this method 
-	 * when the visitor behaviour depends on informations bound to subtrees.
-	 * @param subtreeRoot root of the subtree which the visitor leaves.
-	 */
-	public void subtreeLeft(Term subtreeRoot){
-		if (subtreeRoot.op() instanceof TermTransformer) {
-			TermTransformer mop = (TermTransformer) subtreeRoot.op();
-			final Term transform = mop.transform((Term)subStack.pop(),svInst, getServices());
-			pushNew(transform);
-		} 
-	}
+    /**
+     * this method is called in execPreOrder and execPostOrder in class Term
+     * when leaving the subtree rooted in the term subtreeRoot.
+     * Default implementation is to do nothing. Subclasses can
+     * override this method
+     * when the visitor behaviour depends on informations bound to subtrees.
+     * @param subtreeRoot root of the subtree which the visitor leaves.
+     */
+    public void subtreeLeft(Term subtreeRoot){
+        if (subtreeRoot.op() instanceof TermTransformer) {
+            TermTransformer mop = (TermTransformer) subtreeRoot.op();
+            pushNew(mop.transform((Term)subStack.pop(),svInst, getServices()));
+        }
+    }
+
 }

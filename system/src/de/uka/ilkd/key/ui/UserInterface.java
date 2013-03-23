@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.ui;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -14,6 +10,9 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
+import java.io.File;
+import java.util.List;
 
 public interface UserInterface<S extends IServices, IC extends InitConfig<S, IC>> extends ProblemInitializerListener<S, IC>, ProverTaskListener, ProgressMonitor {
 
@@ -111,14 +110,13 @@ public interface UserInterface<S extends IServices, IC extends InitConfig<S, IC>
      *
      *
      * @param file The java file to open.
-     * @param classPath The class path entries to use.
+     * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
      * @return The opened {@link DefaultProblemLoader}.
-     * @throws IOException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
      */
-    DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException;
-    
+    DefaultProblemLoader load(File file, List<File> classPaths, File bootClassPath) throws ProblemLoaderException;
+
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
      * {@link ProofOblInput} based on the {@link JavaDLInitConfig}.
@@ -137,6 +135,12 @@ public interface UserInterface<S extends IServices, IC extends InitConfig<S, IC>
     boolean isAutoModeSupported(Proof proof);
     
     /**
+     * Starts the auto mode for the given {@link Proof}.
+     * @param proof The {@link Proof} to start auto mode of.
+     */
+    void startAutoMode(Proof proof);
+    
+    /**
      * Starts the auto mode for the given {@link Proof} and the given {@link Goal}s. 
      * @param proof The {@link Proof} to start auto mode of.
      * @param goals The {@link Goal}s to close.
@@ -153,6 +157,14 @@ public interface UserInterface<S extends IServices, IC extends InitConfig<S, IC>
      * {@link UserInterface} is active.
      */
     void waitWhileAutoMode();
+    
+    /**
+     * Starts the auto mode for the given proof which must be contained
+     * in this user interface and blocks the current thread until it
+     * has finished.
+     * @param proof The {@link Proof} to start auto mode and to wait for.
+     */
+    void startAndWaitForAutoMode(Proof proof);
     
     /**
      * Removes the given {@link Proof} from this {@link UserInterface}.

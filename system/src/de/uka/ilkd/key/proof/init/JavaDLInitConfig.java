@@ -67,6 +67,7 @@ public class JavaDLInitConfig extends InitConfig<Services, JavaDLInitConfig> {
         return env;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public JavaDLInitConfig copy() {
         JavaDLInitConfig ic = new JavaDLInitConfig(services.copyPreservesLDTInformation(),

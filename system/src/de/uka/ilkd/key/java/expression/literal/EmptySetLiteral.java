@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.java.expression.literal;
@@ -24,9 +28,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 public class EmptySetLiteral extends Literal {
 
-    public static final EmptySetLiteral INSTANCE = new EmptySetLiteral();
-    
-    private EmptySetLiteral() {}   
+    public static final EmptySetLiteral LOCSET = new EmptySetLiteral();
     
     
     @Override
@@ -45,7 +47,8 @@ public class EmptySetLiteral extends Literal {
     }
 
 
-    public KeYJavaType getKeYJavaType(IServices javaServ) {
-	return javaServ.getProgramInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+    public KeYJavaType getKeYJavaType(IServices services) {
+	PrimitiveType type = PrimitiveType.JAVA_LOCSET;
+	return services.getJavaInfo().getKeYJavaType(type);
     }
 }

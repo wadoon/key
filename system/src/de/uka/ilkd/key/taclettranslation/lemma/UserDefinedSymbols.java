@@ -137,7 +137,7 @@ public class UserDefinedSymbols {
         }
 
         public String getRuleHeader(IServices services) {
-                if (parent != null) {
+                if (parent == null) {
                         if (ruleHeader == null) {
                                 ruleHeader = createRuleHeader(services);
                         }

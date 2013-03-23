@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -17,7 +16,6 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -234,7 +232,7 @@ public abstract class AbstractWindowUserInterface<S extends IServices, IC extend
         */
     @Override
     public DefaultProblemLoader<S, IC> load(File file, List<File> classPath, File bootClassPath)
-            throws IOException, ProofInputException {
+            throws ProblemLoaderException {
                   if (file != null) {
                      mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
                   }

@@ -12,7 +12,6 @@ package de.uka.ilkd.keyabs.logic.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
@@ -128,7 +127,7 @@ public final class LocSetLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
                                  Term[] subs,
-                                 Services services,
+                                 IServices services,
                                  ExecutionContext ec) {
         return isResponsible(op, (Term)null, services, ec);
     }
@@ -138,7 +137,7 @@ public final class LocSetLDT extends LDT {
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
                                  Term left,
                                  Term right,
-                                 Services services,
+                                 IServices services,
                                  ExecutionContext ec) {
         return false;
     }
@@ -166,7 +165,7 @@ public final class LocSetLDT extends LDT {
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
-                                   Services serv,
+                                   IServices serv,
                                    ExecutionContext ec) {
         if(op instanceof Singleton) {
             return singleton;
@@ -193,7 +192,7 @@ public final class LocSetLDT extends LDT {
     @Override
     public Expression translateTerm(Term t, ExtList children, IServices services) {
         if(t.op().equals(empty)) {
-            return EmptySetLiteral.INSTANCE;
+            return EmptySetLiteral.LOCSET;
         }
         assert false;
         return null;

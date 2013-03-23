@@ -1,19 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.HashMap;
-import java.util.Stack;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
@@ -25,10 +27,15 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
+
+import java.util.HashMap;
+import java.util.Stack;
 
 /** Walks through a java AST in depth-left-fist-order. 
  * This walker is used to transform a loop (not only 
@@ -87,8 +94,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     protected Stack<Label> labelStack = new Stack<Label>();
 
-
-    protected Stack<ProgramElement> methodStack = new Stack<ProgramElement>();
+    protected Stack<MethodFrame> methodStack = new Stack<MethodFrame>();
 
     /** creates the WhileLoopTransformation for the transformation mode
      * @param root the ProgramElement where to begin
@@ -166,6 +172,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	return result;
     }
     
+
     /** walks through the AST. While keeping track of the current node
      * @param node the JavaProgramElement the walker is at 
      */
@@ -179,7 +186,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    labelStack.push(((LabeledStatement)node).getLabel());
 	}
 	if (node instanceof MethodFrame) {
-	    methodStack.push(node);
+	    methodStack.push((MethodFrame)node);
 	}
 
 	super.walk(node);
@@ -255,12 +262,21 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	def.doAction(x);
     }
 
-    public void performActionOnStatementBlock(StatementBlock x) {
-	DefaultAction def=new DefaultAction() {
-		ProgramElement createNewElement(ExtList changeList) {
-		    return new StatementBlock(changeList);
-		}
-	    };
+    public void performActionOnStatementBlock(final StatementBlock x) {
+        DefaultAction def=new DefaultAction() {
+            ProgramElement createNewElement(ExtList changeList) {
+                StatementBlock newBlock = new StatementBlock(changeList);
+                ImmutableSet<BlockContract> bcs
+                    = services.getSpecificationRepository().getBlockContracts(x);
+                if (bcs != null) {
+                    for (BlockContract bc : bcs) {
+                        bc = bc.setBlock(newBlock);
+                        services.getSpecificationRepository().addBlockContract(bc);
+                    }
+                }
+                return newBlock;
+            }
+        };
 	def.doAction(x);
     }
 
@@ -312,7 +328,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**
     *
     *     public void performActionOnFor(For x) {
-    * 	ExtList changeList = (ExtList)stack.peek();
+    * 	ExtList changeList = stack.peek();
     * 	if (replaceBreakWithNoLabel==0){
     * 	//most outer for loop
     * 	    if (changeList.getFirst() == CHANGED)
@@ -543,7 +559,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             if (changeList.getFirst() == CHANGED) {
 	    	changeList.removeFirst();
-	    	addChild(new For(changeList));
+	    	For newLoop = new For(changeList);
+	    	services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+	    	addChild(newLoop);
 	    	changed();
 	    } else {
 	    	doDefaultAction(x);
@@ -572,7 +590,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         } else {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
-                addChild(new For(changeList));
+                EnhancedFor newLoop = new EnhancedFor(changeList);
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                addChild(newLoop);
                 changed();
             } else {
                 doDefaultAction(x);
@@ -608,7 +628,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	     * rename all occ. variables in the body (same name but different object)
 	     */
 	    ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body, 
-	            new HashMap(), true, services);
+	            new HashMap<ProgramVariable, ProgramVariable>(), true, services);
 	    replacer.start();
 	    body = (Statement) replacer.result();
 	    
@@ -640,7 +660,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		Statement body = (Statement) (changeList.isEmpty() ?
 					      null :
 					      changeList.removeFirst());
-		addChild(new While(guard, body, x.getPositionInfo()));
+		While newLoop = new While(guard, body, x.getPositionInfo());
+		services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+		addChild(newLoop);
 		changed();
 	    } else {
 		doDefaultAction(x);
@@ -668,12 +690,12 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 unwindedBody = body;
             }
 	    Statement resultStatement = null;
+	    While newLoop = new While(guard, x.getBody(), x.getPositionInfo());
+	    services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
 	    StatementBlock block = new StatementBlock
 		(new ImmutableArray<Statement>(new Statement[]
 		    {unwindedBody, 
-		        new While(guard, 
-		                  x.getBody(), 
-                                  x.getPositionInfo())}));
+		        newLoop}));
 
  	    if (outerLabelNeeded() && breakOuterLabel != null) {
 		// an unlabeled break occurs in the
@@ -688,18 +710,18 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	} else {
 	    if (changeList.getFirst() == CHANGED) {
 		changeList.removeFirst();
-		Expression guard = (Expression) changeList.removeFirst();
-		Statement body = (Statement) (changeList.isEmpty() ?
-					      null :
-					      changeList.removeFirst());
-		addChild(new Do(guard, body, x.getPositionInfo()));
+		Statement body = changeList.removeFirstOccurrence(Statement.class);
+		Guard g = changeList.removeFirstOccurrence(Guard.class);
+		Expression guard = g == null ? null : g.getExpression();
+		Do newLoop = new Do(guard, body, x.getPositionInfo());
+		services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+		addChild(newLoop);
 		changed();
 	    } else {
 		doDefaultAction(x);
 	    }
 	}
     }
-
 
     public void performActionOnIf(If x)     {
 	DefaultAction def=new DefaultAction() {		

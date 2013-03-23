@@ -1,16 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +64,19 @@ public final class MiscTools {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
+
+
+    // TODO Is rp always a program variable?
+    public static ProgramVariable getSelf(MethodFrame mf) {
+        ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
+        ReferencePrefix rp = ec.getRuntimeInstance();
+        if(!(rp instanceof TypeReference) && rp != null) {
+            return (ProgramVariable) rp;
+        } else {
+            return null;
+        }
+    }
+
     
     /**
      * Returns the receiver term of the passed method frame, or null if
@@ -188,22 +206,19 @@ public final class MiscTools {
         String[] b = disectFilename(toFilename).toArray(new String[0]);
         
         // check for Windows paths
-        if (a[0].length() == 2 && a[0].charAt(1) == ':') {
-            // FIXME: UNIX filenames may well contain colons, too
+        if (File.separatorChar == '\\' &&
+                a[0].length() == 2 && a[0].charAt(1) == ':') {
             char drive = Character.toUpperCase(a[0].charAt(0));
             if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive && b[0].charAt(1) == ':'))
                 throw new RuntimeException("cannot make paths on different drives relative");
             // remove drive letter
             a[0] = ""; b[0] = "";
         }
+        int i;
+        String s = "";
+        String t = "";
         
-        if (!a[0].equals("")){ // already relative
-            String res = "";
-            for (String s: a){
-                res += s;
-            }
-            return res;
-        }
+        if (a[0].equals("")) { // not already relative
         if (!b[0].equals("")) 
             throw new RuntimeException("\""+toFilename+ "\" is a relative path. Please use absolute paths to make others relative to them.");
         
@@ -213,9 +228,7 @@ public final class MiscTools {
         
         // FIXME: there may be leading ..'s
         
-        int i = 1; boolean diff= false;
-        String s = "";
-        String t = "";
+        i = 1; boolean diff= false;
         while (i < b.length){
             // shared until i
             if (i >= a.length || !a[i].equals(b[i])) diff = true;
@@ -228,6 +241,7 @@ public final class MiscTools {
             }
             i++;
         }
+        } else { i = 0; }
         while (i < a.length)
             t = t +(a[i].equals("")? "" : "/")+ a[i++];
         // strip leading slash
@@ -451,4 +465,21 @@ public final class MiscTools {
     
  
 
+    /**
+     * read an input stream to its end into a string.
+     * 
+     * @param is
+     *            a non-null open input stream
+     * @return the string created from the input of the stream
+     * @throws IOException may occur while reading the stream
+     */
+    public static String toString(InputStream is) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        byte[] buffer = new byte[2048];
+        int read;
+        while((read=is.read(buffer)) > 0) {
+            sb.append(new String(buffer, 0, read));
+        }
+        return sb.toString();
+    }
 }

@@ -1319,7 +1319,6 @@ public final class LogicPrinter implements ILogicPrinter {
             if (showWholeTaclet) {
                 printHeuristics(taclet);
             }
-            printAttribs(taclet);
             if (showWholeTaclet) {
                 layouter.brk(1, -2).print("}");
             }
@@ -1620,12 +1619,6 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printAttribs(Taclet taclet) throws IOException {
-        if (taclet.noninteractive()) {
-            layouter.brk().print("\\noninteractive");
-        }
-    }
-
     protected void printFind(Taclet taclet) throws IOException {
         if (!(taclet instanceof FindTaclet)) {
             return;
@@ -1752,11 +1745,15 @@ public final class LogicPrinter implements ILogicPrinter {
 
     protected void printRewriteAttributes(RewriteTaclet taclet)
             throws IOException {
-        final int stateRestriction = taclet.getStateRestriction();
+        final int stateRestriction = taclet.getApplicationRestriction();
         if (stateRestriction == RewriteTaclet.SAME_UPDATE_LEVEL) {
             layouter.brk().print("\\sameUpdateLevel");
         } else if (stateRestriction == RewriteTaclet.IN_SEQUENT_STATE) {
             layouter.brk().print("\\inSequentState");
+        } else if (stateRestriction == RewriteTaclet.ANTECEDENT_POLARITY) {
+            layouter.brk().print("\\antecedentPolarity");
+        } else if (stateRestriction == RewriteTaclet.SAME_UPDATE_LEVEL) {
+            layouter.brk().print("\\succedentPolarity");
         }
     }
 

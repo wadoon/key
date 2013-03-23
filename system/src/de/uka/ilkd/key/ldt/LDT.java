@@ -1,19 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.ldt;
 
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -49,8 +52,10 @@ public abstract class LDT implements Named {
     //-------------------------------------------------------------------------
     
     protected LDT(Name name, IServices services) {
-	sort = services.getNamespaces().sorts().lookup(name);
-	assert sort != null;
+        sort = (Sort) services.getNamespaces().sorts().lookup(name);
+	    if (sort == null)
+	        throw new RuntimeException("LDT "+name+" not found.\n"+
+	                "It seems that there are definitions missing from the .key files.");
         this.name = name;
     }
     
@@ -78,7 +83,9 @@ public abstract class LDT implements Named {
     protected final Function addFunction(IServices services, String funcName) {
 	final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
-        assert f != null : "LDT: Function " + funcName + " not found";
+        if (f == null)
+        	throw new RuntimeException("LDT: Function " + funcName + " not found.\n" +
+        			"It seems that there are definitions missing from the .key files.");
         return addFunction(f);
     }
     
@@ -151,7 +158,7 @@ public abstract class LDT implements Named {
     public abstract boolean isResponsible(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
                         Term[] subs, 
-                        Services services, 
+                        IServices services,
                         ExecutionContext ec);
 
     
@@ -170,7 +177,7 @@ public abstract class LDT implements Named {
 	    		de.uka.ilkd.key.java.expression.Operator op, 
 	    		Term left, 
 	    		Term right, 
-	    		Services services, ExecutionContext ec);
+	    		IServices services, ExecutionContext ec);
 
     
     /** returns true if the LDT offers an operation for the given
@@ -202,12 +209,12 @@ public abstract class LDT implements Named {
      */
     public abstract Function getFunctionFor(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
-	    		Services services, 
+	    		IServices services,
 	    		ExecutionContext ec);
 
     public abstract boolean hasLiteralFunction(Function f);
 
+    /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
     public abstract Expression translateTerm(Term t, ExtList children, IServices services);
-    
     public abstract Type getType(Term t);
 }

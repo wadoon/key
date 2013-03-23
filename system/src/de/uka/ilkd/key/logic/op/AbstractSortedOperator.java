@@ -1,17 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -21,7 +26,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Abstract sorted operator class offering some common functionality.
  */
 public abstract class AbstractSortedOperator extends AbstractOperator 
-                                      implements SortedOperator {
+                                      implements SortedOperator, Sorted {
     
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST 
     	= new ImmutableArray<Sort>();

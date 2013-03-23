@@ -1,23 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -26,11 +25,11 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.JavaDLTermBuilder;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -91,6 +90,9 @@ public class JMLSpecFactory {
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
+        public Map<Label, Term> breaks;
+        public Map<Label, Term> continues;
+        public Term returns;
         public boolean strictlyPure;
     }
 
@@ -271,6 +273,24 @@ public class JMLSpecFactory {
         clauses.diverges = translateOrClauses(pm, progVars.selfVar,
                                               progVars.paramVars,
                                               textualSpecCase.getDiverges());
+        clauses.breaks = translateBreaks(pm, progVars.selfVar,
+                progVars.paramVars,
+                progVars.resultVar, progVars.excVar,
+                progVars.atPres,
+                originalBehavior,
+                textualSpecCase.getBreaks());
+        clauses.continues = translateContinues(pm, progVars.selfVar,
+                progVars.paramVars,
+                progVars.resultVar, progVars.excVar,
+                progVars.atPres,
+                originalBehavior,
+                textualSpecCase.getContinues());
+        clauses.returns = translateReturns(pm, progVars.selfVar,
+                progVars.paramVars,
+                progVars.resultVar, progVars.excVar,
+                progVars.atPres,
+                originalBehavior,
+                textualSpecCase.getReturns());
         return clauses;
     }
 
@@ -363,7 +383,7 @@ public class JMLSpecFactory {
                                             services);
             
             // less than nothing is marked by some special term;
-            if(translated == TB.lessThanNothing()) {
+            if(translated == TB.strictlyNothing()) {
                 if(originalClauses.size() > 1) {
                     throw new SLTranslationException(
                             "\"assignable \\less_than_nothing\" does not go with other " +
@@ -395,6 +415,77 @@ public class JMLSpecFactory {
             result  = result.append(translated);
         }
         return result;
+    }
+
+
+    private Map<Label, Term> translateBreaks(
+            IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable,Term> atPres,
+            Behavior originalBehavior,
+            ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        PositionedString[] array = new PositionedString[originalClauses.size()];
+        originalClauses.toArray(array);
+        Map<Label, Term> result = new HashMap<Label, Term>();
+        for (int i = array.length - 1; i >= 0; i--) {
+            Pair<Label, Term> translation =
+                    JMLTranslator.translate(array[i], pm.getContainerType(),
+                            selfVar, paramVars, resultVar,
+                            excVar, atPres,
+                            Pair.class, services);
+            result.put(translation.first, translation.second);
+        }
+        return result;
+    }
+
+
+    private Map<Label, Term> translateContinues(
+            IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable,Term> atPres,
+            Behavior originalBehavior,
+            ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        PositionedString[] array = new PositionedString[originalClauses.size()];
+        originalClauses.toArray(array);
+        Map<Label, Term> result = new HashMap<Label, Term>();
+        for (int i = array.length - 1; i >= 0; i--) {
+            Pair<Label, Term> translation =
+                    JMLTranslator.translate(array[i], pm.getContainerType(),
+                            selfVar, paramVars, resultVar,
+                            excVar, atPres,
+                            Pair.class, services);
+            result.put(translation.first, translation.second);
+        }
+        return result;
+    }
+
+
+    private Term translateReturns(
+            IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable,Term> atPres,
+            Behavior originalBehavior,
+            ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        if (originalBehavior == Behavior.NORMAL_BEHAVIOR) {
+            assert originalClauses.isEmpty();
+            return TB.ff();
+        } else {
+            return translateAndClauses(pm, selfVar, paramVars, resultVar,
+                    excVar, atPres,
+                    originalClauses);
+        }
     }
 
 
@@ -491,7 +582,7 @@ public class JMLSpecFactory {
                                             services);
             
             // less than nothing is marked by some special term;
-            if(translated == TB.lessThanNothing()) {
+            if(translated == TB.strictlyNothing()) {
                 return true;
             }
         }
@@ -634,7 +725,7 @@ public class JMLSpecFactory {
         if (!clauses.accessible.equalsModRenaming(TB.allLocs(services))) {
             assert (progVars.selfVar == null) == pm.isStatic();
             final Contract depContract = cf.dep(
-                    pm.getContainerType(), pm,
+                    pm.getContainerType(), pm, pm.getContainerType(),
                     TB.convertToFormula(clauses.requires.get(services.getTypeConverter().getHeapLDT().getHeap()),services), clauses.measuredBy,
                     clauses.accessible, progVars.selfVar,
                     progVars.paramVars);
@@ -904,7 +995,101 @@ public class JMLSpecFactory {
 
         return result;
     }
+    
+    public ImmutableSet<BlockContract> createJMLBlockContracts(final IProgramMethod method,
+                                                               final List<Label> labels,
+                                                               final StatementBlock block,
+                                                               final TextualJMLSpecCase specificationCase)
+            throws SLTranslationException
+    {
+        final Behavior behavior = specificationCase.getBehavior();
+        final BlockContract.Variables variables = BlockContract.Variables.create(block, labels, method, services);
+        final ProgramVariableCollection programVariables = createProgramVariables(method, block, variables);
+        final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
+        return new SimpleBlockContract.Creator(
+            block, labels, method, behavior, variables, clauses.requires, clauses.ensures, clauses.breaks, clauses.continues,
+            clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, !clauses.strictlyPure, services
+        ).create();
+    }
 
+    private ProgramVariableCollection createProgramVariables(final IProgramMethod method, final StatementBlock block, final BlockContract.Variables variables)
+    {
+        final Map<LocationVariable, LocationVariable> remembranceVariables = variables.combineRemembranceVariables();
+        return new ProgramVariableCollection(
+            variables.self, collectParameters(method).append(collectLocalVariablesVisibleTo(block, method)),
+            variables.result, variables.exception, remembranceVariables, termify(remembranceVariables)
+        );
+    }
+
+    private Map<LocationVariable, Term> termify(final Map<LocationVariable, LocationVariable> remembranceVariables)
+    {
+        final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+        for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
+            result.put(remembranceVariable.getKey(), TB.var(remembranceVariable.getValue()));
+        }
+        return result;
+    }
+
+    // TODO Move to IProgramMethod interface and its implementations.
+    private ImmutableList<ProgramVariable> collectParameters(final IProgramMethod method) {
+        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        final int parameterCount = method.getParameterDeclarationCount();
+        for (int i = parameterCount - 1; i >= 0; i--) {
+            ParameterDeclaration parameter = method.getParameterDeclarationAt(i);
+            result = result.prepend((ProgramVariable) parameter.getVariableSpecification().getProgramVariable());
+        }
+        return result;
+    }
+
+    protected ImmutableList<ProgramVariable> collectLocalVariablesVisibleTo(final Statement statement, final IProgramMethod method)
+    {
+        return collectLocalVariablesVisibleTo(statement, method.getBody());
+    }
+
+    private ImmutableList<ProgramVariable> collectLocalVariablesVisibleTo(final Statement statement, final StatementContainer container)
+    {
+        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        final int statementCount = container.getStatementCount();
+        for (int i = 0; i < statementCount; i++) {
+            final Statement s = container.getStatementAt(i);
+            if (s instanceof For) {
+                final ImmutableArray<VariableSpecification> variables = ((For) s).getVariablesInScope();
+                for (int j = 0; j < variables.size(); j++) {
+                    result = result.prepend((ProgramVariable) variables.get(j).getProgramVariable());
+                }
+            }
+            if (s == statement) {
+                return result;
+            }
+            else if (s instanceof LocalVariableDeclaration) {
+                final ImmutableArray<VariableSpecification> variables = ((LocalVariableDeclaration) s).getVariables();
+                for (int j = 0; j < variables.size(); j++) {
+                    result = result.prepend((ProgramVariable) variables.get(j).getProgramVariable());
+                }
+            }
+            else if (s instanceof StatementContainer) {
+                final ImmutableList<ProgramVariable> visibleLocalVariables
+                        = collectLocalVariablesVisibleTo(statement, (StatementContainer) s);
+                if (visibleLocalVariables != null) {
+                    result = result.prepend(visibleLocalVariables);
+                    return result;
+                }
+            }
+            else if (s instanceof BranchStatement) {
+                final BranchStatement branch = (BranchStatement) s;
+                final int branchCount = branch.getBranchCount();
+                for (int j = 0; j < branchCount; j++) {
+                    final ImmutableList<ProgramVariable> visibleLocalVariables
+                            = collectLocalVariablesVisibleTo(statement, branch.getBranchAt(j));
+                    if (visibleLocalVariables != null) {
+                        result = result.prepend(visibleLocalVariables);
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     public LoopInvariant createJMLLoopInvariant(
             IProgramMethod pm,

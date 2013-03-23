@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 
@@ -21,9 +25,7 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -387,7 +389,9 @@ public class ApplyStrategy {
     /** interrupted by the user? */
     private boolean autoModeActive = false;
 
-    private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
+    /** We use an immutable list to store listeners to allow for 
+     * addition/removal within listener code */
+    private ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
@@ -494,22 +498,20 @@ public class ApplyStrategy {
     }
 
     private synchronized void fireTaskStarted (int maxSteps) {
-        for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            proverTaskObservers.get(i)
-            .taskStarted(PROCESSING_STRATEGY, maxSteps);
+        for (ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskStarted(PROCESSING_STRATEGY, maxSteps);
         }
     }
 
     private synchronized void fireTaskProgress () {
-        for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            proverTaskObservers.get(i)
-            .taskProgress(countApplied);
+        for (ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskProgress(countApplied);
         }
     }
 
     private synchronized void fireTaskFinished (TaskFinishedInfo info) {
-        for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            proverTaskObservers.get(i).taskFinished(info);
+        for (ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskFinished(info);
         }
     }
 
@@ -658,11 +660,11 @@ public class ApplyStrategy {
        return chooser != null ? chooser : defaultGoalChooser;
     }
     public synchronized void addProverTaskObserver(ProverTaskListener observer) {
-        proverTaskObservers.add(observer);
+        proverTaskObservers = proverTaskObservers.prepend(observer);
     }
 
     public synchronized void removeProverTaskObserver(ProverTaskListener observer) {
-        proverTaskObservers.remove(observer);
+        proverTaskObservers = proverTaskObservers.removeAll(observer);
     }
 
 

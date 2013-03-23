@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof;
 
@@ -466,10 +470,14 @@ public class Node {
     /** marks a node as closed */
     Node close() {
 	closed = true;
-	if (parent != null && parent.isCloseable()) {
-	    return parent.close();
-	}	
-	return this;
+        Node tmp = parent;
+        Node result = this;
+        while (tmp != null && tmp.isCloseable()) {
+            tmp.closed = true;
+            result = tmp;
+            tmp = tmp.parent();
+        }
+        return result;
     }
 
     /** checks if an inner node is closeable */

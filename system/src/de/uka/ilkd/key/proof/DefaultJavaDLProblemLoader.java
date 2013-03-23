@@ -30,9 +30,21 @@ public class DefaultJavaDLProblemLoader extends
      * tries to apply rules again.
      * @param poContainer The {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} to instantiate a {@link Proof} for.
      * @return The instantiated {@link Proof}.
-     * @throws de.uka.ilkd.key.proof.init.ProofInputException Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     protected Proof createProof(IPersistablePO.LoadedPOContainer poContainer) throws ProofInputException {
+        return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
+    }
+
+
+    /**
+     * Creates a {@link Proof} for the given {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} and
+     * tries to apply rules again.
+     * @param poContainer The {@link de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer} to instantiate a {@link Proof} for.
+     * @return The instantiated {@link Proof}.
+     * @throws de.uka.ilkd.key.proof.init.ProofInputException Occurred Exception.
+     */
+/*    protected Proof createProof(IPersistablePO.LoadedPOContainer poContainer) throws ProofInputException {
         mediator.setProof(problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum()));
 
         Proof proof = mediator.getSelectedProof();
@@ -43,7 +55,7 @@ public class DefaultJavaDLProblemLoader extends
         }
         mediator.getUI().resetStatus(this);
         return proof;
-    }
+    }*/
 
 
     /**

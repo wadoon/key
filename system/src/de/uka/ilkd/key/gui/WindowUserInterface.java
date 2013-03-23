@@ -1,17 +1,19 @@
 package de.uka.ilkd.key.gui;
 
-
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,18 +30,17 @@ import java.util.List;
 
 public class WindowUserInterface extends AbstractWindowUserInterface<Services, JavaDLInitConfig> {
 
-	private MainWindow mainWindow;
-
 
     private LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
 	
     public WindowUserInterface(MainWindow<Services, JavaDLInitConfig> mainWindow) {
         super(mainWindow);
-        completions.add(new FunctionalOperationContractCompletion());
-        completions.add(new DependencyContractCompletion());
-        completions.add(new LoopInvariantRuleCompletion());
-    }
+	    completions.add(new FunctionalOperationContractCompletion());
+		completions.add(new DependencyContractCompletion());
+		completions.add(new LoopInvariantRuleCompletion());
+		completions.add(new BlockContractCompletion());
+	}
 
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath) {
@@ -137,7 +138,7 @@ public class WindowUserInterface extends AbstractWindowUserInterface<Services, J
 			}
 		} else {
 			resetStatus(this);
-			if (info.toString() != "") {
+			if (!info.toString().isEmpty()) {
 				mainWindow.displayResults(info.toString());
 			}
 		}
@@ -263,7 +264,7 @@ public class WindowUserInterface extends AbstractWindowUserInterface<Services, J
     * {@inheritDoc}
     */
    @Override
-   public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
+   public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
@@ -278,11 +279,34 @@ public class WindowUserInterface extends AbstractWindowUserInterface<Services, J
       return mainWindow.getProofList().containsProof(proof);
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removeProof(Proof proof) {
-      mainWindow.getProofList().removeProof(proof);
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeProof(Proof proof) {
+        if (!proof.isDisposed()) {
+           // The following was copied from AbandonTaskAction when I redirected
+           // the abandon method there to this method.
+           // The code seems to do more than the original code of this method...
+           final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
+           mainWindow.getProofList().removeTask(rootTask);
+           final Proof[] rootTaskProofs = rootTask.allProofs();
+           for (Proof p : rootTaskProofs) {
+               //In a previous revision the following statement was performed only
+               //on one proof object, namely on: mediator.getProof()
+               p.getServices().getSpecificationRepository().removeProof(p);
+               p.mgt().removeProofListener();
+               p.dispose();
+           }
+           proof.dispose();
+           mainWindow.getProofView().removeProofs(rootTaskProofs);
+           
+           // The original code of this method. Neccessary?
+           mainWindow.getProofList().removeProof(proof);
+           
+           // Run the garbage collector.
+           Runtime r = Runtime.getRuntime();
+           r.gc();
+        }
+    }
 }

@@ -1,24 +1,28 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.Debug;
@@ -87,7 +91,7 @@ public final class BooleanLDT extends LDT {
     @Override
     public boolean isResponsible
 	(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, 
-                Services services, ExecutionContext ec) {
+                IServices services, ExecutionContext ec) {
 	if (subs.length == 1) {
 	    return isResponsible(op, subs[0], services, ec);
 	} else if (subs.length == 2) {
@@ -99,7 +103,7 @@ public final class BooleanLDT extends LDT {
     
     @Override
     public boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right, Services services, ExecutionContext ec) {
+	(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right, IServices services, ExecutionContext ec) {
 	return false;
 
     }
@@ -125,7 +129,7 @@ public final class BooleanLDT extends LDT {
     
     @Override
     public Function getFunctionFor
-	(de.uka.ilkd.key.java.expression.Operator op, Services services, 
+	(de.uka.ilkd.key.java.expression.Operator op, IServices services, 
                 ExecutionContext ec) {
 	assert false;
 	return null;

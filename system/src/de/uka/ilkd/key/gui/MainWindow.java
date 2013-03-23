@@ -1,34 +1,18 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.*;
@@ -48,7 +32,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -58,19 +41,37 @@ import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.gui.ABSWindowUserInterface;
 import de.uka.ilkd.keyabs.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.init.ABSProfile;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 
 @SuppressWarnings("serial")
@@ -82,7 +83,7 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
     private static final int MAX_RECENT_FILES = 8;
     
     /** size of the tool bar icons */
-    public static final int TOOLBAR_ICON_SIZE = 15;
+    public static final int TOOLBAR_ICON_SIZE = 16;
     
     /** the tab bar at the left */
     private JTabbedPane tabbedPane;
@@ -123,7 +124,7 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
     private KeYMediator<S, IC> mediator;
     
     /** the user interface which direct all notifications to this window */ 
-    private UserInterface<?,?> userInterface;
+    private UserInterface<S,IC> userInterface;
     
     /** the status line */
     private MainStatusLine statusLine;
@@ -185,8 +186,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
     
-    public static MainWindow<?,?> instance = null;    
-    
+    private static MainWindow<?,?> instance = null;
+
 //    private ProverTaskListener taskListener;
     
     private NotificationManager notificationManager;
@@ -202,9 +203,11 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
     private ExitMainAction exitMainAction;
 
     private ShowActiveSettingsAction showActiveSettingsAction;
+    
+    private UnicodeToggleAction unicodeToggleAction;
 
     /**
-     * creates prover -- private, use {@link #createInstance(String)}
+     * creates prover -- private
      * 
      */
     private MainWindow() {
@@ -212,12 +215,9 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
     
     /**
      * initialize the singleton object of this class.
-     * 
-     * @param title
-     *            the frame's title
      */
-    private void initialize(String title, UserInterface<S, IC> ui) {
-        setTitle(title);
+    private void initialize(UserInterface<S,IC> ui) {
+        setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -243,7 +243,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
      */
     private void setLaF() {
         try{
-            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
+        	 if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
+//            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
                 // Workarounds for GTK+
@@ -310,7 +311,10 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
     private void layoutMain() {
         // set overall layout manager
         getContentPane().setLayout(new BorderLayout());
-        
+
+        // default size
+        setSize(1000, 750);
+
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -323,7 +327,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         // FIXME do this NOT in layout of GUI
         // minimize interaction
         final boolean stupidMode = 
-            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
+        		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         mediator.setStupidMode(stupidMode);
         
         // set up actions
@@ -340,12 +345,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
+        unicodeToggleAction = new UnicodeToggleAction(this);
         
-
-	
-	
-        
-
 	// create empty views
 	createViews();
 	
@@ -400,11 +401,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
             }
         });
         
-        // default size
-        setSize(1000, 750);
-        setName("mainWindow");
-        
         // load preferred sizes from system preferences
+        setName("mainWindow");
         prefSaver.load(this);
     }
 
@@ -416,7 +414,7 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
 	        "The currently open goals");
 	pane.addTab("Proof Search Strategy", null, strategySelectionView,
 	        "Select strategy for automated proof search");
-	pane.addTab("Rules", null, new JScrollPane(ruleView),
+	pane.addTab("Rules", null, ruleView,
 	        "All available rules");
 	
         pane.setSelectedIndex(0);
@@ -460,7 +458,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
-        toolBar.add(new UndoLastStepAction(this, false));
+        toolBar.add(new GoalBackAction(this, false));
+        toolBar.add(new PruneProofAction(this, false));
         JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
@@ -589,6 +588,10 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
 	setStatusLine(s, 0);
     }
     
+    public void selectTab(int tab) {
+    	this.tabbedPane.setSelectedIndex(0);
+    }
+    
 //    /**
 //     * Get the progress monitor that will update a progress bar in a corner of the main window.
 //     */
@@ -706,7 +709,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
         laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
-        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+//        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -719,22 +723,7 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         
        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
-        
-
-        final MainWindowAction pp2 = new MainWindowAction(this, 
-                "Use Unicode symbols", 
-                "If checked formulae are displayed with special Unicode characters" +
-                " (such as \""+UnicodeHelper.AND+"\") instead of the traditional ASCII ones. \n"+
-                "Only works in combination with pretty printing (see above).",
-                NotationInfo.UNICODE_ENABLED){
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                NotationInfo.UNICODE_ENABLED = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                mainWindow.makePrettyView();
-            }
-        };
-        view.add(new JCheckBoxMenuItem(pp2));
+        view.add(new JCheckBoxMenuItem(unicodeToggleAction));
         
         view.addSeparator();
         {
@@ -758,6 +747,7 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
+        proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
 	proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
@@ -774,9 +764,10 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
 	
 	options.add(new TacletOptionsAction(this));
 	options.add(new SMTOptionsAction(this));
-	options.add(setupSpeclangMenu());
+//	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
+        options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));
         
         return options;
@@ -882,7 +873,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         JMenu result = new JMenu("Specification Parser");       
         ButtonGroup group = new ButtonGroup();
         GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 
         JRadioButtonMenuItem jmlButton 
             = new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
@@ -892,7 +884,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         jmlButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 GeneralSettings gs 
-                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+//                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 gs.setUseJML(true);
                 gs.setUseOCL(false);
             }
@@ -905,7 +898,8 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         noneButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
         	GeneralSettings gs 
-        	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        	=ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+    //    	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         	gs.setUseJML(false);
         	gs.setUseOCL(false);
             }
@@ -917,6 +911,10 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
     
     public ProofTreeView getProofView(){
         return proofTreeView;
+    }
+    
+    public SequentView getSequentView(){
+    	return sequentView;
     }
     
     
@@ -986,20 +984,6 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         }
     }
     
-    // FIXME DOES NOT DO THE SAME AS THE ONE ONE ABOVE
-    @Deprecated
-    public void closeTaskWithoutInteraction() {
-        final Proof proof = mediator.getProof();
-        if (proof != null) {
-            final TaskTreeNode rootTask = 
-                proof.getBasicTask().getRootTask();     
-            proofList.removeTaskWithoutInteraction(rootTask);   
-            proof.getServices().getSpecificationRepository().removeProof(proof);
-            proof.mgt().removeProofListener();
-            proofTreeView.removeProofs(rootTask.allProofs());
-        }
-    }
-    
     /**
      * brings window in front and request focus
      */
@@ -1064,7 +1048,7 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-	    assert doNotReenable == null : "toolbar disabled w/o prior enable";
+	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    
 	    doNotReenable = new HashSet<Component>();
 	    Component[] cs = controlToolBar.getComponents();
@@ -1085,7 +1069,7 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            assert doNotReenable != null : "toolbar enabled w/o prior disable";
+            //assert doNotReenable != null : "toolbar enabled w/o prior disable";
             
             Component[] cs = controlToolBar.getComponents();
             for (int i = 0; i < cs.length; i++) {
@@ -1613,12 +1597,6 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
         }
     }
     
-
-    public static boolean hasInstance() {
-        return instance != null;
-    }   
-    
-    
     /**
      * returns an instance of Main and creates one if necessary
      * <strong>Do not use</strong> this method to access the mediator as long as
@@ -1635,49 +1613,35 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
      * @throws IllegalStateException 
      */
     public static MainWindow<?,?> getInstance() throws IllegalStateException {
-        return getInstance(true);
-    }
+	if (instance == null) {
+	    instance = new MainWindow();
+        Profile<?,?> profile = ProofSettings.DEFAULT_SETTINGS.getProfile();
+        if (profile instanceof JavaProfile) {
+            instance = new MainWindow<Services,JavaDLInitConfig>();
+            ((MainWindow<Services,JavaDLInitConfig>)instance).initialize(new WindowUserInterface((MainWindow<Services, JavaDLInitConfig>) instance));
+        } else if (profile instanceof ABSProfile) {
+            instance = new MainWindow<ABSServices,ABSInitConfig>();
+            ((MainWindow<ABSServices,ABSInitConfig>)instance).initialize(new ABSWindowUserInterface((MainWindow<ABSServices, ABSInitConfig>) instance));
+        } else {
+            throw new UnsupportedOperationException("The chosen profile " + profile.name() + " does not support a GUI" );
+        }
 
-    /**
-     * returns an instance of Main and creates one if necessary
-     * <strong>Do not use</strong> this method to access the mediator as long as
-     * you do not attempt create a GUI element. In particular be aware that the 
-     * pattern <tt>getInstance(boolean).mediator().getProof()</tt> breaks GUI and prover 
-     * separation and will not work if an alternative GUI is used (e.g. soon for 
-     * the visual debugger). 
-     * 
-     * Further the above pattern is very fragile as the mediator may have changed 
-     * the selected proof. Usually if you want to have access to a proof e.g. in
-     * the strategy hand the proof object over at the creation time of the component.
-     * 
-     * @param visible a boolean indicating if Main shall be made visible
-     * @return the instance of Main
-     * @throws Exception 
-     */
-    public static MainWindow<?,?> getInstance(final boolean visible) throws IllegalStateException {
-        
-        if(instance == null) {
-            // TODO Come up with a better exception class
-            throw new IllegalStateException(    "There is no GUI main window. Sorry.");
-        }        
-        return instance;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static void createInstance(String title) {
-	assert instance == null : "Attempt to create a second mainwindow";
-	if(instance == null) {
-	    Profile<?,?> profile = ProofSettings.DEFAULT_SETTINGS.getProfile();	    
-	    if (profile instanceof JavaProfile) {
-	        instance = new MainWindow<Services,JavaDLInitConfig>();    
-	        ((MainWindow<Services,JavaDLInitConfig>)instance).initialize(title, new WindowUserInterface((MainWindow<Services, JavaDLInitConfig>) instance));
-	    } else if (profile instanceof ABSProfile) {
-	        instance = new MainWindow<ABSServices,ABSInitConfig>();    
-                ((MainWindow<ABSServices,ABSInitConfig>)instance).initialize(title, new ABSWindowUserInterface((MainWindow<ABSServices, ABSInitConfig>) instance));	        
-	    } else {	   
-	        throw new UnsupportedOperationException("The chosen profile " + profile.name() + " does not support a GUI" );
-	    }
 	}
+	return instance;
+    }
+    
+    /**
+     * <p>
+     * Checks if an instance of the main window is already created or not.
+     * </p>
+     * <p>
+     * This method is required, because the Eclipse integration of KeY has
+     * to do some cleanup only if a main window exists.
+     * </p>
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     */
+    public static boolean hasInstance() {
+       return instance != null;
     }
     
     
@@ -1725,7 +1689,7 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
 	return recentFiles;
     }
 
-    public UserInterface<?, ?> getUserInterface() {
+    public UserInterface<S, IC> getUserInterface() {
         return userInterface;
     }
     
@@ -1738,6 +1702,10 @@ public final class MainWindow<S extends IServices, IC extends InitConfig<S,IC>> 
 
     public Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
+    }
+    
+    public Action getUnicodeToggleAction() {
+    	return unicodeToggleAction;
     }
 
     public void savePreferences() {

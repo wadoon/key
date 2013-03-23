@@ -1,20 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
 
 /* -*-antlr-*- */
 header {
@@ -333,6 +328,10 @@ options {
 	}
     }
 
+    public void recover( RecognitionException ex, BitSet tokenSet ) throws TokenStreamException {
+     consume();
+     consumeUntil( tokenSet );
+    }
 
     public String getChooseContract() {
       return chooseContract;
@@ -775,6 +774,11 @@ options {
                 } catch(Throwable e) {
                     semanticError("Getting array length failed");
                 }
+            } else if(attributeName.equals("<inv>")) {
+                // The invariant observer "<inv>" is implicit and 
+                // not part of the class declaration
+                // A special case is needed, hence.
+                result = javaInfo.getInvProgramVar();
             } else {
                 if (inSchemaMode()) {
                     semanticError("Either undeclared schema variable '" + 
@@ -790,7 +794,7 @@ options {
                 if(!isDeclParser()) {			      	
                     final ImmutableList<ProgramVariable> vars = 	
                     javaInfo.getAllAttributes(attributeName, prefixKJT);
-                    
+
                     if (vars.size() == 0) {
                         semanticError("There is no attribute '" + attributeName + 
                             "' declared in type '" + prefixSort + "'");
@@ -1199,20 +1203,27 @@ options {
 
 
     private TacletBuilder createTacletBuilderFor
-        (Object find, int stateRestriction) 
+        (Object find, int applicationRestriction) 
         throws InvalidFindException {
-        if ( stateRestriction != RewriteTaclet.NONE && !( find instanceof Term ) ) {        
-            String mod;
-            switch (stateRestriction) {
-                case RewriteTaclet.SAME_UPDATE_LEVEL: 
-                       mod = "\"\\sameUpdateLevel\""; 
-                break;
-                case RewriteTaclet.IN_SEQUENT_STATE: 
-                       mod = "\"\\inSequentState\""; 
-                break;                
-                default: 
-                       mod = "State restrictions"; 
-                break;                
+        if ( applicationRestriction != RewriteTaclet.NONE && !( find instanceof Term ) ) {        
+            String mod = "";
+            if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
+                mod = "\"\\sameUpdateLevel\"";
+            }
+            if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\inSequentState\""; 
+            }
+            if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\antecedentPolarity\""; 
+            }
+            if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\succedentPolarity\"";
+            }
+            if (mod == "") {
+                mod = "Application restrictions";               
             }
             
             throw new InvalidFindException
@@ -1223,7 +1234,7 @@ options {
             return new NoFindTacletBuilder();
         } else if ( find instanceof Term ) {
             return new RewriteTacletBuilder().setFind((Term)find)
-                .setStateRestriction(stateRestriction);
+                .setApplicationRestriction(applicationRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
             if ( findSeq.isEmpty() ) {
@@ -3284,8 +3295,8 @@ funcpredvarterm returns [Term a = null]
 	                        if(i < op.arity() && !op.bindVarsAt(i)) {
 	                            for(QuantifiableVariable qv : args[i].freeVars()) {
 	                                if(boundVars.contains(qv)) {
-	                                    semanticError("Building a function term with bound variables failed: "
-	                                                   + "Variable " + qv + " must not occur free in subterm " + i);
+	                                    semanticError("Building function term "+op+" with bound variables failed: "
+	                                                   + "Variable " + qv + " must not occur free in subterm " + args[i]);
 	                                } 
 	                            }	                            
 	                        }
@@ -3369,7 +3380,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
     Object  find = null;
     r = null;
     TacletBuilder b = null;
-    int stateRestriction = RewriteTaclet.NONE;
+    int applicationRestriction = RewriteTaclet.NONE;
 }
     : 
         name:IDENT (choices=option_list[choices])? 
@@ -3379,12 +3390,15 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN 
-            ( SAMEUPDATELEVEL { stateRestriction = RewriteTaclet.SAME_UPDATE_LEVEL; } |
-              INSEQUENTSTATE { stateRestriction = RewriteTaclet.IN_SEQUENT_STATE; } 
-            ) ? ) ?
+        ( FIND LPAREN find = termorseq RPAREN
+            (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
+              | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
+              | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
+              | SUCCEDENTPOLARITY { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
+            )*
+        ) ?
         { 
-            b = createTacletBuilderFor(find, stateRestriction);
+            b = createTacletBuilderFor(find, applicationRestriction);
             b.setName(new Name(name.getText()));
             b.setIfSequent(ifSeq);
         }
@@ -3413,11 +3427,7 @@ modifiers[TacletBuilder b]
            while(it.hasNext())
                b.addRuleSet((RuleSet)it.next());
          }
-        | NONINTERACTIVE { 
-                //      b.setNoninteractive(true);  
-                // "noninteractive" (as it is now) is confusing
-                // dropped this completely until a better solution (->Uwe)
-            }       
+        | NONINTERACTIVE { b.addRuleSet((RuleSet)ruleSets().lookup(new Name("notHumanReadable"))); }
         | DISPLAYNAME dname = string_literal 
             {b.setDisplayName(dname);}
         | HELPTEXT htext = string_literal
@@ -4228,7 +4238,6 @@ problem returns [ Term a = null ]
     Choice c = null;
     ImmutableList<String> stlist = null;
     String string = null;
-    Namespace funcNSForSelectedChoices = new Namespace();
     String pref = null;
 }
     :
