@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import se.gu.svanefalk.testgeneration.backend.junit.JUnitConverter;
 import se.gu.svanefalk.testgeneration.core.NodeTestGenerator;
 import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
@@ -51,7 +52,8 @@ public class TestNodeGeneratorTest extends KeYTestGenTest {
         final List<IExecutionNode> nodes = this.retrieveNode(root, "mid=x");
 
         for (final IExecutionNode node : nodes) {
-            NodeTestGenerator.INSTANCE.constructTestSuiteFromNode(node);
+            NodeTestGenerator.INSTANCE.constructTestSuiteFromNode(node,
+                    new JUnitConverter());
         }
     }
 }

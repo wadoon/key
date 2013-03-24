@@ -62,4 +62,8 @@ public class ClassProxy {
 
         this.nestedProxy = nestedProxy;
     }
+
+    public boolean compare(int x) {
+        return x > 0;
+    }
 }

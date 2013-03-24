@@ -11,12 +11,15 @@ import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
  * Produces instances of {@link KeYJavaClass}.
@@ -48,8 +51,6 @@ public enum KeYJavaClassFactory {
          * Load the file into KeY and get the InitConfig instance for it.
          */
         final InitConfig initConfig = this.keyInterface.loadJavaFile(javaFile);
-
-        final Services services = initConfig.getServices();
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
 
         /*
@@ -59,20 +60,38 @@ public enum KeYJavaClassFactory {
         final String fileName = this.getFileName(javaFile);
         final KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
-        /*
-         * Setup the class
-         */
-        final KeYJavaClass javaClass = new KeYJavaClass(mainClass);
+        return constructClass(mainClass, initConfig);
+    }
+
+    public KeYJavaClass createKeYJavaClass(IExecutionMethodCall methodCall) {
+
+        InitConfig initConfig = methodCall.getMediator().getProof().env()
+                .getInitConfig();
 
         /*
-         * Extract all methods declared in this class (including the ones
-         * provided in Java.lang.Object, even if these have not been
-         * overridden), and create name-value mappings for them. Exclude
-         * implicit methods (i.e. <create>, <init> etc).
+         * Get and process the method call node
          */
-        for (final IProgramMethod method : javaInfo
-                .getAllProgramMethods(mainClass)) {
-            if (!method.getFullName().startsWith("<")) {
+        final IProgramMethod method = methodCall.getProgramMethod();
+
+        /*
+         * Construct the KeYJavaClass itself
+         */
+        final KeYJavaType parent = method.getContainerType();
+
+        return constructClass(parent, initConfig);
+    }
+
+    private KeYJavaClass constructClass(KeYJavaType parent,
+            InitConfig initConfig) {
+
+        Services services = initConfig.getServices();
+        JavaInfo javaInfo = services.getJavaInfo();
+
+        KeYJavaClass keYJavaClass = new KeYJavaClass(parent);
+
+        for (final IProgramMethod memberMethod : javaInfo
+                .getAllProgramMethods(parent)) {
+            if (!memberMethod.getFullName().startsWith("<")) {
 
                 /*
                  * Extract the operational contracts of the method, and create a
@@ -81,19 +100,18 @@ public enum KeYJavaClassFactory {
                  * restrictions on the invocation of the method).
                  */
                 final List<ContractWrapper> contracts = this.getContracts(
-                        method, services);
+                        memberMethod, services);
                 for (final ContractWrapper contract : contracts) {
 
                     final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(
-                            javaClass, method, initConfig, contract);
+                            keYJavaClass, memberMethod, initConfig, contract);
 
-                    javaClass.addMethodMapping(method.getFullName(),
+                    keYJavaClass.addMethodMapping(memberMethod.getFullName(),
                             keYJavaMethod);
                 }
             }
         }
-
-        return javaClass;
+        return keYJavaClass;
     }
 
     /**
@@ -145,4 +163,5 @@ public enum KeYJavaClassFactory {
         final int delimiter = name.indexOf('.');
         return name.substring(0, delimiter);
     }
+
 }

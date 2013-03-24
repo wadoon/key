@@ -1,10 +1,14 @@
 package se.gu.svanefalk.testgeneration.util.parsers.transformers;
 
+import java.util.ArrayList;
+
 import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 public class RemoveSDPsTransformer extends AbstractTermTransformer {
@@ -29,11 +33,59 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
     protected Term transformSortDependentFunction(final Term term) {
 
         final ProgramElementName resolvedVariableName = new ProgramElementName(
-                TermParserTools.resolveIdentifierString(term, StringConstants.FIELD_SEPARATOR));
+                TermParserTools.resolveIdentifierString(term,
+                        StringConstants.FIELD_SEPARATOR));
 
         final LocationVariable resolvedVariable = new LocationVariable(
                 resolvedVariableName, term.sort());
 
         return this.termFactory.createTerm(resolvedVariable);
+    }
+
+    @Override
+    protected Term transformProgramMethod(Term term) {
+
+        /*
+         * Transform the object instance which this method is being invoked
+         * from.
+         */
+        Term parentObject = term.sub(1);
+
+        final ProgramElementName parentObjectIdentifier = new ProgramElementName(
+                TermParserTools.resolveIdentifierString(parentObject,
+                        StringConstants.FIELD_SEPARATOR));
+
+        final LocationVariable transformedParentObjectVariable = new LocationVariable(
+                parentObjectIdentifier, parentObject.sort());
+
+        Term transformedParentObject = this.termFactory
+                .createTerm(transformedParentObjectVariable);
+
+        /*
+         * Construct a new list of children for the new method term
+         */
+        Term[] childBuffer = new Term[term.subs().size()];
+        for (int i = 0; i < term.subs().size(); i++) {
+
+            /*
+             * Skip the second child, as this corresponds to the old parent
+             * object.
+             */
+            if (i != 1) {
+                childBuffer[i] = term.sub(i);
+            }
+
+            /*
+             * If the second child is encountered, replace it with the new
+             * parent object.
+             */
+            else {
+                childBuffer[i] = transformedParentObject;
+            }
+        }
+        ImmutableArray<Term> newChildren = new ImmutableArray<Term>(childBuffer);
+
+        return this.termFactory.createTerm(term.op(), newChildren,
+                term.boundVars(), term.javaBlock());
     }
 }

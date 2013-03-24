@@ -44,14 +44,31 @@ public enum TestGenerator {
     private final CoreInterface coreInterface = CoreInterface.INSTANCE;
 
     /**
-     * Generates a set of JUnit test cases for a subset of methods in a Java
-     * source file.
+     * A list of native methods (i.e. those part of any type with {@link Object}
+     * as its supertype). We use this list in the event that we wish to ignore
+     * such methods while generating test cases.
+     */
+    private static final LinkedList<String> nativeMethods = new LinkedList<String>();
+    static {
+        nativeMethods.add("equals");
+        nativeMethods.add("toString");
+        nativeMethods.add("wait");
+        nativeMethods.add("notify");
+        nativeMethods.add("notifyAll");
+        nativeMethods.add("hashCodeCore");
+        nativeMethods.add("clone");
+        nativeMethods.add("finalize");
+    }
+
+    /**
+     * Generates a set of JUnit test cases for each method in a Java source
+     * file, according to the users preferences.
      * 
      * @param source
      *            path to the Java source file.
      * @param coverage
      *            code coverage critera to be satisfied by the generated test
-     *            cases. May be <code>nulll</code>, in which case a default
+     *            cases. May be <code>null</code>, in which case a default
      *            statement coverage is used.
      * @param includeProtected
      *            set to true to generate test cases also for protected methods.
@@ -71,8 +88,7 @@ public enum TestGenerator {
     }
 
     /**
-     * Generates a test suite covering a subset of methods in a Java source
-     * file.
+     * Generates a test suite covering a single method in a Java source file.
      * 
      * @param source
      *            path to the Java source file
@@ -80,7 +96,7 @@ public enum TestGenerator {
      *            the methods to generate the test cases for.
      * @param coverage
      *            code coverage critera to be satisfied by the generated test
-     *            cases. May be <code>nulll</code>, in which case a default
+     *            cases. May be <code>null</code>, in which case a default
      *            statement coverage is used.
      * @return a test suite for the framework targeted by the implementor.
      */

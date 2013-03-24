@@ -3,6 +3,7 @@ package se.gu.svanefalk.testgeneration.core.testsuiteabstraction;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleConstraint;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
@@ -14,9 +15,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  * <li><i>I</i> is the input (Pi, Si) for the method. where Pi is a set of
  * concrete parameter values to the method (if the method accepts parameters),
  * and Si is a state of the program holding before the method starts execution.</li>
- * <li><i>Or</i> is the <i>Oracle</i> for the method being tested.</li>
+ * <li><i>Or</i> is the <i>OracleConstraint</i> for the method being tested.</li>
  * </ul>
- * The Oracle is defined as a function Or(R, Sf) -> {pass, fail}, where:
+ * The OracleConstraint is defined as a function Or(R, Sf) -> {pass, fail},
+ * where:
  * <p>
  * <ul>
  * <li><i>R</i> is the return value of the function when the method finishes
@@ -72,10 +74,10 @@ public class TestCase implements Comparable<TestCase> {
     private IExecutionNode node;
 
     /**
-     * The Oracle for the method, here represented as a postcondition (i.e. a
-     * set of logical expressions defining under which conditions the Oracle
-     * would evaluate to "pass"), here represented in its native {@link Term}
-     * format.
+     * The OracleConstraint for the method, here represented as a postcondition
+     * (i.e. a set of logical expressions defining under which conditions the
+     * OracleConstraint would evaluate to "pass"), here represented in its
+     * native {@link Term} format.
      */
     private final Oracle oracle;
 

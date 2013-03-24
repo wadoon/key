@@ -4,16 +4,21 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * An OracleClause is a set of FOL formulas joined by disjunctions.
+ * An OracleAssertion is a set of {@link OracleExpression} instances. On a FOL
+ * level, it represents a set of formulas joined by disjunctions.
  * 
  * @author christopher
  * 
  */
-public class OracleClause {
+public class OracleAssertion {
 
+    /**
+     * The expressions present in this assertion. Formally, the semantic meaning
+     * of this set is Expression1 OR Expression2 ... OR ExpressionN.
+     */
     private final Set<OracleExpression> expressions;
 
-    public OracleClause(final Set<OracleExpression> expressions) {
+    public OracleAssertion(final Set<OracleExpression> expressions) {
 
         this.expressions = expressions;
     }
@@ -34,7 +39,7 @@ public class OracleClause {
             toPrint.append(iterator.next());
 
             if (iterator.hasNext()) {
-                toPrint.append(" \\/ ");
+                toPrint.append(" || ");
             }
         }
 

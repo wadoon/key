@@ -42,11 +42,11 @@ public class TestJUnitTestCaseGenerator {
 
         final HashMap<String, Double> results = new HashMap<String, Double>();
 
-        final String methodName = "doStuff";
+        final String methodName = "midOneProxyOneInstance";
         final List<String> output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        codeCoverageParser, junitConverter, methodName);
+                        codeCoverageParser, junitConverter, "mid");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(

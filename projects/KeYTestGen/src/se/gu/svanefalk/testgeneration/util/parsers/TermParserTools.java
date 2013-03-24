@@ -212,16 +212,33 @@ public final class TermParserTools {
         return (operator instanceof Junctor) || (operator instanceof Equality);
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term is of boolean type, false otherwise.
+     */
     public static boolean isBoolean(final Term term) {
         return term.sort().name().toString().equals(StringConstants.BOOLEAN);
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a boolean constant, false
+     *         otherwise.
+     */
     public static boolean isBooleanConstant(final Term term)
             throws TermParserException {
         return TermParserTools.isBooleanFalse(term)
                 || TermParserTools.isBooleanTrue(term);
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents the boolean constant FALSE, false
+     *         otherwise.
+     */
     public static boolean isBooleanFalse(final Term term)
             throws TermParserException {
         if (TermParserTools.isBoolean(term)) {
@@ -232,6 +249,12 @@ public final class TermParserTools {
         }
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents the boolean constant TRUE, false
+     *         otherwise.
+     */
     public static boolean isBooleanTrue(final Term term)
             throws TermTransformerException {
         if (TermParserTools.isBoolean(term)) {
@@ -263,11 +286,23 @@ public final class TermParserTools {
                 .toString());
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents the EXISTS quantifier, false
+     *         otherwise.
+     */
     public static boolean isExistsQuantifier(final Term term) {
 
         return term.op().name().toString().equals(StringConstants.EXISTS);
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents the FOR-ALL quantifier, false
+     *         otherwise.
+     */
     public static boolean isForAllQuantifier(final Term term) {
 
         return term.op().name().toString().equals(StringConstants.FORALL);
@@ -442,6 +477,11 @@ public final class TermParserTools {
         }
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term is of a primitive type, false otherwise.
+     */
     public static boolean isPrimitiveType(final String type) {
         return TermParserTools.primitiveTypes.contains(type);
     }
@@ -519,6 +559,11 @@ public final class TermParserTools {
         return term.op() instanceof SortedOperator;
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a unary function, false otherwise.
+     */
     public static boolean isUnaryFunction(final Term term) {
 
         final String sortName = term.op().name().toString();
@@ -526,6 +571,11 @@ public final class TermParserTools {
         return TermParserTools.unaryFunctions.contains(sortName);
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a variable, false otherwise.
+     */
     public static boolean isVariable(final Term term) {
 
         final Operator operator = term.op();
@@ -599,6 +649,11 @@ public final class TermParserTools {
         }
     }
 
+    /**
+     * @param term
+     *            a term of boolean type
+     * @return a boolean value corresponding to the value of the term.
+     */
     public static boolean translateToJavaBoolean(final Term term)
             throws TermParserException {
         if (TermParserTools.isBoolean(term)) {
@@ -607,5 +662,30 @@ public final class TermParserTools {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
         }
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a Formula, false otherwise.
+     */
+    public static boolean isFormula(Term term) {
+
+        final String sortName = term.sort().name().toString();
+
+        return sortName.equals("Formula");
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a negative number, i.e. the Z
+     *         function, false otherwise.
+     */
+    public static boolean isIntegerNegation(Term term) {
+
+        final String name = term.op().name().toString();
+
+        return name.equals("Z");
     }
 }

@@ -1,12 +1,59 @@
 package se.gu.svanefalk.testgeneration.core.oracle.abstraction;
 
+/**
+ * Provides a high-level representation of a comparator. Such a comparator can
+ * be either a comparison between boolean expressions (i.e. a == true, where a
+ * is boolean), numeric expressions (i.e. b < 3, where b is a number), or
+ * references (i.e. c != null, where c is a Java object).
+ * <p>
+ * This abstraction does not enforce Java type safety (i.e. it is possible to
+ * construct an abstraction such as 3 == false), but relies on the KeY, which
+ * creates the underlying Term this abstraction is built from, in order to
+ * ensure that this is already present.
+ * 
+ * @author christopher
+ * 
+ */
 public class OracleComparator extends OracleExpression {
 
+    /**
+     * The types of Java comparators.
+     */
     public enum ComparatorType {
 
-        GREATER_OR_EQUALS(">="), GREATER_THAN(">"), LESS_OR_EQUALS("<="), LESS_THAN(
-                "<"), EQUALS("=="), NOT_EQUALS("!=");
+        /**
+         * The greater-than-or-equals comparator.
+         */
+        GREATER_OR_EQUALS(">="),
 
+        /**
+         * The greater-than comparator.
+         */
+        GREATER_THAN(">"),
+
+        /**
+         * The less-than-or-equals comparator.
+         */
+        LESS_OR_EQUALS("<="),
+
+        /**
+         * The less-than comparator.
+         */
+        LESS_THAN("<"),
+
+        /**
+         * The equals comparator.
+         */
+        EQUALS("=="),
+
+        /**
+         * The not-equals comparator.
+         */
+        NOT_EQUALS("!=");
+
+        /**
+         * The identifier for this comparator type.
+         */
         private final String identifier;
 
         private ComparatorType(final String identifier) {
@@ -19,30 +66,60 @@ public class OracleComparator extends OracleExpression {
         }
     }
 
+    /**
+     * The comparator type for this comparator instance.
+     */
     private final ComparatorType comparator;
+
+    /**
+     * The first operand of the comparator.
+     */
     private final OracleExpression firstOperand;
+
+    /**
+     * The second operand of the comparator.
+     */
     private final OracleExpression secondOperand;
 
-    public OracleComparator(final ComparatorType comparator,
+    /**
+     * Constructs a new comparator.
+     * 
+     * @param comparatorType
+     *            the comparator type
+     * @param firstOperand
+     *            the first operand
+     * @param secondOperand
+     *            the second operand
+     */
+    public OracleComparator(final ComparatorType comparatorType,
             final OracleExpression firstOperand,
             final OracleExpression secondOperand) {
 
         super(OracleType.BOOLEAN);
-        this.comparator = comparator;
+        this.comparator = comparatorType;
         this.firstOperand = firstOperand;
         this.secondOperand = secondOperand;
     }
 
+    /**
+     * @return the first operand of the comparator.
+     */
     public OracleExpression getFirstOperand() {
 
         return this.firstOperand;
     }
 
-    public ComparatorType getOperation() {
+    /**
+     * @return the comparator type for this comparator.
+     */
+    public ComparatorType getComparatorType() {
 
         return this.comparator;
     }
 
+    /**
+     * @return the second operand of the comparator
+     */
     public OracleExpression getSecondOperand() {
 
         return this.secondOperand;
@@ -50,8 +127,6 @@ public class OracleComparator extends OracleExpression {
 
     @Override
     public String toString() {
-
-        return firstOperand.toString() + " " + comparator.toString() + " "
-                + secondOperand.toString();
+        return firstOperand + " " + comparator + " " + secondOperand;
     }
 }

@@ -113,7 +113,7 @@ public class PrimitiveIntegerOperations {
 
         int mid = z;
 
-        if (y < z) {
+        if (y < z || x < y) {
             if (x < y) {
                 mid = y;
             } else if (x < z) {
@@ -132,6 +132,68 @@ public class PrimitiveIntegerOperations {
         }
         return mid;
     }
+    
+    /*@ public normal_behavior
+    @ ensures (\result == x) || (\result == y) || (\result == z );
+    @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+        (\result <= x )) || ((\result <= x) && (\result <= z ));
+    @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+        (\result >= x )) || ((\result >= x) && (\result >= z ));
+    @*/
+  public static int mid2(final int x, final int y, final int z) {
+
+      int mid = z;
+
+      if (y < z) {
+          if (x < y) {
+              mid = y;
+          } else if (x < z) {
+
+              mid = x;
+          }
+      } else {
+
+          if (x > y) {
+
+              mid = y;
+          } else if (x > z) {
+
+              mid = x;
+          }
+      }
+      return mid;
+  }
+  
+  /*@ public normal_behavior
+  @ ensures (\result == x) || (\result == y) || (\result == z );
+  @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+      (\result <= x )) || ((\result <= x) && (\result <= z ));
+  @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+      (\result >= x )) || ((\result >= x) && (\result >= z ));
+  @*/
+public static int mid3(final int x, final int y, final int z) {
+
+    int mid = z;
+
+    if (y < z) {
+        if (x < y) {
+            mid = y;
+        } else if (x < z) {
+
+            mid = x;
+        }
+    } else {
+
+        if (x > y) {
+
+            mid = y;
+        } else if (x > z) {
+
+            mid = x;
+        }
+    }
+    return mid;
+}
 
     public static int midTwoStatic(final int x) {
 
@@ -207,9 +269,9 @@ public class PrimitiveIntegerOperations {
       @ requires true;
       @ ensures (\forall int i;
       @ (i != 10);
-      @ (i != 20)) && (\result == 1);
+      @ (i != 20)) && (proxy.nestedProxy.nestedProxy.nestedProxy.compare(i) == true);
      @*/
-    public int doStuff(final int i) {
+    public int doStuff(ClassProxy proxy, int i) {
 
         int x = 0;
         x = 1;

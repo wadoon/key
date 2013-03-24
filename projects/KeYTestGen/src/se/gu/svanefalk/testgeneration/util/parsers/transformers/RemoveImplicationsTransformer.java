@@ -20,7 +20,7 @@ public class RemoveImplicationsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(Term term) throws TermTransformerException {
 
-        return null;
+        return transformTerm(term);
     }
 
     @Override

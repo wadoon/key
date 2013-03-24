@@ -21,6 +21,14 @@ import de.uka.ilkd.key.logic.op.Junctor;
  */
 public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
 
+    /**
+     * Used for removing implications from the target term.
+     */
+    private static final RemoveImplicationsTransformer removeImplicationsTransformer = new RemoveImplicationsTransformer();
+
+    /**
+     * Used for putting the target term into Negation Normal Form.
+     */
     private static final NegationNormalFormTransformer nnfTransformer = new NegationNormalFormTransformer();
 
     /**
@@ -107,10 +115,16 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
     public Term transform(final Term term) throws TermTransformerException {
 
         /*
+         * Remove implications from the term
+         */
+        final Term implicationFreeTerm = removeImplicationsTransformer
+                .transform(term);
+
+        /*
          * Put the term into Negation Normal Form
          */
         final Term nnfTerm = ConjunctionNormalFormTransformer.nnfTransformer
-                .transform(term);
+                .transform(implicationFreeTerm);
 
         return this.transformTerm(nnfTerm);
     }

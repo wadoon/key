@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
-class OracleTermTransformer extends AbstractTermTransformer {
+class SimplifyPostconditionTransformer extends AbstractTermTransformer {
 
     /**
      * Simplifies a postcondition by removing {@link SortDependingFunction}
@@ -38,8 +38,7 @@ class OracleTermTransformer extends AbstractTermTransformer {
         /*
          * Remove all SortDependingFunction instances from the Term.
          */
-        oracleTerm = new RemoveSDPsTransformer()
-                .transform(oracleTerm);
+        oracleTerm = new RemoveSDPsTransformer().transform(oracleTerm);
 
         /*
          * Order the operands of the term
@@ -77,6 +76,7 @@ class OracleTermTransformer extends AbstractTermTransformer {
      * removed (hence this method will return null as well).
      * 
      * @param term
+     *            the term
      * @throws ModelGeneratorException
      */
     @Override
@@ -103,42 +103,28 @@ class OracleTermTransformer extends AbstractTermTransformer {
     }
 
     /**
-     * In terms of logical representation, equality differs from the other
-     * comparators (leq, geq etc) in the sense that it can be applied to boolean
-     * values as well as numeric ones. Thus, it is treated differently in the
-     * sense that we simplify it the same way that we simplify junctors.
+     * Simplifies an EQUALS statement by examining the operands. If the first
+     * operand is simplified to null, the entire statement can be removed since
+     * it is now semanticallt useless.
      * 
      * @param term
-     * @return
+     *            the term the term
      * @throws ModelGeneratorException
      */
     @Override
     protected Term transformEquals(final Term term)
             throws TermTransformerException {
 
-        /*
-         * Handle the special case where the child is the exception type.
-         */
-        if (!TermParserTools.isExceptionSort(term.sub(0))) {
+        final Term firstChild = this.transformTerm(term.sub(0));
+        final Term secondChild = this.transformTerm(term.sub(1));
 
-            final Term firstChild = this.transformTerm(term.sub(0));
-            final Term secondChild = this.transformTerm(term.sub(1));
+        if (firstChild == null) {
+            return null;
+        } else {
 
-            if ((firstChild != null) && (secondChild == null)) {
-                return firstChild;
-            }
-
-            if ((firstChild == null) && (secondChild != null)) {
-                return secondChild;
-            }
-
-            if ((firstChild != null) && (secondChild != null)) {
-                return this.termFactory.createTerm(term.op(), firstChild,
-                        secondChild);
-            }
+            return this.termFactory.createTerm(term.op(), firstChild,
+                    secondChild);
         }
-
-        return null;
     }
 
     /**
@@ -163,15 +149,6 @@ class OracleTermTransformer extends AbstractTermTransformer {
         }
 
         return this.termFactory.createTerm(Junctor.NOT, newChild);
-    }
-
-    /**
-     * Simply remove {@link ObserverFunction} instances.
-     */
-    @Override
-    protected Term transformObserverFunction(final Term term) {
-
-        return null;
     }
 
     /**
@@ -203,5 +180,44 @@ class OracleTermTransformer extends AbstractTermTransformer {
         }
 
         return null;
+    }
+
+    /**
+     * Remove formulas not needed to construct the oracle abstraction. These
+     * include the various logical functions introduced by Key.
+     */
+    @Override
+    protected Term transformFormula(Term term) throws TermTransformerException {
+
+        String formulaName = term.op().name().toString();
+
+        /*
+         * Remove the common logical functions introduced by KeY, as they have
+         * no meaning (?) with regard to the postcondition itself.
+         */
+        if (formulaName.equals("inInt")
+                || formulaName.equals("java.lang.Object::<inv>")) {
+            return null;
+        } else {
+            return term;
+        }
+    }
+
+    /**
+     * Remove variables not needed to construct the oracle abstraction, in
+     * particular the ones representing exceptions.
+     */
+    @Override
+    protected Term transformLocationVariable(Term term) {
+
+        /*
+         * Remove the exception check introduced by KeY
+         */
+        String variableName = term.op().name().toString();
+        if (variableName.equals("exc")) {
+            return null;
+        } else {
+            return term;
+        }
     }
 }

@@ -14,7 +14,7 @@ public class Benchmark {
 
     private static long stopWatch = 0L;
 
-    private static final boolean toggleBenchmark = true;
+    private static final boolean toggleBenchmark = false;
 
     private static final boolean verbose = true;
 
