@@ -113,7 +113,7 @@ public class PrimitiveIntegerOperations {
 
         int mid = z;
 
-        if (y < z || x < y) {
+        if (y < z) {
             if (x < y) {
                 mid = y;
             } else if (x < z) {
@@ -271,11 +271,12 @@ public static int mid3(final int x, final int y, final int z) {
       @ (i != 10);
       @ (i != 20)) && (proxy.nestedProxy.nestedProxy.nestedProxy.compare(i) == true);
      @*/
-    public int doStuff(ClassProxy proxy, int i) {
+    public int doStuff(ClassProxy proxy, int i, int x, int y, int z) {
 
-        int x = 0;
-        x = 1;
-        return x;
+        if(x < z && y < z || x < y ) 
+            return 1;
+        else
+            return 2;
     }
 
     /**

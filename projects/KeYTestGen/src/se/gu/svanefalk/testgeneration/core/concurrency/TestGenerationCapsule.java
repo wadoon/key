@@ -2,12 +2,11 @@ package se.gu.svanefalk.testgeneration.core.concurrency;
 
 import java.util.LinkedList;
 import java.util.List;
-import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
-import se.gu.svanefalk.testgeneration.backend.junit.JUnitConverter;
+
 import se.gu.svanefalk.testgeneration.core.CoreException;
-import se.gu.svanefalk.testgeneration.core.NodeTestGenerator;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
+import se.gu.svanefalk.testgeneration.core.codecoverage.pathcontext.ExecutionPathContext;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
@@ -15,15 +14,8 @@ import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationExtractor;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchNode;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguration;
 
 /**
  * Instances of this capsule enables KeYTestGen2 to concurrently generate test
@@ -91,41 +83,15 @@ public class TestGenerationCapsule extends Capsule {
             final IExecutionStartNode root = this.keYInterface
                     .getSymbolicExecutionTree(targetMethod);
 
-            final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                    root);
-
-            while (iterator.hasNext()) {
-                IExecutionNode node = iterator.next();
-                if (node instanceof ExecutionBranchNode) {
-                    ExecutionBranchNode executionBranchNode = (ExecutionBranchNode) node;
-                    IExecutionVariable[] vars = executionBranchNode
-                            .getVariables();
-                    try {
-                        SymbolicConfigurationExtractor sym = executionBranchNode.getConfigurationExtractor();
-                        ISymbolicConfiguration first = sym.getCurrentConfiguration(0);
-                    } catch (ProofInputException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    int x = 1;
-                }
-            }
+            ExecutionPathContext.constructExecutionContext(root);
 
             final List<IExecutionNode> nodes = codeCoverageParser
                     .retrieveNodes(root);
+
             Benchmark
                     .finishBenchmarking("2. [KeY] Create symbolic execution tree");
 
             Benchmark.startBenchmarking("3. generating models");
-
-            /*
-             * for(IExecutionNode node : nodes) {
-             * 
-             * try { String suite =
-             * NodeTestGenerator.INSTANCE.constructTestSuiteFromNode(node, new
-             * JUnitConverter()); int x = 1; } catch (TestGeneratorException e)
-             * { // TODO Auto-generated catch block e.printStackTrace(); } }
-             */
 
             /*
              * Setup the module generation capsules for each node.

@@ -2,6 +2,12 @@ package se.gu.svanefalk.testgeneration.core.codecoverage;
 
 import java.util.List;
 
+import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.BranchCoverageParser;
+import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.ConditionCoverageParser;
+import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.DecisionCoverageParser;
+import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.ModifiedConditionDecisionCoverageParser;
+import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.PathCoverageParser;
+import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
@@ -18,6 +24,13 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
  * @author christopher
  */
 public interface ICodeCoverageParser {
+
+    ICodeCoverageParser branchCoverageParser = new BranchCoverageParser();
+    ICodeCoverageParser conditionCoverageParser = new ConditionCoverageParser();
+    ICodeCoverageParser decisionCoverageParser = new DecisionCoverageParser();
+    ICodeCoverageParser modifiedConditionDecisionCoverageParser = new ModifiedConditionDecisionCoverageParser();
+    ICodeCoverageParser pathCoverageParser = new PathCoverageParser();
+    ICodeCoverageParser statementCoverageParser = new StatementCoverageParser();
 
     public List<IExecutionNode> retrieveNodes(IExecutionStartNode root);
 }
