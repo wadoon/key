@@ -27,6 +27,11 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 public class TestGenerationCapsule extends Capsule {
 
     /**
+     * Global thread pool for dispatching other capsules.
+     */
+    CapsuleExecutor threadPool = CapsuleExecutor.INSTANCE;
+
+    /**
      * Parser for achieving the desired level of code coverage.
      */
     private final ICodeCoverageParser codeCoverageParser;
@@ -62,7 +67,7 @@ public class TestGenerationCapsule extends Capsule {
      * Executes the test generation procedure.
      */
     @Override
-    public void run() {
+    public void doWork() {
 
         /*
          * The generated models.
@@ -82,27 +87,31 @@ public class TestGenerationCapsule extends Capsule {
              * from it the nodes needed in order to reach the desired level of
              * code coverage.
              */
-            Benchmark
-                    .startBenchmarking("2. [KeY] Create symbolic execution tree");
-            final IExecutionStartNode root = this.keYInterface
-                    .getSymbolicExecutionTree(this.targetMethod);
+            Benchmark.startBenchmarking("2. [KeY] Create symbolic execution tree");
+            final IExecutionStartNode root = this.keYInterface.getSymbolicExecutionTree(this.targetMethod);
 
-            ExecutionPathContext.constructExecutionContext(root);
+            ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
 
-            final List<IExecutionNode> nodes = this.codeCoverageParser
-                    .retrieveNodes(root);
+            final List<IExecutionNode> nodes = this.codeCoverageParser.retrieveNodes(root);
 
-            Benchmark
-                    .finishBenchmarking("2. [KeY] Create symbolic execution tree");
+            Benchmark.finishBenchmarking("2. [KeY] Create symbolic execution tree");
 
             Benchmark.startBenchmarking("3. generating models");
+
+            /*
+             * Begin preparing the capsules to be executed
+             */
+            final List<Capsule> toExecute = new LinkedList<Capsule>();
 
             /*
              * Setup the module generation capsules for each node.
              */
             final List<ModelGenerationCapsule> modelGenerationCapsules = new LinkedList<ModelGenerationCapsule>();
             for (final IExecutionNode node : nodes) {
-                modelGenerationCapsules.add(new ModelGenerationCapsule(node));
+                ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
+                        node);
+                modelGenerationCapsules.add(modelGenerationCapsule);
+                toExecute.add(modelGenerationCapsule);
             }
 
             /*
@@ -110,25 +119,12 @@ public class TestGenerationCapsule extends Capsule {
              */
             final OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
                     this.targetMethod);
+            toExecute.add(oracleGenerationCapsule);
 
             /*
              * Dispatch and wait for the capsules.
              */
-            oracleGenerationCapsule.start();
-            for (final ModelGenerationCapsule capsule : modelGenerationCapsules) {
-                capsule.start();
-            }
-            while (true) {
-                try {
-                    oracleGenerationCapsule.join();
-                    for (final ModelGenerationCapsule capsule : modelGenerationCapsules) {
-                        capsule.join();
-                    }
-                    break;
-                } catch (final InterruptedException e) {
-                    continue;
-                }
-            }
+            threadPool.executeCapsulesAndWait(toExecute);
 
             /*
              * Collect the results

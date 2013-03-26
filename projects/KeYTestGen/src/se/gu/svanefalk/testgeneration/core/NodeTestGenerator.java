@@ -9,8 +9,10 @@ import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
+import se.gu.svanefalk.testgeneration.core.concurrency.Capsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.ModelGenerationCapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.OracleGenerationCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.CapsuleExecutor;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
@@ -30,53 +32,40 @@ public enum NodeTestGenerator {
 
     KeYJavaClassFactory factory = KeYJavaClassFactory.INSTANCE;
 
+    private final CapsuleExecutor capsuleExecutor= CapsuleExecutor.INSTANCE;
+
     public String constructTestSuiteFromNode(final IExecutionNode node,
             final IFrameworkConverter frameworkConverter)
             throws TestGeneratorException {
 
         try {
 
-            node.getMediator();
-
             /*
              * Get and process the method call node
              */
-            final IExecutionMethodCall methodCall = this
-                    .getMethodCallNode(node);
+            final IExecutionMethodCall methodCall = this.getMethodCallNode(node);
 
             final String methodName = methodCall.getMethodReference().getName();
 
             /*
              * Construct the corresponding KeYJavaClass
              */
-            final KeYJavaClass keYJavaClass = this.factory
-                    .createKeYJavaClass(methodCall);
-            final KeYJavaMethod targetMethod = keYJavaClass
-                    .getMethod(methodName);
+            final KeYJavaClass keYJavaClass = this.factory.createKeYJavaClass(methodCall);
+            final KeYJavaMethod targetMethod = keYJavaClass.getMethod(methodName);
 
             /*
              * Create and dispatc the Model and Oracle geneators.
              */
+            List<Capsule> capsules = new LinkedList<Capsule>();
             final ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
                     node);
-            modelGenerationCapsule.start();
+            capsules.add(modelGenerationCapsule);
 
             final OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
                     targetMethod);
-            oracleGenerationCapsule.start();
+            capsules.add(oracleGenerationCapsule);
 
-            /*
-             * Wait for them to finish.
-             */
-            while (true) {
-                try {
-                    oracleGenerationCapsule.join();
-                    modelGenerationCapsule.join();
-                    break;
-                } catch (final InterruptedException e) {
-                    continue;
-                }
-            }
+            capsuleExecutor.executeCapsulesAndWait(capsules);
 
             /*
              * Collect the results

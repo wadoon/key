@@ -1,5 +1,7 @@
 package se.gu.svanefalk.testgeneration.core.concurrency;
 
+import java.util.concurrent.CountDownLatch;
+
 import se.gu.svanefalk.testgeneration.KeYTestGenException;
 
 /**
@@ -9,7 +11,17 @@ import se.gu.svanefalk.testgeneration.KeYTestGenException;
  * @author christopher
  * 
  */
-public abstract class Capsule extends Thread {
+public abstract class Capsule implements Runnable {
+
+    private CountDownLatch latch;
+
+    /**
+     * @param latch
+     *            the latch to set
+     */
+    void setLatch(CountDownLatch latch) {
+        this.latch = latch;
+    }
 
     /**
      * Flag to indicate whether or not the outcome of this capsules execution
@@ -34,8 +46,20 @@ public abstract class Capsule extends Thread {
      * @return true if the Capsule executed succesfully, false otherwise.
      */
     public boolean isSucceeded() {
+        Thread thread;
         return this.succeeded;
     }
+
+    @Override
+    public final void run() {
+        try {
+            doWork();
+        } finally {
+            latch.countDown();
+        }
+    }
+
+    public abstract void doWork();
 
     /**
      * Indicate that the execution of the the Capsule succeeded. Cannot be

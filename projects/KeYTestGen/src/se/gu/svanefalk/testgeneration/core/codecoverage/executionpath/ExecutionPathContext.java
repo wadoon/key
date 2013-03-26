@@ -20,8 +20,38 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionStateNode;
 
 public class ExecutionPathContext {
 
+    /**
+     * Used for constructing {@link PathNode} instances.
+     */
     private final static PathNodeFactory nodeFactory = PathNodeFactory.INSTANCE;
 
+    /**
+     * An index over which {@link PathNode} instances in this context are
+     * covered by which {@link ExecutionPath} instance or instances.
+     */
+    private final Map<PathNode, List<ExecutionPath>> executionPathsForNode;
+
+    /**
+     * The {@link ExecutionPath} instances which are part of this context.
+     */
+    private final List<ExecutionPath> executionPaths;
+
+    private ExecutionPathContext(
+            Map<PathNode, List<ExecutionPath>> executionPathsForNode,
+            List<ExecutionPath> executionPaths) {
+        super();
+        this.executionPathsForNode = executionPathsForNode;
+        this.executionPaths = executionPaths;
+    }
+
+    /**
+     * Constructs a new {@link ExecutionContext} instance for a symbolic
+     * execution tree.
+     * 
+     * @param root
+     *            root node of the symbolic execution tree
+     * @return the execution context
+     */
     public static ExecutionPathContext constructExecutionContext(
             final IExecutionStartNode root) {
 
@@ -69,7 +99,7 @@ public class ExecutionPathContext {
                 root);
 
         /*
-         * Iteratively construct the execution path models.
+         * Iteratively construct the execution paths.
          */
         long millis = Calendar.getInstance().getTimeInMillis();
         while (iterator.hasNext()) {
@@ -91,7 +121,6 @@ public class ExecutionPathContext {
                     millis = Calendar.getInstance().getTimeInMillis();
                     visitedNodesBuffer = branchedExecutionPaths.pop();
                     returningFromBranch = false;
-
                 }
 
                 /*
@@ -102,14 +131,12 @@ public class ExecutionPathContext {
                  */
                 if (ExecutionPathContext.isProgramStatementNode(node)) {
 
-                    final String pathNodeIdentifier = ExecutionPathContext
-                            .getUniqueIdentifier((AbstractExecutionStateNode) node);
+                    final String pathNodeIdentifier = ExecutionPathContext.getUniqueIdentifier((AbstractExecutionStateNode) node);
 
                     PathNode pathNode = seenPathNodes.get(pathNodeIdentifier);
 
                     if (pathNode == null) {
-                        pathNode = ExecutionPathContext.nodeFactory
-                                .constructExecutionNode(node);
+                        pathNode = ExecutionPathContext.nodeFactory.constructExecutionNode(node);
                         seenPathNodes.put(pathNodeIdentifier, pathNode);
                     }
                     pathNode.addCorrespondingSymbolicNode(node);
@@ -124,8 +151,7 @@ public class ExecutionPathContext {
                      * Register that the given node is now covered by this
                      * execution path.
                      */
-                    List<ExecutionPath> pathsForNode = executionPathsForNode
-                            .get(pathNode);
+                    List<ExecutionPath> pathsForNode = executionPathsForNode.get(pathNode);
                     if (pathsForNode == null) {
                         pathsForNode = new LinkedList<ExecutionPath>();
                         executionPathsForNode.put(pathNode, pathsForNode);
@@ -154,23 +180,32 @@ public class ExecutionPathContext {
                     executionPaths.add(executionPath);
                     returningFromBranch = true;
 
-                    System.out
-                            .println("Constructing path: "
-                                    + (Calendar.getInstance().getTimeInMillis() - millis));
+                    System.out.println("Constructing path: "
+                            + (Calendar.getInstance().getTimeInMillis() - millis));
                     millis = Calendar.getInstance().getTimeInMillis();
                 }
             }
         }
 
-        return null;
+        return new ExecutionPathContext(executionPathsForNode, executionPaths);
     }
 
+    /**
+     * Computes a unique identifier for an instance of
+     * {@link AbstractExecutionStateNode}.
+     * 
+     * @param node
+     *            the node
+     * @return the identifier
+     */
     private static String getUniqueIdentifier(
             final AbstractExecutionStateNode node) {
 
         final StringBuilder toReturn = new StringBuilder();
         final PositionInfo positionInfo = node.getActivePositionInfo();
         final SourceElement elem = node.getActiveStatement();
+
+        String stuff = "" + positionInfo.getStartPosition() + positionInfo.getEndPosition() + positionInfo.getRelativePosition();
 
         toReturn.append(elem.toString());
         toReturn.append(positionInfo.getStartPosition().toString());
@@ -179,6 +214,12 @@ public class ExecutionPathContext {
         return toReturn.toString();
     }
 
+    /**
+     * 
+     * @param node
+     *            the node
+     * @return true if the node has more than one child, false otherwise
+     */
     private static boolean isBranchingNode(final IExecutionNode node) {
 
         return node.getChildren().length > 1;
@@ -192,6 +233,12 @@ public class ExecutionPathContext {
                 || (node instanceof IExecutionTermination);
     }
 
+    /**
+     * @param node
+     *            the node
+     * @return true if the node corresponds to a program statement, false
+     *         otherwise
+     */
     private static boolean isProgramStatementNode(final IExecutionNode node) {
         return node instanceof AbstractExecutionStateNode;
     }
@@ -199,9 +246,5 @@ public class ExecutionPathContext {
     private static boolean isTerminatingNode(final IExecutionNode node) {
 
         return node instanceof IExecutionTermination;
-    }
-
-    private ExecutionPathContext(final ExecutionPath[] executionPaths) {
-        super();
     }
 }

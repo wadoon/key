@@ -11,6 +11,7 @@ import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
+import se.gu.svanefalk.testgeneration.core.concurrency.CapsuleExecutor;
 import se.gu.svanefalk.testgeneration.core.concurrency.TestGenerationCapsule;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
@@ -38,6 +39,8 @@ public enum CoreInterface {
      * source file
      */
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.INSTANCE;
+
+    private final CapsuleExecutor capsuleExecutor = CapsuleExecutor.INSTANCE;
 
     /**
      * Creates a set of abstract test suites for a given set of methods belong
@@ -75,7 +78,7 @@ public enum CoreInterface {
          * generation. These capsules will then carry out the test generation
          * process concurrently.
          */
-        final LinkedList<TestGenerationCapsule> testGenerationCapsules = new LinkedList<TestGenerationCapsule>();
+        final List<TestGenerationCapsule> testGenerationCapsules = new LinkedList<TestGenerationCapsule>();
         for (final String method : methods) {
 
             /*
@@ -98,19 +101,7 @@ public enum CoreInterface {
         /*
          * Finally, dispatch the capsules and wait for them to finish.
          */
-        for (final TestGenerationCapsule capsule : testGenerationCapsules) {
-            capsule.start();
-        }
-        while (true) {
-            try {
-                for (final TestGenerationCapsule capsule : testGenerationCapsules) {
-                    capsule.join();
-                }
-                break;
-            } catch (final InterruptedException e) {
-                continue;
-            }
-        }
+        capsuleExecutor.executeCapsulesAndWait(testGenerationCapsules);
 
         /*
          * Collect and return the results of the capsules.
@@ -144,14 +135,12 @@ public enum CoreInterface {
              * Extract the abstract representations of the targeted Java class
              * and the specific method for which we wish to generate test cases.
              */
-            Benchmark
-                    .startBenchmarking("1. [KeY] setting up class and method abstractions");
+            Benchmark.startBenchmarking("1. [KeY] setting up class and method abstractions");
 
-            final KeYJavaClass keYJavaClass = this.keYJavaClassFactory
-                    .createKeYJavaClass(new File(source));
+            final KeYJavaClass keYJavaClass = this.keYJavaClassFactory.createKeYJavaClass(new File(
+                    source));
 
-            Benchmark
-                    .finishBenchmarking("1. [KeY] setting up class and method abstractions");
+            Benchmark.finishBenchmarking("1. [KeY] setting up class and method abstractions");
 
             return keYJavaClass;
 

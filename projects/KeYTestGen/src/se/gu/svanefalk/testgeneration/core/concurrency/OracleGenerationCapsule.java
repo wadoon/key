@@ -51,7 +51,7 @@ public class OracleGenerationCapsule extends Capsule {
      * Run the Oracle generation process.
      */
     @Override
-    public void run() {
+    public void doWork() {
 
         /*
          * Attempt to generate an Oracle. Any exception thrown in this process

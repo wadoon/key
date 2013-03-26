@@ -114,19 +114,15 @@ public class PrimitiveIntegerOperations {
         int mid = z;
 
         if (y < z) {
-            if (x < y) {
+            if (x <= y) {
                 mid = y;
-            } else if (x < z) {
-
+            } else if (x <= z) {
                 mid = x;
             }
         } else {
-
             if (x > y) {
-
                 mid = y;
-            } else if (x > z) {
-
+            } else if (x >= z) {
                 mid = x;
             }
         }
@@ -265,18 +261,26 @@ public static int mid3(final int x, final int y, final int z) {
     (final String a, final String b) {
     }
 
-    /*@ public normal_behavior 
+    /* @ public normal_behavior 
       @ requires true;
       @ ensures (\forall int i;
       @ (i != 10);
       @ (i != 20)) && (proxy.nestedProxy.nestedProxy.nestedProxy.compare(i) == true);
      @*/
-    public int doStuff(ClassProxy proxy, int i, int x, int y, int z) {
+    /*@ public normal_behavior 
+    @ requires true;
+    @ ensures true;
+    @*/
+    public int doStuff(int a, int b) {
 
-        if(x < z && y < z || x < y ) 
-            return 1;
+        int result = 0;
+        
+        if(a > b)
+            result = a;
         else
-            return 2;
+            result = a;
+        
+        return result;
     }
 
     /**

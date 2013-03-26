@@ -51,7 +51,7 @@ public class ModelGenerationCapsule extends Capsule {
      * {@link TestCase} instance to encapsulate it.
      */
     @Override
-    public void run() {
+    public void doWork() {
 
         /*
          * Attempt to generate a Model. Any exception thrown indicates permanent
