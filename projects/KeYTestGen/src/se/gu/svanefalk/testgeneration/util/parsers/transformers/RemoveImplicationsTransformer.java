@@ -18,13 +18,13 @@ public class RemoveImplicationsTransformer extends AbstractTermTransformer {
      * @author christopher
      */
     @Override
-    public Term transform(Term term) throws TermTransformerException {
+    public Term transform(final Term term) throws TermTransformerException {
 
-        return transformTerm(term);
+        return this.transformTerm(term);
     }
 
     @Override
-    protected Term transformImplication(Term term)
+    protected Term transformImplication(final Term term)
             throws TermTransformerException {
 
         final Term newFirstChild = this.transformTerm(term.sub(0));

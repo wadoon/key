@@ -2,15 +2,12 @@ package se.gu.svanefalk.testgeneration.backend.xml;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.DTD;
 import javax.xml.stream.events.XMLEvent;
 
 import se.gu.svanefalk.testgeneration.StringConstants;
@@ -22,16 +19,8 @@ import se.gu.svanefalk.testgeneration.core.model.implementation.ModelInstance;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
-import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-import se.gu.svanefalk.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
 import se.gu.svanefalk.testgeneration.util.parsers.visitors.XMLVisitorException;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.NullSort;
 
 /**
  * Provides functionality for turning a set of {@link TestCase} instances into a
@@ -42,134 +31,6 @@ import de.uka.ilkd.key.logic.sort.NullSort;
  * @author christopher
  */
 public class XMLConverter extends XMLHandler implements IFrameworkConverter {
-
-    /**
-     * Instances of this class are used to generate an XML representation from a
-     * {@link Term} postcondition.
-     * 
-     * @author christopher
-     */
-    private static class OracleVisitor extends KeYTestGenTermVisitor {
-
-        /**
-         * Use a stack in order to properly determine the order in which start
-         * and end tags should be inserted for XML elements in the Term.
-         */
-        private final Stack<String> elementNames = new Stack<String>();
-
-        /**
-         * Since {@link Visitor} does not support exceptional behavior, whereas
-         * the {@link XMLEventWriter} demands it, we use an intermediary buffer
-         * to store events, and write them only after the visitation process is
-         * completed.
-         */
-        private final LinkedList<XMLEvent> elements = new LinkedList<XMLEvent>();
-
-        /**
-         * Add a tag, together with formatting, to the outputStream.
-         * 
-         * @param tag
-         *            the tag to insert
-         */
-        private void addTag(final XMLEvent tag) {
-
-            for (int i = 0; i < this.elementNames.size(); i++) {
-                this.elements.add(XMLConverter.tab);
-            }
-            this.elements.add(tag);
-            this.elements.add(XMLConverter.newline);
-        }
-
-        /**
-         * Add a tag, together with formatting, to the outputstream, indented by
-         * a specific number of extra tabs.
-         * 
-         * @param tag
-         *            the tag to insert
-         * @param extraTabs
-         *            number of extra tabs that should be added to the
-         *            indentation of the tag
-         */
-        private void addTag(final XMLEvent tag, final int extraTabs) {
-
-            for (int i = 0; i < extraTabs; i++) {
-                this.elements.add(XMLConverter.tab);
-            }
-            this.addTag(tag);
-        }
-
-        /**
-         * Add a node representing a program variable to the outputStream.
-         * 
-         * @param term
-         *            the {@link Term} from which to generate the Node
-         */
-        private void addVariableNode(final Term term) {
-
-            final String variableName = TermParserTools
-                    .resolveIdentifierString(term, XMLConverter.SEPARATOR);
-            this.addTag(
-                    XMLConverter.eventFactory.createCharacters(variableName), 1);
-        }
-
-        public List<XMLEvent> getElements() {
-
-            return this.elements;
-        }
-
-        /**
-         * Whenever a subtree is entered, create a tag corresponding to the type
-         * of the root element, and push the name of the element on the stack in
-         * order to later generate an end tag.
-         */
-        @Override
-        public void subtreeEntered(final Term subtreeRoot) {
-
-            /*
-             * Verify that the operator bound at the current term represents a
-             * concept suitable for putting in a tag
-             */
-            if (TermParserTools.isBinaryFunction2(subtreeRoot)) {
-                final String operatorName = subtreeRoot.op().name().toString();
-
-                final XMLEvent startTag = XMLConverter.eventFactory
-                        .createStartElement("", "", operatorName);
-                this.addTag(startTag);
-
-                this.elementNames.push(operatorName);
-            }
-        }
-
-        /**
-         * Whenever a subtree is left, generate a closing tag corresponding to
-         * the one that was created when the tree was first entered.
-         */
-        @Override
-        public void subtreeLeft(final Term subtreeRoot) {
-
-            if (TermParserTools.isBinaryFunction2(subtreeRoot)) {
-                final String operatorName = this.elementNames.pop();
-                final XMLEvent endTag = XMLConverter.eventFactory
-                        .createEndElement("", "", operatorName);
-                this.addTag(endTag);
-            }
-        }
-
-        /**
-         * Generate a textual representation for each relevant node
-         */
-        @Override
-        public void visit(final Term visited) {
-
-            final Operator operator = visited.op();
-
-            if ((operator instanceof LocationVariable)
-                    || (operator instanceof SortDependingFunction)
-                    || (visited.sort() instanceof NullSort)) {
-                this.addVariableNode(visited);
-            }
-        }
-    }
 
     /**
      * The eventFactory is used in order to produce {@link XMLEvent}s, that is,
@@ -631,19 +492,5 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         this.writeEndTag(XMLHandler.VALUE_ROOT);
 
         this.writeEndTag(XMLHandler.VARIABLE_ROOT);
-    }
-
-    private void writeXMLEvent(final XMLEvent event) throws XMLStreamException {
-
-        if (event instanceof DTD) {
-            if (this.format) {
-                this.eventWriter.add(event);
-            }
-        } else {
-            this.indentationCounter++;
-            this.addIndentation();
-            this.indentationCounter--;
-            this.eventWriter.add(event);
-        }
     }
 }

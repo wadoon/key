@@ -3,7 +3,6 @@ package se.gu.svanefalk.testgeneration.core.testsuiteabstraction;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleConstraint;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 

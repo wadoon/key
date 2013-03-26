@@ -21,7 +21,7 @@ public class OracleLiteral extends OracleExpression {
      * @param identifier
      *            identifier for the literal
      */
-    public OracleLiteral(OracleType type, String identifier) {
+    public OracleLiteral(final OracleType type, final String identifier) {
         super(type);
         this.identifier = identifier;
     }
@@ -30,11 +30,11 @@ public class OracleLiteral extends OracleExpression {
      * @return the identifier
      */
     public String getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 
     @Override
     public String toString() {
-        return identifier + ":" + getType();
+        return this.identifier + ":" + this.getType();
     }
 }

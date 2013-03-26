@@ -22,14 +22,14 @@ import de.uka.ilkd.key.logic.op.Junctor;
 public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
 
     /**
-     * Used for removing implications from the target term.
-     */
-    private static final RemoveImplicationsTransformer removeImplicationsTransformer = new RemoveImplicationsTransformer();
-
-    /**
      * Used for putting the target term into Negation Normal Form.
      */
     private static final NegationNormalFormTransformer nnfTransformer = new NegationNormalFormTransformer();
+
+    /**
+     * Used for removing implications from the target term.
+     */
+    private static final RemoveImplicationsTransformer removeImplicationsTransformer = new RemoveImplicationsTransformer();
 
     /**
      * Implements the DISTR routine of the CNF algorithm. It is defined as
@@ -117,7 +117,7 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
         /*
          * Remove implications from the term
          */
-        final Term implicationFreeTerm = removeImplicationsTransformer
+        final Term implicationFreeTerm = ConjunctionNormalFormTransformer.removeImplicationsTransformer
                 .transform(term);
 
         /*

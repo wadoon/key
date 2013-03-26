@@ -12,30 +12,29 @@ import se.gu.svanefalk.testgeneration.KeYTestGenException;
 public abstract class Capsule extends Thread {
 
     /**
-     * Exception potentially thrown during the execution of this Capsule.
-     */
-    private KeYTestGenException thrownException;
-
-    /**
      * Flag to indicate whether or not the outcome of this capsules execution
      * was succesful or not.
      */
     private boolean succeeded = false;
 
     /**
-     * @param thrownException
-     *            the thrownException to set
+     * Exception potentially thrown during the execution of this Capsule.
      */
-    protected void setThrownException(KeYTestGenException thrownException) {
-        this.thrownException = thrownException;
-    }
+    private KeYTestGenException thrownException;
 
     /**
      * @return the exception thrown during the execution of this capsule, if
      *         any.
      */
     public KeYTestGenException getThrownException() {
-        return thrownException;
+        return this.thrownException;
+    }
+
+    /**
+     * @return true if the Capsule executed succesfully, false otherwise.
+     */
+    public boolean isSucceeded() {
+        return this.succeeded;
     }
 
     /**
@@ -47,9 +46,10 @@ public abstract class Capsule extends Thread {
     }
 
     /**
-     * @return true if the Capsule executed succesfully, false otherwise.
+     * @param thrownException
+     *            the thrownException to set
      */
-    public boolean isSucceeded() {
-        return succeeded;
+    protected void setThrownException(final KeYTestGenException thrownException) {
+        this.thrownException = thrownException;
     }
 }

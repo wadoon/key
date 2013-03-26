@@ -1,7 +1,6 @@
 package se.gu.svanefalk.testgeneration.core.oracle;
 
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
-import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.AbstractTermTransformer;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.OrderOperandsTransformer;
@@ -128,6 +127,46 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
     }
 
     /**
+     * Remove formulas not needed to construct the oracle abstraction. These
+     * include the various logical functions introduced by Key.
+     */
+    @Override
+    protected Term transformFormula(final Term term)
+            throws TermTransformerException {
+
+        final String formulaName = term.op().name().toString();
+
+        /*
+         * Remove the common logical functions introduced by KeY, as they have
+         * no meaning (?) with regard to the postcondition itself.
+         */
+        if (formulaName.equals("inInt")
+                || formulaName.equals("java.lang.Object::<inv>")) {
+            return null;
+        } else {
+            return term;
+        }
+    }
+
+    /**
+     * Remove variables not needed to construct the oracle abstraction, in
+     * particular the ones representing exceptions.
+     */
+    @Override
+    protected Term transformLocationVariable(final Term term) {
+
+        /*
+         * Remove the exception check introduced by KeY
+         */
+        final String variableName = term.op().name().toString();
+        if (variableName.equals("exc")) {
+            return null;
+        } else {
+            return term;
+        }
+    }
+
+    /**
      * Simplify a negation. If the child is simplified to null, simply return
      * null. Otherwise, create a new negation of the simplification of the
      * child.
@@ -180,44 +219,5 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         }
 
         return null;
-    }
-
-    /**
-     * Remove formulas not needed to construct the oracle abstraction. These
-     * include the various logical functions introduced by Key.
-     */
-    @Override
-    protected Term transformFormula(Term term) throws TermTransformerException {
-
-        String formulaName = term.op().name().toString();
-
-        /*
-         * Remove the common logical functions introduced by KeY, as they have
-         * no meaning (?) with regard to the postcondition itself.
-         */
-        if (formulaName.equals("inInt")
-                || formulaName.equals("java.lang.Object::<inv>")) {
-            return null;
-        } else {
-            return term;
-        }
-    }
-
-    /**
-     * Remove variables not needed to construct the oracle abstraction, in
-     * particular the ones representing exceptions.
-     */
-    @Override
-    protected Term transformLocationVariable(Term term) {
-
-        /*
-         * Remove the exception check introduced by KeY
-         */
-        String variableName = term.op().name().toString();
-        if (variableName.equals("exc")) {
-            return null;
-        } else {
-            return term;
-        }
     }
 }

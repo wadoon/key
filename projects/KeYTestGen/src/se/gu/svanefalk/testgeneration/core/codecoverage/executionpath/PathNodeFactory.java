@@ -1,4 +1,4 @@
-package se.gu.svanefalk.testgeneration.core.codecoverage.pathcontext;
+package se.gu.svanefalk.testgeneration.core.codecoverage.executionpath;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;

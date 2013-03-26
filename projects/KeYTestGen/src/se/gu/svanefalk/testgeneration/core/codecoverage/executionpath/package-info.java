@@ -3,4 +3,4 @@
  *
  * @author christopher
  */
-package se.gu.svanefalk.testgeneration.core.codecoverage.pathcontext;
+package se.gu.svanefalk.testgeneration.core.codecoverage.executionpath;

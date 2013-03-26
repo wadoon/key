@@ -31,7 +31,7 @@ public enum NodeTestGenerator {
     KeYJavaClassFactory factory = KeYJavaClassFactory.INSTANCE;
 
     public String constructTestSuiteFromNode(final IExecutionNode node,
-            IFrameworkConverter frameworkConverter)
+            final IFrameworkConverter frameworkConverter)
             throws TestGeneratorException {
 
         try {
@@ -44,22 +44,24 @@ public enum NodeTestGenerator {
             final IExecutionMethodCall methodCall = this
                     .getMethodCallNode(node);
 
-            String methodName = methodCall.getMethodReference().getName();
+            final String methodName = methodCall.getMethodReference().getName();
 
             /*
              * Construct the corresponding KeYJavaClass
              */
-            KeYJavaClass keYJavaClass = factory.createKeYJavaClass(methodCall);
-            KeYJavaMethod targetMethod = keYJavaClass.getMethod(methodName);
+            final KeYJavaClass keYJavaClass = this.factory
+                    .createKeYJavaClass(methodCall);
+            final KeYJavaMethod targetMethod = keYJavaClass
+                    .getMethod(methodName);
 
             /*
              * Create and dispatc the Model and Oracle geneators.
              */
-            ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
+            final ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
                     node);
             modelGenerationCapsule.start();
 
-            OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
+            final OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
                     targetMethod);
             oracleGenerationCapsule.start();
 
@@ -71,7 +73,7 @@ public enum NodeTestGenerator {
                     oracleGenerationCapsule.join();
                     modelGenerationCapsule.join();
                     break;
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     continue;
                 }
             }
@@ -79,15 +81,15 @@ public enum NodeTestGenerator {
             /*
              * Collect the results
              */
-            Oracle oracle = oracleGenerationCapsule.getResult();
-            Model model = modelGenerationCapsule.getResult();
+            final Oracle oracle = oracleGenerationCapsule.getResult();
+            final Model model = modelGenerationCapsule.getResult();
 
             /*
              * Construct the test cases.
              */
-            List<TestCase> testCases = new LinkedList<TestCase>();
-            TestCase testCase = TestCase.constructTestCase(targetMethod, model,
-                    oracle);
+            final List<TestCase> testCases = new LinkedList<TestCase>();
+            final TestCase testCase = TestCase.constructTestCase(targetMethod,
+                    model, oracle);
             testCases.add(testCase);
 
             Benchmark.finishBenchmarking("3. generating models");
@@ -96,18 +98,18 @@ public enum NodeTestGenerator {
              * Construct the test suite.
              */
 
-            TestSuite testSuite = TestSuite.constructTestSuite(
+            final TestSuite testSuite = TestSuite.constructTestSuite(
                     targetMethod.getDeclaringClass(), targetMethod, testCases);
 
             /*
              * Convert to JUnit and return
              */
-            String finalSuite = frameworkConverter.convert(testSuite);
+            final String finalSuite = frameworkConverter.convert(testSuite);
             return finalSuite;
 
-        } catch (CoreException e) {
+        } catch (final CoreException e) {
             throw new TestGeneratorException(e.getMessage());
-        } catch (FrameworkConverterException e) {
+        } catch (final FrameworkConverterException e) {
             throw new TestGeneratorException(e.getMessage());
         }
     }

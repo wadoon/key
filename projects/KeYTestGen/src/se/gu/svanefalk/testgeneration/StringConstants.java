@@ -19,9 +19,9 @@ public final class StringConstants {
     public static final String EXCEPTION_BASE = "java.lang.Exception";
     public static final String EXISTS = "exists";
     public static final String FALSE = "FALSE";
-    public static final  String FIELD_SEPARATOR = "_";
-    public static final String FORALL = "all";
+    public static final String FIELD_SEPARATOR = "_";
     public static final String FLOAT = "float";
+    public static final String FORALL = "all";
     public static final String GREATER_OR_EQUALS = "geq";
     public static final String GREATER_THAN = "geq";
     public static final String IMPLIES = "imp";
@@ -34,11 +34,11 @@ public final class StringConstants {
     public static final String NEWLINE = "\n";
     public static final String NOT = "not";
     public static final String NUMBERS = "numbers";
+    public static final String OR = "or";
+    public static final String RESULT = "result";
     public static final String SELF = "self";
+    public static final String SUBTRACTION = "sub";
     public static final String TAB = "    ";
     public static final String TRUE = "TRUE";
-    public static final String SUBTRACTION = "sub";
-    public static final String OR = "or";
     public static final String Z = "Z";
-    public static final String RESULT = "result";
 }

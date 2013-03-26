@@ -11,20 +11,10 @@ import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
-import se.gu.svanefalk.testgeneration.core.concurrency.ModelGenerationCapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.TestGenerationCapsule;
-import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
-import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
-import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
-import se.gu.svanefalk.testgeneration.core.oracle.OracleGenerator;
-import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
-import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 /**
  * API singleton for the core package
@@ -85,7 +75,7 @@ public enum CoreInterface {
          * generation. These capsules will then carry out the test generation
          * process concurrently.
          */
-        LinkedList<TestGenerationCapsule> testGenerationCapsules = new LinkedList<TestGenerationCapsule>();
+        final LinkedList<TestGenerationCapsule> testGenerationCapsules = new LinkedList<TestGenerationCapsule>();
         for (final String method : methods) {
 
             /*
@@ -100,7 +90,7 @@ public enum CoreInterface {
             /*
              * Setup and ready the capsule
              */
-            TestGenerationCapsule testGenerationCapsule = new TestGenerationCapsule(
+            final TestGenerationCapsule testGenerationCapsule = new TestGenerationCapsule(
                     codeCoverageParser, targetMethod);
             testGenerationCapsules.add(testGenerationCapsule);
         }
@@ -108,16 +98,16 @@ public enum CoreInterface {
         /*
          * Finally, dispatch the capsules and wait for them to finish.
          */
-        for (TestGenerationCapsule capsule : testGenerationCapsules) {
+        for (final TestGenerationCapsule capsule : testGenerationCapsules) {
             capsule.start();
         }
         while (true) {
             try {
-                for (TestGenerationCapsule capsule : testGenerationCapsules) {
+                for (final TestGenerationCapsule capsule : testGenerationCapsules) {
                     capsule.join();
                 }
                 break;
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 continue;
             }
         }
@@ -125,7 +115,7 @@ public enum CoreInterface {
         /*
          * Collect and return the results of the capsules.
          */
-        for (TestGenerationCapsule capsule : testGenerationCapsules) {
+        for (final TestGenerationCapsule capsule : testGenerationCapsules) {
             testSuites.add(capsule.getResult());
             // Benchmark.startBenchmarking("Create abstract test cases");
         }

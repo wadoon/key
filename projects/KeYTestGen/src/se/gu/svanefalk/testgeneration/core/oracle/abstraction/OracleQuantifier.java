@@ -19,14 +19,14 @@ public class OracleQuantifier extends OracleExpression {
     public enum QuantifierType {
 
         /**
-         * The for-all quantifier.
-         */
-        FORALL(StringConstants.FORALL),
-
-        /**
          * The exists quantifier.
          */
-        EXISTS(StringConstants.EXISTS);
+        EXISTS(StringConstants.EXISTS),
+
+        /**
+         * The for-all quantifier.
+         */
+        FORALL(StringConstants.FORALL);
 
         /**
          * Identifier for this quantifier type.
@@ -44,9 +44,9 @@ public class OracleQuantifier extends OracleExpression {
     }
 
     /**
-     * The type of this quantifier.
+     * The expression bound to this quantifier.
      */
-    private final QuantifierType quantifierTtype;
+    private final OracleConstraint boundExpression;
 
     /**
      * The quantifiable variable of this quantifier, i.e. the variable over
@@ -55,9 +55,9 @@ public class OracleQuantifier extends OracleExpression {
     private final OracleLiteral quantifiableVariable;
 
     /**
-     * The expression bound to this quantifier.
+     * The type of this quantifier.
      */
-    private final OracleConstraint boundExpression;
+    private final QuantifierType quantifierTtype;
 
     /**
      * Constructs a new quantifier.
@@ -70,7 +70,8 @@ public class OracleQuantifier extends OracleExpression {
      *            the expression bound to this quantifier
      */
     public OracleQuantifier(final QuantifierType type,
-            OracleLiteral quantifiableVariable, OracleConstraint boundExpression) {
+            final OracleLiteral quantifiableVariable,
+            final OracleConstraint boundExpression) {
         super(OracleType.BOOLEAN);
 
         this.boundExpression = boundExpression;
@@ -79,29 +80,29 @@ public class OracleQuantifier extends OracleExpression {
     }
 
     /**
-     * @return the {@link QuantifierType} of this quantifier.
-     */
-    public QuantifierType getQuantifierType() {
-        return quantifierTtype;
-    }
-
-    /**
      * @return the expression bound to this quantifier.
      */
     public OracleConstraint getBoundExpression() {
-        return boundExpression;
+        return this.boundExpression;
     }
 
     /**
      * @return the variable quantified over by this quantifier.
      */
     public OracleLiteral getQuantifiableVariable() {
-        return quantifiableVariable;
+        return this.quantifiableVariable;
+    }
+
+    /**
+     * @return the {@link QuantifierType} of this quantifier.
+     */
+    public QuantifierType getQuantifierType() {
+        return this.quantifierTtype;
     }
 
     @Override
     public String toString() {
-        return getQuantifierType() + "(" + getQuantifiableVariable() + ")"
-                + " {" + getBoundExpression() + " } ";
+        return this.getQuantifierType() + "(" + this.getQuantifiableVariable()
+                + ")" + " {" + this.getBoundExpression() + " } ";
     }
 }

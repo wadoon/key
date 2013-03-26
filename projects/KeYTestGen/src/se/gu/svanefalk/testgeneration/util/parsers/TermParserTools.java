@@ -183,6 +183,20 @@ public final class TermParserTools {
         return term.op().name().toString().equals(StringConstants.AND);
     }
 
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an arithmetic comparator, i.e. GEQ,
+     *         GREATER_THAN, LEQ, or LESS_THAN.
+     */
+    public static boolean isArithmeticComparator(final Term term) {
+
+        return TermParserTools.isGreaterOrEquals(term)
+                || TermParserTools.isGreaterThan(term)
+                || TermParserTools.isLessOrEquals(term)
+                || TermParserTools.isLessThan(term);
+    }
+
     public static boolean isBinaryFunction(final Term term) {
 
         final String sortName = term.op().name().toString();
@@ -311,23 +325,23 @@ public final class TermParserTools {
     /**
      * @param term
      *            the term
-     * @return true iff. the term represents a {@link Function}
+     * @return true iff. the term represents a Formula, false otherwise.
      */
-    public static boolean isFunction(final Term term) {
+    public static boolean isFormula(final Term term) {
 
-        return term.op() instanceof Function;
+        final String sortName = term.sort().name().toString();
+
+        return sortName.equals("Formula");
     }
 
     /**
      * @param term
      *            the term
-     * @return true iff. the term represents an arithmetic comparator, i.e. GEQ,
-     *         GREATER_THAN, LEQ, or LESS_THAN.
+     * @return true iff. the term represents a {@link Function}
      */
-    public static boolean isArithmeticComparator(final Term term) {
+    public static boolean isFunction(final Term term) {
 
-        return isGreaterOrEquals(term) || isGreaterThan(term)
-                || isLessOrEquals(term) || isLessThan(term);
+        return term.op() instanceof Function;
     }
 
     /**
@@ -374,6 +388,19 @@ public final class TermParserTools {
     public static boolean isImplication(final Term term) {
 
         return term.op().name().toString().equals(StringConstants.IMPLIES);
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a negative number, i.e. the Z
+     *         function, false otherwise.
+     */
+    public static boolean isIntegerNegation(final Term term) {
+
+        final String name = term.op().name().toString();
+
+        return name.equals("Z");
     }
 
     /**
@@ -662,30 +689,5 @@ public final class TermParserTools {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
         }
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents a Formula, false otherwise.
-     */
-    public static boolean isFormula(Term term) {
-
-        final String sortName = term.sort().name().toString();
-
-        return sortName.equals("Formula");
-    }
-
-    /**
-     * @param term
-     *            the term
-     * @return true iff. the term represents a negative number, i.e. the Z
-     *         function, false otherwise.
-     */
-    public static boolean isIntegerNegation(Term term) {
-
-        final String name = term.op().name().toString();
-
-        return name.equals("Z");
     }
 }

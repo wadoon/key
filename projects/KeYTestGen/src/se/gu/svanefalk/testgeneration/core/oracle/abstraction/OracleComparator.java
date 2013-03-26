@@ -22,6 +22,11 @@ public class OracleComparator extends OracleExpression {
     public enum ComparatorType {
 
         /**
+         * The equals comparator.
+         */
+        EQUALS("=="),
+
+        /**
          * The greater-than-or-equals comparator.
          */
         GREATER_OR_EQUALS(">="),
@@ -40,11 +45,6 @@ public class OracleComparator extends OracleExpression {
          * The less-than comparator.
          */
         LESS_THAN("<"),
-
-        /**
-         * The equals comparator.
-         */
-        EQUALS("=="),
 
         /**
          * The not-equals comparator.
@@ -102,19 +102,19 @@ public class OracleComparator extends OracleExpression {
     }
 
     /**
-     * @return the first operand of the comparator.
-     */
-    public OracleExpression getFirstOperand() {
-
-        return this.firstOperand;
-    }
-
-    /**
      * @return the comparator type for this comparator.
      */
     public ComparatorType getComparatorType() {
 
         return this.comparator;
+    }
+
+    /**
+     * @return the first operand of the comparator.
+     */
+    public OracleExpression getFirstOperand() {
+
+        return this.firstOperand;
     }
 
     /**
@@ -127,6 +127,7 @@ public class OracleComparator extends OracleExpression {
 
     @Override
     public String toString() {
-        return firstOperand + " " + comparator + " " + secondOperand;
+        return this.firstOperand + " " + this.comparator + " "
+                + this.secondOperand;
     }
 }

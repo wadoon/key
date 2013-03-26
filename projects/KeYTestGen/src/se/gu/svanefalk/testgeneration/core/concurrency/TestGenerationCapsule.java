@@ -6,7 +6,7 @@ import java.util.List;
 import se.gu.svanefalk.testgeneration.core.CoreException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
-import se.gu.svanefalk.testgeneration.core.codecoverage.pathcontext.ExecutionPathContext;
+import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
@@ -27,15 +27,15 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 public class TestGenerationCapsule extends Capsule {
 
     /**
+     * Parser for achieving the desired level of code coverage.
+     */
+    private final ICodeCoverageParser codeCoverageParser;
+
+    /**
      * Reference to the {@link KeYInterface}, whenever this capsule needs
      * services from the KeY runtime.
      */
     private final KeYInterface keYInterface = KeYInterface.INSTANCE;
-
-    /**
-     * Parser for achieving the desired level of code coverage.
-     */
-    private final ICodeCoverageParser codeCoverageParser;
 
     /**
      * The method which the test suite will be generated for.
@@ -47,11 +47,15 @@ public class TestGenerationCapsule extends Capsule {
      */
     private TestSuite testSuite = null;
 
-    public TestGenerationCapsule(ICodeCoverageParser codeCoverageParser,
-            KeYJavaMethod targetMethod) {
+    public TestGenerationCapsule(final ICodeCoverageParser codeCoverageParser,
+            final KeYJavaMethod targetMethod) {
         super();
         this.codeCoverageParser = codeCoverageParser;
         this.targetMethod = targetMethod;
+    }
+
+    public TestSuite getResult() {
+        return this.testSuite;
     }
 
     /**
@@ -81,11 +85,11 @@ public class TestGenerationCapsule extends Capsule {
             Benchmark
                     .startBenchmarking("2. [KeY] Create symbolic execution tree");
             final IExecutionStartNode root = this.keYInterface
-                    .getSymbolicExecutionTree(targetMethod);
+                    .getSymbolicExecutionTree(this.targetMethod);
 
             ExecutionPathContext.constructExecutionContext(root);
 
-            final List<IExecutionNode> nodes = codeCoverageParser
+            final List<IExecutionNode> nodes = this.codeCoverageParser
                     .retrieveNodes(root);
 
             Benchmark
@@ -104,8 +108,8 @@ public class TestGenerationCapsule extends Capsule {
             /*
              * Setup the Oracle generation capsule for this method
              */
-            OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
-                    targetMethod);
+            final OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
+                    this.targetMethod);
 
             /*
              * Dispatch and wait for the capsules.
@@ -117,11 +121,11 @@ public class TestGenerationCapsule extends Capsule {
             while (true) {
                 try {
                     oracleGenerationCapsule.join();
-                    for (ModelGenerationCapsule capsule : modelGenerationCapsules) {
+                    for (final ModelGenerationCapsule capsule : modelGenerationCapsules) {
                         capsule.join();
                     }
                     break;
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     continue;
                 }
             }
@@ -137,10 +141,10 @@ public class TestGenerationCapsule extends Capsule {
             /*
              * Construct the test cases.
              */
-            List<TestCase> testCases = new LinkedList<TestCase>();
+            final List<TestCase> testCases = new LinkedList<TestCase>();
             for (final Model model : models) {
                 final TestCase testCase = TestCase.constructTestCase(
-                        targetMethod, model, oracle);
+                        this.targetMethod, model, oracle);
                 testCases.add(testCase);
             }
             Benchmark.finishBenchmarking("3. generating models");
@@ -148,22 +152,19 @@ public class TestGenerationCapsule extends Capsule {
             /*
              * Construct the test suite.
              */
-            testSuite = TestSuite.constructTestSuite(
-                    targetMethod.getDeclaringClass(), targetMethod, testCases);
+            this.testSuite = TestSuite.constructTestSuite(
+                    this.targetMethod.getDeclaringClass(), this.targetMethod,
+                    testCases);
 
             /*
              * Finish execution.
              */
-            setSucceeded();
+            this.setSucceeded();
 
-        } catch (KeYInterfaceException e) {
-            setThrownException(e);
-        } catch (CoreException e) {
-            setThrownException(e);
+        } catch (final KeYInterfaceException e) {
+            this.setThrownException(e);
+        } catch (final CoreException e) {
+            this.setThrownException(e);
         }
-    }
-
-    public TestSuite getResult() {
-        return testSuite;
     }
 }

@@ -11,7 +11,6 @@ import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -19,7 +18,6 @@ import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
  * Produces instances of {@link KeYJavaClass}.
@@ -33,6 +31,39 @@ public enum KeYJavaClassFactory {
      * Interface to the KeY runtime.
      */
     private final KeYInterface keyInterface = KeYInterface.INSTANCE;
+
+    private KeYJavaClass constructClass(final KeYJavaType parent,
+            final InitConfig initConfig) {
+
+        final Services services = initConfig.getServices();
+        final JavaInfo javaInfo = services.getJavaInfo();
+
+        final KeYJavaClass keYJavaClass = new KeYJavaClass(parent);
+
+        for (final IProgramMethod memberMethod : javaInfo
+                .getAllProgramMethods(parent)) {
+            if (!memberMethod.getFullName().startsWith("<")) {
+
+                /*
+                 * Extract the operational contracts of the method, and create a
+                 * separate abstraction of the method for each one of them
+                 * (since each one will effectively represent a unique set of
+                 * restrictions on the invocation of the method).
+                 */
+                final List<ContractWrapper> contracts = this.getContracts(
+                        memberMethod, services);
+                for (final ContractWrapper contract : contracts) {
+
+                    final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(
+                            keYJavaClass, memberMethod, initConfig, contract);
+
+                    keYJavaClass.addMethodMapping(memberMethod.getFullName(),
+                            keYJavaMethod);
+                }
+            }
+        }
+        return keYJavaClass;
+    }
 
     /**
      * Manufactures an instance of {@link KeYJavaClass}.
@@ -60,12 +91,12 @@ public enum KeYJavaClassFactory {
         final String fileName = this.getFileName(javaFile);
         final KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
-        return constructClass(mainClass, initConfig);
+        return this.constructClass(mainClass, initConfig);
     }
 
-    public KeYJavaClass createKeYJavaClass(IExecutionMethodCall methodCall) {
+    public KeYJavaClass createKeYJavaClass(final IExecutionMethodCall methodCall) {
 
-        InitConfig initConfig = methodCall.getMediator().getProof().env()
+        final InitConfig initConfig = methodCall.getMediator().getProof().env()
                 .getInitConfig();
 
         /*
@@ -78,40 +109,7 @@ public enum KeYJavaClassFactory {
          */
         final KeYJavaType parent = method.getContainerType();
 
-        return constructClass(parent, initConfig);
-    }
-
-    private KeYJavaClass constructClass(KeYJavaType parent,
-            InitConfig initConfig) {
-
-        Services services = initConfig.getServices();
-        JavaInfo javaInfo = services.getJavaInfo();
-
-        KeYJavaClass keYJavaClass = new KeYJavaClass(parent);
-
-        for (final IProgramMethod memberMethod : javaInfo
-                .getAllProgramMethods(parent)) {
-            if (!memberMethod.getFullName().startsWith("<")) {
-
-                /*
-                 * Extract the operational contracts of the method, and create a
-                 * separate abstraction of the method for each one of them
-                 * (since each one will effectively represent a unique set of
-                 * restrictions on the invocation of the method).
-                 */
-                final List<ContractWrapper> contracts = this.getContracts(
-                        memberMethod, services);
-                for (final ContractWrapper contract : contracts) {
-
-                    final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(
-                            keYJavaClass, memberMethod, initConfig, contract);
-
-                    keYJavaClass.addMethodMapping(memberMethod.getFullName(),
-                            keYJavaMethod);
-                }
-            }
-        }
-        return keYJavaClass;
+        return this.constructClass(parent, initConfig);
     }
 
     /**

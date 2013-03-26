@@ -39,26 +39,26 @@ public enum TestGenerator {
     INSTANCE;
 
     /**
-     * Interface to the KeYTestGen2 Core system.
-     */
-    private final CoreInterface coreInterface = CoreInterface.INSTANCE;
-
-    /**
      * A list of native methods (i.e. those part of any type with {@link Object}
      * as its supertype). We use this list in the event that we wish to ignore
      * such methods while generating test cases.
      */
     private static final LinkedList<String> nativeMethods = new LinkedList<String>();
+
     static {
-        nativeMethods.add("equals");
-        nativeMethods.add("toString");
-        nativeMethods.add("wait");
-        nativeMethods.add("notify");
-        nativeMethods.add("notifyAll");
-        nativeMethods.add("hashCodeCore");
-        nativeMethods.add("clone");
-        nativeMethods.add("finalize");
+        TestGenerator.nativeMethods.add("equals");
+        TestGenerator.nativeMethods.add("toString");
+        TestGenerator.nativeMethods.add("wait");
+        TestGenerator.nativeMethods.add("notify");
+        TestGenerator.nativeMethods.add("notifyAll");
+        TestGenerator.nativeMethods.add("hashCodeCore");
+        TestGenerator.nativeMethods.add("clone");
+        TestGenerator.nativeMethods.add("finalize");
     }
+    /**
+     * Interface to the KeYTestGen2 Core system.
+     */
+    private final CoreInterface coreInterface = CoreInterface.INSTANCE;
 
     /**
      * Generates a set of JUnit test cases for each method in a Java source

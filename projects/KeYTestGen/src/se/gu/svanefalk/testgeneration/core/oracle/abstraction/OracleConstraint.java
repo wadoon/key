@@ -38,14 +38,14 @@ public class OracleConstraint {
      * @return the assertions present in this constraint.
      */
     public Set<OracleAssertion> getAssertions() {
-        return assertions;
+        return this.assertions;
     }
 
     @Override
     public String toString() {
 
-        StringBuilder toPrint = new StringBuilder();
-        Iterator<OracleAssertion> iterator = assertions.iterator();
+        final StringBuilder toPrint = new StringBuilder();
+        final Iterator<OracleAssertion> iterator = this.assertions.iterator();
         while (iterator.hasNext()) {
             toPrint.append("(" + iterator.next() + ")");
             if (iterator.hasNext()) {

@@ -3,38 +3,28 @@ package se.gu.svanefalk.testgeneration.core.oracle;
 import java.util.HashSet;
 import java.util.Set;
 
-import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleConstraint;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleAssertion;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleComparator;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleComparator.ComparatorType;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleConstraint;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleExpression;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleLiteral;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleMetaExtractor;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleMethodInvocation;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleQuantifier;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleComparator.ComparatorType;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleExpression;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleLiteral;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleQuantifier.QuantifierType;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleType;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
-import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
@@ -137,21 +127,28 @@ public enum OracleGenerator {
      * @throws OracleGeneratorException
      */
     private OracleExpression constructExpressionFromBinaryFunction(
-            final Term term, boolean negate) throws OracleGeneratorException {
+            final Term term, final boolean negate)
+            throws OracleGeneratorException {
 
         /*
          * Retrieve a comparator for the OracleConstraint expression
          */
-        ComparatorType comparator = OracleTypeFactory.getComparatorType(term,
-                negate);
+        final ComparatorType comparator = OracleTypeFactory.getComparatorType(
+                term, negate);
 
-        OracleExpression firstOperand = constructExpressionFromTerm(
+        final OracleExpression firstOperand = this.constructExpressionFromTerm(
                 term.sub(0), negate);
 
-        OracleExpression secondOperand = constructExpressionFromTerm(
-                term.sub(1), negate);
+        final OracleExpression secondOperand = this
+                .constructExpressionFromTerm(term.sub(1), negate);
 
         return new OracleComparator(comparator, firstOperand, secondOperand);
+    }
+
+    private OracleExpression constructExpressionFromFormula(final Term term,
+            final boolean negate) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /**
@@ -168,7 +165,7 @@ public enum OracleGenerator {
      * @throws OracleGeneratorException
      */
     private OracleExpression constructExpressionFromFunction(final Term term,
-            boolean negate) throws OracleGeneratorException {
+            final boolean negate) throws OracleGeneratorException {
 
         try {
 
@@ -195,7 +192,7 @@ public enum OracleGenerator {
             }
 
             if (TermParserTools.isFormula(term)) {
-                return constructExpressionFromFormula(term, negate);
+                return this.constructExpressionFromFormula(term, negate);
             }
 
             if (TermParserTools.isBooleanConstant(term)) {
@@ -211,12 +208,6 @@ public enum OracleGenerator {
                 + term.op().name());
     }
 
-    private OracleExpression constructExpressionFromFormula(Term term,
-            boolean negate) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     /**
      * Transforms a {@link Term} which represents an {@link IfExThenElse}
      * structure (i.e. its {@link Operator} is of this type).
@@ -226,7 +217,7 @@ public enum OracleGenerator {
      * @return the constructExpressionFromed term
      */
     private OracleExpression constructExpressionFromIfExThenElse(
-            final Term term, boolean negate) {
+            final Term term, final boolean negate) {
 
         return null;
     }
@@ -248,26 +239,11 @@ public enum OracleGenerator {
             OracleGeneratorException {
 
         if (TermParserTools.isNot(term)) {
-            return constructExpressionFromTerm(term.sub(0), true);
+            return this.constructExpressionFromTerm(term.sub(0), true);
         }
 
         throw new OracleGeneratorException("Unsupported Junctor: "
                 + term.op().name());
-    }
-
-    /**
-     * Constructs an {@link OracleLiteral} from a {@link LocationVariable}.
-     * 
-     * @param term
-     *            the term representing the variable
-     * @return the literal
-     */
-    private OracleExpression constructExpressionFromVariable(final Term term) {
-
-        OracleType type = OracleTypeFactory.getOracleType(term);
-        String identifier = term.toString();
-        return new OracleLiteral(type, identifier);
-
     }
 
     /**
@@ -282,43 +258,88 @@ public enum OracleGenerator {
      * @throws OracleGeneratorException
      */
     private OracleExpression constructExpressionFromProgramMethod(
-            final Term term, boolean negate) throws OracleGeneratorException {
+            final Term term, final boolean negate)
+            throws OracleGeneratorException {
 
         /*
          * Get the identifier for the method
          */
-        int lastColon = term.op().name().toString().lastIndexOf(':');
-        String identifier = term.op().name().toString()
+        final int lastColon = term.op().name().toString().lastIndexOf(':');
+        final String identifier = term.op().name().toString()
                 .substring(lastColon + 1);
 
         /*
          * Construct the return type
          */
-        OracleType returnType = OracleTypeFactory.getOracleType(term);
+        final OracleType returnType = OracleTypeFactory.getOracleType(term);
 
         /*
          * Construct the parent object from which this method is being invoked.
          */
-        Term parentObjectTerm = term.sub(1);
-        OracleType type = OracleTypeFactory.getOracleType(parentObjectTerm);
-        String parentIdentifier = term.toString();
-        OracleLiteral parentObject = new OracleLiteral(type, parentIdentifier);
+        final Term parentObjectTerm = term.sub(1);
+        final OracleType type = OracleTypeFactory
+                .getOracleType(parentObjectTerm);
+        final String parentIdentifier = term.toString();
+        final OracleLiteral parentObject = new OracleLiteral(type,
+                parentIdentifier);
 
         /*
          * Construct the parameter list. Note that this corresponds to a
          * sequence of expressions - not the formal parameters of the method
          * itself.
          */
-        int bufferSize = term.subs().size();
-        OracleExpression[] parameters = new OracleExpression[bufferSize - 2];
+        final int bufferSize = term.subs().size();
+        final OracleExpression[] parameters = new OracleExpression[bufferSize - 2];
         for (int i = 2; i < bufferSize; i++) {
-            Term parameterTerm = term.sub(i);
-            parameters[i - 2] = constructExpressionFromTerm(parameterTerm,
+            final Term parameterTerm = term.sub(i);
+            parameters[i - 2] = this.constructExpressionFromTerm(parameterTerm,
                     negate);
         }
 
         return new OracleMethodInvocation(returnType, identifier, parentObject,
                 parameters);
+    }
+
+    /**
+     * Constructs an {@link OracleExpression} from a Term representing a
+     * quantifier, i.e. either FOR-ALL or EXISTS. The bound formula of this
+     * quantifier will be simplified to an additional constraint, which makes
+     * things more convenient and does not change the semantics of the formula
+     * itself.
+     * 
+     * @param term
+     *            the term
+     * @param negate
+     *            flag whether or not the operation should be negated
+     * @return the generated OracleExpression
+     * @throws OracleGeneratorException
+     */
+    private OracleExpression constructExpressionFromQuantifier(final Term term,
+            final boolean negate) throws OracleGeneratorException {
+
+        /*
+         * Resolve the type of the quantifier
+         */
+        final QuantifierType quantifierType = OracleTypeFactory
+                .getQuantifierType(term);
+
+        /*
+         * Resolve the expression bounded by this quantifier
+         */
+        final OracleConstraint boundExpression = this.constructOracle(term
+                .sub(0));
+
+        /*
+         * Construct the quantifiable variable
+         */
+        final QuantifiableVariable variable = term.boundVars().get(0);
+        final String identifier = variable.name().toString();
+        final OracleType type = OracleTypeFactory.getOracleType(variable);
+        final OracleLiteral quantifiableVariable = new OracleLiteral(type,
+                identifier);
+
+        return new OracleQuantifier(quantifierType, quantifiableVariable,
+                boundExpression);
     }
 
     /**
@@ -330,7 +351,8 @@ public enum OracleGenerator {
      * @return the constructExpressionFromed term
      */
     private OracleExpression constructExpressionFromSortedOperator(
-            final Term term, boolean negate) throws OracleGeneratorException {
+            final Term term, final boolean negate)
+            throws OracleGeneratorException {
 
         if (TermParserTools.isFunction(term)) {
             return this.constructExpressionFromFunction(term, negate);
@@ -358,46 +380,6 @@ public enum OracleGenerator {
 
         throw new OracleGeneratorException("Unsupported SortedOperator: "
                 + term.op().name());
-    }
-
-    /**
-     * Constructs an {@link OracleExpression} from a Term representing a
-     * quantifier, i.e. either FOR-ALL or EXISTS. The bound formula of this
-     * quantifier will be simplified to an additional constraint, which makes
-     * things more convenient and does not change the semantics of the formula
-     * itself.
-     * 
-     * @param term
-     *            the term
-     * @param negate
-     *            flag whether or not the operation should be negated
-     * @return the generated OracleExpression
-     * @throws OracleGeneratorException
-     */
-    private OracleExpression constructExpressionFromQuantifier(final Term term,
-            final boolean negate) throws OracleGeneratorException {
-
-        /*
-         * Resolve the type of the quantifier
-         */
-        QuantifierType quantifierType = OracleTypeFactory
-                .getQuantifierType(term);
-
-        /*
-         * Resolve the expression bounded by this quantifier
-         */
-        OracleConstraint boundExpression = constructOracle(term.sub(0));
-
-        /*
-         * Construct the quantifiable variable
-         */
-        QuantifiableVariable variable = term.boundVars().get(0);
-        String identifier = variable.name().toString();
-        OracleType type = OracleTypeFactory.getOracleType(variable);
-        OracleLiteral quantifiableVariable = new OracleLiteral(type, identifier);
-
-        return new OracleQuantifier(quantifierType, quantifiableVariable,
-                boundExpression);
     }
 
     /**
@@ -439,11 +421,12 @@ public enum OracleGenerator {
      * @throws OracleGeneratorException
      */
     private OracleExpression constructExpressionFromUnaryFunction(
-            final Term term, boolean negate) throws OracleGeneratorException {
+            final Term term, final boolean negate)
+            throws OracleGeneratorException {
 
         if (TermParserTools.isIntegerNegation(term)) {
-            String value = "-" + resolveNumbers(term.sub(0));
-            OracleType type = OracleTypeFactory.getOracleType(term);
+            final String value = "-" + this.resolveNumbers(term.sub(0));
+            final OracleType type = OracleTypeFactory.getOracleType(term);
             return new OracleLiteral(type, value);
         }
 
@@ -451,22 +434,17 @@ public enum OracleGenerator {
     }
 
     /**
-     * Resolves a {@link Term} representing a numeric constant function into a
-     * corresponding String numeral. For example, Z(0(1(#))) becomes -10.
+     * Constructs an {@link OracleLiteral} from a {@link LocationVariable}.
      * 
      * @param term
-     *            the term
-     * @return the string numeral
+     *            the term representing the variable
+     * @return the literal
      */
-    private String resolveNumbers(Term term) {
+    private OracleExpression constructExpressionFromVariable(final Term term) {
 
-        String numberString = term.op().name().toString();
-
-        if (numberString.equals("#")) {
-            return "";
-        } else {
-            return resolveNumbers(term.sub(0)) + numberString;
-        }
+        final OracleType type = OracleTypeFactory.getOracleType(term);
+        final String identifier = term.toString();
+        return new OracleLiteral(type, identifier);
 
     }
 
@@ -498,6 +476,28 @@ public enum OracleGenerator {
     }
 
     /**
+     * Constructs an {@link Oracle} instance from a Term. The Term is
+     * recursively resolved in order to translate each subnode into a
+     * corresponding Oracle abstraction.
+     * 
+     * @param term
+     *            the term
+     * @return the oracle
+     * @throws OracleGeneratorException
+     */
+    private OracleConstraint constructOracle(final Term term)
+            throws OracleGeneratorException {
+
+        /*
+         * Create and return the OracleConstraint.
+         */
+        final Set<OracleAssertion> oracleClauses = new HashSet<OracleAssertion>();
+        this.constructAssertions(term, oracleClauses);
+
+        return new OracleConstraint(oracleClauses);
+    }
+
+    /**
      * Creates a Test Oracle for the provided method. The Oracle will be
      * generated based on the {@link FunctionalOperationContract} present for
      * the method, if any. If no such contract exists, a trivial
@@ -522,20 +522,22 @@ public enum OracleGenerator {
              * Extract metadata about the poststate of the program (such as
              * expected exceptions).
              */
-            OracleMetaExtractor metaExtractor = new OracleMetaExtractor();
+            final OracleMetaExtractor metaExtractor = new OracleMetaExtractor();
             postCondition.execPreOrder(metaExtractor);
-            OracleType expectedException = metaExtractor.getThrownException();
+            final OracleType expectedException = metaExtractor
+                    .getThrownException();
 
             /*
              * Simplify the postcondition
              */
-            Term simplifiedPostCondition = this.oracleTermTransformer
+            final Term simplifiedPostCondition = this.oracleTermTransformer
                     .transform(postCondition);
 
             /*
              * Create the postcondition constraints model
              */
-            OracleConstraint constraints = constructOracle(simplifiedPostCondition);
+            final OracleConstraint constraints = this
+                    .constructOracle(simplifiedPostCondition);
 
             return new Oracle(constraints, expectedException);
 
@@ -546,24 +548,22 @@ public enum OracleGenerator {
     }
 
     /**
-     * Constructs an {@link Oracle} instance from a Term. The Term is
-     * recursively resolved in order to translate each subnode into a
-     * corresponding Oracle abstraction.
+     * Resolves a {@link Term} representing a numeric constant function into a
+     * corresponding String numeral. For example, Z(0(1(#))) becomes -10.
      * 
      * @param term
      *            the term
-     * @return the oracle
-     * @throws OracleGeneratorException
+     * @return the string numeral
      */
-    private OracleConstraint constructOracle(Term term)
-            throws OracleGeneratorException {
+    private String resolveNumbers(final Term term) {
 
-        /*
-         * Create and return the OracleConstraint.
-         */
-        final Set<OracleAssertion> oracleClauses = new HashSet<OracleAssertion>();
-        this.constructAssertions(term, oracleClauses);
+        final String numberString = term.op().name().toString();
 
-        return new OracleConstraint(oracleClauses);
+        if (numberString.equals("#")) {
+            return "";
+        } else {
+            return this.resolveNumbers(term.sub(0)) + numberString;
+        }
+
     }
 }

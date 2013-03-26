@@ -26,7 +26,8 @@ public class Oracle {
      * @param expectedException
      *            the expected exception
      */
-    public Oracle(OracleConstraint constraints, OracleType expectedException) {
+    public Oracle(final OracleConstraint constraints,
+            final OracleType expectedException) {
         super();
         this.constraints = constraints;
         this.expectedException = expectedException;
@@ -36,13 +37,13 @@ public class Oracle {
      * @return the constraints
      */
     public OracleConstraint getConstraints() {
-        return constraints;
+        return this.constraints;
     }
 
     /**
      * @return the expectedException
      */
     public OracleType getExpectedException() {
-        return expectedException;
+        return this.expectedException;
     }
 }

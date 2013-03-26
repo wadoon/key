@@ -27,14 +27,14 @@ public class OracleAssertion {
      * @return the expressions
      */
     public Set<OracleExpression> getExpressions() {
-        return expressions;
+        return this.expressions;
     }
 
     @Override
     public String toString() {
 
-        StringBuilder toPrint = new StringBuilder();
-        Iterator<OracleExpression> iterator = expressions.iterator();
+        final StringBuilder toPrint = new StringBuilder();
+        final Iterator<OracleExpression> iterator = this.expressions.iterator();
         while (iterator.hasNext()) {
             toPrint.append(iterator.next());
 

@@ -13,9 +13,9 @@ package se.gu.svanefalk.testgeneration.core.oracle.abstraction;
 public class OracleMethodInvocation extends OracleExpression {
 
     /**
-     * The object which this method is being invoked from.
+     * The identifier for this method.
      */
-    private final OracleLiteral parentObject;
+    private final String identifier;
 
     /**
      * The parameters passed to this invocation of the method.
@@ -23,9 +23,9 @@ public class OracleMethodInvocation extends OracleExpression {
     private final OracleExpression[] parameters;
 
     /**
-     * The identifier for this method.
+     * The object which this method is being invoked from.
      */
-    private final String identifier;
+    private final OracleLiteral parentObject;
 
     /**
      * Create a new method invocation.
@@ -39,8 +39,9 @@ public class OracleMethodInvocation extends OracleExpression {
      * @param arguments
      *            arguments passed to the invocation
      */
-    public OracleMethodInvocation(OracleType returnType, String identifier,
-            OracleLiteral parentObject, OracleExpression[] arguments) {
+    public OracleMethodInvocation(final OracleType returnType,
+            final String identifier, final OracleLiteral parentObject,
+            final OracleExpression[] arguments) {
         super(returnType);
 
         this.parentObject = parentObject;
@@ -50,40 +51,40 @@ public class OracleMethodInvocation extends OracleExpression {
     }
 
     /**
-     * @return the object from which the method is being invoked.
+     * @return the identifier for the method.
      */
-    public OracleLiteral getParentObject() {
-        return parentObject;
+    public String getIdentifier() {
+        return this.identifier;
     }
 
     /**
      * @return the parameters passed to the invocation.
      */
     public OracleExpression[] getParameters() {
-        return parameters;
+        return this.parameters;
+    }
+
+    /**
+     * @return the object from which the method is being invoked.
+     */
+    public OracleLiteral getParentObject() {
+        return this.parentObject;
     }
 
     @Override
     public String toString() {
-        StringBuilder toPrint = new StringBuilder();
+        final StringBuilder toPrint = new StringBuilder();
 
-        toPrint.append(identifier);
+        toPrint.append(this.identifier);
         toPrint.append("(");
-        for (int i = 0; i < parameters.length; i++) {
-            toPrint.append(parameters[i]);
-            if (i < parameters.length - 1) {
+        for (int i = 0; i < this.parameters.length; i++) {
+            toPrint.append(this.parameters[i]);
+            if (i < (this.parameters.length - 1)) {
                 toPrint.append(",");
             }
         }
         toPrint.append(")");
 
         return toPrint.toString();
-    }
-
-    /**
-     * @return the identifier for the method.
-     */
-    public String getIdentifier() {
-        return identifier;
     }
 }

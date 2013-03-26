@@ -127,7 +127,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         final Term firstChild = this.transformTerm(term.sub(0));
         final Term secondChild = this.transformTerm(term.sub(1));
-        
+
         final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
                 firstChild, secondChild);
 
@@ -171,6 +171,12 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         return this.termFactory.createTerm(term.op(), newChildren,
                 term.boundVars(), term.javaBlock());
+    }
+
+    protected Term transformFormula(final Term term)
+            throws TermTransformerException {
+
+        return term;
     }
 
     /**
@@ -217,10 +223,10 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
                 return this.transformProgramMethod(term);
             }
 
-            if(TermParserTools.isFormula(term)) {
-                return transformFormula(term);
+            if (TermParserTools.isFormula(term)) {
+                return this.transformFormula(term);
             }
-            
+
             if (TermParserTools.isBooleanConstant(term)) {
                 return this.transformBooleanConstant(term);
             }
@@ -232,12 +238,6 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         throw new TermTransformerException("Unsupported Function: "
                 + term.op().name());
-    }
-    
-    protected Term transformFormula(final Term term)
-            throws TermTransformerException {
-        
-        return term;
     }
 
     /**
@@ -430,7 +430,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
         if (TermParserTools.isObserverFunction(term)) {
             return this.transformObserverFunction(term);
         }
-        
+
         return term;
     }
 

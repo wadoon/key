@@ -26,7 +26,7 @@ public abstract class OracleExpression {
      * @param type
      *            the type of the expression
      */
-    public OracleExpression(OracleType type) {
+    public OracleExpression(final OracleType type) {
         this.type = type;
     }
 
@@ -34,11 +34,11 @@ public abstract class OracleExpression {
      * @return the type
      */
     public OracleType getType() {
-        return type;
+        return this.type;
     }
 
     @Override
     public String toString() {
-        return "OracleExpression, type: " + getType();
+        return "OracleExpression, type: " + this.getType();
     }
 }

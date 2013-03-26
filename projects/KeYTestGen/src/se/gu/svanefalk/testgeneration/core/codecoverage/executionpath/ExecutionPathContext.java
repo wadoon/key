@@ -1,4 +1,4 @@
-package se.gu.svanefalk.testgeneration.core.codecoverage.pathcontext;
+package se.gu.svanefalk.testgeneration.core.codecoverage.executionpath;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -26,6 +26,17 @@ public class ExecutionPathContext {
             final IExecutionStartNode root) {
 
         boolean returningFromBranch = false;
+
+        /*
+         * Maps each {@link PathNode} instance in this context to the set of
+         * {@link ExecutionPath} instances which cover it.
+         */
+        final Map<PathNode, List<ExecutionPath>> executionPathsForNode = new HashMap<PathNode, List<ExecutionPath>>();
+
+        /*
+         * The ExecutionPath currently being constructed
+         */
+        final ExecutionPath executionPath = new ExecutionPath();
 
         /*
          * Map over which program statements have already been seen.
@@ -60,10 +71,11 @@ public class ExecutionPathContext {
         /*
          * Iteratively construct the execution path models.
          */
+        long millis = Calendar.getInstance().getTimeInMillis();
         while (iterator.hasNext()) {
 
             final IExecutionNode node = iterator.next();
-            long millis = Calendar.getInstance().getTimeInMillis();
+
             /*
              * Work only with the symbolic execution nodes corresponding to
              * actual program statements.
@@ -90,12 +102,8 @@ public class ExecutionPathContext {
                  */
                 if (ExecutionPathContext.isProgramStatementNode(node)) {
 
-                    millis = Calendar.getInstance().getTimeInMillis();
                     final String pathNodeIdentifier = ExecutionPathContext
                             .getUniqueIdentifier((AbstractExecutionStateNode) node);
-                    System.out
-                            .println("Getting identifier: "
-                                    + (Calendar.getInstance().getTimeInMillis() - millis));
 
                     PathNode pathNode = seenPathNodes.get(pathNodeIdentifier);
 
@@ -111,6 +119,18 @@ public class ExecutionPathContext {
                      * current execution path.
                      */
                     visitedNodesBuffer.add(pathNode);
+
+                    /*
+                     * Register that the given node is now covered by this
+                     * execution path.
+                     */
+                    List<ExecutionPath> pathsForNode = executionPathsForNode
+                            .get(pathNode);
+                    if (pathsForNode == null) {
+                        pathsForNode = new LinkedList<ExecutionPath>();
+                        executionPathsForNode.put(pathNode, pathsForNode);
+                    }
+                    pathsForNode.add(executionPath);
                 }
 
                 /*
@@ -129,12 +149,15 @@ public class ExecutionPathContext {
                  * execution path and continue walking the tree.
                  */
                 if (ExecutionPathContext.isTerminatingNode(node)) {
-
-                    final ExecutionPath executionPath = new ExecutionPath(
-                            visitedNodesBuffer, node);
+                    executionPath.setCoveredNodes(visitedNodesBuffer);
+                    executionPath.setTerminatingNode(node);
                     executionPaths.add(executionPath);
                     returningFromBranch = true;
 
+                    System.out
+                            .println("Constructing path: "
+                                    + (Calendar.getInstance().getTimeInMillis() - millis));
+                    millis = Calendar.getInstance().getTimeInMillis();
                 }
             }
         }

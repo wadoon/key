@@ -28,16 +28,6 @@ public class OracleOperator extends OracleExpression {
         ADDITION("+"),
 
         /**
-         * The subtraction operator.
-         */
-        SUBTRACTION("-"),
-
-        /**
-         * The multiplication operator.
-         */
-        MULTIPLICATION("*"),
-
-        /**
          * The division operator.
          */
         DIVISION("/"),
@@ -45,7 +35,17 @@ public class OracleOperator extends OracleExpression {
         /**
          * The modulo operator.
          */
-        MODULO("%");
+        MODULO("%"),
+
+        /**
+         * The multiplication operator.
+         */
+        MULTIPLICATION("*"),
+
+        /**
+         * The subtraction operator.
+         */
+        SUBTRACTION("-");
 
         /**
          * The identifier for this operator type.
@@ -69,14 +69,14 @@ public class OracleOperator extends OracleExpression {
     }
 
     /**
-     * The type of this operator.
-     */
-    private final OperatorType operatorType;
-
-    /**
      * The first operand of this operator.
      */
     private final OracleExpression firstOperand;
+
+    /**
+     * The type of this operator.
+     */
+    private final OperatorType operatorType;
 
     /**
      * The second operand of this operator.
@@ -97,7 +97,7 @@ public class OracleOperator extends OracleExpression {
      */
     public OracleOperator(final OperatorType comparatorType,
             final OracleExpression firstOperand,
-            final OracleExpression secondOperand, OracleType type) {
+            final OracleExpression secondOperand, final OracleType type) {
         super(type);
 
         this.operatorType = comparatorType;
@@ -131,7 +131,8 @@ public class OracleOperator extends OracleExpression {
 
     @Override
     public String toString() {
-        return firstOperand.toString() + " " + operatorType.toString() + " "
-                + secondOperand.toString();
+        return this.firstOperand.toString() + " "
+                + this.operatorType.toString() + " "
+                + this.secondOperand.toString();
     }
 }
