@@ -167,7 +167,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
         public SMTSolver createSolver(SMTProblem problem,
                 SolverListener listener, Services services) {
 
-            return new KeYnterpol(problem, listener, services, this);
+            return null; //new KeYnterpol(problem, listener, services, this);
         }
 
         /**
