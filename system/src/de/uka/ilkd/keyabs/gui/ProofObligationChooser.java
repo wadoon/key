@@ -42,7 +42,7 @@ public class ProofObligationChooser {
 
         setData(data);
 
-        JDialog dialog = new JDialog();
+        JDialog dialog = new JDialog((Dialog) null, "Proof-Obligation Browser", true);
         dialog.getContentPane().add(browser);
         dialog.setModal(true);
         dialog.pack();
@@ -83,7 +83,7 @@ public class ProofObligationChooser {
     private void $$$setupUI$$$() {
         browser = new JPanel();
         browser.setLayout(new GridBagLayout());
-        browser.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), "Proofobligation Browser", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION, new Font(browser.getFont().getName(), browser.getFont().getStyle(), browser.getFont().getSize()), new Color(-16777216)));
+        browser.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font(browser.getFont().getName(), browser.getFont().getStyle(), browser.getFont().getSize()), new Color(-16777216)));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridBagLayout());
         GridBagConstraints gbc;

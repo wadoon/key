@@ -116,18 +116,6 @@ public class ABSInfo implements IProgramInfo {
     }
 
     @Override
-    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(
-            KeYJavaType kjt) {
-        return null;
-    }
-
-    @Override
     public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType type) {
         return null;
     }

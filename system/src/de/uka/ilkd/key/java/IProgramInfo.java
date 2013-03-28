@@ -97,18 +97,6 @@ public interface IProgramInfo {
 	 */
 	public abstract KeYJavaType getKeYJavaType(Type t);
 
-	/**
-	 * returns all methods from the given Type as IProgramMethods
-	 */
-	public abstract ImmutableList<IProgramMethod> getAllProgramMethods(
-			KeYJavaType kjt);
-
-	/**
-	 * returns all methods declared in the given Type as IProgramMethods
-	 */
-	public abstract ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(
-			KeYJavaType kjt);
-
 	public abstract Sort nullSort();
 
 	/**

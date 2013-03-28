@@ -14,24 +14,11 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.net.URL;
-import java.util.*;
-
-import javax.swing.*;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -49,6 +36,19 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.util.KeYResourceManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 
 /** 
@@ -244,7 +244,7 @@ public final class SLEnvInput extends AbstractEnvInput<Services, JavaDLInitConfi
         
         final JavaDLInitConfig initConfig = getInitConfig();
         
-        final IProgramInfo javaInfo 
+        final JavaInfo javaInfo
             = initConfig.getServices().getProgramInfo();
         final ISpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();

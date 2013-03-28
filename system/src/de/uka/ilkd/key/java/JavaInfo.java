@@ -13,46 +13,25 @@
 
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
@@ -538,19 +517,17 @@ public final class JavaInfo implements IProgramInfo {
         return kpmi.getMethods(kjt);
     }
 
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllProgramMethods(de.uka.ilkd.key.java.abstraction.KeYJavaType)
-	 */
-    @Override
+    /**
+     * returns all methods from the given Type as IProgramMethods
+     */
 	public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         return kpmi.getAllProgramMethods(kjt);
     }
-    
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllProgramMethodsLocallyDeclared(de.uka.ilkd.key.java.abstraction.KeYJavaType)
-	 */
-    @Override
-	public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
+
+    /**
+     * returns all methods declared in the given Type as IProgramMethods
+     */
+	public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
     
