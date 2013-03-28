@@ -51,8 +51,8 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.gui.ABSWindowUserInterface;
-import de.uka.ilkd.keyabs.init.ABSInitConfig;
-import de.uka.ilkd.keyabs.init.ABSProfile;
+import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.proof.init.ABSProfile;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

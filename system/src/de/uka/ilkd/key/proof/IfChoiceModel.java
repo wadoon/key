@@ -39,7 +39,6 @@ public class IfChoiceModel extends DefaultComboBoxModel {
     private static final long serialVersionUID = -5388696072469119661L;
     private static final String manualText="Manual Input";
     private String manualInput;
-    //    private RuleApp app;
     private Term ifFma;
 
 

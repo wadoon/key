@@ -6,7 +6,7 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 import de.uka.ilkd.keyabs.logic.ldt.LocSetLDT;

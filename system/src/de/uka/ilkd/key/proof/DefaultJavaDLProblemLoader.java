@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.EnvInput;
@@ -168,5 +169,16 @@ public class DefaultJavaDLProblemLoader extends
              }
           }
        }
+
+
+    protected String selectProofObligation() {
+        ProofManagementDialog.showInstance(getMediator(), getInitConfig());
+        if (ProofManagementDialog.startedProof()) {
+            return "";
+        }
+        else {
+            return "Aborted.";
+        }
+    }
     
 }

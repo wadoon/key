@@ -159,9 +159,7 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
     * @return An error message or {@code null} if everything is fine.
     */
-   protected String selectProofObligation() {
-      return null; // Do nothing
-   }
+   protected abstract String selectProofObligation();
 
 
    protected void replayProof(Proof proof) throws ProofInputException {
@@ -170,7 +168,8 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
       mediator.stopInterface(true); // first stop (above) is not enough
 
       if (envInput instanceof KeYUserProblemFile) {
-         problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator), (KeYUserProblemFile) envInput);
+         problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator),
+                 (KeYUserProblemFile) envInput);
       }
       mediator.getUI().resetStatus(this);
    }

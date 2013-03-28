@@ -1,4 +1,4 @@
-package de.uka.ilkd.keyabs.init;
+package de.uka.ilkd.keyabs.proof.init;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,18 +1,21 @@
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.init.ABSInitConfig;
-import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
+import de.uka.ilkd.keyabs.gui.POBrowserData;
+import de.uka.ilkd.keyabs.gui.ProofObligationChooser;
+import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.proof.init.ABSKeYUserProblemFile;
+import de.uka.ilkd.keyabs.speclang.ABSSLInput;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 
 public class DefaultABSDLProblemLoader extends
         ProblemLoader<ABSServices, ABSInitConfig> {
@@ -65,8 +68,9 @@ public class DefaultABSDLProblemLoader extends
     
           if (filename.endsWith(".key") || filename.endsWith(".proof")) {
                   return new ABSKeYUserProblemFile(filename, file, mediator.getUI());
-          }    
-          else {
+          } else if (file.isDirectory()) {
+              return new ABSSLInput(file.getPath(), classPath, bootClassPath);
+          } else {
              if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension \'"
                       + filename.substring(filename.lastIndexOf('.'))
@@ -81,4 +85,10 @@ public class DefaultABSDLProblemLoader extends
           }
        }
 
+    @Override
+    protected String selectProofObligation() {
+        POBrowserData data = new POBrowserData(getInitConfig().getServices());
+        ProofObligationChooser chooser = new ProofObligationChooser(data);
+        return "";
+    }
 }

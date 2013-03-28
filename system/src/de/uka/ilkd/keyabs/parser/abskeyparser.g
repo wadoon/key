@@ -51,7 +51,7 @@ header {
 
 
   import de.uka.ilkd.keyabs.abs.*;
-  import de.uka.ilkd.keyabs.init.*;
+  import de.uka.ilkd.keyabs.proof.init.*;
   import de.uka.ilkd.keyabs.logic.sort.*;
   import de.uka.ilkd.keyabs.proof.*;
 

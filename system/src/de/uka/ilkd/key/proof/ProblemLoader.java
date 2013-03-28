@@ -120,13 +120,5 @@ public abstract class ProblemLoader<S extends IServices, IC extends InitConfig<S
         return null;
     }
 
-    protected String selectProofObligation() {
-      ProofManagementDialog.showInstance(getMediator(), getInitConfig());
-      if (ProofManagementDialog.startedProof()) {
-         return "";
-      }
-      else {
-         return "Aborted.";
-      }
-   }
+
 }

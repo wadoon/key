@@ -18,7 +18,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.keyabs.abs.ABSProgramElement;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.init.FunctionBuilder;
+import de.uka.ilkd.keyabs.proof.init.FunctionBuilder;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 
 public class MethodInvoc2MethodLabel extends AbstractTermTransformer {

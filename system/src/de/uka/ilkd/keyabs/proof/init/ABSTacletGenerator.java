@@ -1,4 +1,4 @@
-package de.uka.ilkd.keyabs.po;
+package de.uka.ilkd.keyabs.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

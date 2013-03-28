@@ -11,8 +11,8 @@ import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.init.ABSInitConfig;
-import de.uka.ilkd.keyabs.init.ABSProblemInitializer;
+import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.proof.init.ABSProblemInitializer;
 
 public class ABSWindowUserInterface extends AbstractWindowUserInterface<ABSServices, ABSInitConfig> {
 

@@ -44,7 +44,6 @@ import java.util.Properties;
  */
 public abstract class AbstractJavaPO implements IPersistablePO {
 
-    protected static final TermFactory TF = TermFactory.DEFAULT;
     protected static final JavaDLTermBuilder TB = JavaProfile.DF();
     protected final JavaDLInitConfig initConfig;
     private final Services services;
@@ -66,14 +65,14 @@ public abstract class AbstractJavaPO implements IPersistablePO {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
-        this.specRepos = (SpecificationRepository) initConfig.getServices().getSpecificationRepository();
+        this.specRepos = initConfig.getServices().getSpecificationRepository();
         this.name = name;
         taclets = DefaultImmutableSet.nil();
     }
 
 
     protected Services getServices() {
-        return (Services) services;
+        return services;
     }
 
 

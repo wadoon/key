@@ -25,23 +25,16 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.gui;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+
+import java.util.Iterator;
 
 /**
  * Applies rules in an automated fashion.
@@ -55,15 +48,15 @@ public class ApplyStrategy {
      * </p>
      * <p>
      * The first check is done before a rule is applied on a {@link Goal} via
-     * {@link #isGoalAllowed(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, Goal)}.
+     * {@link #isGoalAllowed(int, long, de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.IGoalChooser, long, int, de.uka.ilkd.key.proof.Goal)}}.
      * If this method returns {@code false} the strategy stops and the reason
-     * shown to the user is computed via {@link #getGoalNotAllowedMessage(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, Goal)}.
+     * shown to the user is computed via {@link #getGoalNotAllowedMessage(int, long, de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.IGoalChooser, long, int, de.uka.ilkd.key.proof.Goal)}.
      * </p>
      * <p>
      * The second check is after a rule was applied via
-     * {@link #shouldStop(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, SingleRuleApplicationInfo)}.
+     * {@link #shouldStop(int, long, de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.IGoalChooser, long, int, de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo)}.
      * If this method returns {@code true} the strategy stops and the reason
-     * shown to the user is computed via {@link #getStopMessage(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, SingleRuleApplicationInfo)}.
+     * shown to the user is computed via {@link #getStopMessage(int, long, de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.IGoalChooser, long, int, de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo)}.
      * </p>
      * <p>
      * <b>Attention: </b> It is possible that an {@link IStopCondition} has to check
@@ -110,7 +103,7 @@ public class ApplyStrategy {
 
         /**
          * Returns the reason why the previous check via 
-         * {@link #isGoalAllowed(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, Goal)}
+         * {@link #isGoalAllowed(int, long, de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.IGoalChooser, long, int, de.uka.ilkd.key.proof.Goal)}
          * has stopped the apply strategy.
          * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
          * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
@@ -150,7 +143,7 @@ public class ApplyStrategy {
        
         /**
          * Returns a human readable message which explains why the previous 
-         * {@link #shouldStop(ApplyStrategy, Proof, IGoalChooser, long, int, SingleRuleApplicationInfo)}
+         * {@link #shouldStop(int, long, de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.IGoalChooser, long, int, de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo)}
          * has stopped the strategy.
          * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
          * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
@@ -252,8 +245,7 @@ public class ApplyStrategy {
 
     /** 
      * Instances of this class are used to store if a rule could be applied automatically and if not 
-     * to store the reason why no rule applications could be performed. Because of performance reason the
-     * success case returns the singleton {@link SingleRuleApplicationInfo#SUCCESS} 
+     * to store the reason why no rule applications could be performed.
      */
     public static class SingleRuleApplicationInfo {
 

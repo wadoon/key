@@ -24,8 +24,6 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -35,7 +33,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.keyabs.init.ABSProfile;
+import de.uka.ilkd.keyabs.proof.init.ABSProfile;
 
 /**
  * The main entry point for KeY

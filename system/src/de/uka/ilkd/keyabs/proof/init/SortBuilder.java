@@ -1,4 +1,4 @@
-package de.uka.ilkd.keyabs.init;
+package de.uka.ilkd.keyabs.proof.init;
 
 import abs.frontend.ast.*;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;

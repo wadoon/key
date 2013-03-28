@@ -8,12 +8,13 @@
 //
 //
 
-package de.uka.ilkd.keyabs.init.io;
+package de.uka.ilkd.keyabs.proof.io;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -26,10 +27,14 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
+import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
+import de.uka.ilkd.keyabs.proof.init.ABSTacletGenerator;
 import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
+import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
+import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -494,5 +499,33 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
     @Override
     public ABSInitConfig getInitConfig() {
         return initConfig;
+    }
+
+    public ImmutableSet<Taclet> collectInterfaceInvariantTaclets(ABSServices services) {
+        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+        ABSSpecificationRepository repository = services.getSpecificationRepository();
+
+        for (KeYJavaType type : services.getProgramInfo().getAllKeYJavaTypes()) {
+            ImmutableSet<InterfaceInvariant> invs = repository.getInterfaceInvariants(type);
+            if (!invs.isEmpty() && type.getJavaType() instanceof ABSInterfaceType) {
+                ABSTacletGenerator tg = new ABSTacletGenerator();
+                result = result.add(tg.generateTacletForInterfaceInvariant(type, invs, services));
+            }
+        }
+        return result;
+    }
+
+    public ImmutableSet<Taclet> getClassInvariantTaclet(ABSServices services) {
+        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+
+        ABSSpecificationRepository repository = services.getSpecificationRepository();
+        ImmutableSet<ABSClassInvariant> cinvs = repository.getClassInvariants(getMainClassName());
+
+        if (!cinvs.isEmpty()) {
+            ABSTacletGenerator tg = new ABSTacletGenerator();
+            result = result.add(tg.generateTacletForClassInvariant(getMainClassName(),
+                    cinvs, services));
+        }
+        return result;
     }
 }

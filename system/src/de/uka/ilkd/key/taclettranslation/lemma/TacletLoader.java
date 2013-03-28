@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.keyabs.po.ABSKeYUserProblemFile;
+import de.uka.ilkd.keyabs.proof.init.ABSKeYUserProblemFile;
 
 public abstract class TacletLoader<S extends IServices, IC extends InitConfig<S, IC>> {
         

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.keyabs.abs.ABSServices;
@@ -20,6 +21,8 @@ public class HistoryLDT extends LDT {
     private final Sort classLabelSort;
     private final Sort methodLabelSort;
     private final Sort futureSort;
+    private LocationVariable history;
+    private Function wellFormed;
 
     public HistoryLDT(IServices services) {
         super(new Name("Seq"), services);
@@ -97,5 +100,13 @@ public class HistoryLDT extends LDT {
 
     public Function getClassLabel(Name className, ABSServices services) {
         return (Function) services.getNamespaces().functions().lookup(className);
+    }
+
+    public LocationVariable getHistory() {
+        return history;
+    }
+
+    public Function getWellFormed() {
+        return wellFormed;
     }
 }

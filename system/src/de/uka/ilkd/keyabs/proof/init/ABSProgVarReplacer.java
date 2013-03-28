@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.keyabs.proof.init;
 
 import java.util.Map;
 
@@ -97,7 +97,6 @@ public class ABSProgVarReplacer extends ABSModificationVisitor {
 
     public void performActionOnProgramVariable(ProgramVariable pv) {
         ProgramElement newPV = replaceMap.get(pv);
-        System.out.println(pv + "---->" + newPV);
         if (newPV != null) {
             addNewChild(newPV);
         } else {

@@ -1,4 +1,4 @@
-package de.uka.ilkd.keyabs.init;
+package de.uka.ilkd.keyabs.proof.init;
 
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;

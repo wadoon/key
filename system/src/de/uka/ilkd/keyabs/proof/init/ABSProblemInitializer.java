@@ -1,4 +1,4 @@
-package de.uka.ilkd.keyabs.init;
+package de.uka.ilkd.keyabs.proof.init;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
-import de.uka.ilkd.keyabs.init.io.ABSKeYFile;
+import de.uka.ilkd.keyabs.proof.io.ABSKeYFile;
 import de.uka.ilkd.keyabs.proof.io.ABSLDTInput;
 
 
