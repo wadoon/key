@@ -38,7 +38,7 @@ public class TestJUnitTestCaseGenerator {
 
         final TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
         final IFrameworkConverter junitConverter = new JUnitConverter();
-        final ICodeCoverageParser codeCoverageParser = new StatementCoverageParser();
+        final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.statementCoverageParser;
 
         final HashMap<String, Double> results = new HashMap<String, Double>();
 
@@ -46,7 +46,7 @@ public class TestJUnitTestCaseGenerator {
         final List<String> output = testCaseGenerator
                 .generatePartialTestSuite(
                         "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        codeCoverageParser, junitConverter, "midOneProxyOneInstance");
+                        codeCoverageParser, junitConverter, "mid");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(

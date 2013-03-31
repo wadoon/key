@@ -2,19 +2,41 @@ package se.gu.svanefalk.testgeneration.core.codecoverage.executionpath;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 public class ExecutionPath {
 
-    private List<PathNode> coveredNodes;
+    private Set<SourceElement> coveredNodes;
+    private Map<SourceElement, List<IExecutionBranchCondition>> branchConditionMappings;
+
+    /**
+     * @return the branchConditionMappings
+     */
+    public Map<SourceElement, List<IExecutionBranchCondition>> getBranchConditionMappings() {
+        return branchConditionMappings;
+    }
+
+    /**
+     * @param branchConditionMappings
+     *            the branchConditionMappings to set
+     */
+    void setBranchConditionMappings(
+            Map<SourceElement, List<IExecutionBranchCondition>> branchConditionMappings) {
+        this.branchConditionMappings = branchConditionMappings;
+    }
+
     private IExecutionNode terminatingNode;
 
     public ExecutionPath() {
         // TODO Auto-generated constructor stub
     }
 
-    public ExecutionPath(final List<PathNode> coveredNodes,
+    public ExecutionPath(final Set<SourceElement> coveredNodes,
             final IExecutionNode terminatingNode) {
         super();
         this.coveredNodes = coveredNodes;
@@ -24,7 +46,7 @@ public class ExecutionPath {
     /**
      * @return the coveredNodes
      */
-    public List<PathNode> getCoveredNodes() {
+    public Set<SourceElement> getCoveredNodes() {
         return this.coveredNodes;
     }
 
@@ -39,7 +61,7 @@ public class ExecutionPath {
      * @param coveredNodes
      *            the coveredNodes to set
      */
-    public void setCoveredNodes(final List<PathNode> coveredNodes) {
+    public void setCoveredNodes(final Set<SourceElement> coveredNodes) {
         this.coveredNodes = coveredNodes;
     }
 
@@ -55,7 +77,7 @@ public class ExecutionPath {
     public String toString() {
 
         final StringBuilder toPrint = new StringBuilder();
-        final Iterator<PathNode> iterator = this.coveredNodes.iterator();
+        final Iterator<SourceElement> iterator = this.coveredNodes.iterator();
         while (iterator.hasNext()) {
             toPrint.append(iterator.next());
 

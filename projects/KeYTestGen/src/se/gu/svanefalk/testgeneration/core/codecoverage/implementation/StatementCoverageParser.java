@@ -2,14 +2,17 @@ package se.gu.svanefalk.testgeneration.core.codecoverage.implementation;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
+import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPath;
+import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class StatementCoverageParser implements ICodeCoverageParser {
+
+    private static final StatementCoverageBuilder builder = StatementCoverageBuilder.INSTANCE;
 
     /**
      * <p>
@@ -30,22 +33,13 @@ public class StatementCoverageParser implements ICodeCoverageParser {
     @Override
     public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
 
-        /*
-         * Due to the way symbolic execution trees are implemented (do not
-         * confuse them with standard execution trees), simply gathering all
-         * return assertions should guarantee full statement coverage. See
-         * separate proof.
-         */
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
-        final List<IExecutionNode> nodes = new LinkedList<IExecutionNode>();
+        ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
 
-        while (iterator.hasNext()) {
-            final IExecutionNode next = iterator.next();
-            if (next instanceof IExecutionMethodReturn) {
-                nodes.add(next);
-            }
+        Set<ExecutionPath> executionPaths = builder.retrieveExecutionPaths(context);
+        List<IExecutionNode> resultNodes = new LinkedList<IExecutionNode>();
+        for (ExecutionPath path : executionPaths) {
+            resultNodes.add(path.getTerminatingNode());
         }
-        return nodes;
+        return resultNodes;
     }
 }

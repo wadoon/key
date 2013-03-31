@@ -90,8 +90,6 @@ public class TestGenerationCapsule extends Capsule {
             Benchmark.startBenchmarking("2. [KeY] Create symbolic execution tree");
             final IExecutionStartNode root = this.keYInterface.getSymbolicExecutionTree(this.targetMethod);
 
-            ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
-
             final List<IExecutionNode> nodes = this.codeCoverageParser.retrieveNodes(root);
 
             Benchmark.finishBenchmarking("2. [KeY] Create symbolic execution tree");

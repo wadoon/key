@@ -25,12 +25,12 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
  */
 public interface ICodeCoverageParser {
 
-    ICodeCoverageParser branchCoverageParser = new BranchCoverageParser();
-    ICodeCoverageParser conditionCoverageParser = new ConditionCoverageParser();
-    ICodeCoverageParser decisionCoverageParser = new DecisionCoverageParser();
-    ICodeCoverageParser modifiedConditionDecisionCoverageParser = new ModifiedConditionDecisionCoverageParser();
-    ICodeCoverageParser pathCoverageParser = new PathCoverageParser();
-    ICodeCoverageParser statementCoverageParser = new StatementCoverageParser();
+    static ICodeCoverageParser branchCoverageParser = new BranchCoverageParser();
+    static ICodeCoverageParser conditionCoverageParser = new ConditionCoverageParser();
+    static ICodeCoverageParser decisionCoverageParser = new DecisionCoverageParser();
+    static ICodeCoverageParser modifiedConditionDecisionCoverageParser = new ModifiedConditionDecisionCoverageParser();
+    static ICodeCoverageParser pathCoverageParser = new PathCoverageParser();
+    static ICodeCoverageParser statementCoverageParser = new StatementCoverageParser();
 
     public List<IExecutionNode> retrieveNodes(IExecutionStartNode root);
 }

@@ -1,10 +1,11 @@
 package se.gu.svanefalk.testgeneration.core.codecoverage.executionpath;
 
-import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -21,31 +22,30 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionStateNode;
 public class ExecutionPathContext {
 
     /**
-     * Used for constructing {@link PathNode} instances.
-     */
-    private final static PathNodeFactory nodeFactory = PathNodeFactory.INSTANCE;
-
-    /**
-     * An index over which {@link PathNode} instances in this context are
-     * covered by which {@link ExecutionPath} instance or instances.
-     */
-    private final Map<PathNode, List<ExecutionPath>> executionPathsForNode;
-
-    /**
-     * The {@link ExecutionPath} instances which are part of this context.
+     * The {@link ExecutionPathContext} instances which are part of this
+     * context.
      */
     private final List<ExecutionPath> executionPaths;
 
-    private ExecutionPathContext(
-            Map<PathNode, List<ExecutionPath>> executionPathsForNode,
-            List<ExecutionPath> executionPaths) {
+    private final Map<ExecutionBranch, List<ExecutionPath>> executionPathsForBranch;
+
+    private final Set<SourceElement> visitedProgramNodes;
+
+    private final List<ExecutionBranch> executionBranches;
+
+    public ExecutionPathContext(List<ExecutionPath> executionPaths,
+            Map<ExecutionBranch, List<ExecutionPath>> executionPathsForBranch,
+            Set<SourceElement> visitedProgramNodes,
+            List<ExecutionBranch> executionBranches) {
         super();
-        this.executionPathsForNode = executionPathsForNode;
         this.executionPaths = executionPaths;
+        this.executionPathsForBranch = executionPathsForBranch;
+        this.visitedProgramNodes = visitedProgramNodes;
+        this.executionBranches = executionBranches;
     }
 
     /**
-     * Constructs a new {@link ExecutionContext} instance for a symbolic
+     * Constructs a new {@link ExecutionPathContext} instance for a symbolic
      * execution tree.
      * 
      * @param root
@@ -55,23 +55,43 @@ public class ExecutionPathContext {
     public static ExecutionPathContext constructExecutionContext(
             final IExecutionStartNode root) {
 
-        boolean returningFromBranch = false;
-
-        /*
-         * Maps each {@link PathNode} instance in this context to the set of
-         * {@link ExecutionPath} instances which cover it.
-         */
-        final Map<PathNode, List<ExecutionPath>> executionPathsForNode = new HashMap<PathNode, List<ExecutionPath>>();
+        // FIXME: This method is an absolute terror.
 
         /*
          * The ExecutionPath currently being constructed
          */
-        final ExecutionPath executionPath = new ExecutionPath();
+        ExecutionPath executionPath = new ExecutionPath();
 
         /*
-         * Map over which program statements have already been seen.
+         * Flag indicating if we are currently returning from walking a subtree
+         * of a branching node.
          */
-        final Map<String, PathNode> seenPathNodes = new HashMap<String, PathNode>();
+        boolean returningFromBranch = false;
+
+        /*
+         * Set of the SourceElements which have already been seen.
+         */
+        final Set<SourceElement> visitedNodes = new HashSet<SourceElement>();
+
+        /*
+         * Data structures for constructing the ExecutionBranches, together with
+         * associated metadata.
+         */
+        Map<ExecutionBranch, List<ExecutionPath>> executionPathsForBranch = new HashMap<>();
+        List<ExecutionBranch> executionBranches = new LinkedList<>();
+        Stack<SourceElement> lastVisitedSourceElement = new Stack<>();
+
+        /*
+         * Used in order to store the path nodes of the execution path currently
+         * being constructed.
+         */
+        Set<SourceElement> nodesVisitedByCurrentPath = new HashSet<SourceElement>();
+
+        /*
+         * Mapping between SourceElements and their corresponding symbolic
+         * nodes.
+         */
+        final Map<SourceElement, List<IExecutionNode>> symbolicNodesForSourceElements = new HashMap<SourceElement, List<IExecutionNode>>();
 
         /*
          * Stack to hold partial execution paths, i.e. a list of program nodes
@@ -79,7 +99,21 @@ public class ExecutionPathContext {
          * of several different execution paths depending on the outcome of the
          * branching statement in question).
          */
-        final Stack<List<PathNode>> branchedExecutionPaths = new Stack<List<PathNode>>();
+        final Stack<Set<SourceElement>> partialExecutionPaths = new Stack<Set<SourceElement>>();
+
+        /*
+         * For a given path, this map stores a mapping between a PathBranchNode
+         * and a set of PathBranchCondition instances which are being taken from
+         * the PathBranchNode by this particular path.
+         */
+        Map<SourceElement, List<IExecutionBranchCondition>> pathConditionMappings = new HashMap<SourceElement, List<IExecutionBranchCondition>>();
+
+        /*
+         * Stack to hold partially constructed PathBranchNode ->
+         * PathBranchCondition mappings, also divided at branching points in the
+         * code.
+         */
+        final Stack<Map<SourceElement, List<IExecutionBranchCondition>>> branchedPathConditionMappings = new Stack<Map<SourceElement, List<IExecutionBranchCondition>>>();
 
         /*
          * The generated execution paths.
@@ -87,10 +121,9 @@ public class ExecutionPathContext {
         final List<ExecutionPath> executionPaths = new LinkedList<ExecutionPath>();
 
         /*
-         * Used in order to store the path nodes of the execution path currently
-         * being constructed.
+         * The last seen PathBranchNode
          */
-        List<PathNode> visitedNodesBuffer = new LinkedList<PathNode>();
+        Stack<SourceElement> lastSeenPathBranchNode = new Stack<SourceElement>();
 
         /*
          * Iterator for walking the symbolic execution tree.
@@ -101,7 +134,6 @@ public class ExecutionPathContext {
         /*
          * Iteratively construct the execution paths.
          */
-        long millis = Calendar.getInstance().getTimeInMillis();
         while (iterator.hasNext()) {
 
             final IExecutionNode node = iterator.next();
@@ -118,45 +150,85 @@ public class ExecutionPathContext {
                  * here.
                  */
                 if (returningFromBranch) {
-                    millis = Calendar.getInstance().getTimeInMillis();
-                    visitedNodesBuffer = branchedExecutionPaths.pop();
+                    nodesVisitedByCurrentPath = partialExecutionPaths.pop();
+                    pathConditionMappings = branchedPathConditionMappings.pop();
+                    lastSeenPathBranchNode.pop();
+                    executionPath = new ExecutionPath();
                     returningFromBranch = false;
                 }
 
                 /*
-                 * Check if the current symbolic node corresponds to a real
-                 * program node which we have already seen. Create a
-                 * corresponding node for it if so is not the case. Connect the
-                 * concrete node with the symbolic node.
+                 * Process a node which corresponds to a program statement
                  */
                 if (ExecutionPathContext.isProgramStatementNode(node)) {
 
-                    final String pathNodeIdentifier = ExecutionPathContext.getUniqueIdentifier((AbstractExecutionStateNode) node);
-
-                    PathNode pathNode = seenPathNodes.get(pathNodeIdentifier);
-
-                    if (pathNode == null) {
-                        pathNode = ExecutionPathContext.nodeFactory.constructExecutionNode(node);
-                        seenPathNodes.put(pathNodeIdentifier, pathNode);
+                    /*
+                     * Check if we have already visited this node. If not, add
+                     * it to the set of visited nodes.
+                     */
+                    final SourceElement currentElement = getActiveStatement(node);
+                    if (!visitedNodes.contains(currentElement)) {
+                        visitedNodes.add(currentElement);
                     }
-                    pathNode.addCorrespondingSymbolicNode(node);
+
+                    /*
+                     * Associate the current symbolic node with the current
+                     * program element.
+                     */
+                    List<IExecutionNode> symbolicNodes = symbolicNodesForSourceElements.get(currentElement);
+                    if (symbolicNodes == null) {
+                        symbolicNodes = new LinkedList<IExecutionNode>();
+                        symbolicNodesForSourceElements.put(currentElement,
+                                symbolicNodes);
+                    }
+                    symbolicNodes.add(node);
 
                     /*
                      * Add the concrete node to the list of nodes covered by the
                      * current execution path.
                      */
-                    visitedNodesBuffer.add(pathNode);
+                    nodesVisitedByCurrentPath.add(currentElement);
 
                     /*
-                     * Register that the given node is now covered by this
-                     * execution path.
+                     * Construct the ExecutionBranch for this node, by
+                     * associating it with the last node visited before it.
+                     * Further, associate this branch with the current execution
+                     * path, showing that this path covers this branch.
                      */
-                    List<ExecutionPath> pathsForNode = executionPathsForNode.get(pathNode);
-                    if (pathsForNode == null) {
-                        pathsForNode = new LinkedList<ExecutionPath>();
-                        executionPathsForNode.put(pathNode, pathsForNode);
+                    if (!lastVisitedSourceElement.isEmpty()) {
+                        SourceElement lastElement = lastVisitedSourceElement.pop();
+
+                        ExecutionBranch executionBranch = new ExecutionBranch(
+                                lastElement, currentElement);
+
+                        List<ExecutionPath> pathsForBranch = executionPathsForBranch.get(executionBranch);
+                        if (pathsForBranch == null) {
+                            pathsForBranch = new LinkedList<>();
+                            executionPathsForBranch.put(executionBranch,
+                                    pathsForBranch);
+                        }
+                        pathsForBranch.add(executionPath);
+                        executionBranches.add(executionBranch);
                     }
-                    pathsForNode.add(executionPath);
+
+                    /*
+                     * Set the current node as the last visited node.
+                     */
+                    for (int i = 0; i < node.getChildren().length; i++) {
+                        lastVisitedSourceElement.push(currentElement);
+                    }
+
+                    /*
+                     * If this node is an execution branch node, we will node to
+                     * store it so that we can later return to it. We push it
+                     * once upon the stack for each child of the branching node,
+                     * since we will have to return to it that many times.
+                     */
+                    if (isExecutionBranchNode(node)) {
+                        for (int i = 0; i < node.getChildren().length; i++) {
+                            lastSeenPathBranchNode.push(currentElement);
+                        }
+                    }
                 }
 
                 /*
@@ -165,9 +237,36 @@ public class ExecutionPathContext {
                  * construct execution paths for other branches of this node.
                  */
                 if (ExecutionPathContext.isBranchingNode(node)) {
-                    final List<PathNode> oldExecutionPath = new LinkedList<PathNode>();
-                    oldExecutionPath.addAll(visitedNodesBuffer);
-                    branchedExecutionPaths.push(oldExecutionPath);
+
+                    for (int i = 0; i < node.getChildren().length - 1; i++) {
+                        final Set<SourceElement> oldExecutionPath = new HashSet<SourceElement>();
+                        oldExecutionPath.addAll(nodesVisitedByCurrentPath);
+                        partialExecutionPaths.push(oldExecutionPath);
+
+                        /*
+                         * Do the same for the pathcondition mappings.
+                         */
+                        final Map<SourceElement, List<IExecutionBranchCondition>> oldPathConditionMappings = new HashMap<SourceElement, List<IExecutionBranchCondition>>();
+                        oldPathConditionMappings.putAll(pathConditionMappings);
+                        branchedPathConditionMappings.push(oldPathConditionMappings);
+                    }
+                }
+
+                /*
+                 * If the current node is a branch node condition, then we will
+                 * need to associate it with this particular execution path. We
+                 * do so by binding it to the LAST branch node which has been
+                 * visited by this execution path.
+                 */
+                if (isBranchCondition(node)) {
+                    List<IExecutionBranchCondition> pathBranchConditions = pathConditionMappings.get(lastSeenPathBranchNode);
+                    if (pathBranchConditions == null) {
+                        pathBranchConditions = new LinkedList<IExecutionBranchCondition>();
+                        pathConditionMappings.put(
+                                lastSeenPathBranchNode.peek(),
+                                pathBranchConditions);
+                    }
+                    pathBranchConditions.add((IExecutionBranchCondition) node);
                 }
 
                 /*
@@ -175,19 +274,50 @@ public class ExecutionPathContext {
                  * execution path and continue walking the tree.
                  */
                 if (ExecutionPathContext.isTerminatingNode(node)) {
-                    executionPath.setCoveredNodes(visitedNodesBuffer);
+                    executionPath.setCoveredNodes(nodesVisitedByCurrentPath);
+                    executionPath.setBranchConditionMappings(pathConditionMappings);
                     executionPath.setTerminatingNode(node);
                     executionPaths.add(executionPath);
-                    returningFromBranch = true;
 
-                    System.out.println("Constructing path: "
-                            + (Calendar.getInstance().getTimeInMillis() - millis));
-                    millis = Calendar.getInstance().getTimeInMillis();
+                    lastVisitedSourceElement.pop();
+
+                    returningFromBranch = true;
                 }
             }
         }
 
-        return new ExecutionPathContext(executionPathsForNode, executionPaths);
+        return new ExecutionPathContext(executionPaths,
+                executionPathsForBranch, visitedNodes, executionBranches);
+    }
+
+    /**
+     * @return the visitedProgramNodes
+     */
+    public Set<SourceElement> getVisitedProgramNodes() {
+        return visitedProgramNodes;
+    }
+
+    public List<ExecutionPath> getExecutionPathsForBranch(ExecutionBranch branch) {
+        return executionPathsForBranch.get(branch);
+    }
+
+    /**
+     * @return the executionPaths
+     */
+    public List<ExecutionPath> getExecutionPaths() {
+        return executionPaths;
+    }
+
+    /**
+     * @return the executionBranches
+     */
+    public List<ExecutionBranch> getExecutionBranches() {
+        return executionBranches;
+    }
+
+    private static SourceElement getActiveStatement(IExecutionNode node) {
+        AbstractExecutionStateNode abstractExecutionStateNode = (AbstractExecutionStateNode) node;
+        return abstractExecutionStateNode.getActiveStatement();
     }
 
     /**
@@ -204,8 +334,6 @@ public class ExecutionPathContext {
         final StringBuilder toReturn = new StringBuilder();
         final PositionInfo positionInfo = node.getActivePositionInfo();
         final SourceElement elem = node.getActiveStatement();
-
-        String stuff = "" + positionInfo.getStartPosition() + positionInfo.getEndPosition() + positionInfo.getRelativePosition();
 
         toReturn.append(elem.toString());
         toReturn.append(positionInfo.getStartPosition().toString());
@@ -225,12 +353,21 @@ public class ExecutionPathContext {
         return node.getChildren().length > 1;
     }
 
+    private static boolean isExecutionBranchNode(IExecutionNode node) {
+        return node instanceof IExecutionBranchNode;
+    }
+
     private static boolean isExecutionPathNode(final IExecutionNode node) {
 
         return (node instanceof IExecutionStatement)
                 || (node instanceof IExecutionBranchNode)
                 || (node instanceof IExecutionBranchCondition)
                 || (node instanceof IExecutionTermination);
+    }
+
+    private static boolean isBranchCondition(final IExecutionNode node) {
+
+        return node instanceof IExecutionBranchCondition;
     }
 
     /**
