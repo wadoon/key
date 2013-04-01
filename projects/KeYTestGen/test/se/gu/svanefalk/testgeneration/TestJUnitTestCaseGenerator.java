@@ -33,20 +33,18 @@ public class TestJUnitTestCaseGenerator {
             KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
         Assert.assertTrue(new File(
-                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java")
-                .exists());
+                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
 
         final TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
         final IFrameworkConverter junitConverter = new JUnitConverter();
-        final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.statementCoverageParser;
+        final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.branchCoverageParser;
 
         final HashMap<String, Double> results = new HashMap<String, Double>();
 
         final String methodName = "midOneProxyOneInstance";
-        final List<String> output = testCaseGenerator
-                .generatePartialTestSuite(
-                        "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                        codeCoverageParser, junitConverter, "mid");
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
+                codeCoverageParser, junitConverter, "mid");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(
@@ -102,8 +100,7 @@ public class TestJUnitTestCaseGenerator {
             KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
         Assert.assertTrue(new File(
-                "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java")
-                .exists());
+                "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
 
         final TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
         final IFrameworkConverter junitConverter = new JUnitConverter();
@@ -114,10 +111,9 @@ public class TestJUnitTestCaseGenerator {
 
         for (int i = 0; i < RUNS; i++) {
 
-            testCaseGenerator
-                    .generatePartialTestSuite(
-                            "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                            codeCoverageParser, junitConverter, "mid");
+            testCaseGenerator.generatePartialTestSuite(
+                    "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
+                    codeCoverageParser, junitConverter, "mid");
 
             /*
              * String output = testCaseGenerator .generatePartialTestSuite(

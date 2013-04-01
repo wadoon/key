@@ -18,4 +18,18 @@ public class ExecutionBranch {
         // TODO Auto-generated method stub
         return first + " --> " + second;
     }
+
+    /**
+     * @return the first
+     */
+    public SourceElement getFirst() {
+        return first;
+    }
+
+    /**
+     * @return the second
+     */
+    public SourceElement getSecond() {
+        return second;
+    }
 }
