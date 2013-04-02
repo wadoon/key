@@ -29,21 +29,20 @@ public final class CommandLineInterface {
          */
         private static void printAbout() {
 
-            System.out
-                    .println("\nKeYTestGen version 2.0\n\n"
-                            + "KeYTestGen2 is part of the KeY project, a system for integrated, deductive\n"
-                            + "software design. For more info, please visit: <www.key-project.org>\n\n"
-                            + "Copyright (C) 2013 Christopher Svanefalk\n"
-                            + "This program is free software: you can redistribute it and/or modify\n"
-                            + "it under the terms of the GNU General Public License as published by\n"
-                            + "the Free Software Foundation, either version 3 of the License, or\n"
-                            + "(at your option) any later version.\n\n"
-                            + "This program is distributed in the hope that it will be useful,\n"
-                            + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-                            + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-                            + "GNU General Public License for more details.\n\n"
-                            + "You should have received a copy of the GNU General Public License\n"
-                            + "along with this program.  If not, see <http://www.gnu.org/licenses/>.");
+            System.out.println("\nKeYTestGen version 2.0\n\n"
+                    + "KeYTestGen2 is part of the KeY project, a system for integrated, deductive\n"
+                    + "software design. For more info, please visit: <www.key-project.org>\n\n"
+                    + "Copyright (C) 2013 Christopher Svanefalk\n"
+                    + "This program is free software: you can redistribute it and/or modify\n"
+                    + "it under the terms of the GNU General Public License as published by\n"
+                    + "the Free Software Foundation, either version 3 of the License, or\n"
+                    + "(at your option) any later version.\n\n"
+                    + "This program is distributed in the hope that it will be useful,\n"
+                    + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                    + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                    + "GNU General Public License for more details.\n\n"
+                    + "You should have received a copy of the GNU General Public License\n"
+                    + "along with this program.  If not, see <http://www.gnu.org/licenses/>.");
         }
 
         /**
@@ -56,8 +55,7 @@ public final class CommandLineInterface {
             System.out.println("Usage: ktg [options] [Java source file]");
             System.out.println("\nOptions:");
 
-            for (final ParameterDescription parameter : processor
-                    .getParameters()) {
+            for (final ParameterDescription parameter : processor.getParameters()) {
                 System.out.println("\t" + parameter.getNames() + "\t"
                         + parameter.getDescription() + "\n");
             }
@@ -138,8 +136,7 @@ public final class CommandLineInterface {
                  * TODO: method selection needs to be implemented.
                  */
                 if (!this.parser.getMethods().isEmpty()) {
-                    System.out
-                            .println("Warning: method selection not implemented yet");
+                    System.out.println("Warning: method selection not implemented yet");
                 }
 
                 /*
@@ -203,8 +200,7 @@ public final class CommandLineInterface {
          * Default output for no-args invocations.
          */
         if (args.length == 0) {
-            System.out
-                    .println("No arguments specified. Type -h or --help for usage instructions");
+            System.out.println("No arguments specified. Type -h or --help for usage instructions");
             System.exit(0);
         }
 

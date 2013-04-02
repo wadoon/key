@@ -104,11 +104,10 @@ public enum KeYInterface {
         /*
          * Setup a strategy and goal chooser for the proof session
          */
-        SymbolicExecutionEnvironment
-                .configureProofForSymbolicExecution(
-                        proof,
-                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                        true, true);
+        SymbolicExecutionEnvironment.configureProofForSymbolicExecution(
+                proof,
+                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
+                true, true);
 
         return proof;
     }
@@ -150,11 +149,9 @@ public enum KeYInterface {
              * assure maximum coverage of execution paths). Start the proof and
              * wait for it to finish.
              */
-            proof.getSettings()
-                    .getStrategySettings()
-                    .setCustomApplyStrategyStopCondition(
-                            new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                                    ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
+                    new ExecutedSymbolicExecutionTreeNodesStopCondition(
+                            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
 
             this.userInterface.startAndWaitForAutoMode(proof);
 

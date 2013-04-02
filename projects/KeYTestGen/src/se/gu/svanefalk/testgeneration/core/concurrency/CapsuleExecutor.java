@@ -3,7 +3,6 @@ package se.gu.svanefalk.testgeneration.core.concurrency;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -24,15 +23,15 @@ public enum CapsuleExecutor {
      * @param runnables
      *            the runnables
      */
-    public void executeCapsulesAndWait(List<? extends Capsule> capsules) {
+    public void executeCapsulesAndWait(final List<? extends Capsule> capsules) {
 
         /*
          * Setup and launch capsules
          */
-        CountDownLatch latch = new CountDownLatch(capsules.size());
-        for (Capsule capsule : capsules) {
+        final CountDownLatch latch = new CountDownLatch(capsules.size());
+        for (final Capsule capsule : capsules) {
             capsule.setLatch(latch);
-            executor.execute(capsule);
+            this.executor.execute(capsule);
         }
 
         /*
@@ -42,7 +41,7 @@ public enum CapsuleExecutor {
             try {
                 latch.await();
                 break;
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 continue;
             }
         }

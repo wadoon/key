@@ -34,13 +34,13 @@ import se.gu.svanefalk.testgeneration.util.Benchmark;
 public enum CoreInterface {
     INSTANCE;
 
+    private final CapsuleExecutor capsuleExecutor = CapsuleExecutor.INSTANCE;
+
     /**
      * Used in order to generate instances of {@link KeYJavaClass} for a given
      * source file
      */
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.INSTANCE;
-
-    private final CapsuleExecutor capsuleExecutor = CapsuleExecutor.INSTANCE;
 
     /**
      * Creates a set of abstract test suites for a given set of methods belong
@@ -101,7 +101,7 @@ public enum CoreInterface {
         /*
          * Finally, dispatch the capsules and wait for them to finish.
          */
-        capsuleExecutor.executeCapsulesAndWait(testGenerationCapsules);
+        this.capsuleExecutor.executeCapsulesAndWait(testGenerationCapsules);
 
         /*
          * Collect and return the results of the capsules.

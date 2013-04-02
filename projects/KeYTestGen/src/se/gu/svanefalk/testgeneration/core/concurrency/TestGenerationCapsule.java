@@ -6,7 +6,6 @@ import java.util.List;
 import se.gu.svanefalk.testgeneration.core.CoreException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
-import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
@@ -25,11 +24,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
  * 
  */
 public class TestGenerationCapsule extends Capsule {
-
-    /**
-     * Global thread pool for dispatching other capsules.
-     */
-    CapsuleExecutor threadPool = CapsuleExecutor.INSTANCE;
 
     /**
      * Parser for achieving the desired level of code coverage.
@@ -52,15 +46,16 @@ public class TestGenerationCapsule extends Capsule {
      */
     private TestSuite testSuite = null;
 
+    /**
+     * Global thread pool for dispatching other capsules.
+     */
+    CapsuleExecutor threadPool = CapsuleExecutor.INSTANCE;
+
     public TestGenerationCapsule(final ICodeCoverageParser codeCoverageParser,
             final KeYJavaMethod targetMethod) {
         super();
         this.codeCoverageParser = codeCoverageParser;
         this.targetMethod = targetMethod;
-    }
-
-    public TestSuite getResult() {
-        return this.testSuite;
     }
 
     /**
@@ -106,7 +101,7 @@ public class TestGenerationCapsule extends Capsule {
              */
             final List<ModelGenerationCapsule> modelGenerationCapsules = new LinkedList<ModelGenerationCapsule>();
             for (final IExecutionNode node : nodes) {
-                ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
+                final ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
                         node);
                 modelGenerationCapsules.add(modelGenerationCapsule);
                 toExecute.add(modelGenerationCapsule);
@@ -122,7 +117,7 @@ public class TestGenerationCapsule extends Capsule {
             /*
              * Dispatch and wait for the capsules.
              */
-            threadPool.executeCapsulesAndWait(toExecute);
+            this.threadPool.executeCapsulesAndWait(toExecute);
 
             /*
              * Collect the results
@@ -160,5 +155,9 @@ public class TestGenerationCapsule extends Capsule {
         } catch (final CoreException e) {
             this.setThrownException(e);
         }
+    }
+
+    public TestSuite getResult() {
+        return this.testSuite;
     }
 }

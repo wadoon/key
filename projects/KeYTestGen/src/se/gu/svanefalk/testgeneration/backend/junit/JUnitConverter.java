@@ -78,8 +78,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
             final List<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (final TestCase testCase : testCases) {
-                final List<ModelInstance> collectedInstances = this
-                        .extractInstancesFromModel(testCase.getModel());
+                final List<ModelInstance> collectedInstances = this.extractInstancesFromModel(testCase.getModel());
                 instances.addAll(collectedInstances);
             }
 
@@ -189,10 +188,6 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             return builder.toString();
         }
 
-        private boolean isSelf(final ModelVariable variable) {
-            return variable.getIdentifier().equals("self");
-        }
-
         /**
          * Services invocations of
          * {@link JUnitConverter#generateJUnitSources(KeYJavaClass, List)}
@@ -214,8 +209,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             /*
              * Collect the import assertions
              */
-            final List<ModelInstance> instances = this
-                    .collectInstances(testCases);
+            final List<ModelInstance> instances = this.collectInstances(testCases);
             for (final ModelInstance instance : instances) {
                 final String toImport = instance.getType();
                 this.imports.add(toImport);
@@ -298,12 +292,10 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
             methodInvocation += JUnitGeneratorWorker.SELF + "."
                     + testCase.getMethodName() + "(";
-            final List<IProgramVariable> parameters = testCase.getMethod()
-                    .getParameters();
+            final List<IProgramVariable> parameters = testCase.getMethod().getParameters();
 
             for (int i = 0; i < parameters.size(); i++) {
-                final String parameterName = parameters.get(i).name()
-                        .toString();
+                final String parameterName = parameters.get(i).name().toString();
                 methodInvocation += parameterName;
                 if (i != (parameters.size() - 1)) {
                     methodInvocation += ",";
@@ -355,8 +347,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              */
             this.writeComment("Create the values needed for this test case.",
                     false);
-            for (final ModelVariable variable : testCase.getModel()
-                    .getVariables()) {
+            for (final ModelVariable variable : testCase.getModel().getVariables()) {
 
                 if (!variable.isParameter()) {
                     /*
@@ -391,8 +382,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                     "Create the parameter instances to be passed to the method under test.",
                     false);
 
-            for (final ModelVariable variable : testCase.getModel()
-                    .getVariables()) {
+            for (final ModelVariable variable : testCase.getModel().getVariables()) {
 
                 if (variable.isParameter()) {
 
@@ -422,8 +412,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             /*
              * Next, configure the needed instances properly.
              */
-            for (final ModelVariable variable : testCase.getModel()
-                    .getVariables()) {
+            for (final ModelVariable variable : testCase.getModel().getVariables()) {
 
                 if (!variable.isParameter()) {
 
@@ -435,8 +424,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                                 "Configuring variable: "
                                         + variable.getIdentifier(), false);
 
-                        final String variableIdentifier = variable
-                                .getIdentifier();
+                        final String variableIdentifier = variable.getIdentifier();
                         final ModelInstance instance = (ModelInstance) value;
 
                         for (final ModelVariable field : instance.getFields()) {

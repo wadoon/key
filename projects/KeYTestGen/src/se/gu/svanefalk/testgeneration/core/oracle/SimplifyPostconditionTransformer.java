@@ -52,8 +52,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         /*
          * Put it into Conjunctive Normal Form
          */
-        oracleTerm = new ConjunctionNormalFormTransformer()
-                .transform(oracleTerm);
+        oracleTerm = new ConjunctionNormalFormTransformer().transform(oracleTerm);
 
         /*
          * Simplify the disjunctions in the postcondition

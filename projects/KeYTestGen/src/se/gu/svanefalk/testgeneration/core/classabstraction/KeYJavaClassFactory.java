@@ -40,8 +40,7 @@ public enum KeYJavaClassFactory {
 
         final KeYJavaClass keYJavaClass = new KeYJavaClass(parent);
 
-        for (final IProgramMethod memberMethod : javaInfo
-                .getAllProgramMethods(parent)) {
+        for (final IProgramMethod memberMethod : javaInfo.getAllProgramMethods(parent)) {
             if (!memberMethod.getFullName().startsWith("<")) {
 
                 /*
@@ -96,8 +95,7 @@ public enum KeYJavaClassFactory {
 
     public KeYJavaClass createKeYJavaClass(final IExecutionMethodCall methodCall) {
 
-        final InitConfig initConfig = methodCall.getMediator().getProof().env()
-                .getInitConfig();
+        final InitConfig initConfig = methodCall.getMediator().getProof().env().getInitConfig();
 
         /*
          * Get and process the method call node
@@ -128,8 +126,7 @@ public enum KeYJavaClassFactory {
     private List<ContractWrapper> getContracts(final IProgramMethod method,
             final Services services) {
 
-        final SpecificationRepository specificationRepository = services
-                .getSpecificationRepository();
+        final SpecificationRepository specificationRepository = services.getSpecificationRepository();
 
         /*
          * Extract the abstract representation of the method itself, as well as
@@ -139,8 +136,8 @@ public enum KeYJavaClassFactory {
          */
         final KeYJavaType containerClass = method.getContainerType();
         final List<ContractWrapper> contracts = new LinkedList<ContractWrapper>();
-        for (final FunctionalOperationContract contract : specificationRepository
-                .getOperationContracts(containerClass, method)) {
+        for (final FunctionalOperationContract contract : specificationRepository.getOperationContracts(
+                containerClass, method)) {
             contracts.add(new ContractWrapper(
                     (FunctionalOperationContractImpl) contract));
         }

@@ -7,11 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.TreeMap;
-
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchNode;
 
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionBranch;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPath;
@@ -20,21 +15,50 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionP
 public enum BranchCoverageBuilder implements ICoverageBuilder {
     INSTANCE;
 
+    private static class DescendingExecutionBranchComparator implements
+            Comparator<ExecutionPath> {
+
+        private final Map<ExecutionPath, List<ExecutionBranch>> map;
+
+        public DescendingExecutionBranchComparator(
+                final Map<ExecutionPath, List<ExecutionBranch>> map) {
+            this.map = map;
+        }
+
+        @Override
+        public int compare(final ExecutionPath o1, final ExecutionPath o2) {
+            return this.doComparison(o1, o2);
+        }
+
+        private int doComparison(final ExecutionPath o1, final ExecutionPath o2) {
+            final List<ExecutionBranch> first = this.map.get(o1);
+            final List<ExecutionBranch> second = this.map.get(o2);
+            final int diff = first.size() - second.size();
+            if (diff == 0) {
+                return 0;
+            } else if (diff > 0) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+    }
+
     @Override
     public Set<ExecutionPath> retrieveExecutionPaths(
-            ExecutionPathContext context) {
+            final ExecutionPathContext context) {
 
-        List<ExecutionBranch> executionBranches = context.getExecutionBranches();
-        List<ExecutionPath> executionPaths = context.getExecutionPaths();
+        final List<ExecutionBranch> executionBranches = context.getExecutionBranches();
+        final List<ExecutionPath> executionPaths = context.getExecutionPaths();
 
         /*
          * Create a mapping from which we can deduce which execution path covers
          * which execution branch.
          */
-        Map<ExecutionPath, List<ExecutionBranch>> branchesCoveredByPath = new HashMap<ExecutionPath, List<ExecutionBranch>>();
-        for (ExecutionBranch executionBranch : executionBranches) {
-            List<ExecutionPath> coveringPaths = context.getExecutionPathsForBranch(executionBranch);
-            for (ExecutionPath coveringPath : coveringPaths) {
+        final Map<ExecutionPath, List<ExecutionBranch>> branchesCoveredByPath = new HashMap<ExecutionPath, List<ExecutionBranch>>();
+        for (final ExecutionBranch executionBranch : executionBranches) {
+            final List<ExecutionPath> coveringPaths = context.getExecutionPathsForBranch(executionBranch);
+            for (final ExecutionPath coveringPath : coveringPaths) {
                 List<ExecutionBranch> coveredBranches = branchesCoveredByPath.get(coveringPath);
                 if (coveredBranches == null) {
                     coveredBranches = new LinkedList<ExecutionBranch>();
@@ -47,9 +71,9 @@ public enum BranchCoverageBuilder implements ICoverageBuilder {
         /*
          * Sort the mapping
          */
-        DescendingExecutionBranchComparator descendingExecutionBranchComparator = new DescendingExecutionBranchComparator(
+        final DescendingExecutionBranchComparator descendingExecutionBranchComparator = new DescendingExecutionBranchComparator(
                 branchesCoveredByPath);
-        PriorityQueue<ExecutionPath> sortedPaths = new PriorityQueue<ExecutionPath>(
+        final PriorityQueue<ExecutionPath> sortedPaths = new PriorityQueue<ExecutionPath>(
                 20, descendingExecutionBranchComparator);
         sortedPaths.addAll(executionPaths);
 
@@ -59,62 +83,33 @@ public enum BranchCoverageBuilder implements ICoverageBuilder {
          * minimal set covering all branches.
          */
         while (!sortedPaths.isEmpty()) {
-            ExecutionPath targetPath = sortedPaths.poll();
-            List<ExecutionBranch> targetBranches = branchesCoveredByPath.get(targetPath);
-            for (ExecutionPath otherPath : executionPaths) {
+            final ExecutionPath targetPath = sortedPaths.poll();
+            final List<ExecutionBranch> targetBranches = branchesCoveredByPath.get(targetPath);
+            for (final ExecutionPath otherPath : executionPaths) {
                 if (targetPath != otherPath) {
-                    List<ExecutionBranch> otherBranches = branchesCoveredByPath.get(otherPath);
-                    if (subsumes(targetBranches, otherBranches)) {
+                    final List<ExecutionBranch> otherBranches = branchesCoveredByPath.get(otherPath);
+                    if (this.subsumes(targetBranches, otherBranches)) {
                         branchesCoveredByPath.remove(otherPath);
                     }
                 }
             }
         }
-        
+
         return branchesCoveredByPath.keySet();
     }
 
-    private boolean subsumes(List<ExecutionBranch> first,
-            List<ExecutionBranch> second) {
+    private boolean subsumes(final List<ExecutionBranch> first,
+            final List<ExecutionBranch> second) {
 
         if (second.size() > first.size()) {
             return false;
         }
 
-        for (ExecutionBranch branch : second) {
+        for (final ExecutionBranch branch : second) {
             if (!first.contains(branch)) {
                 return false;
             }
         }
         return true;
-    }
-
-    private static class DescendingExecutionBranchComparator implements
-            Comparator<ExecutionPath> {
-
-        private Map<ExecutionPath, List<ExecutionBranch>> map;
-
-        public DescendingExecutionBranchComparator(
-                Map<ExecutionPath, List<ExecutionBranch>> map) {
-            this.map = map;
-        }
-
-        private int doComparison(ExecutionPath o1, ExecutionPath o2) {
-            List<ExecutionBranch> first = map.get(o1);
-            List<ExecutionBranch> second = map.get(o2);
-            int diff = first.size() - second.size();
-            if (diff == 0) {
-                return 0;
-            } else if (diff > 0) {
-                return -1;
-            } else {
-                return 1;
-            }
-        }
-
-        @Override
-        public int compare(ExecutionPath o1, ExecutionPath o2) {
-            return doComparison(o1, o2);
-        }
     }
 }

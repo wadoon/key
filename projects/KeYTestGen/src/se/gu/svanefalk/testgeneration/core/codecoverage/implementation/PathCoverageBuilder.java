@@ -10,7 +10,7 @@ public enum PathCoverageBuilder implements ICoverageBuilder {
 
     @Override
     public Set<ExecutionPath> retrieveExecutionPaths(
-            ExecutionPathContext context) {
+            final ExecutionPathContext context) {
         // TODO Auto-generated method stub
         return null;
     }

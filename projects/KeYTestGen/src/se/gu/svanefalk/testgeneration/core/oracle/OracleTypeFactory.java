@@ -117,8 +117,7 @@ public class OracleTypeFactory {
         ComparatorType comparatorType = null;
 
         if (negated) {
-            comparatorType = OracleTypeFactory.negatedComparators
-                    .get(operatorName);
+            comparatorType = OracleTypeFactory.negatedComparators.get(operatorName);
         } else {
             comparatorType = OracleTypeFactory.comparators.get(operatorName);
         }
@@ -202,8 +201,7 @@ public class OracleTypeFactory {
             throws OracleGeneratorException {
         final String operatorName = term.op().name().toString();
 
-        final QuantifierType type = OracleTypeFactory.quantifiers
-                .get(operatorName);
+        final QuantifierType type = OracleTypeFactory.quantifiers.get(operatorName);
 
         if (type == null) {
             throw new OracleGeneratorException(

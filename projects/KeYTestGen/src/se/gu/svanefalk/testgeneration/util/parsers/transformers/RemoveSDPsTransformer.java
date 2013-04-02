@@ -42,8 +42,7 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
         final LocationVariable transformedParentObjectVariable = new LocationVariable(
                 parentObjectIdentifier, parentObject.sort());
 
-        final Term transformedParentObject = this.termFactory
-                .createTerm(transformedParentObjectVariable);
+        final Term transformedParentObject = this.termFactory.createTerm(transformedParentObjectVariable);
 
         /*
          * Construct a new list of children for the new method term

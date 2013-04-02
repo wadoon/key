@@ -251,8 +251,7 @@ public class ModelGenerationTools {
         }
     }
 
-    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
-            .toString();
+    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR.toString();
 
     private static final TermSimplificationTransformer termSimplificationTransformer = new TermSimplificationTransformer();
 
@@ -291,8 +290,7 @@ public class ModelGenerationTools {
     public static Term simplifyTerm(final Term targetNodeCondition)
             throws TermTransformerException {
 
-        return ModelGenerationTools.termSimplificationTransformer
-                .transform(targetNodeCondition);
+        return ModelGenerationTools.termSimplificationTransformer.transform(targetNodeCondition);
     }
 
     /**

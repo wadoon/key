@@ -80,8 +80,7 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
                  * Parse them both normally.
                  */
                 final Term parsedFirstSub = this.transformTerm(negatedFirstSub);
-                final Term parsedSecondSub = this
-                        .transformTerm(negatedSecondSub);
+                final Term parsedSecondSub = this.transformTerm(negatedSecondSub);
 
                 /*
                  * Finally, return an OR operator with the new terms as
@@ -110,8 +109,7 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
                  * Parse both negated subterms.
                  */
                 final Term parsedFirstSub = this.transformTerm(negatedFirstSub);
-                final Term parsedSecondSub = this
-                        .transformTerm(negatedSecondSub);
+                final Term parsedSecondSub = this.transformTerm(negatedSecondSub);
 
                 /*
                  * Return the new AND operator.

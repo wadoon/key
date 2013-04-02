@@ -27,8 +27,7 @@ public class Benchmark {
     public static void finishBenchmarking(final String event) {
         if (Benchmark.toggleBenchmark) {
             final long clockValue = Benchmark.readings.get(event);
-            final long finalClockValue = Calendar.getInstance()
-                    .getTimeInMillis();
+            final long finalClockValue = Calendar.getInstance().getTimeInMillis();
 
             if (Benchmark.verbose) {
                 System.out.println("BENCHMARK: " + event + " took "

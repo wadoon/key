@@ -41,13 +41,6 @@ public class OracleGenerationCapsule extends Capsule {
     }
 
     /**
-     * @return the result of the Oracle generation process, if succesful.
-     */
-    public Oracle getResult() {
-        return this.oracle;
-    }
-
-    /**
      * Run the Oracle generation process.
      */
     @Override
@@ -69,5 +62,12 @@ public class OracleGenerationCapsule extends Capsule {
          * The oracle generation process was succesful.
          */
         this.setSucceeded();
+    }
+
+    /**
+     * @return the result of the Oracle generation process, if succesful.
+     */
+    public Oracle getResult() {
+        return this.oracle;
     }
 }

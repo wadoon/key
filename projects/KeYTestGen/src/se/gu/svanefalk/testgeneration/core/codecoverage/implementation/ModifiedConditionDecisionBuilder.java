@@ -10,7 +10,7 @@ public enum ModifiedConditionDecisionBuilder implements ICoverageBuilder {
 
     @Override
     public Set<ExecutionPath> retrieveExecutionPaths(
-            ExecutionPathContext context) {
+            final ExecutionPathContext context) {
 
         return null;
     }

@@ -33,11 +33,11 @@ public class BranchCoverageParser implements ICodeCoverageParser {
     @Override
     public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
 
-        ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
-        
-        Set<ExecutionPath> executionPaths = builder.retrieveExecutionPaths(context);
-        List<IExecutionNode> resultNodes = new LinkedList<IExecutionNode>();
-        for (ExecutionPath path : executionPaths) {
+        final ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
+
+        final Set<ExecutionPath> executionPaths = BranchCoverageParser.builder.retrieveExecutionPaths(context);
+        final List<IExecutionNode> resultNodes = new LinkedList<IExecutionNode>();
+        for (final ExecutionPath path : executionPaths) {
             resultNodes.add(path.getTerminatingNode());
         }
         return resultNodes;

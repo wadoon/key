@@ -121,8 +121,7 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
         if (simplifiedFirstChild == null) {
             return this.transform(secondChild);
         } else {
-            final Term transformedSimplifiedFirstChild = this
-                    .transformTerm(simplifiedFirstChild);
+            final Term transformedSimplifiedFirstChild = this.transformTerm(simplifiedFirstChild);
             final Term transformedRightChild = this.transformTerm(secondChild);
             return this.termFactory.createTerm(Junctor.AND,
                     transformedSimplifiedFirstChild, transformedRightChild);

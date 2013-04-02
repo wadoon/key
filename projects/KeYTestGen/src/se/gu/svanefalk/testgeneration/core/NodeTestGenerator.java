@@ -10,9 +10,9 @@ import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.concurrency.Capsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.CapsuleExecutor;
 import se.gu.svanefalk.testgeneration.core.concurrency.ModelGenerationCapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.OracleGenerationCapsule;
-import se.gu.svanefalk.testgeneration.core.concurrency.CapsuleExecutor;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
@@ -30,9 +30,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 public enum NodeTestGenerator {
     INSTANCE;
 
-    KeYJavaClassFactory factory = KeYJavaClassFactory.INSTANCE;
+    private final CapsuleExecutor capsuleExecutor = CapsuleExecutor.INSTANCE;
 
-    private final CapsuleExecutor capsuleExecutor= CapsuleExecutor.INSTANCE;
+    KeYJavaClassFactory factory = KeYJavaClassFactory.INSTANCE;
 
     public String constructTestSuiteFromNode(final IExecutionNode node,
             final IFrameworkConverter frameworkConverter)
@@ -56,7 +56,7 @@ public enum NodeTestGenerator {
             /*
              * Create and dispatc the Model and Oracle geneators.
              */
-            List<Capsule> capsules = new LinkedList<Capsule>();
+            final List<Capsule> capsules = new LinkedList<Capsule>();
             final ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
                     node);
             capsules.add(modelGenerationCapsule);
@@ -65,7 +65,7 @@ public enum NodeTestGenerator {
                     targetMethod);
             capsules.add(oracleGenerationCapsule);
 
-            capsuleExecutor.executeCapsulesAndWait(capsules);
+            this.capsuleExecutor.executeCapsulesAndWait(capsules);
 
             /*
              * Collect the results

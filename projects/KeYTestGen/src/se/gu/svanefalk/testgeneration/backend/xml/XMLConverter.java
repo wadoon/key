@@ -36,23 +36,19 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * The eventFactory is used in order to produce {@link XMLEvent}s, that is,
      * XML tags.
      */
-    private static final XMLEventFactory eventFactory = XMLEventFactory
-            .newFactory();
+    private static final XMLEventFactory eventFactory = XMLEventFactory.newFactory();
 
     /**
      * {@link XMLEvent} representing a newline.
      */
-    private static final XMLEvent newline = XMLConverter.eventFactory
-            .createDTD("\n");
+    private static final XMLEvent newline = XMLConverter.eventFactory.createDTD("\n");
 
-    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
-            .toString();
+    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR.toString();
 
     /**
      * {@link XMLEvent} representing a tab.
      */
-    private static final XMLEvent tab = XMLConverter.eventFactory
-            .createDTD("    ");
+    private static final XMLEvent tab = XMLConverter.eventFactory.createDTD("    ");
 
     /**
      * The eventWriter is used to add new {@link XMLEvent}s to the outputStream.
@@ -92,8 +88,8 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     public XMLConverter() throws XMLGeneratorException {
 
         try {
-            this.eventWriter = XMLOutputFactory.newFactory()
-                    .createXMLEventWriter(this.outputStream);
+            this.eventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(
+                    this.outputStream);
         } catch (final XMLStreamException e) {
             throw new XMLGeneratorException(
                     "FATAL: failed to initialize XMLVisitor" + e.getMessage());
@@ -190,15 +186,13 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
             throws XMLStreamException {
 
         if (this.format) {
-            this.eventWriter.add(XMLConverter.eventFactory
-                    .createStartDocument());
+            this.eventWriter.add(XMLConverter.eventFactory.createStartDocument());
             this.eventWriter.add(XMLConverter.newline);
             this.eventWriter.add(XMLConverter.eventFactory.createStartElement(
                     "", "", documentName));
             this.eventWriter.add(XMLConverter.newline);
         } else {
-            this.eventWriter.add(XMLConverter.eventFactory
-                    .createStartDocument());
+            this.eventWriter.add(XMLConverter.eventFactory.createStartDocument());
             this.eventWriter.add(XMLConverter.eventFactory.createStartElement(
                     "", "", documentName));
         }
@@ -444,12 +438,10 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
             this.indentationCounter++;
             this.addIndentation();
             this.indentationCounter--;
-            this.eventWriter.add(XMLConverter.eventFactory
-                    .createCharacters(element.toString()));
+            this.eventWriter.add(XMLConverter.eventFactory.createCharacters(element.toString()));
             this.eventWriter.add(XMLConverter.newline);
         } else {
-            this.eventWriter.add(XMLConverter.eventFactory
-                    .createCharacters(element.toString()));
+            this.eventWriter.add(XMLConverter.eventFactory.createCharacters(element.toString()));
         }
     }
 

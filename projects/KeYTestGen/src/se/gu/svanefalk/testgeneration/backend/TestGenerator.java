@@ -112,8 +112,8 @@ public enum TestGenerator {
             /*
              * Create abstract test suites for the selected methods.
              */
-            final List<TestSuite> testSuites = this.coreInterface
-                    .createTestSuites(source, coverage, methods);
+            final List<TestSuite> testSuites = this.coreInterface.createTestSuites(
+                    source, coverage, methods);
 
             /*
              * Convert the abstract test suites to the desired final format.
@@ -122,8 +122,7 @@ public enum TestGenerator {
             final List<String> convertedTestSuites = new LinkedList<String>();
             for (final TestSuite testSuite : testSuites) {
 
-                final String convertedTestSuite = frameworkConverter
-                        .convert(testSuite);
+                final String convertedTestSuite = frameworkConverter.convert(testSuite);
 
                 convertedTestSuites.add(convertedTestSuite);
             }

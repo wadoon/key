@@ -122,8 +122,7 @@ public class Model {
                 return;
             }
 
-            final ModelInstance instance = (ModelInstance) localOther
-                    .getValue();
+            final ModelInstance instance = (ModelInstance) localOther.getValue();
             instance.addField(target);
             target.setParentModelInstance(instance);
         }

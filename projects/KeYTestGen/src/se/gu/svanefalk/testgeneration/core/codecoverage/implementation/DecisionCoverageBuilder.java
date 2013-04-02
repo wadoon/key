@@ -18,36 +18,113 @@ import de.uka.ilkd.key.java.statement.If;
 public enum DecisionCoverageBuilder implements ICoverageBuilder {
     INSTANCE;
 
+    private static class DescendingExecutionBranchComparator implements
+            Comparator<ExecutionPath> {
+
+        private final Map<ExecutionPath, Set<BranchStatement>> map;
+
+        public DescendingExecutionBranchComparator(
+                final Map<ExecutionPath, Set<BranchStatement>> map) {
+            this.map = map;
+        }
+
+        @Override
+        public int compare(final ExecutionPath o1, final ExecutionPath o2) {
+            return this.doComparison(o1, o2);
+        }
+
+        private int doComparison(final ExecutionPath o1, final ExecutionPath o2) {
+            final Set<BranchStatement> first = this.map.get(o1);
+            final Set<BranchStatement> second = this.map.get(o2);
+            final int diff = first.size() - second.size();
+            if (diff == 0) {
+                return 0;
+            } else if (diff > 0) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+    }
+
+    private Set<BranchStatement> collectBranchStatements(
+            final Set<SourceElement> visitedProgramNodes) {
+
+        final Set<BranchStatement> branchStatements = new HashSet<>();
+        for (final SourceElement element : visitedProgramNodes) {
+            if (element instanceof BranchStatement) {
+                branchStatements.add((BranchStatement) element);
+            }
+        }
+        return branchStatements;
+    }
+
+    private Set<ExecutionPath> constructMinimalSetForMapping(
+            final PriorityQueue<ExecutionPath> sortedPaths,
+            final Map<ExecutionPath, Set<BranchStatement>> mapping) {
+
+        while (!sortedPaths.isEmpty()) {
+            final ExecutionPath executionPath = sortedPaths.poll();
+            final Set<BranchStatement> branchStatements = mapping.get(executionPath);
+            for (final ExecutionPath pathToCompare : sortedPaths) {
+                final Set<BranchStatement> branchStatementsToCompare = mapping.get(pathToCompare);
+                if (branchStatementsToCompare != null) {
+                    if (this.subsumes(branchStatements,
+                            branchStatementsToCompare)) {
+                        mapping.remove(pathToCompare);
+                    }
+                }
+            }
+        }
+
+        final Set<ExecutionPath> minimalSet = new HashSet<>();
+        for (final ExecutionPath path : mapping.keySet()) {
+            minimalSet.add(path);
+        }
+        return minimalSet;
+    }
+
+    private boolean contains(final ExecutionPath path,
+            final SourceElement thenBranchResult) {
+
+        for (final SourceElement element : path.getCoveredNodes()) {
+            if (element == thenBranchResult) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public Set<ExecutionPath> retrieveExecutionPaths(
-            ExecutionPathContext context) {
+            final ExecutionPathContext context) {
 
         /*
          * Create two separate mappings - one which maps, for each execution
          * branch, the branching nodes in which the Then branch is taken by that
          * path. Conversely, do the same for the Else branch.
          */
-        Set<BranchStatement> branchStatements = collectBranchStatements(context.getVisitedProgramNodes());
-        List<ExecutionPath> executionPaths = context.getExecutionPaths();
+        final Set<BranchStatement> branchStatements = this.collectBranchStatements(context.getVisitedProgramNodes());
+        final List<ExecutionPath> executionPaths = context.getExecutionPaths();
 
-        Map<ExecutionPath, Set<BranchStatement>> thenMapping = new HashMap<ExecutionPath, Set<BranchStatement>>();
-        Map<ExecutionPath, Set<BranchStatement>> elseMapping = new HashMap<ExecutionPath, Set<BranchStatement>>();
+        final Map<ExecutionPath, Set<BranchStatement>> thenMapping = new HashMap<ExecutionPath, Set<BranchStatement>>();
+        final Map<ExecutionPath, Set<BranchStatement>> elseMapping = new HashMap<ExecutionPath, Set<BranchStatement>>();
 
-        for (BranchStatement branchStatement : branchStatements) {
+        for (final BranchStatement branchStatement : branchStatements) {
             if (branchStatement instanceof If) {
-                If ifBranch = (If) branchStatement;
-                SourceElement thenBranchResult = ifBranch.getThen().getBody();
-                SourceElement elseBranchResult = ifBranch.getElse().getBody();
+                final If ifBranch = (If) branchStatement;
+                final SourceElement thenBranchResult = ifBranch.getThen().getBody();
+                final SourceElement elseBranchResult = ifBranch.getElse().getBody();
 
-                for (ExecutionPath path : executionPaths) {
-                    if (contains(path, thenBranchResult)) {
+                for (final ExecutionPath path : executionPaths) {
+                    if (this.contains(path, thenBranchResult)) {
                         Set<BranchStatement> mappedElements = thenMapping.get(path);
                         if (mappedElements == null) {
                             mappedElements = new HashSet<BranchStatement>();
                             thenMapping.put(path, mappedElements);
                         }
                         mappedElements.add(branchStatement);
-                    } else if (contains(path, elseBranchResult)) {
+                    } else if (this.contains(path, elseBranchResult)) {
                         Set<BranchStatement> mappedElements = elseMapping.get(path);
                         if (mappedElements == null) {
                             mappedElements = new HashSet<BranchStatement>();
@@ -66,12 +143,12 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
          * these two sets. This is most likely NOT an optimal algorithm for
          * calculating a minimal set.
          */
-        PriorityQueue<ExecutionPath> thenSortedPaths = new PriorityQueue<>(20,
-                new DescendingExecutionBranchComparator(thenMapping));
-        PriorityQueue<ExecutionPath> elseSortedPaths = new PriorityQueue<>(20,
-                new DescendingExecutionBranchComparator(elseMapping));
+        final PriorityQueue<ExecutionPath> thenSortedPaths = new PriorityQueue<>(
+                20, new DescendingExecutionBranchComparator(thenMapping));
+        final PriorityQueue<ExecutionPath> elseSortedPaths = new PriorityQueue<>(
+                20, new DescendingExecutionBranchComparator(elseMapping));
 
-        for (ExecutionPath executionPath : executionPaths) {
+        for (final ExecutionPath executionPath : executionPaths) {
             thenSortedPaths.add(executionPath);
             elseSortedPaths.add(executionPath);
         }
@@ -79,9 +156,9 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
         /*
          * Construct minimum set for the both mappings
          */
-        Set<ExecutionPath> minimalThenPaths = constructMinimalSetForMapping(
+        final Set<ExecutionPath> minimalThenPaths = this.constructMinimalSetForMapping(
                 thenSortedPaths, thenMapping);
-        Set<ExecutionPath> minimalElsePaths = constructMinimalSetForMapping(
+        final Set<ExecutionPath> minimalElsePaths = this.constructMinimalSetForMapping(
                 elseSortedPaths, elseMapping);
 
         /*
@@ -91,89 +168,14 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
         return minimalThenPaths;
     }
 
-    private Set<ExecutionPath> constructMinimalSetForMapping(
-            PriorityQueue<ExecutionPath> sortedPaths,
-            Map<ExecutionPath, Set<BranchStatement>> mapping) {
-
-        while (!sortedPaths.isEmpty()) {
-            ExecutionPath executionPath = sortedPaths.poll();
-            Set<BranchStatement> branchStatements = mapping.get(executionPath);
-            for (ExecutionPath pathToCompare : sortedPaths) {
-                Set<BranchStatement> branchStatementsToCompare = mapping.get(pathToCompare);
-                if (branchStatementsToCompare != null) {
-                    if (subsumes(branchStatements, branchStatementsToCompare)) {
-                        mapping.remove(pathToCompare);
-                    }
-                }
-            }
-        }
-
-        Set<ExecutionPath> minimalSet = new HashSet<>();
-        for (ExecutionPath path : mapping.keySet()) {
-            minimalSet.add(path);
-        }
-        return minimalSet;
-    }
-
-    private boolean contains(ExecutionPath path, SourceElement thenBranchResult) {
-
-        for (SourceElement element : path.getCoveredNodes()) {
-            if (element == thenBranchResult) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Set<BranchStatement> collectBranchStatements(
-            Set<SourceElement> visitedProgramNodes) {
-
-        Set<BranchStatement> branchStatements = new HashSet<>();
-        for (SourceElement element : visitedProgramNodes) {
-            if (element instanceof BranchStatement) {
-                branchStatements.add((BranchStatement) element);
-            }
-        }
-        return branchStatements;
-    }
-
-    private static class DescendingExecutionBranchComparator implements
-            Comparator<ExecutionPath> {
-
-        private Map<ExecutionPath, Set<BranchStatement>> map;
-
-        public DescendingExecutionBranchComparator(
-                Map<ExecutionPath, Set<BranchStatement>> map) {
-            this.map = map;
-        }
-
-        private int doComparison(ExecutionPath o1, ExecutionPath o2) {
-            Set<BranchStatement> first = map.get(o1);
-            Set<BranchStatement> second = map.get(o2);
-            int diff = first.size() - second.size();
-            if (diff == 0) {
-                return 0;
-            } else if (diff > 0) {
-                return -1;
-            } else {
-                return 1;
-            }
-        }
-
-        @Override
-        public int compare(ExecutionPath o1, ExecutionPath o2) {
-            return doComparison(o1, o2);
-        }
-    }
-
-    private boolean subsumes(Set<BranchStatement> first,
-            Set<BranchStatement> second) {
+    private boolean subsumes(final Set<BranchStatement> first,
+            final Set<BranchStatement> second) {
 
         if (second.size() > first.size()) {
             return false;
         }
 
-        for (BranchStatement branchStatement : second) {
+        for (final BranchStatement branchStatement : second) {
             if (!first.contains(branchStatement)) {
                 return false;
             }

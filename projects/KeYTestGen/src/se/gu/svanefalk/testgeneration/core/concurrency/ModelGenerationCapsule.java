@@ -38,15 +38,6 @@ public class ModelGenerationCapsule extends Capsule {
     }
 
     /**
-     * Return the resulting Model created by this Capsule, if successful.
-     * 
-     * @return
-     */
-    public Model getResult() {
-        return this.model;
-    }
-
-    /**
      * Generates a model for the node in this capsule, and creates a final
      * {@link TestCase} instance to encapsulate it.
      */
@@ -69,5 +60,14 @@ public class ModelGenerationCapsule extends Capsule {
          * ModelGeneration succeeded.
          */
         this.setSucceeded();
+    }
+
+    /**
+     * Return the resulting Model created by this Capsule, if successful.
+     * 
+     * @return
+     */
+    public Model getResult() {
+        return this.model;
     }
 }

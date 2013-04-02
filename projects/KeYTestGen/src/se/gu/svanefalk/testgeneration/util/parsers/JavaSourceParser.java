@@ -107,9 +107,7 @@ public class JavaSourceParser {
 
     public static void main(final String[] args) throws IOException {
 
-        System.out
-                .println(JavaSourceParser
-                        .declaresNoArgsConstructor("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"));
+        System.out.println(JavaSourceParser.declaresNoArgsConstructor("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"));
     }
 
     /**

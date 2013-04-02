@@ -296,8 +296,7 @@ public final class TermParserTools {
      */
     public static boolean isExceptionSort(final Term term) {
 
-        return TermParserTools.exceptionSorts.contains(term.sort().name()
-                .toString());
+        return TermParserTools.exceptionSorts.contains(term.sort().name().toString());
     }
 
     /**
@@ -351,8 +350,8 @@ public final class TermParserTools {
      */
     public static boolean isGreaterOrEquals(final Term term) {
 
-        return term.op().name().toString()
-                .equals(StringConstants.GREATER_OR_EQUALS);
+        return term.op().name().toString().equals(
+                StringConstants.GREATER_OR_EQUALS);
     }
 
     /**
@@ -420,8 +419,8 @@ public final class TermParserTools {
      */
     public static boolean isLessOrEquals(final Term term) {
 
-        return term.op().name().toString()
-                .equals(StringConstants.LESS_OR_EQUALS);
+        return term.op().name().toString().equals(
+                StringConstants.LESS_OR_EQUALS);
     }
 
     /**

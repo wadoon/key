@@ -67,8 +67,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
              * Process the Then branch in the fashion described above.
              */
             if (this.isEndBranch(thenBranch)) {
-                realOutcome = TermParserTools
-                        .translateToJavaBoolean(thenBranch);
+                realOutcome = TermParserTools.translateToJavaBoolean(thenBranch);
                 if (realOutcome == expectedOutcome) {
                     conditions.add(condition);
                     return;
@@ -84,8 +83,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
              * Process the Else branch in the same fashion.
              */
             if (this.isEndBranch(elseBranch)) {
-                realOutcome = TermParserTools
-                        .translateToJavaBoolean(elseBranch);
+                realOutcome = TermParserTools.translateToJavaBoolean(elseBranch);
                 if (realOutcome == expectedOutcome) {
                     conditions.add(this.termFactory.createTerm(Junctor.NOT,
                             condition));
@@ -149,8 +147,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                  * The expected outcome of the evaluation of the if-then-else
                  * statement. May be choosen arbitrarily, see below.
                  */
-                boolean outcome = TermParserTools
-                        .translateToJavaBoolean(secondChild);
+                boolean outcome = TermParserTools.translateToJavaBoolean(secondChild);
 
                 /*
                  * If the second operand is a boolean, it can only (?) be a
@@ -162,14 +159,13 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                 if (TermParserTools.isBoolean(secondChild)) {
 
                     if (TermParserTools.isBooleanConstant(secondChild)) {
-                        outcome = TermParserTools
-                                .translateToJavaBoolean(secondChild);
+                        outcome = TermParserTools.translateToJavaBoolean(secondChild);
                     } else {
                         outcome = true;
                         this.createTrueConstant();
-                        final Term newSecondChild = this.termFactory
-                                .createTerm(Equality.EQUALS, secondChild,
-                                        this.createTrueConstant());
+                        final Term newSecondChild = this.termFactory.createTerm(
+                                Equality.EQUALS, secondChild,
+                                this.createTrueConstant());
 
                         conditions.add(newSecondChild);
                     }

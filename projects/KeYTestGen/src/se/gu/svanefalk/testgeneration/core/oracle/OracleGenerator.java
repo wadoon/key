@@ -139,8 +139,8 @@ public enum OracleGenerator {
         final OracleExpression firstOperand = this.constructExpressionFromTerm(
                 term.sub(0), negate);
 
-        final OracleExpression secondOperand = this
-                .constructExpressionFromTerm(term.sub(1), negate);
+        final OracleExpression secondOperand = this.constructExpressionFromTerm(
+                term.sub(1), negate);
 
         return new OracleComparator(comparator, firstOperand, secondOperand);
     }
@@ -265,8 +265,8 @@ public enum OracleGenerator {
          * Get the identifier for the method
          */
         final int lastColon = term.op().name().toString().lastIndexOf(':');
-        final String identifier = term.op().name().toString()
-                .substring(lastColon + 1);
+        final String identifier = term.op().name().toString().substring(
+                lastColon + 1);
 
         /*
          * Construct the return type
@@ -277,8 +277,7 @@ public enum OracleGenerator {
          * Construct the parent object from which this method is being invoked.
          */
         final Term parentObjectTerm = term.sub(1);
-        final OracleType type = OracleTypeFactory
-                .getOracleType(parentObjectTerm);
+        final OracleType type = OracleTypeFactory.getOracleType(parentObjectTerm);
         final String parentIdentifier = term.toString();
         final OracleLiteral parentObject = new OracleLiteral(type,
                 parentIdentifier);
@@ -320,14 +319,12 @@ public enum OracleGenerator {
         /*
          * Resolve the type of the quantifier
          */
-        final QuantifierType quantifierType = OracleTypeFactory
-                .getQuantifierType(term);
+        final QuantifierType quantifierType = OracleTypeFactory.getQuantifierType(term);
 
         /*
          * Resolve the expression bounded by this quantifier
          */
-        final OracleConstraint boundExpression = this.constructOracle(term
-                .sub(0));
+        final OracleConstraint boundExpression = this.constructOracle(term.sub(0));
 
         /*
          * Construct the quantifiable variable
@@ -469,8 +466,8 @@ public enum OracleGenerator {
             this.constructExpressions(term.sub(1), expressions);
         } else {
 
-            final OracleExpression expression = this
-                    .constructExpressionFromTerm(term, false);
+            final OracleExpression expression = this.constructExpressionFromTerm(
+                    term, false);
             expressions.add(expression);
         }
     }
@@ -524,20 +521,17 @@ public enum OracleGenerator {
              */
             final OracleMetaExtractor metaExtractor = new OracleMetaExtractor();
             postCondition.execPreOrder(metaExtractor);
-            final OracleType expectedException = metaExtractor
-                    .getThrownException();
+            final OracleType expectedException = metaExtractor.getThrownException();
 
             /*
              * Simplify the postcondition
              */
-            final Term simplifiedPostCondition = this.oracleTermTransformer
-                    .transform(postCondition);
+            final Term simplifiedPostCondition = this.oracleTermTransformer.transform(postCondition);
 
             /*
              * Create the postcondition constraints model
              */
-            final OracleConstraint constraints = this
-                    .constructOracle(simplifiedPostCondition);
+            final OracleConstraint constraints = this.constructOracle(simplifiedPostCondition);
 
             return new Oracle(constraints, expectedException);
 

@@ -117,14 +117,12 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
         /*
          * Remove implications from the term
          */
-        final Term implicationFreeTerm = ConjunctionNormalFormTransformer.removeImplicationsTransformer
-                .transform(term);
+        final Term implicationFreeTerm = ConjunctionNormalFormTransformer.removeImplicationsTransformer.transform(term);
 
         /*
          * Put the term into Negation Normal Form
          */
-        final Term nnfTerm = ConjunctionNormalFormTransformer.nnfTransformer
-                .transform(implicationFreeTerm);
+        final Term nnfTerm = ConjunctionNormalFormTransformer.nnfTransformer.transform(implicationFreeTerm);
 
         return this.transformTerm(nnfTerm);
     }

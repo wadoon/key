@@ -11,24 +11,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 public class ExecutionPath {
 
-    private Set<SourceElement> coveredNodes;
     private Map<SourceElement, List<IExecutionBranchCondition>> branchConditionMappings;
-
-    /**
-     * @return the branchConditionMappings
-     */
-    public Map<SourceElement, List<IExecutionBranchCondition>> getBranchConditionMappings() {
-        return branchConditionMappings;
-    }
-
-    /**
-     * @param branchConditionMappings
-     *            the branchConditionMappings to set
-     */
-    void setBranchConditionMappings(
-            Map<SourceElement, List<IExecutionBranchCondition>> branchConditionMappings) {
-        this.branchConditionMappings = branchConditionMappings;
-    }
+    private Set<SourceElement> coveredNodes;
 
     private IExecutionNode terminatingNode;
 
@@ -44,6 +28,13 @@ public class ExecutionPath {
     }
 
     /**
+     * @return the branchConditionMappings
+     */
+    public Map<SourceElement, List<IExecutionBranchCondition>> getBranchConditionMappings() {
+        return this.branchConditionMappings;
+    }
+
+    /**
      * @return the coveredNodes
      */
     public Set<SourceElement> getCoveredNodes() {
@@ -55,6 +46,15 @@ public class ExecutionPath {
      */
     public IExecutionNode getTerminatingNode() {
         return this.terminatingNode;
+    }
+
+    /**
+     * @param branchConditionMappings
+     *            the branchConditionMappings to set
+     */
+    void setBranchConditionMappings(
+            final Map<SourceElement, List<IExecutionBranchCondition>> branchConditionMappings) {
+        this.branchConditionMappings = branchConditionMappings;
     }
 
     /**

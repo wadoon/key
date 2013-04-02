@@ -16,14 +16,6 @@ public abstract class Capsule implements Runnable {
     private CountDownLatch latch;
 
     /**
-     * @param latch
-     *            the latch to set
-     */
-    void setLatch(CountDownLatch latch) {
-        this.latch = latch;
-    }
-
-    /**
      * Flag to indicate whether or not the outcome of this capsules execution
      * was succesful or not.
      */
@@ -33,6 +25,8 @@ public abstract class Capsule implements Runnable {
      * Exception potentially thrown during the execution of this Capsule.
      */
     private KeYTestGenException thrownException;
+
+    public abstract void doWork();
 
     /**
      * @return the exception thrown during the execution of this capsule, if
@@ -46,20 +40,25 @@ public abstract class Capsule implements Runnable {
      * @return true if the Capsule executed succesfully, false otherwise.
      */
     public boolean isSucceeded() {
-        Thread thread;
         return this.succeeded;
     }
 
     @Override
     public final void run() {
         try {
-            doWork();
+            this.doWork();
         } finally {
-            latch.countDown();
+            this.latch.countDown();
         }
     }
 
-    public abstract void doWork();
+    /**
+     * @param latch
+     *            the latch to set
+     */
+    void setLatch(final CountDownLatch latch) {
+        this.latch = latch;
+    }
 
     /**
      * Indicate that the execution of the the Capsule succeeded. Cannot be

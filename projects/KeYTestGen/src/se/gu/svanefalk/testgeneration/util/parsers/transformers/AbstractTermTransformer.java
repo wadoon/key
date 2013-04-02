@@ -76,8 +76,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
         final Term firstChild = this.transformTerm(term.sub(0));
         final Term secondChild = this.transformTerm(term.sub(1));
 
-        return this.termFactory
-                .createTerm(Junctor.AND, firstChild, secondChild);
+        return this.termFactory.createTerm(Junctor.AND, firstChild, secondChild);
     }
 
     /**

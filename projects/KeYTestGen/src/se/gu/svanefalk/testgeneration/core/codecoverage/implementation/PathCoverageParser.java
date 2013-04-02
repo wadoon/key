@@ -12,10 +12,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class PathCoverageParser implements ICodeCoverageParser {
 
+    private static final PathCoverageBuilder builder = PathCoverageBuilder.INSTANCE;
 
-private static final PathCoverageBuilder builder = PathCoverageBuilder.INSTANCE;
-
-    
     /**
      * <p>
      * Returns a set of {@link IExecutionNode} instances, s.t. generating a test
@@ -42,11 +40,11 @@ private static final PathCoverageBuilder builder = PathCoverageBuilder.INSTANCE;
     @Override
     public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
 
-        ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
+        final ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
 
-        Set<ExecutionPath> executionPaths = builder.retrieveExecutionPaths(context);
-        List<IExecutionNode> resultNodes = new LinkedList<IExecutionNode>();
-        for (ExecutionPath path : executionPaths) {
+        final Set<ExecutionPath> executionPaths = PathCoverageParser.builder.retrieveExecutionPaths(context);
+        final List<IExecutionNode> resultNodes = new LinkedList<IExecutionNode>();
+        for (final ExecutionPath path : executionPaths) {
             resultNodes.add(path.getTerminatingNode());
         }
         return resultNodes;

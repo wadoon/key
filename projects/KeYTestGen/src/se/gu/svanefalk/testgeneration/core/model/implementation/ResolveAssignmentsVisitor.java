@@ -19,8 +19,7 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
      * Constant for separating fields in {@link SortDependingFunction}
      * instances.
      */
-    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR
-            .toString();
+    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR.toString();
 
     /**
      * The {@link Model} instance associated with the Term being visited.
@@ -82,9 +81,8 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                  */
                 if (TermParserTools.isBoolean(leftOperand)) {
 
-                    leftOperandIdentifier = TermParserTools
-                            .resolveIdentifierString(leftOperand,
-                                    ResolveAssignmentsVisitor.SEPARATOR);
+                    leftOperandIdentifier = TermParserTools.resolveIdentifierString(
+                            leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
 
                     /*
                      * If the right-hand operator is a boolean constant (TRUE or
@@ -93,11 +91,9 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                      */
                     if (TermParserTools.isBooleanConstant(rightOperand)) {
 
-                        final ModelVariable modelVariable = this.model
-                                .getVariable(leftOperandIdentifier);
+                        final ModelVariable modelVariable = this.model.getVariable(leftOperandIdentifier);
 
-                        boolean value = TermParserTools
-                                .isBooleanTrue(rightOperand);
+                        boolean value = TermParserTools.isBooleanTrue(rightOperand);
                         value = this.sawNot ? !value : value;
                         this.model.add(modelVariable, value);
                     } else {
@@ -108,18 +104,14 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                      */
                 } else if (!this.sawNot) {
 
-                    leftOperandIdentifier = TermParserTools
-                            .resolveIdentifierString(leftOperand,
-                                    ResolveAssignmentsVisitor.SEPARATOR);
-                    rightOperandIdentifier = TermParserTools
-                            .resolveIdentifierString(rightOperand,
-                                    ResolveAssignmentsVisitor.SEPARATOR);
+                    leftOperandIdentifier = TermParserTools.resolveIdentifierString(
+                            leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
+                    rightOperandIdentifier = TermParserTools.resolveIdentifierString(
+                            rightOperand, ResolveAssignmentsVisitor.SEPARATOR);
 
-                    final ModelVariable leftModelVariable = this.model
-                            .getVariable(leftOperandIdentifier);
+                    final ModelVariable leftModelVariable = this.model.getVariable(leftOperandIdentifier);
 
-                    final ModelVariable rightModelVariable = this.model
-                            .getVariable(rightOperandIdentifier);
+                    final ModelVariable rightModelVariable = this.model.getVariable(rightOperandIdentifier);
 
                     this.model.assignPointer(leftModelVariable,
                             rightModelVariable);

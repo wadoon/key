@@ -187,15 +187,13 @@ public enum ModelGenerator implements IModelGenerator {
                  * Finally, retrieve the variable corresponding to the name of
                  * the result, and insert the corresponding result into it.
                  */
-                final ModelVariable variable = model
-                        .getVariable(varName.trim());
+                final ModelVariable variable = model.getVariable(varName.trim());
                 if (variable != null) {
 
                     variable.setValue(value);
                 } else {
                     final StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder
-                            .append("Tried to insert concrete value into invalid abstract heap variable: ");
+                    stringBuilder.append("Tried to insert concrete value into invalid abstract heap variable: ");
                     stringBuilder.append(varName);
                     throw new ModelGeneratorException(stringBuilder.toString());
                 }
@@ -228,8 +226,7 @@ public enum ModelGenerator implements IModelGenerator {
              * There is hence nothing useful we can do with it, and we just
              * return it as null.
              */
-            final Term simplifiedPathCondition = ModelGenerationTools
-                    .simplifyTerm(pathCondition);
+            final Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
 
             if (simplifiedPathCondition == null) {
 
@@ -253,9 +250,8 @@ public enum ModelGenerator implements IModelGenerator {
                  */
                 do {
 
-                    result = this.smtInterface
-                            .startMessageBasedSession(commands)
-                            .replaceAll("success", "").trim();
+                    result = this.smtInterface.startMessageBasedSession(
+                            commands).replaceAll("success", "").trim();
 
                     attempts++;
 
