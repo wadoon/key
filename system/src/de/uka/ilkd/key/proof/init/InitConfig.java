@@ -1,3 +1,17 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
+
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
@@ -86,8 +100,10 @@ public abstract class InitConfig<S extends IServices, IC extends InitConfig<S, I
             }
         }
         if(changed) {
+            @SuppressWarnings("unchecked")
+            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
-                setDefaultChoices((HashMap<String, String>)category2DefaultChoice.clone());
+                setDefaultChoices(clone);
         }
     }
 
@@ -113,9 +129,10 @@ public abstract class InitConfig<S extends IServices, IC extends InitConfig<S, I
      */
     public void setActivatedChoices(ImmutableSet<Choice> activatedChoices) {
         category2DefaultChoice =
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
-            getDefaultChoices();
-    
+	    ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
+	    getDefaultChoices();
+
+        @SuppressWarnings("unchecked")
         HashMap<String, String> c2DC = (HashMap<String,String>)category2DefaultChoice.clone();
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());

@@ -1,31 +1,36 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
+
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
-
-
 @SuppressWarnings("unchecked")
-public class TestKey extends TestCase {
+public class TestKey extends TestSuite {
 
-    static Class[] utilityTests = new Class[] {
+    static Class<? extends TestCase>[] utilityTests = new Class[] {
 	de.uka.ilkd.key.collection.TestSetAsListOfString.class,
 	de.uka.ilkd.key.collection.TestSLListOfString.class,
 	de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
 	de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
+	de.uka.ilkd.key.util.TestLexicographicComparator.class,
+    de.uka.ilkd.key.util.TestMiscTools.class,
 	de.uka.ilkd.key.util.pp.TestLayouter.class
     }; 
 
 
-    static Class[] logicModelTests = new Class[] {
+    static Class<? extends TestCase>[] logicModelTests = new Class[] {
 	de.uka.ilkd.key.logic.TestTermFactory.class,
 	de.uka.ilkd.key.logic.TestTerm.class,
 	de.uka.ilkd.key.logic.TestNamespace.class,
@@ -37,14 +42,14 @@ public class TestKey extends TestCase {
     };
 
 
-    static Class[] parserTests = new Class[] {
+    static Class<? extends TestCase>[] parserTests = new Class[] {
 	de.uka.ilkd.key.parser.TestDeclParser.class,
 	de.uka.ilkd.key.parser.TestTermParser.class,
 	de.uka.ilkd.key.parser.TestTacletParser.class,
     };
 
 
-    static Class[] ruleTests = new Class[] {
+    static Class<? extends TestCase>[] ruleTests = new Class[] {
 	de.uka.ilkd.key.rule.TestSchemaModalOperators.class,
 	de.uka.ilkd.key.rule.tacletbuilder.TestTacletBuild.class,
 	de.uka.ilkd.key.rule.TestCollisionResolving.class,
@@ -56,15 +61,16 @@ public class TestKey extends TestCase {
     };
 
 
-    static Class[] proofConstructionTests = new Class[] {
+    static Class<? extends TestCase>[] proofConstructionTests = new Class[] {
 	de.uka.ilkd.key.proof.TestTacletIndex.class,
 	de.uka.ilkd.key.proof.TestProofTree.class,
 	de.uka.ilkd.key.proof.TestGoal.class,
-	de.uka.ilkd.key.proof.TestTermTacletAppIndex.class
+	de.uka.ilkd.key.proof.TestTermTacletAppIndex.class,
+	de.uka.ilkd.key.taclettranslation.TestTacletTranslator.class
     };
 
 
-    static Class[] javaTests = new Class[] {
+    static Class<? extends TestCase>[] javaTests = new Class[] {
 	de.uka.ilkd.key.java.TestJavaInfo.class,
 	de.uka.ilkd.key.java.TestJavaCardDLJavaExtensions.class,
 	de.uka.ilkd.key.java.TestRecoder2KeY.class,
@@ -74,13 +80,13 @@ public class TestKey extends TestCase {
     };
 
 
-    static Class[] speclangTests = new Class[] {
+    static Class<? extends TestCase>[] speclangTests = new Class[] {
         de.uka.ilkd.key.speclang.jml.translation.TestJMLTranslator.class,
         de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
     };
      
      
-    static Class[] smtTests = new Class[] {
+    static Class<? extends TestCase>[] smtTests = new Class[] {
 	de.uka.ilkd.key.smt.test.TestSimplify.class,
 	de.uka.ilkd.key.smt.test.TestZ3.class,
 	de.uka.ilkd.key.smt.test.TestYices.class,
@@ -88,10 +94,12 @@ public class TestKey extends TestCase {
 
     };
 
-    static Class[] setTests = new Class[] {
+    static Class<? extends TestCase>[] setTests = new Class[] {
        de.uka.ilkd.key.util.TestNodePreorderIterator.class,
        de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
        de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
+       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationExtractor.class,
+       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationWriterAndReader.class,
        de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
        de.uka.ilkd.key.symbolic_execution.po.TestFunctionalOperationContractPO.class,
        de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodPO.class,
@@ -105,7 +113,7 @@ public class TestKey extends TestCase {
     };
 
      
-     public static TestSuite createSuite(Class[] testClasses, final String msg) {
+     public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {
 	TestSuite suite = new TestSuite() {
 		public void run(TestResult result) {
 		    System.out.print("[" + msg + "]: ");
@@ -135,8 +143,9 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
-	//suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
-        
+	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
+	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
+
 	return suite;
     }
 

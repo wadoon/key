@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -39,14 +38,18 @@ public abstract class AbstractUserInterface<S extends IServices, IC extends Init
      * {@inheritDoc}
      */
     @Override
-    public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
-       getMediator().stopInterface(true);
-       DefaultProblemLoader loader = createDefaultProblemLoader(file, classPath, bootClassPath, getMediator());
-       loader.load();
-       getMediator().startInterface(true);
-       return loader;
+    public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+       try {
+          getMediator().stopInterface(true);
+          DefaultProblemLoader loader = createDefaultProblemLoader(file, classPath, bootClassPath, getMediator());
+          loader.load();
+          return loader;
+       }
+       finally {
+          getMediator().startInterface(true);
+       }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -55,14 +58,34 @@ public abstract class AbstractUserInterface<S extends IServices, IC extends Init
        AbstractProblemInitializer<?, IC> init = createProblemInitializer(true);
        return init.startProver(initConfig, input, 0);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startAndWaitForAutoMode(Proof proof) {
+       startAutoMode(proof);
+       waitWhileAutoMode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startAutoMode(Proof proof) {
+       KeYMediator mediator = getMediator();
+       mediator.setProof(proof);
+       mediator.startAutoMode();
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
-       getMediator().setProof(proof);
-       getMediator().startAutoMode(goals);
+       KeYMediator mediator = getMediator();
+       mediator.setProof(proof);
+       mediator.startAutoMode(goals);
     }
 
     /**

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.speclang;
@@ -76,8 +80,9 @@ public class JavaContractFactory {
     //create new contract
     return new FunctionalOperationContractImpl(foci.baseName,
             foci.name,
-            foci.kjt,                                    
+            foci.kjt,
             foci.pm,
+            foci.specifiedIn,
             foci.modality,
             foci.originalPres,
             foci.originalMby,
@@ -129,6 +134,7 @@ public class JavaContractFactory {
                                                    foci.name,
                                                    foci.kjt,
                                                    foci.pm,
+                                                   foci.specifiedIn,
                                                    foci.modality,
                                                    newPres,
                                                    foci.originalMby,
@@ -148,14 +154,15 @@ public class JavaContractFactory {
 
     public DependencyContract dep(KeYJavaType containerType,
                                   IObserverFunction pm,
+                                  KeYJavaType specifiedIn,
                                   Term requires,
                                   Term measuredBy,
                                   Term accessible,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars) {
         assert (selfVar == null) == pm.isStatic();
-        return dep("JML accessible clause", containerType, pm, requires,
-                   measuredBy, accessible, selfVar, paramVars);
+        return dep("JML accessible clause", containerType, pm, specifiedIn,
+                   requires, measuredBy, accessible, selfVar, paramVars);
     }
     
     public DependencyContract dep(KeYJavaType kjt,
@@ -165,11 +172,11 @@ public class JavaContractFactory {
                 tb.paramVars(services, dep.first, false);
         assert (selfVar == null) == dep.first.isStatic();
         if (selfVar != null) {
-            return dep(kjt, dep.first, tb.inv(services, tb.var(selfVar)),
+            return dep(kjt, dep.first, dep.first.getContainerType(), tb.inv(services, tb.var(selfVar)),
                        dep.third, dep.second, selfVar, paramVars);
         } else {
             // TODO: insert static invariant??
-            return dep(kjt, dep.first, tb.tt(), dep.third, dep.second,
+            return dep(kjt, dep.first, dep.first.getContainerType(), tb.tt(), dep.third, dep.second,
                        selfVar, paramVars);
         }
     }
@@ -177,15 +184,16 @@ public class JavaContractFactory {
     public DependencyContract dep(String string,
                                   KeYJavaType containerType,
                                   IObserverFunction pm,
+                                  KeYJavaType specifiedIn,
                                   Term requires,
                                   Term measuredBy,
                                   Term accessible,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars) {
         assert (selfVar == null) == pm.isStatic();
-        return new DependencyContractImpl(string, containerType, pm, requires,
-                                          measuredBy, accessible, selfVar,
-                                          paramVars);
+        return new DependencyContractImpl(string, containerType, pm, specifiedIn,
+                                          requires, measuredBy, accessible,
+                                          selfVar, paramVars);
     }
 
     @Override
@@ -221,7 +229,7 @@ public class JavaContractFactory {
             ProgramVariable excVar,
             Map<LocationVariable,LocationVariable> atPreVars,
             boolean toBeSaved) {
-        return new FunctionalOperationContractImpl(baseName, kjt,   pm, modality, 
+        return new FunctionalOperationContractImpl(baseName, kjt, pm, pm.getContainerType(), modality, 
                 pres, mby, posts, mods, hasMod, selfVar, paramVars,resultVar,excVar,atPreVars, toBeSaved, 
                 mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
@@ -235,7 +243,7 @@ public class JavaContractFactory {
     public FunctionalOperationContract func (String baseName, IProgramMethod pm,
             Modality modality, Map<LocationVariable,Term> pres, Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
-        return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, modality, pres, mby,
+        return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, pm.getContainerType(), modality, pres, mby,
                 posts, mods, hasMod, progVars.selfVar, progVars.paramVars,
                 progVars.resultVar, progVars.excVar, progVars.atPreVars,
                 Contract.INVALID_ID, toBeSaved, transaction);
@@ -352,23 +360,24 @@ public class JavaContractFactory {
         }
 
         return new FunctionalOperationContractImpl(INVALID_ID,
-                         nameSB.toString(),
-                                         t.kjt,                        
-                                         t.pm,
-                                         moda,
-                                         pres,
-                                         mby,
-                                         posts,
-                                         mods,
-                                         hasMod,
-                                         t.originalSelfVar,
-                                         t.originalParamVars,
-                                         t.originalResultVar,
-                                         t.originalExcVar,
-                                         t.originalAtPreVars,
-                                         Contract.INVALID_ID,
-                                         t.toBeSaved,
-                                         t.transaction);
+                                                   nameSB.toString(),
+                                                   t.kjt,
+                                                   t.pm,
+                                                   t.specifiedIn,
+                                                   moda,
+                                                   pres,
+                                                   mby,
+                                                   posts,
+                                                   mods,
+                                                   hasMod,
+                                                   t.originalSelfVar,
+                                                   t.originalParamVars,
+                                                   t.originalResultVar,
+                                                   t.originalExcVar,
+                                                   t.originalAtPreVars,
+                                                   Contract.INVALID_ID,
+                                                   t.toBeSaved,
+                                                   t.transaction);
     }
     
 
@@ -435,34 +444,41 @@ public class JavaContractFactory {
     }
     
     
-    public static String generateDisplayName(String myBaseName,
-                                             KeYJavaType myKjt,
-                                             IObserverFunction myTarget,
+    public static String generateDisplayName(String baseName,
+                                             KeYJavaType forClass,
+                                             IObserverFunction target,
+                                             KeYJavaType specifiedIn,
                                              int myId) {
-        return myBaseName + " " + myId +
-                (myKjt.equals(myTarget.getContainerType())
+        return baseName + " " + myId +
+                (specifiedIn.equals(forClass)
                   ? ""
                   : " for "
-                    + myKjt.getJavaType().getFullName());
+                    + specifiedIn.getJavaType().getFullName());
     }
     
     
-    public static String generateContractName(String myBaseName,
-                                              KeYJavaType myKjt,
-                                              IObserverFunction myTarget,
+    public static String generateContractName(String baseName,
+                                              KeYJavaType forClass,
+                                              IObserverFunction target,
+                                              KeYJavaType specifiedIn,
                                               int myId) {
-        return generateContractTypeName(myBaseName, myKjt, myTarget)
+        return generateContractTypeName(baseName, forClass, target, specifiedIn)
                + "." + myId;
     }
 
 
-    public static String generateContractTypeName(String myBaseName,
-                                                  KeYJavaType myKjt,
-                                                  IObserverFunction myTarget) {
-        return myKjt.getJavaType().getFullName() + "[" +
-               myTarget + "(" +
-               concadinate(",", myTarget.getParamTypes()) + ")" + "]"
-               + "." + myBaseName;
+    public static String generateContractTypeName(String baseName,
+                                                  KeYJavaType forClass,
+                                                  IObserverFunction target,
+                                                  KeYJavaType specifiedIn) {
+        final String methodName = target.name().toString();
+        final int startIndexShortName = methodName.indexOf("::") + 2;
+        final String methodShortName = methodName.substring(startIndexShortName);
+        return forClass.getJavaType().getFullName() + "[" +
+               specifiedIn.getJavaType().getFullName() + "::" +
+               methodShortName + "(" +
+               concadinate(",", target.getParamTypes()) + ")" + "]"
+               + "." + baseName;
                
     }
     

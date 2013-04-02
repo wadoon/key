@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.logic;
@@ -48,22 +52,6 @@ public class InnerVariableNamer extends VariableNamer {
 	return (maxInGlobals > maxInProgram ? maxInGlobals : maxInProgram);
     }
 
-    // reklov
-    // START TEMPORARY DOWNWARD COMPATIBILITY
-    private ImmutableList<Name> oldProgVarProposals = ImmutableSLList.<Name>nil();
-
-    public void setOldProgVarProposals(Name proposals) {
-        if (proposals == null) return;
-        String[] props = proposals.toString().split(",|;");
-
-        for (String prop : props) {
-            oldProgVarProposals = oldProgVarProposals.append(new Name(prop));
-        }
-
-    }
-
-    // END TEMPORARY DOWNWARD COMPATIBILITY
-
     public ProgramVariable rename(ProgramVariable var,
                                   Goal goal,
                                   PosInOccurrence posOfFind) {
@@ -76,20 +64,8 @@ public class InnerVariableNamer extends VariableNamer {
 	final NameCreationInfo nci = getMethodStack(posOfFind);
 	ProgramElementName newname = null;
 
-	// reklov
-	// START TEMPORARY DOWNWARD COMPATIBILITY
 	// Name proposal = services.getProof().getNameRecorder().getProposal();
-	Name proposal = null;
-
-	final IServices services = goal.proof().getServices();
-    if (!oldProgVarProposals.isEmpty()) {
-	    proposal = oldProgVarProposals.head();
-	    oldProgVarProposals = oldProgVarProposals.tail();
-	} else {
-	    proposal = services.getNameRecorder().getProposal();
-	}
-
-	// END TEMPORARY DOWNWARD COMPATIBILITY
+    Name proposal = services.getNameRecorder().getProposal();
 
 	if (proposal != null) {
 	    newname = new ProgramElementName(proposal.toString(), nci);
@@ -116,9 +92,6 @@ public class InnerVariableNamer extends VariableNamer {
             newvar = new LocationVariable(newname, var.getKeYJavaType());
             map.put(var, newvar);
             renamingHistory = map;
-            //execute renaming
-            ProgVarReplacer pvr = new ProgVarReplacer(map, services);
-            pvr.replace(goal);
         }
 
         assert newvar != null;

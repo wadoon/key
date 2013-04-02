@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.proof;
@@ -314,6 +318,16 @@ public final class Goal  {
 	setSequent(sequent().addFormula(cf, inAntec, first));
     }
 
+    public void addFormulaToAntecedent(SequentFormula formula, boolean first)
+    {
+        addFormula(formula, true, first);
+    }
+
+    public void addFormulaToSuccedent(SequentFormula formula, boolean first)
+    {
+        addFormula(formula, false, first);
+    }
+
     /** returns set of rules applied at this branch 
      * @return IList<RuleApp> applied rule applications
      */
@@ -477,6 +491,7 @@ public final class Goal  {
      * clones the goal (with copy of tacletindex and ruleAppIndex)
      * @return Object the clone
      */
+    @SuppressWarnings("unchecked")
     public Object clone() {	
 	Goal clone = new Goal ( node,
 	                        ruleAppIndex.copy (),

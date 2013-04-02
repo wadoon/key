@@ -13,13 +13,9 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.IKeYFile;
-import de.uka.ilkd.key.proof.io.LDTInput;
-import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -308,14 +304,14 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
             // createBaseConfig implemented by the subclasses to avoid the cast
             // in
             // createInitConfig
-            baseConfig = profile.createInitConfig(services);
+            InitConfig<?,?> newBaseConfig = profile.createInitConfig(services);
 
             RuleSource tacletBase = profile.getStandardRules().getTacletBase();
             if (tacletBase != null) {
                 IKeYFile<S, IC> tacletBaseFile = createTacletBaseKeYFile();
-                readEnvInput(tacletBaseFile, (IC) baseConfig);
+                readEnvInput(tacletBaseFile, (IC) newBaseConfig);
             }
-
+            baseConfig = newBaseConfig;
         }
         return prepare(envInput, (IC) baseConfig);
 

@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
@@ -33,6 +35,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -105,10 +108,9 @@ public class QueryExpand implements BuiltInRule {
      *        Otherwise it is a list of logical variables that can be instantiated (using the rules allLeft, exRight) 
      *        and therefore the result of the query must be stored by function that depends on instVars (e.g. forall i; res(i)=query(i)).
      *        The list may be empty even if it not null.
-     * @param newGoal The new goal that results from this rule application. (requires to register new symbols)
      * @return The formula (!{U}<result=query();>result=res_query) & query()=res_query
      * @author Richard Bubel
-     * @author gladisch 
+     * @author gladisch
      */
     public Term queryEvalTerm(IServices services, Term query, LogicVariable[] instVars){
     	
@@ -252,15 +254,13 @@ public class QueryExpand implements BuiltInRule {
      * @param term  A formula that potentially contains queries that should be evaluated/expanded.
      * @param positiveContext Set false iff the <code>term</code> is in a logically negated context wrt. to the succedent.
      * @param allowExpandBelowInstQuantifier TODO
-     * @param node   The node of the current goal in the proof
-     * @param newGoal The new goal that will result from query evaluation. This is needed to register new symbols.
      * @return A modified version of the <code>term</code> with inserted "query evalutions".
      * @author gladisch
      */
-    public Term evaluateQueries(Services services,  Term term, boolean positiveContext, boolean allowExpandBelowInstQuantifier){
+    public Term evaluateQueries(IServices services,  Term term, boolean positiveContext, boolean allowExpandBelowInstQuantifier){
     	//System.out.println("---------- evaluateQueries on:  ---------------- "+term+"\n-------------------------------\n");
     	final int depth =term.depth(); 
-    	Vector<QueryEvalPos> qeps = new Vector<QueryEvalPos>();
+    	List<QueryEvalPos> qeps = new Vector<QueryEvalPos>();
     	Vector<Integer> path = new Vector<Integer>(depth);
     	path.setSize(depth);
     	final ImmutableSLList<QuantifiableVariable> instVars;
@@ -270,9 +270,6 @@ public class QueryExpand implements BuiltInRule {
     		instVars = null;
     	}
     	findQueriesAndEvaluationPositions(term, 0, path, instVars, positiveContext, 0, positiveContext, qeps);
-    	final Term result;
-    	//QueryEvalPos qep = qeps.get(7);
-
     	removeRedundant(qeps);
     	//sorting is important in order to ensure that the original term is modified in a depth-first order.
     	Collections.sort(qeps);
@@ -312,16 +309,17 @@ public class QueryExpand implements BuiltInRule {
      * @param qeps The resulting collection of query evaluation positions.
      * @author gladisch 
      */
+    @SuppressWarnings("unchecked")
     private void findQueriesAndEvaluationPositions(Term t, int level, Vector<Integer> pathInTerm, 
     		               ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive, 
-    		               int qepLevel, boolean qepIsPositive, Vector<QueryEvalPos> qeps){
+    		               int qepLevel, boolean qepIsPositive, List<QueryEvalPos> qeps){
     	if(t==null){
     		return;
     	}
     	final Operator op = t.op();
     	final int nextLevel = level+1;
     	if(op instanceof IProgramMethod){ //Query found
-    		//System.out.println("Query found:"+t+ " position:"+(positive?"positive":"negative"));
+    		//System.out.println("Query found:"+t+ " position:"+(qepIsPositive?"positive":"negative"));
     		QueryEvalPos qep = new QueryEvalPos(t, (Vector<Integer>)pathInTerm.clone(), qepLevel+1, instVars, qepIsPositive);
     		qeps.add(qep);
     		//System.out.println("AddedA: "+qep);
@@ -339,6 +337,10 @@ public class QueryExpand implements BuiltInRule {
     	}else if(op== Junctor.NOT){
     		pathInTerm.set(nextLevel, 0);
     		findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, !curPosIsPositive, qepLevel, qepIsPositive, qeps);
+    	}else if(op== Equality.EQV){ 
+    		// Each subformula of "<->" is in both, positive and negative scope. Query expansion below it would be unsound. 
+    		// Alternatively "<->" could be converted into "->" and "<-"
+    		return;
     	}else if(t.javaBlock()!=JavaBlock.EMPTY_JAVABLOCK){ //do not descend below java blocks.
     		return;
     	}else if(op== Quantifier.ALL ){ 
@@ -375,11 +377,6 @@ public class QueryExpand implements BuiltInRule {
         		//System.out.println("AddedB: "+qep);
     		}
     	}
-    	/*else if(op instanceof Junctor){
-    		//Other Junctors like <-> must be handled explicitly. E.g. "<->" must be converted to "->" and "<-", so the query occurs in positive and negative position.
-    		return;
-    	}
-    	*/
     }
     
     
@@ -396,6 +393,8 @@ public class QueryExpand implements BuiltInRule {
     		//System.out.println("collectQueriesRec encountered javaBlock.");
     		return;
     	}
+    	// What about checking if an update is encountered?
+    	
     	if(t.op() instanceof IProgramMethod){ //Query found
     		//System.out.println("Query found:"+t);
     		result.add(t);
@@ -411,7 +410,7 @@ public class QueryExpand implements BuiltInRule {
     /**
      * Tries to remove redundant query evaluations/expansions.
      */
-    private void removeRedundant(Vector<QueryEvalPos> qeps){
+    private void removeRedundant(List<QueryEvalPos> qeps){
     	int size=qeps.size();
     	for(int i=0;i<size;i++){
     		QueryEvalPos cur = qeps.get(i);
@@ -432,7 +431,7 @@ public class QueryExpand implements BuiltInRule {
      * in a formula.
      * @author gladisch
      */
-    private class QueryEvalPos implements Comparable{
+    private class QueryEvalPos implements Comparable<QueryEvalPos> {
     	
     	/** The query that is subject to query evaluation/expansion. 
     	 * The query itself is not modified but a formula is added at a position 
@@ -446,7 +445,8 @@ public class QueryExpand implements BuiltInRule {
     	
     	final public LogicVariable[] instVars;
 
-    	public QueryEvalPos(Term query, Vector<Integer> path, int level, ImmutableList<QuantifiableVariable> iVars, boolean isPositive){
+    	@SuppressWarnings("unchecked")
+        public QueryEvalPos(Term query, Vector<Integer> path, int level, ImmutableList<QuantifiableVariable> iVars, boolean isPositive){
     		this.query = query;
     		pathInTerm = (Vector<Integer>)path.clone();
 			pathInTerm.setSize(level);
@@ -482,7 +482,8 @@ public class QueryExpand implements BuiltInRule {
 
     	
     	public boolean subsumes(QueryEvalPos other){
-    		if(!query.equals(other.query) || pathInTerm.size()>other.pathInTerm.size() || !instVars.equals(other.instVars)){
+    		if(!query.equals(other.query) || pathInTerm.size()>other.pathInTerm.size() || 
+    				!Arrays.deepEquals(instVars, other.instVars)) {
     			return false;
     		}
     		//query.equals(other.query) && pathInTerm.size()<=other.pathInTerm.size()
@@ -498,8 +499,7 @@ public class QueryExpand implements BuiltInRule {
     	/** For sorting. Longer paths come first in order to apply 
     	 * modifications to the target term in a depth-first order.	 */
 		@Override
-		public int compareTo(Object arg0) {
-			QueryEvalPos other = (QueryEvalPos)arg0;
+		public int compareTo(QueryEvalPos other) {
 			final int otherSize = other.pathInTerm.size();
 			final int thisSize  = pathInTerm.size();
 			return (thisSize<otherSize? 1 : (thisSize>otherSize? -1 : 0));

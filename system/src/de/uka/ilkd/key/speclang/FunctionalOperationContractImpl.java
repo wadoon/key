@@ -1,28 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.speclang;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -33,39 +27,34 @@ import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Standard implementation of the OperationContract interface.
  */
-public final class FunctionalOperationContractImpl implements FunctionalOperationContract {
+public class FunctionalOperationContractImpl implements FunctionalOperationContract {
     
     protected static final TermBuilder TB = JavaProfile.DF();
 
     final String baseName;
     final String name;
-    final KeYJavaType kjt;    
+    final KeYJavaType kjt;
     final IProgramMethod pm;
+    final KeYJavaType specifiedIn;
     final Modality modality;
     final Map<LocationVariable,Term> originalPres;
-    final Term originalMby;    
+    final Term originalMby;
     final Map<LocationVariable,Term> originalPosts;
     final Map<LocationVariable,Term> originalMods;
     final ProgramVariable originalSelfVar;
@@ -90,24 +79,25 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     //-------------------------------------------------------------------------
     
     FunctionalOperationContractImpl(String baseName,
-	                          String name,
-                                  KeYJavaType kjt,	                          
-                                  IProgramMethod pm,
-            		          Modality modality,
-            		          Map<LocationVariable,Term> pres,
-            		          Term mby,
-            		          Map<LocationVariable,Term> posts,
-            		          Map<LocationVariable,Term> mods,
-            		          boolean hasRealMod,
-            		          ProgramVariable selfVar,
-            		          ImmutableList<ProgramVariable> paramVars,
-            		          ProgramVariable resultVar,
-            		          ProgramVariable excVar,
-                                  Map<LocationVariable, LocationVariable> atPreVars,
-                                  int id,
-                                  boolean toBeSaved,
-                                  boolean transaction) {
-	assert !(name == null && baseName == null);
+                                    String name,
+                                    KeYJavaType kjt,
+                                    IProgramMethod pm,
+                                    KeYJavaType specifiedIn,
+                                    Modality modality,
+                                    Map<LocationVariable,Term> pres,
+                                    Term mby,
+                                    Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> mods,
+                                    boolean hasRealMod,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable excVar,
+                                    Map<LocationVariable, LocationVariable> atPreVars,
+                                    int id,
+                                    boolean toBeSaved,
+                                    boolean transaction) {
+        assert !(name == null && baseName == null);
         assert kjt != null;	
         assert pm != null;
         assert pres != null;
@@ -126,23 +116,24 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         this.baseName               = baseName;
         this.name = name != null 
                   ? name 
-                  : JavaContractFactory.generateContractName(baseName, kjt, pm, id);
+                  : JavaContractFactory.generateContractName(baseName, kjt, pm, specifiedIn, id);
         this.pm          	    = pm;
         this.kjt                    = kjt;
+        this.specifiedIn            = specifiedIn;
         this.modality               = modality;
-	this.originalPres           = pres;
-	this.originalMby            = mby;
-	this.originalPosts          = posts;
-	this.originalMods           = mods;
-	this.hasRealModifiesClause  = hasRealMod;
-	this.originalSelfVar        = selfVar;
-	this.originalParamVars      = paramVars;
-	this.originalResultVar      = resultVar;
-	this.originalExcVar         = excVar;
-	this.originalAtPreVars      = atPreVars;
-	this.id                     = id;
+        this.originalPres           = pres;
+        this.originalMby            = mby;
+        this.originalPosts          = posts;
+        this.originalMods           = mods;
+        this.hasRealModifiesClause  = hasRealMod;
+        this.originalSelfVar        = selfVar;
+        this.originalParamVars      = paramVars;
+        this.originalResultVar      = resultVar;
+        this.originalExcVar         = excVar;
+        this.originalAtPreVars      = atPreVars;
+        this.id                     = id;
         this.transaction            = transaction;
-	this.toBeSaved	            = toBeSaved;
+        this.toBeSaved	            = toBeSaved;
     }
   
     
@@ -151,36 +142,38 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      * @param baseName base name of the contract (does not have to be unique)
      * @param pm the IProgramMethod to which the contract belongs
      * @param modality the modality of the contract
-     * @param pre the precondition of the contract
+     * @param pres the precondition of the contract
      * @param mby the measured_by clause of the contract 
-     * @param post the postcondition of the contract
-     * @param mod the modifies clause of the contract
+     * @param posts the postcondition of the contract
+     * @param mods the modifies clause of the contract
      * @param selfVar the variable used for the receiver object
      * @param paramVars the variables used for the operation parameters
      * @param resultVar the variables used for the operation result
      * @param excVar the variable used for the thrown exception
-     * @param heapAtPreVar the variable used for the pre-heap
+     * @param atPreVars the variable used for the pre-heap
      */
     FunctionalOperationContractImpl(String baseName,
-                                 KeYJavaType kjt,	    
-                                 IProgramMethod pm,
-            		         Modality modality,
-            		         Map<LocationVariable,Term> pres,
-            		         Term mby,            		         
-            		         Map<LocationVariable,Term> posts,
-            		         Map<LocationVariable,Term> mods,
-            		         boolean hasMod,
-            		         ProgramVariable selfVar,
-            		         ImmutableList<ProgramVariable> paramVars,
-            		         ProgramVariable resultVar,
-            		         ProgramVariable excVar,
-                                 Map<LocationVariable,LocationVariable> atPreVars,
-                                 boolean toBeSaved,
-                                 boolean transaction) {
+                                    KeYJavaType kjt,
+                                    IProgramMethod pm,
+                                    KeYJavaType specifiedIn,
+                                    Modality modality,
+                                    Map<LocationVariable,Term> pres,
+                                    Term mby,
+                                    Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> mods,
+                                    boolean hasMod,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable excVar,
+                                    Map<LocationVariable, LocationVariable> atPreVars,
+                                    boolean toBeSaved,
+                                    boolean transaction) {
         this(baseName,
              null,
              kjt,             
              pm,
+             specifiedIn,
              modality,
              pres,
              mby,
@@ -228,7 +221,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     //-------------------------------------------------------------------------
 
     
-    private Map<ProgramVariable, ProgramVariable> getReplaceMap(
+    protected Map<ProgramVariable, ProgramVariable> getReplaceMap(
 	    		      ProgramVariable selfVar, 
 	    		      ImmutableList<ProgramVariable> paramVars, 
 	    		      ProgramVariable resultVar, 
@@ -269,7 +262,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	}
 
         if(atPreVars != null) {
-          final AbstractHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+          final IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
           for(LocationVariable h : heapLDT.getAllHeaps()) {
              if(atPreVars.get(h) != null) {
                 assert originalAtPreVars.get(h).sort().equals(atPreVars.get(h).sort());
@@ -282,7 +275,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }
     
     
-    private Map<Term, Term> getReplaceMap(
+    protected Map<Term, Term> getReplaceMap(
 	    		      LocationVariable baseHeap,
 	    		      Term heapTerm,
 	    		      Term selfTerm, 
@@ -500,84 +493,118 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	return or.replace(originalMby);
     }    
     
-    
+    @Override
+    public String getPlainText(IServices services) {
+       return getText(false, services);
+    }
     
     @Override
     public String getHTMLText(IServices services) {
-    final IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-    final LocationVariable baseHeap = heapLDT.getHeap();
-	final StringBuffer sig = new StringBuffer();
-	if(originalResultVar != null) {
-	    sig.append(originalResultVar);
-	    sig.append(" = ");
-	} else if(pm.isConstructor()) {
-	    sig.append(originalSelfVar);
-	    sig.append(" = new ");
-	}
-	if(!pm.isStatic() && !pm.isConstructor()) {
-	    sig.append(originalSelfVar);
-	    sig.append(".");
-	}
-	sig.append(pm.getName());
-	sig.append("(");
-	for(ProgramVariable pv : originalParamVars) {
-	    sig.append(pv.name()).append(", ");
-	}
-	if(!originalParamVars.isEmpty()) {
-	    sig.setLength(sig.length() - 2);
-	}
-	sig.append(")");
-	sig.append(" catch(");
-	sig.append(originalExcVar);
-	sig.append(")");
-	
-        final String mby  = hasMby() 
-        		    ? LogicPrinter.quickPrintTerm(originalMby, services)
-        	            : null;        
-        
-        String mods = "";
-        for(LocationVariable h : heapLDT.getAllHeaps()) {
-           if(originalMods.get(h) != null) {
-             mods = mods +"<br><b>mod"+(h == baseHeap ? "" : "["+h+"]")+"</b> " +
-               LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalMods.get(h), services), false);
-             if(h == baseHeap && !hasRealModifiesClause) {
-               mods = mods + "<b>, creates no new objects</b>";
-             }
-           }
-        }
-
-        String pres = "";
-        for(LocationVariable h : heapLDT.getAllHeaps()) {
-           if(originalPres.get(h) != null) {
-             pres = pres +"<br><b>pre"+(h == baseHeap ? "" : "["+h+"]")+"</b> " +
-               LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPres.get(h),services), false);
-           }
-        }
-
-        String posts = "";
-        for(LocationVariable h : heapLDT.getAllHeaps()) {
-           if(originalPres.get(h) != null) {
-             posts = posts +"<br><b>post"+(h == baseHeap ? "" : "["+h+"]")+"</b> " +
-               LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPosts.get(h),services), false);
-           }
-        }
-
-                      
-        return "<html>"
-                + "<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>"
-                + pres
-                + posts
-                + mods
-                + (hasMby() 
-                   ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
-                	   						 false)
-                   : "")                
-                + "<br><b>termination</b> "
-                + getModality()
-                + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "")
-                + "</html>";
-    }    
+       return getText(true, services);
+    }
     
+   private String getText(boolean includeHtmlMarkup, IServices services) {
+      final IHeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+      final LocationVariable baseHeap = heapLDT.getHeap();
+      final StringBuffer sig = new StringBuffer();
+      if (originalResultVar != null) {
+         sig.append(originalResultVar);
+         sig.append(" = ");
+      }
+      else if (pm.isConstructor()) {
+         sig.append(originalSelfVar);
+         sig.append(" = new ");
+      }
+      if (!pm.isStatic() && !pm.isConstructor()) {
+         sig.append(originalSelfVar);
+         sig.append(".");
+      }
+      sig.append(pm.getName());
+      sig.append("(");
+      for (ProgramVariable pv : originalParamVars) {
+         sig.append(pv.name()).append(", ");
+      }
+      if (!originalParamVars.isEmpty()) {
+         sig.setLength(sig.length() - 2);
+      }
+      sig.append(")");
+      sig.append(" catch(");
+      sig.append(originalExcVar);
+      sig.append(")");
+
+      final String mby = hasMby() ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
+
+      String mods = "";
+      for (LocationVariable h : heapLDT.getAllHeaps()) {
+         if (originalMods.get(h) != null) {
+            String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services);
+            mods = mods
+                  + (includeHtmlMarkup ? "<br><b>" : "\n")
+                  + "mod"
+                  + (h == baseHeap ? "" : "[" + h + "]")
+                  + (includeHtmlMarkup ? "</b> " : ": ")
+                  + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
+            if (h == baseHeap && !hasRealModifiesClause) {
+               mods = mods + 
+                      (includeHtmlMarkup ? "<b>" : "") +
+               		 ", creates no new objects" +
+               		 (includeHtmlMarkup ? "</b>" : "");
+            }
+         }
+      }
+
+      String pres = "";
+      for (LocationVariable h : heapLDT.getAllHeaps()) {
+         if (originalPres.get(h) != null) {
+            String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services);
+            pres = pres
+                  + (includeHtmlMarkup ? "<br><b>" : "\n")
+                  + "pre"
+                  + (h == baseHeap ? "" : "[" + h + "]")
+                  + (includeHtmlMarkup ? "</b> " : ": ")
+                  + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPres, false) : printPres.trim());
+         }
+      }
+
+      String posts = "";
+      for (LocationVariable h : heapLDT.getAllHeaps()) {
+         if (originalPres.get(h) != null) {
+            String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services);
+            posts = posts
+                  + (includeHtmlMarkup ? "<br><b>" : "\n")
+                  + "post"
+                  + (h == baseHeap ? "" : "[" + h + "]")
+                  + (includeHtmlMarkup ? "</b> " : ": ")
+                  + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false) : printPosts.trim());
+         }
+      }
+
+      if (includeHtmlMarkup) {
+         return "<html>"
+               + "<i>"
+               + LogicPrinter.escapeHTML(sig.toString(), false)
+               + "</i>"
+               + pres
+               + posts
+               + mods
+               + (hasMby() ? "<br><b>measured-by</b> "+ LogicPrinter.escapeHTML(mby, false) : "")
+               + "<br><b>termination</b> "
+               + getModality()
+               + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "") + 
+               "</html>";
+         
+      }
+      else {
+         return sig.toString()
+               + pres
+               + posts
+               + mods
+               + (hasMby() ? "\nmeasured-by: "+ mby : "")
+               + "\ntermination: "
+               + getModality()
+               + (transactionApplicableContract() ? "\ntransaction applicable:" : "");
+      }
+   }
     
     @Override
     public boolean toBeSaved() {
@@ -858,7 +885,8 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	        	        
     @Override
     public String getDisplayName() {
-        return JavaContractFactory.generateDisplayName(baseName, kjt, pm, id);
+        return JavaContractFactory.generateDisplayName(baseName, kjt, pm, specifiedIn,
+                id);
     }
 
 
@@ -878,6 +906,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    null,
                                                    kjt,
                                                    pm,
+                                                   specifiedIn,
                                                    modality,
                                                    originalPres,
                                                    originalMby,
@@ -903,6 +932,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    null,
                                                    newKJT,
                                                    (IProgramMethod) newPM,
+                                                   specifiedIn,
                                                    modality,
                                                    originalPres,
                                                    originalMby,
@@ -922,6 +952,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     @Override
     public String getTypeName() {
-        return JavaContractFactory.generateContractTypeName(baseName, kjt, pm);
+        return JavaContractFactory.generateContractTypeName(baseName, kjt, pm, specifiedIn);
     }
+
 }

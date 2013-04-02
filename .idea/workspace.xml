@@ -1,14 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYSIS_IN_BACKGROUND" value="true" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="3a386247-f946-4ee7-baa5-b8e5712659db" name="Default" comment="interface and class invariants can be specified">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/init/FunctionBuilder.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/init/FunctionBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/pp/LogicPrinter.java" afterPath="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/pp/LogicPrinter.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/init/ABSProgVarReplacer.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/init/ABSInitConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/init/ABSProblemInitializer.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/init/ABSProfile.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/init/FunctionBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/init/SortBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/init/io/ABSKeYFile.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/po/ABSKeYUserProblemFile.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/po/ABSTacletGenerator.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/parser/abskeyparser.g" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/parser/abskeyparser.g" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSContextStatementBlock.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSContextStatementBlock.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSInfo.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/proof/io/ABSLDTInput.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/proof/io/ABSLDTInput.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/converter/ABSModelParserInfo.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/converter/ABSModelParserInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSModificationVisitor.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSModificationVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/pp/ABSProgramPrettyPrinter.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/pp/ABSProgramPrettyPrinter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/proof/mgt/ABSProofEnvironment.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/proof/mgt/ABSProofEnvironment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSServices.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSServices.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/logic/ABSTermBuilder.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/logic/ABSTermBuilder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSVisitor.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSVisitorImpl.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/abs/ABSVisitorImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/gui/ABSWindowUserInterface.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/gui/ABSWindowUserInterface.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/init/AbstractJavaPO.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/init/AbstractJavaPO.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/gui/ApplyStrategy.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/gui/ApplyStrategy.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/DefaultABSDLProblemLoader.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/DefaultABSDLProblemLoader.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/DefaultProblemLoader.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/DefaultProblemLoader.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/gui/lemmatagenerator/EnvironmentCreator.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/gui/lemmatagenerator/EnvironmentCreator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/logic/ldt/HistoryLDT.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/logic/ldt/HistoryLDT.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/init/IProgramVisitorProvider.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/init/IProgramVisitorProvider.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/IfChoiceModel.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/proof/IfChoiceModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/pp/LogicPrinter.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/pp/LogicPrinter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/gui/Main.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/gui/Main.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/gui/MainWindow.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/gui/MainWindow.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/rule/metaconstruct/MethodInvoc2MethodLabel.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/rule/metaconstruct/MethodInvoc2MethodLabel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/taclettranslation/lemma/TacletLoader.java" afterPath="$PROJECT_DIR$/system/src/de/uka/ilkd/key/taclettranslation/lemma/TacletLoader.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="key.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363848179133" ignored="false" />
-    <file path="/fragment.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363933813006" ignored="false" />
+    <file path="/Dummy.txt" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364485801721" ignored="false" />
+    <file path="/fragment.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364486882801" ignored="false" />
     <file path="/AbstractHeapLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362830739730" ignored="false" />
     <file path="/SortBuilder.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362466809557" ignored="false" />
     <file path="/ABSReader.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363785294895" ignored="false" />
@@ -43,28 +81,26 @@
     <file path="/InnerVariableNamer.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362828500051" ignored="false" />
     <file path="/ABSProgramReplaceVisitor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362828632575" ignored="false" />
     <file path="/ABSProgVarReplacer.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362828859964" ignored="false" />
-    <file path="/LDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362830694700" ignored="false" />
-    <file path="/HeapLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363849531648" ignored="false" />
-    <file path="/AbstractTypeConverter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362830758903" ignored="false" />
-    <file path="/TestParallelSiteProofs.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362830899194" ignored="false" />
-    <file path="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/symbolic_execution/util/SymbolicExecutionUtil.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831177806" ignored="false" />
-    <file path="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/gui/lemmatagenerator/LemmataAutoModeOptions.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831177807" ignored="false" />
-    <file path="/AbstractSymbolicExecutionTestCase.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831349006" ignored="false" />
+    <file path="/LDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363993824179" ignored="false" />
+    <file path="/HeapLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364021670482" ignored="false" />
+    <file path="/AbstractTypeConverter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363975378572" ignored="false" />
+    <file path="/TestParallelSiteProofs.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364023239713" ignored="false" />
+    <file path="/AbstractSymbolicExecutionTestCase.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364022968448" ignored="false" />
     <file path="/AbstractWindowUserInterface.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831414080" ignored="false" />
     <file path="/ExampleChooser.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831480999" ignored="false" />
-    <file path="/WindowUserInterface.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831676143" ignored="false" />
+    <file path="/WindowUserInterface.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364024510244" ignored="false" />
     <file path="/BooleanLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831686773" ignored="false" />
-    <file path="/LocSetLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362832342606" ignored="false" />
+    <file path="/LocSetLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364021827723" ignored="false" />
     <file path="/IntegerLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831711824" ignored="false" />
-    <file path="/FloatLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831727068" ignored="false" />
+    <file path="/FloatLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364021709674" ignored="false" />
     <file path="/DoubleLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831734655" ignored="false" />
     <file path="/CharListLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831740082" ignored="false" />
     <file path="/SeqLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362831782374" ignored="false" />
-    <file path="/DefaultProblemLoader.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362832191713" ignored="false" />
-    <file path="/AbstractUserInterface.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362832691353" ignored="false" />
+    <file path="/DefaultProblemLoader.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364487775879" ignored="false" />
+    <file path="/AbstractUserInterface.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363977989677" ignored="false" />
     <file path="/ProblemLoader.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362832504929" ignored="false" />
-    <file path="/ConsoleUserInterface.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362832866579" ignored="false" />
-    <file path="/DefaultABSDLProblemLoader.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1362833233343" ignored="false" />
+    <file path="/ConsoleUserInterface.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363976710892" ignored="false" />
+    <file path="/DefaultABSDLProblemLoader.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364500841929" ignored="false" />
     <file path="/history.key" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363934893445" ignored="false" />
     <file path="/genericRules.key" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363247036377" ignored="false" />
     <file path="/DLSpecFactory.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363931868716" ignored="false" />
@@ -75,35 +111,100 @@
     <file path="/ABSKeYUserProblemFile.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363931569060" ignored="false" />
     <file path="/ABSTacletGenerator.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363931712168" ignored="false" />
     <file path="/ABSServices.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363800647443" ignored="false" />
-    <file path="/ABSInfo.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363849936424" ignored="false" />
+    <file path="/ABSInfo.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364489117852" ignored="false" />
     <file path="/HistoryLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363802650815" ignored="false" />
-    <file path="/ClassInvariant.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363929596986" ignored="false" />
+    <file path="/ClassInvariant.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363967759585" ignored="false" />
     <file path="/ClassInvariantImpl.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363930228991" ignored="false" />
-    <file path="/SpecificationRepository.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363930806099" ignored="false" />
-    <file path="/ISpecificationRepository.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363930861750" ignored="false" />
+    <file path="/SpecificationRepository.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363994308934" ignored="false" />
+    <file path="/ISpecificationRepository.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364023848669" ignored="false" />
     <file path="/AbstractABS2KeYABSConverter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363933794308" ignored="false" />
     <file path="/ConcreteABS2KeYABSConverter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363848221284" ignored="false" />
     <file path="/ABSTypeConverter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363849590114" ignored="false" />
     <file path="/FieldTypeToSortCondition.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363849665034" ignored="false" />
     <file path="/IProgramInfo.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363849683504" ignored="false" />
-    <file path="/LogicPrinter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363934411127" ignored="false" />
+    <file path="/LogicPrinter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364040219098" ignored="false" />
     <file path="/ABSVariableSV.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363867142144" ignored="false" />
     <file path="/ABSProgramSVSort.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363851071771" ignored="false" />
     <file path="/ABSFieldSV.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363852436077" ignored="false" />
     <file path="/SchemaABS2KeYABSConverter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363852327040" ignored="false" />
     <file path="/MemberPVToField.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363852784217" ignored="false" />
-    <file path="/IHeapLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363852794567" ignored="false" />
-    <file path="$PROJECT_DIR$/.idea/workspace.xml" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363948481402" ignored="false" />
+    <file path="/IHeapLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363979402482" ignored="false" />
     <file path="/ABSGetExp.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363856978204" ignored="false" />
-    <file path="/ABSVisitor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363933969859" ignored="false" />
-    <file path="/ABSVisitorImpl.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363933999258" ignored="false" />
+    <file path="/ABSVisitor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364039486977" ignored="false" />
+    <file path="/ABSVisitorImpl.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364039510194" ignored="false" />
     <file path="/ABSProgramPrettyPrinter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363934220186" ignored="false" />
-    <file path="/ABSModificationVisitor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363934180629" ignored="false" />
+    <file path="/ABSModificationVisitor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364039765848" ignored="false" />
     <file path="/ABSClassInvariant.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363929794357" ignored="false" />
     <file path="/JavaClassInvariant.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363930100088" ignored="false" />
     <file path="/ABSClassInvariantImpl.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363930443499" ignored="false" />
     <file path="$PROJECT_DIR$/system/src/de/uka/ilkd/keyabs/po/ABSKeYUserProblemFile.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363931611027" ignored="false" />
     <file path="/ABSReturnStatement.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363933956671" ignored="false" />
+    <file path="/DefaultTacletTranslator.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364024053268" ignored="false" />
+    <file path="/DependencyContractImpl.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363975064825" ignored="false" />
+    <file path="/DLEmbeddedExpression.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363979441932" ignored="false" />
+    <file path="/EmptySetLiteral.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363968447560" ignored="false" />
+    <file path="/FunctionalOperationContractPO.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363968794720" ignored="false" />
+    <file path="/InitConfig.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363968953041" ignored="false" />
+    <file path="/JavaDLInitConfig.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363969044020" ignored="false" />
+    <file path="/IntroAtPreDefsOp.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363969132793" ignored="false" />
+    <file path="/InvariantConfigurator.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363979251382" ignored="false" />
+    <file path="/MainWindow.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363978186579" ignored="false" />
+    <file path="/OneStepSimplifier.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363970349466" ignored="false" />
+    <file path="/TestClashFreeSubst.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363971154513" ignored="false" />
+    <file path="/TermBuilder.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363975665469" ignored="false" />
+    <file path="/AbstractTacletSchemaVariableCollector.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364024113584" ignored="false" />
+    <file path="/SyntacticalReplaceVisitor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363993469288" ignored="false" />
+    <file path="/RewriteTaclet.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363973866140" ignored="false" />
+    <file path="/ProgVarReplaceVisitor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363973984512" ignored="false" />
+    <file path="/AbstractProblemInitializer.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363974339985" ignored="false" />
+    <file path="/Contract.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363974978271" ignored="false" />
+    <file path="/FunctionalOperationContractImpl.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363975254927" ignored="false" />
+    <file path="/TypeConverter.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363979426908" ignored="false" />
+    <file path="/JavaDLTermBuilder.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363975883042" ignored="false" />
+    <file path="/JMLTranslator.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363976148662" ignored="false" />
+    <file path="/UserInterface.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363976381123" ignored="false" />
+    <file path="/KeYEnvironment.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364022901952" ignored="false" />
+    <file path="/BlockContractRule.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363979073922" ignored="false" />
+    <file path="/ProgramElementReplacer.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363978976017" ignored="false" />
+    <file path="/LoopInvariant.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363979138472" ignored="false" />
+    <file path="/BlockContractBuiltInRuleApp.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363979279393" ignored="false" />
+    <file path="/FreeLDT.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363993807301" ignored="false" />
+    <file path="/TacletApp.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363993342465" ignored="false" />
+    <file path="/LDTInput.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363993644186" ignored="false" />
+    <file path="/JavaLDTInput.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363993688360" ignored="false" />
+    <file path="/ABSLDTInput.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363993761165" ignored="false" />
+    <file path="/RuleView.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363994060480" ignored="false" />
+    <file path="/AbstractSMTTranslator.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1363994225679" ignored="false" />
+    <file path="/BlockContract.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364022172331" ignored="false" />
+    <file path="/SimpleBlockContract.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364023677695" ignored="false" />
+    <file path="/SymbolicConfigurationExtractor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364021482074" ignored="false" />
+    <file path="/TextualJMLSpecCase.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364021616484" ignored="false" />
+    <file path="/TacletView.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364021948966" ignored="false" />
+    <file path="/JavaASTVisitor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364021983804" ignored="false" />
+    <file path="/SymbolicExecutionUtil.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364024894852" ignored="false" />
+    <file path="/QueryExpand.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364022657037" ignored="false" />
+    <file path="/SymbolicExecutionEnvironment.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364022932705" ignored="false" />
+    <file path="/ExecutionVariable.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364023134738" ignored="false" />
+    <file path="/AbstractJavaPO.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364023711085" ignored="false" />
+    <file path="/LoopInvariantImpl.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364023737149" ignored="false" />
+    <file path="/FreeLiteral.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364023889409" ignored="false" />
+    <file path="/TestDropEffectlessElementary.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364023986496" ignored="false" />
+    <file path="/GUIOneStepChildTreeNode.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364024200481" ignored="false" />
+    <file path="/TestSymbolicConfigurationExtractor.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364024251689" ignored="false" />
+    <file path="/SymbolicExecutionTreeBuilder.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364024409585" ignored="false" />
+    <file path="/DependencyContractPO.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364024553352" ignored="false" />
+    <file path="/InspectorForDecisionPredicates.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364025109737" ignored="false" />
+    <file path="/InspectorForFormulas.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364025217372" ignored="false" />
+    <file path="/ABSKeYParser.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364025486062" ignored="false" />
+    <file path="/Main.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364025788855" ignored="false" />
+    <file path="/ABSMethodFrame.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364040276448" ignored="false" />
+    <file path="/ABSContextStatementBlock.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364041270876" ignored="false" />
+    <file path="/ApplyStrategy.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364042385931" ignored="false" />
+    <file path="/PreservesInvariantPO.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364108892686" ignored="false" />
+    <file path="/ABSTermBuilder.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364058422070" ignored="false" />
+    <file path="/ProofObligationChooser.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364500859179" ignored="false" />
+    <file path="/POBrowserData.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364500721820" ignored="false" />
+    <file path="/ABSSLInput.java" changelist="3a386247-f946-4ee7-baa5-b8e5712659db" time="1364486982104" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +219,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -153,6 +253,7 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -162,46 +263,63 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="abskeyparser.g" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/parser/abskeyparser.g">
+      <file leaf-file-name="DefaultProblemLoader.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/DefaultProblemLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="3668" column="54" selection-start="108562" selection-end="108562" vertical-scroll-proportion="0.0">
+            <state line="161" column="53" selection-start="5806" selection-end="5806" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="absProgramRules.key" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/absProgramRules.key">
+      <file leaf-file-name="DefaultABSDLProblemLoader.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/DefaultABSDLProblemLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="291" column="58" selection-start="8446" selection-end="8446" vertical-scroll-proportion="0.0">
+            <state line="91" column="0" selection-start="3856" selection-end="3856" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="seq.key" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/seq.key">
+      <file leaf-file-name="POBrowserData.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/POBrowserData.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="126" column="15" selection-start="2648" selection-end="2654" vertical-scroll-proportion="0.33205375">
-              <folding />
+            <state line="13" column="23" selection-start="325" selection-end="325" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HistoryLDT.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/logic/ldt/HistoryLDT.java">
+      <file leaf-file-name="ProofObligationChooser.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/ProofObligationChooser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="13" selection-start="633" selection-end="633" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="42" column="20" selection-start="1354" selection-end="1354" vertical-scroll-proportion="0.7442748">
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#823#1127#0" expanded="true" />
+                <element signature="e#1116#1117#0" expanded="true" />
+                <element signature="e#1171#1330#0" expanded="true" />
+                <element signature="e#1319#1320#0" expanded="true" />
+                <element signature="initializer##0;class#ProofObligationChooser#0" expanded="true" />
+                <element signature="initializer##0;class#ProofObligationChooser#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="history.key" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/history.key">
+      <file leaf-file-name="ProofObligationChooser.form" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/ProofObligationChooser.form">
+          <provider selected="true" editor-type-id="ui-designer">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ABSSLInput.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/speclang/ABSSLInput.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="505" column="44" selection-start="14574" selection-end="14574" vertical-scroll-proportion="0.0">
+            <state line="18" column="41" selection-start="519" selection-end="519" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -226,22 +344,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/speclang/dl/ABSClassInvariantImpl.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/po/ABSTacletGenerator.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/speclang/dl/DLSpecFactory.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/gui/ProofManagementDialog.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/init/AbstractProblemInitializer.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/parser/abskeyparser.g" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/init/FunctionBuilder.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ReturnStatement/ABSReturnStatement.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ABSVisitor.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ABSVisitorImpl.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ABSModificationVisitor.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/pp/ABSProgramPrettyPrinter.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/pp/LogicPrinter.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/AbstractABS2KeYABSConverter.java" />
-        <option value="$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/history.key" />
-        <option value="$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/absProgramRules.key" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/logic/ABSTermBuilder.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/init/AbstractJavaPO.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/proof/init/ABSProgVarReplacer.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/PreservesInvariantPO.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/proof/init/ABSKeYUserProblemFile.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/speclang/ABSSLInput.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/standardRulesABS.key" />
+        <option value="$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/ruleSetsDeclarations.key" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/ProblemLoader.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/DefaultJavaDLProblemLoader.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/DefaultProblemLoader.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ABSInfo.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/ProofObligationChooser.form" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/POBrowserData.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/DefaultABSDLProblemLoader.java" />
+        <option value="$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/ProofObligationChooser.java" />
       </list>
     </option>
   </component>
@@ -251,6 +369,100 @@
   <component name="ProjectFrameBounds">
     <option name="width" value="1440" />
     <option name="height" value="900" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Ant inspections</id>
+          </State>
+          <State>
+            <id>Bitwise operation issues</id>
+          </State>
+          <State>
+            <id>Bitwise operation issuesJavaScript</id>
+          </State>
+          <State>
+            <id>CSS</id>
+          </State>
+          <State>
+            <id>Class structure</id>
+          </State>
+          <State>
+            <id>Cloning issues</id>
+          </State>
+          <State>
+            <id>Code style issues</id>
+          </State>
+          <State>
+            <id>Code style issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Control flow issues</id>
+          </State>
+          <State>
+            <id>Control flow issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Data flow issues</id>
+          </State>
+          <State>
+            <id>Data flow issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Declaration redundancy</id>
+          </State>
+          <State>
+            <id>Imports</id>
+          </State>
+          <State>
+            <id>Internationalization issues</id>
+          </State>
+          <State>
+            <id>JUnit issues</id>
+          </State>
+          <State>
+            <id>JavaScript</id>
+          </State>
+          <State>
+            <id>Logging issues</id>
+          </State>
+          <State>
+            <id>Naming conventions</id>
+          </State>
+          <State>
+            <id>Numeric issues</id>
+          </State>
+          <State>
+            <id>Performance issues</id>
+          </State>
+          <State>
+            <id>Probable bugs</id>
+          </State>
+          <State>
+            <id>Security issues</id>
+          </State>
+          <State>
+            <id>Threading issues</id>
+          </State>
+          <State>
+            <id>Verbose or redundant code constructs</id>
+          </State>
+          <State>
+            <id>XPath</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Abstraction issues</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -278,8 +490,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -287,126 +497,6 @@
               <option name="myItemId" value="key" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend.jar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend.jar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="abs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend.jar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="abs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="frontend" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="absfrontend.jar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="abs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="frontend" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ast" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -429,6 +519,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="system" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="eclipse" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="system" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -502,8 +610,12 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="dl" />
+              <option name="myItemId" value="gui" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.intellij.uiDesigner.projectView.FormNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -532,225 +644,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="pp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keyabs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="po" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keyabs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="parser" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keyabs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="logic" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keyabs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="logic" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ldt" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keyabs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="init" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keyabs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="abs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keyabs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="abs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ReturnStatement" />
+              <option name="myItemId" value="gui" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -807,74 +701,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="proof" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="proof" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mgt" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ilkd" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="proof" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="init" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -922,33 +748,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="resources" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eclipse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="resources" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="de" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="uka" />
+              <option name="myItemId" value="genSrc" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -956,15 +756,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="keyabs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="proof" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rules" />
+              <option name="myItemId" value="parser" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -982,15 +774,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="resources" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="de" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="uka" />
+              <option name="myItemId" value="genSrc" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -1000,21 +784,23 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
     <property name="project.structure.last.edited" value="Libraries" />
-    <property name="project.structure.proportion" value="0.15" />
     <property name="OverrideImplement.combined" value="false" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
-    <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
+    <property name="recentsLimit" value="5" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
     <property name="last_opened_file_path" value="$key_lib$/recoderKey.jar!/" />
-    <property name="GoToClass.includeJavaFiles" value="false" />
+    <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
     <property name="GenerateAntBuildDialog.outputFileNameProperty" value="key" />
+    <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -1023,24 +809,30 @@
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="options.lastSelected" value="preferences.pluginManager" />
+    <property name="options.lastSelected" value="project.propGUI" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="restartRequiresConfirmation" value="true" />
     <property name="GenerateAntBuildDialog.backupFiles" value="true" />
-    <property name="options.searchVisible" value="true" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="ExtractSuperBase.RECENT_KEYS">
       <recent name="de.uka.ilkd.key.speclang" />
     </key>
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="de.uka.ilkd.keyabs.speclang" />
       <recent name="de.uka.ilkd.keyabs.abs.ReturnStatement" />
       <recent name="de.uka.ilkd.keyabs.po" />
       <recent name="de.uka.ilkd.keyabs.speclang.dl" />
       <recent name="de.uka.ilkd.keyabs.abs.converter" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="de.uka.ilkd.keyabs.proof.io" />
+      <recent name="de.uka.ilkd.keyabs.proof.init" />
+      <recent name="de.uka.ilkd.keyabs.proof" />
     </key>
   </component>
   <component name="RunManager" selected="Application.ABS KeY">
@@ -1056,19 +848,6 @@
       <option name="SHMEM_ADDRESS" value="javadebug" />
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
-      <method />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
@@ -1097,6 +876,19 @@
       <envs />
       <properties />
       <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -1161,6 +953,11 @@
     </configuration>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SliceManager">
+    <option name="analysisUIOptions">
+      <AnalysisUIOptions />
+    </option>
+  </component>
   <component name="StructureViewFactory">
     <option name="ACTIVE_ACTIONS" value="ALPHA_COMPARATOR" />
   </component>
@@ -1208,28 +1005,29 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32793018" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.329602" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.7820774" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32711443" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20064034" sideWeight="0.7820774" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1205165" sideWeight="0.7331671" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32917705" sideWeight="0.50645626" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32917705" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32917705" sideWeight="0.48278335" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32793018" sideWeight="0.48278335" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13988522" sideWeight="0.23940149" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998565" sideWeight="0.6708229" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13988522" sideWeight="0.7331671" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2697274" sideWeight="0.7331671" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26683292" sideWeight="0.48852223" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1398079" sideWeight="0.7820774" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3615495" sideWeight="0.7331671" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26683292" sideWeight="0.48852223" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32917705" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Thumbnails" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.329602" sideWeight="0.4971223" order="7" side_tool="false" content_ui="tabs" />
     </layout>
@@ -1305,122 +1103,123 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/init/AbstractProblemInitializer.java">
+    <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/key/proof/rules/ruleSetsDeclarations.key">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="187" column="23" selection-start="6838" selection-end="6838" vertical-scroll-proportion="0.7185629">
-          <folding>
-            <element signature="e#3899#3929#1" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$key_lib$/absfrontend.jar!/abs/frontend/ast/ReturnStmt.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="32" selection-start="3000" selection-end="3000" vertical-scroll-proportion="0.49227372">
+        <state line="61" column="12" selection-start="1495" selection-end="1515" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/AbstractABS2KeYABSConverter.java">
+    <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/ruleSetsDeclarations.key">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="293" column="59" selection-start="11058" selection-end="11058" vertical-scroll-proportion="0.12970711">
+        <state line="51" column="0" selection-start="984" selection-end="984" vertical-scroll-proportion="0.5230126">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/standardRulesABS.key">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="0" selection-start="441" selection-end="441" vertical-scroll-proportion="0.27196652">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/intRulesIgnoringOverflow.key">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="67" selection-start="267" selection-end="267" vertical-scroll-proportion="0.08108108">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/io/AbstractEnvInput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="22" selection-start="948" selection-end="948" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/ProblemLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="122" column="0" selection-start="4297" selection-end="4297" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/DefaultJavaDLProblemLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="180" column="9" selection-start="7926" selection-end="8134" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/speclang/SLEnvInput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="352" column="51" selection-start="13955" selection-end="13955" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ABSInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="258" column="38" selection-start="8018" selection-end="8018" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/ProofObligationChooser.form">
+      <provider selected="true" editor-type-id="ui-designer">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/speclang/ABSSLInput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="41" selection-start="519" selection-end="519" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/logic/Name.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="13" selection-start="1188" selection-end="1188" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/POBrowserData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="23" selection-start="325" selection-end="325" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#860#878#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/init/FunctionBuilder.java">
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/DefaultProblemLoader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="79" column="101" selection-start="3191" selection-end="3191" vertical-scroll-proportion="0.3148855">
+        <state line="161" column="53" selection-start="5806" selection-end="5806" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/po/ABSTacletGenerator.java">
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/key/proof/DefaultABSDLProblemLoader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="0" selection-start="1609" selection-end="1609" vertical-scroll-proportion="0.46183205">
+        <state line="91" column="0" selection-start="3856" selection-end="3856" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/gui/ProofObligationChooser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="42" column="20" selection-start="1354" selection-end="1354" vertical-scroll-proportion="0.7442748">
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#823#1127#0" expanded="true" />
+            <element signature="e#1116#1117#0" expanded="true" />
+            <element signature="e#1171#1330#0" expanded="true" />
+            <element signature="e#1319#1320#0" expanded="true" />
+            <element signature="initializer##0;class#ProofObligationChooser#0" expanded="true" />
+            <element signature="initializer##0;class#ProofObligationChooser#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ReturnStatement/ABSReturnStatement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="30" selection-start="592" selection-end="592" vertical-scroll-proportion="0.566108">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ABSVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="50" selection-start="2097" selection-end="2097" vertical-scroll-proportion="0.6927374">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ABSVisitorImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="246" column="0" selection-start="5822" selection-end="5910" vertical-scroll-proportion="0.7895717">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/abs/ABSModificationVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="505" column="54" selection-start="15523" selection-end="15523" vertical-scroll-proportion="0.6767857">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/pp/ABSProgramPrettyPrinter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="344" column="36" selection-start="8649" selection-end="8649" vertical-scroll-proportion="0.6767857">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/pp/LogicPrinter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2073" column="38" selection-start="66464" selection-end="66464" vertical-scroll-proportion="0.7714808">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/parser/abskeyparser.g">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3668" column="54" selection-start="108562" selection-end="108562" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/src/de/uka/ilkd/keyabs/logic/ldt/HistoryLDT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="13" selection-start="633" selection-end="633" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/history.key">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="505" column="44" selection-start="14574" selection-end="14574" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/absProgramRules.key">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="291" column="58" selection-start="8446" selection-end="8446" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/eclipse/system/resources/de/uka/ilkd/keyabs/proof/rules/seq.key">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="126" column="15" selection-start="2648" selection-end="2654" vertical-scroll-proportion="0.33205375">
-          <folding />
         </state>
       </provider>
     </entry>

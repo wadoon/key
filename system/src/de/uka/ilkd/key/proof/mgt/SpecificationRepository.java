@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof.mgt;
 
@@ -17,6 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
@@ -71,6 +76,8 @@ public final class SpecificationRepository implements ISpecificationRepository<J
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
+    private final Map<StatementBlock,ImmutableSet<BlockContract>> blockContracts
+                = new LinkedHashMap<StatementBlock, ImmutableSet<BlockContract>>();
     private final Map<IObserverFunction,IObserverFunction> unlimitedToLimited
     		= new LinkedHashMap<IObserverFunction,IObserverFunction>();
     private final Map<IObserverFunction,IObserverFunction> limitedToUnlimited
@@ -229,8 +236,8 @@ public final class SpecificationRepository implements ISpecificationRepository<J
     private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
         final KeYJavaType kjt = ax.getKJT();
         //TODO: package information not yet available
-        // DISCUSSION: how should it be treated in the mean time? as public? Our specifications rarely stretch over different packages... 
-        final boolean visibleToPackage = true;
+        // BUGFIX: package-private is understood as private (see bug #1268)
+        final boolean visibleToPackage = false;
         final VisibilityModifier visibility = ax.getVisibility();
         if (VisibilityModifier.isPublic(visibility))
             return true;
@@ -323,7 +330,7 @@ public final class SpecificationRepository implements ISpecificationRepository<J
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),
 					   TB.func(unlimited, subs)));
-	tacletBuilder.setStateRestriction(RewriteTaclet.IN_SEQUENT_STATE);
+	tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
 	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"limit " + unlimited.name()));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
@@ -1046,33 +1053,99 @@ public final class SpecificationRepository implements ISpecificationRepository<J
         return loopInvs.get(loop);
     }
 
+    /**
+     * Copies a loop invariant from a loop statement to another.
+     * 
+     * If the original loop does not possess an invariant, 
+     * none is set to the target.
+     * 
+     * A possibly existing old registration will be overwritten, a registration
+     * for the original loop remains untouched.
+     * 
+     * @param from the loop with the original contract
+     * @param to the loop for which the contract is to be copied
+     */
+    public void copyLoopInvariant(LoopStatement from, LoopStatement to) {
+        LoopInvariant inv = getLoopInvariant(from);
+        if(inv != null) {
+            inv = inv.setLoop(to);
+            addLoopInvariant(inv);
+        }
+    }
 
     /**
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void setLoopInvariant(LoopInvariant inv) {
+    public void addLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
     
     
+    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
+        if (blockContracts.get(block) == null) {
+            return DefaultImmutableSet.<BlockContract>nil();
+        }
+        else {
+            return blockContracts.get(block);
+        }
+    }
+
+    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block, final Modality modality)
+    {
+        ImmutableSet<BlockContract> result = getBlockContracts(block);
+        final Modality matchModality = getMatchModality(modality);
+        for (BlockContract contract : result) {
+            if (!contract.getModality().equals(matchModality)
+                    || (modality.transaction() && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
+    }
+
+    private Modality getMatchModality(final Modality modality)
+    {
+        if (modality.transaction()) {
+            return modality == Modality.DIA_TRANSACTION ? Modality.DIA : Modality.BOX;
+        }
+        else {
+            return modality;
+        }
+    }
+
+    public void addBlockContract(final BlockContract contract)
+    {
+        final StatementBlock block = contract.getBlock();
+        blockContracts.put(block, getBlockContracts(block).add(contract));
+    }
+
+
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
-	for(SpecificationElement spec : specs) {
-	    if(spec instanceof Contract) {
-		addContract((Contract)spec);
-	    } else if(spec instanceof JavaClassInvariant) {
-		addClassInvariant((JavaClassInvariant)spec);
-	    } else if(spec instanceof InitiallyClause){
-	        addInitiallyClause((InitiallyClause)spec);
-	    } else if(spec instanceof ClassAxiom) {
-		addClassAxiom((ClassAxiom)spec);
-	    } else if(spec instanceof LoopInvariant) {
-		setLoopInvariant((LoopInvariant)spec);
-	    } else {
-		assert false : "unexpected spec: " + spec +"\n("+spec.getClass()+")";
-	    }
-	}
+        for (SpecificationElement spec : specs) {
+            if (spec instanceof Contract) {
+                addContract((Contract)spec);
+            }
+            else if (spec instanceof JavaClassInvariant) {
+                addClassInvariant((JavaClassInvariant)spec);
+            }
+            else if (spec instanceof InitiallyClause) {
+                addInitiallyClause((InitiallyClause)spec);
+            }
+            else if (spec instanceof ClassAxiom) {
+                addClassAxiom((ClassAxiom)spec);
+            }
+            else if (spec instanceof LoopInvariant) {
+                addLoopInvariant((LoopInvariant)spec);
+            }
+            else if (spec instanceof BlockContract) {
+                addBlockContract((BlockContract) spec);
+            }
+            else {
+                assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
+            }
+        }
     }
     
     

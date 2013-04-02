@@ -1,14 +1,14 @@
 package de.uka.ilkd.keyabs.abs;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import abs.backend.coreabs.CoreAbsBackend;
 import abs.frontend.ast.MethodImpl;
+import abs.frontend.ast.MethodSig;
 import abs.frontend.ast.Model;
+import abs.frontend.ast.ParamDecl;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.IServices;
@@ -16,17 +16,14 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
-import de.uka.ilkd.keyabs.init.SortBuilder;
+import de.uka.ilkd.keyabs.abs.converter.ClassDescriptor;
+import de.uka.ilkd.keyabs.proof.init.SortBuilder;
 
 public class ABSInfo implements IProgramInfo {
 
@@ -67,6 +64,32 @@ public class ABSInfo implements IProgramInfo {
         return new ABSInfo((ABSServices) serv, program2key.copy(), absInfo);
     }
 
+
+    //TODO: fix both methods below to return sets or to take parameter types to make selction unique
+
+    public MethodSig getMethodSignature(String className, String methodName) {
+        for (MethodImpl m : absInfo.getClasses().get(new Name(className)).getMethods()) {
+            if (methodName.equals(m.getMethodSig().getName())) {
+                return m.getMethodSig();
+            }
+        }
+        return null;
+    }
+
+    public ImmutableArray<IProgramVariable> getMethodParameter(MethodSig msig) {
+        IProgramVariable[] parameters = new IProgramVariable[msig.getNumParam()];
+        int count = 0;
+        for (ParamDecl p : msig.getParamList()) {
+            KeYJavaType paramType = getKeYJavaType(p.getType().getQualifiedName());
+            if (paramType == null) {
+                throw new IllegalStateException("Type " + p.getType().getQualifiedName() + " unknwon.");
+            }
+            parameters[count++] = new LocationVariable(new ProgramElementName(p.getName()),
+                    paramType, null, false, false);
+        }
+        return new ImmutableArray<>(parameters);
+    }
+
     public ABSStatementBlock getMethodImpl(String className, String methodName) {
         for (MethodImpl m : absInfo.getClasses().get(new Name(className)).getMethods()) {
               if (methodName.equals(m.getMethodSig().getName())) {
@@ -90,18 +113,6 @@ public class ABSInfo implements IProgramInfo {
         final HashSet<KeYJavaType> set = new HashSet<KeYJavaType>();
         set.addAll(name2sortABSPair.values());
         return Collections.unmodifiableSet(set);
-    }
-
-    @Override
-    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(
-            KeYJavaType kjt) {
-        return null;
     }
 
     @Override
@@ -229,5 +240,10 @@ public class ABSInfo implements IProgramInfo {
 
     public Model parseInContext(String s) throws IOException {
         return absInfo.parseInContext(s);
+    }
+
+    public List<MethodImpl> getAllMethods(Name selectedClass) {
+        ClassDescriptor classDescription = absInfo.getClasses().get(selectedClass);
+        return classDescription.getMethods();
     }
 }

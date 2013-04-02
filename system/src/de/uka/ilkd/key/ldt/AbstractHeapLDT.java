@@ -1,12 +1,8 @@
 package de.uka.ilkd.key.ldt;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -14,14 +10,13 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public abstract class AbstractHeapLDT extends LDT implements IHeapLDT {
 
@@ -183,14 +178,14 @@ public abstract class AbstractHeapLDT extends LDT implements IHeapLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services,
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, IServices services,
 	    ExecutionContext ec) {
 	        return false;
 	    }
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
-	    Services services, ExecutionContext ec) {
+	    IServices services, ExecutionContext ec) {
 	        return false;
 	    }
 
@@ -207,7 +202,7 @@ public abstract class AbstractHeapLDT extends LDT implements IHeapLDT {
     }
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv, ExecutionContext ec) {
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, IServices serv, ExecutionContext ec) {
         assert false;
         return null;
     }

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
 
@@ -25,10 +29,15 @@ public interface ProverTaskListener {
     
     /**
      * Called when progress is made on a task.
-     * @param position indicates how much work has been done relative to the
-     * value of size passed in @c taskStarted
+     * 
+     * This method is called after every single step of the task
+     * 
+     * @param position
+     *            indicates how much work has been done relative to the value of
+     *            {@code size} passed in {@link #taskStarted(String, int)}.
      */
     void taskProgress ( int position );
+    
     
     /**
      * Called when a task is finished.

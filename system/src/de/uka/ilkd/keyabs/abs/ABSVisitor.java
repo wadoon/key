@@ -69,4 +69,6 @@ public interface ABSVisitor extends ProgramVisitor {
     void performActionOnABSGetExp(ABSGetExp x);
 
     void performActionOnABSReturnStatement(ABSReturnStatement x);
+
+    void performActionOnABSMethodFrame(ABSMethodFrame x);
 }

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.logic;
 
@@ -223,6 +227,11 @@ public class Namespace<T extends Named> implements java.io.Serializable {
 			return elements().append(parent().allElements());
 		}
 	}
+
+    /** Convenience method to look up. */
+    public Named lookup(String name){
+        return lookup(new Name(name));
+    }
 
 	/** returns the fall-back Namespace of this Namespace, i.e. the one
 	 * where symbols are looked up that are not found in this one.

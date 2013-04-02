@@ -116,7 +116,7 @@ public class ABSContextStatementBlock extends ABSStatementBlock implements
         SourceData newSource = source;
 
         if (matchCond.getInstantiations().getContextInstantiation() != null) {
-            // Currently we do not allow to context statement block
+            // Currently we do not allow two context statement block
             // occurrences in find or assumes clauses
             return null;
         }
@@ -158,6 +158,12 @@ public class ABSContextStatementBlock extends ABSStatementBlock implements
             int start = -1;
 
             if (relPos != PosInProgram.TOP) {
+                if (firstActiveStatement instanceof ABSMethodFrame) {
+                    /* lastExecutionContext = (ExecutionContext)
+                            ((ABSMethodFrame)firstActiveStatement).
+                                    getExecutionContext(); */
+                    // TODO: store here last this, ml, cl, result
+                }
                 start = relPos.get(relPos.depth() - 1);
                 if (relPos.depth() > 1) {
                     firstActiveStatement = (ProgramPrefix) PosInProgram
@@ -168,6 +174,8 @@ public class ABSContextStatementBlock extends ABSStatementBlock implements
         } else {
             prefix = null;
         }
+
+        // TODO: match here this, cl, ml, result
 
         // matching children
         matchCond = matchChildren(newSource, matchCond, 0);

@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -22,6 +23,7 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
+import org.key_project.sed.key.ui.view.SymbolicExecutionSettingsView;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,6 +34,275 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Martin Hentschel
  */
 public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
+   /**
+    * If the fast mode is enabled the step wise creation of models is disabled.
+    */
+   private static final boolean FAST_MODE = true;
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractAllBranchesOpenTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractAllBranchesOpenTest",
+                     "data/useOperationContractAllBranchesOpenTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractAllBranchesOpenTest", "main", "I", "QUseOperationContractAllBranchesOpenTest;"),
+                     "data/useOperationContractAllBranchesOpenTest/oracle/UseOperationContractAllBranchesOpenTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractExceptionalNoPreconditionWithNullCheckTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractExceptionalNoPreconditionWithNullCheckTest",
+                     "data/useOperationContractExceptionalNoPreconditionWithNullCheckTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractExceptionalNoPreconditionWithNullCheckTest", "main", "QUseOperationContractExceptionalNoPreconditionWithNullCheckTest;"),
+                     "data/useOperationContractExceptionalNoPreconditionWithNullCheckTest/oracle/UseOperationContractExceptionalNoPreconditionWithNullCheckTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractFalsePreconditionTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFalsePreconditionTest",
+                     "data/useOperationContractFalsePreconditionTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractFalsePreconditionTest", "main"),
+                     "data/useOperationContractFalsePreconditionTest/oracle/UseOperationContractExceptionalNoPreconditionWithNullCheckTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractFixedNormalPostTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest",
+                     "data/useOperationContractFixedNormalPostTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractFixedNormalPostTest", "main"),
+                     "data/useOperationContractFixedNormalPostTest/oracle/UseOperationContractFixedNormalPostTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractInvalidPreconditionOnObjectTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionOnObjectTest",
+                     "data/useOperationContractInvalidPreconditionOnObjectTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractInvalidPreconditionOnObjectTest", "main"),
+                     "data/useOperationContractInvalidPreconditionOnObjectTest/oracle/UseOperationContractInvalidPreconditionOnObjectTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractInvalidPreconditionTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest",
+                     "data/useOperationContractInvalidPreconditionTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractInvalidPreconditionTest", "main"),
+                     "data/useOperationContractInvalidPreconditionTest/oracle/UseOperationContractInvalidPreconditionTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractNoExceptionTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoExceptionTest",
+                     "data/useOperationContractNoExceptionTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractNoExceptionTest", "main"),
+                     "data/useOperationContractNoExceptionTest/oracle/UseOperationContractNoExceptionTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractNoPreconditionTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoPreconditionTest",
+                     "data/useOperationContractNoPreconditionTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractNoPreconditionTest", "main"),
+                     "data/useOperationContractNoPreconditionTest/oracle/UseOperationContractNoPreconditionTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractNoPreconditionWithNullCheckTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoPreconditionWithNullCheckTest",
+                     "data/useOperationContractNoPreconditionWithNullCheckTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractNoPreconditionWithNullCheckTest", "main", "QUseOperationContractNoPreconditionWithNullCheckTest;"),
+                     "data/useOperationContractNoPreconditionWithNullCheckTest/oracle/UseOperationContractNoPreconditionWithNullCheckTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractNormalAndExceptionalBranchTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest",
+                     "data/useOperationContractNormalAndExceptionalBranchTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractNormalAndExceptionalBranchTest", "main", "I"),
+                     "data/useOperationContractNormalAndExceptionalBranchTest/oracle/UseOperationContractNormalAndExceptionalBranchTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testUseOperationContractNormalAndExceptionalTogetherTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest",
+                     "data/useOperationContractNormalAndExceptionalTogetherTest/test",
+                     false,
+                     createMethodSelector("UseOperationContractNormalAndExceptionalTogetherTest", "main"),
+                     "data/useOperationContractNormalAndExceptionalTogetherTest/oracle/UseOperationContractNormalAndExceptionalTogetherTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testComplexConstructorTest() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testComplexConstructorTest",
+                                   "data/complexConstructorTest/test",
+                                   false,
+                                   createMethodSelector("ComplexConstructorTest", "main"),
+                                   "data/complexConstructorTest/oracle/ComplexConstructorTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testSimpleConstructorTest() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleConstructorTest",
+                                   "data/simpleConstructorTest/test",
+                                   false,
+                                   createMethodSelector("SimpleConstructorTest", "main"),
+                                   "data/simpleConstructorTest/oracle/SimpleConstructorTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testMagic42() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMagic42",
+                     "data/magic42/test",
+                     false,
+                     createMethodSelector("Magic42", "compute", "I"),
+                     "data/magic42/oracle/Magic42.xml",
+                     true,
+                     14,
+                     true,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false);
+   }
+   
    /**
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
@@ -131,6 +402,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      false);
    }
    
@@ -147,6 +419,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false,
                      false,
                      false,
@@ -169,6 +442,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      false);
    }
    
@@ -185,6 +459,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false,
                      false,
                      false,
@@ -634,6 +909,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false, 
                      false,
                      true,
+                     false,
                      false);
    }
    
@@ -649,6 +925,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      "data/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
                      false,
                      30,
+                     false,
                      false,
                      false,
                      false,
@@ -762,7 +1039,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                                IMethodSelector selector,
                                                String expectedModelPathInBundle) throws Exception {
       assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false);
-      assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, true);
+      if (!FAST_MODE) {
+         assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, true);
+      }
    }
    
    /**
@@ -784,8 +1063,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                                String expectedModelPathInBundle,
                                                boolean includeCallStack,
                                                boolean mergeBranchConditions) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false, mergeBranchConditions);
-      assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, true, false, mergeBranchConditions);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false, mergeBranchConditions, false);
+      if (!FAST_MODE) {
+         assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, true, false, mergeBranchConditions, false);
+      }
    }
    
    /**
@@ -841,7 +1122,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
                                  boolean stepIntoInsteadOfRun) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, false, stepIntoInsteadOfRun, false, false);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, false, stepIntoInsteadOfRun, false, false, false);
    }
    
    /**
@@ -866,6 +1147,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
@@ -879,7 +1161,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  final boolean includeCallstack,
                                  final boolean stepIntoInsteadOfRun,
                                  final boolean showKeYMainWindow,
-                                 final boolean mergeBranchConditions) throws Exception {
+                                 final boolean mergeBranchConditions,
+                                 final boolean useOperationContracts) throws Exception {
       IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
@@ -896,6 +1179,11 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             assertFalse(target.isTerminated());
             // Make sure that the debug target is in the initial state.
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+            // Configure operation contract usage
+            SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
+            SWTBotCombo methodTreatmentCombo = symbolicSettingsView.bot().comboBox();
+            assertTrue(methodTreatmentCombo.isEnabled());
+            methodTreatmentCombo.setSelection(useOperationContracts ? SymbolicExecutionSettingsView.METHOD_TREATMENT_CONTRACT : SymbolicExecutionSettingsView.METHOD_TREATMENT_EXPAND);
             // Get debug target TreeItem
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
             // Create tree

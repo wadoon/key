@@ -1,11 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 /* -*-Antlr-*- */
 
@@ -51,6 +56,10 @@ tokens {
     
     NULLABLE        = "nullable";
     NON_NULL        = "non_null";
+
+    BREAKS          = "breaks";
+    CONTINUES       = "continues";
+    RETURNS         = "returns";
 }
 
 AND : "&";
@@ -70,6 +79,7 @@ ELEMTYPE : "\\elemtype";
 EQUAL_SINGLE : "=";
 EVERYTHING : "\\everything";
 FRESH : "\\fresh"; 
+FREE : "\\free";
 GEQ : ">=";
 GT : ">";
 IMPLIES : "==>";
@@ -100,7 +110,9 @@ NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
 NOTHING : "\\nothing";
-LESS_THAN_NOTHING : "\\less_than_nothing";   //KeY extension for strict purity, not official JML (MU)
+LESS_THAN_NOTHING : "\\less_than_nothing";   //KeY extension for strict purity, not official JML (MU);
+// less_than_nothing is *deprecated* and to be removed eventually, use strictly_nothing instead
+STRICTLY_NOTHING : "\\strictly_nothing";
 OLD : "\\old";
 OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
@@ -153,7 +165,6 @@ SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
 SEQREPLACE : "\\seq_put";
 INDEXOF : "\\indexOf";
-SEQCONTAINS : "\\contains"; // temp workaround as long as sets are not yet implemented
 SEQDEF : "\\seq_def";
 
 MEASURED_BY : "\\measured_by";

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 /** this class parses in a config file that has to use the following grammar:
  *  S -> (IDENTIFIER ':'  (alles ausser ';')* ';')* 
@@ -40,15 +44,14 @@ public class Config {
 
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
-    
-    static HashMap<String, StringBuffer> map = new HashMap<String, StringBuffer>();
+    static HashMap<String,StringBuffer> map = new HashMap<String,StringBuffer>();
 
     /** loads a resource and returns its URL 
      * @param cl the Class used to determine the resource 
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public static URL getResourceFile(Class cl, String resourcename) {
+    public static URL getResourceFile(Class<?> cl, String resourcename) {
 	URL resourceURL = cl.getResource(resourcename);
 	if (resourceURL == null && cl.getSuperclass() != null) {
 	    return getResourceFile(cl.getSuperclass(), resourcename);

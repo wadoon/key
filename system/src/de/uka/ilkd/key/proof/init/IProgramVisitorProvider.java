@@ -34,7 +34,8 @@ import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.ABSVisitorImpl;
 import de.uka.ilkd.keyabs.abs.IProgramASTModifyingVisitor;
-import de.uka.ilkd.keyabs.init.ABSProfile;
+import de.uka.ilkd.keyabs.proof.init.ABSProfile;
+import de.uka.ilkd.keyabs.proof.init.ABSProgVarReplacer;
 import de.uka.ilkd.keyabs.rule.ABSTacletSchemaVariableCollector;
 import de.uka.ilkd.keyabs.rule.ABSTacletVariableSVCollector;
 
@@ -79,9 +80,9 @@ public class IProgramVisitorProvider {
 
     public IProgramVariableCollector<LocationVariable> createProgramVariableCollector(
             ProgramElement root, IServices services) {
-        return ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ? new ABSProgramVariableCollector(
-                root, (ABSServices) services) : new ProgramVariableCollector(
-                root, services);
+        return ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof ABSProfile ?
+                new ABSProgramVariableCollector( root, (ABSServices) services) :
+                new ProgramVariableCollector(root, services);
     }
 
     private static final class ABSReadPVCollector extends ABSVisitorImpl

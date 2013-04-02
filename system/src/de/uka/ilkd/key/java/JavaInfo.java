@@ -1,60 +1,37 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.java;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.LRUCache;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.LRUCache;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
@@ -142,11 +119,16 @@ public final class JavaInfo implements IProgramInfo {
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
     
+    /** caches the program variable for {@code <inv>} */
+    private ProgramVariable invProgVar;
+    
+    /** caches the observer for {@code <inv>} */
+    private IObserverFunction inv;
+    
     /** the name of the class used as default execution context */
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
     
-    private IObserverFunction inv;
     private HashMap<KeYJavaType,IObserverFunction> staticInvs = new HashMap<KeYJavaType,IObserverFunction>();
 
     
@@ -404,30 +386,10 @@ public final class JavaInfo implements IProgramInfo {
 	}
 	
 	if(result == null) {
-	    final Namespace<Sort> sorts = services.getNamespaces().sorts();
+	    Name ldtName = type.getCorrespondingLDTName();
+	    final Namespace sorts = services.getNamespaces().sorts();
 	    final Sort sort;
-	    if(type == PrimitiveType.JAVA_BOOLEAN) {
-		sort = sorts.lookup(BooleanLDT.NAME);;
-	    } else if(type == PrimitiveType.JAVA_BYTE
-	              || type == PrimitiveType.JAVA_CHAR 
-	              || type == PrimitiveType.JAVA_INT 
-                      || type == PrimitiveType.JAVA_LONG 
-		      || type == PrimitiveType.JAVA_SHORT
-		      || type == PrimitiveType.JAVA_BIGINT) { 
-		 sort = sorts.lookup(IntegerLDT.NAME);;
-	    } else if(type == PrimitiveType.JAVA_FLOAT) {
-		sort = sorts.lookup(FloatLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_DOUBLE) {
-		sort = sorts.lookup(DoubleLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_LOCSET) {
-                sort = sorts.lookup(LocSetLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_SEQ) {
-                sort = sorts.lookup(SeqLDT.NAME);
-	    } else {
-		assert false : "unexpected primitive type: " + type;
-	    	sort = null;
-	    }
-	    
+	    sort = (Sort) sorts.lookup(ldtName);
 	    assert sort != null : "could not find sort for type: " + type;
 	    result = new KeYJavaType(type, sort);
 	    if(type2KJTCache != null) {
@@ -506,7 +468,17 @@ public final class JavaInfo implements IProgramInfo {
 	         }
 	     }
 	 }	
-	 return sort2KJTCache.get(sort);
+	 
+	 // lookup for primitive ldts
+	 KeYJavaType result = sort2KJTCache.get(sort);
+	 if(result == null) {
+	     Name n = sort.name();
+	     PrimitiveType pt = PrimitiveType.getPrimitiveTypeByLDT(n);
+	     if(pt != null) {
+	         return getPrimitiveKeYJavaType(pt);
+	     }
+	 }
+    return result;
      }
 
 
@@ -545,19 +517,17 @@ public final class JavaInfo implements IProgramInfo {
         return kpmi.getMethods(kjt);
     }
 
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllProgramMethods(de.uka.ilkd.key.java.abstraction.KeYJavaType)
-	 */
-    @Override
+    /**
+     * returns all methods from the given Type as IProgramMethods
+     */
 	public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         return kpmi.getAllProgramMethods(kjt);
     }
-    
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.ProgramInfo#getAllProgramMethodsLocallyDeclared(de.uka.ilkd.key.java.abstraction.KeYJavaType)
-	 */
-    @Override
-	public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
+
+    /**
+     * returns all methods declared in the given Type as IProgramMethods
+     */
+	public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
     
@@ -950,12 +920,14 @@ public final class JavaInfo implements IProgramInfo {
      * @return the attribute program variable of the given name 
      * @throws IllegalArgumentException if the qualified class name is empty or
      * null
+     * @throws UnknownJavaTypeException if the qualified name refers to an unknown type
      */
     public ProgramVariable getAttribute(String programName, 
             String qualifiedClassName) {
     	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
     		throw new IllegalArgumentException("Missing qualified classname");
     	}
+    	
     	KeYJavaType kjt = null;
     	try {
     		kjt = getKeYJavaTypeByClassName(qualifiedClassName);
@@ -965,6 +937,11 @@ public final class JavaInfo implements IProgramInfo {
     			kjt = getKeYJavaType(qualifiedClassName);
     		}
     	}
+    	
+    	if (kjt == null) {
+    		throw new UnknownJavaTypeException("Java type '" + qualifiedClassName + "' not known.");
+    	}
+    	
     	return getAttribute(programName, kjt);
     }
 
@@ -1289,11 +1266,11 @@ public final class JavaInfo implements IProgramInfo {
         return length;
     }
     
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.java.ProgramInfo#getInv()
-	 */
-    @Override
-	public IObserverFunction getInv() {
+    /**
+     * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of an object.
+     * @see #getInvProgramVar()
+     */
+    public IObserverFunction getInv() {
 	if(inv == null) {
 	    inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,
@@ -1304,6 +1281,22 @@ public final class JavaInfo implements IProgramInfo {
         			       new ImmutableArray<KeYJavaType>());
 	}
 	return inv;
+    }
+    
+    /**
+     * Returns the special program variable symbol <code>&lt;inv&gt;</code>
+     * which stands for the class invariant of an object.
+     * 
+     * @see #getInv()
+     */
+    public ProgramVariable getInvProgramVar() {
+        if(invProgVar == null) {
+            ProgramElementName pen = new ProgramElementName("<inv>", "java.lang.Object");
+            invProgVar = new LocationVariable(pen, 
+                                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+                                getJavaLangObject(), false, true);
+        }
+        return invProgVar;
     }
 
     /**

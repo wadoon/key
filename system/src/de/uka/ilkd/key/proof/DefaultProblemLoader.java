@@ -1,19 +1,16 @@
 package de.uka.ilkd.key.proof;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Properties;
-
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.io.DefaultProofFileParser;
 import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.speclang.Contract;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>
@@ -93,26 +90,37 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public String load() throws ProofInputException, IOException {
-      // Read environment
-      envInput = createEnvInput();
-      problemInitializer = createProblemInitializer();
-      initConfig = createInitConfig();
-      // Read proof obligation settings
-      LoadedPOContainer poContainer = createProofObligationContainer();
+   public String load() throws ProblemLoaderException {
       try {
-         if (poContainer == null) {
-            return selectProofObligation();
+         // Read environment
+      boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+         envInput = createEnvInput();
+         problemInitializer = createProblemInitializer();
+         initConfig = createInitConfig();
+         // Read proof obligation settings
+         LoadedPOContainer poContainer = createProofObligationContainer();
+         try {
+            if (poContainer == null) {
+               return selectProofObligation();
+            }
+            // Create proof and apply rules again if possible
+            proof = createProof(poContainer);
+            if (proof != null) {
+               replayProof(proof);
+            }
+            return ""; // Everything fine
          }
-         // Create proof and apply rules again if possible
-         proof = createProof(poContainer);
-         return ""; // Everything fine
+         finally {
+    	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
+            getMediator().resetNrGoalsClosedByHeuristics();
+            if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+               ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+            }  
+         }
       }
-      finally {
-         getMediator().resetNrGoalsClosedByHeuristics();
-         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-         }  
+      catch (Exception e) {
+         throw new ProblemLoaderException(this, e);
       }
    }
 
@@ -151,10 +159,20 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
     * @return An error message or {@code null} if everything is fine.
     */
-   protected String selectProofObligation() {
-      return null; // Do nothing
-   }
+   protected abstract String selectProofObligation();
 
+
+   protected void replayProof(Proof proof) throws ProofInputException {
+      mediator.setProof(proof);
+
+      mediator.stopInterface(true); // first stop (above) is not enough
+
+      if (envInput instanceof KeYUserProblemFile) {
+         problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator),
+                 (KeYUserProblemFile) envInput);
+      }
+      mediator.getUI().resetStatus(this);
+   }
 
    /**
     * Returns the file or folder to load.

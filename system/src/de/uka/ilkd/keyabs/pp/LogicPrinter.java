@@ -20,11 +20,7 @@ import java.util.Stack;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -1319,7 +1315,6 @@ public final class LogicPrinter implements ILogicPrinter {
             if (showWholeTaclet) {
                 printHeuristics(taclet);
             }
-            printAttribs(taclet);
             if (showWholeTaclet) {
                 layouter.brk(1, -2).print("}");
             }
@@ -1620,12 +1615,6 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printAttribs(Taclet taclet) throws IOException {
-        if (taclet.noninteractive()) {
-            layouter.brk().print("\\noninteractive");
-        }
-    }
-
     protected void printFind(Taclet taclet) throws IOException {
         if (!(taclet instanceof FindTaclet)) {
             return;
@@ -1752,11 +1741,15 @@ public final class LogicPrinter implements ILogicPrinter {
 
     protected void printRewriteAttributes(RewriteTaclet taclet)
             throws IOException {
-        final int stateRestriction = taclet.getStateRestriction();
+        final int stateRestriction = taclet.getApplicationRestriction();
         if (stateRestriction == RewriteTaclet.SAME_UPDATE_LEVEL) {
             layouter.brk().print("\\sameUpdateLevel");
         } else if (stateRestriction == RewriteTaclet.IN_SEQUENT_STATE) {
             layouter.brk().print("\\inSequentState");
+        } else if (stateRestriction == RewriteTaclet.ANTECEDENT_POLARITY) {
+            layouter.brk().print("\\antecedentPolarity");
+        } else if (stateRestriction == RewriteTaclet.SAME_UPDATE_LEVEL) {
+            layouter.brk().print("\\succedentPolarity");
         }
     }
 
@@ -1921,10 +1914,10 @@ public final class LogicPrinter implements ILogicPrinter {
     public void printABSStatementBlock(ABSStatementBlock x) throws IOException {
         layouter.print("{").beginC(2).ind();
         printStatementList(x);
-        layouter.brk(0,-2).end().print("}");
+        layouter.brk(0, -2).end().print("}");
     }
 
-    private void printStatementList(ABSStatementBlock x) throws IOException {
+    private void printStatementList(StatementContainer x) throws IOException {
         if (x.getStatementCount() <= 0) return;
         layouter.print(" ");
         for (int i = 0; i < x.getStatementCount(); i++) {
@@ -2080,6 +2073,13 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.print(";");
     }
 
-
+    public void printABSMethodFrame(ABSMethodFrame x) throws IOException {
+        layouter.print("method(").beginC(0).print("this<-");
+        x.getChildAt(0).visit(programPrettyPrinter);
+        layouter.print("):{").end();
+        layouter.beginC(2).ind();
+        printStatementList(x);
+        layouter.brk(0,-2).end().print("}");
+    }
 
 }

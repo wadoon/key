@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.gui.configuration;
 
 import java.util.LinkedList;
@@ -19,7 +23,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
  * Heuristics and the maximum amount of heuristics steps before an
  * interactive step is required.
  */
-public class GeneralSettings implements Settings {
+public class GeneralSettings implements Settings, Cloneable {
 
 
     private static final String TACLET_FILTER = "[General]StupidMode";
@@ -29,6 +33,7 @@ public class GeneralSettings implements Settings {
     	= "[General]OneStepSimplification";    
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String USE_OCL_KEY = "[General]UseOCL";
+    private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     
     /** if true then JML/OCL specifications are globally disabled 
      * in this run of KeY, regardless of the regular settings 
@@ -47,6 +52,9 @@ public class GeneralSettings implements Settings {
     /** is one-step simplification enabled */
     private boolean oneStepSimplification = true;
     
+    /** launches the rightclick the macro menu. on by default. */
+    private boolean rightClickMacros = true;
+
     /** JML is active by default */
     private boolean useJML = true;
     
@@ -55,7 +63,6 @@ public class GeneralSettings implements Settings {
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
-
 
     // getter
     public boolean tacletFilter() {
@@ -77,6 +84,9 @@ public class GeneralSettings implements Settings {
 	return oneStepSimplification;
     }
     
+    public boolean isRightClickMacro() {
+        return rightClickMacros;
+    }
     
     public boolean useJML() {
         return useJML && !disableSpecs;
@@ -110,6 +120,13 @@ public class GeneralSettings implements Settings {
 	    oneStepSimplification = b;
 	    fireSettingsChanged();
 	}
+    }
+    
+    public void setRightClickMacros(boolean b) {
+        if(this.rightClickMacros != b) {
+            rightClickMacros = b;
+            fireSettingsChanged();
+        }
     }
 
     
@@ -150,6 +167,11 @@ public class GeneralSettings implements Settings {
             oneStepSimplification = Boolean.valueOf(val).booleanValue();
         }
         
+        val = props.getProperty(RIGHT_CLICK_MACROS_KEY);
+        if(val != null) {
+            rightClickMacros = Boolean.valueOf(val).booleanValue();
+        }
+        
         val = props.getProperty(USE_JML_KEY);
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
@@ -170,7 +192,8 @@ public class GeneralSettings implements Settings {
     public void writeSettings(Object sender, Properties props) {
 	props.setProperty(TACLET_FILTER, "" + tacletFilter);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
-        props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);        
+        props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);
+        props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(USE_OCL_KEY, "" + useOCL);
     }

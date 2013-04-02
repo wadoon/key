@@ -4,10 +4,11 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.xml.sax.SAXException;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
+import org.xml.sax.SAXException;
+
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -25,7 +26,7 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
     * of symbolic execution tree nodes to make sure that the
     * stop conditions works correctly in combination with the goal chooser.
     */
-   public void testStepOverOnTwoBranches() throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+   public void testStepOverOnTwoBranches() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       // Define test settings
       String javaPathInkeyRepDirectory = "examples/_testcase/set/stepOverOnTwoBranches/test/StepOverOnTwoBranches.java";
       String containerTypeName = "StepOverOnTwoBranches";
@@ -33,7 +34,7 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
       String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/stepOverOnTwoBranches/oracle/StepOverOnTwoBranches";
       String oracleFileExtension = ".xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<Services, JavaDLInitConfig, CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false);
+      SymbolicExecutionEnvironment<Services, JavaDLInitConfig, CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false);
       // Make sure that initial tree is valid
       int oracleIndex = 0;
       assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.pp;
 
@@ -414,17 +418,24 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{
-        if (taclet.noninteractive()) {
-            layouter.brk().print("\\noninteractive");
-        }       
+//        if (taclet.noninteractive()) {
+//            layouter.brk().print("\\noninteractive");
+//        }       
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) throws IOException{
-        final int stateRestriction = taclet.getStateRestriction();
-        if (stateRestriction == RewriteTaclet.SAME_UPDATE_LEVEL) {
+        final int applicationRestriction = taclet.getApplicationRestriction();
+        if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
             layouter.brk().print("\\sameUpdateLevel");
-        } else if (stateRestriction == RewriteTaclet.IN_SEQUENT_STATE) {
+        }
+        if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
             layouter.brk().print("\\inSequentState");
+        }
+        if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+            layouter.brk().print("\\antecedentPolarity");
+        }
+        if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+            layouter.brk().print("\\succedentPolarity");
         }
     }
 
@@ -1415,8 +1426,11 @@ public final class LogicPrinter implements ILogicPrinter {
 
         layouter.print ( keyword );
 
-        assert t.boundVars().isEmpty();
-
+        if ( t.varsBoundHere ( 0 ).size () > 0 ) {
+            layouter.print ( " " );
+            printVariables ( t.varsBoundHere ( 0 ) );
+        }
+        
         layouter.print( " (" );
         markStartSub ();
         printTerm ( t.sub ( 0 ) );

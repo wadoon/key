@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="de.uka.ilkd.keyabs.gui.ProofObligationChooser">
+  <grid id="27dc6" binding="browser" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="20" y="20" width="801" height="445"/>
+    </constraints>
+    <properties/>
+    <border type="bevel-lowered">
+      <font/>
+      <title-color color="-16777216"/>
+    </border>
+    <children>
+      <grid id="f60dd" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="1" hsize-policy="1" anchor="4" fill="2" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="6de39" class="javax.swing.JButton" binding="cancelButton" default-binding="true">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <text value="Cancel"/>
+            </properties>
+          </component>
+          <component id="83b86" class="javax.swing.JButton" binding="OKButton" default-binding="true">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <foreground color="-13421773"/>
+              <text value="OK"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="6399e" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <maximumSize width="200" height="2147483647"/>
+          <minimumSize width="200" height="200"/>
+          <preferredSize width="200" height="200"/>
+        </properties>
+        <border type="line" title="Classes" title-justification="1">
+          <title-color color="-6710887"/>
+          <color color="-13421773"/>
+        </border>
+        <children>
+          <component id="8fed4" class="javax.swing.JList" binding="classes">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="50"/>
+              </grid>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <maximumSize width="200" height="20000"/>
+              <minimumSize width="200" height="200"/>
+              <model/>
+              <preferredSize width="200" height="200"/>
+              <selectionMode value="0"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="454aa" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <maximumSize width="200" height="2147483647"/>
+          <minimumSize width="200" height="200"/>
+          <preferredSize width="200" height="200"/>
+        </properties>
+        <border type="line" title="Methods">
+          <title-color color="-6710887"/>
+          <color color="-13421773"/>
+        </border>
+        <children>
+          <component id="3c871" class="javax.swing.JList" binding="methods">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="50"/>
+              </grid>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <maximumSize width="200" height="20000"/>
+              <minimumSize width="200" height="200"/>
+              <preferredSize width="200" height="200"/>
+              <selectionMode value="0"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="3f351" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="7" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <maximumSize width="200" height="2147483647"/>
+          <minimumSize width="200" height="26"/>
+          <preferredSize width="200" height="26"/>
+        </properties>
+        <border type="line" title="Proofobligations">
+          <title-color color="-6710887"/>
+          <color color="-13421773"/>
+        </border>
+        <children>
+          <component id="e123a" class="javax.swing.JList" binding="proofObligation">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="50"/>
+              </grid>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <maximumSize width="200" height="20000"/>
+              <minimumSize width="200" height="200"/>
+              <model/>
+              <preferredSize width="200" height="200"/>
+              <selectionMode value="0"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

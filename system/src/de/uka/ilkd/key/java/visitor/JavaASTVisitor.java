@@ -1,23 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.java.visitor;
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.CompilationUnit;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.java.Import;
-import de.uka.ilkd.key.java.PackageSpecification;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassInitializer;
@@ -160,6 +157,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
@@ -191,6 +189,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker
                                        .getLoopInvariant((LoopStatement) node);
             if(li != null) {
                 performActionOnLoopInvariant(li);
+            }
+        } else if (node instanceof StatementBlock && services != null) {
+            ImmutableSet<BlockContract> bcs = services.getSpecificationRepository()
+                                                      .getBlockContracts((StatementBlock) node);
+            for (BlockContract bc : bcs) {
+                performActionOnBlockContract(bc);
             }
         }
     }
@@ -956,6 +960,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     
     @Override
     public void performActionOnLoopInvariant(LoopInvariant x) {
+        //do nothing
+    }
+    
+    @Override
+    public void performActionOnBlockContract(BlockContract x) {
         //do nothing
     }
 

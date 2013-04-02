@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 /**
  * @author koenn
@@ -15,6 +19,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -27,11 +32,13 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.UIConfiguration;
 import de.uka.ilkd.key.rule.Taclet;
 
+@Deprecated
 public class TacletView implements ActionListener{
 
     private JDialog frame;
@@ -51,7 +58,7 @@ public class TacletView implements ActionListener{
 
     private TacletView() {
 
-        frame = new JDialog();
+        frame = new JDialog(MainWindow.getInstance());
         frame.setTitle("Taclet View");
         frame.setLocationByPlatform(true);
 
@@ -78,6 +85,8 @@ public class TacletView implements ActionListener{
 
         frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
         frame.getContentPane().add(buttonPane, BorderLayout.SOUTH);
+        
+        frame.getRootPane().setDefaultButton(button);
 
         frame.pack();	   
     }
@@ -88,11 +97,12 @@ public class TacletView implements ActionListener{
     }
     
     
-    private void showTacletView(Taclet tac, boolean modal, UIConfiguration uic){
-	frame.setModal(modal);
+    public void showTacletView(Taclet tac, boolean modal){
+        frame.setModalityType(modal? 
+                ModalityType.APPLICATION_MODAL: ModalityType.MODELESS);
         scrollPane.setBorder(BorderFactory.createTitledBorder
                 (getDisplayName(tac)));
-        content.setText(getTacletByName(tac, uic));
+        content.setText(getTacletByName(tac, ProofSettings.DEFAULT_SETTINGS.getProfile().getUIConfiguration()));
 
         content.setCaretPosition(0);
 
@@ -101,13 +111,11 @@ public class TacletView implements ActionListener{
     }
 
     
-    public void showTacletView(DefaultMutableTreeNode node, UIConfiguration uic){
-        Taclet tac;
+    public void showTacletView(DefaultMutableTreeNode node){
         if (node.getUserObject() instanceof Taclet) {
-            tac = (Taclet) node.getUserObject();        
-        } else return;
-        showTacletView(tac,false, uic);
-
+            Taclet tac = (Taclet) node.getUserObject();
+            showTacletView(tac, false);
+        } 
     }
 
     

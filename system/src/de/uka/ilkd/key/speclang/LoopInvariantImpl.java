@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.speclang;
 
@@ -42,11 +46,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
     /**
      * Creates a loop invariant.
      * @param loop the loop to which the invariant belongs
-     * @param invariant the invariant formula
+     * @param invariants the invariant formula
      * @param modifies the modifier set
      * @param variant the variant term
      * @param selfTerm the term used for the receiver object
-     * @param heapAtPre the term used for the at pre heap
+     * @param atPres the term used for the at pre heap
      */
     public LoopInvariantImpl(LoopStatement loop,
                              Map<LocationVariable,Term> invariants,
@@ -260,6 +264,16 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + originalModifies
                 + "; variant: "
                 + originalVariant;
+    }
+
+    @Override
+    public String getPlainText(IServices services) {
+       return "invariants: " 
+             + originalInvariants
+             + ";\nmodifies: " 
+             + originalModifies
+             + ";\nvariant: "
+             + originalVariant;
     }
 
 

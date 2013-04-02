@@ -51,7 +51,7 @@ header {
 
 
   import de.uka.ilkd.keyabs.abs.*;
-  import de.uka.ilkd.keyabs.init.*;
+  import de.uka.ilkd.keyabs.proof.init.*;
   import de.uka.ilkd.keyabs.logic.sort.*;
   import de.uka.ilkd.keyabs.proof.*;
 
@@ -1005,7 +1005,7 @@ options {
             return new NoFindTacletBuilder();
         } else if ( find instanceof Term ) {
             return new RewriteTacletBuilder().setFind((Term)find)
-                .setStateRestriction(stateRestriction);
+                .setApplicationRestriction(stateRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
             if ( findSeq.isEmpty() ) {

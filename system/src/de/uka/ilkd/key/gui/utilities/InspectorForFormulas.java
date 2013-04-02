@@ -4,7 +4,7 @@ import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.DefaultProofFileParser;
+import de.uka.ilkd.key.proof.io.DefaultProofFileParser;
 
 /**
  * Inspects whether a given string can be translated into a formula. 

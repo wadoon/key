@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -9,6 +10,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -146,6 +148,14 @@ public class ProofStarter {
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
+
+    /**
+     * Returns the maximal steps to be performed.
+     * @return The maximal steps to be performed.
+     */
+    public int getMaxRuleApplications() {
+       return this.maxSteps;
+    }
     
     /**
      * set maximal steps to be performed
@@ -160,17 +170,25 @@ public class ProofStarter {
         this.strategyProperties = (StrategyProperties) sp.clone();
     }
     
+    /**
+     * starts proof attempt
+     * @return the proof after the attempt terminated  
+     */
+     public ApplyStrategyInfo start() {
+        return start(proof.openGoals());
+     }
     
    /**
     * starts proof attempt
     * @return the proof after the attempt terminated  
     */
-    public ApplyStrategyInfo start() {
+    public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         
         final Profile profile = proof.env().getInitConfig().getProfile();
         proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
         
-        if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
+//        if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
+        if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
            OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
            if (simplifier != null) {
               simplifier.refresh(proof);
@@ -185,7 +203,7 @@ public class ProofStarter {
         if (ptl != null) prover.addProverTaskObserver(ptl);
         
         ApplyStrategy.ApplyStrategyInfo result = 
-                prover.start(proof, proof.openGoals(), maxSteps, timeout, false);
+                prover.start(proof, goals, maxSteps, timeout, false);
     
         if (result.isError()) {
             throw new RuntimeException("Proof attempt failed due to exception:"+result.getException(),
@@ -204,4 +222,12 @@ public class ProofStarter {
     	this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
     	this.setStrategy(proof.getSettings().getStrategySettings().getActiveStrategyProperties());
     }    
+   
+    /**
+     * Returns the managed side {@link Proof}.
+     * @return The managed side {@link Proof}.
+     */
+    public Proof getProof() {
+      return proof;
+    }
 }

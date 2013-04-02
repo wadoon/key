@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.logic;
 
@@ -197,21 +201,17 @@ public class TestVariableNamer extends TestCase {
 
 	PosInOccurrence pio = constructPIO(formulaWithX);
  	Goal goal = constructGoal(formulaWithX);
-	Sequent originalSequent = goal.sequent();
 
 	v = vn.rename(y, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("y"));
-	assertTrue(goal.sequent().equals(originalSequent));
 
    	v = vn.rename(xx, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("x"));
-	assertTrue(goal.sequent().equals(originalSequent));
 
         proof.getNamespaces().programVariables().addSafely(v);
 	addGlobal(goal, v);
 	w = vn.rename(x, goal, pio);
 	assertFalse(w.getProgramElementName().getProgramName().equals("x"));
-	assertFalse(goal.sequent().equals(originalSequent));
 	assertTrue(inGlobals(goal, v));
 
 	// Reset progVar namespace which was altered due to addGlobal()
@@ -222,20 +222,20 @@ public class TestVariableNamer extends TestCase {
 
    
     
-    public void testInnerRenameInTacletApps() {
-     	VariableNamer vn = services.getVariableNamer();
-	ProgramVariable v;
-	
-	PosInOccurrence pio = constructPIO(formulaWithX);
-	Goal goal = constructGoal(formulaWithX);
-        proof.getNamespaces().programVariables().addSafely(xx);
-	addGlobal(goal, xx);
-	addTacletApp(goal, x);
-	
-	v = vn.rename(x, goal, pio);
-	assertFalse(inTacletApps(goal, x));
-	assertTrue(inTacletApps(goal, v));
-    }
+//    public void testInnerRenameInTacletApps() {
+//     	VariableNamer vn = services.getVariableNamer();
+//	ProgramVariable v;
+//	
+//	PosInOccurrence pio = constructPIO(formulaWithX);
+//	Goal goal = constructGoal(formulaWithX);
+//        proof.getNamespaces().programVariables().addSafely(xx);
+//	addGlobal(goal, xx);
+//	addTacletApp(goal, x);
+//	
+//	v = vn.rename(x, goal, pio);
+//	assertFalse(inTacletApps(goal, x));
+//	assertTrue(inTacletApps(goal, v));
+//    }
     
     public void testNameProposals() {
     	VariableNamer vn = services.getVariableNamer();

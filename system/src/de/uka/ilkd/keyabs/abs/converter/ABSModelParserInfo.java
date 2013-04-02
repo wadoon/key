@@ -11,8 +11,8 @@ import abs.backend.coreabs.CoreAbsBackend;
 import abs.frontend.ast.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.keyabs.init.FunctionBuilder;
-import de.uka.ilkd.keyabs.init.SortBuilder;
+import de.uka.ilkd.keyabs.proof.init.FunctionBuilder;
+import de.uka.ilkd.keyabs.proof.init.SortBuilder;
 
 /**
  * This class reads in the ABS model and collects the necessary information about the model like

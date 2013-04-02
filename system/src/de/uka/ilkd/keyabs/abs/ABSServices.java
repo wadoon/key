@@ -12,7 +12,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
-import de.uka.ilkd.keyabs.init.ABSProfile;
+import de.uka.ilkd.keyabs.proof.init.ABSProfile;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
 

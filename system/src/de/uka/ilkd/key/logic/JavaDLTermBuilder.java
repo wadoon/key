@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.logic;
 
-import java.io.StringReader;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IServices;
@@ -10,15 +7,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -26,6 +18,10 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
+
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JavaDLTermBuilder extends TermBuilder<Services> {
 
@@ -115,7 +111,8 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
      * Creates program variables for the parameters. Take care to register them
      * in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(IServices services, String postfix, IObserverFunction obs, boolean makeNamesUnique) {
+    public ImmutableList<ProgramVariable> paramVars(IServices services,
+            String postfix, IObserverFunction obs, boolean makeNamesUnique) {
         final ImmutableList<ProgramVariable> paramVars 
         	= paramVars(services, obs, true);
         ImmutableList<ProgramVariable> result 
@@ -134,7 +131,9 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
      * Creates a program variable for the result. Take care to register it
      * in the namespaces.
      */
-    public LocationVariable resultVar(IServices services, IProgramMethod pm, boolean makeNameUnique) {
+    public LocationVariable resultVar(IServices services,
+                                      IProgramMethod pm,
+                                      boolean makeNameUnique) {
         return resultVar(services, "result", pm, makeNameUnique);
     }
 
@@ -158,7 +157,9 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
      * Creates a program variable for the thrown exception. Take care to 
      * register it in the namespaces.
      */
-    public LocationVariable excVar(Services services, IProgramMethod pm, boolean makeNameUnique) {
+    public LocationVariable excVar(Services services,
+                                   IProgramMethod pm,
+                                   boolean makeNameUnique) {
         return excVar(services, "exc", pm, makeNameUnique);
     }
 
@@ -166,7 +167,10 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
      * Creates a program variable for the thrown exception. Take care to 
      * register it in the namespaces.
      */
-    public LocationVariable excVar(Services services, String name, IProgramMethod pm, boolean makeNameUnique) {
+    public LocationVariable excVar(Services services,
+                                   String name,
+                                   IProgramMethod pm,
+                                   boolean makeNameUnique) {
         if(makeNameUnique) {
             name = newName(services, name);
         }	
@@ -361,32 +365,36 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
                                     fieldVarTerm))));
     }
 
+
+
+
     /**
      * Returns the framing condition that the resulting heap is identical (i.e.
      * has the same value in all locations) to the before-heap.
-     * 
+     *
      * @see #frame(Services, Term, Map, Term)
      */
-    public Term frameStrictlyEmpty(Services services, Term heapTerm, Map<Term,Term> normalToAtPre) {
+    public Term frameStrictlyEmpty(Services services, Term heapTerm,
+                                   Map<Term,Term> normalToAtPre) {
         final Sort objectSort = services.getJavaInfo().objectSort();
         final Sort fieldSort = services.getTypeConverter()
                 .getHeapLDT()
                 .getFieldSort();
-    
+
         final Name objVarName   = new Name(newName(services, "o"));
         final Name fieldVarName = new Name(newName(services, "f"));
         final LogicVariable objVar = new LogicVariable(objVarName, objectSort);
         final LogicVariable fieldVar = new LogicVariable(fieldVarName, fieldSort);
         final Term objVarTerm = var(objVar);
         final Term fieldVarTerm = var(fieldVar);
-    
+
         final OpReplacer or = new OpReplacer(normalToAtPre);
-    
+
         ImmutableList<QuantifiableVariable> quantVars =
                 ImmutableSLList.<QuantifiableVariable>nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
-        
+
         return all(quantVars,
                 equals(select(services,
                         Sort.ANY,
@@ -399,6 +407,31 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
                                 objVarTerm,
                                 fieldVarTerm)));
     }
+
+    public Term anonUpd(LocationVariable heap, Services services, Term mod, Term anonHeap) {
+        return elementary(services,
+                heap,
+                anon(services,
+                        var(heap),
+                        mod,
+                        anonHeap));
+    }
+
+
+    public Term forallHeaps(Services services, Term t) {
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final LogicVariable heapLV
+                = new LogicVariable(new Name("h"), heapLDT.targetSort());
+        final Map<LocationVariable, LogicVariable> map
+                = new HashMap<LocationVariable, LogicVariable>();
+        map.put(heapLDT.getHeap(), heapLV);
+        final OpReplacer or = new OpReplacer(map);
+        t = or.replace(t);
+        return all(heapLV, t);
+    }
+
+
+
 
     public Term inv(IServices services, Term h, Term o) {
         return func(services.getJavaInfo().getInv(),
@@ -431,11 +464,119 @@ public class JavaDLTermBuilder extends TermBuilder<Services> {
 	return fieldStore(services, NULL(services), f, v);
     }
 
+    public Term wellFormed(Term heap, Services services) {
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()),
+                heap);
+    }
+
+
     public Term wellFormed(LocationVariable heap, Services services) {
         return wellFormed(var(heap), services);
     }
-    
 
+
+
+
+
+
+
+
+    public static class Serviced extends JavaDLTermBuilder {
+
+        protected final Services services;
+
+        public Serviced(final Services services)
+        {
+            assert services != null;
+            this.services = services;
+        }
+
+        public String newName(final String baseName)
+        {
+            return newName(services, baseName);
+        }
+
+        public Term wellFormed(final LocationVariable heap)
+        {
+            return wellFormed(heap, services);
+        }
+
+        public Term reachableValue(final ProgramVariable variable)
+        {
+            return reachableValue(services, variable);
+        }
+
+        public Term frame(final Term heapTerm, final Map<Term, Term> normalToAtPre, final Term modifiesClause)
+        {
+            return frame(services, heapTerm, normalToAtPre, modifiesClause);
+        }
+
+        public Term frameStrictlyEmpty(final Term heapTerm, final Map<Term, Term> normalToAtPre)
+        {
+            return frameStrictlyEmpty(services, heapTerm, normalToAtPre);
+        }
+
+        public LocationVariable selfVar(final IProgramMethod method, final KeYJavaType type, final boolean makeNameUnique)
+        {
+            return selfVar(services, method, type, makeNameUnique);
+        }
+
+        public LocationVariable resultVar(final IProgramMethod method, final boolean makeNameUnique)
+        {
+            return resultVar(services, method, makeNameUnique);
+        }
+
+        public LocationVariable excVar(final IProgramMethod method, final boolean makeNameUnique)
+        {
+            return excVar(services, method, makeNameUnique);
+        }
+
+        public LocationVariable heapAtPreVar(final String baseName, final Sort sort, final boolean makeNameUnique)
+        {
+            return heapAtPreVar(services, baseName, sort, makeNameUnique);
+        }
+
+        public Term convertToFormula(final Term term)
+        {
+            return convertToFormula(term, services);
+        }
+
+        public Term elementary(final UpdateableOperator leftHandSide, final Term rightHandSide) {
+            return elementary(services, leftHandSide, rightHandSide);
+        }
+
+        public Term TRUE()
+        {
+            return TRUE(services);
+        }
+
+        public Term FALSE()
+        {
+            return FALSE(services);
+        }
+
+        public Term NULL()
+        {
+            return NULL(services);
+        }
+
+        public Term wellFormed(final Term heap)
+        {
+            return wellFormed(heap, services);
+        }
+
+
+        public Term anonUpd(final LocationVariable heap, final Term modifiesClause, final Term anonymisationHeap)
+        {
+            return anonUpd(heap, services, modifiesClause, anonymisationHeap);
+        }
+
+        public Term union(final Term firstLocationSet, final Term secondLocationSet)
+        {
+            return union(services, firstLocationSet, secondLocationSet);
+        }
+
+    }
 
 
 }

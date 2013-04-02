@@ -1,16 +1,17 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
-package de.uka.ilkd.key.proof.init;
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
 
-import java.io.IOException;
-import java.util.Properties;
+package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -19,11 +20,7 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.AbstractHeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTermBuilder;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -36,7 +33,10 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
 
+import java.io.IOException;
+import java.util.Properties;
 
 
 /**
@@ -44,11 +44,10 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractJavaPO implements IPersistablePO {
 
-    protected static final TermFactory TF = TermFactory.DEFAULT;
     protected static final JavaDLTermBuilder TB = JavaProfile.DF();
     protected final JavaDLInitConfig initConfig;
     private final Services services;
-    protected final AbstractHeapLDT heapLDT;
+    protected final IHeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
     protected final String name;
     protected ImmutableSet<NoPosTacletApp> taclets;
@@ -66,14 +65,14 @@ public abstract class AbstractJavaPO implements IPersistablePO {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
-        this.specRepos = (SpecificationRepository) initConfig.getServices().getSpecificationRepository();
+        this.specRepos = initConfig.getServices().getSpecificationRepository();
         this.name = name;
         taclets = DefaultImmutableSet.nil();
     }
 
 
     protected Services getServices() {
-        return (Services) services;
+        return services;
     }
 
 
@@ -160,13 +159,26 @@ public abstract class AbstractJavaPO implements IPersistablePO {
                     getSCC(axiom, axioms);
             for (Taclet axiomTaclet : axiom.getTaclets(scc, getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
-                                             + axiom.getName();
-                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-                        axiomTaclet));
-                initConfig.getProofEnv().registerRule(axiomTaclet,
-                                                      AxiomJustification.INSTANCE);
+                        + axiom.getName();
+
+                // only include if choices are appropriate
+                if (choicesApply(axiomTaclet, initConfig.getActivatedChoices())) {
+                    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
+                            axiomTaclet));
+                    initConfig.getProofEnv().registerRule(axiomTaclet,
+                            AxiomJustification.INSTANCE);
+                }
             }
         }
+    }
+    
+    /** Check whether a taclet conforms with the currently active choices.
+     * I.e., whether the taclet's given choices is a subset of <code>choices</code>.
+     */
+    private boolean choicesApply (Taclet taclet, ImmutableSet<Choice> choices) {
+        for (Choice tacletChoices: taclet.getChoices())
+            if (!choices.contains(tacletChoices)) return false;
+        return true;
     }
 
 

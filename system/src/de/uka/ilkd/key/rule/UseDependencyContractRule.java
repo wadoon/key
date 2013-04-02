@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule;
 
@@ -24,11 +28,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -103,9 +105,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    }
 	}
 	return result;
-    }    
-    
-    
+    }
+
+
     private boolean hasRawSteps(Term heapTerm, Sequent seq, Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
@@ -254,7 +256,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final Term candidate = pos.subTerm();
 	if(isBaseOcc(focus, candidate)) {
 	    result.put(candidate.sub(0), pos);
-	}
+        }
 	for(int i = 0, n = candidate.arity(); i < n; i++) {
 	    collectBaseOccsHelper(focus, pos.down(i), result);
 	}
@@ -438,7 +440,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final PosInOccurrence step = 
                 ((UseDependencyContractApp)ruleApp).step(goal.sequent(), services); 
 
-        assert !step.equals(focus);
+        assert !step.subTerm().equals(focus);
         
         //get changed locs and used equalities
         final Term subStep = step.subTerm().sub(0);
@@ -524,32 +526,42 @@ public final class UseDependencyContractRule implements BuiltInRule {
             }
         }
         
-        //split goal into two branches
-        final ImmutableList<Goal> result = goal.split(2);
-        final Goal preGoal = result.head();
-        final Goal postGoal = result.tail().head();
-        final String changeString 
-        	= LogicPrinter.quickPrintTerm(changedLocs.first, 
-        				      services);
-        preGoal.setBranchLabel("Dependencies changed by write to " 
-        	               + changeString);
-        postGoal.setBranchLabel("Dependencies unchanged by write to " 
-        	                + changeString);
+//        //split goal into two branches
+//        final ImmutableList<Goal> result = goal.split(2);
+//        final Goal preGoal = result.head();
+//        final Goal postGoal = result.tail().head();
+//        final String changeString 
+//        	= LogicPrinter.quickPrintTerm(changedLocs.first, 
+//        				      services);
+//        preGoal.setBranchLabel("Dependencies changed by write to " 
+//        	                + changeString);
+//        postGoal.setBranchLabel("Dependencies unchanged by write to " 
+//        	                + changeString);
+//        
+//        //create "Pre" branch
+//        preGoal.addFormula(new SequentFormula(cutFormula),
+//        		   false,
+//        		   true);
+//        
+//        //create "Post" branch
+//        final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
+//        subs[0] = subStep;
+//        final Term termWithBaseHeap = TB.func(target, subs);
+//        postGoal.addFormula(new SequentFormula(TB.equals(focus, termWithBaseHeap)), true, false);
+//        postGoal.addFormula(new SequentFormula(cutFormula),
+//        	 	    true,
+//        	 	    false);
         
-        //create "Pre" branch
-        preGoal.addFormula(new SequentFormula(cutFormula),
-        		   false,
-        		   true);
         
         //create "Post" branch
+        final ImmutableList<Goal> result = goal.split(1);
         final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
         subs[0] = subStep;
         final Term termWithBaseHeap = TB.func(target, subs);
-        postGoal.addFormula(new SequentFormula(TB.equals(focus, termWithBaseHeap)), true, false);
-        postGoal.addFormula(new SequentFormula(cutFormula),
-        	 	    true,
-        	 	    false);
-        
+        final Term implication =
+                TB.imp(cutFormula, TB.equals(focus, termWithBaseHeap));
+        result.head().addFormula(new SequentFormula(implication), true, false);
+
         return result;
     }
     

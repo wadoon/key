@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.proof;
@@ -286,6 +290,7 @@ public final class TacletIndex  {
     }
 
     /** copies the index */
+    @SuppressWarnings("unchecked")
     public TacletIndex copy() {
 	return new TacletIndex((HashMap<Object, ImmutableList<NoPosTacletApp>>)rwList.clone(), 
 			     (HashMap<Object, ImmutableList<NoPosTacletApp>>)antecList.clone(), 
@@ -402,6 +407,7 @@ public final class TacletIndex  {
     }
 
     
+    @SuppressWarnings("deprecation")
     private ImmutableList<NoPosTacletApp> getListHelp(
 	    	HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
 	    	Term term,
@@ -645,7 +651,7 @@ public final class TacletIndex  {
 	/**
 	 * the classes that represent prefix elements of a java block
 	 */
-	static final Class[] prefixClasses = new Class[]{
+    static final Class<?>[] prefixClasses = new Class<?>[]{
 		ABSStatementBlock.class,
 	    StatementBlock.class,
 	    LabeledStatement.class,

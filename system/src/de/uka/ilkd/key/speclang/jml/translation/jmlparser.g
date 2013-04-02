@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 /* -*-antlr-*- */
@@ -252,18 +256,17 @@ options {
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      */
     // TODO: remove when all clients have been moved to JMLTranslator
-    private Term convertToOld(Term term) {
-	assert atPres != null && atPres.get(getBaseHeap()) != null;
-	Map map = new LinkedHashMap();
-        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term t = atPres.get(h);
-            if(t != null) {
-              map.put(TB.var(h), t);
+    private Term convertToOld(final Term term) {
+	    assert atPres != null && atPres.get(getBaseHeap()) != null;
+	    Map<Term, Term> map = new LinkedHashMap<Term, Term>();
+        for (LocationVariable heap : atPres.keySet()) {
+            Term heapAtPre = atPres.get(heap);
+            if (heapAtPre != null) {
+                map.put(TB.var(heap), heapAtPre);
             }
         }
-
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(term);
+	    OpReplacer or = new OpReplacer(map);
+	    return or.replace(term);
     }
 
     private Term convertToBackup(Term term) {
@@ -338,12 +341,15 @@ top returns [Object result = null] throws  SLTranslationException
 :
     (   result = accessibleclause
     |   result = assignableclause
+    |   result = breaksclause
+    |   result = continuesclause
     |   result = dependsclause
     |   result = declassifyclause
     |   result = ensuresclause
     |   result = representsclause
     |   result = requiresclause
     |   result = respectsclause
+    |   result = returnsclause
     |   result = signalsclause
     |   result = signalsonlyclause
     |   result = termexpression
@@ -364,8 +370,10 @@ assignableclause returns [Term result = null] throws SLTranslationException
     ass:ASSIGNABLE 
     ( result=storeRefUnion
         { result = translator.translate(ass.getText(), Term.class, result, services); }
-    | LESS_THAN_NOTHING
-        { result = TB.lessThanNothing(); }
+    | LESS_THAN_NOTHING // deprecated
+        { result = TB.strictlyNothing(); }
+    | STRICTLY_NOTHING
+        { result = TB.strictlyNothing(); }
     )
     ;
 
@@ -524,6 +532,47 @@ termexpression returns [Term result = null] throws SLTranslationException {
 :
     exp=expression { result = (Term) exp.getTerm(); }
     ;
+
+
+breaksclause returns [Pair result=null] throws SLTranslationException
+{
+    String label = null;
+    Term pred = null;
+}
+:
+	breaks:BREAKS LPAREN (id:IDENT { label = id.getText(); })? RPAREN
+	(pred = predornot)?
+	{
+        result = translator.translate(breaks.getText(), Pair.class, pred, label, services);
+	}
+;
+
+
+continuesclause returns [Pair result=null] throws SLTranslationException
+{
+    String label = null;
+    Term pred = null;
+}
+:
+	continues:CONTINUES LPAREN (id:IDENT { label = id.getText(); })? RPAREN
+	(pred = predornot)?
+	{
+        result = translator.translate(continues.getText(), Pair.class, pred, label, services);
+	}
+	;
+
+
+returnsclause returns [Term result=null] throws SLTranslationException
+{
+    Term pred = null;
+}
+:
+	rtrns:RETURNS
+	(result = predornot)?
+	{
+        result = translator.translate(rtrns.getText(), Term.class, result, services);
+	}
+    ;	
 
 
 storeRefUnion returns [Term result = null] throws SLTranslationException {
@@ -1593,18 +1642,17 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   EMPTYSET
         {
-            result = new SLExpression(TB.empty(services),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+            result = translator.translate(JMLTranslator.JMLKeyWord.EMPTY, services, javaInfo);
         }
 
     |   t = createLocset
         { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
         
     |   (UNION | UNION_2) LPAREN t=storeRefUnion RPAREN
-        { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
+        { result = translator.translate(JMLTranslator.JMLKeyWord.UNION, t, javaInfo); }
         
     |   INTERSECT LPAREN t=storeRefIntersect RPAREN
-        { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
+        { result = translator.translate(JMLTranslator.JMLKeyWord.INTERSECT, t, javaInfo); }
 
     |   SETMINUS LPAREN t=storeref COMMA t2=storeref RPAREN
         {
@@ -1698,7 +1746,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             final Term put = TB.seqConcat(services, ante, TB.seqConcat(services, insert, post));
             result = new SLExpression(put);
         }
-    |   (tk1:SEQCONTAINS{tk=tk1;} | tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
+    |   (tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {
             result = translator.translate(tk.getText(), SLExpression.class, services, e1, e2);
@@ -1954,6 +2002,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
             }            
+        | FREE { type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_FREE_ADT); }
 	)
 	
 ;

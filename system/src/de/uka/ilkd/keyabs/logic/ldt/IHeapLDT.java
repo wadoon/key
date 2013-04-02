@@ -2,6 +2,7 @@ package de.uka.ilkd.keyabs.logic.ldt;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -9,6 +10,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public interface IHeapLDT {
+
+    public Sort targetSort();
 
     /**
      * Returns the sort "Field".

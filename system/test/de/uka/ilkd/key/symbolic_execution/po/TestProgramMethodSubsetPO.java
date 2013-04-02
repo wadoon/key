@@ -4,11 +4,12 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -23,7 +24,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code x-=42;return x;} of {@code doSomething} with precondition.
     */
-   public void testDoSomethingElseBranch() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoSomethingElseBranch() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "doSomething",
@@ -37,7 +38,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code x=x*-1; x+=2;} of {@code doSomething} with precondition.
     */
-   public void testDoSomethingIfBranch() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoSomethingIfBranch() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "doSomething",
@@ -58,7 +59,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     * }
     * }} of {@code doSomething} with precondition.
     */
-   public void testDoSomethingIf() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoSomethingIf() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "doSomething",
@@ -80,7 +81,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     * }
     * }} of {@code doSomething} with precondition.
     */
-   public void testDoSomethingIfWithSurroundingStatements() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoSomethingIfWithSurroundingStatements() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "doSomething",
@@ -94,7 +95,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code x=1*asdf;int y = 2+CONSTANT+field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; return z;} of {@code doSomething} with precondition.
     */
-   public void testDoSomethingWithReturn_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoSomethingWithReturn_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "doSomething",
@@ -108,7 +109,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code x=1*asdf;int y = 2+CONSTANT+field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; return z;} of {@code doSomething} without precondition.
     */
-   public void testDoSomethingWithReturn() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoSomethingWithReturn() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "doSomething",
@@ -122,7 +123,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code x=1*asdf;int y = 2+CONSTANT+field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;} of {@code doSomething} with precondition.
     */
-   public void testDoSomethingNoReturn_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoSomethingNoReturn_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "doSomething",
@@ -136,7 +137,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code x=1*asdf;int y = 2+CONSTANT+field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;} of {@code doSomething} without precondition.
     */
-   public void testDoSomethingNoReturn() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoSomethingNoReturn() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "doSomething",
@@ -150,7 +151,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code int b = 3*y;return ;} of {@code voidMethod} with precondition.
     */
-   public void testVoidMethodWithReturn_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testVoidMethodWithReturn_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "voidMethod",
@@ -164,7 +165,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code int b = 3*y;return ;} of {@code voidMethod} without precondition.
     */
-   public void testVoidMethodWithReturn() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testVoidMethodWithReturn() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "voidMethod",
@@ -178,7 +179,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code int a = 2 * y;} of {@code voidMethod} with precondition.
     */
-   public void testVoidMethodNoReturn_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testVoidMethodNoReturn_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "voidMethod",
@@ -192,7 +193,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
    /**
     * Tests {@code int a = 2 * y;} of {@code voidMethod} without precondition.
     */
-   public void testVoidMethodNoReturn() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testVoidMethodNoReturn() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPartPOTest/test/MethodPartPOTest.java",
              "MethodPartPOTest",
              "voidMethod",
@@ -213,9 +214,9 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                          String precondition,
                          Position startPosition,
                          Position endPosition,
-                         String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+                         String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<Services, JavaDLInitConfig, CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, startPosition, endPosition, false);
+      SymbolicExecutionEnvironment<Services, JavaDLInitConfig, CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, startPosition, endPosition, false, false, false);
       // Extract and test try content
       String tryContent = getTryContent(env.getProof());
       assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));

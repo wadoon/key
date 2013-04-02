@@ -1,7 +1,5 @@
 package de.uka.ilkd.keyabs.abs;
 
-import java.util.Stack;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -10,6 +8,8 @@ import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.*;
+
+import java.util.Stack;
 
 public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         IProgramASTModifyingVisitor, ABSVisitor {
@@ -509,5 +509,18 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         }
     }
 
+    @Override
+    public void performActionOnABSMethodFrame(ABSMethodFrame x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            IABSPureExpression thisExp = (IABSPureExpression) children.remove(0);
+            ImmutableArray<IABSStatement> body =
+                    new ImmutableArray<>(children.collect(IABSStatement.class));
+            addNewChild(new ABSMethodFrame(thisExp, body));
+        } else {
+            addChild(x);
+        }
+    }
 
 }
