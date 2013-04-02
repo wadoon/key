@@ -282,7 +282,7 @@ public enum ModelGenerator implements IModelGenerator {
     private boolean isValidResult(final String result) {
 
         /*
-         * Very primitive
+         * FIXME: Very primitive
          */
         final Pattern consPattern = Pattern.compile("\\(model");
         final Matcher consMatcher = consPattern.matcher(result);

@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchNode;
 
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionBranch;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPath;
@@ -68,7 +70,7 @@ public enum BranchCoverageBuilder implements ICoverageBuilder {
                 }
             }
         }
-
+        
         return branchesCoveredByPath.keySet();
     }
 

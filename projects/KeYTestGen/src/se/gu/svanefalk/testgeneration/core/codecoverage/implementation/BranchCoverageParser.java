@@ -34,7 +34,7 @@ public class BranchCoverageParser implements ICodeCoverageParser {
     public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
 
         ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
-
+        
         Set<ExecutionPath> executionPaths = builder.retrieveExecutionPaths(context);
         List<IExecutionNode> resultNodes = new LinkedList<IExecutionNode>();
         for (ExecutionPath path : executionPaths) {

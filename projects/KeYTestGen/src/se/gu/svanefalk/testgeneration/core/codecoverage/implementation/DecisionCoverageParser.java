@@ -1,12 +1,18 @@
 package se.gu.svanefalk.testgeneration.core.codecoverage.implementation;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
+import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPath;
+import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class DecisionCoverageParser implements ICodeCoverageParser {
+
+    private static final DecisionCoverageBuilder builder = DecisionCoverageBuilder.INSTANCE;
 
     /**
      * <p>
@@ -43,6 +49,13 @@ public class DecisionCoverageParser implements ICodeCoverageParser {
     @Override
     public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
 
-        throw new UnsupportedOperationException("Not implemented yet");
+        ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
+
+        Set<ExecutionPath> executionPaths = builder.retrieveExecutionPaths(context);
+        List<IExecutionNode> resultNodes = new LinkedList<IExecutionNode>();
+        for (ExecutionPath path : executionPaths) {
+            resultNodes.add(path.getTerminatingNode());
+        }
+        return resultNodes;
     }
 }

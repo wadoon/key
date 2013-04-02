@@ -10,6 +10,9 @@ import java.util.Stack;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
@@ -17,7 +20,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionStateNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchNode;
 
 public class ExecutionPathContext {
 
