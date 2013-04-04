@@ -12,8 +12,10 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionP
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.Then;
 
 public enum DecisionCoverageBuilder implements ICoverageBuilder {
     INSTANCE;
@@ -36,6 +38,15 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
         private int doComparison(final ExecutionPath o1, final ExecutionPath o2) {
             final Set<BranchStatement> first = this.map.get(o1);
             final Set<BranchStatement> second = this.map.get(o2);
+            
+            if(first == null && second == null) {
+                return 0;
+            } else if(first == null && second != null) {
+                return -1;
+            } else if(first != null && second == null) {
+                return 1;
+            }
+            
             final int diff = first.size() - second.size();
             if (diff == 0) {
                 return 0;
@@ -85,10 +96,14 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
     }
 
     private boolean contains(final ExecutionPath path,
-            final SourceElement thenBranchResult) {
+            final SourceElement branchResult) {
+
+        if (branchResult == null) {
+            return false;
+        }
 
         for (final SourceElement element : path.getCoveredNodes()) {
-            if (element == thenBranchResult) {
+            if (element == branchResult) {
                 return true;
             }
         }
@@ -112,9 +127,24 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
 
         for (final BranchStatement branchStatement : branchStatements) {
             if (branchStatement instanceof If) {
+                
                 final If ifBranch = (If) branchStatement;
-                final SourceElement thenBranchResult = ifBranch.getThen().getBody();
-                final SourceElement elseBranchResult = ifBranch.getElse().getBody();
+
+                SourceElement thenBranchResult = null;
+                SourceElement elseBranchResult = null;
+
+                /*
+                 * One or both of the outcomes of the If-statement may be
+                 * fall-throughs, and we need to deal with them accordingly.
+                 */
+                if (ifBranch.getThen() != null) {
+                    thenBranchResult = ifBranch.getThen().getBody();
+                    thenBranchResult = getStatementOnBranch(thenBranchResult);
+                }
+                if (ifBranch.getElse() != null) {
+                    elseBranchResult = ifBranch.getElse().getBody();
+                    elseBranchResult = getStatementOnBranch(elseBranchResult);
+                }
 
                 for (final ExecutionPath path : executionPaths) {
                     if (this.contains(path, thenBranchResult)) {
@@ -124,12 +154,14 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
                             thenMapping.put(path, mappedElements);
                         }
                         mappedElements.add(branchStatement);
+
                     } else if (this.contains(path, elseBranchResult)) {
                         Set<BranchStatement> mappedElements = elseMapping.get(path);
                         if (mappedElements == null) {
                             mappedElements = new HashSet<BranchStatement>();
                             thenMapping.put(path, mappedElements);
                         }
+                        mappedElements.add(branchStatement);
                     }
                 }
             } else {
@@ -166,6 +198,14 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
          */
         minimalThenPaths.addAll(minimalElsePaths);
         return minimalThenPaths;
+    }
+
+    private SourceElement getStatementOnBranch(SourceElement thenBranchResult) {
+        if (thenBranchResult instanceof StatementBlock) {
+            return ((StatementBlock) thenBranchResult).getChildAt(0);
+        } else {
+            return thenBranchResult;
+        }
     }
 
     private boolean subsumes(final Set<BranchStatement> first,

@@ -37,7 +37,7 @@ public class TestJUnitTestCaseGenerator {
 
         final TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
         final IFrameworkConverter junitConverter = new JUnitConverter();
-        final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.branchCoverageParser;
+        final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.decisionCoverageParser;
 
         final HashMap<String, Double> results = new HashMap<String, Double>();
 

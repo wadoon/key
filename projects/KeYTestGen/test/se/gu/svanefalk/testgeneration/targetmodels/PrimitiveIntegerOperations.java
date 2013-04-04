@@ -113,7 +113,7 @@ public class PrimitiveIntegerOperations {
 
         int mid = z;
         if (y < z) {
-            if (x <= y) {
+            if (x < y) {
                 mid = y;
             } else if (x <= z) {
                 mid = x;

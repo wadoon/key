@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.Stack;
 
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
@@ -170,6 +172,7 @@ public class ExecutionPathContext {
                          * add it to the set of visited nodes.
                          */
                         final SourceElement currentElement = this.getActiveStatement(node);
+                        currentElement.getStartPosition();
                         if (!this.visitedNodes.contains(currentElement)) {
                             this.visitedNodes.add(currentElement);
                         }
