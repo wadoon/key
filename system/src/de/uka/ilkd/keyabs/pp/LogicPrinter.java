@@ -103,6 +103,7 @@ import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
  */
 public final class LogicPrinter implements ILogicPrinter {
 
+
     /**
      * A {@link de.uka.ilkd.key.util.pp.Backend} which puts its result in a
      * StringBuffer and builds a PositionTable. Position table construction is
@@ -1927,7 +1928,7 @@ public final class LogicPrinter implements ILogicPrinter {
                 markFirstStatement = false;
                 mark(MARK_START_FIRST_STMT);
             }
-            x.getChildAt(i).visit(programPrettyPrinter);
+            x.getStatementAt(i).visit(programPrettyPrinter);
             if (fstStmnt) {               
                 mark(MARK_END_FIRST_STMT);
             }
@@ -2074,12 +2075,16 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSMethodFrame(ABSMethodFrame x) throws IOException {
-        layouter.print("method(").beginC(0).print("this<-");
+        layouter.print("method(").beginC(0).print("source <- ");
         x.getChildAt(0).visit(programPrettyPrinter);
         layouter.print("):{").end();
         layouter.beginC(2).ind();
         printStatementList(x);
         layouter.brk(0,-2).end().print("}");
+    }
+
+    public void printABSMethodLabel(ABSMethodLabel x) throws IOException {
+        layouter.print(x.toString());
     }
 
 }

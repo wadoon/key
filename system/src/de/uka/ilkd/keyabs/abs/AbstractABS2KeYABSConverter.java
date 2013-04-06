@@ -193,6 +193,10 @@ public abstract class AbstractABS2KeYABSConverter {
 
     public Expression convert(VarUse varUse) {
         IProgramVariable var = lookupLocalVariable(varUse.getName());
+        if (var == null) {
+            var = lookupFieldVariable(varUse.getDecl().getContextDecl().qualifiedName(), varUse.getName());
+            return new ABSFieldReference(var);
+        }
         return new ABSLocalVariableReference(var);
     }
 

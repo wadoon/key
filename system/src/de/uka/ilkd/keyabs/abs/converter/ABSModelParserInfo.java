@@ -168,6 +168,10 @@ public class ABSModelParserInfo {
             classDescription.addFields(fd);
         }
 
+        for (ParamDecl pd : cd.getParams()) {
+            classDescription.addParam(pd);
+        }
+
         for (MethodImpl md : cd.getMethodList()) {
             classDescription.addMethod(md);
         }

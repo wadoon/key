@@ -1,13 +1,25 @@
 package de.uka.ilkd.keyabs.gui;
 
-import abs.frontend.ast.MethodImpl;
+import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.proofobligations.ABSPreservesInvariantPO;
+import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.proof.init.ABSProblemInitializer;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,6 +29,10 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ProofObligationChooser {
+    private static final String PRESERVES_INV_DISPLAY_TEXT = "Preserve Class Invariant";
+    private final KeYMediator<ABSServices, ABSInitConfig> mediator;
+    private final ABSInitConfig initConfig;
+
     private JList<Name> classes;
     private JList<POBrowserData.MethodRepresentative> methods;
     private JButton cancelButton;
@@ -24,8 +40,23 @@ public class ProofObligationChooser {
     private JList proofObligation;
     private JPanel browser;
     private POBrowserData data;
+    private String selectedPO;
 
-    public ProofObligationChooser(POBrowserData data) {
+    public boolean isProofStarted() {
+        return proofStarted;
+    }
+
+    private boolean proofStarted = false;
+
+
+    public ProofObligationChooser(KeYMediator<ABSServices, ABSInitConfig> mediator,
+                                  ABSInitConfig initConfig,
+                                  POBrowserData data) {
+
+        this.mediator = mediator;
+        this.initConfig = initConfig;
+        setData(data);
+
         classes.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -36,17 +67,82 @@ public class ProofObligationChooser {
         methods.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                //TODO
+                ArrayList<String> poList = new ArrayList<>();
+                if (methods.getSelectedValue() != null) {
+                    boolean invariants = ProofObligationChooser.this.data.hasClassInvariantFor(classes.getSelectedValue());
+                    if (invariants) {
+                        poList.add(PRESERVES_INV_DISPLAY_TEXT);
+                    }
+                }
+                proofObligation.setListData(poList.toArray());
             }
         });
 
-        setData(data);
+        proofObligation.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (proofObligation.getSelectedValue() != null) {
+                    if (proofObligation.
+                            getSelectedValue().equals(PRESERVES_INV_DISPLAY_TEXT)) {
+                        selectedPO = ABSPreservesInvariantPO.PRESERVES_INV_PO;
+                    }
+                } else {
+                    selectedPO = "";
+                }
+            }
+        });
 
-        JDialog dialog = new JDialog((Dialog) null, "Proof-Obligation Browser", true);
+
+        final JDialog dialog = new JDialog((Dialog) null, "Proof-Obligation Browser", true);
+
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectedPO = "";
+                dialog.setVisible(false);
+                dialog.dispose();
+            }
+        });
+
+        OKButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                dialog.setVisible(false);
+                dialog.dispose();
+
+                if (selectedPO != null && !selectedPO.isEmpty()) {
+                    StringTokenizer tokenize = new StringTokenizer(selectedPO, "::");
+                    assert tokenize.countTokens() == 3;
+                    tokenize.nextElement();
+                    ABSPreservesInvariantPO po =
+                            new ABSPreservesInvariantPO(ProofObligationChooser.this.initConfig,
+                                    classes.getSelectedValue(), methods.getSelectedValue().getMethod());
+                    findOrStartProof(po);
+                    proofStarted = true;
+                }
+            }
+        });
+
         dialog.getContentPane().add(browser);
         dialog.setModal(true);
         dialog.pack();
         dialog.setVisible(true);
+
+
+    }
+
+    private void findOrStartProof(ProofOblInput po) {
+        UserInterface ui = mediator.getUI();
+        AbstractProblemInitializer pi =
+                new ABSProblemInitializer(ui,
+                        mediator.getProfile(),
+                        initConfig.getServices(), true, ui);
+        try {
+            pi.startProver(initConfig, po, 0);
+        } catch (ProofInputException exc) {
+            ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
+        }
     }
 
     private void createUIComponents() {
@@ -64,6 +160,10 @@ public class ProofObligationChooser {
 
     public boolean isModified(POBrowserData data) {
         return false;
+    }
+
+    public String getSelectedPO() {
+        return selectedPO;
     }
 
     {

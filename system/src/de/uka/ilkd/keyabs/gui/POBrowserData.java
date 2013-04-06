@@ -2,8 +2,10 @@ package de.uka.ilkd.keyabs.gui;
 
 import abs.frontend.ast.MethodImpl;
 import abs.frontend.ast.ParamDecl;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 
 import java.util.*;
 
@@ -31,8 +33,16 @@ public class POBrowserData {
     }
 
 
+    public boolean hasClassInvariantFor(Name className) {
+        ImmutableSet<ABSClassInvariant> classInvariants = services.getSpecificationRepository().getClassInvariants(className.toString());
+        return classInvariants != null && !classInvariants.isEmpty();
+    }
 
     public class MethodRepresentative {
+        public MethodImpl getMethod() {
+            return method;
+        }
+
         private MethodImpl method;
 
         public  MethodRepresentative(MethodImpl method) {

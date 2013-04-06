@@ -14,10 +14,10 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
  * Time: 12:38
  * To change this template use File | Settings | File Templates.
  */
-public class ABSMethodFrame extends ABSNonTerminalProgramElement implements ProgramPrefix, StatementContainer {
+public class ABSMethodFrame extends ABSNonTerminalProgramElement implements IABSStatement, ProgramPrefix, StatementContainer {
 
-    private final IABSPureExpression thisExp;
-    private final ImmutableArray<IABSStatement> body;
+    private final ABSMethodLabel methodLabel;
+    private final ImmutableArray<? extends IABSStatement> body;
 
     /**
      * contains all program prefix elements below and including itself
@@ -25,11 +25,13 @@ public class ABSMethodFrame extends ABSNonTerminalProgramElement implements Prog
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
 
 
-    public ABSMethodFrame(IABSPureExpression thisExp,
-                          ImmutableArray<IABSStatement> body
+    public ABSMethodFrame(ABSMethodLabel methodLabel,
+                          ImmutableArray<? extends IABSStatement> body
                           /* Method Label, Class Label */) {
-        this.thisExp = thisExp;
+
+        this.methodLabel = methodLabel;
         this.body = body;
+
         this.prefixElementArray = ABSStatementBlock.computePrefixElements(body, 0, this);
     }
 
@@ -68,7 +70,7 @@ public class ABSMethodFrame extends ABSNonTerminalProgramElement implements Prog
     @Override
     public ProgramElement getChildAt(int index) {
         if (index == 0)
-            return thisExp;
+            return methodLabel;
         index--;
         return body.get(index);
     }
@@ -80,7 +82,6 @@ public class ABSMethodFrame extends ABSNonTerminalProgramElement implements Prog
 
     @Override
     public Statement getStatementAt(int index) {
-        return body.get(index
-        );
+        return body.get(index);
     }
 }

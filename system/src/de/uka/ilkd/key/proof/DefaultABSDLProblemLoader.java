@@ -4,7 +4,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.init.proofobligations.ABSPreservesInvariantPO;import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.gui.POBrowserData;
 import de.uka.ilkd.keyabs.gui.ProofObligationChooser;
@@ -16,9 +16,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class DefaultABSDLProblemLoader extends
         ProblemLoader<ABSServices, ABSInitConfig> {
+
+    private String poID;
 
     public DefaultABSDLProblemLoader(File file, List<File> classPath,
             File bootClassPath, KeYMediator<ABSServices, ABSInitConfig> mediator) {
@@ -88,7 +91,9 @@ public class DefaultABSDLProblemLoader extends
     @Override
     protected String selectProofObligation() {
         POBrowserData data = new POBrowserData(getInitConfig().getServices());
-        ProofObligationChooser chooser = new ProofObligationChooser(data);
-        return "";
+        ProofObligationChooser chooser =
+                new ProofObligationChooser(getMediator(), getInitConfig(), data);
+
+        return chooser.isProofStarted() ? "" : "Aborted.";
     }
 }

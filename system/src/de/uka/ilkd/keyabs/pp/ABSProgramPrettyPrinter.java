@@ -28,8 +28,6 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 
     @Override
     public void performActionOnProgramMethod(IProgramMethod x) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -356,6 +354,16 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void performActionABSMethodLabel(ABSMethodLabel x) {
+        try {
+            lp.printABSMethodLabel(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

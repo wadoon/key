@@ -36,6 +36,9 @@ public class HistoryLDT extends LDT {
         futureSort = services.getNamespaces().sorts()
                 .lookup(new Name("Future"));
 
+        history = (LocationVariable) services.getNamespaces().programVariables().lookup("history");
+        wellFormed = addFunction((Function) services.getNamespaces().functions().lookup("wfHist"));
+
     }
 
     @Override

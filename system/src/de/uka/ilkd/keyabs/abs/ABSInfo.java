@@ -2,12 +2,10 @@ package de.uka.ilkd.keyabs.abs;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import abs.backend.coreabs.CoreAbsBackend;
-import abs.frontend.ast.MethodImpl;
-import abs.frontend.ast.MethodSig;
-import abs.frontend.ast.Model;
-import abs.frontend.ast.ParamDecl;
+import abs.frontend.ast.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.IProgramInfo;
@@ -23,6 +21,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.abs.converter.ClassDescriptor;
+import de.uka.ilkd.keyabs.proof.init.FunctionBuilder;
 import de.uka.ilkd.keyabs.proof.init.SortBuilder;
 
 public class ABSInfo implements IProgramInfo {
@@ -101,6 +100,13 @@ public class ABSInfo implements IProgramInfo {
               }
         }
         return null;
+    }
+
+    public ABSStatementBlock getMethodBody(MethodImpl method) {
+        ConcreteABS2KeYABSConverter conv =
+                new ConcreteABS2KeYABSConverter(services.getNamespaces().programVariables(),
+                        services);
+        return conv.convert(method.getBlock());
     }
 
     public ABSModelParserInfo getABSParserInfo() {
@@ -245,5 +251,22 @@ public class ABSInfo implements IProgramInfo {
     public List<MethodImpl> getAllMethods(Name selectedClass) {
         ClassDescriptor classDescription = absInfo.getClasses().get(selectedClass);
         return classDescription.getMethods();
+    }
+
+    public Function getMethodLabelFor(MethodImpl method) {
+
+        Decl context = method.getContextDecl();
+        if (context instanceof ClassDecl) {
+            ClassDecl classContext = (ClassDecl) context;
+            for (InterfaceTypeUse itf : classContext.getImplementedInterfaceUses()) {
+                if (((InterfaceDecl)itf.getDecl()).lookupMethod(method.getMethodSig().getName())!=null) {
+                    context = itf.getDecl();
+                    break;
+                }
+            }
+        }
+
+        return (Function) services.getNamespaces().functions().lookup(FunctionBuilder.createNameFor(method.getMethodSig(),
+                (InterfaceDecl) context));
     }
 }

@@ -252,5 +252,10 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
         doDefaultAction(x);
     }
 
+    @Override
+    public void performActionABSMethodLabel(ABSMethodLabel x) {
+        doDefaultAction(x);
+    }
+
 
 }

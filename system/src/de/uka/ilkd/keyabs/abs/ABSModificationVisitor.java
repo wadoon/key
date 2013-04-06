@@ -514,13 +514,18 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            IABSPureExpression thisExp = (IABSPureExpression) children.remove(0);
+            ABSMethodLabel methodLabel = (ABSMethodLabel) children.remove(0);
             ImmutableArray<IABSStatement> body =
                     new ImmutableArray<>(children.collect(IABSStatement.class));
-            addNewChild(new ABSMethodFrame(thisExp, body));
+            addNewChild(new ABSMethodFrame(methodLabel, body));
         } else {
             addChild(x);
         }
     }
 
+
+    @Override
+    public void performActionABSMethodLabel(ABSMethodLabel x) {
+        addChild(x);
+    }
 }
