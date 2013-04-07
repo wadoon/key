@@ -76,7 +76,7 @@ import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 import de.uka.ilkd.keyabs.abs.*;
-import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
+import de.uka.ilkd.keyabs.abs.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
@@ -102,6 +102,7 @@ import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
  * 
  */
 public final class LogicPrinter implements ILogicPrinter {
+
 
 
     /**
@@ -2075,15 +2076,28 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSMethodFrame(ABSMethodFrame x) throws IOException {
-        layouter.print("method(").beginC(0).print("source <- ");
-        x.getChildAt(0).visit(programPrettyPrinter);
-        layouter.print("):{").end();
+        layouter.print("methodframe");
+        x.getExecutionContext().visit(programPrettyPrinter);
+        layouter.print(":{");
         layouter.beginC(2).ind();
         printStatementList(x);
         layouter.brk(0,-2).end().print("}");
     }
 
-    public void printABSMethodLabel(ABSMethodLabel x) throws IOException {
+    public void printABSExecutionContext(ABSExecutionContext x) throws IOException {
+        layouter.print("(").beginC(0);
+        layouter.print("source <- ");
+        x.getMethodLabel().visit(programPrettyPrinter);
+        layouter.print(",").ind(1, 0);
+        layouter.print("return <- ").print("(").print("var:").ind(1, 0);
+        x.getResult().visit(programPrettyPrinter);
+        layouter.print(",").ind(1,0).print("fut:").ind(1,0);
+        x.getFuture().visit(programPrettyPrinter);
+        layouter.end().print(")");
+    }
+
+
+    public void printABSMethodLabel(IABSMethodLabel x) throws IOException {
         layouter.print(x.toString());
     }
 

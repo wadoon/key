@@ -1,0 +1,82 @@
+module ReplicationSystem.Server;
+
+export *;
+
+import * from ReplicationSystem.Environment.Files;
+import * from ReplicationSystem.Environment.DataTypes;
+import * from ReplicationSystem.Environment.ReplicationSnapshot.Interfaces;
+
+import * from ReplicationSystem.Server.Interfaces;
+import * from ReplicationSystem.Environment.ReplicationSnapshot.Interfaces;
+import * from ReplicationSystem.Environment.Interfaces;
+
+import * from ReplicationSystem.Server.SyncServerAcceptor;
+import * from ReplicationSystem.Server.SyncServerClientCoordinator;
+import * from ReplicationSystem.Environment.DataBases;
+import * from ReplicationSystem.Server.ReplicationSnapshot;
+
+[COG] 
+class SyncServerImpl(
+	Schedules schedules,
+	Set<ClientId> clients) implements SyncServer {
+	
+	Bool shutDown = False;
+	
+	[Far] SyncServerClientCoordinator coordinator;
+	[Near] SyncServerAcceptor acceptor;
+	[Near] UpdatableDataBase db;
+	[Near] ReplicationSnapshot snapshot;
+	
+	Map<String,Schedule> scheduleMap = schedulemap(schedules);
+	
+	{
+		db = new DataBaseImpl();
+		snapshot = new ReplicationSnapshotImpl(db,schedules);
+	}
+	
+	Unit run() {
+		coordinator = new cog SyncServerClientCoordinatorImpl(this,clients);
+		Fut<Unit> f = coordinator!setSnapshot(snapshot); f.get;
+		acceptor = new SyncServerAcceptorImpl(this);
+	}
+	
+	DataBase getDataBase() {
+		return db;
+	}
+	
+	Schedule getSchedule(String name) {
+		assert contains(keys(scheduleMap),name);
+		return lookupUnsafe(scheduleMap,name);
+	}
+	
+	Schedules listSchedules() {
+		return schedules;
+	}
+	
+	ReplicationSnapshot getReplicationSnapshot() {
+		return snapshot;
+	}
+	
+	UpdatableDataBase getUpdatableDataBase() {
+		return db;
+	}
+	
+	Bool isShutdownRequested() {
+		return shutDown;
+	}
+	
+	Unit requestShutDown() {
+		this.shutDown = True;
+	}
+
+	SyncServerClientCoordinator getCoordinator() {
+		await coordinator != null;
+		return this.coordinator;
+	}
+	
+	SyncServerAcceptor getAcceptor() {
+		await acceptor != null;
+		return this.acceptor;
+	}
+
+}

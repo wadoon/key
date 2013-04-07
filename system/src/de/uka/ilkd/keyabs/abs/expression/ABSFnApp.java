@@ -11,14 +11,18 @@ import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 
 public class ABSFnApp extends ABSNonTerminalProgramElement implements
 	IABSPureExpression {
-    
+
+    public ProgramElementName getFnName() {
+        return fctName;
+    }
+
     private final ProgramElementName fctName;
     private final IABSPureExpression[] arguments;
     
 
     public ABSFnApp(ProgramElementName fctName,
 	    IABSPureExpression[] arguments) {
-	this.fctName = fctName;
+	    this.fctName = fctName;
         this.arguments = arguments == null ? new IABSPureExpression[0]
                 : arguments;
     }

@@ -1,0 +1,67 @@
+module ReplicationSystem.ReplicationSystem;
+
+export *;
+
+import * from ReplicationSystem.Environment.DataTypes;
+import * from ReplicationSystem.Environment.Files;
+
+import * from ReplicationSystem.Environment.Interfaces;
+import * from ReplicationSystem.Server.Interfaces;
+import * from ReplicationSystem.Client.Interfaces;
+
+import * from ReplicationSystem.Environment.DataBases;
+import * from ReplicationSystem.Client;
+import * from ReplicationSystem.Server;
+import * from ReplicationSystem.Server.Update;
+
+import * from Replication.Network;
+import * from ReplicationSystem.Tests;
+
+//ReplicationSystem simulator
+//@param maxUpdates maximum number of updates
+//@param schedules list of schedules
+//@param cids list of clients
+class ReplicationSystem(
+	[Final] Int maxUpdates, 
+	[Final] List<Schedule> schedules,
+	[Final] Int maxJobs,
+	[Final] Set<ClientId> cids) {
+
+	Unit run() {
+		// One SyncServer
+		SyncServer syncserver = new cog SyncServerImpl(
+				listToSet(schedules),
+				cids);
+		
+		Set<[Far] ClientConnector> syncclients = EmptySet;
+		Set<ClientId> iterator = cids;
+		while (hasNext(iterator)) {
+			Pair<Set<ClientId>,ClientId> nt = next(iterator);
+		
+			ClientConnector syncclient = new cog SyncClientImpl(maxJobs,snd(nt));
+			
+			syncclients = insertElement(syncclients,syncclient);
+			iterator = fst(nt);
+		}
+		
+		//inject changes
+		Updater updater = new cog UpdaterImpl(maxUpdates,syncserver); 
+		Network network = new cog Network(syncserver,syncclients,updater);
+		
+		Fut<SyncServerAcceptor> acc = syncserver!getAcceptor(); await acc?;
+		[Far] SyncServerAcceptor acceptor = acc.get;	
+		
+		Set<ClientConnector> clientIterator = syncclients;
+		while (hasNext(clientIterator)) {
+			Pair<Set<ClientConnector>,ClientConnector> nt = next(clientIterator);
+			ClientConnector syncclient = snd(nt);
+			
+			//make sure clients have access to the network
+			Fut<Unit> fu = syncclient!setNetwork(network); fu.get;
+			syncclient!setAcceptor(acceptor);
+			clientIterator = fst(nt);
+		}
+			
+	}
+	
+} 

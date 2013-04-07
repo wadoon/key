@@ -1,0 +1,110 @@
+module ReplicationSystem.Client.Interfaces;
+
+export *;
+
+import * from ReplicationSystem.Environment.Files;
+import * from ReplicationSystem.Environment.DataTypes;
+
+import * from ReplicationSystem.Environment.Interfaces;
+import * from ReplicationSystem.Interfaces;
+import * from ReplicationSystem.Server.Interfaces;
+import * from Replication.Network;
+
+interface Client extends Node {
+	ClientDataBase getClientDataBase();
+}
+
+interface ClientConnector extends Client {
+	Unit setAcceptor(SyncServerAcceptor acceptor);
+	Unit setNetwork(Network network);
+}
+
+// CSP model SyncClient(n)
+// Java class com.fredhopper.application.SyncClient
+interface SyncClient extends Client, ClientStateMachine {
+	[Far] SyncServerAcceptor getAcceptor();
+}
+
+interface InternalClient extends SyncClient {
+	/*	
+	 * Existing java implementation does not have client id
+	 * the notion of an identifier for each client is required
+	 * since the ABS model should guarantee data
+	 * consistency as well as deadlock freedom
+	 */
+	ClientId getId();
+	
+	/*
+	 * The number of jobs spawned off so far
+	 */
+	[Atomic]
+	Int jobCount();
+	
+	/*
+	 * Notify a new job can be started.
+	 */
+	Unit nextJob();
+	
+	/*
+	 * Schedule jobs
+	 */
+	Unit scheduleJob(JobType jb, Schedule schedule);
+	
+	/*
+	 * Notify client this job is finished.
+	 */
+	Unit finishJob(ClientJob job);
+
+}
+
+interface ClientStateMachine {
+	Unit waitToBoot();
+	Unit boot();
+	Unit start();
+	Unit waitToReplicate();
+	Unit replicate();
+	Unit end();
+}
+
+interface ClientJob extends Worker  {
+
+	//@ model Maybe<Schedules> ss; 
+	//@ initially ss == Nothing;
+	
+	//@ model Map<List<String>, Maybe<FileSize>> map;
+	
+	//@ model Map<TransactionId, Bool> ts;
+	//@ initially ts == EmptyMap; 
+	//@ invariant \forall TransactionId i; 
+	//@		contains(keys(ts), id) ==> lookupUnsafe(ts, id);
+
+	//@ ensures contains(keys(ts), id);
+	//@ ensures contains(keys(\old(ts)), id) ==> ts == put(\old(ts), id, True); 
+	Bool registerReplicationItems(TransactionId id);
+	
+	//@ ensures \result == lookupDefault(map, id, Nothing);
+	Maybe<FileSize> processFile(List<String> id);
+	
+	//@ requires length(split(fst(file),fileSep())) > 0; 
+	//@ requires snd(file) > 0;
+	//@ requires cmd == Just(OverwriteFile) ==> 
+	//@		lookupDefault(map, split(fst(file),fileSep()), Nothing) == Nothing ||
+	//@		fromJust(lookupDefault(map, split(fst(file),fileSep()), Nothing)) > filecontent(file);
+	//@ requires cmd == Just(ContiunueFile) ==> 
+	//@		contains(keys(map), split(fst(file),fileSep())) && 
+	//@		lookupUnsafe(map, split(fst(file),fileSep())) != Nothing &&
+	//@		fromJust(lookupUnsafe(map, split(fst(file),fileSep()))) < filecontent(file);
+	//@ ensures cmd == Just(OverwriteFile) ==> 
+	//@		lookupUnsafe(map, split(fst(file),fileSep())) == Just(filecontent(file));  
+	//@ ensures cmd == Just(ContiunueFile) ==> 
+	//@		lookupUnsafe(map, split(fst(file),fileSep())) == 
+	//@		Just(fromJust(lookupUnsafe(\old(map), split(fst(file),fileSep()))) + filecontent(file));
+	Unit processContent(File file);
+	
+	//@ requires ss == Nothing;
+	//@ ensures ss == Just(schedules);
+	[Atomic]
+	Unit receiveSchedule(Schedules schedules);
+	
+	Unit executeJob();
+}

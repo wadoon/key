@@ -1,0 +1,7 @@
+module ReplicationSystem.Installation;
+
+import * from ReplicationSystem.Main;
+
+{ 
+	new cog ReplicationSystemMain();
+}

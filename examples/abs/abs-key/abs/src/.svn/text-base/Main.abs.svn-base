@@ -1,0 +1,67 @@
+module ReplicationSystem.Main;
+
+export *;
+
+import * from ReplicationSystem.Environment.DataTypes;
+import * from ReplicationSystem.Environment.Files;
+import * from ReplicationSystem.ReplicationSystem;
+
+class ReplicationSystemMain {
+			 
+	[Final] List<Pair<String,List<Item>>> businessItems = 
+		list[Pair(businesses(),list[FileItem("config","config/business.xml")])];
+		
+	[Final] List<Pair<String,List<Item>>> dataItems = 
+		list[Pair(datas(),list[LogItem("indices/itemstore/log"),LogItem("indices/tree/log")]),
+			 Pair(datas(),list[FileItem("indices/itemstore","indices/itemstore/i"),
+			                  FileItem("indices/tree","indices/tree/t")])];
+
+	[Final] List<Pair<String,List<Item>>> searchItems =
+		list[Pair(search(),list[SearchItem("indices/search")])];
+		
+	[Final] Map<String,Pair<Int,Deadline>> scheduleMap =
+		map[Pair(businesses(), Pair(0,Duration(10))),
+			Pair(datas(), Pair(0,Duration(10))),
+			Pair(search(), Pair(0,Duration(10)))];
+			
+	Unit run() {
+		List<Schedule> schedules = this.getSchedules();
+		
+		Set<ClientId> cids = this.getCids();
+		Int maxJobs = this.getMaxJobs();
+		Int maxUpdates = this.getMaxUpdates();
+		
+		new cog ReplicationSystem(maxUpdates,schedules,maxJobs,cids);
+	}
+	
+	Int getMaxJobs() {
+		return 7;
+	}
+	
+	Int getMaxUpdates() {
+		return 10;
+	}
+	
+	Map<String,Pair<Int,Deadline>> getScheduleMap() {
+		return scheduleMap;
+	} 
+	
+	List<Schedule> getSchedules() {
+		Map<String,Pair<Int,Deadline>> m = this.getScheduleMap();
+		return itemMapToSchedule(Nil,m,concatenates(list[searchItems,businessItems,dataItems]));
+	}
+	
+	Set<ClientId> getCids() {
+		Set<ClientId> cs = EmptySet;
+		Int c = this.getNumberOfClients();
+		while (c > 0) {
+			cs = Insert(c,cs);
+			c = c - 1;
+		}
+		return cs;
+	}
+	
+	Int getNumberOfClients() {
+		return 1;
+	}
+}

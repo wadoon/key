@@ -18,21 +18,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
-import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
-import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.*;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
@@ -70,7 +56,7 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 		    if (pe instanceof IABSFieldReference) {
                 IABSFieldReference field = (IABSFieldReference) pe;
                 return TB.dot(services, field.getVariable().sort(),
-                        TB.var(services.getNamespaces().programVariables().lookup(new ProgramElementName("this"))),
+                        TB.func(getThisConstant()),
                         getHeapLDT().getFieldSymbolForPV((LocationVariable) field.getVariable(),services));
             } else {
 		        return TB.var(((IABSLocationReference) pe).getVariable());
@@ -79,8 +65,17 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 		return TB.func((Function) getServices().getNamespaces()
 			.functions().lookup((Name) pe));
 	    }*/ else if (pe instanceof IProgramVariable) {
-            return TB.var((IProgramVariable) pe);
+            if (pe instanceof LocationVariable && ((LocationVariable)pe).isMember()) {
+                LocationVariable field = (LocationVariable) pe;
+                return TB.dot(services, field.sort(),
+                        TB.func(getThisConstant()),
+                        getHeapLDT().getFieldSymbolForPV(field, services));
+            } else {
+                return TB.var((IProgramVariable) pe);
+            }
 
+        } else if (pe instanceof ABSMethodLabel) {
+            return TB.func(((ABSMethodLabel)pe).getMethodLabel());
         } else {
 		final TermBuilder tb = services.getTermBuilder();
 		if (pe instanceof ABSBinaryOperatorPureExp) {
@@ -131,10 +126,27 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 			    tb.zTerm(services, "-1"),
 			    convertToLogicElement(
 				    ((ABSMinusExp) pe).getChildAt(0), ec));
-		}
+		} else if (pe instanceof ThisExpression) {
+            return tb.func(getThisConstant());
+        } else if (pe instanceof ABSFnApp) {
+            ABSFnApp fnApp = (ABSFnApp) pe;
+            Function fn = (Function) services.getNamespaces().functions().lookup(fnApp.getFnName());
+            Term[] args = new Term[fnApp.getArgumentCount()];
+            for (int i = 0; i<fnApp.getArgumentCount(); i++) {
+                IABSPureExpression arg = fnApp.getArgumentAt(i);
+                args[i] = convertToLogicElement(arg);
+            }
+            return tb.func(fn, args);
+        } else {
+            System.out.println("Unsupported " + pe + ":" + pe.getClass());
+        }
 	    }
 	}
 	return null;
+    }
+
+    private Function getThisConstant() {
+        return (Function) services.getNamespaces().functions().lookup(new Name("this"));
     }
 
     private Term convertBool2Fml(Junctor op, Term left, Term right) {

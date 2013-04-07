@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
  */
 public class ABSMethodFrame extends ABSNonTerminalProgramElement implements IABSStatement, ProgramPrefix, StatementContainer {
 
-    private final ABSMethodLabel methodLabel;
+    private final ABSExecutionContext executionContext;
     private final ImmutableArray<? extends IABSStatement> body;
 
     /**
@@ -25,11 +25,11 @@ public class ABSMethodFrame extends ABSNonTerminalProgramElement implements IABS
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
 
 
-    public ABSMethodFrame(ABSMethodLabel methodLabel,
+    public ABSMethodFrame(ABSExecutionContext executionContext,
                           ImmutableArray<? extends IABSStatement> body
                           /* Method Label, Class Label */) {
 
-        this.methodLabel = methodLabel;
+        this.executionContext = executionContext;
         this.body = body;
 
         this.prefixElementArray = ABSStatementBlock.computePrefixElements(body, 0, this);
@@ -70,7 +70,7 @@ public class ABSMethodFrame extends ABSNonTerminalProgramElement implements IABS
     @Override
     public ProgramElement getChildAt(int index) {
         if (index == 0)
-            return methodLabel;
+            return executionContext;
         index--;
         return body.get(index);
     }
@@ -83,5 +83,9 @@ public class ABSMethodFrame extends ABSNonTerminalProgramElement implements IABS
     @Override
     public Statement getStatementAt(int index) {
         return body.get(index);
+    }
+
+    public ABSExecutionContext getExecutionContext() {
+        return executionContext;
     }
 }

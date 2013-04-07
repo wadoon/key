@@ -5,7 +5,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
-import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.*;
 
 public abstract class ABSVisitorImpl implements ABSVisitor {
@@ -104,7 +103,7 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     }
 
     @Override
-    public void performActionABSStatementBlock(ABSStatementBlock x) {
+    public void performActionOnABSStatementBlock(ABSStatementBlock x) {
         doDefaultAction(x);
     }
 
@@ -253,7 +252,12 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     }
 
     @Override
-    public void performActionABSMethodLabel(ABSMethodLabel x) {
+    public void performActionOnABSMethodLabel(IABSMethodLabel x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnABSExecutionContext(ABSExecutionContext x) {
         doDefaultAction(x);
     }
 

@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.op.Function;
  * Time: 14:57
  * To change this template use File | Settings | File Templates.
  */
-public class ABSMethodLabel extends ABSProgramElement{
+public class ABSMethodLabel extends ABSProgramElement implements IABSMethodLabel {
 
     private final Function methodLabel;
 
@@ -19,11 +19,15 @@ public class ABSMethodLabel extends ABSProgramElement{
 
     @Override
     public void visit(ABSVisitor v) {
-        v.performActionABSMethodLabel(this);
+        v.performActionOnABSMethodLabel(this);
     }
 
     @Override
     public String toString() {
         return methodLabel.name().toString();
+    }
+
+    public Function getMethodLabel() {
+        return methodLabel;
     }
 }

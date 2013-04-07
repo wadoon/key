@@ -1,0 +1,71 @@
+module ReplicationSystem.Schedulers;
+
+export *;
+
+import * from ABS.Scheduler;
+import * from ReplicationSystem.Environment.Files;
+
+//lenient deadlines consume less resource?
+def Int defaultScheduleCost(Schedule s) =
+	case s {
+		NoSchedule => 1;
+		Schedule(n,_,_,i) =>
+			 case n {
+			 	"Data" => 6;// - (durationValue(i)/100 * 5);
+			 	"Business rules" => 6;// - (durationValue(i)/100 * 3);
+			 	"Search" => 6;// - (durationValue(i)/100 * 2);  
+			 };
+	};
+	
+// according to schedule priorities
+def Process scheduleHighestCostScheduler(List<Process> q) = 
+	scheduleCostSchedulerH(head(q),tail(q));
+	
+def Process scheduleCostSchedulerH(Process h, List<Process> t) =
+	case t {
+		Nil => h;
+		Cons(h2,t2) => case value(h) > value(h2) {
+			True => scheduleCostSchedulerH(h,t2);
+			False => scheduleCostSchedulerH(h2,t2);
+		};
+	};
+	
+def Process scheduleLoweestCostScheduler(List<Process> q) = 
+	scheduleCostSchedulerL(head(q),tail(q));
+	
+def Process scheduleCostSchedulerL(Process h, List<Process> t) =
+	case t {
+		Nil => h;
+		Cons(h2,t2) => case value(h) < value(h2) {
+			True => scheduleCostSchedulerL(h,t2);
+			False => scheduleCostSchedulerL(h2,t2);
+		};
+	};
+	
+//earliest deadline first scheduling
+def Process edf(List<Process> q) = 
+	edfH(head(q),tail(q));
+	
+def Process edfH(Process h, List<Process> t) =
+	case t {
+		Nil => h;
+		Cons(h2,t2) => 
+			case durationLessThan(procdeadline(h),procdeadline(h2)) {
+				True => edfH(h,t2);
+				False => edfH(h2,t2);
+			};
+	};
+	
+//highest cost first
+def Process hcf(List<Process> q) = 
+	hcfH(head(q),tail(q));
+	
+def Process hcfH(Process h, List<Process> t) =
+	case t {
+		Nil => h;
+		Cons(h2,t2) => 
+			case durationLessThan(cost(h),cost(h2)) {
+				False => hcfH(h,t2);
+				True => hcfH(h2,t2);
+			};
+	};

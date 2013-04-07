@@ -1,4 +1,4 @@
-package de.uka.ilkd.keyabs.abs.ReturnStatement;
+package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.keyabs.abs.*;

@@ -8,6 +8,11 @@ import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.gui.POBrowserData;
+import de.uka.ilkd.keyabs.gui.ProofObligationChooser;
+import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.proof.init.ABSProfile;
 
 /**
  * Shows the proof management dialog
@@ -57,8 +62,15 @@ public final class ProofManagementAction extends MainWindowAction {
 	    mainWindow.notify(
 		    new GeneralFailureEvent("Please load a proof first"));
 	} else {
-	    ProofManagementDialog.showInstance(getMediator(), getMediator().getProof().env()
-		    .getInitConfig());
+	    if (getMediator().getProfile() instanceof ABSProfile) {
+            ProofObligationChooser chooser = new ProofObligationChooser(getMediator(),
+                    (ABSInitConfig) getMediator().getProof().env().getInitConfig(),
+                    new POBrowserData((ABSServices) getMediator().getServices()));
+        }
+        else {
+            ProofManagementDialog.showInstance(getMediator(), getMediator().getProof().env()
+                    .getInitConfig());
+        }
 	}
     }
 }

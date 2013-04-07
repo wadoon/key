@@ -5,6 +5,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.proofobligations.ABSAbstractPO;
 import de.uka.ilkd.key.proof.init.proofobligations.ABSPreservesInvariantPO;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.keyabs.abs.ABSServices;
@@ -115,7 +116,7 @@ public class ProofObligationChooser {
                     StringTokenizer tokenize = new StringTokenizer(selectedPO, "::");
                     assert tokenize.countTokens() == 3;
                     tokenize.nextElement();
-                    ABSPreservesInvariantPO po =
+                    ABSAbstractPO po =
                             new ABSPreservesInvariantPO(ProofObligationChooser.this.initConfig,
                                     classes.getSelectedValue(), methods.getSelectedValue().getMethod());
                     findOrStartProof(po);

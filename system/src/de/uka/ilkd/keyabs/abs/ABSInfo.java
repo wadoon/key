@@ -1,13 +1,9 @@
 package de.uka.ilkd.keyabs.abs;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
-
 import abs.backend.coreabs.CoreAbsBackend;
 import abs.frontend.ast.*;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.IProgramInfo;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -18,11 +14,16 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
 import de.uka.ilkd.keyabs.abs.converter.ABSModelParserInfo;
 import de.uka.ilkd.keyabs.abs.converter.ClassDescriptor;
 import de.uka.ilkd.keyabs.proof.init.FunctionBuilder;
 import de.uka.ilkd.keyabs.proof.init.SortBuilder;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 public class ABSInfo implements IProgramInfo {
 
@@ -75,7 +76,7 @@ public class ABSInfo implements IProgramInfo {
         return null;
     }
 
-    public ImmutableArray<IProgramVariable> getMethodParameter(MethodSig msig) {
+    private ImmutableList<IProgramVariable> getMethodParameter(MethodSig msig) {
         IProgramVariable[] parameters = new IProgramVariable[msig.getNumParam()];
         int count = 0;
         for (ParamDecl p : msig.getParamList()) {
@@ -86,27 +87,25 @@ public class ABSInfo implements IProgramInfo {
             parameters[count++] = new LocationVariable(new ProgramElementName(p.getName()),
                     paramType, null, false, false);
         }
-        return new ImmutableArray<>(parameters);
+        return ImmutableSLList.<IProgramVariable>nil().append(parameters);
     }
 
-    public ABSStatementBlock getMethodImpl(String className, String methodName) {
+    public Pair<ABSStatementBlock, ImmutableList<IProgramVariable>> getMethodImpl(String className, String methodName) {
         for (MethodImpl m : absInfo.getClasses().get(new Name(className)).getMethods()) {
               if (methodName.equals(m.getMethodSig().getName())) {
-                  ConcreteABS2KeYABSConverter conv =
-                          new ConcreteABS2KeYABSConverter(services.getNamespaces().programVariables(),
-                                                          services);
-                  ABSStatementBlock body = conv.convert(m.getBlock());
-                  return body;
+                    return getMethodBody(m);
               }
         }
         return null;
     }
 
-    public ABSStatementBlock getMethodBody(MethodImpl method) {
+    public Pair<ABSStatementBlock, ImmutableList<IProgramVariable>> getMethodBody(MethodImpl method) {
+        ImmutableList<IProgramVariable> params = getMethodParameter(method.getMethodSig());
+        services.getNamespaces().programVariables().add(params);
         ConcreteABS2KeYABSConverter conv =
                 new ConcreteABS2KeYABSConverter(services.getNamespaces().programVariables(),
                         services);
-        return conv.convert(method.getBlock());
+        return new Pair<>(conv.convert(method.getBlock()), params);
     }
 
     public ABSModelParserInfo getABSParserInfo() {

@@ -100,7 +100,7 @@ public class FunctionBuilder {
             }
         }
 
-        System.out.println("==> Register Fields ");
+        System.out.println("Register Fields ");
         for (ClassDescriptor classDescriptor : info.getABSParserInfo().getClasses().values()) {
             for (FieldDecl  field : classDescriptor.getFields()) {
                 registerField(services, heapLDT, funcNS, progVarNS, classDescriptor, field);
@@ -141,7 +141,6 @@ public class FunctionBuilder {
                 new KeYJavaType(),
                 false, false));
         funcNS.add(fieldFct);
-        System.out.println(classDescriptor.name() + ": Field: " + fieldFct);
     }
 
     public static Name createNameFor(FunctionDecl fd) {

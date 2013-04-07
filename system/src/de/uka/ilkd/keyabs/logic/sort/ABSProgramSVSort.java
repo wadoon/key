@@ -13,10 +13,7 @@ import de.uka.ilkd.key.logic.sort.IProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.logic.sort.programSV.ABSFieldSV;
-import de.uka.ilkd.keyabs.logic.sort.programSV.ABSPureExpSV;
-import de.uka.ilkd.keyabs.logic.sort.programSV.ABSStatementSV;
-import de.uka.ilkd.keyabs.logic.sort.programSV.ABSVariableSV;
+import de.uka.ilkd.keyabs.logic.sort.programSV.*;
 
 public abstract class ABSProgramSVSort extends AbstractSort implements IProgramSVSort<ABSServices> {
 
@@ -33,6 +30,7 @@ public abstract class ABSProgramSVSort extends AbstractSort implements IProgramS
     public static final IProgramSVSort<ABSServices> ABS_PUREEXPRESSION = new ABSPureExpSV();
     public static final IProgramSVSort<ABSServices> ABS_VARIABLE = new ABSVariableSV();
     public static final IProgramSVSort<ABSServices> ABS_FIELD = new ABSFieldSV();
+    public static final IProgramSVSort<ABSServices> ABS_METHODLABEL = new ABSMethodLabelSV();
     public static final IProgramSVSort<ABSServices> ABS_STATEMENT = new ABSStatementSV();
     public static final IProgramSVSort<ABSServices> ABS_TYPEREF = new ABSTypeReferenceSV();
     public static final IProgramSVSort<ABSServices> ABS_INTERFACE_TYPEREF = new ABSInterfaceTypeReferenceSV();

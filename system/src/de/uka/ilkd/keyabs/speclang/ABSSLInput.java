@@ -21,6 +21,7 @@ import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariantImpl;
 import de.uka.ilkd.keyabs.speclang.dl.DLSpecFactory;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
@@ -43,35 +44,45 @@ public class ABSSLInput extends AbstractEnvInput<ABSServices, ABSInitConfig> {
 
         System.out.println("Reading class invariants");
         //services.getProgramInfo().getABSParserInfo().getClasses();
-        FileReader fileReader = null;
-        String name = "student.inv";
-        try {
-            fileReader = new FileReader(new File(javaPath + "/"+ "student.inv"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        try{
-            ABSKeYParser parser
-                    = new ABSKeYParser(ParserMode.TERM, new ABSKeYLexer(
-                    fileReader,
-                    services.getExceptionHandler()),
-                    "",
-                    null,
-                    services,
-                    services.getNamespaces());
-            parser.invariants();
+        File dir = new File(javaPath);
+        File[] files = dir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname != null &&
+                        pathname.getName().endsWith(".inv");
+            }
+        });
+
+        for (File inv : files) {
+            FileReader fileReader = null;
+            try {
+                fileReader = new FileReader(inv);
+            } catch (FileNotFoundException e) {
+                return;
+            }
+            try {
+                ABSKeYParser parser
+                        = new ABSKeYParser(ParserMode.TERM, new ABSKeYLexer(
+                        fileReader,
+                        services.getExceptionHandler()),
+                        "",
+                        null,
+                        services,
+                        services.getNamespaces());
+                parser.invariants();
  /*           DLSpecFactory factory = new DLSpecFactory(services);
             LogicVariable heapVar = new LogicVariable(new Name("heapVar"),
                     services.getTypeConverter().getHeapLDT().targetSort());
             LogicVariable historyVar = new LogicVariable(new Name("historyVar"),
                     services.getTypeConverter().getHistoryLDT().targetSort());
             LogicVariable self = new LogicVariable(new Name("selfVar"), Sort.ANY);*/
-            services.getSpecificationRepository().
-                    addClassInvariant(parser.getClassInvariants().iterator().next());
-        } catch (RecognitionException re) {
-            throw new ProofInputException(re);
-        } catch (TokenStreamException tse) {
-            throw new ProofInputException(tse);
+                services.getSpecificationRepository().
+                        addClassInvariant(parser.getClassInvariants().iterator().next());
+            } catch (RecognitionException re) {
+                throw new ProofInputException(re);
+            } catch (TokenStreamException tse) {
+                throw new ProofInputException(tse);
+            }
         }
 
     }

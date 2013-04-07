@@ -211,7 +211,6 @@ public class ABSModelParserInfo {
                     MethodSig msig = (MethodSig) currentNode;
                     addMethodSignature(msig);
                     collectTypesAndFunctionDeclarations(currentNode);
-                    System.out.println("Method " + msig.getName() + " declared in " + msig.getContextDecl().getName());
                 } else if (currentNode instanceof VarDecl) {
                     VarDecl vd = (VarDecl) currentNode;
                     collectTypesAndFunctionDeclarations(currentNode);
