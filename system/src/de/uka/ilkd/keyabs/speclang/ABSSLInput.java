@@ -17,6 +17,7 @@ import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
 import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
+import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariantImpl;
 import de.uka.ilkd.keyabs.speclang.dl.DLSpecFactory;
 
@@ -76,8 +77,10 @@ public class ABSSLInput extends AbstractEnvInput<ABSServices, ABSInitConfig> {
             LogicVariable historyVar = new LogicVariable(new Name("historyVar"),
                     services.getTypeConverter().getHistoryLDT().targetSort());
             LogicVariable self = new LogicVariable(new Name("selfVar"), Sort.ANY);*/
+            for (ABSClassInvariant classInvariant : parser.getClassInvariants()) {
                 services.getSpecificationRepository().
-                        addClassInvariant(parser.getClassInvariants().iterator().next());
+                        addClassInvariant(classInvariant);
+            }
             } catch (RecognitionException re) {
                 throw new ProofInputException(re);
             } catch (TokenStreamException tse) {

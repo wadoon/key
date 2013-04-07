@@ -68,6 +68,8 @@ public class ABSTacletGenerator {
         Term invAxiom = TB.tt();
 
         for (ABSClassInvariant inv : invAxioms) {
+            System.out.println(inv.getOriginalInv());
+            System.out.println(inv.getInv(historySV, heapSV, thisObjSV, services));
             invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInv(historySV, heapSV, thisObjSV, services));
         }
 

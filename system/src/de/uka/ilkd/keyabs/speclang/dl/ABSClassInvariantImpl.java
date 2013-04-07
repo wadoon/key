@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 import java.util.LinkedHashMap;
@@ -41,6 +42,9 @@ public class ABSClassInvariantImpl implements ABSClassInvariant {
         this.originalHistoryVar = originalHistoryVar;
         this.originalHeapVar = originalHeapVar;
         this.originalSelfVar = originalSelfVar;
+
+        assert inv.freeVars().contains((QuantifiableVariable) originalHeapVar);
+
     }
 
     @Override
