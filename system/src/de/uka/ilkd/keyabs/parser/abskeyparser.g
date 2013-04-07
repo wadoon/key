@@ -846,31 +846,32 @@ options {
 	    int endBody = s.lastIndexOf("}");
 	    String methodFrameHeader = s.substring(s.indexOf("(")+1, startBody - 2);
 
-	    System.out.println("MF Header:"+methodFrameHeader);
+	    //System.out.println("MF Header:"+methodFrameHeader);
         int startLabel = methodFrameHeader.indexOf("<-") + 2;
         int endLabel = methodFrameHeader.indexOf(",");
         String methodLabel = methodFrameHeader.substring(startLabel, endLabel).trim();
-        System.out.println("MethodLabel:|"+methodLabel+"|"+ lookup(new Name(methodLabel)));
+        //System.out.println("MethodLabel:|"+methodLabel+"|"+ lookup(new Name(methodLabel)));
 
         methodFrameHeader = methodFrameHeader.substring(endLabel + 1);
         int startExecutionContext = methodFrameHeader.indexOf("(") + 1;
         int endExecutionContext = methodFrameHeader.indexOf(")");
         String executionContext = methodFrameHeader.substring(startExecutionContext, endExecutionContext).trim();
-        System.out.println("Exec:|"+executionContext+"|");
+
+        // System.out.println("Exec:|"+executionContext+"|");
         String resultVar = executionContext.substring(executionContext.indexOf(":") + 1,
                                                       executionContext.indexOf(",")).trim();
-        System.out.println("ResultVar:|"+resultVar+"|"+ lookup(new Name(resultVar)));
+        //System.out.println("ResultVar:|"+resultVar+"|"+ lookup(new Name(resultVar)));
 
         executionContext = executionContext.substring(executionContext.indexOf(",") + 1);
         String futureVar = executionContext.substring(executionContext.indexOf(":") + 1).trim();
-        System.out.println("ResultVar:|"+futureVar+"|" + lookup(new Name(futureVar)));
+        //System.out.println("ResultVar:|"+futureVar+"|" + lookup(new Name(futureVar)));
 
         context = new ABSExecutionContext((IABSMethodLabel) lookup(new Name(methodLabel)),
                                           (IABSPureExpression) lookup(new Name(resultVar)),
                                           (IABSPureExpression) lookup(new Name(futureVar)));
 
 	    s = s.substring(startBody, endBody);
-	    System.out.println("MF Body:"+s);
+	    //System.out.println("MF Body:"+s);
 
 	}
 

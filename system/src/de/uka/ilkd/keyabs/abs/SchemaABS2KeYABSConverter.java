@@ -35,10 +35,10 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
     protected ProgramElement requestConversion(ASTNode<?> x) {
         IProgramVariable result = null;
         if (x instanceof ExpressionStmt) {
-            if (((ExpressionStmt) x).getNumChild() == 2) {
+            if (x.getNumChild() == 2) {
                 if (x.getChild(1) instanceof IncompleteSyncAccess) {
-                    final String name = ((VarUse) ((IncompleteSyncAccess) x
-                            .getChild(1)).getChild(0)).getName();
+                    final String name = ((VarUse) x
+                            .getChild(1).getChild(0)).getName();
                     result = lookup(name);
                 }
             }
@@ -52,7 +52,8 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         
         IProgramVariable methodNameSV = lookup(x.getMethod());
         
-        MethodName methodName = (MethodName) (methodNameSV != null ? methodNameSV : new ProgramElementName(x.getMethod()));
+        MethodName methodName = (MethodName) (methodNameSV != null ? methodNameSV :
+                new ProgramElementName(x.getMethod()));
 
         IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
 

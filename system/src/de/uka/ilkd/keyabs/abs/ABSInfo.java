@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -101,10 +102,10 @@ public class ABSInfo implements IProgramInfo {
 
     public Pair<ABSStatementBlock, ImmutableList<IProgramVariable>> getMethodBody(MethodImpl method) {
         ImmutableList<IProgramVariable> params = getMethodParameter(method.getMethodSig());
-        services.getNamespaces().programVariables().add(params);
+        Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables().copy();
+        progVars.add(params);
         ConcreteABS2KeYABSConverter conv =
-                new ConcreteABS2KeYABSConverter(services.getNamespaces().programVariables(),
-                        services);
+                new ConcreteABS2KeYABSConverter(progVars, services);
         return new Pair<>(conv.convert(method.getBlock()), params);
     }
 

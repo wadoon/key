@@ -23,6 +23,7 @@ public class HistoryLDT extends LDT {
     private final Sort futureSort;
     private LocationVariable history;
     private Function wellFormed;
+    private Function invocationReactionEvent;
 
     public HistoryLDT(IServices services) {
         super(new Name("Seq"), services);
@@ -36,8 +37,9 @@ public class HistoryLDT extends LDT {
         futureSort = services.getNamespaces().sorts()
                 .lookup(new Name("Future"));
 
-        history = (LocationVariable) services.getNamespaces().programVariables().lookup("history");
-        wellFormed = addFunction((Function) services.getNamespaces().functions().lookup("wfHist"));
+        history                 = (LocationVariable) services.getNamespaces().programVariables().lookup("history");
+        wellFormed              = addFunction((Function) services.getNamespaces().functions().lookup("wfHist"));
+        invocationReactionEvent = addFunction((Function) services.getNamespaces().functions().lookup("invocREv"));
 
     }
 
@@ -111,5 +113,9 @@ public class HistoryLDT extends LDT {
 
     public Function getWellFormed() {
         return wellFormed;
+    }
+
+    public Function getInvocationReactionEvent() {
+        return invocationReactionEvent;
     }
 }

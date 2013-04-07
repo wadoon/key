@@ -63,6 +63,7 @@ public class ProofObligationChooser {
             public void valueChanged(ListSelectionEvent e) {
                 final Name selectedClass = classes.getSelectedValue();
                 methods.setListData(ProofObligationChooser.this.data.getMethods(selectedClass));
+                if (methods.getModel().getSize() > 0) { methods.setSelectedIndex(0); }
             }
         });
         methods.addListSelectionListener(new ListSelectionListener() {
@@ -76,6 +77,7 @@ public class ProofObligationChooser {
                     }
                 }
                 proofObligation.setListData(poList.toArray());
+                if (proofObligation.getModel().getSize() > 0) { proofObligation.setSelectedIndex(0); }
             }
         });
 

@@ -118,11 +118,10 @@ public class SortBuilder {
             }
 
 
-            for (DataConstructor cons : d.getDataConstructorList()) {
-
+            /* for (DataConstructor cons : d.getDataConstructorList()) {
                 System.out.println("DATACONS:" + cons.getType().getQualifiedName());
                 System.out.println(cons.getName() + ":" + cons.getType());
-            }
+            }*/
 
             // create instantiated data type
             /*
