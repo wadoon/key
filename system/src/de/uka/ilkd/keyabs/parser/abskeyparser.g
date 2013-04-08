@@ -2048,7 +2048,7 @@ funcpred_name returns [String result = null]
     :
      
     (sort_name DOUBLECOLON) => (prefix = sort_name 
-        DOUBLECOLON name = simple_ident {result = prefix + "::" + name;})
+        DOUBLECOLON name = simple_ident_dots {result = prefix + "::" + name;})
   | 
     (prefix = simple_ident_dots {result = prefix; })
 ;

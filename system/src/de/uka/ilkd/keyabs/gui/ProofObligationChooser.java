@@ -63,7 +63,9 @@ public class ProofObligationChooser {
             public void valueChanged(ListSelectionEvent e) {
                 final Name selectedClass = classes.getSelectedValue();
                 methods.setListData(ProofObligationChooser.this.data.getMethods(selectedClass));
-                if (methods.getModel().getSize() > 0) { methods.setSelectedIndex(0); }
+                if (methods.getModel().getSize() > 0) {
+                    methods.setSelectedIndex(0);
+                }
             }
         });
         methods.addListSelectionListener(new ListSelectionListener() {
@@ -77,7 +79,10 @@ public class ProofObligationChooser {
                     }
                 }
                 proofObligation.setListData(poList.toArray());
-                if (proofObligation.getModel().getSize() > 0) { proofObligation.setSelectedIndex(0); }
+                if (methods.getSelectedValue() != null &&
+                        proofObligation.getModel().getSize() > 0) {
+                    proofObligation.setSelectedIndex(0);
+                }
             }
         });
 
@@ -221,7 +226,7 @@ public class ProofObligationChooser {
         panel2.setLayout(new GridBagLayout());
         panel2.setMaximumSize(new Dimension(200, 2147483647));
         panel2.setMinimumSize(new Dimension(200, 200));
-        panel2.setPreferredSize(new Dimension(200, 200));
+        panel2.setPreferredSize(new Dimension(500, 400));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -231,9 +236,9 @@ public class ProofObligationChooser {
         browser.add(panel2, gbc);
         panel2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-13421773)), "Classes", TitledBorder.LEFT, TitledBorder.DEFAULT_POSITION, null, new Color(-6710887)));
         classes = new JList();
-        classes.setMaximumSize(new Dimension(200, 20000));
+        classes.setMaximumSize(new Dimension(500, 20000));
         classes.setMinimumSize(new Dimension(200, 200));
-        classes.setPreferredSize(new Dimension(200, 200));
+        classes.setPreferredSize(new Dimension(500, 400));
         classes.setSelectionMode(0);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -246,7 +251,7 @@ public class ProofObligationChooser {
         panel3.setLayout(new GridBagLayout());
         panel3.setMaximumSize(new Dimension(200, 2147483647));
         panel3.setMinimumSize(new Dimension(200, 200));
-        panel3.setPreferredSize(new Dimension(200, 200));
+        panel3.setPreferredSize(new Dimension(200, 400));
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -258,7 +263,7 @@ public class ProofObligationChooser {
         methods = new JList();
         methods.setMaximumSize(new Dimension(200, 20000));
         methods.setMinimumSize(new Dimension(200, 200));
-        methods.setPreferredSize(new Dimension(200, 200));
+        methods.setPreferredSize(new Dimension(400, 500));
         methods.setSelectionMode(0);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -271,7 +276,7 @@ public class ProofObligationChooser {
         panel4.setLayout(new GridBagLayout());
         panel4.setMaximumSize(new Dimension(200, 2147483647));
         panel4.setMinimumSize(new Dimension(200, 26));
-        panel4.setPreferredSize(new Dimension(200, 26));
+        panel4.setPreferredSize(new Dimension(200, 400));
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;

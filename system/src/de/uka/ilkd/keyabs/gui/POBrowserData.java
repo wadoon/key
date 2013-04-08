@@ -29,7 +29,9 @@ public class POBrowserData {
         for (MethodImpl m : services.getProgramInfo().getAllMethods(selectedClass)) {
             methods.add(new MethodRepresentative(m));
         }
-        return methods.toArray(new MethodRepresentative[methods.size()]);
+        final MethodRepresentative[] result = methods.toArray(new MethodRepresentative[methods.size()]);
+        Arrays.sort(result);
+        return result;
     }
 
 
@@ -38,7 +40,7 @@ public class POBrowserData {
         return classInvariants != null && !classInvariants.isEmpty();
     }
 
-    public class MethodRepresentative {
+    public class MethodRepresentative implements Comparable<MethodRepresentative>{
         public MethodImpl getMethod() {
             return method;
         }
@@ -48,6 +50,7 @@ public class POBrowserData {
         public  MethodRepresentative(MethodImpl method) {
             this.method = method;
         }
+
 
 
         public String toString() {
@@ -66,5 +69,9 @@ public class POBrowserData {
 
         }
 
+        @Override
+        public int compareTo(MethodRepresentative o) {
+            return this.toString().compareTo(o.toString());
+        }
     }
 }

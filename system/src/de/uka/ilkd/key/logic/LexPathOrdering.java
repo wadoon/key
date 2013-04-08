@@ -328,6 +328,8 @@ public class LexPathOrdering implements TermOrdering {
             if ( opStr.equals ( "jdiv" ) ) return Integer.valueOf ( 9 );
             
             if ( opStr.equals ( "empty" ) ) return Integer.valueOf ( 0 );
+            if ( opStr.equals ( "seqEmpty" ) ) return Integer.valueOf ( 0 );
+
 
             return null;
         }
