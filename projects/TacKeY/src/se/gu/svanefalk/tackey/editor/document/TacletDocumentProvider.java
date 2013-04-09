@@ -5,8 +5,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
-import se.gu.svanefalk.tackey.constants.TacletKeyWords;
-
 /**
  * Provides {@link IDocument} instances representing Taclet source files, stored
  * on disk.
@@ -17,12 +15,13 @@ import se.gu.svanefalk.tackey.constants.TacletKeyWords;
 public class TacletDocumentProvider extends FileDocumentProvider {
 
     @Override
-    protected IDocument createDocument(Object element) throws CoreException {
+    protected IDocument createDocument(final Object element)
+            throws CoreException {
 
         /*
          * Create the document according to the standard implementation.
          */
-        IDocument document = super.createDocument(element);
+        final IDocument document = super.createDocument(element);
 
         /*
          * Connect this document to a TacletSourcePartitioner before returning
@@ -30,7 +29,7 @@ public class TacletDocumentProvider extends FileDocumentProvider {
          */
         if (document != null) {
 
-            IDocumentPartitioner documentPartitioner = TacletSourcePartitioner.createDefaultInstance();
+            final IDocumentPartitioner documentPartitioner = TacletSourcePartitioner.createDefaultInstance();
             documentPartitioner.connect(document);
             document.setDocumentPartitioner(documentPartitioner);
         }

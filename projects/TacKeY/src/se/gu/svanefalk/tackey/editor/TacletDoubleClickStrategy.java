@@ -13,7 +13,7 @@ import org.eclipse.jface.text.ITextViewer;
 public class TacletDoubleClickStrategy implements ITextDoubleClickStrategy {
 
     @Override
-    public void doubleClicked(ITextViewer viewer) {
+    public void doubleClicked(final ITextViewer viewer) {
         System.out.println("Click!");
     }
 }

@@ -1,17 +1,13 @@
 package se.gu.svanefalk.tackey.editor.document;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.rules.IPredicateRule;
-import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.jface.text.rules.WordPatternRule;
 
-import se.gu.svanefalk.tackey.editor.TacletSourceElements;
+import se.gu.svanefalk.tackey.constants.TacletSourceElements;
 
 /**
  * This scanner is used in order to pick out the essential elements of a Taclet
@@ -24,7 +20,7 @@ public class TacletSourcePartitionScanner extends RuleBasedPartitionScanner {
 
     public TacletSourcePartitionScanner() {
 
-        ArrayList<IPredicateRule> rules = new ArrayList<>();
+        final ArrayList<IPredicateRule> rules = new ArrayList<>();
 
         /*
          * Setup the partitioning rules.
@@ -39,8 +35,8 @@ public class TacletSourcePartitionScanner extends RuleBasedPartitionScanner {
         /*
          * Add the rules to the scanner
          */
-        IPredicateRule[] rawRules = new IPredicateRule[rules.size()];
+        final IPredicateRule[] rawRules = new IPredicateRule[rules.size()];
         rules.toArray(rawRules);
-        setPredicateRules(rawRules);
+        this.setPredicateRules(rawRules);
     }
 }

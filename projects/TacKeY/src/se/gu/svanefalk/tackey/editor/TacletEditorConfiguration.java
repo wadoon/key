@@ -3,14 +3,14 @@ package se.gu.svanefalk.tackey.editor;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.eclipse.swt.graphics.Color;
 
+import se.gu.svanefalk.tackey.constants.TacletSourceElements;
 import se.gu.svanefalk.tackey.editor.colors.ColorManager;
-import se.gu.svanefalk.tackey.editor.document.TacletSourcePartitionScanner;
-import se.gu.svanefalk.tackey.editor.scanners.TacletKeywordScanner;
+import se.gu.svanefalk.tackey.editor.syntaxcoloring.SyntaxColoringKeywordScanner;
 
 /**
  * This configuration class contains the settings, as well as the bulk of
@@ -31,17 +31,19 @@ public class TacletEditorConfiguration extends SourceViewerConfiguration {
      * Used in order to pick out Taclet language keywords in the document being
      * worked with.
      */
-    private RuleBasedScanner tacletKeyWordScanner;
+    private RuleBasedScanner keywordColoringScanner;
 
-    /**
-     * Used in order to get {@link Color} instances for various elements in the
-     * source code being edited.
-     */
-    private final ColorManager colorManager;
-
-    public TacletEditorConfiguration(ColorManager colorManager) {
+    public TacletEditorConfiguration(final ColorManager colorManager) {
         super();
-        this.colorManager = colorManager;
+    }
+
+    @Override
+    public String[] getConfiguredContentTypes(final ISourceViewer sourceViewer) {
+
+        return new String[] { TacletSourceElements.DECLARATION,
+                TacletSourceElements.STATEMENT,
+                TacletSourceElements.OPENING_BRACE,
+                TacletSourceElements.CLOSING_BRACE };
     }
 
     /**
@@ -50,43 +52,38 @@ public class TacletEditorConfiguration extends SourceViewerConfiguration {
      */
     @Override
     public ITextDoubleClickStrategy getDoubleClickStrategy(
-            ISourceViewer sourceViewer, String contentType) {
-        if (doubleClickStrategy == null)
-            doubleClickStrategy = new TacletDoubleClickStrategy();
-        return doubleClickStrategy;
-    }
-
-    public IPresentationReconciler getPresentationReconciler(
-            ISourceViewer sourceViewer) {
-        PresentationReconciler reconciler = new PresentationReconciler();
-        /*
-         * DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(
-         * getTacletKeywordScanner()); reconciler.setDamager(damagerRepairer,
-         * TacletSourcePartitionScanner.KEYWORD);
-         * reconciler.setRepairer(damagerRepairer,
-         * TacletSourcePartitionScanner.KEYWORD);
-         */
-        return reconciler;
+            final ISourceViewer sourceViewer, final String contentType) {
+        if (this.doubleClickStrategy == null) {
+            this.doubleClickStrategy = new TacletDoubleClickStrategy();
+        }
+        return this.doubleClickStrategy;
     }
 
     /**
-     * Lazily retrieve a {@link RuleBasedScanner} for handling Taclet keywords.
+     * Lazily retrieve a {@link RuleBasedScanner} for coloring Taclet keywords
+     * in the scope of this editor.
      * 
-     * @return
+     * @return the scanner
      */
-    private RuleBasedScanner getTacletKeywordScanner() {
-        if (tacletKeyWordScanner == null) {
-            tacletKeyWordScanner = new TacletKeywordScanner();
+    private RuleBasedScanner getKeywordColoringScanner() {
+        if (this.keywordColoringScanner == null) {
+            this.keywordColoringScanner = SyntaxColoringKeywordScanner.createDefaultInstance();
         }
-        return tacletKeyWordScanner;
+        return this.keywordColoringScanner;
     }
 
     @Override
-    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+    public IPresentationReconciler getPresentationReconciler(
+            final ISourceViewer sourceViewer) {
 
-        return new String[] { TacletSourceElements.DECLARATION,
-                TacletSourceElements.KEYWORD,
-                TacletSourceElements.OPENING_BRACE,
-                TacletSourceElements.CLOSING_BRACE };
+        final PresentationReconciler reconciler = new PresentationReconciler();
+
+        final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(
+                this.getKeywordColoringScanner());
+
+        reconciler.setDamager(damagerRepairer, TacletSourceElements.STATEMENT);
+        reconciler.setRepairer(damagerRepairer, TacletSourceElements.STATEMENT);
+
+        return reconciler;
     }
 }

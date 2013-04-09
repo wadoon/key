@@ -9,14 +9,14 @@ import org.eclipse.swt.widgets.Display;
 
 public enum ColorManager {
     INSTANCE;
-    
+
     private final Map<RGB, Color> colorMapping = new HashMap<RGB, Color>();
 
     /**
      * Disposes of the color manager by disposing of all mapped colors.
      */
     public void dispose() {
-        for (Color color : colorMapping.values()) {
+        for (final Color color : this.colorMapping.values()) {
             color.dispose();
         }
     }
@@ -29,15 +29,15 @@ public enum ColorManager {
      *            the RGB valuse
      * @return the Color instance
      */
-    public Color getColor(RGB rgb) {
-        Color color = colorMapping.get(rgb);
+    public Color getColor(final RGB rgb) {
+        Color color = this.colorMapping.get(rgb);
 
         /*
          * If the color is not already mapped, lazily instantiate it.
          */
         if (color == null) {
             color = new Color(Display.getCurrent(), rgb);
-            colorMapping.put(rgb, color);
+            this.colorMapping.put(rgb, color);
         }
         return color;
     }

@@ -5,7 +5,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.Token;
 
-import se.gu.svanefalk.tackey.editor.TacletSourceElements;
+import se.gu.svanefalk.tackey.constants.TacletSourceElements;
 import se.gu.svanefalk.tackey.editor.rules.RuleUtils;
 
 /**
@@ -16,20 +16,19 @@ import se.gu.svanefalk.tackey.editor.rules.RuleUtils;
  */
 public class TacletSourceKeywordRule extends MultiLineRule {
 
-    public static IToken KEYWORD_TOKEN = new Token(
-            TacletSourceElements.KEYWORD);
-
     private static final char BACKSLASH = '\\';
-    private static final char OPENING_PARENTHESIS = '(';
+
     private static final char CLOSING_PARENTHESIS = ')';
-    private static final char WHITESPACE = ' ';
+    public static IToken KEYWORD_TOKEN = new Token(
+            TacletSourceElements.STATEMENT);
+    private static final char OPENING_PARENTHESIS = '(';
 
     public TacletSourceKeywordRule() {
-        super("\\", "", KEYWORD_TOKEN);
+        super("\\", "", TacletSourceKeywordRule.KEYWORD_TOKEN);
     }
 
     @Override
-    protected boolean endSequenceDetected(ICharacterScanner scanner) {
+    protected boolean endSequenceDetected(final ICharacterScanner scanner) {
 
         /*
          * Keeps track of the number of braces remaining to close.
@@ -75,21 +74,21 @@ public class TacletSourceKeywordRule extends MultiLineRule {
             /*
              * scan until an opening parenthesis is found.
              */
-            if (currentChar == OPENING_PARENTHESIS) {
+            if (currentChar == TacletSourceKeywordRule.OPENING_PARENTHESIS) {
                 if (!sawParenthesis) {
                     sawParenthesis = true;
                 }
                 parenthesesToClose++;
             }
 
-            if (currentChar == CLOSING_PARENTHESIS) {
+            if (currentChar == TacletSourceKeywordRule.CLOSING_PARENTHESIS) {
                 parenthesesToClose--;
             }
 
             /*
              * Return true if all parentheses have been closed.
              */
-            if (sawParenthesis && parenthesesToClose == 0) {
+            if (sawParenthesis && (parenthesesToClose == 0)) {
                 return true;
             }
 
@@ -97,7 +96,8 @@ public class TacletSourceKeywordRule extends MultiLineRule {
              * The search fails in the event that we encounter a new backslash,
              * indicating the beginning of another keyword.
              */
-            if (currentChar == BACKSLASH && charsRead > 1) {
+            if ((currentChar == TacletSourceKeywordRule.BACKSLASH)
+                    && (charsRead > 1)) {
                 RuleUtils.unwindScanner(scanner, charsRead);
                 return false;
             }
@@ -106,7 +106,7 @@ public class TacletSourceKeywordRule extends MultiLineRule {
              * Finally, the search fails in the event that we encounter EOF.
              * FIXME: needs to unwind
              */
-            if ((int) currentChar < 0 || (int) currentChar > 256) {
+            if ((currentChar < 0) || (currentChar > 256)) {
                 if (!sawParenthesis) {
                     RuleUtils.unwindScanner(scanner, charsRead);
                     return true;

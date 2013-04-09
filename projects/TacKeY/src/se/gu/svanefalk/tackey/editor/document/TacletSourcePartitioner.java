@@ -6,7 +6,7 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
-import se.gu.svanefalk.tackey.editor.TacletSourceElements;
+import se.gu.svanefalk.tackey.constants.TacletSourceElements;
 
 /**
  * Instances of this class are used in order to partition Taclet source files.
@@ -15,24 +15,6 @@ import se.gu.svanefalk.tackey.editor.TacletSourceElements;
  * 
  */
 public class TacletSourcePartitioner extends FastPartitioner {
-
-    /**
-     * @return a default implementation of the Taclet source partitioner,
-     *         recognizing the basic source elements and partitioning
-     *         accordingly.
-     */
-    public static TacletSourcePartitioner createDefaultInstance() {
-
-        TacletSourcePartitionScanner tacletPartitionScanner = new TacletSourcePartitionScanner();
-
-        String[] legalContentTypes = new String[] {
-                TacletSourceElements.OPENING_BRACE,
-                TacletSourceElements.CLOSING_BRACE,
-                TacletSourceElements.DECLARATION, TacletSourceElements.KEYWORD };
-
-        return new TacletSourcePartitioner(tacletPartitionScanner,
-                legalContentTypes);
-    }
 
     /**
      * Creates a custome implementation of the Taclet source partitioner.
@@ -44,12 +26,32 @@ public class TacletSourcePartitioner extends FastPartitioner {
      * @return the custom implementation
      */
     public static TacletSourcePartitioner createCustomInstance(
-            IPartitionTokenScanner scanner, String[] legalContentTypes) {
+            final IPartitionTokenScanner scanner,
+            final String[] legalContentTypes) {
         return new TacletSourcePartitioner(scanner, legalContentTypes);
     }
 
-    private TacletSourcePartitioner(IPartitionTokenScanner scanner,
-            String[] legalContentTypes) {
+    /**
+     * @return a default implementation of the Taclet source partitioner,
+     *         recognizing the basic source elements and partitioning
+     *         accordingly.
+     */
+    public static TacletSourcePartitioner createDefaultInstance() {
+
+        final TacletSourcePartitionScanner tacletPartitionScanner = new TacletSourcePartitionScanner();
+
+        final String[] legalContentTypes = new String[] {
+                TacletSourceElements.OPENING_BRACE,
+                TacletSourceElements.CLOSING_BRACE,
+                TacletSourceElements.DECLARATION,
+                TacletSourceElements.STATEMENT };
+
+        return new TacletSourcePartitioner(tacletPartitionScanner,
+                legalContentTypes);
+    }
+
+    private TacletSourcePartitioner(final IPartitionTokenScanner scanner,
+            final String[] legalContentTypes) {
         super(scanner, legalContentTypes);
     }
 
@@ -58,9 +60,10 @@ public class TacletSourcePartitioner extends FastPartitioner {
      * representing a Taclet source file.
      */
     @Override
-    public void connect(IDocument document, boolean delayInitialization) {
+    public void connect(final IDocument document,
+            final boolean delayInitialization) {
         super.connect(document, delayInitialization);
-        printPartitions(document);
+        this.printPartitions(document);
     }
 
     /**
@@ -68,10 +71,11 @@ public class TacletSourcePartitioner extends FastPartitioner {
      * 
      * @param document
      */
-    public void printPartitions(IDocument document) {
-        StringBuffer buffer = new StringBuffer();
+    public void printPartitions(final IDocument document) {
+        final StringBuffer buffer = new StringBuffer();
 
-        ITypedRegion[] partitions = computePartitioning(0, document.getLength());
+        final ITypedRegion[] partitions = this.computePartitioning(0,
+                document.getLength());
         for (int i = 0; i < partitions.length; i++) {
             try {
                 buffer.append("Partition type: " + partitions[i].getType()
@@ -82,7 +86,7 @@ public class TacletSourcePartitioner extends FastPartitioner {
                 buffer.append(document.get(partitions[i].getOffset(),
                         partitions[i].getLength()));
                 buffer.append("\n---------------------------\n\n\n");
-            } catch (BadLocationException e) {
+            } catch (final BadLocationException e) {
                 e.printStackTrace();
             }
         }

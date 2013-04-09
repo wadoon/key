@@ -26,22 +26,17 @@ public class TacletEditor extends TextEditor {
     private final ColorManager colorManager;
 
     /**
-     * The {@link SourceViewerConfiguration} instance is used in order to
-     * customize the behavior of the Taclet editor, and will hence contain the
-     * majority of its business logic.
-     */
-    private final SourceViewerConfiguration tacletEditorConfiguration;
-
-    /**
      * The {@link IDocumentProvider} is used in order to supply the edior with
      * the {@link IDocument} instances which it will work with.
      */
     private final IDocumentProvider documentProvider;
 
     /**
-     * The IEditorInput instance is used to handle user input to this editor.
+     * The {@link SourceViewerConfiguration} instance is used in order to
+     * customize the behavior of the Taclet editor, and will hence contain the
+     * majority of its business logic.
      */
-    private IEditorInput editorInput;
+    private final SourceViewerConfiguration tacletEditorConfiguration;
 
     public TacletEditor() {
         super();
@@ -49,15 +44,22 @@ public class TacletEditor extends TextEditor {
         /*
          * Setup the configuration for this editor
          */
-        colorManager = ColorManager.INSTANCE;
-        tacletEditorConfiguration = new TacletEditorConfiguration(colorManager);
-        setSourceViewerConfiguration(tacletEditorConfiguration);
+        this.colorManager = ColorManager.INSTANCE;
+        this.tacletEditorConfiguration = new TacletEditorConfiguration(
+                this.colorManager);
+        this.setSourceViewerConfiguration(this.tacletEditorConfiguration);
 
         /*
          * Setup the document provider
          */
-        documentProvider = new TacletDocumentProvider();
-        setDocumentProvider(documentProvider);
+        this.documentProvider = new TacletDocumentProvider();
+        this.setDocumentProvider(this.documentProvider);
+    }
+
+    @Override
+    public void dispose() {
+        this.colorManager.dispose();
+        super.dispose();
     }
 
     /**
@@ -67,16 +69,8 @@ public class TacletEditor extends TextEditor {
      * whole is disposed of.
      */
     @Override
-    protected void doSetInput(IEditorInput input) throws CoreException {
+    protected void doSetInput(final IEditorInput input) throws CoreException {
         super.doSetInput(input);
 
-        this.editorInput = input;
-
-    }
-
-    @Override
-    public void dispose() {
-        colorManager.dispose();
-        super.dispose();
     }
 }
