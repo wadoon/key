@@ -1,11 +1,12 @@
-package se.gu.svanefalk.tackey.editors.rules;
+package se.gu.svanefalk.tackey.editor.document;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.Token;
 
-import se.gu.svanefalk.tackey.editors.scanners.TacletSourcePartitionScanner;
+import se.gu.svanefalk.tackey.editor.TacletSourceElements;
+import se.gu.svanefalk.tackey.editor.rules.RuleUtils;
 
 /**
  * Identifies Taclet keywords, together with their operands (if any).
@@ -13,17 +14,17 @@ import se.gu.svanefalk.tackey.editors.scanners.TacletSourcePartitionScanner;
  * @author christopher
  * 
  */
-public class TacletKeywordRule extends MultiLineRule {
+public class TacletSourceKeywordRule extends MultiLineRule {
 
     public static IToken KEYWORD_TOKEN = new Token(
-            TacletSourcePartitionScanner.KEYWORD);
+            TacletSourceElements.KEYWORD);
 
     private static final char BACKSLASH = '\\';
     private static final char OPENING_PARENTHESIS = '(';
     private static final char CLOSING_PARENTHESIS = ')';
     private static final char WHITESPACE = ' ';
 
-    public TacletKeywordRule() {
+    public TacletSourceKeywordRule() {
         super("\\", "", KEYWORD_TOKEN);
     }
 

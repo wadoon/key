@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors;
+package se.gu.svanefalk.tackey.editor;
 
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -8,9 +8,9 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.graphics.Color;
 
-import se.gu.svanefalk.tackey.editors.colors.ColorManager;
-import se.gu.svanefalk.tackey.editors.scanners.TacletKeyWordScanner;
-import se.gu.svanefalk.tackey.editors.scanners.TacletSourcePartitionScanner;
+import se.gu.svanefalk.tackey.editor.colors.ColorManager;
+import se.gu.svanefalk.tackey.editor.document.TacletSourcePartitionScanner;
+import se.gu.svanefalk.tackey.editor.scanners.TacletKeywordScanner;
 
 /**
  * This configuration class contains the settings, as well as the bulk of
@@ -76,7 +76,7 @@ public class TacletEditorConfiguration extends SourceViewerConfiguration {
      */
     private RuleBasedScanner getTacletKeywordScanner() {
         if (tacletKeyWordScanner == null) {
-            tacletKeyWordScanner = new TacletKeyWordScanner();
+            tacletKeyWordScanner = new TacletKeywordScanner();
         }
         return tacletKeyWordScanner;
     }
@@ -84,9 +84,9 @@ public class TacletEditorConfiguration extends SourceViewerConfiguration {
     @Override
     public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 
-        return new String[] { TacletSourcePartitionScanner.DECLARATION,
-                TacletSourcePartitionScanner.KEYWORD,
-                TacletSourcePartitionScanner.OPENING_BRACE,
-                TacletSourcePartitionScanner.CLOSING_BRACE };
+        return new String[] { TacletSourceElements.DECLARATION,
+                TacletSourceElements.KEYWORD,
+                TacletSourceElements.OPENING_BRACE,
+                TacletSourceElements.CLOSING_BRACE };
     }
 }

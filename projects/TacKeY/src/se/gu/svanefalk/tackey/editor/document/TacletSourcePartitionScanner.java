@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors.scanners;
+package se.gu.svanefalk.tackey.editor.document;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -11,15 +11,16 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordPatternRule;
 
-import se.gu.svanefalk.tackey.editors.rules.TacletDeclarationRule;
-import se.gu.svanefalk.tackey.editors.rules.TacletKeywordRule;
+import se.gu.svanefalk.tackey.editor.TacletSourceElements;
 
+/**
+ * This scanner is used in order to pick out the essential elements of a Taclet
+ * source file for the purpose of partitioning it.
+ * 
+ * @author christopher
+ * 
+ */
 public class TacletSourcePartitionScanner extends RuleBasedPartitionScanner {
-
-    public static final String KEYWORD = "keyword";
-    public static final String DECLARATION = "declaration";
-    public static final String OPENING_BRACE = "opening_brace";
-    public static final String CLOSING_BRACE = "close_brace";
 
     public TacletSourcePartitionScanner() {
 
@@ -28,10 +29,12 @@ public class TacletSourcePartitionScanner extends RuleBasedPartitionScanner {
         /*
          * Setup the partitioning rules.
          */
-        rules.add(new TacletDeclarationRule());
-        rules.add(new SingleLineRule("{", "{", new Token(OPENING_BRACE)));
-        rules.add(new TacletKeywordRule());
-        rules.add(new SingleLineRule("}", ";", new Token(CLOSING_BRACE)));
+        rules.add(new TacletSourceDeclarationRule());
+        rules.add(new SingleLineRule("{", "{", new Token(
+                TacletSourceElements.OPENING_BRACE)));
+        rules.add(new TacletSourceKeywordRule());
+        rules.add(new SingleLineRule("}", ";", new Token(
+                TacletSourceElements.CLOSING_BRACE)));
 
         /*
          * Add the rules to the scanner

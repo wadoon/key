@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors.colors;
+package se.gu.svanefalk.tackey.editor.colors;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors.scanners;
+package se.gu.svanefalk.tackey.editor.scanners;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IRule;
@@ -8,16 +8,16 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordPatternRule;
 
-import se.gu.svanefalk.tackey.editors.KeywordDetector;
-import se.gu.svanefalk.tackey.editors.WhitespaceDetector;
-import se.gu.svanefalk.tackey.editors.colors.ColorManager;
-import se.gu.svanefalk.tackey.editors.colors.TacletEditorColors;
+import se.gu.svanefalk.tackey.editor.KeywordDetector;
+import se.gu.svanefalk.tackey.editor.WhitespaceDetector;
+import se.gu.svanefalk.tackey.editor.colors.ColorManager;
+import se.gu.svanefalk.tackey.editor.colors.TacletEditorColors;
 
-public class TacletKeyWordScanner extends RuleBasedScanner {
+public class TacletKeywordScanner extends RuleBasedScanner {
 
     private final ColorManager colorManager = ColorManager.INSTANCE;
 
-    public TacletKeyWordScanner() {
+    public TacletKeywordScanner() {
         super();
         IToken keywordToken = new Token(new TextAttribute(
                 colorManager.getColor(TacletEditorColors.KEYWORD)));

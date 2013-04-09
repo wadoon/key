@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors;
+package se.gu.svanefalk.tackey.editor.document;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
@@ -6,7 +6,6 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
 import se.gu.svanefalk.tackey.constants.TacletKeyWords;
-import se.gu.svanefalk.tackey.editors.scanners.TacletSourcePartitionScanner;
 
 /**
  * Provides {@link IDocument} instances representing Taclet source files, stored
@@ -31,15 +30,7 @@ public class TacletDocumentProvider extends FileDocumentProvider {
          */
         if (document != null) {
 
-            TacletSourcePartitionScanner tacletPartitionScanner = new TacletSourcePartitionScanner();
-            String[] legalContentTypes = new String[] {
-                    TacletSourcePartitionScanner.OPENING_BRACE,
-                    TacletSourcePartitionScanner.CLOSING_BRACE,
-                    TacletSourcePartitionScanner.DECLARATION,
-                    TacletSourcePartitionScanner.KEYWORD };
-            IDocumentPartitioner documentPartitioner = new TacletSourcePartitioner(
-                    tacletPartitionScanner, legalContentTypes);
-
+            IDocumentPartitioner documentPartitioner = TacletSourcePartitioner.createDefaultInstance();
             documentPartitioner.connect(document);
             document.setDocumentPartitioner(documentPartitioner);
         }

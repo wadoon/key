@@ -8,7 +8,7 @@
             name="Taclet Editor"
             extensions="key"
             icon="icons/sample.gif"
-            class="se.gu.svanefalk.tackey.editors.TacletEditor"
+            class="se.gu.svanefalk.tackey.editor.TacletEditor"
             id="se.gu.svanefalk.tackey.editors.TacletEditor">
       </editor>
       <editor

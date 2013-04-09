@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors.rules;
+package se.gu.svanefalk.tackey.editor.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 

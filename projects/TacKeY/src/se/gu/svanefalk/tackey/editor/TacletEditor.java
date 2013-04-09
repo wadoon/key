@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors;
+package se.gu.svanefalk.tackey.editor;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
@@ -7,7 +7,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import se.gu.svanefalk.tackey.editors.colors.ColorManager;
+import se.gu.svanefalk.tackey.editor.colors.ColorManager;
+import se.gu.svanefalk.tackey.editor.document.TacletDocumentProvider;
 
 /**
  * Instances of this class represent the main interface for the Taclet editor in

@@ -5,4 +5,4 @@
  * @author christopher
  *
  */
-package se.gu.svanefalk.tackey.editors.colors;
+package se.gu.svanefalk.tackey.editor.rules;

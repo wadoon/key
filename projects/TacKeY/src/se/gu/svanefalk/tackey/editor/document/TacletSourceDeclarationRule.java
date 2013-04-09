@@ -1,16 +1,17 @@
-package se.gu.svanefalk.tackey.editors.rules;
+package se.gu.svanefalk.tackey.editor.document;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.Token;
 
-import se.gu.svanefalk.tackey.editors.scanners.TacletSourcePartitionScanner;
+import se.gu.svanefalk.tackey.editor.TacletSourceElements;
 
-public class TacletDeclarationRule extends MultiLineRule {
+
+public class TacletSourceDeclarationRule extends MultiLineRule {
 
     public static IToken DECLARATION_TOKEN = new Token(
-            TacletSourcePartitionScanner.DECLARATION);
+            TacletSourceElements.DECLARATION);
 
     /**
      * As this rule is only applicable once per taclet, we flag it as used as
@@ -20,7 +21,7 @@ public class TacletDeclarationRule extends MultiLineRule {
 
     private static final char OPENING_CURLYBRACE = '{';
 
-    public TacletDeclarationRule() {
+    public TacletSourceDeclarationRule() {
         super(" ", " ", DECLARATION_TOKEN);
     }
 

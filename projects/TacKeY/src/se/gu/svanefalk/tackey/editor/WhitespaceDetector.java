@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors;
+package se.gu.svanefalk.tackey.editor;
 
 import org.eclipse.jface.text.rules.IWhitespaceDetector;
 

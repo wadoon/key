@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editors.colors;
+package se.gu.svanefalk.tackey.editor.colors;
 
 import org.eclipse.swt.graphics.RGB;
 
