@@ -8,6 +8,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import se.gu.svanefalk.tackey.constants.TacletKeywords;

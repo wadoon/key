@@ -34,7 +34,7 @@ public final class TacletKeywords {
         list.add(TacletKeywords.REPLACEWITH);
         list.add(TacletKeywords.VARCOND);
         list.add(TacletKeywords.SAMEUPDATELEVEL);
-        list.add(TacletKeywords.MODALITY);
+        list.add(TacletKeywords.MODALITY); 
         list.add(TacletKeywords.FORMULA);
         list.add(TacletKeywords.HEURISTICS);
         list.add(TacletKeywords.ADD);

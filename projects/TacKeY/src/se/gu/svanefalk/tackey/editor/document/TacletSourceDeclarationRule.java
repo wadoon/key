@@ -24,6 +24,29 @@ public class TacletSourceDeclarationRule extends MultiLineRule {
         super(" ", " ", TacletSourceDeclarationRule.DECLARATION_TOKEN);
     }
 
+    /**
+     * Customize the evaluation function to handle cases where there is no
+     * definitive starting sequence
+     */
+    @Override
+    protected IToken doEvaluate(ICharacterScanner scanner, boolean resume) {
+
+        if (resume) {
+
+            if (endSequenceDetected(scanner))
+                return fToken;
+
+        } else {
+
+            if (sequenceDetected(scanner, fStartSequence, fBreaksOnEOF)) {
+                if (endSequenceDetected(scanner))
+                    return fToken;
+            }
+        }
+
+        return Token.UNDEFINED;
+    }
+
     @Override
     protected boolean endSequenceDetected(final ICharacterScanner scanner) {
         if (this.hasSucceeded) {

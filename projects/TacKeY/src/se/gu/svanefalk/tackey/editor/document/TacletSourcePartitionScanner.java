@@ -25,12 +25,12 @@ public class TacletSourcePartitionScanner extends RuleBasedPartitionScanner {
         /*
          * Setup the partitioning rules.
          */
-        rules.add(new TacletSourceDeclarationRule());
         rules.add(new SingleLineRule("{", "{", new Token(
                 TacletSourceElements.OPENING_BRACE)));
-        rules.add(new TacletSourceKeywordRule());
         rules.add(new SingleLineRule("}", ";", new Token(
                 TacletSourceElements.CLOSING_BRACE)));
+        rules.add(new TacletSourceKeywordRule());
+        rules.add(new TacletSourceDeclarationRule());
 
         /*
          * Add the rules to the scanner

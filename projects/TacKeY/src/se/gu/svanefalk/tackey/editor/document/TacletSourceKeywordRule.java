@@ -27,6 +27,8 @@ public class TacletSourceKeywordRule extends MultiLineRule {
         super("\\", "", TacletSourceKeywordRule.KEYWORD_TOKEN);
     }
 
+
+
     @Override
     protected boolean endSequenceDetected(final ICharacterScanner scanner) {
 
