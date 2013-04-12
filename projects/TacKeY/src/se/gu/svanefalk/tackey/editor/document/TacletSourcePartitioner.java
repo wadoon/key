@@ -41,10 +41,9 @@ public class TacletSourcePartitioner extends FastPartitioner {
         final TacletSourcePartitionScanner tacletPartitionScanner = new TacletSourcePartitionScanner();
 
         final String[] legalContentTypes = new String[] {
-                TacletSourceElements.OPENING_BRACE,
-                TacletSourceElements.CLOSING_BRACE,
                 TacletSourceElements.DECLARATION,
-                TacletSourceElements.STATEMENT };
+                TacletSourceElements.SINGLE_COMMENT,
+                TacletSourceElements.NESTED_COMMENT };
 
         return new TacletSourcePartitioner(tacletPartitionScanner,
                 legalContentTypes);

@@ -1,0 +1,161 @@
+// $ANTLR 2.7.2: lexer.g -> KeYLexerTokenTypes.txt$
+KeYLexer    // output token vocab name
+SORTS="\\sorts"=4
+GENERIC="\\generic"=5
+EXTENDS="\\extends"=6
+ONEOF="\\oneof"=7
+ABSTRACT="\\abstract"=8
+SCHEMAVARIABLES="\\schemaVariables"=9
+SCHEMAVAR="\\schemaVar"=10
+MODALOPERATOR="\\modalOperator"=11
+PROGRAM="\\program"=12
+FORMULA="\\formula"=13
+TERM="\\term"=14
+UPDATE="\\update"=15
+VARIABLES="\\variables"=16
+SKOLEMTERM="\\skolemTerm"=17
+SKOLEMFORMULA="\\skolemFormula"=18
+MODIFIES="\\modifies"=19
+PROGRAMVARIABLES="\\programVariables"=20
+VARCOND="\\varcond"=21
+APPLY_UPDATE_ON_RIGID="\\applyUpdateOnRigid"=22
+DEPENDINGON="\\dependingOn"=23
+DISJOINTMODULONULL="\\disjointModuloNull"=24
+DROP_EFFECTLESS_ELEMENTARIES="\\dropEffectlessElementaries"=25
+DROP_EFFECTLESS_STORES="\\dropEffectlessStores"=26
+SIMPLIFY_IF_THEN_ELSE_UPDATE="\\simplifyIfThenElseUpdate"=27
+ENUM_CONST="\\enumConstant"=28
+FREELABELIN="\\freeLabelIn"=29
+HASSORT="\\hasSort"=30
+FIELDTYPE="\\fieldType"=31
+ELEMSORT="\\elemSort"=32
+ISARRAY="\\isArray"=33
+ISARRAYLENGTH="\\isArrayLength"=34
+ISENUMTYPE="\\isEnumType"=35
+ISINDUCTVAR="\\isInductVar"=36
+ISLOCALVARIABLE="\\isLocalVariable"=37
+ISOBSERVER="\\isObserver"=38
+DIFFERENT="\\different"=39
+METADISJOINT="\\metaDisjoint"=40
+ISREFERENCE="\\isReference"=41
+ISREFERENCEARRAY="\\isReferenceArray"=42
+ISSUBTYPE="\\sub"=43
+EQUAL_UNIQUE="\\equalUnique"=44
+NEW="\\new"=45
+NEWLABEL="\\newLabel"=46
+NOT="\\not"=47
+NOTFREEIN="\\notFreeIn"=48
+SAME="\\same"=49
+STATIC="\\static"=50
+STATICMETHODREFERENCE="\\staticMethodReference"=51
+STRICT="\\strict"=52
+TYPEOF="\\typeof"=53
+INSTANTIATE_GENERIC="\\instantiateGeneric"=54
+FORALL="\\forall"=55
+EXISTS="\\exists"=56
+SUBST="\\subst"=57
+IF="\\if"=58
+IFEX="\\ifEx"=59
+THEN="\\then"=60
+ELSE="\\else"=61
+INCLUDE="\\include"=62
+INCLUDELDTS="\\includeLDTs"=63
+CLASSPATH="\\classpath"=64
+BOOTCLASSPATH="\\bootclasspath"=65
+NODEFAULTCLASSES="\\noDefaultClasses"=66
+JAVASOURCE="\\javaSource"=67
+WITHOPTIONS="\\withOptions"=68
+OPTIONSDECL="\\optionsDecl"=69
+KEYSETTINGS="\\settings"=70
+TRUE="true"=71
+FALSE="false"=72
+SAMEUPDATELEVEL="\\sameUpdateLevel"=73
+INSEQUENTSTATE="\\inSequentState"=74
+ANTECEDENTPOLARITY="\\antecedentPolarity"=75
+SUCCEDENTPOLARITY="\\succedentPolarity"=76
+CLOSEGOAL="\\closegoal"=77
+HEURISTICSDECL="\\heuristicsDecl"=78
+NONINTERACTIVE="\\noninteractive"=79
+DISPLAYNAME="\\displayname"=80
+HELPTEXT="\\helptext"=81
+REPLACEWITH="\\replacewith"=82
+ADDRULES="\\addrules"=83
+ADDPROGVARS="\\addprogvars"=84
+HEURISTICS="\\heuristics"=85
+FIND="\\find"=86
+ADD="\\add"=87
+ASSUMES="\\assumes"=88
+PREDICATES="\\predicates"=89
+FUNCTIONS="\\functions"=90
+UNIQUE="\\unique"=91
+RULES="\\rules"=92
+PROBLEM="\\problem"=93
+CHOOSECONTRACT="\\chooseContract"=94
+PROOFOBLIGATION="\\proofObligation"=95
+PROOF="\\proof"=96
+CONTRACTS="\\contracts"=97
+INVARIANTS="\\invariants"=98
+IN_TYPE="\\inType"=99
+IS_ABSTRACT_OR_INTERFACE="\\isAbstractOrInterface"=100
+CONTAINERTYPE="\\containerType"=101
+LIMITED="$lmtd"=102
+LOCSET="\\locset"=103
+SEQ="\\seq"=104
+BIGINT="\\bigint"=105
+VOCAB=106
+SEMI("`;'")=107
+SLASH("`/'")=108
+COLON("`:'")=109
+DOUBLECOLON("Double `:'")=110
+ASSIGN("`:='")=111
+DOT("`.'")=112
+DOTRANGE("`..'")=113
+COMMA("`,'")=114
+LPAREN("`('")=115
+RPAREN("`)'")=116
+LBRACE("`{'")=117
+RBRACE("`}'")=118
+LBRACKET("`['")=119
+RBRACKET("']'")=120
+EMPTYBRACKETS("a pair of empty brackets []")=121
+AT("`at'")=122
+PARALLEL("`parallel'")=123
+OR("`|'")=124
+AND("`&'")=125
+IMP("`->'")=126
+EQUALS("`='")=127
+NOT_EQUALS("`!='")=128
+SEQARROW("`==>'")=129
+EXP("'^'")=130
+TILDE("'~'")=131
+PERCENT("`%'")=132
+STAR("`*'")=133
+MINUS("`-'")=134
+PLUS("`+'")=135
+GREATER("`>'")=136
+GREATEREQUAL("`>='")=137
+WS("white space")=138
+STRING_LITERAL("a string in double quotes")=139
+LESS_DISPATCH=140
+LESS("'<'")=141
+LESSEQUAL("'<='")=142
+IMPLICIT_IDENT("an implicit identifier (letters only)")=143
+EQV("`<->'")=144
+PRIMES_OR_CHARLITERAL=145
+PRIMES("Sequence of primes (at least one)")=146
+CHAR_LITERAL("a char in single quotes")=147
+ESC=148
+QUOTED_STRING_LITERAL("a string with double quotes")=149
+SL_COMMENT("a comment")=150
+ML_COMMENT("a comment")=151
+DIGIT_DISPATCH=152
+HEX_LITERAL("a hexadeciaml constant")=153
+DIGIT("a digit")=154
+HEX("a hexadeciamal number")=155
+LETTER("a letter")=156
+IDCHAR("an admissible character for identifiers")=157
+IDENT("an identifer")=158
+NUM_LITERAL("a number")=159
+MODALITY("All possible modalities, including schema.")=160
+MODALITYEND=161
+JAVABLOCK=162

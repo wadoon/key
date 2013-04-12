@@ -10,6 +10,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 import se.gu.svanefalk.tackey.constants.TacletSourceElements;
 import se.gu.svanefalk.tackey.editor.colors.ColorManager;
+import se.gu.svanefalk.tackey.editor.syntaxcoloring.CommentColoringScanner;
 import se.gu.svanefalk.tackey.editor.syntaxcoloring.SyntaxColoringKeywordScanner;
 
 /**
@@ -31,7 +32,9 @@ public class TacletEditorConfiguration extends SourceViewerConfiguration {
      * Used in order to pick out Taclet language keywords in the document being
      * worked with.
      */
-    private RuleBasedScanner keywordColoringScanner;
+    private RuleBasedScanner keywordColoringScanner = null;
+
+    private RuleBasedScanner commentColoringScanner = null;
 
     public TacletEditorConfiguration(final ColorManager colorManager) {
         super();
@@ -67,9 +70,16 @@ public class TacletEditorConfiguration extends SourceViewerConfiguration {
      */
     private RuleBasedScanner getKeywordColoringScanner() {
         if (this.keywordColoringScanner == null) {
-            this.keywordColoringScanner = SyntaxColoringKeywordScanner.createDefaultInstance();
+            this.keywordColoringScanner = SyntaxColoringKeywordScanner.createInstance();
         }
         return this.keywordColoringScanner;
+    }
+
+    private RuleBasedScanner getCommentColoringScanner() {
+        if (this.commentColoringScanner == null) {
+            this.commentColoringScanner = CommentColoringScanner.createInstance();
+        }
+        return this.commentColoringScanner;
     }
 
     @Override
@@ -78,11 +88,25 @@ public class TacletEditorConfiguration extends SourceViewerConfiguration {
 
         final PresentationReconciler reconciler = new PresentationReconciler();
 
-        final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(
+        final DefaultDamagerRepairer keywordRepairer = new DefaultDamagerRepairer(
                 this.getKeywordColoringScanner());
 
-        reconciler.setDamager(damagerRepairer, TacletSourceElements.STATEMENT);
-        reconciler.setRepairer(damagerRepairer, TacletSourceElements.STATEMENT);
+        DefaultDamagerRepairer commentRepairer = new DefaultDamagerRepairer(
+                getCommentColoringScanner());
+
+        reconciler.setDamager(keywordRepairer, TacletSourceElements.DECLARATION);
+        reconciler.setRepairer(keywordRepairer,
+                TacletSourceElements.DECLARATION);
+
+        reconciler.setDamager(commentRepairer,
+                TacletSourceElements.SINGLE_COMMENT);
+        reconciler.setRepairer(commentRepairer,
+                TacletSourceElements.SINGLE_COMMENT);
+
+        reconciler.setDamager(commentRepairer,
+                TacletSourceElements.NESTED_COMMENT);
+        reconciler.setRepairer(commentRepairer,
+                TacletSourceElements.NESTED_COMMENT);
 
         return reconciler;
     }

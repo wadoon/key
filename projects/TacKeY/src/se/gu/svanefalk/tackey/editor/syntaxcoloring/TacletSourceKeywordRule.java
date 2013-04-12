@@ -1,4 +1,4 @@
-package se.gu.svanefalk.tackey.editor.document;
+package se.gu.svanefalk.tackey.editor.syntaxcoloring;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;

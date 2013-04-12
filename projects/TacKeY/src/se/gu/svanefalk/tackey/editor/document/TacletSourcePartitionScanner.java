@@ -3,11 +3,15 @@ package se.gu.svanefalk.tackey.editor.document;
 import java.util.ArrayList;
 
 import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 
 import se.gu.svanefalk.tackey.constants.TacletSourceElements;
+import se.gu.svanefalk.tackey.editor.rules.NestedCommentRule;
+import se.gu.svanefalk.tackey.editor.rules.SingleCommentRule;
 
 /**
  * This scanner is used in order to pick out the essential elements of a Taclet
@@ -25,12 +29,9 @@ public class TacletSourcePartitionScanner extends RuleBasedPartitionScanner {
         /*
          * Setup the partitioning rules.
          */
-        rules.add(new SingleLineRule("{", "{", new Token(
-                TacletSourceElements.OPENING_BRACE)));
-        rules.add(new SingleLineRule("}", ";", new Token(
-                TacletSourceElements.CLOSING_BRACE)));
-        rules.add(new TacletSourceKeywordRule());
-        rules.add(new TacletSourceDeclarationRule());
+        rules.add(SingleCommentRule.createDefaultInstance());
+        rules.add(NestedCommentRule.createDefaultInstance());
+        rules.add(TacletSourceDeclarationRule.createDefaultInstance());
 
         /*
          * Add the rules to the scanner
