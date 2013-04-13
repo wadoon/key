@@ -1,6 +1,9 @@
 package se.gu.svanefalk.tackey.editor;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
+import org.eclipse.jface.text.formatter.ContentFormatter;
+import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -10,6 +13,8 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 import se.gu.svanefalk.tackey.constants.TacletSourceElements;
 import se.gu.svanefalk.tackey.editor.colors.ColorManager;
+import se.gu.svanefalk.tackey.editor.formatting.DeclarationFormattingStrategy;
+import se.gu.svanefalk.tackey.editor.formatting.DefaultFormattingStrategy;
 import se.gu.svanefalk.tackey.editor.syntaxcoloring.CommentColoringScanner;
 import se.gu.svanefalk.tackey.editor.syntaxcoloring.SyntaxColoringKeywordScanner;
 
@@ -109,5 +114,26 @@ public class TacletEditorConfiguration extends SourceViewerConfiguration {
                 TacletSourceElements.NESTED_COMMENT);
 
         return reconciler;
+    }
+
+    @Override
+    public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
+
+        ContentFormatter formatter = new ContentFormatter();
+
+        formatter.setFormattingStrategy(new DefaultFormattingStrategy(),
+                IDocument.DEFAULT_CONTENT_TYPE);
+        formatter.setFormattingStrategy(new DeclarationFormattingStrategy(),
+                TacletSourceElements.DECLARATION);
+        formatter.setFormattingStrategy(new DeclarationFormattingStrategy(),
+                TacletSourceElements.KEYWORD);
+        formatter.setFormattingStrategy(new DeclarationFormattingStrategy(),
+                TacletSourceElements.STATEMENT);
+        formatter.setFormattingStrategy(new DeclarationFormattingStrategy(),
+                TacletSourceElements.SINGLE_COMMENT);
+        formatter.setFormattingStrategy(new DeclarationFormattingStrategy(),
+                TacletSourceElements.NESTED_COMMENT);
+
+        return formatter;
     }
 }

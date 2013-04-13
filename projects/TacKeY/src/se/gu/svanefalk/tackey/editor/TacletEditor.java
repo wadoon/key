@@ -18,7 +18,7 @@ import se.gu.svanefalk.tackey.editor.document.TacletDocumentProvider;
  * 
  */
 public class TacletEditor extends TextEditor {
-
+    
     /**
      * The {@link ColorManager} is used in order to handle colors for various
      * partitions of the document being edited.
@@ -72,5 +72,10 @@ public class TacletEditor extends TextEditor {
     protected void doSetInput(final IEditorInput input) throws CoreException {
         super.doSetInput(input);
 
+    }
+
+    @Override
+    public Object getAdapter(Class required) {
+        return super.getAdapter(required);
     }
 }

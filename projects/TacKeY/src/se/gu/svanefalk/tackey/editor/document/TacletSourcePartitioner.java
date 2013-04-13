@@ -71,22 +71,26 @@ public class TacletSourcePartitioner extends FastPartitioner {
      * @param document
      */
     public void printPartitions(final IDocument document) {
-        final StringBuffer buffer = new StringBuffer();
+        StringBuffer buffer = new StringBuffer();
 
         final ITypedRegion[] partitions = this.computePartitioning(0,
                 document.getLength());
         for (int i = 0; i < partitions.length; i++) {
-            try {
-                buffer.append("Partition type: " + partitions[i].getType()
-                        + ", offset: " + partitions[i].getOffset()
-                        + ", length: " + partitions[i].getLength());
-                buffer.append("\n");
-                buffer.append("Text:\n");
-                buffer.append(document.get(partitions[i].getOffset(),
-                        partitions[i].getLength()));
-                buffer.append("\n---------------------------\n\n\n");
-            } catch (final BadLocationException e) {
-                e.printStackTrace();
+            if (partitions[i].getType().equals(TacletSourceElements.DECLARATION)) {
+                try {
+                    buffer.append("Partition type: " + partitions[i].getType()
+                            + ", offset: " + partitions[i].getOffset()
+                            + ", length: " + partitions[i].getLength());
+                    buffer.append("\n");
+                    buffer.append("Text:\n");
+                    buffer.append(document.get(partitions[i].getOffset(),
+                            partitions[i].getLength()));
+                    buffer.append("\n---------------------------\n\n\n");
+                    System.out.println(buffer);
+                    buffer = new StringBuffer();
+                } catch (final BadLocationException e) {
+                    e.printStackTrace();
+                }
             }
         }
         System.out.print(buffer);

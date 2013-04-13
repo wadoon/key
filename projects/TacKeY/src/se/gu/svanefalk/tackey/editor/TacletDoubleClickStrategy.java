@@ -1,5 +1,6 @@
 package se.gu.svanefalk.tackey.editor;
 
+import org.eclipse.jface.text.DefaultTextDoubleClickStrategy;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.ITextViewer;
 
@@ -10,10 +11,6 @@ import org.eclipse.jface.text.ITextViewer;
  * @author christopher
  * 
  */
-public class TacletDoubleClickStrategy implements ITextDoubleClickStrategy {
+public class TacletDoubleClickStrategy extends DefaultTextDoubleClickStrategy {
 
-    @Override
-    public void doubleClicked(final ITextViewer viewer) {
-        System.out.println("Click!");
-    }
 }

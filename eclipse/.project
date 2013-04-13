@@ -19,9 +19,24 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>genSrc</name>
+			<type>2</type>
+			<location>/home/christopher/git/key/system/genSrc</location>
+		</link>
+		<link>
 			<name>key_lib</name>
 			<type>2</type>
 			<locationURI>key_lib</locationURI>
+		</link>
+		<link>
+			<name>src</name>
+			<type>2</type>
+			<location>/home/christopher/git/key/system/src</location>
+		</link>
+		<link>
+			<name>test</name>
+			<type>2</type>
+			<location>/home/christopher/git/key/system/test</location>
 		</link>
 	</linkedResources>
 </projectDescription>

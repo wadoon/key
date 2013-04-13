@@ -1,5 +1,7 @@
 package se.gu.svanefalk.tackey.editor.document;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
@@ -13,6 +15,8 @@ public class TacletSourceDeclarationRule extends MultiLineRule {
             String endSequence, IToken token) {
         super(startSequence, endSequence, token);
     }
+
+    private final Pattern latinLetterRegex = Pattern.compile("[a-zA-Z]");
 
     private static final char OPENING_CURLYBRACE = '{';
     private static final char CLOSING_CURLYBRACE = '}';
@@ -30,11 +34,35 @@ public class TacletSourceDeclarationRule extends MultiLineRule {
      */
     @Override
     protected IToken doEvaluate(ICharacterScanner scanner, boolean resume) {
-        if (endSequenceDetected(scanner))
-            return fToken;
-        else {
-            return Token.UNDEFINED;
+
+        if (resume) {
+
+            if (endSequenceDetected(scanner))
+                return fToken;
+
+        } else {
+
+            int c = scanner.read();
+            if (sequenceDetected(scanner, fStartSequence, fBreaksOnEOF)) {
+                if (endSequenceDetected(scanner))
+                    return fToken;
+            }
         }
+        scanner.unread();
+        return Token.UNDEFINED;
+    }
+
+    /**
+     * This rule can start at any character in the latin alphabet
+     */
+    @Override
+    protected boolean sequenceDetected(ICharacterScanner scanner,
+            char[] sequence, boolean eofAllowed) {
+
+        char character = (char) scanner.read();
+        boolean match = latinLetterRegex.matcher(String.valueOf(character)).matches();
+        scanner.unread();
+        return match;
     }
 
     @Override
@@ -60,11 +88,14 @@ public class TacletSourceDeclarationRule extends MultiLineRule {
          */
         int bracesToClose = 0;
 
+        String debug = "";
+
         while (true) {
 
             currentChar = (char) scanner.read();
 
             charsRead++;
+            debug += currentChar;
 
             /*
              * scan until an opening parenthesis is found.
@@ -83,7 +114,7 @@ public class TacletSourceDeclarationRule extends MultiLineRule {
             /*
              * Return true if all parentheses have been closed.
              */
-            if (currentChar == SEMICOLON && sawOpeningBrace
+            if (currentChar == CLOSING_CURLYBRACE && sawOpeningBrace
                     && (bracesToClose == 0)) {
                 return true;
             }

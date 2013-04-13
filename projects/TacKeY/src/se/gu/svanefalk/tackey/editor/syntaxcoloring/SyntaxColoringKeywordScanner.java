@@ -11,7 +11,10 @@ import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
+import se.gu.svanefalk.tackey.constants.TacletComparators;
 import se.gu.svanefalk.tackey.constants.TacletKeywords;
+import se.gu.svanefalk.tackey.constants.TacletOperators;
+import se.gu.svanefalk.tackey.constants.TacletTypes;
 import se.gu.svanefalk.tackey.editor.colors.ColorManager;
 import se.gu.svanefalk.tackey.editor.colors.TacletEditorColors;
 import se.gu.svanefalk.tackey.editor.rules.NestedCommentRule;
@@ -45,6 +48,53 @@ public class SyntaxColoringKeywordScanner extends RuleBasedScanner {
         }
 
         rules.add(keywordColoringRule);
+
+        /*
+         * Setup the rules for coloring types
+         */
+        final WordRule typeRule = new WordRule(NonNumericDetector.getInstance());
+
+        for (final String keyword : TacletTypes.getAsList()) {
+
+            final IToken typeColoringToken = new Token(new TextAttribute(
+                    keywordColor, null, SWT.BOLD));
+
+            typeRule.addWord(keyword, typeColoringToken);
+        }
+
+        rules.add(typeRule);
+
+        /*
+         * Setup the rules for coloring the comparators
+         */
+        final WordRule comparatorRule = new WordRule(
+                NonNumericDetector.getInstance());
+
+        for (final String comparator : TacletComparators.getAsList()) {
+
+            final IToken comparatorColoringToken = new Token(new TextAttribute(
+                    keywordColor, null, SWT.BOLD));
+
+            comparatorRule.addWord(comparator, comparatorColoringToken);
+        }
+
+        rules.add(comparatorRule);
+
+        /*
+         * Setup the rules for coloring the operators
+         */
+        final WordRule operatorRule = new WordRule(
+                NonNumericDetector.getInstance());
+
+        for (final String operator : TacletOperators.getAsList()) {
+
+            final IToken operatorColoringToken = new Token(new TextAttribute(
+                    keywordColor, null, SWT.BOLD));
+
+            operatorRule.addWord(operator, operatorColoringToken);
+        }
+
+        rules.add(operatorRule);
 
         /*
          * Setup the rules for coloring comments within the declaration
