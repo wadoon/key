@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.parser.ABSDefaultTermParser;
@@ -45,4 +46,9 @@ public class ABSTermBuilder extends TermBuilder<ABSServices> {
     public Term classInvariant(LocationVariable history, LocationVariable heap, IProgramVariable thisRef, ABSServices services) {
         return func(services.getCInv(), var(history), var(heap), var(thisRef));
     }
+
+    public Term classInvariant(LocationVariable history, LocationVariable heap, Function thisRef, ABSServices services) {
+        return func(services.getCInv(), var(history), var(heap), func(thisRef));
+    }
+
 }

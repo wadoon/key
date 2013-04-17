@@ -100,18 +100,13 @@ public class FunctionBuilder {
             }
         }
 
-        System.out.println("==> Register Fields ");
+        System.out.println("Register Fields ");
         for (ClassDescriptor classDescriptor : info.getABSParserInfo().getClasses().values()) {
             for (FieldDecl  field : classDescriptor.getFields()) {
-                final ProgramElementName fieldName = new ProgramElementName(field.getName(),
-                        classDescriptor.name().toString());
-                final Function fieldFct = new Function(fieldName,
-                        heapLDT.getFieldSort(), new Sort[0], null, true);
-                progVarNS.add(new LocationVariable(fieldName,
-                        services.getJavaInfo().getKeYJavaType(field.getType().getQualifiedName()),
-                        new KeYJavaType(),
-                        false, false));
-                funcNS.add(fieldFct);
+                registerField(services, heapLDT, funcNS, progVarNS, classDescriptor, field);
+            }
+            for (ParamDecl field : classDescriptor.getParams()) {
+                registerField(services, heapLDT, funcNS, progVarNS, classDescriptor, field);
             }
         }
 
@@ -132,6 +127,20 @@ public class FunctionBuilder {
             }
         }
 
+    }
+
+    private void registerField(ABSServices services, HeapLDT heapLDT,
+                               Namespace<SortedOperator> funcNS, Namespace<IProgramVariable> progVarNS,
+                               ClassDescriptor classDescriptor, TypedVarOrFieldDecl field) {
+        final ProgramElementName fieldName = new ProgramElementName(field.getName(),
+                classDescriptor.name().toString());
+        final Function fieldFct = new Function(fieldName,
+                heapLDT.getFieldSort(), new Sort[0], null, true);
+        progVarNS.add(new LocationVariable(fieldName,
+                services.getJavaInfo().getKeYJavaType(field.getType().getQualifiedName()),
+                new KeYJavaType(),
+                false, false));
+        funcNS.add(fieldFct);
     }
 
     public static Name createNameFor(FunctionDecl fd) {

@@ -834,12 +834,48 @@ options {
     
     private PairOfStringAndJavaBlock getABSBlock(Token t) throws antlr.SemanticException {
 	PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
-        String s = t.getText();
+    String s = t.getText();
 	int index = s.indexOf("\n");
 	sjb.opName = s.substring(0,index);
 	s = s.substring(index+1);
-	
-        JavaReader jr = javaReader;
+
+    ABSExecutionContext context = null;
+
+	if (s.indexOf("methodframe") != -1) {
+	    int startBody = s.indexOf(":{") + 1;
+	    int endBody = s.lastIndexOf("}");
+	    String methodFrameHeader = s.substring(s.indexOf("(")+1, startBody - 2);
+
+	    //System.out.println("MF Header:"+methodFrameHeader);
+        int startLabel = methodFrameHeader.indexOf("<-") + 2;
+        int endLabel = methodFrameHeader.indexOf(",");
+        String methodLabel = methodFrameHeader.substring(startLabel, endLabel).trim();
+        //System.out.println("MethodLabel:|"+methodLabel+"|"+ lookup(new Name(methodLabel)));
+
+        methodFrameHeader = methodFrameHeader.substring(endLabel + 1);
+        int startExecutionContext = methodFrameHeader.indexOf("(") + 1;
+        int endExecutionContext = methodFrameHeader.indexOf(")");
+        String executionContext = methodFrameHeader.substring(startExecutionContext, endExecutionContext).trim();
+
+        // System.out.println("Exec:|"+executionContext+"|");
+        String resultVar = executionContext.substring(executionContext.indexOf(":") + 1,
+                                                      executionContext.indexOf(",")).trim();
+        //System.out.println("ResultVar:|"+resultVar+"|"+ lookup(new Name(resultVar)));
+
+        executionContext = executionContext.substring(executionContext.indexOf(",") + 1);
+        String futureVar = executionContext.substring(executionContext.indexOf(":") + 1).trim();
+        //System.out.println("ResultVar:|"+futureVar+"|" + lookup(new Name(futureVar)));
+
+        context = new ABSExecutionContext((IABSMethodLabel) lookup(new Name(methodLabel)),
+                                          (IABSPureExpression) lookup(new Name(resultVar)),
+                                          (IABSPureExpression) lookup(new Name(futureVar)));
+
+	    s = s.substring(startBody, endBody);
+	    //System.out.println("MF Body:"+s);
+
+	}
+
+    JavaReader jr = javaReader;
 
 	try {
             if (inSchemaMode()) {
@@ -856,6 +892,12 @@ options {
             }else{
                 sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), getServices(), s);
             }
+            if (context != null) {
+               ABSStatementBlock block = (ABSStatementBlock) sjb.javaBlock.program();
+               ABSMethodFrame mf = new ABSMethodFrame(context, block.getBody());
+               sjb.javaBlock = JavaBlock.createJavaBlock(new ABSStatementBlock(mf));
+            }
+
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
@@ -2006,7 +2048,7 @@ funcpred_name returns [String result = null]
     :
      
     (sort_name DOUBLECOLON) => (prefix = sort_name 
-        DOUBLECOLON name = simple_ident {result = prefix + "::" + name;})
+        DOUBLECOLON name = simple_ident_dots {result = prefix + "::" + name;})
   | 
     (prefix = simple_ident_dots {result = prefix; })
 ;
@@ -2162,7 +2204,8 @@ methodcall returns [Term a = null]
       className = simple_ident_dots
       methodName=simple_ident LPAREN RPAREN RBRACKET  a = term60
   {
-    ABSStatementBlock block = getServices().getProgramInfo().getMethodImpl(className, methodName);
+    ABSStatementBlock block =
+      getServices().getProgramInfo().getMethodImpl(className, methodName).first;
 
     a = tf.createTerm(Modality.BOX, new Term[]{a}, null, JavaBlock.createJavaBlock(block));
   }

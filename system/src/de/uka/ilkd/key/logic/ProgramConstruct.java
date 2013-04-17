@@ -28,6 +28,8 @@ import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.keyabs.abs.IABSLocalVariableReference;
+import de.uka.ilkd.keyabs.abs.IABSMethodLabel;
 import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 import de.uka.ilkd.keyabs.abs.IABSStatement;
 
@@ -39,6 +41,6 @@ import de.uka.ilkd.keyabs.abs.IABSStatement;
 public interface ProgramConstruct extends Expression, Statement, ILoopInit, 
     IForUpdates, IGuard, Label, TerminalProgramElement, ExpressionStatement,
     TypeReference, IProgramVariable, IProgramMethod, Branch, IExecutionContext, MethodName, 
-    IABSStatement, IABSPureExpression {  
+    IABSStatement, IABSPureExpression, IABSMethodLabel {
 }
     

@@ -147,7 +147,10 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer ABS_THIS_VARIABLE = 
 	    new GetThisReference();
 
-    
+    public static final AbstractTermTransformer ABS_BOOL_TO_FML =
+            new ABSBool2Fml();
+
+
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
     protected static final JavaDLTermBuilder TB = JavaProfile.DF();
     

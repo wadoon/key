@@ -1,9 +1,6 @@
 package de.uka.ilkd.keyabs.abs.converter;
 
-import abs.frontend.ast.ClassDecl;
-import abs.frontend.ast.FieldDecl;
-import abs.frontend.ast.MethodImpl;
-import abs.frontend.ast.MethodSig;
+import abs.frontend.ast.*;
 import de.uka.ilkd.key.logic.Name;
 
 import java.util.ArrayList;
@@ -22,11 +19,13 @@ public class ClassDescriptor {
     private final List<FieldDecl> fields;
     private final List<MethodImpl> methods;
     private final ClassDecl classDeclaration;
+    private final List<ParamDecl> params;
 
     public ClassDescriptor(String fullyQualifiedName, ClassDecl cd) {
         this.className = new Name(fullyQualifiedName);
         this.classDeclaration = cd;
         this.fields  = new ArrayList<>();
+        this.params  = new ArrayList<>();
         this.methods = new ArrayList<>();
     }
 
@@ -46,8 +45,16 @@ public class ClassDescriptor {
         fields.add(fd);
     }
 
+    public void addParam(ParamDecl pd) {
+        params.add(pd);
+    }
+
     public List<FieldDecl> getFields() {
         return fields;
+    }
+
+    public List<ParamDecl> getParams() {
+        return params;
     }
 
     public String toString() {

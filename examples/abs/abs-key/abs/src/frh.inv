@@ -1,0 +1,8 @@
+\invariants(Seq historySV, Heap heapSV, ABSAnyInterface self) {
+   shutDownOnlyIfEmptyJobs: ReplicationSystem.Client.SyncClientImpl
+   {	    
+       boolean::select(heapSV, self, ReplicationSystem.Client.SyncClientImpl::shutDown) = TRUE &
+       endsWith(historySV, historySV) ->
+        ABS.StdLib.Set::select(heapSV, self, ReplicationSystem.Client.SyncClientImpl::jobRecords) = ABS.StdLib.Set::EmptySet
+   };
+}

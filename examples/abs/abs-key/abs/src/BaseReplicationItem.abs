@@ -1,0 +1,146 @@
+module ReplicationSystem.Server.BaseReplicationItem;
+
+export *;
+
+import * from ReplicationSystem.Environment.Interfaces;
+import * from ReplicationSystem.Environment.ReplicationSnapshot.Interfaces;
+import * from ReplicationSystem.Environment.DataTypes;
+import * from ReplicationSystem.Environment.Files;
+
+interface InternalItem extends BasicReplicationItem {
+	[Atomic] Directory getState();
+	[Atomic] Unit setState(Directory dir);
+}
+
+class BasicReplicationItemImpl(FileId qualified, ServerDataBase db) 
+implements InternalItem {
+
+	Directory snapshot = updateDirWithDir(rootDir(),emptyDir(qualified));
+	
+	FileEntry getContents() {
+		return dirContent(snapshot);
+	}
+	
+	FileId getAbsoluteDir() {
+		return qualified;
+	}
+	
+	[Atomic] Unit cleanup() {
+		this.snapshot = updateDirWithDir(rootDir(),emptyDir(qualified)); 
+	}
+	
+	[Atomic] Directory getState() {
+		return snapshot;
+	}
+	
+	[Atomic] Unit setState(Directory dir) {
+		this.snapshot = dir;
+	}
+
+}
+
+
+// For testing
+class ReplicationFilePattern(FileId qualified, String pattern, ServerDataBase db) 
+implements ServerReplicationItem {
+
+	InternalItem internal;
+
+	{
+		internal = new BasicReplicationItemImpl(qualified,db); 
+	}  
+	
+	FileEntry getContents() {
+		return internal.getContents();
+	}
+	
+	Command getCommand() { 
+		return ReceivePatternFile;
+	}
+	
+	ReplicationItemType getType() { 
+		return ReplicationFilePattern; 
+	}
+	
+	FileId getAbsoluteDir() {
+		return internal.getAbsoluteDir();
+	}
+	
+	[Atomic] Unit refresh() {
+		//We know snapshot cannot be access during the execution of this method 
+		//by another task.
+		Directory snapshot = internal.getState();
+	
+		// get all file names for the newest check points
+		Maybe<FileContent> ffs = db.listFilesAt(qualified);
+		if (ffs != Nothing) {
+			FileContent content = fromJust(ffs);
+			assert isDirectory(content);
+			FileEntry es = entries(content);
+			Set<Pair<FileId,FileContent>> entryset = entrySet(es);
+			while (hasNext(entryset)) {
+				Pair<Set<Pair<FileId,FileContent>>,Pair<FileId,FileContent>> nt = next(entryset);
+				Pair<FileId,FileContent> entry = qualifyEntry(snd(nt),qualified);
+				FileId fid = fst(entry);
+				if (isAncester(qualified,fid) && filter(pattern,fid)) {
+					snapshot = updateDirWithContent(snapshot,fid,snd(entry));
+				}
+				entryset = fst(nt);
+				
+			}
+		}
+		internal.setState(snapshot);
+	} 
+	
+	[Atomic] Unit cleanup() {
+		internal.cleanup();
+	}
+}
+
+//For testing
+class ReplicationLogItem(FileId qualified, ServerDataBase db) 
+implements ServerReplicationItem {
+	
+	Directory snapshot = rootDir();
+	
+	InternalItem internal;
+
+	{
+		internal = new BasicReplicationItemImpl(qualified,db); 
+	}  
+	
+	FileEntry getContents() {
+		return internal.getContents();
+	}
+	
+	Command getCommand() { 
+		return AppendSearchFile; 
+	}
+	
+	ReplicationItemType getType() { 
+		return LogReplicationItem; 
+	}
+	
+	FileId getAbsoluteDir() {
+		return internal.getAbsoluteDir();
+	}
+	
+	[Atomic] Unit refresh() {
+		//We know snapshot cannot be access during the execution of this method 
+		//by another task.
+		Directory snapshot = internal.getState();
+	
+		//get content for this replication item
+		Maybe<FileContent> ffs = db.listFilesAt(qualified);
+		if (ffs != Nothing) {
+			FileContent content = fromJust(ffs);
+			assert isDirectory(content); //it must be a directory
+			snapshot = updateDirWithDir(snapshot,dir(qualified,entries(content)));
+		}
+		internal.setState(snapshot);
+	}
+	
+	[Atomic] Unit cleanup() {
+		internal.cleanup();
+	}
+}

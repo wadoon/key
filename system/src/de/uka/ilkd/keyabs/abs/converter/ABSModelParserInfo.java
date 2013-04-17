@@ -168,6 +168,10 @@ public class ABSModelParserInfo {
             classDescription.addFields(fd);
         }
 
+        for (ParamDecl pd : cd.getParams()) {
+            classDescription.addParam(pd);
+        }
+
         for (MethodImpl md : cd.getMethodList()) {
             classDescription.addMethod(md);
         }
@@ -207,7 +211,6 @@ public class ABSModelParserInfo {
                     MethodSig msig = (MethodSig) currentNode;
                     addMethodSignature(msig);
                     collectTypesAndFunctionDeclarations(currentNode);
-                    System.out.println("Method " + msig.getName() + " declared in " + msig.getContextDecl().getName());
                 } else if (currentNode instanceof VarDecl) {
                     VarDecl vd = (VarDecl) currentNode;
                     collectTypesAndFunctionDeclarations(currentNode);

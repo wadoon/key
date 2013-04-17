@@ -6,7 +6,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.*;
 
 import java.util.Stack;
@@ -217,7 +216,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
     }
 
     @Override
-    public void performActionABSStatementBlock(ABSStatementBlock x) {
+    public void performActionOnABSStatementBlock(ABSStatementBlock x) {
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
@@ -514,13 +513,33 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            IABSPureExpression thisExp = (IABSPureExpression) children.remove(0);
+            ABSExecutionContext executionContext = (ABSExecutionContext) children.remove(0);
             ImmutableArray<IABSStatement> body =
                     new ImmutableArray<>(children.collect(IABSStatement.class));
-            addNewChild(new ABSMethodFrame(thisExp, body));
+            addNewChild(new ABSMethodFrame(executionContext, body));
         } else {
             addChild(x);
         }
     }
 
+
+    @Override
+    public void performActionOnABSMethodLabel(IABSMethodLabel x) {
+        addChild(x);
+    }
+
+    @Override
+    public void performActionOnABSExecutionContext(ABSExecutionContext x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            ABSMethodLabel methodLabel = (ABSMethodLabel) children.remove(0);
+            ABSLocalVariableReference result = (ABSLocalVariableReference) children.remove(0);
+            ABSLocalVariableReference future = (ABSLocalVariableReference) children.remove(0);
+
+            addNewChild(new ABSExecutionContext(methodLabel, result, future));
+        } else {
+            addChild(x);
+        }
+    }
 }

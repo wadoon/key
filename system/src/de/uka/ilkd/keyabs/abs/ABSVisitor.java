@@ -2,7 +2,6 @@ package de.uka.ilkd.keyabs.abs;
 
 import de.uka.ilkd.key.java.visitor.ProgramVisitor;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
-import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.*;
 
 public interface ABSVisitor extends ProgramVisitor {
@@ -15,7 +14,7 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnCopyAssignment(CopyAssignment x);
 
-    void performActionABSStatementBlock(ABSStatementBlock x);
+    void performActionOnABSStatementBlock(ABSStatementBlock x);
 
     void performActionOnProgramMetaConstruct(ProgramTransformer<ABSServices> x);
 
@@ -71,4 +70,8 @@ public interface ABSVisitor extends ProgramVisitor {
     void performActionOnABSReturnStatement(ABSReturnStatement x);
 
     void performActionOnABSMethodFrame(ABSMethodFrame x);
+
+    void performActionOnABSMethodLabel(IABSMethodLabel x);
+
+    void performActionOnABSExecutionContext(ABSExecutionContext x);
 }

@@ -14,8 +14,8 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.keyabs.abs.ReturnStatement.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.*;
+import de.uka.ilkd.keyabs.logic.sort.programSV.ABSFieldSV;
 
 public abstract class AbstractABS2KeYABSConverter {
 
@@ -193,6 +193,10 @@ public abstract class AbstractABS2KeYABSConverter {
 
     public Expression convert(VarUse varUse) {
         IProgramVariable var = lookupLocalVariable(varUse.getName());
+        if (var == null || var.sort() instanceof ABSFieldSV) {
+            var = lookupFieldVariable(varUse.getDecl().getContextDecl().qualifiedName(), varUse.getName());
+            return new ABSFieldReference(var);
+        }
         return new ABSLocalVariableReference(var);
     }
 
@@ -251,7 +255,7 @@ public abstract class AbstractABS2KeYABSConverter {
     }
 
     public ABSFnApp convert(FnApp x) {
-        ProgramElementName methodName = new ProgramElementName(x.getName());
+        ProgramElementName fctName = new ProgramElementName(x.getName(), x.getDecl().getModule().getName());
         IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
 
         int i = 0;
@@ -259,7 +263,7 @@ public abstract class AbstractABS2KeYABSConverter {
             arguments[i] = (IABSPureExpression) convert(arg);
             i++;
         }
-        return new ABSFnApp(methodName, arguments);
+        return new ABSFnApp(fctName, arguments);
     }
 
     
@@ -285,7 +289,6 @@ public abstract class AbstractABS2KeYABSConverter {
     }
 
     public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
-        // KeYJavaType type = lookupType(x.getVarDecl().getAccess().toString());
         KeYJavaType type = lookupType(x.getVarDecl().getType()
                 .getQualifiedName());
         LocationVariable localVar = new LocationVariable(

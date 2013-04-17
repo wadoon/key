@@ -47,7 +47,7 @@
         <properties>
           <maximumSize width="200" height="2147483647"/>
           <minimumSize width="200" height="200"/>
-          <preferredSize width="200" height="200"/>
+          <preferredSize width="500" height="400"/>
         </properties>
         <border type="line" title="Classes" title-justification="1">
           <title-color color="-6710887"/>
@@ -62,10 +62,10 @@
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties>
-              <maximumSize width="200" height="20000"/>
+              <maximumSize width="500" height="20000"/>
               <minimumSize width="200" height="200"/>
               <model/>
-              <preferredSize width="200" height="200"/>
+              <preferredSize width="500" height="400"/>
               <selectionMode value="0"/>
             </properties>
           </component>
@@ -79,7 +79,7 @@
         <properties>
           <maximumSize width="200" height="2147483647"/>
           <minimumSize width="200" height="200"/>
-          <preferredSize width="200" height="200"/>
+          <preferredSize width="200" height="400"/>
         </properties>
         <border type="line" title="Methods">
           <title-color color="-6710887"/>
@@ -96,7 +96,7 @@
             <properties>
               <maximumSize width="200" height="20000"/>
               <minimumSize width="200" height="200"/>
-              <preferredSize width="200" height="200"/>
+              <preferredSize width="400" height="500"/>
               <selectionMode value="0"/>
             </properties>
           </component>
@@ -110,7 +110,7 @@
         <properties>
           <maximumSize width="200" height="2147483647"/>
           <minimumSize width="200" height="26"/>
-          <preferredSize width="200" height="26"/>
+          <preferredSize width="200" height="400"/>
         </properties>
         <border type="line" title="Proofobligations">
           <title-color color="-6710887"/>

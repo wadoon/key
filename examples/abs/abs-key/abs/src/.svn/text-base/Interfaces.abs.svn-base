@@ -1,0 +1,53 @@
+module ReplicationSystem.Interfaces;
+
+export *;
+
+import * from ReplicationSystem.Environment.Interfaces;
+import * from ReplicationSystem.Environment.Files;
+import * from ReplicationSystem.Environment.DataTypes;
+
+// Tester
+interface Tester { 
+	Unit analyse();
+}
+
+// Common Interfaces
+interface Commandee { 
+	//@ model Maybe<Command> cmd; initially cmd == Nothing;
+
+	//@ ensures cmd == Just(command);
+	Unit command(Command command);
+}
+
+interface Worker extends Commandee {
+	/*	
+	 * Existing java implementation does not have client id
+	 * the notion of an identifier for each client is required
+	 * since the ABS model should guarantee data
+	 * consistency as well as deadlock freedom
+	 */
+	ClientId forClient();
+}
+
+// One can shut down a node or ask if the node has been shut down.
+// Both client and server are nodes
+interface Node {
+	
+	/* view shutdown { 
+     *   call_Node.isShutdownRequested i, 
+     *   call_Node.requestShutDown r
+	 * }
+ 	 */
+ 	 
+ 	/*
+	 * START ::= F       
+	 *   F   ::= i F'    
+     *         | r T'
+	 *   T   ::= i T'    
+     *         | r T'      
+     */
+
+	DataBase getDataBase();
+	Bool isShutdownRequested();
+	Unit requestShutDown();
+}

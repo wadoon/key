@@ -1,0 +1,56 @@
+module ReplicationSystem.Environment.Interfaces;
+
+export *;
+
+import * from ReplicationSystem.Environment.Files;
+import * from ReplicationSystem.Environment.DataTypes;
+
+/*
+ * Common operations to all data base:
+ * 1. get the file size (content) of a file (id)
+ * 2. check if a file exists in this data base
+ * 3. list all files in the data base
+ * 4. get the content of the specified subdirectory.
+ * 5. get the root directory of this data base
+ */
+interface DataBase {
+ 	[Atomic] FileContent getContent(List<String> fId);
+ 	[Atomic] Bool hasFile(List<String> fId);
+  	[Atomic] Set<FileId> listFiles();
+  	[Atomic] Maybe<FileContent> listFilesAt(FileId dir);
+	[Atomic] Directory getRoot();
+}
+
+/*
+ * update this data base with a set of changes.
+ */
+interface UpdatableDataBase extends ServerDataBase {
+	[Atomic] Unit update(Map<FileId,FileContent> changes);
+	[Atomic] TransactionHistories getTransactions();
+}
+
+/*
+ * A data base on the server can peform the following: 
+ * 1. refresh data base and returns the most recent transaction id
+ */
+interface ServerDataBase extends DataBase {
+  	[Atomic] TransactionId refresh();
+}
+
+/*
+ * A client data base cannot be refreshed
+ * but can perform the following:
+ * 1. prepare a new client replication item;
+ * 2. update both internal data base and file store with new files
+ * 3. get the last transaction ids
+ */
+interface ClientDataBase extends DataBase {
+  	[Atomic] Bool prepareReplicationItem(TransactionId p, Schedule schedule);
+  	[Atomic] Unit updateFile(FileId fId, FileSize size);
+  	[Atomic] Map<String,TransactionId> lastTransactionIds();
+}
+
+
+interface Updater {
+	Unit shutDown();
+}

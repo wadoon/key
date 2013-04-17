@@ -7,7 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -42,6 +42,7 @@ public class ABSTacletGenerator {
 
         rw.addTacletGoalTemplate(new RewriteTacletGoalTemplate(invAxiom));
 
+
         return rw.getRewriteTaclet();
     }
 
@@ -60,19 +61,22 @@ public class ABSTacletGenerator {
                 services.getTypeConverter().getHeapLDT().targetSort());
 
         SchemaVariable thisObjSV = SchemaVariableFactory.createTermSV(new Name("thisObjSV"),
-                Sort.ANY);
+                services.getProgramInfo().getAnyInterfaceSort());
 
 
         ABSTermBuilder TB = services.getTermBuilder();
         Term invAxiom = TB.tt();
 
         for (ABSClassInvariant inv : invAxioms) {
+            System.out.println(inv.getOriginalInv());
+            System.out.println(inv.getInv(historySV, heapSV, thisObjSV, services));
             invAxiom = ABSTermBuilder.TB.and(invAxiom, inv.getInv(historySV, heapSV, thisObjSV, services));
         }
 
         rw.setFind(TB.func(func, TB.var(historySV), TB.var(heapSV), TB.var(thisObjSV)));
         rw.addTacletGoalTemplate(new RewriteTacletGoalTemplate(invAxiom));
 
+        rw.addRuleSet(new RuleSet(new Name("partialInvAxiom")));
         return rw.getRewriteTaclet();
     }
 

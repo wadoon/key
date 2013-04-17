@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.ProofInputException;

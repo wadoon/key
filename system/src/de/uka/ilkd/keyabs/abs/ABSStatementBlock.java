@@ -194,7 +194,7 @@ public class ABSStatementBlock extends ABSNonTerminalProgramElement implements
 
     @Override
     public void visit(ABSVisitor v) {
-        v.performActionABSStatementBlock(this);
+        v.performActionOnABSStatementBlock(this);
     }
 
     @Override

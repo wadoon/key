@@ -56,6 +56,7 @@ import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.keyabs.abs.ABSMethodFrame;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 
 /**
@@ -653,7 +654,8 @@ public final class TacletIndex  {
 	 */
     static final Class<?>[] prefixClasses = new Class<?>[]{
 		ABSStatementBlock.class,
-	    StatementBlock.class,
+        ABSMethodFrame.class,
+        StatementBlock.class,
 	    LabeledStatement.class,
 	    Try.class,	    
 	    MethodFrame.class,
@@ -673,7 +675,7 @@ public final class TacletIndex  {
 	 * fields to indicate the position of the next relevant child (the next
 	 * possible prefix element or real statement
 	 */
-	static final int[] nextChild = new int[]{0,0,1,0,1,1};
+	static final int[] nextChild = new int[]{0,1,0,1,0,1,1};
 
 
 

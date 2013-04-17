@@ -26,8 +26,8 @@ public class SchemaABSReader implements SchemaJavaReader {
 
     private void printTree(ASTNode node) {
         for (int i = 0; i < node.getNumChild(); i++) {
-            System.out.println(node.value + ":" + node + ":"
-                    + node.getClass().getSimpleName());
+            /* System.out.println(node.value + ":" + node + ":"
+                    + node.getClass().getSimpleName()); */
             printTree(node.getChild(i));
         }
     }
@@ -53,15 +53,15 @@ public class SchemaABSReader implements SchemaJavaReader {
                     new StringReader(blockStr));
 
 
-            if (m.getErrors().size() > 0) {
-                System.out.println("ParseInput: " + blockStr);
+            /* if (m.getErrors().size() > 0) {
+                 System.out.println("ParseInput: " + blockStr);
                 System.out.println(m.getMainBlock() + " Errors: " + m.getErrors().size());
 
                 for (SemanticError se : m.getErrors()) {
                     System.out.println(se.getHelpMessage() + " : "
                             + se.getFileName() + " : " + se.getMsgString());
                 }
-            }
+            }*/
                 
             AbstractABS2KeYABSConverter converter = new SchemaABS2KeYABSConverter(
                     schemaVariables, services);
@@ -72,7 +72,7 @@ public class SchemaABSReader implements SchemaJavaReader {
                 block = new ABSContextStatementBlock(block.getBody());
             }
 
-            System.out.println("Converted " + block);
+            //System.out.println("Converted " + block);
 
             return JavaBlock.createJavaBlock(block);
         } catch (IOException e) {

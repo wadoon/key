@@ -18,8 +18,11 @@ import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.pp.ILogicPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import java.io.IOException;
 
 /**
  * A specieal kind of gui proof tree node to show intermediate intermediate steps of the 
@@ -57,8 +60,13 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     @Override public String toString() {
     	//For prettyprinting
     	IServices services = parent.getNode().proof().getServices();
-    	String prettySubTerm = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
-        return app.rule().name() + " ON " +prettySubTerm;
+        ILogicPrinter printer = services.getUIConfiguration().createLogicPrinter(services);
+        try {
+            printer.printTerm(app.posInOccurrence().subTerm());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return app.rule().name() + " ON " +printer.toString();
     }
 
     @Override public void flushCache() {
