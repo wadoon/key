@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Taclet Editor"
+            extensions="key"
+            icon="icons/sample.gif"
+            class="se.gu.svanefalk.tackey.editor.TacletEditor"
+            id="se.gu.svanefalk.tackey.editors.TacletEditor">
+      </editor>
+      <editor
+            class="se.gu.svanefalk.tackey.editorss.XMLEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="xml"
+            icon="icons/sample.gif"
+            id="se.gu.svanefalk.tackey.editorss.XMLEditor"
+            name="Sample XML Editor">
+      </editor>
+   </extension>
+
+</plugin>

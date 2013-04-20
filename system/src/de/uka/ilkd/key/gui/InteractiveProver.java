@@ -84,7 +84,7 @@ public class InteractiveProver {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(selListener);
 
-        mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
+         mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
         applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
