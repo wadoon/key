@@ -3,6 +3,8 @@ package se.gu.svanefalk.keystone.context;
 import java.util.HashSet;
 import java.util.Set;
 
+import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
+
 import de.uka.ilkd.key.logic.Term;
 
 /**
@@ -37,7 +39,7 @@ public class ProblemContext {
     }
 
     /**
-     * Collect all variables present in the problem
+     * Collect all variables present in the current problem.
      * 
      * @param problem
      *            the problem
@@ -45,6 +47,17 @@ public class ProblemContext {
      */
     private static Set<Number> collectVariables(Term problem) {
 
+        if (TermParserTools.isAnd(problem)) {
+
+        }
+        return null;
+    }
+    
+    private static Set<Number> collectVariables(Term problem) {
+
+        if (TermParserTools.isAnd(problem)) {
+
+        }
         return null;
     }
 }
