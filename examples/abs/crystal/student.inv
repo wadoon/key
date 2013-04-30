@@ -1,0 +1,8 @@
+\invariants(Seq historySV, Heap heapSV, ABSAnyInterface self) {
+  studentInv : CV.Stud {
+
+     true
+
+  };
+
+}
