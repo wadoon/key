@@ -1,8 +1,11 @@
 \invariants(Seq historySV, Heap heapSV, ABSAnyInterface self) {
   studentInv : CV.Stud {
-
-     true
-
+	\forall ABSAnyInterface concreteCaller; \forall Future concreteFut; \forall ABSAnyInterface cv;(
+ 		(seqLen(history) % 2 = 0 &
+  		\forall int idx;\exists ABSAnyInterface c; \exists Future u; (
+    			idx>=0 & idx<seqLen(history) & idx % 2 = 0 ->
+                   	(HistoryLabel::seqGet(history, idx) = invocREv(c, self, u, CV.StudI::getCV, seqEmpty) &
+                    	HistoryLabel::seqGet(history, idx + 1) = compEv(self, u, CV.StudI::getCV, cv))
+	)))
   };
-
 }
