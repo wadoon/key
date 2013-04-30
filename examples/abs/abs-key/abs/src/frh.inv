@@ -2,7 +2,15 @@
    shutDownOnlyIfEmptyJobs: ReplicationSystem.Client.SyncClientImpl
    {	    
        boolean::select(heapSV, self, ReplicationSystem.Client.SyncClientImpl::shutDown) = TRUE &
-       endsWith(historySV, historySV) ->
+       \exists Replication.Network.Network callee;\exists Future future; 
+          endsWith(historySV, 
+                seqSingleton(invocEv(self,
+                       callee,
+                       future,
+                       Replication.Network.Network::shutDown#ReplicationSystem.Client.Interfaces.ClientConnector,
+                       seqSingleton(self)))) 
+	->
         ABS.StdLib.Set::select(heapSV, self, ReplicationSystem.Client.SyncClientImpl::jobRecords) = ABS.StdLib.Set::EmptySet
    };
 }
+  
