@@ -8,7 +8,7 @@ data News = E1 | E2 | E3 | E4 | E5 | None;
 
 interface ServiceI{
 	Unit subscribe(ClientI cl);
-	Unit produce(Bool b1, Bool b2);
+	Unit produce();
 }
 
 interface ProxyI{
@@ -38,11 +38,11 @@ interface ClientI{
 class Service(Int limit, NewsProducerI np) implements ServiceI{
 	ProducerI prod; ProxyI proxy; ProxyI lastProxy;
 	
-	{prod = new Producer(np); proxy = new Proxy(limit,this); lastProxy = proxy; this!produce(True,True);}
+	{prod = new Producer(np); proxy = new Proxy(limit,this); lastProxy = proxy; this!produce();}
 	
-	Unit subscribe(ClientI cl){lastProxy = lastProxy.add(cl);}
+	Unit subscribe(ClientI cl){Fut<ProxyI> last = lastProxy!add(cl); lastProxy = last.get;}
 	
-	Unit produce(Bool b1, Bool b2){Fut<News> fut; fut = prod!detectNews(); proxy!publish(fut);}
+	Unit produce(){Fut<News> fut = prod!detectNews(); proxy!publish(fut);}
 }
 
 class Proxy(Int limit, ServiceI s) implements ProxyI{
@@ -52,9 +52,8 @@ class Proxy(Int limit, ServiceI s) implements ProxyI{
 		ProxyI lastProxy = this;
 		if(length(myClients) < limit){myClients = appendright(myClients, cl);}
 		else{
-			if(nextProxy == null){nextProxy = new Proxy(limit,s);
-			}
-			lastProxy = nextProxy.add(cl);
+			if(nextProxy == null){nextProxy = new Proxy(limit,s);}
+			Fut<ProxyI> last = nextProxy!add(cl); lastProxy = last.get;
 		}
 
 		return lastProxy;
@@ -70,7 +69,7 @@ class Proxy(Int limit, ServiceI s) implements ProxyI{
 			counter = counter + 1;
 		}		
 			
-		if(nextProxy == null){s!produce(True,True);}
+		if(nextProxy == null){s!produce();}
 		else{nextProxy!publish(fut);}
 	}
 }
@@ -78,10 +77,15 @@ class Proxy(Int limit, ServiceI s) implements ProxyI{
 class Producer(NewsProducerI np) implements ProducerI{	
 	News detectNews(){
 		List<News> requests = Nil;
-	    News ns = None;
-		requests =  np.getRequests();
-		while(requests == Nil){requests =  np.getRequests();}
-		ns = np.getNews();
+	        News ns = None;
+		Fut<List<News>> newsList = np!getRequests();
+		requests = news.get;
+		while(requests == Nil){
+                	Fut<List<News>> newsList = np!getRequests();
+                	requests = news.get;
+		}
+		Fut<News> news = np!getNews();
+		ns = news.get;
 		return ns;
 	}
 }
