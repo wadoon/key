@@ -227,7 +227,7 @@ public enum ModelGenerator implements IModelGenerator {
              * return it as null.
              */
             final Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
-
+            System.out.println(simplifiedPathCondition);
             if (simplifiedPathCondition == null) {
 
                 return null;

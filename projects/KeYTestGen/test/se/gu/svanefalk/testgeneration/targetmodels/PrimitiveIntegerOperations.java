@@ -260,12 +260,6 @@ public static int mid3(final int x, final int y, final int z) {
     (final String a, final String b) {
     }
 
-    /* @ public normal_behavior 
-      @ requires true;
-      @ ensures (\forall int i;
-      @ (i != 10);
-      @ (i != 20)) && (proxy.nestedProxy.nestedProxy.nestedProxy.compare(i) == true);
-     @*/
     /*@ public normal_behavior 
     @ requires true;
     @ ensures true;
@@ -274,7 +268,7 @@ public static int mid3(final int x, final int y, final int z) {
 
         int result = 0;
         
-        if(a > b)
+        if(a*a > b*b)
             result = a;
         else
             result = a;

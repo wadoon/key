@@ -44,7 +44,7 @@ public class TestJUnitTestCaseGenerator {
         final String methodName = "midOneProxyOneInstance";
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                codeCoverageParser, junitConverter, "mid");
+                codeCoverageParser, junitConverter, "doStuff");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(

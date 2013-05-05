@@ -52,12 +52,4 @@ public class ProblemContext {
         }
         return null;
     }
-    
-    private static Set<Number> collectVariables(Term problem) {
-
-        if (TermParserTools.isAnd(problem)) {
-
-        }
-        return null;
-    }
 }
