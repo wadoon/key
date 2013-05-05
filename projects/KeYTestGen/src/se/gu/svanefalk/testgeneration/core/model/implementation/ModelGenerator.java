@@ -59,8 +59,8 @@ public enum ModelGenerator implements IModelGenerator {
      */
     private ModelGenerator() {
 
-        this.settings = ModelSettings.getDefaultSMTSettings();
-        this.configuration = ModelSettings.getDefaultTranslatorConfiguration();
+        settings = ModelSettings.getDefaultSMTSettings();
+        configuration = ModelSettings.getDefaultTranslatorConfiguration();
     }
 
     /**
@@ -98,15 +98,15 @@ public enum ModelGenerator implements IModelGenerator {
              * Model, extracting them from an SMT solution for the pathcondition
              * for this node.
              */
-            final String solverResult = this.instantiatePathCondition(
-                    pathCondition, services);
+            final String solverResult = instantiatePathCondition(pathCondition,
+                    services);
 
             /*
              * If any such primitive values were found, merge their concrete
              * values into the Model
              */
             if (solverResult != null) {
-                this.insertSMTOutputIntoModel(solverResult, model);
+                insertSMTOutputIntoModel(solverResult, model);
             }
 
             return model;
@@ -234,7 +234,7 @@ public enum ModelGenerator implements IModelGenerator {
 
             } else {
 
-                final String commands = this.translateToSMTLIB2(
+                final String commands = translateToSMTLIB2(
                         simplifiedPathCondition, services);
 
                 String result = "";
@@ -250,12 +250,12 @@ public enum ModelGenerator implements IModelGenerator {
                  */
                 do {
 
-                    result = this.smtInterface.startMessageBasedSession(
-                            commands).replaceAll("success", "").trim();
+                    result = smtInterface.startMessageBasedSession(commands).replaceAll(
+                            "success", "").trim();
 
                     attempts++;
 
-                } while (!this.isValidResult(result)
+                } while (!isValidResult(result)
                         && (attempts < ModelSettings.getNUMBER_OF_TRIES()));
 
                 return result;
@@ -300,10 +300,10 @@ public enum ModelGenerator implements IModelGenerator {
          * Set up the translator for this term.
          */
         final SmtLib2Translator translator = new SmtLib2Translator(services,
-                this.configuration);
+                configuration);
 
         final StringBuffer result = translator.translateProblem(term, services,
-                this.settings);
+                settings);
 
         result.append("\n(get-model)");
 

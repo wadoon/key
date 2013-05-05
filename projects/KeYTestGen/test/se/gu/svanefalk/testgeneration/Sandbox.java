@@ -25,10 +25,9 @@ public class Sandbox extends KeYTestGenTest {
             final String method) throws ProofInputException,
             ModelGeneratorException, IOException, ProblemLoaderException {
 
-        return this.getPreparedEnvironment(
+        return getPreparedEnvironment(
                 AbstractSymbolicExecutionTestCase.keyRepDirectory,
-                this.javaPathInBaseDir, this.containerTypeName, method, null,
-                false);
+                javaPathInBaseDir, containerTypeName, method, null, false);
     }
 
     @Test
@@ -37,11 +36,10 @@ public class Sandbox extends KeYTestGenTest {
             IllegalFormulaException, TermTransformerException {
 
         final String method = "doStuff";
-        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = this
-                .getEnvironmentForMethod(method);
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
-        final List<IExecutionNode> nodes = this.retrieveNode(environment
-                .getBuilder().getStartNode(), "x=1");
+        final List<IExecutionNode> nodes = retrieveNode(
+                environment.getBuilder().getStartNode(), "x=1");
 
         for (final IExecutionNode node : nodes) {
 

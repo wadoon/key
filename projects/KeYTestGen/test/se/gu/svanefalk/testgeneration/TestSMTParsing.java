@@ -13,7 +13,7 @@ public class TestSMTParsing extends KeYTestGenTest {
     @Test
     public void test() {
 
-        final String[] definitions = this.output.split("\\(define-fun");
+        final String[] definitions = output.split("\\(define-fun");
 
         for (String definition : definitions) {
 

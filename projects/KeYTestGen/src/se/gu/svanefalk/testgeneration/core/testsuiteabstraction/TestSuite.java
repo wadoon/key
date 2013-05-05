@@ -77,20 +77,20 @@ public class TestSuite {
      * @return the {@link KeYJavaClass} associated with this test suite.
      */
     public KeYJavaClass getJavaClass() {
-        return this.javaClass;
+        return javaClass;
     }
 
     /**
      * @return the method this test suite contains test cases for.
      */
     public KeYJavaMethod getMethod() {
-        return this.method;
+        return method;
     }
 
     /**
      * @return the test cases contained in this test suite.
      */
     public List<TestCase> getTestCases() {
-        return this.testCases;
+        return testCases;
     }
 }

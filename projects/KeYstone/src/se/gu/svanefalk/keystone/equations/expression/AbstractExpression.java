@@ -1,6 +1,6 @@
 package se.gu.svanefalk.keystone.equations.expression;
 
-import se.gu.svanefalk.keystone.equations.IExpression;
+import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
 public abstract class AbstractExpression implements IExpression {
 

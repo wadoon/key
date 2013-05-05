@@ -9,7 +9,7 @@ public class EliminateConjunctionsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        return this.transformTerm(term);
+        return transformTerm(term);
     }
 
     @Override
@@ -22,9 +22,9 @@ public class EliminateConjunctionsTransformer extends AbstractTermTransformer {
         final String secondChildName = secondChild.toString();
 
         if (firstChildName.length() < secondChildName.length()) {
-            return this.transformTerm(firstChild);
+            return transformTerm(firstChild);
         } else {
-            return this.transformTerm(secondChild);
+            return transformTerm(secondChild);
         }
     }
 }

@@ -37,7 +37,7 @@ public final class KeYJavaClass {
      */
     void addMethodMapping(final String methodName, final KeYJavaMethod method) {
 
-        this.methods.put(methodName, method);
+        methods.put(methodName, method);
     }
 
     /**
@@ -50,7 +50,7 @@ public final class KeYJavaClass {
      */
     public KeYJavaMethod getMethod(final String name) {
 
-        return this.methods.get(name);
+        return methods.get(name);
     }
 
     /**
@@ -60,27 +60,27 @@ public final class KeYJavaClass {
      */
     public Set<String> getMethods() {
 
-        return this.methods.keySet();
+        return methods.keySet();
     }
 
     /**
      * @return the name
      */
     public String getName() {
-        return this.type.getName();
+        return type.getName();
     }
 
     /**
      * @return the packageDeclaration
      */
     public String getPackageDeclaration() {
-        return this.type.createPackagePrefix().toString();
+        return type.createPackagePrefix().toString();
     }
 
     /**
      * @return the type
      */
     public KeYJavaType getType() {
-        return this.type;
+        return type;
     }
 }

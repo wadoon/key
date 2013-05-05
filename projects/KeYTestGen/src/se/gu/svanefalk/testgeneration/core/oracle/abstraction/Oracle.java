@@ -37,13 +37,13 @@ public class Oracle {
      * @return the constraints
      */
     public OracleConstraint getConstraints() {
-        return this.constraints;
+        return constraints;
     }
 
     /**
      * @return the expectedException
      */
     public OracleType getExpectedException() {
-        return this.expectedException;
+        return expectedException;
     }
 }

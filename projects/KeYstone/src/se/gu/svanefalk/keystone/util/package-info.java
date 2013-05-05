@@ -5,4 +5,4 @@
  * @author christopher
  *
  */
-package se.gu.svanefalk.keystone.context;
+package se.gu.svanefalk.keystone.util;

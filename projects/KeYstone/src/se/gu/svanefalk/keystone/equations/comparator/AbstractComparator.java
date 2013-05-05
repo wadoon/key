@@ -1,7 +1,7 @@
 package se.gu.svanefalk.keystone.equations.comparator;
 
-import se.gu.svanefalk.keystone.equations.IComparator;
-import se.gu.svanefalk.keystone.equations.IExpression;
+import se.gu.svanefalk.testgeneration.keystone.equations.IComparator;
+import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
 public abstract class AbstractComparator implements IComparator {
 

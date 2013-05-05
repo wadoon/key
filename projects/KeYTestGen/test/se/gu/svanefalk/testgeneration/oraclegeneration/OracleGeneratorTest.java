@@ -23,10 +23,9 @@ public class OracleGeneratorTest extends KeYTestGenTest {
             final String method) throws ProofInputException,
             ModelGeneratorException, IOException, ProblemLoaderException {
 
-        return this.getPreparedEnvironment(
+        return getPreparedEnvironment(
                 AbstractSymbolicExecutionTestCase.keyRepDirectory,
-                this.javaPathInBaseDir, this.containerTypeName, method, null,
-                false);
+                javaPathInBaseDir, containerTypeName, method, null, false);
     }
 
     @Test
@@ -35,8 +34,7 @@ public class OracleGeneratorTest extends KeYTestGenTest {
             XMLVisitorException, ProblemLoaderException {
 
         final String method = "max";
-        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = this
-                .getEnvironmentForMethod(method);
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
         environment.getBuilder().getStartNode();
 

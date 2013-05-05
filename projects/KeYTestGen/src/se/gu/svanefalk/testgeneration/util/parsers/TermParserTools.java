@@ -174,6 +174,16 @@ public final class TermParserTools {
     }
 
     /**
+     * 
+     * @param term
+     *            the term
+     * @return if the term represents addition
+     */
+    public static boolean isAddition(final Term term) {
+        return term.op().name().equals(StringConstants.ADDITION);
+    }
+
+    /**
      * @param term
      *            the term
      * @return true iff. the term represents an AND junctor
@@ -277,6 +287,16 @@ public final class TermParserTools {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
         }
+    }
+
+    /**
+     * 
+     * @param term
+     *            the term
+     * @return if the term represents division
+     */
+    public static boolean isDivision(final Term term) {
+        return term.op().name().equals(StringConstants.DIVISION);
     }
 
     /**
@@ -456,6 +476,16 @@ public final class TermParserTools {
     }
 
     /**
+     * 
+     * @param term
+     *            the term
+     * @return if the term represents multiplication
+     */
+    public static boolean isMultiplication(final Term term) {
+        return term.op().name().equals(StringConstants.MULTIPLICATION);
+    }
+
+    /**
      * @param term
      *            the term
      * @return true iff. the term represents a NOT junctor
@@ -583,6 +613,16 @@ public final class TermParserTools {
     public static boolean isSortedOperator(final Term term) {
 
         return term.op() instanceof SortedOperator;
+    }
+
+    /**
+     * 
+     * @param term
+     *            the term
+     * @return if the term represents subtraction
+     */
+    public static boolean isSubtraction(final Term term) {
+        return term.op().name().equals(StringConstants.SUBTRACTION);
     }
 
     /**

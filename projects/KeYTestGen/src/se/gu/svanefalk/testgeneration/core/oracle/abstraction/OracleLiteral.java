@@ -30,11 +30,11 @@ public class OracleLiteral extends OracleExpression {
      * @return the identifier
      */
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     @Override
     public String toString() {
-        return this.identifier + ":" + this.getType();
+        return identifier + ":" + getType();
     }
 }

@@ -39,7 +39,7 @@ public enum StatementCoverageBuilder implements ICoverageBuilder {
         for (final ExecutionPath firstPath : originalList) {
             for (final ExecutionPath secondPath : originalList) {
                 if ((firstPath != secondPath)
-                        && this.subsumes(firstPath, secondPath)) {
+                        && subsumes(firstPath, secondPath)) {
                     targetSet.remove(secondPath);
                 }
             }
@@ -49,7 +49,7 @@ public enum StatementCoverageBuilder implements ICoverageBuilder {
 
     private boolean subsumes(final ExecutionPath firstPath,
             final ExecutionPath secondPath) {
-        return this.isSubsetOf(secondPath.getCoveredNodes(),
+        return isSubsetOf(secondPath.getCoveredNodes(),
                 firstPath.getCoveredNodes());
     }
 }

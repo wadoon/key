@@ -88,8 +88,8 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     public XMLConverter() throws XMLGeneratorException {
 
         try {
-            this.eventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(
-                    this.outputStream);
+            eventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(
+                    outputStream);
         } catch (final XMLStreamException e) {
             throw new XMLGeneratorException(
                     "FATAL: failed to initialize XMLVisitor" + e.getMessage());
@@ -98,8 +98,8 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
 
     private void addIndentation() throws XMLStreamException {
 
-        for (int i = 0; i < this.indentationCounter; i++) {
-            this.eventWriter.add(XMLConverter.tab);
+        for (int i = 0; i < indentationCounter; i++) {
+            eventWriter.add(XMLConverter.tab);
         }
     }
 
@@ -131,21 +131,21 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
             /*
              * Write the preamble for the document
              */
-            this.writeDocumentStart(XMLHandler.TESTSUITE_ROOT);
+            writeDocumentStart(XMLHandler.TESTSUITE_ROOT);
 
             /*
              * Write the test cases
              */
             for (final TestCase testCase : testCases) {
-                this.writeTestCase(testCase);
+                writeTestCase(testCase);
             }
 
             /*
              * Write the document end
              */
-            this.writeDocumentEnd(XMLHandler.TESTSUITE_ROOT);
+            writeDocumentEnd(XMLHandler.TESTSUITE_ROOT);
 
-            return this.outputStream.toString();
+            return outputStream.toString();
         } catch (final XMLStreamException xse) {
             throw new XMLGeneratorException(xse.getMessage());
         } catch (final XMLVisitorException xve) {
@@ -162,16 +162,16 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     private void writeDocumentEnd(final String documentName)
             throws XMLStreamException {
 
-        if (this.format) {
-            this.eventWriter.add(XMLConverter.eventFactory.createEndElement("",
-                    "", documentName));
-            this.eventWriter.add(XMLConverter.newline);
-            this.eventWriter.add(XMLConverter.eventFactory.createEndDocument());
-            this.eventWriter.add(XMLConverter.newline);
+        if (format) {
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
+                    documentName));
+            eventWriter.add(XMLConverter.newline);
+            eventWriter.add(XMLConverter.eventFactory.createEndDocument());
+            eventWriter.add(XMLConverter.newline);
         } else {
-            this.eventWriter.add(XMLConverter.eventFactory.createEndElement("",
-                    "", documentName));
-            this.eventWriter.add(XMLConverter.eventFactory.createEndDocument());
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
+                    documentName));
+            eventWriter.add(XMLConverter.eventFactory.createEndDocument());
         }
     }
 
@@ -185,16 +185,16 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     private void writeDocumentStart(final String documentName)
             throws XMLStreamException {
 
-        if (this.format) {
-            this.eventWriter.add(XMLConverter.eventFactory.createStartDocument());
-            this.eventWriter.add(XMLConverter.newline);
-            this.eventWriter.add(XMLConverter.eventFactory.createStartElement(
-                    "", "", documentName));
-            this.eventWriter.add(XMLConverter.newline);
+        if (format) {
+            eventWriter.add(XMLConverter.eventFactory.createStartDocument());
+            eventWriter.add(XMLConverter.newline);
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
+                    "", documentName));
+            eventWriter.add(XMLConverter.newline);
         } else {
-            this.eventWriter.add(XMLConverter.eventFactory.createStartDocument());
-            this.eventWriter.add(XMLConverter.eventFactory.createStartElement(
-                    "", "", documentName));
+            eventWriter.add(XMLConverter.eventFactory.createStartDocument());
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
+                    "", documentName));
         }
     }
 
@@ -208,15 +208,15 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      */
     private void writeEndTag(final String tagName) throws XMLStreamException {
 
-        if (this.format) {
-            this.addIndentation();
-            this.eventWriter.add(XMLConverter.eventFactory.createEndElement("",
-                    "", tagName));
-            this.eventWriter.add(XMLConverter.newline);
-            this.indentationCounter--;
+        if (format) {
+            addIndentation();
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
+                    tagName));
+            eventWriter.add(XMLConverter.newline);
+            indentationCounter--;
         } else {
-            this.eventWriter.add(XMLConverter.eventFactory.createEndElement("",
-                    "", tagName));
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
+                    tagName));
         }
     }
 
@@ -232,27 +232,27 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      */
     private void writeFixture(final Model model) throws XMLStreamException {
 
-        this.writeStartTag(XMLHandler.TESTFIXTURE_ROOT);
+        writeStartTag(XMLHandler.TESTFIXTURE_ROOT);
 
         /*
          * Write the variables contained in this fixture
          */
-        this.writeStartTag(XMLHandler.VARIABLES_ROOT);
+        writeStartTag(XMLHandler.VARIABLES_ROOT);
         for (final ModelVariable modelVariable : model.getVariables()) {
-            this.writeVariable(modelVariable);
+            writeVariable(modelVariable);
         }
-        this.writeEndTag(XMLHandler.VARIABLES_ROOT);
+        writeEndTag(XMLHandler.VARIABLES_ROOT);
 
         /*
          * Write the instances contained in this fixture
          */
-        this.writeStartTag(XMLHandler.INSTANCES_ROOT);
+        writeStartTag(XMLHandler.INSTANCES_ROOT);
         for (final ModelVariable modelVariable : model.getVariables()) {
             this.writeInstance(modelVariable.getValue());
         }
-        this.writeEndTag(XMLHandler.INSTANCES_ROOT);
+        writeEndTag(XMLHandler.INSTANCES_ROOT);
 
-        this.writeEndTag(XMLHandler.TESTFIXTURE_ROOT);
+        writeEndTag(XMLHandler.TESTFIXTURE_ROOT);
     }
 
     private void writeInstance(final Integer instance)
@@ -264,23 +264,23 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         /*
          * Write the identifier of the instance
          */
-        this.writeStartTag(XMLHandler.IDENTIFIER_ROOT);
-        this.writeTextElement(identifier);
-        this.writeEndTag(XMLHandler.IDENTIFIER_ROOT);
+        writeStartTag(XMLHandler.IDENTIFIER_ROOT);
+        writeTextElement(identifier);
+        writeEndTag(XMLHandler.IDENTIFIER_ROOT);
 
         /*
          * Write the type
          */
-        this.writeStartTag(XMLHandler.TYPE_ROOT);
-        this.writeTextElement(type);
-        this.writeEndTag(XMLHandler.TYPE_ROOT);
+        writeStartTag(XMLHandler.TYPE_ROOT);
+        writeTextElement(type);
+        writeEndTag(XMLHandler.TYPE_ROOT);
 
         /*
          * Write the fields belonging to this instance
          */
-        this.writeStartTag(XMLHandler.FIELD_ROOT);
-        this.writeTextElement(instance.toString());
-        this.writeEndTag(XMLHandler.FIELD_ROOT);
+        writeStartTag(XMLHandler.FIELD_ROOT);
+        writeTextElement(instance.toString());
+        writeEndTag(XMLHandler.FIELD_ROOT);
     }
 
     /**
@@ -300,25 +300,25 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         /*
          * Write the identifier of the instance
          */
-        this.writeStartTag(XMLHandler.IDENTIFIER_ROOT);
-        this.writeTextElement(identifier);
-        this.writeEndTag(XMLHandler.IDENTIFIER_ROOT);
+        writeStartTag(XMLHandler.IDENTIFIER_ROOT);
+        writeTextElement(identifier);
+        writeEndTag(XMLHandler.IDENTIFIER_ROOT);
 
         /*
          * Write the type
          */
-        this.writeStartTag(XMLHandler.TYPE_ROOT);
-        this.writeTextElement(type);
-        this.writeEndTag(XMLHandler.TYPE_ROOT);
+        writeStartTag(XMLHandler.TYPE_ROOT);
+        writeTextElement(type);
+        writeEndTag(XMLHandler.TYPE_ROOT);
 
         /*
          * Write the fields belonging to this instance
          */
-        this.writeStartTag(XMLHandler.FIELD_ROOT);
+        writeStartTag(XMLHandler.FIELD_ROOT);
         for (final ModelVariable child : instance.getFields()) {
-            this.writeTextElement(child.getIdentifier());
+            writeTextElement(child.getIdentifier());
         }
-        this.writeEndTag(XMLHandler.FIELD_ROOT);
+        writeEndTag(XMLHandler.FIELD_ROOT);
     }
 
     /**
@@ -331,14 +331,14 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      */
     private void writeInstance(final Object instance) throws XMLStreamException {
 
-        this.writeStartTag(XMLHandler.INSTANCE_ROOT);
+        writeStartTag(XMLHandler.INSTANCE_ROOT);
 
         if (instance instanceof ModelInstance) {
             this.writeInstance((ModelInstance) instance);
         } else if (instance instanceof Integer) {
             this.writeInstance((Integer) instance);
         }
-        this.writeEndTag(XMLHandler.INSTANCE_ROOT);
+        writeEndTag(XMLHandler.INSTANCE_ROOT);
     }
 
     /**
@@ -353,25 +353,25 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     private void writeMethodInfo(final KeYJavaMethod method)
             throws XMLStreamException {
 
-        this.writeStartTag(XMLHandler.METHOD_ROOT);
+        writeStartTag(XMLHandler.METHOD_ROOT);
 
         /*
          * Write the name of the method
          */
-        this.writeStartTag(XMLHandler.NAME_ROOT);
-        this.writeTextElement(method.getProgramMethod().getFullName());
-        this.writeEndTag(XMLHandler.NAME_ROOT);
+        writeStartTag(XMLHandler.NAME_ROOT);
+        writeTextElement(method.getProgramMethod().getFullName());
+        writeEndTag(XMLHandler.NAME_ROOT);
 
         /*
          * Write the parameters
          */
-        this.writeStartTag(XMLHandler.PARAMETERS_ROOT);
+        writeStartTag(XMLHandler.PARAMETERS_ROOT);
         for (final IProgramVariable parameter : method.getParameters()) {
-            this.writeTextElement(parameter.name().toString());
+            writeTextElement(parameter.name().toString());
         }
-        this.writeEndTag(XMLHandler.PARAMETERS_ROOT);
+        writeEndTag(XMLHandler.PARAMETERS_ROOT);
 
-        this.writeEndTag(XMLHandler.METHOD_ROOT);
+        writeEndTag(XMLHandler.METHOD_ROOT);
     }
 
     /**
@@ -384,15 +384,15 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      */
     private void writeStartTag(final String tagName) throws XMLStreamException {
 
-        if (this.format) {
-            this.indentationCounter++;
-            this.addIndentation();
-            this.eventWriter.add(XMLConverter.eventFactory.createStartElement(
-                    "", "", tagName));
-            this.eventWriter.add(XMLConverter.newline);
+        if (format) {
+            indentationCounter++;
+            addIndentation();
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
+                    "", tagName));
+            eventWriter.add(XMLConverter.newline);
         } else {
-            this.eventWriter.add(XMLConverter.eventFactory.createStartElement(
-                    "", "", tagName));
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
+                    "", tagName));
         }
     }
 
@@ -408,13 +408,13 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     private void writeTestCase(final TestCase testCase)
             throws XMLStreamException, XMLVisitorException {
 
-        this.writeStartTag(XMLHandler.TESTCASE_ROOT);
+        writeStartTag(XMLHandler.TESTCASE_ROOT);
 
-        this.writeMethodInfo(testCase.getMethod());
-        this.writeFixture(testCase.getModel());
+        writeMethodInfo(testCase.getMethod());
+        writeFixture(testCase.getModel());
         // this.writeOracle(testCase.getOracle());
 
-        this.writeEndTag(XMLHandler.TESTCASE_ROOT);
+        writeEndTag(XMLHandler.TESTCASE_ROOT);
     }
 
     /**
@@ -434,14 +434,14 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
             element = new String("null");
         }
 
-        if (this.format) {
-            this.indentationCounter++;
-            this.addIndentation();
-            this.indentationCounter--;
-            this.eventWriter.add(XMLConverter.eventFactory.createCharacters(element.toString()));
-            this.eventWriter.add(XMLConverter.newline);
+        if (format) {
+            indentationCounter++;
+            addIndentation();
+            indentationCounter--;
+            eventWriter.add(XMLConverter.eventFactory.createCharacters(element.toString()));
+            eventWriter.add(XMLConverter.newline);
         } else {
-            this.eventWriter.add(XMLConverter.eventFactory.createCharacters(element.toString()));
+            eventWriter.add(XMLConverter.eventFactory.createCharacters(element.toString()));
         }
     }
 
@@ -456,7 +456,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     private void writeVariable(final ModelVariable variable)
             throws XMLStreamException {
 
-        this.writeStartTag(XMLHandler.VARIABLE_ROOT);
+        writeStartTag(XMLHandler.VARIABLE_ROOT);
 
         final String identifier = variable.getIdentifier();
         final String type = variable.getType();
@@ -464,25 +464,25 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         /*
          * Write the identifier of this particular variable
          */
-        this.writeStartTag(XMLHandler.IDENTIFIER_ROOT);
-        this.writeTextElement(identifier);
-        this.writeEndTag(XMLHandler.IDENTIFIER_ROOT);
+        writeStartTag(XMLHandler.IDENTIFIER_ROOT);
+        writeTextElement(identifier);
+        writeEndTag(XMLHandler.IDENTIFIER_ROOT);
 
         /*
          * Write the type of this variable
          */
-        this.writeStartTag(XMLHandler.TYPE_ROOT);
-        this.writeTextElement(type);
-        this.writeEndTag(XMLHandler.TYPE_ROOT);
+        writeStartTag(XMLHandler.TYPE_ROOT);
+        writeTextElement(type);
+        writeEndTag(XMLHandler.TYPE_ROOT);
 
         /*
          * Write the instance pointed to by this variable FIXME: Abstraction
          * needs to handle uniqueness in a better way, do not rely on hashCode.
          */
-        this.writeStartTag(XMLHandler.VALUE_ROOT);
-        this.writeTextElement(variable.getValue());
-        this.writeEndTag(XMLHandler.VALUE_ROOT);
+        writeStartTag(XMLHandler.VALUE_ROOT);
+        writeTextElement(variable.getValue());
+        writeEndTag(XMLHandler.VALUE_ROOT);
 
-        this.writeEndTag(XMLHandler.VARIABLE_ROOT);
+        writeEndTag(XMLHandler.VARIABLE_ROOT);
     }
 }

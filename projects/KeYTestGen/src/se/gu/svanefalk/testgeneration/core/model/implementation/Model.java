@@ -67,7 +67,7 @@ public class Model {
         /*
          * Check if the variable already exists in the buffer.
          */
-        final ModelVariable localVariable = this.lookupVariable(variable);
+        final ModelVariable localVariable = lookupVariable(variable);
 
         /*
          * If it does, configure it properly according to the provided value,
@@ -81,7 +81,7 @@ public class Model {
                 ((ModelInstance) instance).addReferee(variable);
             }
 
-            this.variables.add(variable);
+            variables.add(variable);
 
             /*
              * If it is not, then simply update the value currently pointed to
@@ -110,15 +110,15 @@ public class Model {
     public void assignField(ModelVariable target, final ModelVariable other) {
 
         if (!target.equals(other)) {
-            target = this.lookupVariable(target);
-            final ModelVariable localOther = this.lookupVariable(other);
+            target = lookupVariable(target);
+            final ModelVariable localOther = lookupVariable(other);
 
             /*
              * If the other currently does not exist in the Model, buffer it for
              * subsequent insertion.
              */
             if (other == null) {
-                this.buffer.put(other, target);
+                buffer.put(other, target);
                 return;
             }
 
@@ -142,8 +142,8 @@ public class Model {
     public void assignPointer(ModelVariable target, ModelVariable other) {
 
         if (!target.equals(other)) {
-            target = this.lookupVariable(target);
-            other = this.lookupVariable(other);
+            target = lookupVariable(target);
+            other = lookupVariable(other);
 
             if (other != null) {
                 target.setValue(other.getValue());
@@ -163,7 +163,7 @@ public class Model {
      */
     public ModelVariable getVariable(final String reference) {
 
-        for (final ModelVariable variable : this.variables) {
+        for (final ModelVariable variable : variables) {
 
             if (variable.getIdentifier().equals(reference)) {
                 return variable;
@@ -179,7 +179,7 @@ public class Model {
      */
     public final List<ModelVariable> getVariables() {
 
-        return this.variables;
+        return variables;
     }
 
     /**
@@ -191,7 +191,7 @@ public class Model {
      */
     private ModelVariable lookupVariable(final ModelVariable variable) {
 
-        final int index = this.variables.indexOf(variable);
-        return index >= 0 ? this.variables.get(index) : null;
+        final int index = variables.indexOf(variable);
+        return index >= 0 ? variables.get(index) : null;
     }
 }

@@ -58,19 +58,19 @@ public class ModelInstance {
 
     private ModelInstance(final KeYJavaType keYJavaType) {
 
-        this.type = keYJavaType;
-        this.identifier = Integer.toString(++ModelInstance.ID);
+        type = keYJavaType;
+        identifier = Integer.toString(++ModelInstance.ID);
     }
 
     public void addField(final ModelVariable variable) {
 
-        if (!this.fields.contains(variable)) {
-            this.fields.add(variable);
+        if (!fields.contains(variable)) {
+            fields.add(variable);
         }
     }
 
     public void addReferee(final ModelVariable referee) {
-        this.referees.add(referee);
+        referees.add(referee);
     }
 
     /**
@@ -90,7 +90,7 @@ public class ModelInstance {
             return false;
         }
         final ModelInstance other = (ModelInstance) obj;
-        return this.identifier.equals(other.identifier);
+        return identifier.equals(other.identifier);
     }
 
     /**
@@ -98,16 +98,16 @@ public class ModelInstance {
      */
     public List<ModelVariable> getFields() {
 
-        return new LinkedList<ModelVariable>(this.fields);
+        return new LinkedList<ModelVariable>(fields);
     }
 
     public String getIdentifier() {
 
-        return this.identifier;
+        return identifier;
     }
 
     public List<ModelVariable> getReferees() {
-        return this.referees;
+        return referees;
     }
 
     /**
@@ -115,17 +115,17 @@ public class ModelInstance {
      */
     public String getType() {
 
-        return this.type.getJavaType().getFullName();
+        return type.getJavaType().getFullName();
     }
 
     public String getTypeName() {
 
-        return this.type.getJavaType().getName().toString();
+        return type.getJavaType().getName().toString();
     }
 
     @Override
     public String toString() {
 
-        return "Instance " + this.identifier;
+        return "Instance " + identifier;
     }
 }

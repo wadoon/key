@@ -4,7 +4,8 @@ import javax.naming.OperationNotSupportedException;
 
 import org.apache.commons.math3.fraction.Fraction;
 
-import se.gu.svanefalk.keystone.equations.IExpression;
+import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
+import se.gu.svanefalk.testgeneration.keystone.equations.comparator.AbstractComparator;
 
 public class GreaterOrEquals extends AbstractComparator {
 

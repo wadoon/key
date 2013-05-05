@@ -91,30 +91,29 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                      */
                     if (TermParserTools.isBooleanConstant(rightOperand)) {
 
-                        final ModelVariable modelVariable = this.model.getVariable(leftOperandIdentifier);
+                        final ModelVariable modelVariable = model.getVariable(leftOperandIdentifier);
 
                         boolean value = TermParserTools.isBooleanTrue(rightOperand);
-                        value = this.sawNot ? !value : value;
-                        this.model.add(modelVariable, value);
+                        value = sawNot ? !value : value;
+                        model.add(modelVariable, value);
                     } else {
                     }
 
                     /*
                      * Process reference variables.
                      */
-                } else if (!this.sawNot) {
+                } else if (!sawNot) {
 
                     leftOperandIdentifier = TermParserTools.resolveIdentifierString(
                             leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
                     rightOperandIdentifier = TermParserTools.resolveIdentifierString(
                             rightOperand, ResolveAssignmentsVisitor.SEPARATOR);
 
-                    final ModelVariable leftModelVariable = this.model.getVariable(leftOperandIdentifier);
+                    final ModelVariable leftModelVariable = model.getVariable(leftOperandIdentifier);
 
-                    final ModelVariable rightModelVariable = this.model.getVariable(rightOperandIdentifier);
+                    final ModelVariable rightModelVariable = model.getVariable(rightOperandIdentifier);
 
-                    this.model.assignPointer(leftModelVariable,
-                            rightModelVariable);
+                    model.assignPointer(leftModelVariable, rightModelVariable);
                 }
             }
 
@@ -129,12 +128,12 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
     public void visit(final Term visited) {
 
         if (TermParserTools.isNot(visited)) {
-            this.sawNot = true;
+            sawNot = true;
         } else if (TermParserTools.isEquals(visited)) {
-            this.parseEquals(visited);
-            this.sawNot = false;
-        } else if (TermParserTools.isBinaryFunction2(visited) && this.sawNot) {
-            this.sawNot = false;
+            parseEquals(visited);
+            sawNot = false;
+        } else if (TermParserTools.isBinaryFunction2(visited) && sawNot) {
+            sawNot = false;
         }
     }
 }

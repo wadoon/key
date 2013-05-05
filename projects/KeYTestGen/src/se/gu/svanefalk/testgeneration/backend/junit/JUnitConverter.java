@@ -78,7 +78,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
             final List<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (final TestCase testCase : testCases) {
-                final List<ModelInstance> collectedInstances = this.extractInstancesFromModel(testCase.getModel());
+                final List<ModelInstance> collectedInstances = extractInstancesFromModel(testCase.getModel());
                 instances.addAll(collectedInstances);
             }
 
@@ -115,12 +115,12 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             /*
              * Write the method for setting fields of objects.
              */
-            this.writeSetFieldMethod();
+            writeSetFieldMethod();
 
             /*
              * Write the method for getting fields of objects.
              */
-            this.writeGetFieldMethod();
+            writeGetFieldMethod();
 
             /*
              * Write the main init method for creating the repository of Object
@@ -156,7 +156,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              * Write the package declaration.
              */
             builder.append("package ");
-            builder.append(this.className);
+            builder.append(className);
             builder.append("TestClass;\n\n");
 
             /*
@@ -177,7 +177,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             /*
              * Write the specific imports.
              */
-            for (final String importt : this.imports) {
+            for (final String importt : imports) {
                 builder.append("import ");
                 builder.append(importt);
                 builder.append(";\n");
@@ -209,23 +209,23 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             /*
              * Collect the import assertions
              */
-            final List<ModelInstance> instances = this.collectInstances(testCases);
+            final List<ModelInstance> instances = collectInstances(testCases);
             for (final ModelInstance instance : instances) {
                 final String toImport = instance.getType();
-                this.imports.add(toImport);
+                imports.add(toImport);
             }
 
             /*
              * Get the name of the class being tested.
              */
-            this.className = klass.getName();
+            className = klass.getName();
 
             final String methodName = testCases.get(0).getMethodName();
 
             /*
              * Print the new class header
              */
-            this.writeClassHeader(null, "public", "", "Test_" + klass.getName()
+            writeClassHeader(null, "public", "", "Test_" + klass.getName()
                     + "_" + methodName);
 
             /*
@@ -233,20 +233,20 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              */
             for (final TestCase testCase : testCases) {
 
-                this.writeTestMethod(testCase);
+                writeTestMethod(testCase);
             }
 
             /*
              * Create the fixutre repository for this class
              */
-            this.createFixtureRepository(testCases);
+            createFixtureRepository(testCases);
 
             /*
              * Close the class body.
              */
-            this.writeClosingBrace();
+            writeClosingBrace();
 
-            return this.getCurrentOutput();
+            return getCurrentOutput();
         }
 
         /**
@@ -254,24 +254,24 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
          */
         private void writeGetFieldMethod() {
 
-            this.writeComment("Gets the field of a given object", true);
-            this.writeMethodHeader(null, "private", new String[] { "<T>" },
-                    "T", "getFieldValue", new String[] { "Object instance",
+            writeComment("Gets the field of a given object", true);
+            writeMethodHeader(null, "private", new String[] { "<T>" }, "T",
+                    "getFieldValue", new String[] { "Object instance",
                             "String fieldName" }, new String[] {
                             "NoSuchFieldException", "SecurityException",
                             "IllegalArgumentException",
                             "IllegalAccessException" });
 
-            this.writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
+            writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
-            this.writeLine("field.setAccessible(true);"
+            writeLine("field.setAccessible(true);"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
-            this.writeLine("return (T)field.get(instance);"
+            writeLine("return (T)field.get(instance);"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
-            this.writeClosingBrace();
+            writeClosingBrace();
         }
 
         /**
@@ -302,7 +302,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                 }
             }
             methodInvocation += ");" + AbstractJavaSourceGenerator.NEWLINE;
-            this.writeLine(methodInvocation);
+            writeLine(methodInvocation);
         }
 
         /**
@@ -310,25 +310,24 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
          */
         private void writeSetFieldMethod() {
 
-            this.writeComment("Sets a field of some object to a given value",
-                    true);
-            this.writeMethodHeader(null, "private", null, "void",
-                    "setFieldValue", new String[] { "Object instance",
-                            "String fieldName", "Object value" }, new String[] {
+            writeComment("Sets a field of some object to a given value", true);
+            writeMethodHeader(null, "private", null, "void", "setFieldValue",
+                    new String[] { "Object instance", "String fieldName",
+                            "Object value" }, new String[] {
                             "NoSuchFieldException", "SecurityException",
                             "IllegalArgumentException",
                             "IllegalAccessException" });
 
-            this.writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
+            writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
-            this.writeLine("field.setAccessible(true);"
+            writeLine("field.setAccessible(true);"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
-            this.writeLine("field.set(instance, value );"
+            writeLine("field.set(instance, value );"
                     + AbstractJavaSourceGenerator.NEWLINE);
 
-            this.writeClosingBrace();
+            writeClosingBrace();
         }
 
         /**
@@ -345,8 +344,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              * Begin with declaring all the instance variables needed for the
              * current test case.
              */
-            this.writeComment("Create the values needed for this test case.",
-                    false);
+            writeComment("Create the values needed for this test case.", false);
             for (final ModelVariable variable : testCase.getModel().getVariables()) {
 
                 if (!variable.isParameter()) {
@@ -354,7 +352,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * Declares and instantiates a reference typed instance.
                      */
                     if (variable.getValue() instanceof ModelInstance) {
-                        this.writeLine(variable.getType() + " "
+                        writeLine(variable.getType() + " "
                                 + variable.getIdentifier() + " = " + "new"
                                 + " " + variable.getType() + "();");
                     }
@@ -365,12 +363,12 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * be configured as part of the classes they are fields of).
                      */
                     else {
-                        this.writeLine(variable.getType() + " "
+                        writeLine(variable.getType() + " "
                                 + variable.getIdentifier() + " = "
                                 + variable.getValue() + ";");
                     }
 
-                    this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
+                    writeLine(AbstractJavaSourceGenerator.NEWLINE);
                 }
             }
 
@@ -378,7 +376,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              * Next, create the method parameters (we do this separately for the
              * sake of clarity).
              */
-            this.writeComment(
+            writeComment(
                     "Create the parameter instances to be passed to the method under test.",
                     false);
 
@@ -390,7 +388,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * Declares and instantiates a reference typed instance.
                      */
                     if (variable.getValue() instanceof ModelInstance) {
-                        this.writeLine(variable.getType() + " "
+                        writeLine(variable.getType() + " "
                                 + variable.getIdentifier() + " = " + "new"
                                 + " " + variable.getType() + "();");
                     }
@@ -401,11 +399,11 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * be configured as part of the classes they are fields of).
                      */
                     else {
-                        this.writeLine(variable.getType() + " "
+                        writeLine(variable.getType() + " "
                                 + variable.getIdentifier() + " = "
                                 + variable.getValue() + ";");
                     }
-                    this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
+                    writeLine(AbstractJavaSourceGenerator.NEWLINE);
                 }
             }
 
@@ -420,7 +418,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
                     if (value instanceof ModelInstance) {
 
-                        this.writeComment(
+                        writeComment(
                                 "Configuring variable: "
                                         + variable.getIdentifier(), false);
 
@@ -438,12 +436,11 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                                 fieldValueIdentifier = fieldValue.toString();
                             }
 
-                            this.writeLine("setFieldValue("
-                                    + variableIdentifier + "," + "\""
-                                    + field.getVariableName() + "\"" + ","
-                                    + fieldValueIdentifier + ");");
+                            writeLine("setFieldValue(" + variableIdentifier
+                                    + "," + "\"" + field.getVariableName()
+                                    + "\"" + "," + fieldValueIdentifier + ");");
 
-                            this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
+                            writeLine(AbstractJavaSourceGenerator.NEWLINE);
                         }
                     }
                 }
@@ -462,15 +459,15 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
         private void writeTestMethod(final TestCase testCase)
                 throws JUnitConverterException {
 
-            this.writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            writeLine(AbstractJavaSourceGenerator.NEWLINE);
 
             /*
              * Write the method header.
              */
             final String methodName = "test"
                     + testCase.getMethod().getProgramMethod().getName();
-            this.writeMethodHeader(new String[] { "@Test" }, "public", null,
-                    "void", methodName + this.ID++, null, new String[] {
+            writeMethodHeader(new String[] { "@Test" }, "public", null, "void",
+                    methodName + ID++, null, new String[] {
                             "NoSuchFieldException", "SecurityException",
                             "IllegalArgumentException",
                             "IllegalAccessException" });
@@ -478,21 +475,21 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             /*
              * Write the test fixture.
              */
-            this.writeTestFixture2(testCase);
+            writeTestFixture2(testCase);
 
             /*
              * Write the invocation of the method itself. If the method return
              * type is different from void, write a temporary variable to store
              * the result.
              */
-            this.writeMethodInvocation(testCase);
+            writeMethodInvocation(testCase);
 
             /*
              * Write the oracle
              */
             // this.writeTestOracle(testCase);
 
-            this.writeClosingBrace();
+            writeClosingBrace();
         }
     }
 

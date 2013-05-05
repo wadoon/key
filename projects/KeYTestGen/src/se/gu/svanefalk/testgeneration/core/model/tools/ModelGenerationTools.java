@@ -58,7 +58,7 @@ public class ModelGenerationTools {
         @Override
         public Term transform(final Term term) throws TermTransformerException {
 
-            return this.transformTerm(term);
+            return transformTerm(term);
         }
 
         /**
@@ -75,8 +75,8 @@ public class ModelGenerationTools {
         protected Term transformAnd(final Term term)
                 throws TermTransformerException {
 
-            final Term firstChild = this.transformTerm(term.sub(0));
-            final Term secondChild = this.transformTerm(term.sub(1));
+            final Term firstChild = transformTerm(term.sub(0));
+            final Term secondChild = transformTerm(term.sub(1));
 
             if ((firstChild != null) && (secondChild == null)) {
                 return firstChild;
@@ -87,7 +87,7 @@ public class ModelGenerationTools {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return this.termFactory.createTerm(Junctor.AND, firstChild,
+                return termFactory.createTerm(Junctor.AND, firstChild,
                         secondChild);
             }
 
@@ -109,8 +109,8 @@ public class ModelGenerationTools {
         protected Term transformEquals(final Term term)
                 throws TermTransformerException {
 
-            final Term firstChild = this.transformTerm(term.sub(0));
-            final Term secondChild = this.transformTerm(term.sub(1));
+            final Term firstChild = transformTerm(term.sub(0));
+            final Term secondChild = transformTerm(term.sub(1));
 
             if ((firstChild != null) && (secondChild == null)) {
                 return firstChild;
@@ -121,7 +121,7 @@ public class ModelGenerationTools {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return this.termFactory.createTerm(term.op(), firstChild,
+                return termFactory.createTerm(term.op(), firstChild,
                         secondChild);
             }
 
@@ -143,13 +143,13 @@ public class ModelGenerationTools {
         protected Term transformNot(final Term term)
                 throws TermTransformerException {
 
-            final Term newChild = this.transformTerm(term.sub(0));
+            final Term newChild = transformTerm(term.sub(0));
 
             if (newChild == null) {
                 return null;
             }
 
-            return this.termFactory.createTerm(Junctor.NOT, newChild);
+            return termFactory.createTerm(Junctor.NOT, newChild);
         }
 
         /**
@@ -175,8 +175,8 @@ public class ModelGenerationTools {
         protected Term transformOr(final Term term)
                 throws TermTransformerException {
 
-            final Term firstChild = this.transformTerm(term.sub(0));
-            final Term secondChild = this.transformTerm(term.sub(1));
+            final Term firstChild = transformTerm(term.sub(0));
+            final Term secondChild = transformTerm(term.sub(1));
 
             if ((firstChild != null) && (secondChild == null)) {
                 return firstChild;
@@ -187,7 +187,7 @@ public class ModelGenerationTools {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return this.termFactory.createTerm(Junctor.OR, firstChild,
+                return termFactory.createTerm(Junctor.OR, firstChild,
                         secondChild);
             }
 
@@ -226,7 +226,7 @@ public class ModelGenerationTools {
                 final LocationVariable resolvedVariable = new LocationVariable(
                         resolvedVariableName, term.sort());
 
-                return this.termFactory.createTerm(resolvedVariable);
+                return termFactory.createTerm(resolvedVariable);
             }
 
             return null;

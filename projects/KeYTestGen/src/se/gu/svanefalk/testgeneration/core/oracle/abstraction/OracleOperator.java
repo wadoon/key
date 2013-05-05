@@ -64,7 +64,7 @@ public class OracleOperator extends OracleExpression {
 
         @Override
         public String toString() {
-            return this.identifier;
+            return identifier;
         }
     }
 
@@ -100,7 +100,7 @@ public class OracleOperator extends OracleExpression {
             final OracleExpression secondOperand, final OracleType type) {
         super(type);
 
-        this.operatorType = comparatorType;
+        operatorType = comparatorType;
         this.firstOperand = firstOperand;
         this.secondOperand = secondOperand;
     }
@@ -110,7 +110,7 @@ public class OracleOperator extends OracleExpression {
      */
     public OracleExpression getFirstOperand() {
 
-        return this.firstOperand;
+        return firstOperand;
     }
 
     /**
@@ -118,7 +118,7 @@ public class OracleOperator extends OracleExpression {
      */
     public OperatorType getOperation() {
 
-        return this.operatorType;
+        return operatorType;
     }
 
     /**
@@ -126,13 +126,12 @@ public class OracleOperator extends OracleExpression {
      */
     public OracleExpression getSecondOperand() {
 
-        return this.secondOperand;
+        return secondOperand;
     }
 
     @Override
     public String toString() {
-        return this.firstOperand.toString() + " "
-                + this.operatorType.toString() + " "
-                + this.secondOperand.toString();
+        return firstOperand.toString() + " " + operatorType.toString() + " "
+                + secondOperand.toString();
     }
 }

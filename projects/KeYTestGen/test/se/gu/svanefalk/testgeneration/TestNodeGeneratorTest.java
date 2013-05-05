@@ -28,14 +28,13 @@ public class TestNodeGeneratorTest extends KeYTestGenTest {
     private void setup(final String method) throws ProofInputException,
             ModelGeneratorException, IOException, ProblemLoaderException {
 
-        if (this.modelGenerator == null) {
-            this.modelGenerator = ModelGenerator.INSTANCE;
+        if (modelGenerator == null) {
+            modelGenerator = ModelGenerator.INSTANCE;
         }
 
-        this.environment = this.getPreparedEnvironment(
+        environment = getPreparedEnvironment(
                 AbstractSymbolicExecutionTestCase.keyRepDirectory,
-                this.javaPathInBaseDir, this.containerTypeName, method, null,
-                false);
+                javaPathInBaseDir, containerTypeName, method, null, false);
     }
 
     /**
@@ -46,10 +45,9 @@ public class TestNodeGeneratorTest extends KeYTestGenTest {
     @Test
     public void testMid() throws Exception {
 
-        this.setup("mid");
-        final IExecutionStartNode root = this.environment.getBuilder()
-                .getStartNode();
-        final List<IExecutionNode> nodes = this.retrieveNode(root, "mid=x");
+        setup("mid");
+        final IExecutionStartNode root = environment.getBuilder().getStartNode();
+        final List<IExecutionNode> nodes = retrieveNode(root, "mid=x");
 
         for (final IExecutionNode node : nodes) {
             NodeTestGenerator.INSTANCE.constructTestSuiteFromNode(node,

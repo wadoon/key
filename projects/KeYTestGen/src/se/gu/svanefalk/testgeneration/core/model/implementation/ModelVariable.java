@@ -88,7 +88,7 @@ public class ModelVariable {
     private ModelVariable(final IProgramVariable programVariable,
             final String identifier) {
 
-        this.variable = programVariable;
+        variable = programVariable;
         this.identifier = identifier;
     }
 
@@ -109,7 +109,7 @@ public class ModelVariable {
             return false;
         }
         final ModelVariable other = (ModelVariable) obj;
-        return this.identifier.equals(other.identifier);
+        return identifier.equals(other.identifier);
     }
 
     /**
@@ -117,7 +117,7 @@ public class ModelVariable {
      */
     public String getIdentifier() {
 
-        return this.identifier;
+        return identifier;
     }
 
     /**
@@ -127,7 +127,7 @@ public class ModelVariable {
      */
     public ModelInstance getParentModelInstance() {
 
-        return this.parentModelInstance;
+        return parentModelInstance;
     }
 
     /**
@@ -136,7 +136,7 @@ public class ModelVariable {
      */
     public String getType() {
 
-        return this.variable.getKeYJavaType().getName();
+        return variable.getKeYJavaType().getName();
     }
 
     /**
@@ -145,12 +145,12 @@ public class ModelVariable {
      */
     public <T> T getValue() {
 
-        return (T) this.boundValue;
+        return (T) boundValue;
     }
 
     public String getVariableName() {
 
-        final String rawName = this.variable.name().toString();
+        final String rawName = variable.name().toString();
         final int lastColon = rawName.lastIndexOf(':');
 
         if (lastColon != -1) {
@@ -164,7 +164,7 @@ public class ModelVariable {
      * @return the isParameter
      */
     public boolean isParameter() {
-        return this.isParameter;
+        return isParameter;
     }
 
     /**
@@ -193,12 +193,12 @@ public class ModelVariable {
      */
     public void setValue(final Object value) {
 
-        this.boundValue = value;
+        boundValue = value;
     }
 
     @Override
     public String toString() {
 
-        return this.getType() + " : " + this.identifier;
+        return getType() + " : " + identifier;
     }
 }

@@ -38,14 +38,13 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
     private void setup(final String method) throws ProofInputException,
             ModelGeneratorException, IOException, ProblemLoaderException {
 
-        if (this.modelGenerator == null) {
-            this.modelGenerator = ModelGenerator.INSTANCE;
+        if (modelGenerator == null) {
+            modelGenerator = ModelGenerator.INSTANCE;
         }
 
-        this.environment = this.getPreparedEnvironment(
+        environment = getPreparedEnvironment(
                 AbstractSymbolicExecutionTestCase.keyRepDirectory,
-                this.javaPathInBaseDir, this.containerTypeName, method, null,
-                false);
+                javaPathInBaseDir, containerTypeName, method, null, false);
     }
 
     @Test
@@ -76,7 +75,7 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
     @Test
     public void testMid() throws Exception {
 
-        this.setup("mid");
+        setup("mid");
         this.testMid("x");
         this.testMid("y");
         this.testMid("z");
@@ -91,9 +90,8 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
      */
     private void testMid(final String variable) throws Exception {
 
-        final ArrayList<IExecutionNode> nodes = this
-                .retrieveNode(this.environment.getBuilder().getStartNode(),
-                        "mid=" + variable);
+        final ArrayList<IExecutionNode> nodes = retrieveNode(
+                environment.getBuilder().getStartNode(), "mid=" + variable);
 
         /*
          * For each node, generate a model for it, refine that model, and then
@@ -103,9 +101,9 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
         for (final IExecutionNode node : nodes) {
 
             System.out.println("Mid " + variable);
-            this.printSingleNode(node);
+            printSingleNode(node);
 
-            final Model model = this.modelGenerator.generateModel(node);
+            final Model model = modelGenerator.generateModel(node);
 
             final int x = (Integer) model.getVariable("x").getValue();
             final int y = (Integer) model.getVariable("y").getValue();
@@ -115,26 +113,22 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
             System.out.println("Satisfiable assignment: x=" + x + " y=" + y
                     + " z=" + z);
 
-            Assert.assertTrue(result == (Integer) model.getVariable(variable)
-                    .getValue());
+            Assert.assertTrue(result == (Integer) model.getVariable(variable).getValue());
         }
     }
 
     private void testMidTwoInstance(final String variable) throws Exception {
 
-        final ArrayList<IExecutionNode> nodes = this
-                .retrieveNode(this.environment.getBuilder().getStartNode(),
-                        "mid=" + variable);
+        final ArrayList<IExecutionNode> nodes = retrieveNode(
+                environment.getBuilder().getStartNode(), "mid=" + variable);
 
         for (final IExecutionNode node : nodes) {
 
-            final Model model = this.modelGenerator.generateModel(node);
+            final Model model = modelGenerator.generateModel(node);
 
             final int x = (Integer) model.getVariable("x").getValue();
-            final int y = (Integer) model.getVariable("self_dollar_instanceY")
-                    .getValue();
-            final int z = (Integer) model.getVariable("self_dollar_instanceZ")
-                    .getValue();
+            final int y = (Integer) model.getVariable("self_dollar_instanceY").getValue();
+            final int z = (Integer) model.getVariable("self_dollar_instanceZ").getValue();
 
             final PrimitiveIntegerOperations operations = new PrimitiveIntegerOperations();
             operations.setInstanceY(y);
@@ -161,10 +155,10 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
     @Test
     public void testMidTwoInstancel() throws Exception {
 
-        this.setup("midTwoInstance");
-        this.testMidTwoInstance("x");
-        this.testMidTwoInstance("instanceY");
-        this.testMidTwoInstance("instanceZ");
+        setup("midTwoInstance");
+        testMidTwoInstance("x");
+        testMidTwoInstance("instanceY");
+        testMidTwoInstance("instanceZ");
     }
 
     /**
@@ -175,7 +169,7 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
     @Test
     public void testMidTwoProxy() throws Exception {
 
-        this.setup("midTwoProxy");
+        setup("midTwoProxy");
         // testMidTwoProxy("x");
         this.testMidTwoProxy("proxy.instanceInt");
         // testMidTwoProxy("proxy.nestedProxy.instanceInt");
@@ -185,20 +179,18 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
 
         // printSymbolicExecutionTree(environment.getBuilder().getStartNode());
 
-        final ArrayList<IExecutionNode> nodes = this
-                .retrieveNode(this.environment.getBuilder().getStartNode(),
-                        "mid=" + variable);
+        final ArrayList<IExecutionNode> nodes = retrieveNode(
+                environment.getBuilder().getStartNode(), "mid=" + variable);
 
         for (final IExecutionNode node : nodes) {
 
-            final Model model = this.modelGenerator.generateModel(node);
+            final Model model = modelGenerator.generateModel(node);
 
             final int x = (Integer) model.getVariable("x").getValue();
             final int y = (Integer) model.getVariable(
                     "self_dollar_proxy_dollar_instanceInt").getValue();
             final int z = (Integer) model.getVariable(
-                    "self_dollar_proxy_dollar_nestedProxy_dollar_instanceInt")
-                    .getValue();
+                    "self_dollar_proxy_dollar_nestedProxy_dollar_instanceInt").getValue();
 
             final PrimitiveIntegerOperations operations = new PrimitiveIntegerOperations();
             operations.setInstanceY(y);

@@ -43,14 +43,14 @@ public enum NodeTestGenerator {
             /*
              * Get and process the method call node
              */
-            final IExecutionMethodCall methodCall = this.getMethodCallNode(node);
+            final IExecutionMethodCall methodCall = getMethodCallNode(node);
 
             final String methodName = methodCall.getMethodReference().getName();
 
             /*
              * Construct the corresponding KeYJavaClass
              */
-            final KeYJavaClass keYJavaClass = this.factory.createKeYJavaClass(methodCall);
+            final KeYJavaClass keYJavaClass = factory.createKeYJavaClass(methodCall);
             final KeYJavaMethod targetMethod = keYJavaClass.getMethod(methodName);
 
             /*
@@ -65,7 +65,7 @@ public enum NodeTestGenerator {
                     targetMethod);
             capsules.add(oracleGenerationCapsule);
 
-            this.capsuleExecutor.executeCapsulesAndWait(capsules);
+            capsuleExecutor.executeCapsulesAndWait(capsules);
 
             /*
              * Collect the results
@@ -117,7 +117,7 @@ public enum NodeTestGenerator {
         if (node instanceof IExecutionMethodCall) {
             return (IExecutionMethodCall) node;
         } else {
-            return this.getMethodCallNode(node.getParent());
+            return getMethodCallNode(node.getParent());
         }
     }
 }

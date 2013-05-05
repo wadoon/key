@@ -2,7 +2,8 @@ package se.gu.svanefalk.keystone.equations.comparator;
 
 import javax.naming.OperationNotSupportedException;
 
-import se.gu.svanefalk.keystone.equations.IExpression;
+import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
+import se.gu.svanefalk.testgeneration.keystone.equations.comparator.AbstractComparator;
 
 public class Equals extends AbstractComparator {
 

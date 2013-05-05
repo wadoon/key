@@ -62,7 +62,7 @@ public class OracleComparator extends OracleExpression {
 
         @Override
         public String toString() {
-            return this.identifier;
+            return identifier;
         }
     }
 
@@ -96,7 +96,7 @@ public class OracleComparator extends OracleExpression {
             final OracleExpression secondOperand) {
 
         super(OracleType.BOOLEAN);
-        this.comparator = comparatorType;
+        comparator = comparatorType;
         this.firstOperand = firstOperand;
         this.secondOperand = secondOperand;
     }
@@ -106,7 +106,7 @@ public class OracleComparator extends OracleExpression {
      */
     public ComparatorType getComparatorType() {
 
-        return this.comparator;
+        return comparator;
     }
 
     /**
@@ -114,7 +114,7 @@ public class OracleComparator extends OracleExpression {
      */
     public OracleExpression getFirstOperand() {
 
-        return this.firstOperand;
+        return firstOperand;
     }
 
     /**
@@ -122,12 +122,11 @@ public class OracleComparator extends OracleExpression {
      */
     public OracleExpression getSecondOperand() {
 
-        return this.secondOperand;
+        return secondOperand;
     }
 
     @Override
     public String toString() {
-        return this.firstOperand + " " + this.comparator + " "
-                + this.secondOperand;
+        return firstOperand + " " + comparator + " " + secondOperand;
     }
 }

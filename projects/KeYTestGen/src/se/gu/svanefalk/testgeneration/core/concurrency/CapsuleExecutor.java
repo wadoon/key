@@ -31,7 +31,7 @@ public enum CapsuleExecutor {
         final CountDownLatch latch = new CountDownLatch(capsules.size());
         for (final Capsule capsule : capsules) {
             capsule.setLatch(latch);
-            this.executor.execute(capsule);
+            executor.execute(capsule);
         }
 
         /*

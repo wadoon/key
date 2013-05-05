@@ -31,21 +31,21 @@ public class ExecutionPath {
      * @return the branchConditionMappings
      */
     public Map<SourceElement, List<IExecutionBranchCondition>> getBranchConditionMappings() {
-        return this.branchConditionMappings;
+        return branchConditionMappings;
     }
 
     /**
      * @return the coveredNodes
      */
     public Set<SourceElement> getCoveredNodes() {
-        return this.coveredNodes;
+        return coveredNodes;
     }
 
     /**
      * @return the terminatingNode
      */
     public IExecutionNode getTerminatingNode() {
-        return this.terminatingNode;
+        return terminatingNode;
     }
 
     /**
@@ -77,7 +77,7 @@ public class ExecutionPath {
     public String toString() {
 
         final StringBuilder toPrint = new StringBuilder();
-        final Iterator<SourceElement> iterator = this.coveredNodes.iterator();
+        final Iterator<SourceElement> iterator = coveredNodes.iterator();
         while (iterator.hasNext()) {
             toPrint.append(iterator.next());
 

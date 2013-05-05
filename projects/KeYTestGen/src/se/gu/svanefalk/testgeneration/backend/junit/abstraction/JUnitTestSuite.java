@@ -41,7 +41,7 @@ public class JUnitTestSuite {
      * 
      */
     public void addImport(final String importStatement) {
-        this.imports.add(importStatement);
+        imports.add(importStatement);
     }
 
     /**
@@ -51,20 +51,20 @@ public class JUnitTestSuite {
      * 
      */
     public void addTestCase(final JUnitTestCase testCase) {
-        this.testCases.add(testCase);
+        testCases.add(testCase);
     }
 
     /**
      * @return the imports
      */
     public List<String> getImports() {
-        return this.imports;
+        return imports;
     }
 
     /**
      * @return the testCases
      */
     public List<JUnitTestCase> getTestCases() {
-        return this.testCases;
+        return testCases;
     }
 }

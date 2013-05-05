@@ -71,7 +71,7 @@ public enum KeYInterface {
             false);
 
     public void __DEBUG_RESET() {
-        this.userInterface = new CustomConsoleUserInterface(false);
+        userInterface = new CustomConsoleUserInterface(false);
     }
 
     /**
@@ -95,7 +95,7 @@ public enum KeYInterface {
         final ProofOblInput proofObligationInput = new ProgramMethodPO(
                 initConfig, method.getFullName(), method, precondition, true);
 
-        final Proof proof = this.userInterface.createProof(initConfig,
+        final Proof proof = userInterface.createProof(initConfig,
                 proofObligationInput);
         if (proof == null) {
             throw new ProofInputException("Unable to load proof");
@@ -134,9 +134,9 @@ public enum KeYInterface {
              * Setup and prepare the proof session, and retrieve the KeYMediator
              * instance to use.
              */
-            final Proof proof = this.getProof(method.getInitConfig(),
+            final Proof proof = getProof(method.getInitConfig(),
                     method.getProgramMethod(), null);
-            final KeYMediator mediator = this.userInterface.getMediator();
+            final KeYMediator mediator = userInterface.getMediator();
 
             /*
              * Create the symbolic execution tree builder.
@@ -153,7 +153,7 @@ public enum KeYInterface {
                     new ExecutedSymbolicExecutionTreeNodesStopCondition(
                             ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
 
-            this.userInterface.startAndWaitForAutoMode(proof);
+            userInterface.startAndWaitForAutoMode(proof);
 
             /*
              * Create the symbolic execution tree, and assert that it indeed
@@ -196,8 +196,8 @@ public enum KeYInterface {
 
             KeYInterface.lock.lock();
 
-            final DefaultProblemLoader loader = this.userInterface.load(
-                    javaFile, null, null);
+            final DefaultProblemLoader loader = userInterface.load(javaFile,
+                    null, null);
 
             final InitConfig initConfig = loader.getInitConfig();
 

@@ -122,7 +122,7 @@ public class CommandParser {
      */
     public List<File> getFiles() {
 
-        return this.files;
+        return files;
     }
 
     /**
@@ -130,7 +130,7 @@ public class CommandParser {
      */
     public List<String> getMethods() {
 
-        return this.methods;
+        return methods;
     }
 
     /**
@@ -138,7 +138,7 @@ public class CommandParser {
      */
     public String getOutputDirectory() {
 
-        return this.outputDirectory;
+        return outputDirectory;
     }
 
     /**
@@ -146,7 +146,7 @@ public class CommandParser {
      */
     public Set<String> getTestFrameworks() {
 
-        return this.testFrameworks;
+        return testFrameworks;
     }
 
     /**
@@ -154,7 +154,7 @@ public class CommandParser {
      */
     public boolean isAboutFlagSet() {
 
-        return this.about;
+        return about;
     }
 
     /**
@@ -162,7 +162,7 @@ public class CommandParser {
      */
     public boolean isHelpFlagSet() {
 
-        return this.help;
+        return help;
     }
 
     /**
@@ -170,6 +170,6 @@ public class CommandParser {
      */
     public boolean isVerboseFlagSet() {
 
-        return this.help;
+        return help;
     }
 }

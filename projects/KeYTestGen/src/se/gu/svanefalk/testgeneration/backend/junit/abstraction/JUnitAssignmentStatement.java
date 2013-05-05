@@ -47,20 +47,20 @@ public class JUnitAssignmentStatement {
      * @return the fieldName
      */
     public String getFieldName() {
-        return this.fieldName;
+        return fieldName;
     }
 
     /**
      * @return the fieldValue
      */
     public String getFieldValue() {
-        return this.fieldValue;
+        return fieldValue;
     }
 
     /**
      * @return the objectName
      */
     public String getObjectName() {
-        return this.objectName;
+        return objectName;
     }
 }

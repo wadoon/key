@@ -29,7 +29,7 @@ public class JUnitFixture {
      */
     public void addAssignmentStatement(
             final JUnitAssignmentStatement assignmentStatement) {
-        this.assignments.add(assignmentStatement);
+        assignments.add(assignmentStatement);
     }
 
     /**
@@ -39,20 +39,20 @@ public class JUnitFixture {
      */
     public void addDeclarationStatement(
             final JUnitDeclarationStatement declarationStatement) {
-        this.declarations.add(declarationStatement);
+        declarations.add(declarationStatement);
     }
 
     /**
      * @return the assignments
      */
     public List<JUnitAssignmentStatement> getAssignments() {
-        return this.assignments;
+        return assignments;
     }
 
     /**
      * @return the declarations
      */
     public List<JUnitDeclarationStatement> getDeclarations() {
-        return this.declarations;
+        return declarations;
     }
 }

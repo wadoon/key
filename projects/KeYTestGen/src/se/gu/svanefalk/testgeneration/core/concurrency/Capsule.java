@@ -33,22 +33,22 @@ public abstract class Capsule implements Runnable {
      *         any.
      */
     public KeYTestGenException getThrownException() {
-        return this.thrownException;
+        return thrownException;
     }
 
     /**
      * @return true if the Capsule executed succesfully, false otherwise.
      */
     public boolean isSucceeded() {
-        return this.succeeded;
+        return succeeded;
     }
 
     @Override
     public final void run() {
         try {
-            this.doWork();
+            doWork();
         } finally {
-            this.latch.countDown();
+            latch.countDown();
         }
     }
 
@@ -65,7 +65,7 @@ public abstract class Capsule implements Runnable {
      * reveresed once set due to the nature of the Capsule itself.
      */
     protected void setSucceeded() {
-        this.succeeded = true;
+        succeeded = true;
     }
 
     /**

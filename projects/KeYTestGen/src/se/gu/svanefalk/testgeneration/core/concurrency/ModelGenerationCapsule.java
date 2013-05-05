@@ -50,16 +50,16 @@ public class ModelGenerationCapsule extends Capsule {
          * just kill the Capsule.
          */
         try {
-            this.model = this.modelGenerator.generateModel(this.node);
+            model = modelGenerator.generateModel(node);
         } catch (final ModelGeneratorException e) {
-            this.setThrownException(e);
+            setThrownException(e);
             return;
         }
 
         /*
          * ModelGeneration succeeded.
          */
-        this.setSucceeded();
+        setSucceeded();
     }
 
     /**
@@ -68,6 +68,6 @@ public class ModelGenerationCapsule extends Capsule {
      * @return
      */
     public Model getResult() {
-        return this.model;
+        return model;
     }
 }

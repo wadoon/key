@@ -66,7 +66,7 @@ public enum CoreInterface {
         /*
          * Get the abstract representation of the class.
          */
-        final KeYJavaClass targetClass = this.extractKeYJavaClass(path);
+        final KeYJavaClass targetClass = extractKeYJavaClass(path);
 
         /*
          * The result set of abstract test suites.
@@ -101,7 +101,7 @@ public enum CoreInterface {
         /*
          * Finally, dispatch the capsules and wait for them to finish.
          */
-        this.capsuleExecutor.executeCapsulesAndWait(testGenerationCapsules);
+        capsuleExecutor.executeCapsulesAndWait(testGenerationCapsules);
 
         /*
          * Collect and return the results of the capsules.
@@ -137,7 +137,7 @@ public enum CoreInterface {
              */
             Benchmark.startBenchmarking("1. [KeY] setting up class and method abstractions");
 
-            final KeYJavaClass keYJavaClass = this.keYJavaClassFactory.createKeYJavaClass(new File(
+            final KeYJavaClass keYJavaClass = keYJavaClassFactory.createKeYJavaClass(new File(
                     source));
 
             Benchmark.finishBenchmarking("1. [KeY] setting up class and method abstractions");

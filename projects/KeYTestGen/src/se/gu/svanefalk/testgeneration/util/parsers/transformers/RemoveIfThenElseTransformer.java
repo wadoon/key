@@ -30,10 +30,9 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
         } else {
 
             final Term leftChild = conditions.poll();
-            final Term rightChild = this.constructConjunction(conditions);
+            final Term rightChild = constructConjunction(conditions);
 
-            return this.termFactory.createTerm(Junctor.AND, leftChild,
-                    rightChild);
+            return termFactory.createTerm(Junctor.AND, leftChild, rightChild);
         }
     }
 
@@ -66,13 +65,13 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
             /*
              * Process the Then branch in the fashion described above.
              */
-            if (this.isEndBranch(thenBranch)) {
+            if (isEndBranch(thenBranch)) {
                 realOutcome = TermParserTools.translateToJavaBoolean(thenBranch);
                 if (realOutcome == expectedOutcome) {
                     conditions.add(condition);
                     return;
                 } else {
-                    conditionToSave = this.termFactory.createTerm(Junctor.NOT,
+                    conditionToSave = termFactory.createTerm(Junctor.NOT,
                             condition);
                 }
             } else {
@@ -82,10 +81,10 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
             /*
              * Process the Else branch in the same fashion.
              */
-            if (this.isEndBranch(elseBranch)) {
+            if (isEndBranch(elseBranch)) {
                 realOutcome = TermParserTools.translateToJavaBoolean(elseBranch);
                 if (realOutcome == expectedOutcome) {
-                    conditions.add(this.termFactory.createTerm(Junctor.NOT,
+                    conditions.add(termFactory.createTerm(Junctor.NOT,
                             condition));
                     return;
                 } else {
@@ -101,7 +100,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
              * a nested if-then-statement.
              */
             conditions.add(conditionToSave);
-            this.resolveIfThenElse(nestedBranch, expectedOutcome, conditions);
+            resolveIfThenElse(nestedBranch, expectedOutcome, conditions);
 
         } catch (final TermParserException e) {
 
@@ -118,7 +117,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
      */
     @Override
     public Term transform(final Term term) throws TermTransformerException {
-        return this.transformTerm(term);
+        return transformTerm(term);
     }
 
     /**
@@ -162,10 +161,10 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                         outcome = TermParserTools.translateToJavaBoolean(secondChild);
                     } else {
                         outcome = true;
-                        this.createTrueConstant();
-                        final Term newSecondChild = this.termFactory.createTerm(
+                        createTrueConstant();
+                        final Term newSecondChild = termFactory.createTerm(
                                 Equality.EQUALS, secondChild,
-                                this.createTrueConstant());
+                                createTrueConstant());
 
                         conditions.add(newSecondChild);
                     }
@@ -180,20 +179,19 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                      */
                 } else {
                     outcome = true;
-                    final Term newSecondChild = this.termFactory.createTerm(
-                            Equality.EQUALS, secondChild,
-                            this.createTrueConstant());
+                    final Term newSecondChild = termFactory.createTerm(
+                            Equality.EQUALS, secondChild, createTrueConstant());
 
                     conditions.add(newSecondChild);
                 }
 
-                this.resolveIfThenElse(firstChild, outcome, conditions);
-                final Term newTerm = this.constructConjunction(conditions);
+                resolveIfThenElse(firstChild, outcome, conditions);
+                final Term newTerm = constructConjunction(conditions);
 
                 /*
                  * Continue parsing normally
                  */
-                return this.transformAnd(newTerm);
+                return transformAnd(newTerm);
 
             } else {
 

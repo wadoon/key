@@ -11,5 +11,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key-devel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SmtInterpol"/>
+	<classpathentry kind="lib" path="/usr/share/java/apache-commons-math.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

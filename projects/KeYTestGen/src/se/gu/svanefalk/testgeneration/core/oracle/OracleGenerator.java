@@ -90,14 +90,14 @@ public enum OracleGenerator {
             final Term secondChild = term.sub(1);
 
             if (TermParserTools.isAnd(firstChild)) {
-                this.constructAssertions(firstChild, clauses);
-                this.constructExpressions(secondChild, expressions);
+                constructAssertions(firstChild, clauses);
+                constructExpressions(secondChild, expressions);
             } else if (TermParserTools.isAnd(secondChild)) {
-                this.constructAssertions(secondChild, clauses);
-                this.constructExpressions(firstChild, expressions);
+                constructAssertions(secondChild, clauses);
+                constructExpressions(firstChild, expressions);
             } else {
-                this.constructExpressions(firstChild, expressions);
-                this.constructExpressions(secondChild, expressions);
+                constructExpressions(firstChild, expressions);
+                constructExpressions(secondChild, expressions);
             }
         }
 
@@ -106,7 +106,7 @@ public enum OracleGenerator {
          * into a single OracleAssertion.
          */
         else {
-            this.constructExpressions(term, expressions);
+            constructExpressions(term, expressions);
         }
 
         clause = new OracleAssertion(expressions);
@@ -136,10 +136,10 @@ public enum OracleGenerator {
         final ComparatorType comparator = OracleTypeFactory.getComparatorType(
                 term, negate);
 
-        final OracleExpression firstOperand = this.constructExpressionFromTerm(
+        final OracleExpression firstOperand = constructExpressionFromTerm(
                 term.sub(0), negate);
 
-        final OracleExpression secondOperand = this.constructExpressionFromTerm(
+        final OracleExpression secondOperand = constructExpressionFromTerm(
                 term.sub(1), negate);
 
         return new OracleComparator(comparator, firstOperand, secondOperand);
@@ -180,23 +180,23 @@ public enum OracleGenerator {
             }
 
             if (TermParserTools.isBinaryFunction(term)) {
-                return this.constructExpressionFromBinaryFunction(term, negate);
+                return constructExpressionFromBinaryFunction(term, negate);
             }
 
             if (TermParserTools.isUnaryFunction(term)) {
-                return this.constructExpressionFromUnaryFunction(term, negate);
+                return constructExpressionFromUnaryFunction(term, negate);
             }
 
             if (TermParserTools.isProgramMethod(term)) {
-                return this.constructExpressionFromProgramMethod(term, negate);
+                return constructExpressionFromProgramMethod(term, negate);
             }
 
             if (TermParserTools.isFormula(term)) {
-                return this.constructExpressionFromFormula(term, negate);
+                return constructExpressionFromFormula(term, negate);
             }
 
             if (TermParserTools.isBooleanConstant(term)) {
-                return this.constructExpressionFromVariable(term);
+                return constructExpressionFromVariable(term);
             }
 
         } catch (final TermParserException e) {
@@ -239,7 +239,7 @@ public enum OracleGenerator {
             OracleGeneratorException {
 
         if (TermParserTools.isNot(term)) {
-            return this.constructExpressionFromTerm(term.sub(0), true);
+            return constructExpressionFromTerm(term.sub(0), true);
         }
 
         throw new OracleGeneratorException("Unsupported Junctor: "
@@ -291,7 +291,7 @@ public enum OracleGenerator {
         final OracleExpression[] parameters = new OracleExpression[bufferSize - 2];
         for (int i = 2; i < bufferSize; i++) {
             final Term parameterTerm = term.sub(i);
-            parameters[i - 2] = this.constructExpressionFromTerm(parameterTerm,
+            parameters[i - 2] = constructExpressionFromTerm(parameterTerm,
                     negate);
         }
 
@@ -324,7 +324,7 @@ public enum OracleGenerator {
         /*
          * Resolve the expression bounded by this quantifier
          */
-        final OracleConstraint boundExpression = this.constructOracle(term.sub(0));
+        final OracleConstraint boundExpression = constructOracle(term.sub(0));
 
         /*
          * Construct the quantifiable variable
@@ -352,27 +352,27 @@ public enum OracleGenerator {
             throws OracleGeneratorException {
 
         if (TermParserTools.isFunction(term)) {
-            return this.constructExpressionFromFunction(term, negate);
+            return constructExpressionFromFunction(term, negate);
         }
 
         if (TermParserTools.isEquals(term)) {
-            return this.constructExpressionFromBinaryFunction(term, negate);
+            return constructExpressionFromBinaryFunction(term, negate);
         }
 
         if (TermParserTools.isJunctor(term)) {
-            return this.constructExpressionFromJunctor(term, negate);
+            return constructExpressionFromJunctor(term, negate);
         }
 
         if (TermParserTools.isProgramVariable(term)) {
-            return this.constructExpressionFromVariable(term);
+            return constructExpressionFromVariable(term);
         }
 
         if (TermParserTools.isLogicVariable(term)) {
-            return this.constructExpressionFromVariable(term);
+            return constructExpressionFromVariable(term);
         }
 
         if (TermParserTools.isQuantifier(term)) {
-            return this.constructExpressionFromQuantifier(term, negate);
+            return constructExpressionFromQuantifier(term, negate);
         }
 
         throw new OracleGeneratorException("Unsupported SortedOperator: "
@@ -394,10 +394,10 @@ public enum OracleGenerator {
             final boolean negate) throws OracleGeneratorException {
 
         if (TermParserTools.isSortedOperator(term)) {
-            return this.constructExpressionFromSortedOperator(term, negate);
+            return constructExpressionFromSortedOperator(term, negate);
 
         } else if (TermParserTools.isIfExThenElse(term)) {
-            return this.constructExpressionFromIfExThenElse(term, negate);
+            return constructExpressionFromIfExThenElse(term, negate);
 
         }
         throw new OracleGeneratorException(
@@ -422,7 +422,7 @@ public enum OracleGenerator {
             throws OracleGeneratorException {
 
         if (TermParserTools.isIntegerNegation(term)) {
-            final String value = "-" + this.resolveNumbers(term.sub(0));
+            final String value = "-" + resolveNumbers(term.sub(0));
             final OracleType type = OracleTypeFactory.getOracleType(term);
             return new OracleLiteral(type, value);
         }
@@ -462,11 +462,11 @@ public enum OracleGenerator {
          * If the Term is an Or-term, resolve both sub-expressions recursively
          */
         if (TermParserTools.isOr(term)) {
-            this.constructExpressions(term.sub(0), expressions);
-            this.constructExpressions(term.sub(1), expressions);
+            constructExpressions(term.sub(0), expressions);
+            constructExpressions(term.sub(1), expressions);
         } else {
 
-            final OracleExpression expression = this.constructExpressionFromTerm(
+            final OracleExpression expression = constructExpressionFromTerm(
                     term, false);
             expressions.add(expression);
         }
@@ -489,7 +489,7 @@ public enum OracleGenerator {
          * Create and return the OracleConstraint.
          */
         final Set<OracleAssertion> oracleClauses = new HashSet<OracleAssertion>();
-        this.constructAssertions(term, oracleClauses);
+        constructAssertions(term, oracleClauses);
 
         return new OracleConstraint(oracleClauses);
     }
@@ -526,12 +526,12 @@ public enum OracleGenerator {
             /*
              * Simplify the postcondition
              */
-            final Term simplifiedPostCondition = this.oracleTermTransformer.transform(postCondition);
+            final Term simplifiedPostCondition = oracleTermTransformer.transform(postCondition);
 
             /*
              * Create the postcondition constraints model
              */
-            final OracleConstraint constraints = this.constructOracle(simplifiedPostCondition);
+            final OracleConstraint constraints = constructOracle(simplifiedPostCondition);
 
             return new Oracle(constraints, expectedException);
 
@@ -556,7 +556,7 @@ public enum OracleGenerator {
         if (numberString.equals("#")) {
             return "";
         } else {
-            return this.resolveNumbers(term.sub(0)) + numberString;
+            return resolveNumbers(term.sub(0)) + numberString;
         }
 
     }

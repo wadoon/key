@@ -188,11 +188,9 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
             final String precondition, final boolean mergeBranchConditions)
             throws ProofInputException, IOException, ProblemLoaderException {
 
-        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = AbstractSymbolicExecutionTestCase
-                .createSymbolicExecutionEnvironment(
-                        AbstractSymbolicExecutionTestCase.keyRepDirectory,
-                        rootFolder, resourceFile, method, null, false, false,
-                        false);
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = AbstractSymbolicExecutionTestCase.createSymbolicExecutionEnvironment(
+                AbstractSymbolicExecutionTestCase.keyRepDirectory, rootFolder,
+                resourceFile, method, null, false, false, false);
 
         Assert.assertNotNull(env);
 
@@ -201,8 +199,8 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         final ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
                 ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
 
-        proof.getSettings().getStrategySettings()
-                .setCustomApplyStrategyStopCondition(stopCondition);
+        proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
+                stopCondition);
 
         env.getUi().startAndWaitForAutoMode(proof);
 
@@ -222,11 +220,9 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
             final IExecutionNode next = iterator.next();
 
             if (next instanceof IExecutionBranchNode) {
-                System.out.println(((IExecutionBranchNode) next)
-                        .getActivePositionInfo());
-                System.out.println(((IExecutionBranchNode) next)
-                        .getActiveStatement());
-                this.printSingleNode(next);
+                System.out.println(((IExecutionBranchNode) next).getActivePositionInfo());
+                System.out.println(((IExecutionBranchNode) next).getActiveStatement());
+                printSingleNode(next);
             }
         }
     }
@@ -242,7 +238,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
             final IExecutionNode next = iterator.next();
 
             if (next instanceof ExecutionMethodReturn) {
-                this.printSingleNode(next);
+                printSingleNode(next);
             }
         }
     }
@@ -258,7 +254,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
             final IExecutionNode next = iterator.next();
 
             if (next instanceof IExecutionStatement) {
-                this.printSingleNode(next);
+                printSingleNode(next);
             }
         }
     }
@@ -274,10 +270,9 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
             final IExecutionNode next = iterator.next();
 
             if (next instanceof IExecutionStateNode<?>) {
-                this.printSingleNode(next);
+                printSingleNode(next);
                 final IExecutionStateNode<SourceElement> stuff = (IExecutionStateNode<SourceElement>) next;
-                for (final IExecutionVariable var : SymbolicExecutionUtil
-                        .createExecutionVariables(stuff)) {
+                for (final IExecutionVariable var : SymbolicExecutionUtil.createExecutionVariables(stuff)) {
                     System.out.println("\n" + var.getProgramVariable());
                     for (final IExecutionValue val : var.getValues()) {
 
@@ -294,8 +289,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         final JavaInfo info = root.getMediator().getJavaInfo();
 
         for (final KeYJavaType type : info.getAllKeYJavaTypes()) {
-            System.out
-                    .println(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+            System.out.println(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
 
         }
     }
@@ -361,7 +355,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
 
             final IExecutionNode next = iterator.next();
 
-            this.printSingleNode(next);
+            printSingleNode(next);
         }
     }
 
@@ -407,7 +401,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
 
         for (int i = 0; i < term.arity(); i++) {
             System.out.println("Printing child " + i + " of current node");
-            this.printTermAST(term.sub(i));
+            printTermAST(term.sub(i));
         }
     }
 
@@ -418,7 +412,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         }
 
         for (int i = 0; i < term.arity(); i++) {
-            this.printVars(term.sub(i));
+            printVars(term.sub(i));
         }
 
     }

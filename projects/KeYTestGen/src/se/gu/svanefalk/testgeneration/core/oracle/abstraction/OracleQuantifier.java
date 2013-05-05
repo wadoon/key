@@ -39,7 +39,7 @@ public class OracleQuantifier extends OracleExpression {
 
         @Override
         public String toString() {
-            return this.identifier;
+            return identifier;
         }
     }
 
@@ -76,33 +76,33 @@ public class OracleQuantifier extends OracleExpression {
 
         this.boundExpression = boundExpression;
         this.quantifiableVariable = quantifiableVariable;
-        this.quantifierTtype = type;
+        quantifierTtype = type;
     }
 
     /**
      * @return the expression bound to this quantifier.
      */
     public OracleConstraint getBoundExpression() {
-        return this.boundExpression;
+        return boundExpression;
     }
 
     /**
      * @return the variable quantified over by this quantifier.
      */
     public OracleLiteral getQuantifiableVariable() {
-        return this.quantifiableVariable;
+        return quantifiableVariable;
     }
 
     /**
      * @return the {@link QuantifierType} of this quantifier.
      */
     public QuantifierType getQuantifierType() {
-        return this.quantifierTtype;
+        return quantifierTtype;
     }
 
     @Override
     public String toString() {
-        return this.getQuantifierType() + "(" + this.getQuantifiableVariable()
-                + ")" + " {" + this.getBoundExpression() + " } ";
+        return getQuantifierType() + "(" + getQuantifiableVariable() + ")"
+                + " {" + getBoundExpression() + " } ";
     }
 }

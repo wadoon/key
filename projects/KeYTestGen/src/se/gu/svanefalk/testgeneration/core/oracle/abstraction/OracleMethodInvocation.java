@@ -46,7 +46,7 @@ public class OracleMethodInvocation extends OracleExpression {
 
         this.parentObject = parentObject;
         this.identifier = identifier;
-        this.parameters = arguments;
+        parameters = arguments;
 
     }
 
@@ -54,32 +54,32 @@ public class OracleMethodInvocation extends OracleExpression {
      * @return the identifier for the method.
      */
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     /**
      * @return the parameters passed to the invocation.
      */
     public OracleExpression[] getParameters() {
-        return this.parameters;
+        return parameters;
     }
 
     /**
      * @return the object from which the method is being invoked.
      */
     public OracleLiteral getParentObject() {
-        return this.parentObject;
+        return parentObject;
     }
 
     @Override
     public String toString() {
         final StringBuilder toPrint = new StringBuilder();
 
-        toPrint.append(this.identifier);
+        toPrint.append(identifier);
         toPrint.append("(");
-        for (int i = 0; i < this.parameters.length; i++) {
-            toPrint.append(this.parameters[i]);
-            if (i < (this.parameters.length - 1)) {
+        for (int i = 0; i < parameters.length; i++) {
+            toPrint.append(parameters[i]);
+            if (i < (parameters.length - 1)) {
                 toPrint.append(",");
             }
         }

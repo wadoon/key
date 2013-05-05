@@ -38,6 +38,6 @@ public final class OracleType {
 
     @Override
     public String toString() {
-        return this.name;
+        return name;
     }
 }

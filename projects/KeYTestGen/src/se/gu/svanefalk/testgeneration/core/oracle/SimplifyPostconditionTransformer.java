@@ -47,7 +47,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         /*
          * Do the transformation
          */
-        oracleTerm = this.transformTerm(oracleTerm);
+        oracleTerm = transformTerm(oracleTerm);
 
         /*
          * Put it into Conjunctive Normal Form
@@ -81,8 +81,8 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
     protected Term transformAnd(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = this.transformTerm(term.sub(0));
-        final Term secondChild = this.transformTerm(term.sub(1));
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
 
         if ((firstChild != null) && (secondChild == null)) {
             return firstChild;
@@ -93,8 +93,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         }
 
         if ((firstChild != null) && (secondChild != null)) {
-            return this.termFactory.createTerm(Junctor.AND, firstChild,
-                    secondChild);
+            return termFactory.createTerm(Junctor.AND, firstChild, secondChild);
         }
 
         return null;
@@ -113,15 +112,14 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
     protected Term transformEquals(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = this.transformTerm(term.sub(0));
-        final Term secondChild = this.transformTerm(term.sub(1));
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
 
         if (firstChild == null) {
             return null;
         } else {
 
-            return this.termFactory.createTerm(term.op(), firstChild,
-                    secondChild);
+            return termFactory.createTerm(term.op(), firstChild, secondChild);
         }
     }
 
@@ -180,13 +178,13 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
     protected Term transformNot(final Term term)
             throws TermTransformerException {
 
-        final Term newChild = this.transformTerm(term.sub(0));
+        final Term newChild = transformTerm(term.sub(0));
 
         if (newChild == null) {
             return null;
         }
 
-        return this.termFactory.createTerm(Junctor.NOT, newChild);
+        return termFactory.createTerm(Junctor.NOT, newChild);
     }
 
     /**
@@ -201,8 +199,8 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
     @Override
     protected Term transformOr(final Term term) throws TermTransformerException {
 
-        final Term firstChild = this.transformTerm(term.sub(0));
-        final Term secondChild = this.transformTerm(term.sub(1));
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
 
         if ((firstChild != null) && (secondChild == null)) {
             return firstChild;
@@ -213,8 +211,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         }
 
         if ((firstChild != null) && (secondChild != null)) {
-            return this.termFactory.createTerm(Junctor.OR, firstChild,
-                    secondChild);
+            return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
         }
 
         return null;

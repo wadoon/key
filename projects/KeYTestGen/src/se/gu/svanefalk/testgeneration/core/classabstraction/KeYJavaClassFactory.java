@@ -49,7 +49,7 @@ public enum KeYJavaClassFactory {
                  * (since each one will effectively represent a unique set of
                  * restrictions on the invocation of the method).
                  */
-                final List<ContractWrapper> contracts = this.getContracts(
+                final List<ContractWrapper> contracts = getContracts(
                         memberMethod, services);
                 for (final ContractWrapper contract : contracts) {
 
@@ -80,17 +80,17 @@ public enum KeYJavaClassFactory {
         /*
          * Load the file into KeY and get the InitConfig instance for it.
          */
-        final InitConfig initConfig = this.keyInterface.loadJavaFile(javaFile);
+        final InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
 
         /*
          * Retrieve the KeYJavaType for the top level class declaration in this
          * file
          */
-        final String fileName = this.getFileName(javaFile);
+        final String fileName = getFileName(javaFile);
         final KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
-        return this.constructClass(mainClass, initConfig);
+        return constructClass(mainClass, initConfig);
     }
 
     public KeYJavaClass createKeYJavaClass(final IExecutionMethodCall methodCall) {
@@ -107,7 +107,7 @@ public enum KeYJavaClassFactory {
          */
         final KeYJavaType parent = method.getContainerType();
 
-        return this.constructClass(parent, initConfig);
+        return constructClass(parent, initConfig);
     }
 
     /**

@@ -87,19 +87,19 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
     public TermToModelVisitor(final Model model, final IExecutionNode node) {
 
-        final IExecutionMethodCall methodCall = this.getMethodCallNode(node);
+        final IExecutionMethodCall methodCall = getMethodCallNode(node);
 
         this.model = model;
 
-        this.javaInfo = methodCall.getServices().getJavaInfo();
+        javaInfo = methodCall.getServices().getJavaInfo();
 
         /*
          * Construct the default base class.
          */
         final KeYJavaType container = methodCall.getProgramMethod().getContainerType();
 
-        this.default_self = new LocationVariable(
-                new ProgramElementName("self"), new KeYJavaType(container));
+        default_self = new LocationVariable(new ProgramElementName("self"),
+                new KeYJavaType(container));
 
         /*
          * Add the root variable and instance to the Model
@@ -107,7 +107,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         final ModelInstance selfInstance = ModelInstance.constructModelInstance(container);
 
         final ModelVariable self = ModelVariable.constructModelVariable(
-                this.default_self, "self");
+                default_self, "self");
 
         model.add(self, selfInstance);
 
@@ -166,7 +166,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         if (node instanceof IExecutionMethodCall) {
             return (IExecutionMethodCall) node;
         } else {
-            return this.getMethodCallNode(node.getParent());
+            return getMethodCallNode(node.getParent());
         }
     }
 
@@ -177,7 +177,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
      */
     public Model getModel() {
 
-        return this.model;
+        return model;
     }
 
     /**
@@ -196,7 +196,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         }
 
         final String[] split = term.op().toString().split("::\\$");
-        return this.javaInfo.getAttribute(split[1], split[0]);
+        return javaInfo.getAttribute(split[1], split[0]);
     }
 
     /**
@@ -232,7 +232,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
                 if (operator.toString().equalsIgnoreCase("self")) {
 
-                    return this.default_self;
+                    return default_self;
                 } else {
                     return (ProgramVariable) operator;
                 }
@@ -250,7 +250,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
 
             if (operator.toString().equalsIgnoreCase("self")) {
 
-                return this.default_self;
+                return default_self;
             }
         }
 
@@ -261,7 +261,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          */
         if (operator.getClass() == SortDependingFunction.class) {
 
-            return this.getProgramVariableForField(term.sub(2));
+            return getProgramVariableForField(term.sub(2));
         }
 
         return null;
@@ -290,7 +290,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * has been found - this is a terribly ugly hack. Check if sort is null
          * instead? What other variables (if any) may have nulled sorts?
          */
-        final ProgramVariable programVariable = this.getVariable(term);
+        final ProgramVariable programVariable = getVariable(term);
 
         if ((programVariable == null)
                 || programVariable.toString().equals("self")) {
@@ -310,7 +310,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         /*
          * Check that the variable we found is not already present in the model.
          */
-        final ModelVariable currentVariable = this.model.getVariable(identifier);
+        final ModelVariable currentVariable = model.getVariable(identifier);
         if ((currentVariable != null) && currentVariable.isParameter()) {
             return;
         }
@@ -337,7 +337,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * premature, but must be done to preserve referential integrity and
          * avoiding extra work.
          */
-        this.model.add(variable, instance);
+        model.add(variable, instance);
 
         /*
          * If the term is a SortDependingFunction, we are faced with two
@@ -354,7 +354,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          */
         if (TermParserTools.isSortDependingFunction(term)) {
 
-            final ProgramVariable parentVariable = this.getVariable(term.sub(1));
+            final ProgramVariable parentVariable = getVariable(term.sub(1));
 
             /*
              * The parent is not null, and this variable is hence an instance
@@ -368,13 +368,13 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                 final ModelVariable parentModelVariable = ModelVariable.constructModelVariable(
                         parentVariable, parentIdentifier);
 
-                this.model.assignField(variable, parentModelVariable);
+                model.assignField(variable, parentModelVariable);
 
             } else if (!programVariable.isStatic()) {
 
                 final ModelVariable self = ModelVariable.constructModelVariable(
-                        this.default_self, "self");
-                this.model.assignField(variable, self);
+                        default_self, "self");
+                model.assignField(variable, self);
             }
         }
 
@@ -392,8 +392,8 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
         else {
 
             final ModelVariable self = ModelVariable.constructModelVariable(
-                    this.default_self, "self");
-            this.model.assignField(variable, self);
+                    default_self, "self");
+            model.assignField(variable, self);
 
         }
     }
@@ -416,7 +416,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
     public void visit(final Term visited) {
 
         if (TermParserTools.isVariable(visited)) {
-            this.parseVariableTerm(visited);
+            parseVariableTerm(visited);
         }
     }
 }

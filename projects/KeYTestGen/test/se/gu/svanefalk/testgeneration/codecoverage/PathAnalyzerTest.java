@@ -29,10 +29,9 @@ public class PathAnalyzerTest extends KeYTestGenTest {
             final String method) throws ProofInputException,
             ModelGeneratorException, IOException, ProblemLoaderException {
 
-        return this.getPreparedEnvironment(
+        return getPreparedEnvironment(
                 AbstractSymbolicExecutionTestCase.keyRepDirectory,
-                this.javaPathInBaseDir, this.containerTypeName, method, null,
-                false);
+                javaPathInBaseDir, containerTypeName, method, null, false);
     }
 
     @Test
@@ -40,22 +39,18 @@ public class PathAnalyzerTest extends KeYTestGenTest {
             IOException, ProblemLoaderException {
 
         final String method = "max";
-        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = this
-                .getEnvironmentForMethod(method);
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
-        final SpecificationRepository repo = environment.getServices()
-                .getSpecificationRepository();
-        final IExecutionStartNode root = environment.getBuilder()
-                .getStartNode();
-        final IExecutionMethodCall callNode = this.getMethodCallNode(root);
+        final SpecificationRepository repo = environment.getServices().getSpecificationRepository();
+        final IExecutionStartNode root = environment.getBuilder().getStartNode();
+        final IExecutionMethodCall callNode = getMethodCallNode(root);
         final KeYMediator mediator = environment.getBuilder().getMediator();
         final JavaInfo info = mediator.getJavaInfo();
         final IProgramMethod programMethod = callNode.getProgramMethod();
 
         System.out.println(callNode);
         System.out.println(callNode.getProgramMethod());
-        final KeYJavaType container = callNode.getProgramMethod()
-                .getContainerType();
+        final KeYJavaType container = callNode.getProgramMethod().getContainerType();
         System.out.println(container);
 
         /*
@@ -68,13 +63,11 @@ public class PathAnalyzerTest extends KeYTestGenTest {
 
         System.out.println("TYPE: "
                 + info.getTypeByClassName("PrimitiveIntegerOperations"));
-        System.out
-                .println(info
-                        .getTypeByName("se.gu.svanefalk.testgeneration.targetmodels.PrimitiveIntegerOperations"));
+        System.out.println(info.getTypeByName("se.gu.svanefalk.testgeneration.targetmodels.PrimitiveIntegerOperations"));
         System.out.println(programMethod.getType());
         final KeYJavaType methodType = programMethod.getType();
-        for (final FunctionalOperationContract contract : repo
-                .getOperationContracts(methodType, callNode.getProgramMethod())) {
+        for (final FunctionalOperationContract contract : repo.getOperationContracts(
+                methodType, callNode.getProgramMethod())) {
             System.out.println(contract);
         }
     }

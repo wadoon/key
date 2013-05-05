@@ -23,7 +23,7 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        return this.transformTerm(term);
+        return transformTerm(term);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
         final LocationVariable transformedParentObjectVariable = new LocationVariable(
                 parentObjectIdentifier, parentObject.sort());
 
-        final Term transformedParentObject = this.termFactory.createTerm(transformedParentObjectVariable);
+        final Term transformedParentObject = termFactory.createTerm(transformedParentObjectVariable);
 
         /*
          * Construct a new list of children for the new method term
@@ -69,8 +69,8 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
         final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
                 childBuffer);
 
-        return this.termFactory.createTerm(term.op(), newChildren,
-                term.boundVars(), term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
     }
 
     @Override
@@ -83,6 +83,6 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
         final LocationVariable resolvedVariable = new LocationVariable(
                 resolvedVariableName, term.sort());
 
-        return this.termFactory.createTerm(resolvedVariable);
+        return termFactory.createTerm(resolvedVariable);
     }
 }

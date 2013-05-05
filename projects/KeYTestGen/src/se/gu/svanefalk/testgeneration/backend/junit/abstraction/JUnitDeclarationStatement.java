@@ -35,8 +35,8 @@ public class JUnitDeclarationStatement {
     private final String value;
 
     public JUnitDeclarationStatement(final ModelVariable variable) {
-        this.type = variable.getType();
-        this.identifier = variable.getIdentifier();
+        type = variable.getType();
+        identifier = variable.getIdentifier();
 
         final Object value = variable.getValue();
         if (value instanceof ModelInstance) {
@@ -59,20 +59,20 @@ public class JUnitDeclarationStatement {
      * @return the identifier
      */
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     /**
      * @return the type
      */
     public String getType() {
-        return this.type;
+        return type;
     }
 
     /**
      * @return the value
      */
     public String getValue() {
-        return this.value;
+        return value;
     }
 }

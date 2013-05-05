@@ -27,12 +27,12 @@ public enum BranchCoverageBuilder implements ICoverageBuilder {
 
         @Override
         public int compare(final ExecutionPath o1, final ExecutionPath o2) {
-            return this.doComparison(o1, o2);
+            return doComparison(o1, o2);
         }
 
         private int doComparison(final ExecutionPath o1, final ExecutionPath o2) {
-            final List<ExecutionBranch> first = this.map.get(o1);
-            final List<ExecutionBranch> second = this.map.get(o2);
+            final List<ExecutionBranch> first = map.get(o1);
+            final List<ExecutionBranch> second = map.get(o2);
             final int diff = first.size() - second.size();
             if (diff == 0) {
                 return 0;
@@ -88,7 +88,7 @@ public enum BranchCoverageBuilder implements ICoverageBuilder {
             for (final ExecutionPath otherPath : executionPaths) {
                 if (targetPath != otherPath) {
                     final List<ExecutionBranch> otherBranches = branchesCoveredByPath.get(otherPath);
-                    if (this.subsumes(targetBranches, otherBranches)) {
+                    if (subsumes(targetBranches, otherBranches)) {
                         branchesCoveredByPath.remove(otherPath);
                     }
                 }

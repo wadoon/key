@@ -83,9 +83,9 @@ public class TestGenerationCapsule extends Capsule {
              * code coverage.
              */
             Benchmark.startBenchmarking("2. [KeY] Create symbolic execution tree");
-            final IExecutionStartNode root = this.keYInterface.getSymbolicExecutionTree(this.targetMethod);
+            final IExecutionStartNode root = keYInterface.getSymbolicExecutionTree(targetMethod);
 
-            final List<IExecutionNode> nodes = this.codeCoverageParser.retrieveNodes(root);
+            final List<IExecutionNode> nodes = codeCoverageParser.retrieveNodes(root);
 
             Benchmark.finishBenchmarking("2. [KeY] Create symbolic execution tree");
 
@@ -111,13 +111,13 @@ public class TestGenerationCapsule extends Capsule {
              * Setup the Oracle generation capsule for this method
              */
             final OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
-                    this.targetMethod);
+                    targetMethod);
             toExecute.add(oracleGenerationCapsule);
 
             /*
              * Dispatch and wait for the capsules.
              */
-            this.threadPool.executeCapsulesAndWait(toExecute);
+            threadPool.executeCapsulesAndWait(toExecute);
 
             /*
              * Collect the results
@@ -133,7 +133,7 @@ public class TestGenerationCapsule extends Capsule {
             final List<TestCase> testCases = new LinkedList<TestCase>();
             for (final Model model : models) {
                 final TestCase testCase = TestCase.constructTestCase(
-                        this.targetMethod, model, oracle);
+                        targetMethod, model, oracle);
                 testCases.add(testCase);
             }
             Benchmark.finishBenchmarking("3. generating models");
@@ -141,23 +141,22 @@ public class TestGenerationCapsule extends Capsule {
             /*
              * Construct the test suite.
              */
-            this.testSuite = TestSuite.constructTestSuite(
-                    this.targetMethod.getDeclaringClass(), this.targetMethod,
-                    testCases);
+            testSuite = TestSuite.constructTestSuite(
+                    targetMethod.getDeclaringClass(), targetMethod, testCases);
 
             /*
              * Finish execution.
              */
-            this.setSucceeded();
+            setSucceeded();
 
         } catch (final KeYInterfaceException e) {
-            this.setThrownException(e);
+            setThrownException(e);
         } catch (final CoreException e) {
-            this.setThrownException(e);
+            setThrownException(e);
         }
     }
 
     public TestSuite getResult() {
-        return this.testSuite;
+        return testSuite;
     }
 }

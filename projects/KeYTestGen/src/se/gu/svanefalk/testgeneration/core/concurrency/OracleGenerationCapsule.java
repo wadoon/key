@@ -52,22 +52,22 @@ public class OracleGenerationCapsule extends Capsule {
          * we hence just kill the Capsule.
          */
         try {
-            this.oracle = this.oracleGenerator.generateOracle(this.method);
+            oracle = oracleGenerator.generateOracle(method);
         } catch (final OracleGeneratorException e) {
-            this.setThrownException(e);
+            setThrownException(e);
             return;
         }
 
         /*
          * The oracle generation process was succesful.
          */
-        this.setSucceeded();
+        setSucceeded();
     }
 
     /**
      * @return the result of the Oracle generation process, if succesful.
      */
     public Oracle getResult() {
-        return this.oracle;
+        return oracle;
     }
 }

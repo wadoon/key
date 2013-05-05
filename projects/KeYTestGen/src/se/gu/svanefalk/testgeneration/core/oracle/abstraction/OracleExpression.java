@@ -34,11 +34,11 @@ public abstract class OracleExpression {
      * @return the type
      */
     public OracleType getType() {
-        return this.type;
+        return type;
     }
 
     @Override
     public String toString() {
-        return "OracleExpression, type: " + this.getType();
+        return "OracleExpression, type: " + getType();
     }
 }

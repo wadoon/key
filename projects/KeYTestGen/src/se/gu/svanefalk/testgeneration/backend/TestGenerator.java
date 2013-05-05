@@ -112,7 +112,7 @@ public enum TestGenerator {
             /*
              * Create abstract test suites for the selected methods.
              */
-            final List<TestSuite> testSuites = this.coreInterface.createTestSuites(
+            final List<TestSuite> testSuites = coreInterface.createTestSuites(
                     source, coverage, methods);
 
             /*

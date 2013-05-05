@@ -49,7 +49,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
         final Name name = new Name("FALSE");
         final Sort sort = new SortImpl(new Name(StringConstants.BOOLEAN));
         final Function function = new Function(name, sort);
-        return this.termFactory.createTerm(function);
+        return termFactory.createTerm(function);
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
         final Name name = new Name("TRUE");
         final Sort sort = new SortImpl(new Name(StringConstants.BOOLEAN));
         final Function function = new Function(name, sort);
-        return this.termFactory.createTerm(function);
+        return termFactory.createTerm(function);
     }
 
     /**
@@ -73,10 +73,10 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformAnd(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = this.transformTerm(term.sub(0));
-        final Term secondChild = this.transformTerm(term.sub(1));
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
 
-        return this.termFactory.createTerm(Junctor.AND, firstChild, secondChild);
+        return termFactory.createTerm(Junctor.AND, firstChild, secondChild);
     }
 
     /**
@@ -92,10 +92,10 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformBinaryFunction(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = this.transformTerm(term.sub(0));
-        final Term secondChild = this.transformTerm(term.sub(1));
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
 
-        final Term newTerm = this.termFactory.createTerm(term.op(), firstChild,
+        final Term newTerm = termFactory.createTerm(term.op(), firstChild,
                 secondChild);
 
         return newTerm;
@@ -124,14 +124,14 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformEquals(final Term term)
             throws TermTransformerException {
 
-        final Term firstChild = this.transformTerm(term.sub(0));
-        final Term secondChild = this.transformTerm(term.sub(1));
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
 
         final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
                 firstChild, secondChild);
 
-        return this.termFactory.createTerm(term.op(), newChildren,
-                term.boundVars(), term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
     }
 
     /**
@@ -145,12 +145,12 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformExistsQuantifier(final Term term)
             throws TermTransformerException {
 
-        final Term newChild = this.transformTerm(term.sub(0));
+        final Term newChild = transformTerm(term.sub(0));
         final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
                 newChild);
 
-        return this.termFactory.createTerm(term.op(), newChildren,
-                term.boundVars(), term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
     }
 
     /**
@@ -164,12 +164,12 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformForAllQuantifier(final Term term)
             throws TermTransformerException {
 
-        final Term newChild = this.transformTerm(term.sub(0));
+        final Term newChild = transformTerm(term.sub(0));
         final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
                 newChild);
 
-        return this.termFactory.createTerm(term.op(), newChildren,
-                term.boundVars(), term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
     }
 
     protected Term transformFormula(final Term term)
@@ -199,35 +199,35 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
              */
 
             if (TermParserTools.isNullSort(term)) {
-                return this.transformNull(term);
+                return transformNull(term);
             }
 
             if (TermParserTools.isSortDependingFunction(term)) {
-                return this.transformSortDependentFunction(term);
+                return transformSortDependentFunction(term);
             }
 
             if (TermParserTools.isBinaryFunction(term)) {
-                return this.transformBinaryFunction(term);
+                return transformBinaryFunction(term);
             }
 
             if (TermParserTools.isUnaryFunction(term)) {
-                return this.transformUnaryFunction(term);
+                return transformUnaryFunction(term);
             }
 
             if (TermParserTools.isLiteral(term)) {
-                return this.transformLiteral(term);
+                return transformLiteral(term);
             }
 
             if (TermParserTools.isProgramMethod(term)) {
-                return this.transformProgramMethod(term);
+                return transformProgramMethod(term);
             }
 
             if (TermParserTools.isFormula(term)) {
-                return this.transformFormula(term);
+                return transformFormula(term);
             }
 
             if (TermParserTools.isBooleanConstant(term)) {
-                return this.transformBooleanConstant(term);
+                return transformBooleanConstant(term);
             }
 
         } catch (final TermParserException e) {
@@ -276,14 +276,14 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformImplication(final Term term)
             throws TermTransformerException {
 
-        final Term newFirstChild = this.transformTerm(term.sub(0));
-        final Term newSecondChild = this.transformTerm(term.sub(1));
+        final Term newFirstChild = transformTerm(term.sub(0));
+        final Term newSecondChild = transformTerm(term.sub(1));
 
         final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
                 newFirstChild, newSecondChild);
 
-        return this.termFactory.createTerm(term.op(), newChildren,
-                term.boundVars(), term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
+                term.javaBlock());
     }
 
     /**
@@ -297,19 +297,19 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             throws TermTransformerException {
 
         if (TermParserTools.isAnd(term)) {
-            return this.transformAnd(term);
+            return transformAnd(term);
 
         } else if (TermParserTools.isOr(term)) {
-            return this.transformOr(term);
+            return transformOr(term);
 
         } else if (TermParserTools.isEquals(term)) {
-            return this.transformEquals(term);
+            return transformEquals(term);
 
         } else if (TermParserTools.isNot(term)) {
-            return this.transformNot(term);
+            return transformNot(term);
 
         } else if (TermParserTools.isImplication(term)) {
-            return this.transformImplication(term);
+            return transformImplication(term);
         }
 
         throw new TermTransformerException("Unsupported Junctor: "
@@ -330,8 +330,8 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
          * Literals may or may not declare children, such as 1(#);
          */
         if (!term.subs().isEmpty()) {
-            final Term child = this.transformTerm(term.sub(0));
-            return this.termFactory.createTerm(term.op(), child);
+            final Term child = transformTerm(term.sub(0));
+            return termFactory.createTerm(term.op(), child);
         } else {
             return term;
         }
@@ -372,9 +372,9 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformNot(final Term term)
             throws TermTransformerException {
 
-        final Term newChild = this.transformTerm(term.sub(0));
+        final Term newChild = transformTerm(term.sub(0));
 
-        return this.termFactory.createTerm(Junctor.NOT, newChild);
+        return termFactory.createTerm(Junctor.NOT, newChild);
     }
 
     /**
@@ -411,10 +411,10 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      */
     protected Term transformOr(final Term term) throws TermTransformerException {
 
-        final Term firstChild = this.transformTerm(term.sub(0));
-        final Term secondChild = this.transformTerm(term.sub(1));
+        final Term firstChild = transformTerm(term.sub(0));
+        final Term secondChild = transformTerm(term.sub(1));
 
-        return this.termFactory.createTerm(Junctor.OR, firstChild, secondChild);
+        return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
     }
 
     /**
@@ -427,7 +427,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformProgramMethod(final Term term) {
 
         if (TermParserTools.isObserverFunction(term)) {
-            return this.transformObserverFunction(term);
+            return transformObserverFunction(term);
         }
 
         return term;
@@ -445,7 +445,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             throws TermTransformerException {
 
         if (TermParserTools.isLocationVariable(term)) {
-            return this.transformLocationVariable(term);
+            return transformLocationVariable(term);
         }
 
         throw new TermTransformerException("Unsupported SortedOperator: "
@@ -456,11 +456,11 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             throws TermTransformerException {
 
         if (TermParserTools.isExistsQuantifier(term)) {
-            return this.transformExistsQuantifier(term);
+            return transformExistsQuantifier(term);
         }
 
         if (TermParserTools.isForAllQuantifier(term)) {
-            return this.transformForAllQuantifier(term);
+            return transformForAllQuantifier(term);
         }
 
         throw new TermTransformerException("Unsupported quantifier: "
@@ -493,27 +493,27 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             throws TermTransformerException {
 
         if (TermParserTools.isFunction(term)) {
-            return this.transformFunction(term);
+            return transformFunction(term);
         }
 
         if (TermParserTools.isEquals(term)) {
-            return this.transformEquals(term);
+            return transformEquals(term);
         }
 
         if (TermParserTools.isJunctor(term)) {
-            return this.transformJunctor(term);
+            return transformJunctor(term);
         }
 
         if (TermParserTools.isProgramVariable(term)) {
-            return this.transformProgramVariable(term);
+            return transformProgramVariable(term);
         }
 
         if (TermParserTools.isLogicVariable(term)) {
-            return this.transformLogicVariable(term);
+            return transformLogicVariable(term);
         }
 
         if (TermParserTools.isQuantifier(term)) {
-            return this.transformQuantifier(term);
+            return transformQuantifier(term);
         }
 
         throw new TermTransformerException("Unsupported SortedOperator: "
@@ -536,13 +536,13 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
          * Order matters here, since SortedOperator is a subclass of Operator.
          */
         if (TermParserTools.isSortedOperator(term)) {
-            return this.transformSortedOperator(term);
+            return transformSortedOperator(term);
 
         } else if (TermParserTools.isIfExThenElse(term)) {
-            return this.transformIfExThenElse(term);
+            return transformIfExThenElse(term);
 
         } else if (TermParserTools.isIfThenElse(term)) {
-            return this.transformIfThenElse(term);
+            return transformIfThenElse(term);
 
         }
 
@@ -560,9 +560,9 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformUnaryFunction(final Term term)
             throws TermTransformerException {
 
-        final Term child = this.transformTerm(term.sub(0));
+        final Term child = transformTerm(term.sub(0));
 
-        final Term newTerm = this.termFactory.createTerm(term.op(), child);
+        final Term newTerm = termFactory.createTerm(term.op(), child);
 
         return newTerm;
     }

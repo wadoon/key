@@ -61,28 +61,27 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
 
         if (TermParserTools.isAnd(firstTerm)) {
 
-            final Term firstDistributedChild = this.distribute(
-                    firstTerm.sub(0), secondTerm);
-            final Term secondDistributedChild = this.distribute(
-                    firstTerm.sub(1), secondTerm);
+            final Term firstDistributedChild = distribute(firstTerm.sub(0),
+                    secondTerm);
+            final Term secondDistributedChild = distribute(firstTerm.sub(1),
+                    secondTerm);
 
-            return this.termFactory.createTerm(Junctor.AND,
-                    firstDistributedChild, secondDistributedChild);
+            return termFactory.createTerm(Junctor.AND, firstDistributedChild,
+                    secondDistributedChild);
 
         } else if (TermParserTools.isAnd(secondTerm)) {
 
-            final Term firstDistributedChild = this.distribute(firstTerm,
+            final Term firstDistributedChild = distribute(firstTerm,
                     secondTerm.sub(0));
-            final Term secondDistributedChild = this.distribute(firstTerm,
+            final Term secondDistributedChild = distribute(firstTerm,
                     secondTerm.sub(1));
 
-            return this.termFactory.createTerm(Junctor.AND,
-                    firstDistributedChild, secondDistributedChild);
+            return termFactory.createTerm(Junctor.AND, firstDistributedChild,
+                    secondDistributedChild);
 
         } else {
 
-            return this.termFactory.createTerm(Junctor.OR, firstTerm,
-                    secondTerm);
+            return termFactory.createTerm(Junctor.OR, firstTerm, secondTerm);
         }
     }
 
@@ -124,14 +123,14 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
          */
         final Term nnfTerm = ConjunctionNormalFormTransformer.nnfTransformer.transform(implicationFreeTerm);
 
-        return this.transformTerm(nnfTerm);
+        return transformTerm(nnfTerm);
     }
 
     @Override
     protected Term transformOr(final Term term) throws TermTransformerException {
 
-        final Term firstTransformedTerm = this.transformTerm(term.sub(0));
-        final Term secondTransformedTerm = this.transformTerm(term.sub(1));
-        return this.distribute(firstTransformedTerm, secondTransformedTerm);
+        final Term firstTransformedTerm = transformTerm(term.sub(0));
+        final Term secondTransformedTerm = transformTerm(term.sub(1));
+        return distribute(firstTransformedTerm, secondTransformedTerm);
     }
 }

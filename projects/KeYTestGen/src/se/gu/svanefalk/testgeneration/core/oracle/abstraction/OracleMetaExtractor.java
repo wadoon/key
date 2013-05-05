@@ -23,7 +23,7 @@ public class OracleMetaExtractor extends KeYTestGenTermVisitor {
      * @return the exception thrown by the method under test.
      */
     public OracleType getThrownException() {
-        return this.thrownException;
+        return thrownException;
     }
 
     /**
@@ -40,7 +40,7 @@ public class OracleMetaExtractor extends KeYTestGenTermVisitor {
              */
             final String variableName = visited.op().name().toString();
             if (variableName.equals("exc")) {
-                this.thrownException = OracleTypeFactory.getOracleType(visited);
+                thrownException = OracleTypeFactory.getOracleType(visited);
             }
         }
     }

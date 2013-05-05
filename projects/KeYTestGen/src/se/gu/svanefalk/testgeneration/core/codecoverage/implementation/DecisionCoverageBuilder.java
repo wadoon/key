@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.Then;
 
 public enum DecisionCoverageBuilder implements ICoverageBuilder {
     INSTANCE;
@@ -32,18 +31,18 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
 
         @Override
         public int compare(final ExecutionPath o1, final ExecutionPath o2) {
-            return this.doComparison(o1, o2);
+            return doComparison(o1, o2);
         }
 
         private int doComparison(final ExecutionPath o1, final ExecutionPath o2) {
-            final Set<BranchStatement> first = this.map.get(o1);
-            final Set<BranchStatement> second = this.map.get(o2);
+            final Set<BranchStatement> first = map.get(o1);
+            final Set<BranchStatement> second = map.get(o2);
 
-            if (first == null && second == null) {
+            if ((first == null) && (second == null)) {
                 return 0;
-            } else if (first == null && second != null) {
+            } else if ((first == null) && (second != null)) {
                 return -1;
-            } else if (first != null && second == null) {
+            } else if ((first != null) && (second == null)) {
                 return 1;
             }
 
@@ -88,7 +87,7 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
                 for (final ExecutionPath pathToCompare : sortedPaths) {
                     final Set<BranchStatement> branchStatementsToCompare = mapping.get(pathToCompare);
                     if (branchStatementsToCompare != null) {
-                        if (this.subsumes(branchStatements,
+                        if (subsumes(branchStatements,
                                 branchStatementsToCompare)) {
                             mapping.remove(pathToCompare);
                         }
@@ -119,6 +118,22 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
         return false;
     }
 
+    /**
+     * Retrieves the {@link SourceElement} reached from a given branch of a
+     * {@link BranchStatement}.
+     * 
+     * @param thenBranchResult
+     * @return
+     */
+    private SourceElement getStatementOnBranch(
+            final SourceElement thenBranchResult) {
+        if (thenBranchResult instanceof StatementBlock) {
+            return ((StatementBlock) thenBranchResult).getChildAt(0);
+        } else {
+            return thenBranchResult;
+        }
+    }
+
     @Override
     public Set<ExecutionPath> retrieveExecutionPaths(
             final ExecutionPathContext context) {
@@ -128,7 +143,7 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
          * branch, the branching nodes in which the Then branch is taken by that
          * path. Conversely, do the same for the Else branch.
          */
-        final Set<BranchStatement> branchStatements = this.collectBranchStatements(context.getVisitedProgramNodes());
+        final Set<BranchStatement> branchStatements = collectBranchStatements(context.getVisitedProgramNodes());
         final List<ExecutionPath> executionPaths = context.getExecutionPaths();
 
         final Map<ExecutionPath, Set<BranchStatement>> thenMapping = new HashMap<ExecutionPath, Set<BranchStatement>>();
@@ -162,7 +177,7 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
                  */
                 for (final ExecutionPath path : executionPaths) {
                     if (contains(path, ifBranch)) {
-                        if (this.contains(path, thenBranchResult)) {
+                        if (contains(path, thenBranchResult)) {
                             Set<BranchStatement> mappedElements = thenMapping.get(path);
                             if (mappedElements == null) {
                                 mappedElements = new HashSet<BranchStatement>();
@@ -177,7 +192,7 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
                                 elseMapping.put(path, mappedElements);
                             }
                             mappedElements.add(branchStatement);
-                        } 
+                        }
                     }
                 }
             } else {
@@ -204,9 +219,9 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
         /*
          * Construct minimum set for the both mappings
          */
-        final Set<ExecutionPath> minimalThenPaths = this.constructMinimalSetForMapping(
+        final Set<ExecutionPath> minimalThenPaths = constructMinimalSetForMapping(
                 thenSortedPaths, thenMapping);
-        final Set<ExecutionPath> minimalElsePaths = this.constructMinimalSetForMapping(
+        final Set<ExecutionPath> minimalElsePaths = constructMinimalSetForMapping(
                 elseSortedPaths, elseMapping);
 
         /*
@@ -214,21 +229,6 @@ public enum DecisionCoverageBuilder implements ICoverageBuilder {
          */
         minimalThenPaths.addAll(minimalElsePaths);
         return minimalThenPaths;
-    }
-
-    /**
-     * Retrieves the {@link SourceElement} reached from a given branch of a
-     * {@link BranchStatement}.
-     * 
-     * @param thenBranchResult
-     * @return
-     */
-    private SourceElement getStatementOnBranch(SourceElement thenBranchResult) {
-        if (thenBranchResult instanceof StatementBlock) {
-            return ((StatementBlock) thenBranchResult).getChildAt(0);
-        } else {
-            return thenBranchResult;
-        }
     }
 
     private boolean subsumes(final Set<BranchStatement> first,

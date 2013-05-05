@@ -29,12 +29,16 @@ public class ClassProxy {
 
     public ClassProxy nestedProxy;
 
+    public boolean compare(final int x) {
+        return x > 0;
+    }
+
     /**
      * @return the instanceInt
      */
     public final int getInstanceInt() {
 
-        return this.instanceInt;
+        return instanceInt;
     }
 
     /**
@@ -42,7 +46,7 @@ public class ClassProxy {
      */
     public final ClassProxy getNestedProxy() {
 
-        return this.nestedProxy;
+        return nestedProxy;
     }
 
     /**
@@ -61,9 +65,5 @@ public class ClassProxy {
     public final void setNestedProxy(final ClassProxy nestedProxy) {
 
         this.nestedProxy = nestedProxy;
-    }
-
-    public boolean compare(int x) {
-        return x > 0;
     }
 }

@@ -18,19 +18,19 @@ public class ExecutionBranch {
      * @return the first
      */
     public SourceElement getFirst() {
-        return this.first;
+        return first;
     }
 
     /**
      * @return the second
      */
     public SourceElement getSecond() {
-        return this.second;
+        return second;
     }
 
     @Override
     public String toString() {
         // TODO Auto-generated method stub
-        return this.first + " --> " + this.second;
+        return first + " --> " + second;
     }
 }

@@ -20,20 +20,20 @@ public class RemoveImplicationsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        return this.transformTerm(term);
+        return transformTerm(term);
     }
 
     @Override
     protected Term transformImplication(final Term term)
             throws TermTransformerException {
 
-        final Term newFirstChild = this.transformTerm(term.sub(0));
-        final Term negatedNewFirstChild = this.termFactory.createTerm(
-                Junctor.NOT, newFirstChild);
+        final Term newFirstChild = transformTerm(term.sub(0));
+        final Term negatedNewFirstChild = termFactory.createTerm(Junctor.NOT,
+                newFirstChild);
 
-        final Term newSecondChild = this.transformTerm(term.sub(1));
+        final Term newSecondChild = transformTerm(term.sub(1));
 
-        return this.termFactory.createTerm(Junctor.OR, negatedNewFirstChild,
+        return termFactory.createTerm(Junctor.OR, negatedNewFirstChild,
                 newSecondChild);
     }
 }

@@ -5,24 +5,22 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.operator.ComparativeOperator;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public enum LogicConditionExtractor {
     INSTANCE;
 
-    public Set<ProgramElement> getConditions(Expression expression) {
+    public Set<ProgramElement> getConditions(final Expression expression) {
 
-        Set<ProgramElement> returnSet = new HashSet<ProgramElement>();
+        final Set<ProgramElement> returnSet = new HashSet<ProgramElement>();
         getConditionsHelper(expression, returnSet);
         return returnSet;
     }
 
-    private void getConditionsHelper(ProgramElement element,
-            Set<ProgramElement> returnSet) {
+    private void getConditionsHelper(final ProgramElement element,
+            final Set<ProgramElement> returnSet) {
 
         if (element instanceof Operator) {
 
@@ -30,7 +28,7 @@ public enum LogicConditionExtractor {
                 returnSet.add(element);
 
             } else {
-                Operator operator = (Operator) element;
+                final Operator operator = (Operator) element;
                 for (int i = 0; i < operator.getChildCount(); i++) {
                     getConditionsHelper(operator.getChildAt(i), returnSet);
                 }

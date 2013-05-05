@@ -27,18 +27,15 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 public class TestConditionParsing extends KeYTestGenTest {
 
     private final String containerTypeName = "PrimitiveIntegerOperations";
-    private final boolean debug = true;
-
     private final String javaPathInBaseDir = "system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java";
 
     private SymbolicExecutionEnvironment<CustomConsoleUserInterface> getEnvironmentForMethod(
             final String method) throws ProofInputException,
             ModelGeneratorException, IOException, ProblemLoaderException {
 
-        return this.getPreparedEnvironment(
+        return getPreparedEnvironment(
                 AbstractSymbolicExecutionTestCase.keyRepDirectory,
-                this.javaPathInBaseDir, this.containerTypeName, method, null,
-                false);
+                javaPathInBaseDir, containerTypeName, method, null, false);
     }
 
     protected void printInstance(final Term term) {
@@ -53,7 +50,7 @@ public class TestConditionParsing extends KeYTestGenTest {
         }
 
         for (int i = 0; i < term.arity(); i++) {
-            this.printInstance(term.sub(i));
+            printInstance(term.sub(i));
         }
     }
 
@@ -69,17 +66,13 @@ public class TestConditionParsing extends KeYTestGenTest {
             TermTransformerException {
 
         final String method = "maxProxyInstance";
-        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = this
-                .getEnvironmentForMethod(method);
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
-        final IExecutionStartNode start = environment.getBuilder()
-                .getStartNode();
-        final IExecutionNode targetNode = this.retrieveNode(start, "return x")
-                .get(0);
+        final IExecutionStartNode start = environment.getBuilder().getStartNode();
+        final IExecutionNode targetNode = retrieveNode(start, "return x").get(0);
         final Term targetNodeCondition = targetNode.getPathCondition();
 
-        final Term result = ModelGenerationTools
-                .simplifyTerm(targetNodeCondition);
+        final Term result = ModelGenerationTools.simplifyTerm(targetNodeCondition);
         Assert.assertFalse(result == null);
     }
 
@@ -88,8 +81,7 @@ public class TestConditionParsing extends KeYTestGenTest {
             ModelGeneratorException, IOException, ProblemLoaderException {
 
         final String method = "max";
-        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = this
-                .getEnvironmentForMethod(method);
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = getEnvironmentForMethod(method);
 
         environment.getBuilder().getStartNode();
 
@@ -100,25 +92,24 @@ public class TestConditionParsing extends KeYTestGenTest {
     public void testSimpleBuilderExtraction() throws ProofInputException,
             TestGeneratorException, IOException, ProblemLoaderException {
 
-        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = AbstractSymbolicExecutionTestCase
-                .createSymbolicExecutionEnvironment(
-                        AbstractSymbolicExecutionTestCase.keyRepDirectory,
-                        this.javaPathInBaseDir, this.containerTypeName, "max",
-                        null, false, false, false);
+        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = AbstractSymbolicExecutionTestCase.createSymbolicExecutionEnvironment(
+                AbstractSymbolicExecutionTestCase.keyRepDirectory,
+                javaPathInBaseDir, containerTypeName, "max", null, false,
+                false, false);
 
         final Proof proof = environment.getProof();
 
         final ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
                 ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
 
-        proof.getSettings().getStrategySettings()
-                .setCustomApplyStrategyStopCondition(stopCondition);
+        proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
+                stopCondition);
 
         environment.getUi().startAndWaitForAutoMode(proof);
 
         environment.getBuilder().analyse();
 
-        this.printSymbolicExecutionTree(environment.getBuilder().getStartNode());
+        printSymbolicExecutionTree(environment.getBuilder().getStartNode());
     }
 
 }

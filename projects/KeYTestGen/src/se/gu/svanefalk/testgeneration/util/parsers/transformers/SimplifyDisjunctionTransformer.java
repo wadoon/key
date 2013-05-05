@@ -19,8 +19,8 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
 
         if (TermParserTools.isOr(term)) {
 
-            this.collectLiterals(term.sub(0), literals);
-            this.collectLiterals(term.sub(1), literals);
+            collectLiterals(term.sub(0), literals);
+            collectLiterals(term.sub(1), literals);
         } else {
 
             final String termName = term.toString().trim();
@@ -47,8 +47,8 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
          */
         if (TermParserTools.isOr(term)) {
 
-            final Term firstChild = this.simplify(term.sub(0), literals);
-            final Term secondChild = this.simplify(term.sub(1), literals);
+            final Term firstChild = simplify(term.sub(0), literals);
+            final Term secondChild = simplify(term.sub(1), literals);
 
             if ((firstChild != null) && (secondChild == null)) {
                 return firstChild;
@@ -59,7 +59,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return this.termFactory.createTerm(Junctor.OR, firstChild,
+                return termFactory.createTerm(Junctor.OR, firstChild,
                         secondChild);
             }
 
@@ -98,7 +98,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        return this.transformTerm(term);
+        return transformTerm(term);
     }
 
     @Override
@@ -111,23 +111,23 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
          * Collect all literals in the right subtree
          */
         final Set<String> literals = new HashSet<String>();
-        this.collectLiterals(secondChild, literals);
+        collectLiterals(secondChild, literals);
 
         /*
          * Simplify the left subtree
          */
-        final Term simplifiedFirstChild = this.simplify(firstChild, literals);
+        final Term simplifiedFirstChild = simplify(firstChild, literals);
 
         /*
          * Depending on the outcome of the previous simplification, recursively
          * transform both subtrees, or just the right one.
          */
         if (simplifiedFirstChild == null) {
-            return this.transform(secondChild);
+            return transform(secondChild);
         } else {
-            final Term transformedSimplifiedFirstChild = this.transformTerm(simplifiedFirstChild);
-            final Term transformedRightChild = this.transformTerm(secondChild);
-            return this.termFactory.createTerm(Junctor.OR,
+            final Term transformedSimplifiedFirstChild = transformTerm(simplifiedFirstChild);
+            final Term transformedRightChild = transformTerm(secondChild);
+            return termFactory.createTerm(Junctor.OR,
                     transformedSimplifiedFirstChild, transformedRightChild);
         }
     }
