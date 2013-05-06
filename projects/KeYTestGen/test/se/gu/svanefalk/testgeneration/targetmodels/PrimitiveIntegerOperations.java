@@ -102,19 +102,13 @@ public class PrimitiveIntegerOperations {
         return PrimitiveIntegerOperations.staticZ;
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
+    /*@ public normal_behavior
+      @ ensures (\result == x) || (\result == y) || (\result == z );
+      @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+          (\result <= x )) || ((\result <= x) && (\result <= z ));
+      @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+          (\result >= x )) || ((\result >= x) && (\result >= z ));
+      @*/
     public static int mid(final int x, final int y, final int z) {
 
         int mid = z;
@@ -133,80 +127,68 @@ public class PrimitiveIntegerOperations {
         }
         return mid;
     }
+    
+    /*@ public normal_behavior
+    @ ensures (\result == x) || (\result == y) || (\result == z );
+    @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+        (\result <= x )) || ((\result <= x) && (\result <= z ));
+    @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+        (\result >= x )) || ((\result >= x) && (\result >= z ));
+    @*/
+  public static int mid2(final int x, final int y, final int z) {
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
-    public static int mid2(final int x, final int y, final int z) {
+      int mid = z;
 
-        int mid = z;
+      if (y < z) {
+          if (x < y) {
+              mid = y;
+          } else if (x < z) {
 
-        if (y < z) {
-            if (x < y) {
-                mid = y;
-            } else if (x < z) {
+              mid = x;
+          }
+      } else {
 
-                mid = x;
-            }
-        } else {
+          if (x > y) {
 
-            if (x > y) {
+              mid = y;
+          } else if (x > z) {
 
-                mid = y;
-            } else if (x > z) {
+              mid = x;
+          }
+      }
+      return mid;
+  }
+  
+  /*@ public normal_behavior
+  @ ensures (\result == x) || (\result == y) || (\result == z );
+  @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+      (\result <= x )) || ((\result <= x) && (\result <= z ));
+  @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+      (\result >= x )) || ((\result >= x) && (\result >= z ));
+  @*/
+public static int mid3(final int x, final int y, final int z) {
 
-                mid = x;
-            }
+    int mid = z;
+
+    if (y < z) {
+        if (x < y) {
+            mid = y;
+        } else if (x < z) {
+
+            mid = x;
         }
-        return mid;
-    }
+    } else {
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ ensures (\result == x) || (\result == y) || (\result == z );
-     * 
-     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-     * (\result <= x )) || ((\result <= x) && (\result <= z ));
-     * 
-     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-     * (\result >= x )) || ((\result >= x) && (\result >= z ));
-     * 
-     * @
-     */
-    public static int mid3(final int x, final int y, final int z) {
+        if (x > y) {
 
-        int mid = z;
+            mid = y;
+        } else if (x > z) {
 
-        if (y < z) {
-            if (x < y) {
-                mid = y;
-            } else if (x < z) {
-
-                mid = x;
-            }
-        } else {
-
-            if (x > y) {
-
-                mid = y;
-            } else if (x > z) {
-
-                mid = x;
-            }
+            mid = x;
         }
-        return mid;
     }
+    return mid;
+}
 
     public static int midTwoStatic(final int x) {
 
@@ -278,25 +260,19 @@ public class PrimitiveIntegerOperations {
     (final String a, final String b) {
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ requires true;
-     * 
-     * @ ensures true;
-     * 
-     * @
-     */
-    public int doStuff(final int a, final int b) {
+    /*@ public normal_behavior 
+    @ requires true;
+    @ ensures true;
+    @*/
+    public int doStuff(int a, int b) {
 
         int result = 0;
-
-        if (((a * a) - 2) >= ((b * b) + 1)) {
+        
+        if(a*a - 2 >= b*b + 1 )
             result = a;
-        } else {
+        else
             result = a;
-        }
-
+        
         return result;
     }
 
@@ -305,7 +281,7 @@ public class PrimitiveIntegerOperations {
      */
     public final int getInstanceX() {
 
-        return instanceX;
+        return this.instanceX;
     }
 
     /**
@@ -313,7 +289,7 @@ public class PrimitiveIntegerOperations {
      */
     public final int getInstanceY() {
 
-        return instanceY;
+        return this.instanceY;
     }
 
     /**
@@ -321,7 +297,7 @@ public class PrimitiveIntegerOperations {
      */
     public final int getInstanceZ() {
 
-        return instanceZ;
+        return this.instanceZ;
     }
 
     /**
@@ -329,7 +305,7 @@ public class PrimitiveIntegerOperations {
      */
     public final ClassProxy getProxy() {
 
-        return proxy;
+        return this.proxy;
     }
 
     /*
@@ -361,10 +337,10 @@ public class PrimitiveIntegerOperations {
 
         int max = x;
 
-        if (x >= instanceY) {
+        if (x >= this.instanceY) {
             max = x;
         } else {
-            max = instanceY;
+            max = this.instanceY;
         }
 
         return max;
@@ -372,10 +348,10 @@ public class PrimitiveIntegerOperations {
 
     public int maxProxyInstance(final int x) {
 
-        if (x > proxy.nestedProxy.instanceInt) {
+        if (x > this.proxy.nestedProxy.instanceInt) {
             return x;
         } else {
-            return proxy.nestedProxy.instanceInt;
+            return this.proxy.nestedProxy.instanceInt;
         }
     }
 
@@ -401,50 +377,45 @@ public class PrimitiveIntegerOperations {
         return max;
     }
 
-    /*
-     * @ public normal_behavior
-     * 
-     * @ ensures (\result == x) || (\result == proxy.nestedProxy.instanceInt) ||
-     * (\result == instanceZ );
-     * 
-     * @ ensures ((\result <= proxy.nestedProxy.instanceInt) && (\result <=
-     * instanceZ )) || ((\result <= proxy.nestedProxy.instanceInt) && (\result
-     * <= x )) || ((\result <= x) && (\result <= instanceZ));
-     * 
-     * @ ensures ((\result >= proxy.nestedProxy.instanceInt) && (\result >=
-     * instanceZ )) || ((\result >= proxy.nestedProxy.instanceInt) && (\result
-     * >= x )) || ((\result >= x) && (\result >= instanceZ));
-     * 
-     * @
-     */
+    /*@ public normal_behavior
+      @ ensures (\result == x) || (\result == proxy.nestedProxy.instanceInt) ||
+          (\result == instanceZ );
+      @ ensures ((\result <= proxy.nestedProxy.instanceInt) && (\result <=
+          instanceZ )) || ((\result <= proxy.nestedProxy.instanceInt) && (\result
+          <= x )) || ((\result <= x) && (\result <= instanceZ));
+     @ ensures ((\result >= proxy.nestedProxy.instanceInt) && (\result >=
+          instanceZ )) || ((\result >= proxy.nestedProxy.instanceInt) && (\result
+          >= x )) || ((\result >= x) && (\result >= instanceZ));
+      @*/
     public int midOneProxyOneInstance(final int x) {
 
         int mid = 0;
 
-        if ((proxy == proxy.nestedProxy) && (x == proxy.instanceInt)
-                && (proxy.nestedProxy.nestedProxy == null)) {
+        if ((this.proxy == this.proxy.nestedProxy)
+                && (x == this.proxy.instanceInt)
+                && (this.proxy.nestedProxy.nestedProxy == null)) {
             mid = 15;
         }
 
-        if (proxy == null) {
+        if (this.proxy == null) {
             mid = 16;
         }
 
-        if (proxy.instanceInt < instanceZ) {
-            if (x < proxy.nestedProxy.nestedProxy.nestedProxy.instanceInt) {
-                mid = proxy.nestedProxy.instanceInt;
-            } else if (x < instanceZ) {
+        if (this.proxy.instanceInt < this.instanceZ) {
+            if (x < this.proxy.nestedProxy.nestedProxy.nestedProxy.instanceInt) {
+                mid = this.proxy.nestedProxy.instanceInt;
+            } else if (x < this.instanceZ) {
 
                 mid = x;
             }
         } else {
 
-            if (x > proxy.nestedProxy.instanceInt) {
+            if (x > this.proxy.nestedProxy.instanceInt) {
 
-                mid = proxy.nestedProxy.instanceInt;
-            } else if (x > instanceZ) {
+                mid = this.proxy.nestedProxy.instanceInt;
+            } else if (x > this.instanceZ) {
 
-                mid = instanceZ;
+                mid = this.instanceZ;
             }
         }
         return mid;
@@ -452,21 +423,21 @@ public class PrimitiveIntegerOperations {
 
     public int midTwoInstance(final int x) {
 
-        int mid = instanceZ;
+        int mid = this.instanceZ;
 
-        if (instanceY < instanceZ) {
-            if (x < instanceY) {
-                mid = instanceY;
-            } else if (x < instanceZ) {
+        if (this.instanceY < this.instanceZ) {
+            if (x < this.instanceY) {
+                mid = this.instanceY;
+            } else if (x < this.instanceZ) {
 
                 mid = x;
             }
         } else {
 
-            if (x > instanceY) {
+            if (x > this.instanceY) {
 
-                mid = instanceY;
-            } else if (x > instanceZ) {
+                mid = this.instanceY;
+            } else if (x > this.instanceZ) {
 
                 mid = x;
             }
@@ -476,21 +447,21 @@ public class PrimitiveIntegerOperations {
 
     public int midTwoProxy(final int x) {
 
-        int mid = proxy.nestedProxy.instanceInt;
+        int mid = this.proxy.nestedProxy.instanceInt;
 
-        if (proxy.instanceInt < proxy.nestedProxy.instanceInt) {
-            if (x < proxy.instanceInt) {
-                mid = proxy.instanceInt;
-            } else if (x < proxy.nestedProxy.instanceInt) {
+        if (this.proxy.instanceInt < this.proxy.nestedProxy.instanceInt) {
+            if (x < this.proxy.instanceInt) {
+                mid = this.proxy.instanceInt;
+            } else if (x < this.proxy.nestedProxy.instanceInt) {
 
                 mid = x;
             }
         } else {
 
-            if (x > proxy.instanceInt) {
+            if (x > this.proxy.instanceInt) {
 
-                mid = proxy.instanceInt;
-            } else if (x > proxy.nestedProxy.instanceInt) {
+                mid = this.proxy.instanceInt;
+            } else if (x > this.proxy.nestedProxy.instanceInt) {
 
                 mid = x;
             }
@@ -507,7 +478,7 @@ public class PrimitiveIntegerOperations {
      */
     public int references() {
 
-        if (proxy != null) {
+        if (this.proxy != null) {
             return 1;
 
         } else {

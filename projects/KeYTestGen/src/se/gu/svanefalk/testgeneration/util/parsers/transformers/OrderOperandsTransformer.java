@@ -20,6 +20,18 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 public class OrderOperandsTransformer extends AbstractTermTransformer {
 
+    private static OrderOperandsTransformer instance = null;
+
+    public static OrderOperandsTransformer getInstance() {
+        if (OrderOperandsTransformer.instance == null) {
+            OrderOperandsTransformer.instance = new OrderOperandsTransformer();
+        }
+        return OrderOperandsTransformer.instance;
+    }
+
+    private OrderOperandsTransformer() {
+    }
+
     private void collectLiteralsFromTree(final Term term,
             final Operator operator, final List<Term> literals) {
 

@@ -1,10 +1,23 @@
 package se.gu.svanefalk.testgeneration.core.model.tools;
 
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.AbstractTermTransformer;
+import se.gu.svanefalk.testgeneration.util.parsers.transformers.NegationNormalFormTransformer;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 
 public class EliminateConjunctionsTransformer extends AbstractTermTransformer {
+
+    private static EliminateConjunctionsTransformer instance = null;
+
+    public static EliminateConjunctionsTransformer getInstance() {
+        if (EliminateConjunctionsTransformer.instance == null) {
+            EliminateConjunctionsTransformer.instance = new EliminateConjunctionsTransformer();
+        }
+        return EliminateConjunctionsTransformer.instance;
+    }
+
+    private EliminateConjunctionsTransformer() {
+    }
 
     @Override
     public Term transform(final Term term) throws TermTransformerException {

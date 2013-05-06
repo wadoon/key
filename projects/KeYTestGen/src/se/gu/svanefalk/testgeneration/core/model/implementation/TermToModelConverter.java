@@ -37,7 +37,8 @@ class TermToModelConverter {
         /*
          * Remove if-then-else assertions from the pathcondition
          */
-        pathCondition = new RemoveIfThenElseTransformer().transform(pathCondition);
+        pathCondition = RemoveIfThenElseTransformer.getInstance().transform(
+                pathCondition);
 
         /*
          * Construct the initial Model, containing representation of all the
@@ -51,8 +52,10 @@ class TermToModelConverter {
         /*
          * Distribute negations and remove conjunctions
          */
-        pathCondition = new NegationNormalFormTransformer().transform(pathCondition);
-        pathCondition = new EliminateConjunctionsTransformer().transform(pathCondition);
+        pathCondition = NegationNormalFormTransformer.getInstance().transform(
+                pathCondition);
+        pathCondition = EliminateConjunctionsTransformer.getInstance().transform(
+                pathCondition);
 
         /*
          * Setup all reference relationships expressed in the Term. Done

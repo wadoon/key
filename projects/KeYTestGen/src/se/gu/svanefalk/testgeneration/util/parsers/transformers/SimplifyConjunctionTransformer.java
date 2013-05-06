@@ -9,6 +9,18 @@ import de.uka.ilkd.key.logic.op.Junctor;
 
 public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
 
+    private static SimplifyConjunctionTransformer instance = null;
+
+    public static SimplifyConjunctionTransformer getInstance() {
+        if (SimplifyConjunctionTransformer.instance == null) {
+            SimplifyConjunctionTransformer.instance = new SimplifyConjunctionTransformer();
+        }
+        return SimplifyConjunctionTransformer.instance;
+    }
+
+    private SimplifyConjunctionTransformer() {
+    }
+    
     private void collectLiterals(final Term term, final Set<String> literals) {
 
         if (TermParserTools.isAnd(term)) {
@@ -92,7 +104,7 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        final Term orderedTerm = new OrderOperandsTransformer().transform(term);
+        final Term orderedTerm = OrderOperandsTransformer.getInstance().transform(term);
         return transformTerm(orderedTerm);
     }
 

@@ -14,6 +14,18 @@ import de.uka.ilkd.key.logic.op.Junctor;
  */
 public class NegationNormalFormTransformer extends AbstractTermTransformer {
 
+    private static NegationNormalFormTransformer instance = null;
+
+    public static NegationNormalFormTransformer getInstance() {
+        if (NegationNormalFormTransformer.instance == null) {
+            NegationNormalFormTransformer.instance = new NegationNormalFormTransformer();
+        }
+        return NegationNormalFormTransformer.instance;
+    }
+
+    private NegationNormalFormTransformer() {
+    }
+
     /**
      * Puts a Term into Negation Normal Form, using the following algorithm:
      * 

@@ -33,7 +33,7 @@ public class Preprocessor {
     private static final int PROBLEM_PRICE = 1;
 
     private static final int VARIABLE_PRICE = 2;
-
+    
     public static Preprocessor getInstance() {
         if (Preprocessor.instance == null) {
             Preprocessor.instance = new Preprocessor();
@@ -53,6 +53,12 @@ public class Preprocessor {
     public Set<Term> createMinimalProblemSet(final Term term) {
 
         final Set<Term> minimalProblemSet = new HashSet<>();
+        
+        /*
+         * Do preprocessing of the Term itself.
+         */
+        
+        
         createMinimalProblemSet_helper(term, minimalProblemSet);
         return minimalProblemSet;
     }

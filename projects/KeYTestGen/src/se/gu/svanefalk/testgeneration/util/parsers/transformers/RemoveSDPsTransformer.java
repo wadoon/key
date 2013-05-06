@@ -10,6 +10,18 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 public class RemoveSDPsTransformer extends AbstractTermTransformer {
 
+    private static RemoveSDPsTransformer instance = null;
+
+    public static RemoveSDPsTransformer getInstance() {
+        if (RemoveSDPsTransformer.instance == null) {
+            RemoveSDPsTransformer.instance = new RemoveSDPsTransformer();
+        }
+        return RemoveSDPsTransformer.instance;
+    }
+
+    private RemoveSDPsTransformer() {
+    }
+    
     /**
      * Removes all instances of {@link SortDependingFunction} nodes in a given
      * term, replacing them with {@link LocationVariable} instances whose names

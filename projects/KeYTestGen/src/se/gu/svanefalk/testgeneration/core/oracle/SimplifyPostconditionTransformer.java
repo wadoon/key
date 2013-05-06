@@ -37,32 +37,39 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         /*
          * Remove all SortDependingFunction instances from the Term.
          */
-        oracleTerm = new RemoveSDPsTransformer().transform(oracleTerm);
+        oracleTerm = RemoveSDPsTransformer.getInstance().transform(oracleTerm);
 
         /*
          * Order the operands of the term
          */
-        oracleTerm = new OrderOperandsTransformer().transform(oracleTerm);
+        oracleTerm = OrderOperandsTransformer.getInstance().transform(
+                oracleTerm);
 
         /*
          * Do the transformation
          */
         oracleTerm = transformTerm(oracleTerm);
+        if (oracleTerm == null) {
+            return null;
+        }
 
         /*
          * Put it into Conjunctive Normal Form
          */
-        oracleTerm = new ConjunctionNormalFormTransformer().transform(oracleTerm);
+        oracleTerm = ConjunctionNormalFormTransformer.getInstance().transform(
+                oracleTerm);
 
         /*
          * Simplify the disjunctions in the postcondition
          */
-        oracleTerm = new SimplifyDisjunctionTransformer().transform(oracleTerm);
+        oracleTerm = SimplifyDisjunctionTransformer.getInstance().transform(
+                oracleTerm);
 
         /*
          * Simplify the remaining conjunctions
          */
-        oracleTerm = new SimplifyConjunctionTransformer().transform(oracleTerm);
+        oracleTerm = SimplifyConjunctionTransformer.getInstance().transform(
+                oracleTerm);
 
         return oracleTerm;
     }

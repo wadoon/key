@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
+import se.gu.svanefalk.testgeneration.keystone.KeYStone;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -34,6 +35,8 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
  */
 public enum ModelGenerator implements IModelGenerator {
     INSTANCE;
+
+    KeYStone keYStone = KeYStone.INSTANCE;
 
     /**
      * The Configuration to use for the SMT-LIB2 translator used by the
@@ -227,6 +230,7 @@ public enum ModelGenerator implements IModelGenerator {
              * return it as null.
              */
             final Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
+            keYStone.solveConstraint(simplifiedPathCondition);
             System.out.println(simplifiedPathCondition);
             if (simplifiedPathCondition == null) {
 

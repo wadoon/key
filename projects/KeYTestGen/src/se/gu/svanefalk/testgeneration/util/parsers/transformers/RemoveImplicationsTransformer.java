@@ -11,6 +11,18 @@ import de.uka.ilkd.key.logic.op.Junctor;
  */
 public class RemoveImplicationsTransformer extends AbstractTermTransformer {
 
+    private static RemoveImplicationsTransformer instance = null;
+
+    public static RemoveImplicationsTransformer getInstance() {
+        if (RemoveImplicationsTransformer.instance == null) {
+            RemoveImplicationsTransformer.instance = new RemoveImplicationsTransformer();
+        }
+        return RemoveImplicationsTransformer.instance;
+    }
+
+    private RemoveImplicationsTransformer() {
+    }
+
     /**
      * Transforms a {@link Term} by replacing all implications a -> b with the
      * equivalent form !a \/ b.

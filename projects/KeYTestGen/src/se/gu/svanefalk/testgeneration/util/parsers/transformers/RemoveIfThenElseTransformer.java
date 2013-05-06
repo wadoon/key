@@ -19,6 +19,18 @@ import de.uka.ilkd.key.logic.op.Junctor;
  */
 public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
 
+    private static RemoveIfThenElseTransformer instance = null;
+
+    public static RemoveIfThenElseTransformer getInstance() {
+        if (RemoveIfThenElseTransformer.instance == null) {
+            RemoveIfThenElseTransformer.instance = new RemoveIfThenElseTransformer();
+        }
+        return RemoveIfThenElseTransformer.instance;
+    }
+
+    private RemoveIfThenElseTransformer() {
+    }
+
     private Term constructConjunction(final Queue<Term> conditions) {
 
         if (conditions.size() == 0) {

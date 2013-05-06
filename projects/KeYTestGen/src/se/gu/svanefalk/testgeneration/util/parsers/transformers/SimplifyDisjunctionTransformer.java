@@ -15,6 +15,18 @@ import de.uka.ilkd.key.logic.op.Junctor;
  */
 public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
 
+    private static SimplifyDisjunctionTransformer instance = null;
+
+    public static SimplifyDisjunctionTransformer getInstance() {
+        if (SimplifyDisjunctionTransformer.instance == null) {
+            SimplifyDisjunctionTransformer.instance = new SimplifyDisjunctionTransformer();
+        }
+        return SimplifyDisjunctionTransformer.instance;
+    }
+
+    private SimplifyDisjunctionTransformer() {
+    }
+    
     private void collectLiterals(final Term term, final Set<String> literals) {
 
         if (TermParserTools.isOr(term)) {
