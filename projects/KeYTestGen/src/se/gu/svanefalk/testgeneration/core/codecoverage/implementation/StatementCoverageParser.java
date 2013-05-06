@@ -12,7 +12,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class StatementCoverageParser implements ICodeCoverageParser {
 
-    private static final StatementCoverageBuilder builder = StatementCoverageBuilder.INSTANCE;
+    private static final StatementCoverageBuilder builder = StatementCoverageBuilder.getInstance();
 
     /**
      * <p>

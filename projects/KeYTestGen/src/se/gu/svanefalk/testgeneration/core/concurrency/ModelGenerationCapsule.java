@@ -25,7 +25,7 @@ public class ModelGenerationCapsule extends Capsule {
      * concrete fixtures for test cases. Default implementation based on SMT
      * solvers is available, but the user can choose to use her own.
      */
-    protected final ModelGenerator modelGenerator = ModelGenerator.INSTANCE;
+    protected final ModelGenerator modelGenerator = ModelGenerator.getInstance();
 
     /**
      * The {@link IExecutionNode} instance associated with this capsule.

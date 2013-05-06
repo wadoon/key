@@ -5,14 +5,27 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import se.gu.svanefalk.testgeneration.core.CoreInterface;
+
 /**
  * Encapsulates an {@link Executor} for global use across KeYTestGen2.
  * 
  * @author christopher
  * 
  */
-public enum CapsuleExecutor {
-    INSTANCE;
+public class CapsuleExecutor {
+    
+    private static CapsuleExecutor instance = null;
+
+    public static CapsuleExecutor getInstance() {
+        if (instance == null) {
+            instance = new CapsuleExecutor();
+        }
+        return instance;
+    }
+
+    private CapsuleExecutor() {
+    }
 
     private final Executor executor = Executors.newCachedThreadPool();
 

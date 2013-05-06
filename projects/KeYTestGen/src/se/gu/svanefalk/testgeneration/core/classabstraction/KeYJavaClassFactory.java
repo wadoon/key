@@ -7,6 +7,7 @@ import java.util.List;
 
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
+import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
 import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -24,13 +25,25 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
  * 
  * @author christopher
  */
-public enum KeYJavaClassFactory {
-    INSTANCE;
+public class KeYJavaClassFactory {
+    
+    private static KeYJavaClassFactory instance = null;
+
+    public static KeYJavaClassFactory getInstance() {
+        if (instance == null) {
+            instance = new KeYJavaClassFactory();
+        }
+        return instance;
+    }
+    
+    private KeYJavaClassFactory() {
+        
+    }
 
     /**
      * Interface to the KeY runtime.
      */
-    private final KeYInterface keyInterface = KeYInterface.INSTANCE;
+    private final KeYInterface keyInterface = KeYInterface.getInstance();
 
     private KeYJavaClass constructClass(final KeYJavaType parent,
             final InitConfig initConfig) {

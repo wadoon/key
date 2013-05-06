@@ -16,8 +16,20 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.If;
 
-public enum DecisionCoverageBuilder implements ICoverageBuilder {
-    INSTANCE;
+public class DecisionCoverageBuilder implements ICoverageBuilder {
+    
+    private static DecisionCoverageBuilder instance = null;
+
+    public static DecisionCoverageBuilder getInstance() {
+        if (instance == null) {
+            instance = new DecisionCoverageBuilder();
+        }
+        return instance;
+    }
+    
+    private DecisionCoverageBuilder() {
+        
+    }
 
     private static class DescendingExecutionBranchComparator implements
             Comparator<ExecutionPath> {

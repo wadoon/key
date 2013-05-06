@@ -12,7 +12,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class BranchCoverageParser implements ICodeCoverageParser {
 
-    private static final BranchCoverageBuilder builder = BranchCoverageBuilder.INSTANCE;
+    private static final BranchCoverageBuilder builder = BranchCoverageBuilder.getInstance();
 
     /**
      * <p>

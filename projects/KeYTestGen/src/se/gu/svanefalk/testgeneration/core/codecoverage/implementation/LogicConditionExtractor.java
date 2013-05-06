@@ -9,8 +9,20 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.operator.ComparativeOperator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-public enum LogicConditionExtractor {
-    INSTANCE;
+public class LogicConditionExtractor {
+   
+    private static LogicConditionExtractor instance = null;
+
+    public static LogicConditionExtractor getInstance() {
+        if (instance == null) {
+            instance = new LogicConditionExtractor();
+        }
+        return instance;
+    }
+    
+    private LogicConditionExtractor() {
+        
+    }
 
     public Set<ProgramElement> getConditions(final Expression expression) {
 

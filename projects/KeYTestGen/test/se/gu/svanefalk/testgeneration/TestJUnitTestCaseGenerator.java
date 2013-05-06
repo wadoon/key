@@ -73,7 +73,7 @@ public class TestJUnitTestCaseGenerator {
 
         System.out.println();
         Benchmark.reset();
-        KeYInterface.INSTANCE.__DEBUG_RESET();
+        KeYInterface.getInstance().__DEBUG_RESET();
 
         System.out.println("RESULTS:");
         for (final String id : results.keySet()) {
@@ -142,7 +142,7 @@ public class TestJUnitTestCaseGenerator {
 
             System.out.println();
             Benchmark.reset();
-            KeYInterface.INSTANCE.__DEBUG_RESET();
+            KeYInterface.getInstance().__DEBUG_RESET();
         }
 
         System.out.println("RESULTS:");

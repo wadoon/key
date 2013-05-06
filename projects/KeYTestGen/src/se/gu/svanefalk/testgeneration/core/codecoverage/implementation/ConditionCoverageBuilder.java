@@ -5,8 +5,21 @@ import java.util.Set;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPath;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 
-public enum ConditionCoverageBuilder implements ICoverageBuilder {
-    INSTANCE;
+public class ConditionCoverageBuilder implements ICoverageBuilder {
+    
+    private static ConditionCoverageBuilder instance = null;
+
+    public static ConditionCoverageBuilder getInstance() {
+        if (instance == null) {
+            instance = new ConditionCoverageBuilder();
+        }
+        return instance;
+    }
+    
+    private ConditionCoverageBuilder() {
+        
+    }
+
 
     @Override
     public Set<ExecutionPath> retrieveExecutionPaths(

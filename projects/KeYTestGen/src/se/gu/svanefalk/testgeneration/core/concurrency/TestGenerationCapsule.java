@@ -34,7 +34,7 @@ public class TestGenerationCapsule extends Capsule {
      * Reference to the {@link KeYInterface}, whenever this capsule needs
      * services from the KeY runtime.
      */
-    private final KeYInterface keYInterface = KeYInterface.INSTANCE;
+    private final KeYInterface keYInterface = KeYInterface.getInstance();
 
     /**
      * The method which the test suite will be generated for.
@@ -49,7 +49,7 @@ public class TestGenerationCapsule extends Capsule {
     /**
      * Global thread pool for dispatching other capsules.
      */
-    CapsuleExecutor threadPool = CapsuleExecutor.INSTANCE;
+    CapsuleExecutor threadPool = CapsuleExecutor.getInstance();
 
     public TestGenerationCapsule(final ICodeCoverageParser codeCoverageParser,
             final KeYJavaMethod targetMethod) {

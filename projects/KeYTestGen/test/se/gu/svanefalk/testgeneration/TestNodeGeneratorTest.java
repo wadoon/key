@@ -29,7 +29,7 @@ public class TestNodeGeneratorTest extends KeYTestGenTest {
             ModelGeneratorException, IOException, ProblemLoaderException {
 
         if (modelGenerator == null) {
-            modelGenerator = ModelGenerator.INSTANCE;
+            modelGenerator = ModelGenerator.getInstance();
         }
 
         environment = getPreparedEnvironment(
@@ -50,7 +50,7 @@ public class TestNodeGeneratorTest extends KeYTestGenTest {
         final List<IExecutionNode> nodes = retrieveNode(root, "mid=x");
 
         for (final IExecutionNode node : nodes) {
-            NodeTestGenerator.INSTANCE.constructTestSuiteFromNode(node,
+            NodeTestGenerator.getInstance().constructTestSuiteFromNode(node,
                     new JUnitConverter());
         }
     }

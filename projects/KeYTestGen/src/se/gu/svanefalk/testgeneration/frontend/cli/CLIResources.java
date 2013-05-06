@@ -3,14 +3,27 @@ package se.gu.svanefalk.testgeneration.frontend.cli;
 import java.util.HashMap;
 
 import se.gu.svanefalk.testgeneration.backend.custom.ITestCaseParser;
+import se.gu.svanefalk.testgeneration.core.NodeTestGenerator;
 
 /**
  * Shared resources for the KeyTestGen CLI.
  * 
  * @author christopher
  */
-public enum CLIResources {
-    INSTANCE;
+public class CLIResources {
+    
+    private static CLIResources instance = null;
+
+    public static CLIResources getInstance() {
+        if (instance == null) {
+            instance = new CLIResources();
+        }
+        return instance;
+    }
+
+    private CLIResources() {
+
+    }
 
     /**
      * Collection which keeps track of the target test FRAMEWORKS currently

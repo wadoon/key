@@ -39,7 +39,7 @@ public class TestModelGenerationIntegers extends KeYTestGenTest {
             ModelGeneratorException, IOException, ProblemLoaderException {
 
         if (modelGenerator == null) {
-            modelGenerator = ModelGenerator.INSTANCE;
+            modelGenerator = ModelGenerator.getInstance();
         }
 
         environment = getPreparedEnvironment(

@@ -5,6 +5,8 @@ import java.util.Set;
 
 import se.gu.svanefalk.testgeneration.keystone.util.Tuple;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
+import se.gu.svanefalk.testgeneration.util.parsers.transformers.NegationNormalFormTransformer;
+import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -33,7 +35,7 @@ public class Preprocessor {
     private static final int PROBLEM_PRICE = 1;
 
     private static final int VARIABLE_PRICE = 2;
-    
+
     public static Preprocessor getInstance() {
         if (Preprocessor.instance == null) {
             Preprocessor.instance = new Preprocessor();
@@ -50,15 +52,21 @@ public class Preprocessor {
         return variableSet;
     }
 
-    public Set<Term> createMinimalProblemSet(final Term term) {
+    public Set<Term> createMinimalProblemSet(final Term term) throws KeYStoneException {
 
         final Set<Term> minimalProblemSet = new HashSet<>();
-        
-        /*
-         * Do preprocessing of the Term itself.
-         */
-        
-        
+
+        try {
+            /*
+             * Do preprocessing of the Term itself.
+             */
+            Term processedTerm = NegationNormalFormTransformer.getInstance().transform(term);
+            
+
+        } catch (TermTransformerException e) {
+            throw new KeYStoneException(e.getMessage());
+        }
+
         createMinimalProblemSet_helper(term, minimalProblemSet);
         return minimalProblemSet;
     }

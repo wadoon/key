@@ -58,7 +58,7 @@ public enum TestGenerator {
     /**
      * Interface to the KeYTestGen2 Core system.
      */
-    private final CoreInterface coreInterface = CoreInterface.INSTANCE;
+    private final CoreInterface coreInterface = CoreInterface.getInstance();
 
     /**
      * Generates a set of JUnit test cases for each method in a Java source

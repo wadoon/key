@@ -12,7 +12,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class DecisionCoverageParser implements ICodeCoverageParser {
 
-    private static final DecisionCoverageBuilder builder = DecisionCoverageBuilder.INSTANCE;
+    private static final DecisionCoverageBuilder builder = DecisionCoverageBuilder.getInstance();
 
     /**
      * <p>

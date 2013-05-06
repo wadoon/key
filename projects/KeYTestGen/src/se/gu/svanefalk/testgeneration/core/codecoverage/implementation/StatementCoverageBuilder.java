@@ -9,8 +9,20 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionP
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 import de.uka.ilkd.key.java.SourceElement;
 
-public enum StatementCoverageBuilder implements ICoverageBuilder {
-    INSTANCE;
+public class StatementCoverageBuilder implements ICoverageBuilder {
+    
+    private static StatementCoverageBuilder instance = null;
+
+    public static StatementCoverageBuilder getInstance() {
+        if (instance == null) {
+            instance = new StatementCoverageBuilder();
+        }
+        return instance;
+    }
+
+    private StatementCoverageBuilder() {
+
+    }
 
     private boolean isSubsetOf(final Set<SourceElement> first,
             final Set<SourceElement> second) {

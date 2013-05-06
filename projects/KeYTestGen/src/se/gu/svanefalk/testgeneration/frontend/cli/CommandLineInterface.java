@@ -164,7 +164,7 @@ public final class CommandLineInterface {
         private void generateTestCases(final String framework,
                 final List<File> files) throws IOException {
 
-            CLIResources.INSTANCE.getFrameworkParser(framework);
+            CLIResources.getInstance().getFrameworkParser(framework);
 
             /*
              * Create an output folder for the framework files, and write the

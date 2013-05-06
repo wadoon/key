@@ -12,7 +12,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class PathCoverageParser implements ICodeCoverageParser {
 
-    private static final PathCoverageBuilder builder = PathCoverageBuilder.INSTANCE;
+    private static final PathCoverageBuilder builder = PathCoverageBuilder.getInstance();
 
     /**
      * <p>

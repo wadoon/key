@@ -9,6 +9,7 @@ import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
+import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageBuilder;
 import se.gu.svanefalk.testgeneration.core.concurrency.Capsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.CapsuleExecutor;
 import se.gu.svanefalk.testgeneration.core.concurrency.ModelGenerationCapsule;
@@ -27,12 +28,24 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  * 
  * @author christopher
  */
-public enum NodeTestGenerator {
-    INSTANCE;
+public class NodeTestGenerator {
+    
+    private static NodeTestGenerator instance = null;
 
-    private final CapsuleExecutor capsuleExecutor = CapsuleExecutor.INSTANCE;
+    public static NodeTestGenerator getInstance() {
+        if (instance == null) {
+            instance = new NodeTestGenerator();
+        }
+        return instance;
+    }
 
-    KeYJavaClassFactory factory = KeYJavaClassFactory.INSTANCE;
+    private NodeTestGenerator() {
+
+    }
+
+    private final CapsuleExecutor capsuleExecutor = CapsuleExecutor.getInstance();
+
+    KeYJavaClassFactory factory = KeYJavaClassFactory.getInstance();
 
     public String constructTestSuiteFromNode(final IExecutionNode node,
             final IFrameworkConverter frameworkConverter)

@@ -3,10 +3,12 @@ package se.gu.svanefalk.testgeneration.core.model.implementation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
 import se.gu.svanefalk.testgeneration.keystone.KeYStone;
+import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -33,10 +35,18 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
  * The set of assignments found are further processed into an instance of
  * {@link IModel}, which constitutes the final representaiton of the model.
  */
-public enum ModelGenerator implements IModelGenerator {
-    INSTANCE;
+public class ModelGenerator implements IModelGenerator {
+    
+    private static ModelGenerator instance = null;
 
-    KeYStone keYStone = KeYStone.INSTANCE;
+    public static ModelGenerator getInstance() {
+        if (instance == null) {
+            instance = new ModelGenerator();
+        }
+        return instance;
+    }
+
+    KeYStone keYStone = KeYStone.getInstance();
 
     /**
      * The Configuration to use for the SMT-LIB2 translator used by the
@@ -268,6 +278,8 @@ public enum ModelGenerator implements IModelGenerator {
         } catch (final TermTransformerException e) {
             throw new ModelGeneratorException(e.getMessage());
         } catch (final IllegalFormulaException e) {
+            throw new ModelGeneratorException(e.getMessage());
+        } catch (KeYStoneException e) {
             throw new ModelGeneratorException(e.getMessage());
         }
     }
