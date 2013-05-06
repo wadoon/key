@@ -2,7 +2,7 @@ package se.gu.svanefalk.testgeneration.core.model.implementation;
 
 import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-import se.gu.svanefalk.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
+import se.gu.svanefalk.testgeneration.util.visitors.KeYTestGenTermVisitor;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

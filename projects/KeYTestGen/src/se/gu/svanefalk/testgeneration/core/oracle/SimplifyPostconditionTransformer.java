@@ -1,13 +1,13 @@
 package se.gu.svanefalk.testgeneration.core.oracle;
 
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.AbstractTermTransformer;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.ConjunctionNormalFormTransformer;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.OrderOperandsTransformer;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.RemoveSDPsTransformer;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.SimplifyConjunctionTransformer;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.SimplifyDisjunctionTransformer;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+import se.gu.svanefalk.testgeneration.util.transformers.AbstractTermTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.ConjunctionNormalFormTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.OrderOperandsTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.RemoveSDPsTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.SimplifyConjunctionTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.SimplifyDisjunctionTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ObserverFunction;

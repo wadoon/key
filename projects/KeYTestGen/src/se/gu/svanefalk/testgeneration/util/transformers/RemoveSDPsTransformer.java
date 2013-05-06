@@ -1,4 +1,4 @@
-package se.gu.svanefalk.testgeneration.util.parsers.transformers;
+package se.gu.svanefalk.testgeneration.util.transformers;
 
 import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;

@@ -11,7 +11,7 @@ import se.gu.svanefalk.testgeneration.KeYTestGenTest;
 import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.proof.ProblemLoaderException;

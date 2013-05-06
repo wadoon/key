@@ -5,8 +5,8 @@ import java.util.Set;
 
 import se.gu.svanefalk.testgeneration.keystone.util.Tuple;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.NegationNormalFormTransformer;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;

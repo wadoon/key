@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;

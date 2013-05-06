@@ -16,7 +16,7 @@ import se.gu.svanefalk.testgeneration.core.concurrency.TestGenerationCapsule;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.NegationNormalFormTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
 
 /**
  * API singleton for the core package

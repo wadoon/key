@@ -19,7 +19,7 @@ import se.gu.svanefalk.testgeneration.core.model.implementation.ModelInstance;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
-import se.gu.svanefalk.testgeneration.util.parsers.visitors.XMLVisitorException;
+import se.gu.svanefalk.testgeneration.util.visitors.XMLVisitorException;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**

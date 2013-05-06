@@ -1,4 +1,4 @@
-package se.gu.svanefalk.testgeneration.util.parsers.transformers;
+package se.gu.svanefalk.testgeneration.util.transformers;
 
 import java.util.HashSet;
 import java.util.Set;

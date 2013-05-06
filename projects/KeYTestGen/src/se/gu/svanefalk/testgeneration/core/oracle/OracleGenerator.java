@@ -20,7 +20,7 @@ import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleQuantifier.Q
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleType;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.LocationVariable;

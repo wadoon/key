@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import se.gu.svanefalk.testgeneration.backend.xml.XMLGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
-import se.gu.svanefalk.testgeneration.util.parsers.transformers.TermTransformerException;
+import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.smt.IllegalFormulaException;

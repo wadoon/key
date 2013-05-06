@@ -7,7 +7,7 @@ import org.junit.Test;
 import se.gu.svanefalk.testgeneration.KeYTestGenTest;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
-import se.gu.svanefalk.testgeneration.util.parsers.visitors.XMLVisitorException;
+import se.gu.svanefalk.testgeneration.util.visitors.XMLVisitorException;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;

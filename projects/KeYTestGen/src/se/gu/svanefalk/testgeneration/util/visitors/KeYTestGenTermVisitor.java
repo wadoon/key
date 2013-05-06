@@ -1,4 +1,4 @@
-package se.gu.svanefalk.testgeneration.util.parsers.visitors;
+package se.gu.svanefalk.testgeneration.util.visitors;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;

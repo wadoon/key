@@ -2,7 +2,7 @@ package se.gu.svanefalk.testgeneration.core.oracle.abstraction;
 
 import se.gu.svanefalk.testgeneration.core.oracle.OracleTypeFactory;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-import se.gu.svanefalk.testgeneration.util.parsers.visitors.KeYTestGenTermVisitor;
+import se.gu.svanefalk.testgeneration.util.visitors.KeYTestGenTermVisitor;
 import de.uka.ilkd.key.logic.Term;
 
 /**

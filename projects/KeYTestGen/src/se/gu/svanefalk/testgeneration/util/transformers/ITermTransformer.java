@@ -1,4 +1,4 @@
-package se.gu.svanefalk.testgeneration.util.parsers.transformers;
+package se.gu.svanefalk.testgeneration.util.transformers;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.TermTransformer;
