@@ -17,4 +17,11 @@ public class Division extends AbstractExpression {
     public Fraction evaluate() throws OperationNotSupportedException {
         return getLeftOperand().evaluate().divide(getRightOperand().evaluate());
     }
+    
+
+    @Override
+    public String toString() {
+        
+        return getLeftOperand().toString() + "/" + getRightOperand().toString();
+    }
 }

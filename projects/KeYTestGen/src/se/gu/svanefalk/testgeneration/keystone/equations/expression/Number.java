@@ -31,4 +31,10 @@ public class Number implements IExpression {
     public void setValue(final Fraction value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+
+        return value.toString();
+    }
 }

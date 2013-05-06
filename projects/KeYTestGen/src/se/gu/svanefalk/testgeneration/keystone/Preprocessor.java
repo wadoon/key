@@ -6,10 +6,15 @@ import java.util.Set;
 import se.gu.svanefalk.testgeneration.keystone.util.Tuple;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.NormalizeArithmeticComparatorsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 
 public class Preprocessor {
 
@@ -25,7 +30,7 @@ public class Preprocessor {
         @Override
         public void visit(final Term visited) {
             if (TermParserTools.isProgramVariable(visited)) {
-                variables.add((ProgramVariable) visited);
+                variables.add((ProgramVariable) visited.op());
             }
         }
     }
@@ -52,40 +57,60 @@ public class Preprocessor {
         return variableSet;
     }
 
-    public Set<Term> createMinimalProblemSet(final Term term) throws KeYStoneException {
+    public Set<Term> createMinimalProblemSet(final Term term)
+            throws KeYStoneException {
 
         final Set<Term> minimalProblemSet = new HashSet<>();
 
         try {
+
             /*
              * Do preprocessing of the Term itself.
              */
-            Term processedTerm = NegationNormalFormTransformer.getInstance().transform(term);
-            
+            Term processedTerm = NegationNormalFormTransformer.getInstance().transform(
+                    term);
+
+            createMinimalProblemSet_helper(processedTerm, minimalProblemSet);
+
+            return minimalProblemSet;
 
         } catch (TermTransformerException e) {
             throw new KeYStoneException(e.getMessage());
         }
-
-        createMinimalProblemSet_helper(term, minimalProblemSet);
-        return minimalProblemSet;
     }
 
     private void createMinimalProblemSet_helper(final Term term,
-            final Set<Term> minimalProblemSet) {
+            final Set<Term> minimalProblemSet) throws KeYStoneException {
 
         if (TermParserTools.isAnd(term)) {
             createMinimalProblemSet_helper(term.sub(0), minimalProblemSet);
             createMinimalProblemSet_helper(term.sub(1), minimalProblemSet);
+            return;
         }
 
         if (TermParserTools.isOr(term)) {
             if (price(term.sub(0)) <= price(term.sub(1))) {
                 createMinimalProblemSet_helper(term.sub(0), minimalProblemSet);
+                return;
             } else {
                 createMinimalProblemSet_helper(term.sub(1), minimalProblemSet);
+                return;
             }
         }
+
+        if (TermParserTools.isNot(term)) {
+            createMinimalProblemSet_helper(term.sub(0), minimalProblemSet);
+            return;
+        }
+
+        if (TermParserTools.isBinaryFunction(term)) {
+            minimalProblemSet.add(term);
+            return;
+        }
+
+        throw new KeYStoneException("Path condition contains illegal Term: "
+                + term);
+
     }
 
     private int evaluatePrice(final Tuple<Integer, Set<ProgramVariable>> tuple) {
@@ -122,6 +147,10 @@ public class Preprocessor {
             } else {
                 return rightTuple;
             }
+        }
+
+        if (TermParserTools.isNot(term)) {
+            return priceGather(term.sub(0));
         }
 
         return new Tuple<Integer, Set<ProgramVariable>>(

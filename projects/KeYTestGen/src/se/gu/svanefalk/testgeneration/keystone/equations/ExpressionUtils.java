@@ -17,19 +17,21 @@ import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.logic.Term;
 
-public class ExpressionBuilder {
+public class ExpressionUtils {
 
-    private static ExpressionBuilder instance = null;
+    private static int extraVariableIndex = 1;
 
-    public static ExpressionBuilder getInstance() {
+    private static ExpressionUtils instance = null;
 
-        if (ExpressionBuilder.instance == null) {
-            ExpressionBuilder.instance = new ExpressionBuilder();
+    public static ExpressionUtils getInstance() {
+
+        if (ExpressionUtils.instance == null) {
+            ExpressionUtils.instance = new ExpressionUtils();
         }
-        return ExpressionBuilder.instance;
+        return ExpressionUtils.instance;
     }
 
-    private ExpressionBuilder() {
+    private ExpressionUtils() {
 
     }
 
@@ -73,6 +75,8 @@ public class ExpressionBuilder {
         if (TermParserTools.isDivision(term)) {
             return new Division(leftChild, rightChild);
         }
+
+        int x;
 
         throw new KeYStoneException("Illegal binary function: " + term);
     }
@@ -138,5 +142,45 @@ public class ExpressionBuilder {
         } else {
             return resolveNumber(term.sub(0)) + numberString;
         }
+    }
+
+    public Equals removeInequality(IComparator comparator,
+            Map<String, Variable> variableIndex) {
+
+        /*
+         * Add slack variable.
+         */
+        if (comparator instanceof LessOrEquals) {
+
+            String variableName = "s" + extraVariableIndex++;
+            Variable slackVariable = new Variable(variableName);
+            Addition slackAddition = new Addition(
+                    ((LessOrEquals) comparator).getLeftOperand(), slackVariable);
+
+            variableIndex.put(variableName, slackVariable);
+
+            return new Equals(slackAddition,
+                    ((LessOrEquals) comparator).getRightOperand());
+        }
+
+        /*
+         * Add surplus variable.
+         */
+        if (comparator instanceof GreaterOrEquals) {
+
+            String variableName = "s" + extraVariableIndex++;
+            Variable surplusVariable = new Variable(variableName);
+
+            variableIndex.put(variableName, surplusVariable);
+
+            Subtraction surplusSubtraction = new Subtraction(
+                    ((GreaterOrEquals) comparator).getLeftOperand(),
+                    surplusVariable);
+
+            return new Equals(surplusSubtraction,
+                    ((GreaterOrEquals) comparator).getRightOperand());
+        }
+
+        return (Equals) comparator;
     }
 }

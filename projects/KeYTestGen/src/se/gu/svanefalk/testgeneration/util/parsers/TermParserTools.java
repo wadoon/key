@@ -180,7 +180,7 @@ public final class TermParserTools {
      * @return if the term represents addition
      */
     public static boolean isAddition(final Term term) {
-        return term.op().name().equals(StringConstants.ADDITION);
+        return term.op().toString().equals(StringConstants.ADDITION);
     }
 
     /**
@@ -296,7 +296,7 @@ public final class TermParserTools {
      * @return if the term represents division
      */
     public static boolean isDivision(final Term term) {
-        return term.op().name().equals(StringConstants.DIVISION);
+        return term.op().toString().equals(StringConstants.DIVISION);
     }
 
     /**
@@ -482,7 +482,7 @@ public final class TermParserTools {
      * @return if the term represents multiplication
      */
     public static boolean isMultiplication(final Term term) {
-        return term.op().name().equals(StringConstants.MULTIPLICATION);
+        return term.op().toString().equals(StringConstants.MULTIPLICATION);
     }
 
     /**
@@ -622,7 +622,7 @@ public final class TermParserTools {
      * @return if the term represents subtraction
      */
     public static boolean isSubtraction(final Term term) {
-        return term.op().name().equals(StringConstants.SUBTRACTION);
+        return term.op().toString().equals(StringConstants.SUBTRACTION);
     }
 
     /**

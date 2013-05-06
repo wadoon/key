@@ -19,4 +19,10 @@ public class Multiplication extends AbstractExpression {
                 getRightOperand().evaluate());
     }
 
+
+    @Override
+    public String toString() {
+        
+        return getLeftOperand().toString() + " * " + getRightOperand().toString();
+    }
 }

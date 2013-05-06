@@ -18,4 +18,11 @@ public class Subtraction extends AbstractExpression {
         return getLeftOperand().evaluate().subtract(
                 getRightOperand().evaluate());
     }
+    
+
+    @Override
+    public String toString() {
+        
+        return getLeftOperand().toString() + " - " + getRightOperand().toString();
+    }
 }

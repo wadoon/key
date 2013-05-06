@@ -26,4 +26,11 @@ public class GreaterOrEquals extends AbstractComparator {
 
         return leftDividend >= rightDividend;
     }
+    
+
+    @Override
+    public String toString() {
+        
+        return getLeftOperand().toString() + " >= " + getRightOperand().toString();
+    }
 }

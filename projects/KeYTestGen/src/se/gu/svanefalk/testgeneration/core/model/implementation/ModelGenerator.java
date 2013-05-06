@@ -9,6 +9,7 @@ import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
 import se.gu.svanefalk.testgeneration.keystone.KeYStone;
 import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
+import se.gu.svanefalk.testgeneration.util.transformers.NormalizeArithmeticComparatorsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -36,7 +37,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
  * {@link IModel}, which constitutes the final representaiton of the model.
  */
 public class ModelGenerator implements IModelGenerator {
-    
+
     private static ModelGenerator instance = null;
 
     public static ModelGenerator getInstance() {
@@ -239,7 +240,10 @@ public class ModelGenerator implements IModelGenerator {
              * There is hence nothing useful we can do with it, and we just
              * return it as null.
              */
-            final Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
+            Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
+            simplifiedPathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(
+                    services).transform(simplifiedPathCondition);
+
             keYStone.solveConstraint(simplifiedPathCondition);
             System.out.println(simplifiedPathCondition);
             if (simplifiedPathCondition == null) {

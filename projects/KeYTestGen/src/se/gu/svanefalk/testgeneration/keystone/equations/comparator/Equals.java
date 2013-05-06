@@ -14,4 +14,11 @@ public class Equals extends AbstractComparator {
     public boolean evaluate() throws OperationNotSupportedException {
         return getLeftOperand().evaluate().equals(getRightOperand().evaluate());
     }
+    
+
+    @Override
+    public String toString() {
+        
+        return getLeftOperand().toString() + " = " + getRightOperand().toString();
+    }
 }

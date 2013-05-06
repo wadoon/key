@@ -264,11 +264,11 @@ public static int mid3(final int x, final int y, final int z) {
     @ requires true;
     @ ensures true;
     @*/
-    public int doStuff(int a, int b) {
+    public int doStuff(int a, int b,int c, int d) {
 
         int result = 0;
         
-        if(a*a - 2 >= b*b + 1 )
+        if((a*a - 2 >= b*b + 1) )
             result = a;
         else
             result = a;
