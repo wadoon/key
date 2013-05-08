@@ -6,7 +6,7 @@ import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
-public class Multiplication extends AbstractExpression {
+public class Multiplication extends AbstractBinaryExpression {
 
     public Multiplication(final IExpression leftOperand,
             final IExpression rightOperand) {

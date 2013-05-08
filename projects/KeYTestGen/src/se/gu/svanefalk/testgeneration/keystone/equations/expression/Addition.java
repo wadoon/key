@@ -8,7 +8,7 @@ import de.uka.ilkd.key.strategy.feature.LeftmostNegAtomFeature;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
-public class Addition extends AbstractExpression {
+public class Addition extends AbstractBinaryExpression {
 
     public Addition(final IExpression leftOperand,
             final IExpression rightOperand) {

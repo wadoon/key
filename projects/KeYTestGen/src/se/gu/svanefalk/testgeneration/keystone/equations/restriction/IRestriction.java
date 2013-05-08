@@ -1,6 +1,8 @@
 package se.gu.svanefalk.testgeneration.keystone.equations.restriction;
 
+import org.apache.commons.math3.fraction.Fraction;
+
 public interface IRestriction {
 
-    boolean holds();
+    Fraction makeConform(Fraction value);
 }

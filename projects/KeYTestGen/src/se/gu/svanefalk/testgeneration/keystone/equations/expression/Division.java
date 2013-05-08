@@ -6,7 +6,7 @@ import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
-public class Division extends AbstractExpression {
+public class Division extends AbstractBinaryExpression {
 
     public Division(final IExpression leftOperand,
             final IExpression rightOperand) {

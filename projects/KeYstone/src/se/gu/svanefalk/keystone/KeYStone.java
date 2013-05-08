@@ -1,10 +1,9 @@
 package se.gu.svanefalk.keystone;
 
 import java.util.Map;
-import java.util.Set;
 
+import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.keystone.Preprocessor;
-
 import de.uka.ilkd.key.logic.Term;
 
 public enum KeYStone {
@@ -12,11 +11,11 @@ public enum KeYStone {
 
     Preprocessor preprocessor = Preprocessor.getInstance();
 
-    public Map<String, Number> solveConstraint(Term constraint) {
+    public Map<String, Number> solveConstraint(final Term constraint)
+            throws KeYStoneException {
 
-        Set<Term> minimalProblemSet = preprocessor.createMinimalProblemSet(constraint);
+        preprocessor.createMinimalProblemSet(constraint);
 
-        
         return null;
     }
 }

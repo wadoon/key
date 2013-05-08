@@ -419,6 +419,19 @@ public final class TermParserTools {
 
         final String name = term.op().name().toString();
 
+        return name.equals("neglit");
+    }
+    
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a negative number, i.e. the Z
+     *         function, false otherwise.
+     */
+    public static boolean isInteger(final Term term) {
+
+        final String name = term.op().name().toString();
+
         return name.equals("Z");
     }
 

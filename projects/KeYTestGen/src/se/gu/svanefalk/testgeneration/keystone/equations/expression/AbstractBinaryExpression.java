@@ -2,12 +2,12 @@ package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
-public abstract class AbstractExpression implements IExpression {
+public abstract class AbstractBinaryExpression implements IExpression {
 
     private IExpression leftOperand = null;
     private IExpression rightOperand = null;
 
-    public AbstractExpression(final IExpression leftOperand,
+    public AbstractBinaryExpression(final IExpression leftOperand,
             final IExpression rightOperand) {
         super();
         this.leftOperand = leftOperand;

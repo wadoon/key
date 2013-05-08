@@ -8,9 +8,11 @@ import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.GreaterOrEquals;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.LessOrEquals;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.AbstractBinaryExpression;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Addition;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Division;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Multiplication;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.Negation;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Number;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Subtraction;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
@@ -19,7 +21,9 @@ import de.uka.ilkd.key.logic.Term;
 
 public class ExpressionUtils {
 
-    private static int extraVariableIndex = 1;
+    private static String dummyVariablePrefix = "keystone_dummyvariable";
+
+    private static int dummyVariableIndex = 1;
 
     private static ExpressionUtils instance = null;
 
@@ -75,9 +79,7 @@ public class ExpressionUtils {
         if (TermParserTools.isDivision(term)) {
             return new Division(leftChild, rightChild);
         }
-
-        int x;
-
+        
         throw new KeYStoneException("Illegal binary function: " + term);
     }
 
@@ -119,9 +121,15 @@ public class ExpressionUtils {
             final Map<String, Variable> variableContext)
             throws KeYStoneException {
 
-        if (TermParserTools.isIntegerNegation(term)) {
-            final int value = Integer.parseInt("-" + resolveNumber(term.sub(0)));
-            return new Number(new Fraction(value));
+        if (TermParserTools.isInteger(term)) {
+            if (TermParserTools.isIntegerNegation(term.sub(0))) {
+                final int value = Integer.parseInt("-"
+                        + resolveNumber(term.sub(0).sub(0)));
+                return new Negation(new Number(new Fraction(value)));
+            } else {
+                final int value = Integer.parseInt(resolveNumber(term.sub(0)));
+                return new Number(new Fraction(value));
+            }
         }
         throw new KeYStoneException("Illegal unary function: " + term);
     }
@@ -144,20 +152,19 @@ public class ExpressionUtils {
         }
     }
 
-    public Equals removeInequality(IComparator comparator,
-            Map<String, Variable> variableIndex) {
+    public Equals createEqualityFromInequality(IComparator comparator,
+            Map<String, Variable> variableIndex, Variable dummyVariable) {
 
         /*
          * Add slack variable.
          */
         if (comparator instanceof LessOrEquals) {
 
-            String variableName = "s" + extraVariableIndex++;
-            Variable slackVariable = new Variable(variableName);
+            Variable slackVariable = dummyVariable;
             Addition slackAddition = new Addition(
                     ((LessOrEquals) comparator).getLeftOperand(), slackVariable);
 
-            variableIndex.put(variableName, slackVariable);
+            variableIndex.put(slackVariable.getName(), slackVariable);
 
             return new Equals(slackAddition,
                     ((LessOrEquals) comparator).getRightOperand());
@@ -168,10 +175,9 @@ public class ExpressionUtils {
          */
         if (comparator instanceof GreaterOrEquals) {
 
-            String variableName = "s" + extraVariableIndex++;
-            Variable surplusVariable = new Variable(variableName);
+            Variable surplusVariable = dummyVariable;
 
-            variableIndex.put(variableName, surplusVariable);
+            variableIndex.put(surplusVariable.getName(), surplusVariable);
 
             Subtraction surplusSubtraction = new Subtraction(
                     ((GreaterOrEquals) comparator).getLeftOperand(),
@@ -182,5 +188,47 @@ public class ExpressionUtils {
         }
 
         return (Equals) comparator;
+    }
+
+    public Equals removeInequality(IComparator comparator,
+            Map<String, Variable> variableIndex) {
+
+        /*
+         * Add slack variable.
+         */
+        if (comparator instanceof LessOrEquals) {
+
+            Variable slackVariable = createDummyVariable();
+            Addition slackAddition = new Addition(
+                    ((LessOrEquals) comparator).getLeftOperand(), slackVariable);
+
+            variableIndex.put(slackVariable.getName(), slackVariable);
+
+            return new Equals(slackAddition,
+                    ((LessOrEquals) comparator).getRightOperand());
+        }
+
+        /*
+         * Add surplus variable.
+         */
+        if (comparator instanceof GreaterOrEquals) {
+
+            Variable surplusVariable = createDummyVariable();
+
+            variableIndex.put(surplusVariable.getName(), surplusVariable);
+
+            Subtraction surplusSubtraction = new Subtraction(
+                    ((GreaterOrEquals) comparator).getLeftOperand(),
+                    surplusVariable);
+
+            return new Equals(surplusSubtraction,
+                    ((GreaterOrEquals) comparator).getRightOperand());
+        }
+
+        return (Equals) comparator;
+    }
+
+    public static Variable createDummyVariable() {
+        return new Variable(dummyVariablePrefix + dummyVariableIndex++);
     }
 }

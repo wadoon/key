@@ -1,5 +1,6 @@
 package se.gu.svanefalk.testgeneration.keystone;
 
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,7 +60,9 @@ public class Preprocessor {
 
     public Set<Term> createMinimalProblemSet(final Term term)
             throws KeYStoneException {
-
+        
+        long time = Calendar.getInstance().getTimeInMillis();
+        
         final Set<Term> minimalProblemSet = new HashSet<>();
 
         try {
@@ -72,6 +75,9 @@ public class Preprocessor {
 
             createMinimalProblemSet_helper(processedTerm, minimalProblemSet);
 
+            System.out.println("Do Preprocessing: "
+                    + (Calendar.getInstance().getTimeInMillis() - time));
+            
             return minimalProblemSet;
 
         } catch (TermTransformerException e) {

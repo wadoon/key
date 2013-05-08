@@ -15,6 +15,13 @@ public class Variable implements IExpression {
 
     private final String name;
 
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
     public Variable(String name) {
         super();
         this.name = name;
