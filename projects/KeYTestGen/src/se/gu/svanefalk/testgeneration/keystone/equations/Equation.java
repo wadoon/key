@@ -1,10 +1,7 @@
 package se.gu.svanefalk.testgeneration.keystone.equations;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import de.uka.ilkd.key.strategy.feature.TernarySumFeature;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.AbstractBinaryExpression;

@@ -79,7 +79,7 @@ public class ExpressionUtils {
         if (TermParserTools.isDivision(term)) {
             return new Division(leftChild, rightChild);
         }
-        
+
         throw new KeYStoneException("Illegal binary function: " + term);
     }
 
@@ -160,14 +160,14 @@ public class ExpressionUtils {
          */
         if (comparator instanceof LessOrEquals) {
 
-            Variable slackVariable = dummyVariable;
-            Addition slackAddition = new Addition(
-                    ((LessOrEquals) comparator).getLeftOperand(), slackVariable);
+            IExpression leftOperand = ((LessOrEquals) comparator).getLeftOperand();
+            IExpression rightOperand = ((LessOrEquals) comparator).getRightOperand();
 
-            variableIndex.put(slackVariable.getName(), slackVariable);
+            Addition slackAddition = new Addition(leftOperand, dummyVariable);
 
-            return new Equals(slackAddition,
-                    ((LessOrEquals) comparator).getRightOperand());
+            variableIndex.put(dummyVariable.getName(), dummyVariable);
+
+            return new Equals(slackAddition, rightOperand);
         }
 
         /*
@@ -175,54 +175,15 @@ public class ExpressionUtils {
          */
         if (comparator instanceof GreaterOrEquals) {
 
-            Variable surplusVariable = dummyVariable;
+            IExpression leftOperand = ((GreaterOrEquals) comparator).getLeftOperand();
+            IExpression rightOperand = ((GreaterOrEquals) comparator).getRightOperand();
 
-            variableIndex.put(surplusVariable.getName(), surplusVariable);
+            variableIndex.put(dummyVariable.getName(), dummyVariable);
 
-            Subtraction surplusSubtraction = new Subtraction(
-                    ((GreaterOrEquals) comparator).getLeftOperand(),
-                    surplusVariable);
+            Subtraction surplusSubtraction = new Subtraction(leftOperand,
+                    dummyVariable);
 
-            return new Equals(surplusSubtraction,
-                    ((GreaterOrEquals) comparator).getRightOperand());
-        }
-
-        return (Equals) comparator;
-    }
-
-    public Equals removeInequality(IComparator comparator,
-            Map<String, Variable> variableIndex) {
-
-        /*
-         * Add slack variable.
-         */
-        if (comparator instanceof LessOrEquals) {
-
-            Variable slackVariable = createDummyVariable();
-            Addition slackAddition = new Addition(
-                    ((LessOrEquals) comparator).getLeftOperand(), slackVariable);
-
-            variableIndex.put(slackVariable.getName(), slackVariable);
-
-            return new Equals(slackAddition,
-                    ((LessOrEquals) comparator).getRightOperand());
-        }
-
-        /*
-         * Add surplus variable.
-         */
-        if (comparator instanceof GreaterOrEquals) {
-
-            Variable surplusVariable = createDummyVariable();
-
-            variableIndex.put(surplusVariable.getName(), surplusVariable);
-
-            Subtraction surplusSubtraction = new Subtraction(
-                    ((GreaterOrEquals) comparator).getLeftOperand(),
-                    surplusVariable);
-
-            return new Equals(surplusSubtraction,
-                    ((GreaterOrEquals) comparator).getRightOperand());
+            return new Equals(surplusSubtraction, rightOperand);
         }
 
         return (Equals) comparator;
