@@ -4,11 +4,11 @@ import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
-public class Number implements IExpression {
+public class NumericConstant implements IExpression {
 
     private Fraction value = null;
 
-    public Number(final Fraction fraction) {
+    public NumericConstant(final Fraction fraction) {
         value = fraction;
     }
 

@@ -1,19 +1,27 @@
 package se.gu.svanefalk.testgeneration.keystone.equations;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
+
+import javax.naming.OperationNotSupportedException;
 
 import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.DummyVariable;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 import se.gu.svanefalk.testgeneration.keystone.equations.restriction.IRestriction;
 import se.gu.svanefalk.testgeneration.keystone.equations.restriction.RestrictionFactory;
@@ -35,11 +43,13 @@ public class EquationSystem {
      */
     private static final Fraction maxInteger;
     private static final Fraction minInteger;
+    private static final NumericConstant baseIntegerValue;
     private static final IRestriction greaterThanZeroRestriction;
     private static final IRestriction integerValueRestriction;
     private static final RestrictionFactory restrictionFactory;
     static {
         restrictionFactory = RestrictionFactory.getInstance();
+        baseIntegerValue = new NumericConstant(new Fraction(1));
         maxInteger = new Fraction(Integer.MAX_VALUE);
         minInteger = new Fraction(Integer.MIN_VALUE);
         integerValueRestriction = restrictionFactory.createRangeRestriction(
@@ -61,8 +71,6 @@ public class EquationSystem {
             final Collection<Term> terms) throws KeYStoneException {
 
         long time = Calendar.getInstance().getTimeInMillis();
-        
-        RestrictionFactory restrictionFactory = RestrictionFactory.getInstance();
 
         Map<Variable, List<IRestriction>> restrictions = new HashMap<>();
 
@@ -90,7 +98,7 @@ public class EquationSystem {
          * Create the equations
          */
         ExpressionUtils expressionUtils = ExpressionUtils.getInstance();
-        Set<Equation> equations = new HashSet<>();
+        List<Equation> equations = new ArrayList<>();
         for (Term term : terms) {
 
             /*
@@ -102,7 +110,7 @@ public class EquationSystem {
             /*
              * Convert the inequality to an equation.
              */
-            Variable dummyVariable = ExpressionUtils.createDummyVariable();
+            Variable dummyVariable = DummyVariable.createDummyVariable();
             Equals equality = expressionUtils.createEqualityFromInequality(
                     inequality, variableIndex, dummyVariable);
             Equation equation = Equation.createEquation(equality);
@@ -122,8 +130,128 @@ public class EquationSystem {
 
             System.out.println("Create system: "
                     + (Calendar.getInstance().getTimeInMillis() - time));
+
         }
-        return new EquationSystem(equations, null, variableIndex);
+
+        /*
+         * Sort the resulting equations according to number of variables.
+         */
+        Collections.sort(equations, EquationSetSorter.getInstance());
+        Set<Equation> equationSet = new LinkedHashSet<>();
+        for (Equation equation : equations) {
+            equationSet.add(equation);
+        }
+
+        return new EquationSystem(equationSet, restrictions, variableIndex);
+    }
+
+    public Map<String, Number> solveSystem() {
+
+        /*
+         * Empty systems should not occur, but we accomodate them just in case.
+         */
+        if (equations.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        /*
+         * If the system consists of a single equation, it is technically not a
+         * system, but we make no such distincation and resolve it anyway.
+         */
+        if (equations.size() == 1) {
+            return solveSingleEquation();
+        }
+
+        /*
+         * Solve a regular system. Begin with separating the system into
+         * dependent and independent variables, by simply solving for as many
+         * non-dummy variables as possible through regular substitution.
+         */
+        List<Equation> equationsToSolve = new LinkedList<>();
+        equationsToSolve.addAll(equations);
+
+        Deque<Variable> variablesToSolve = new LinkedList<>();
+        for (Variable variable : variableIndex.values()) {
+            if (!(variable instanceof DummyVariable)) {
+                variablesToSolve.add(variable);
+            }
+        }
+
+        Set<Variable> boundVariables = new HashSet<>();
+        Set<Variable> unBoundVariables = new HashSet<>();
+
+        while (!equationsToSolve.isEmpty()) {
+            Variable variableToSolve = variablesToSolve.poll();
+
+            for (Equation equation : equationsToSolve) {
+
+                if (constainsVariable(equation, variableToSolve)) {
+                    IExpression solution = equation.solveForVariable(variableToSolve);
+                    substituteVariable(variableToSolve, solution);
+                    equationsToSolve.remove(equation);
+                    boundVariables.add(variableToSolve);
+                    break;
+                }
+            }
+        }
+
+        /*
+         * Create the set of unbound variables by taking the complement to the
+         * set of bound ones.
+         */
+        for (Variable variable : variableIndex.values()) {
+            if (!boundVariables.contains(variable)) {
+                unBoundVariables.add(variable);
+            }
+        }
+
+        /*
+         * Assign arbitrary values to the set of unbound variables.
+         */
+        for (Variable variable : unBoundVariables) {
+            variable.bind(baseIntegerValue);
+        }
+
+        return null;
+    }
+
+    private void substituteVariable(Variable variableToSolve,
+            IExpression solution) {
+
+        assert variableIndex.values().contains(variableToSolve);
+
+        /*
+         * TODO: Perhaps remove binding restrictions on variables?
+         */
+        try {
+            variableToSolve.bind(solution);
+        } catch (OperationNotSupportedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param equation
+     * @param variablesToSolve
+     * @return true if the equation contains the variable, false otherwise.
+     *         Reference based comparisons are enforced.
+     */
+    private boolean constainsVariable(Equation equation,
+            Variable variableToSolve) {
+
+        for (Variable variable : equation.getVariables()) {
+            if (variable == variableToSolve) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private Map<String, Number> solveSingleEquation() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /**
@@ -173,6 +301,35 @@ public class EquationSystem {
                 String variableName = visited.toString();
                 variableIndex.put(variableName, new Variable(variableName));
             }
+        }
+    }
+
+    /**
+     * Used for sorting {@link Equation} instances with regard to how many
+     * variables the contain.
+     * 
+     * @author christopher
+     * 
+     */
+    private static class EquationSetSorter implements Comparator<Equation> {
+
+        private static EquationSetSorter instance = null;
+
+        public static EquationSetSorter getInstance() {
+
+            if (EquationSetSorter.instance == null) {
+                EquationSetSorter.instance = new EquationSetSorter();
+            }
+            return EquationSetSorter.instance;
+        }
+
+        private EquationSetSorter() {
+
+        }
+
+        @Override
+        public int compare(Equation o1, Equation o2) {
+            return o1.getVariables().size() - o2.getVariables().size();
         }
     }
 }

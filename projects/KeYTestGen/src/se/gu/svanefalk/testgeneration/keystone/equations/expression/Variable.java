@@ -27,15 +27,8 @@ public class Variable implements IExpression {
         this.name = name;
     }
 
-    public void bind(IExpression expression)
-            throws OperationNotSupportedException {
-
-        if (binding == null) {
-            this.binding = expression;
-        } else {
-            throw new OperationNotSupportedException(
-                    "Attempted to bind already bound variable");
-        }
+    public void bind(IExpression expression) {
+        this.binding = expression;
     }
 
     @Override

@@ -22,6 +22,6 @@ public class Division extends AbstractBinaryExpression {
     @Override
     public String toString() {
         
-        return getLeftOperand().toString() + "/" + getRightOperand().toString();
+        return "(" + getLeftOperand().toString() + "/" + getRightOperand().toString() + ")";
     }
 }

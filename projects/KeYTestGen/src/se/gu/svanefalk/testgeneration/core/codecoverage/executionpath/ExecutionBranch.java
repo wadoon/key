@@ -4,33 +4,38 @@ import de.uka.ilkd.key.java.SourceElement;
 
 public class ExecutionBranch {
 
-    private final SourceElement first;
+    /**
+     * The program element which this branch leads from.
+     */
+    private final SourceElement to;
 
-    private final SourceElement second;
+    /**
+     * The program element which this branch leads to.
+     */
+    private final SourceElement from;
 
     public ExecutionBranch(final SourceElement first, final SourceElement second) {
         super();
-        this.first = first;
-        this.second = second;
+        this.to = first;
+        this.from = second;
     }
 
     /**
-     * @return the first
+     * @return the to
      */
     public SourceElement getFirst() {
-        return first;
+        return to;
     }
 
     /**
-     * @return the second
+     * @return the from
      */
     public SourceElement getSecond() {
-        return second;
+        return from;
     }
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
-        return first + " --> " + second;
+        return to + " --> " + from;
     }
 }

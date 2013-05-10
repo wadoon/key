@@ -23,6 +23,6 @@ public class Multiplication extends AbstractBinaryExpression {
     @Override
     public String toString() {
         
-        return getLeftOperand().toString() + " * " + getRightOperand().toString();
+        return "(" + getLeftOperand().toString() + " * " + getRightOperand().toString() + ")";
     }
 }

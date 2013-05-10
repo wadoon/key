@@ -138,10 +138,11 @@ public class ExecutionPathContext {
                         executionPath = new ExecutionPath();
 
                         /*
-                         * Pop, from the stack of seen ExecutionBranch instance,
-                         * all the ones below the parent of this node.
+                         * Pop, from the stack of seen ExecutionBranch
+                         * instances, all the ones below the parent of this
+                         * node.
                          */
-                        final SourceElement parent = ((AbstractExecutionStateNode) node.getParent()).getActiveStatement();
+                        final SourceElement parent = findParentExecutionBranch(node);
                         while (true) {
                             final ExecutionBranch branch = branchesForSubtree.peek();
                             if (branch.getSecond() != parent) {
@@ -195,7 +196,11 @@ public class ExecutionPathContext {
 
                         /*
                          * Construct the ExecutionBranch for this node, by
-                         * associating it with the last node visited before it.
+                         * associating it with the last node visited before it
+                         * (i.e. the last element is the element which the
+                         * branch leads FROM, the current element will be the
+                         * element it leads TO).
+                         * 
                          * Further, associate this branch with the current
                          * execution path, showing that this path covers this
                          * branch.
@@ -303,6 +308,17 @@ public class ExecutionPathContext {
 
             return new ExecutionPathContext(executionPaths,
                     executionPathsForBranch, visitedNodes, executionBranches);
+        }
+
+        private SourceElement findParentExecutionBranch(IExecutionNode node) {
+
+            while (true) {
+                if (node.getParent() instanceof AbstractExecutionStateNode) {
+                    return ((AbstractExecutionStateNode) node.getParent()).getActiveStatement();
+                } else {
+                    node = node.getParent();
+                }
+            }
         }
 
         private SourceElement getActiveStatement(final IExecutionNode node) {

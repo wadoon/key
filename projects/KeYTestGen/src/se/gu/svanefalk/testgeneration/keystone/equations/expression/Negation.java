@@ -18,4 +18,9 @@ public class Negation extends AbstractUnaryExpression {
     public Fraction evaluate() throws OperationNotSupportedException {
         return getOperand().evaluate().multiply(minusOne);
     }
+
+    @Override
+    public String toString() {
+        return "-(" + getOperand() + ")";
+    }
 }

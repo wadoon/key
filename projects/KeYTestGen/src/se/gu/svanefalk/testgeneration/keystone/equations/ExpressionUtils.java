@@ -8,22 +8,17 @@ import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.GreaterOrEquals;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.LessOrEquals;
-import se.gu.svanefalk.testgeneration.keystone.equations.expression.AbstractBinaryExpression;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Addition;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Division;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Multiplication;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Negation;
-import se.gu.svanefalk.testgeneration.keystone.equations.expression.Number;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Subtraction;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.logic.Term;
 
 public class ExpressionUtils {
-
-    private static String dummyVariablePrefix = "keystone_dummyvariable";
-
-    private static int dummyVariableIndex = 1;
 
     private static ExpressionUtils instance = null;
 
@@ -125,10 +120,10 @@ public class ExpressionUtils {
             if (TermParserTools.isIntegerNegation(term.sub(0))) {
                 final int value = Integer.parseInt("-"
                         + resolveNumber(term.sub(0).sub(0)));
-                return new Negation(new Number(new Fraction(value)));
+                return new Negation(new NumericConstant(new Fraction(value)));
             } else {
                 final int value = Integer.parseInt(resolveNumber(term.sub(0)));
-                return new Number(new Fraction(value));
+                return new NumericConstant(new Fraction(value));
             }
         }
         throw new KeYStoneException("Illegal unary function: " + term);
@@ -187,9 +182,5 @@ public class ExpressionUtils {
         }
 
         return (Equals) comparator;
-    }
-
-    public static Variable createDummyVariable() {
-        return new Variable(dummyVariablePrefix + dummyVariableIndex++);
     }
 }

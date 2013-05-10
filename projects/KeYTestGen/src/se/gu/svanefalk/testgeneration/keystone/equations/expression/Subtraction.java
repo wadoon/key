@@ -18,11 +18,11 @@ public class Subtraction extends AbstractBinaryExpression {
         return getLeftOperand().evaluate().subtract(
                 getRightOperand().evaluate());
     }
-    
 
     @Override
     public String toString() {
-        
-        return getLeftOperand().toString() + " - " + getRightOperand().toString();
+
+        return "(" + getLeftOperand().toString() + " - "
+                + getRightOperand().toString() + ")";
     }
 }

@@ -34,6 +34,7 @@ public class KeYStone {
         Set<Term> minimalProblemSet = preprocessor.createMinimalProblemSet(constraint);
 
         EquationSystem equationSystem = EquationSystem.createEquationSystem(minimalProblemSet);
+        equationSystem.solveSystem();
 
         
         
