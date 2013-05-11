@@ -268,7 +268,7 @@ public static int mid3(final int x, final int y, final int z) {
 
         int result = 0;
         
-        if((5*a - 5 >= 6*b) && (4*c + 8 <= 5*d + 2))
+        if((12*a - 5 >= b*5) && (c*6 + 8 <= 2/d))
             result = 1;
         else
             result = 2;

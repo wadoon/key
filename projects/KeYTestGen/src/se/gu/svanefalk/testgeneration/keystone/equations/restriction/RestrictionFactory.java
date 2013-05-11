@@ -1,11 +1,25 @@
 package se.gu.svanefalk.testgeneration.keystone.equations.restriction;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.math3.fraction.Fraction;
 
 public class RestrictionFactory {
+
+    private static final Fraction maxInteger;
+    private static final Fraction minInteger;
+
+    public static final IRestriction greaterThanZeroRestriction;
+    public static final IRestriction integerValueRestriction;
+
+    static {
+        RestrictionFactory restrictionFactory = RestrictionFactory.getInstance();
+
+        maxInteger = new Fraction(Integer.MAX_VALUE);
+        minInteger = new Fraction(Integer.MIN_VALUE);
+        integerValueRestriction = restrictionFactory.createRangeRestriction(
+                minInteger, maxInteger);
+        greaterThanZeroRestriction = restrictionFactory.createGreaterOrEqualsRestriction(new Fraction(
+                0));
+    }
 
     private static RestrictionFactory instance = null;
 

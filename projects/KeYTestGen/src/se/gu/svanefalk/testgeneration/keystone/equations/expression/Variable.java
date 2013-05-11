@@ -1,12 +1,21 @@
 package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.naming.OperationNotSupportedException;
 
 import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
+import se.gu.svanefalk.testgeneration.keystone.equations.restriction.IRestriction;
 
 public class Variable implements IExpression {
+
+    /**
+     * Restrictions to be enforced on this variable.
+     */
+    private final List<IRestriction> restrictions = new LinkedList<>();
 
     /**
      * The expression bound to this variable. Can only be bound once.
@@ -39,6 +48,10 @@ public class Variable implements IExpression {
             throw new OperationNotSupportedException(
                     "Attempted to evaluate unbound variable");
         }
+    }
+
+    public void imposeRestriction(IRestriction restriction) {
+        restrictions.add(restriction);
     }
 
     @Override

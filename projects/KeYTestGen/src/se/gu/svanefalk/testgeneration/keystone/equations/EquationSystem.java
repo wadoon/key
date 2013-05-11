@@ -43,13 +43,19 @@ public class EquationSystem {
      */
     private static final Fraction maxInteger;
     private static final Fraction minInteger;
+
     private static final NumericConstant baseIntegerValue;
+
     private static final IRestriction greaterThanZeroRestriction;
     private static final IRestriction integerValueRestriction;
+
     private static final RestrictionFactory restrictionFactory;
+
     static {
         restrictionFactory = RestrictionFactory.getInstance();
+
         baseIntegerValue = new NumericConstant(new Fraction(1));
+
         maxInteger = new Fraction(Integer.MAX_VALUE);
         minInteger = new Fraction(Integer.MIN_VALUE);
         integerValueRestriction = restrictionFactory.createRangeRestriction(
@@ -130,7 +136,6 @@ public class EquationSystem {
 
             System.out.println("Create system: "
                     + (Calendar.getInstance().getTimeInMillis() - time));
-
         }
 
         /*
@@ -145,7 +150,8 @@ public class EquationSystem {
         return new EquationSystem(equationSet, restrictions, variableIndex);
     }
 
-    public Map<String, Number> solveSystem() {
+    public Map<String, Fraction> solveSystem()
+            throws OperationNotSupportedException {
 
         /*
          * Empty systems should not occur, but we accomodate them just in case.
@@ -212,7 +218,58 @@ public class EquationSystem {
             variable.bind(baseIntegerValue);
         }
 
-        return null;
+        /*
+         * Enforce restrictions on the variables.
+         * 
+         * FIXME: This is most likely NOT SOUND and may lead to highly
+         * unpredicatble runtime behavior. The entire constraint system is too
+         * haphazard.
+         */
+        for (Variable variable : unBoundVariables) {
+            for (IRestriction restriction : restrictions.get(variable)) {
+                restriction.makeConform(variable.evaluate());
+            }
+        }
+
+        /*
+         * Finally, compile a set of relevant, resulting values, and return it.
+         */
+        Map<String, Fraction> valueMapping = new HashMap<>();
+        for (Variable variable : variableIndex.values()) {
+            if (!(variable instanceof DummyVariable)) {
+                valueMapping.put(variable.getName(), variable.evaluate());
+            }
+        }
+
+        assert __debug_AssertCorrectness(valueMapping);
+
+        return valueMapping;
+    }
+
+    private boolean __debug_AssertCorrectness(Map<String, Fraction> valueMapping)
+            throws OperationNotSupportedException {
+        resetAllVariables();
+
+        for (String setVariableIdentifier : valueMapping.keySet()) {
+            Variable variableToBind = variableIndex.get(setVariableIdentifier);
+            NumericConstant valueToBind = new NumericConstant(
+                    valueMapping.get(variableToBind));
+            variableToBind.bind(valueToBind);
+        }
+
+        for (Equation equation : equations) {
+            if (!equation.evaluate()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void resetAllVariables() {
+        for (Variable variable : variableIndex.values()) {
+            variable.bind(null);
+        }
     }
 
     private void substituteVariable(Variable variableToSolve,
@@ -220,15 +277,7 @@ public class EquationSystem {
 
         assert variableIndex.values().contains(variableToSolve);
 
-        /*
-         * TODO: Perhaps remove binding restrictions on variables?
-         */
-        try {
-            variableToSolve.bind(solution);
-        } catch (OperationNotSupportedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        variableToSolve.bind(solution);
     }
 
     /**
@@ -245,11 +294,10 @@ public class EquationSystem {
                 return true;
             }
         }
-
         return false;
     }
 
-    private Map<String, Number> solveSingleEquation() {
+    private Map<String, Fraction> solveSingleEquation() {
         // TODO Auto-generated method stub
         return null;
     }

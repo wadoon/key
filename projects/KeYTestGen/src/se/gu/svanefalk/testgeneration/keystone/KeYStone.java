@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.OperationNotSupportedException;
+
 import se.gu.svanefalk.testgeneration.frontend.cli.CLIResources;
 import se.gu.svanefalk.testgeneration.keystone.equations.EquationSystem;
 
@@ -28,18 +30,21 @@ public class KeYStone {
 
     public Map<String, Number> solveConstraint(final Term constraint)
             throws KeYStoneException {
+        try {
+            long time = Calendar.getInstance().getTimeInMillis();
 
-        long time = Calendar.getInstance().getTimeInMillis();
+            Set<Term> minimalProblemSet = preprocessor.createMinimalProblemSet(constraint);
 
-        Set<Term> minimalProblemSet = preprocessor.createMinimalProblemSet(constraint);
+            EquationSystem equationSystem = EquationSystem.createEquationSystem(minimalProblemSet);
 
-        EquationSystem equationSystem = EquationSystem.createEquationSystem(minimalProblemSet);
-        equationSystem.solveSystem();
+            equationSystem.solveSystem();
 
-        
-        
-        System.out.println("Run KeYStone: "
-                + (Calendar.getInstance().getTimeInMillis() - time));
+            System.out.println("Run KeYStone: "
+                    + (Calendar.getInstance().getTimeInMillis() - time));
+
+        } catch (OperationNotSupportedException e) {
+            throw new KeYStoneException(e.getMessage());
+        }
 
         return null;
     }

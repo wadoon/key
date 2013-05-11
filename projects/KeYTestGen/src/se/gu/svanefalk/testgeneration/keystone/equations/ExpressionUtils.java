@@ -120,7 +120,7 @@ public class ExpressionUtils {
             if (TermParserTools.isIntegerNegation(term.sub(0))) {
                 final int value = Integer.parseInt("-"
                         + resolveNumber(term.sub(0).sub(0)));
-                return new Negation(new NumericConstant(new Fraction(value)));
+                return new NumericConstant(new Fraction(value));
             } else {
                 final int value = Integer.parseInt(resolveNumber(term.sub(0)));
                 return new NumericConstant(new Fraction(value));

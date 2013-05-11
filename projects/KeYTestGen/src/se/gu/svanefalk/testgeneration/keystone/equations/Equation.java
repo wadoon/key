@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import javax.naming.OperationNotSupportedException;
+
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.AbstractBinaryExpression;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.AbstractUnaryExpression;
@@ -27,6 +29,9 @@ public class Equation {
      */
     private final Equals root;
 
+    /**
+     * The variables present in the equation.
+     */
     private final Set<Variable> variables;
 
     /**
@@ -36,12 +41,24 @@ public class Equation {
         return variables;
     }
 
+    /**
+     * Creates a new Equation from an expression tree and a set of variables.
+     * 
+     * @param root
+     * @param variables
+     */
     private Equation(Equals root, Set<Variable> variables) {
         super();
         this.root = root;
         this.variables = variables;
     }
 
+    /**
+     * Creates an Equation from a tree representation.
+     * 
+     * @param root
+     * @return
+     */
     public static Equation createEquation(Equals root) {
 
         Set<Variable> variables = extractVariables(root);
@@ -256,10 +273,14 @@ public class Equation {
         return oppositeEquationTop;
     }
 
-    private void solveForVariable_helper() {
-
-    }
-
+    /**
+     * Constructs a trace of expressions from the root of an equation, down to a
+     * given variable. Assumes the variable only occurs in one place.
+     * 
+     * @param node 
+     * @param variable
+     * @return
+     */
     private Deque<IExpression> buildTrace(Equals node, Variable variable) {
 
         assert node != null;
@@ -283,6 +304,15 @@ public class Equation {
         return queue;
     }
 
+
+    /**
+     * Constructs a trace of expressions from the root of an equation, down to a
+     * given variable. Assumes the variable only occurs in one place.
+     * 
+     * @param node 
+     * @param variable
+     * @return
+     */
     private Deque<IExpression> buildTrace(IExpression node, Variable variable) {
 
         assert node != null;
@@ -357,5 +387,9 @@ public class Equation {
     @Override
     public String toString() {
         return root.toString();
+    }
+
+    public boolean evaluate() throws OperationNotSupportedException {
+        return root.evaluate();
     }
 }
