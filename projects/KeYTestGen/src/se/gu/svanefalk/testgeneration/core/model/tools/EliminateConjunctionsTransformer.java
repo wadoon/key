@@ -1,7 +1,6 @@
 package se.gu.svanefalk.testgeneration.core.model.tools;
 
 import se.gu.svanefalk.testgeneration.util.transformers.AbstractTermTransformer;
-import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 

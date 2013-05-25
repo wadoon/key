@@ -3,8 +3,6 @@ package se.gu.svanefalk.testgeneration.core.oracle;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.crypto.spec.PSource;
-
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleAssertion;
@@ -533,10 +531,10 @@ public enum OracleGenerator {
              * Simplify the postcondition
              */
             final Term simplifiedPostCondition = oracleTermTransformer.transform(postCondition);
-            if(simplifiedPostCondition == null) {
+            if (simplifiedPostCondition == null) {
                 return new Oracle(null, null);
             }
-            
+
             /*
              * Create the postcondition constraints model
              */

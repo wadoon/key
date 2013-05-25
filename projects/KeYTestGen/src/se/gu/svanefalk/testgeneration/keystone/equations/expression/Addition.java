@@ -1,10 +1,6 @@
 package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.apache.commons.math3.fraction.Fraction;
-
-import de.uka.ilkd.key.strategy.feature.LeftmostNegAtomFeature;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
@@ -16,13 +12,14 @@ public class Addition extends AbstractBinaryExpression {
     }
 
     @Override
-    public Fraction evaluate() throws OperationNotSupportedException {
+    public Fraction evaluate() {
         return getLeftOperand().evaluate().add(getRightOperand().evaluate());
     }
 
     @Override
     public String toString() {
-        
-        return "(" + getLeftOperand().toString() + " + " + getRightOperand().toString() + ")";
+
+        return "(" + getLeftOperand().toString() + " + "
+                + getRightOperand().toString() + ")";
     }
 }

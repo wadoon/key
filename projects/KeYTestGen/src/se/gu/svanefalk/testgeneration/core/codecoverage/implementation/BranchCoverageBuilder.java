@@ -8,26 +8,11 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionBranch;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPath;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 
 public class BranchCoverageBuilder implements ICoverageBuilder {
-    
-    private static BranchCoverageBuilder instance = null;
-
-    public static BranchCoverageBuilder getInstance() {
-        if (instance == null) {
-            instance = new BranchCoverageBuilder();
-        }
-        return instance;
-    }
-    
-    private BranchCoverageBuilder() {
-        
-    }
-
 
     private static class DescendingExecutionBranchComparator implements
             Comparator<ExecutionPath> {
@@ -56,6 +41,19 @@ public class BranchCoverageBuilder implements ICoverageBuilder {
                 return 1;
             }
         }
+    }
+
+    private static BranchCoverageBuilder instance = null;
+
+    public static BranchCoverageBuilder getInstance() {
+        if (BranchCoverageBuilder.instance == null) {
+            BranchCoverageBuilder.instance = new BranchCoverageBuilder();
+        }
+        return BranchCoverageBuilder.instance;
+    }
+
+    private BranchCoverageBuilder() {
+
     }
 
     @Override

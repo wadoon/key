@@ -6,20 +6,19 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionP
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 
 public class ConditionCoverageBuilder implements ICoverageBuilder {
-    
+
     private static ConditionCoverageBuilder instance = null;
 
     public static ConditionCoverageBuilder getInstance() {
-        if (instance == null) {
-            instance = new ConditionCoverageBuilder();
+        if (ConditionCoverageBuilder.instance == null) {
+            ConditionCoverageBuilder.instance = new ConditionCoverageBuilder();
         }
-        return instance;
-    }
-    
-    private ConditionCoverageBuilder() {
-        
+        return ConditionCoverageBuilder.instance;
     }
 
+    private ConditionCoverageBuilder() {
+
+    }
 
     @Override
     public Set<ExecutionPath> retrieveExecutionPaths(

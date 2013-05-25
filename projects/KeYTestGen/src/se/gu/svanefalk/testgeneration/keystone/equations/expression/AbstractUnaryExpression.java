@@ -2,14 +2,14 @@ package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
 
-public abstract class AbstractUnaryExpression implements IExpression {
-
-    public AbstractUnaryExpression(IExpression operand) {
-        super();
-        this.operand = operand;
-    }
+public abstract class AbstractUnaryExpression extends AbstractExpression {
 
     private IExpression operand = null;
+
+    public AbstractUnaryExpression(final IExpression operand) {
+        this.operand = operand;
+        operand.setParent(this);
+    }
 
     /**
      * @return the operand
@@ -22,7 +22,7 @@ public abstract class AbstractUnaryExpression implements IExpression {
      * @param operand
      *            the operand to set
      */
-    public void setOperand(IExpression operand) {
+    public void setOperand(final IExpression operand) {
         this.operand = operand;
     }
 

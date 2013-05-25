@@ -1,9 +1,9 @@
 package se.gu.svanefalk.testgeneration.core.model.implementation;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
@@ -41,19 +41,19 @@ public class ModelGenerator implements IModelGenerator {
     private static ModelGenerator instance = null;
 
     public static ModelGenerator getInstance() {
-        if (instance == null) {
-            instance = new ModelGenerator();
+        if (ModelGenerator.instance == null) {
+            ModelGenerator.instance = new ModelGenerator();
         }
-        return instance;
+        return ModelGenerator.instance;
     }
-
-    KeYStone keYStone = KeYStone.getInstance();
 
     /**
      * The Configuration to use for the SMT-LIB2 translator used by the
      * ModelGenerator.
      */
     private final Configuration configuration;
+
+    KeYStone keYStone = KeYStone.getInstance();
 
     /**
      * The settings for the SMT solvers. These follow a default implementation,
@@ -112,22 +112,56 @@ public class ModelGenerator implements IModelGenerator {
              * Model, extracting them from an SMT solution for the pathcondition
              * for this node.
              */
-            final String solverResult = instantiatePathCondition(pathCondition,
-                    services);
+            // final String solverResult =
+            // instantiatePathCondition(pathCondition,
+            // services);
 
             /*
              * If any such primitive values were found, merge their concrete
              * values into the Model
              */
-            if (solverResult != null) {
-                insertSMTOutputIntoModel(solverResult, model);
-            }
+            // if (solverResult != null) {
+            // insertSMTOutputIntoModel(solverResult, model);
+            // }
+
+            final Map<String, Integer> concreteValues = getConcreteValues(
+                    pathCondition, services);
+
+            instantiateModel(model, concreteValues);
 
             return model;
 
         } catch (final ProofInputException e) {
             throw new ModelGeneratorException(e.getMessage());
         } catch (final TermTransformerException e) {
+            throw new ModelGeneratorException(e.getMessage());
+        }
+    }
+
+    private Map<String, Integer> getConcreteValues(final Term pathCondition,
+            final Services services) throws ModelGeneratorException {
+
+        try {
+            /*
+             * Simplify the path condition. If the simplified path condition is
+             * null, this means that it does not contain any primitive values.
+             * There is hence nothing useful we can do with it, and we just
+             * return it as null.
+             */
+            Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
+
+            simplifiedPathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(
+                    services).transform(simplifiedPathCondition);
+
+            if (simplifiedPathCondition == null) {
+                return null;
+            } else {
+                return keYStone.solveConstraint(simplifiedPathCondition);
+            }
+
+        } catch (final TermTransformerException e) {
+            throw new ModelGeneratorException(e.getMessage());
+        } catch (final KeYStoneException e) {
             throw new ModelGeneratorException(e.getMessage());
         }
     }
@@ -215,76 +249,16 @@ public class ModelGenerator implements IModelGenerator {
         }
     }
 
-    /**
-     * Returns an {@link SMTSolverResult} for the pathcondition of a given
-     * {@link IExecutionNode}. This result will represent a concrete assignment
-     * of primitive values in the pathcondition, such that the constraint
-     * represented by the pathcondition becomes satisifed.
-     * <p>
-     * We are not interested in the shape of the solved contraint per se, rather
-     * we will use these concrete values to instantiate our {@link Model}.
-     * 
-     * @param node
-     *            the node whose pathpathcondition to instantiate
-     * @return the SMT solver result
-     * @throws ModelGeneratorException
-     */
-    private String instantiatePathCondition(final Term pathCondition,
-            final Services services) throws ModelGeneratorException {
+    private void instantiateModel(final Model model,
+            final Map<String, Integer> concreteValues) {
 
-        try {
+        for (final String variableName : concreteValues.keySet()) {
 
-            /*
-             * Simplify the path condition. If the simplified path condition is
-             * null, this means that it does not contain any primitive values.
-             * There is hence nothing useful we can do with it, and we just
-             * return it as null.
-             */
-            Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
-            simplifiedPathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(
-                    services).transform(simplifiedPathCondition);
+            final ModelVariable variable = model.getVariable(variableName);
 
-            keYStone.solveConstraint(simplifiedPathCondition);
-            System.out.println(simplifiedPathCondition);
-            if (simplifiedPathCondition == null) {
-
-                return null;
-
-            } else {
-
-                final String commands = translateToSMTLIB2(
-                        simplifiedPathCondition, services);
-
-                String result = "";
-                /*
-                 * Used for keeping track of the number of attempts at model
-                 * generation so far.
-                 */
-                int attempts = 1;
-
-                /*
-                 * Assert that we could actually find a satisfiable assignment
-                 * for the SMT problem. If not, keep trying until we do
-                 */
-                do {
-
-                    result = smtInterface.startMessageBasedSession(commands).replaceAll(
-                            "success", "").trim();
-
-                    attempts++;
-
-                } while (!isValidResult(result)
-                        && (attempts < ModelSettings.getNUMBER_OF_TRIES()));
-
-                return result;
+            if (variable != null) {
+                variable.setValue(concreteValues.get(variableName));
             }
-
-        } catch (final TermTransformerException e) {
-            throw new ModelGeneratorException(e.getMessage());
-        } catch (final IllegalFormulaException e) {
-            throw new ModelGeneratorException(e.getMessage());
-        } catch (KeYStoneException e) {
-            throw new ModelGeneratorException(e.getMessage());
         }
     }
 

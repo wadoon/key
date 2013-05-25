@@ -2,9 +2,7 @@ package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 
 import org.apache.commons.math3.fraction.Fraction;
 
-import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
-
-public class NumericConstant implements IExpression {
+public class NumericConstant extends AbstractExpression {
 
     private Fraction value = null;
 

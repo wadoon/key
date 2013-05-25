@@ -11,7 +11,6 @@ import se.gu.svanefalk.testgeneration.keystone.equations.comparator.LessOrEquals
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Addition;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Division;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Multiplication;
-import se.gu.svanefalk.testgeneration.keystone.equations.expression.Negation;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Subtraction;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
@@ -34,12 +33,16 @@ public class ExpressionUtils {
 
     }
 
-    public IComparator constructExpression(final Term term,
-            final Map<String, Variable> variableContext)
+    public IComparator constructRelation(final Term term)
             throws KeYStoneException {
 
-        final IExpression leftChild = processTerm(term.sub(0), variableContext);
-        final IExpression rightChild = processTerm(term.sub(1), variableContext);
+        assert (term != null);
+
+        final IExpression leftChild = processTerm(term.sub(0));
+        assert (leftChild != null);
+
+        final IExpression rightChild = processTerm(term.sub(1));
+        assert (rightChild != null);
 
         if (TermParserTools.isEquals(term)) {
             return new Equals(leftChild, rightChild);
@@ -52,12 +55,50 @@ public class ExpressionUtils {
         throw new KeYStoneException("Illegal comparator: " + term);
     }
 
-    private IExpression processBinaryFunction(final Term term,
-            final Map<String, Variable> variableContext)
+    public Equals createEqualityFromInequality(final IComparator comparator,
+            final Map<String, Variable> variableIndex,
+            final Variable dummyVariable) {
+
+        /*
+         * Add slack variable.
+         */
+        if (comparator instanceof LessOrEquals) {
+
+            final IExpression leftOperand = ((LessOrEquals) comparator).getLeftOperand();
+            final IExpression rightOperand = ((LessOrEquals) comparator).getRightOperand();
+
+            final Addition slackAddition = new Addition(leftOperand,
+                    dummyVariable);
+
+            variableIndex.put(dummyVariable.getName(), dummyVariable);
+
+            return new Equals(slackAddition, rightOperand);
+        }
+
+        /*
+         * Add surplus variable.
+         */
+        if (comparator instanceof GreaterOrEquals) {
+
+            final IExpression leftOperand = ((GreaterOrEquals) comparator).getLeftOperand();
+            final IExpression rightOperand = ((GreaterOrEquals) comparator).getRightOperand();
+
+            variableIndex.put(dummyVariable.getName(), dummyVariable);
+
+            final Subtraction surplusSubtraction = new Subtraction(leftOperand,
+                    dummyVariable);
+
+            return new Equals(surplusSubtraction, rightOperand);
+        }
+
+        return (Equals) comparator;
+    }
+
+    private IExpression processBinaryFunction(final Term term)
             throws KeYStoneException {
 
-        final IExpression leftChild = processTerm(term.sub(0), variableContext);
-        final IExpression rightChild = processTerm(term.sub(1), variableContext);
+        final IExpression leftChild = processTerm(term.sub(0));
+        final IExpression rightChild = processTerm(term.sub(1));
 
         if (TermParserTools.isAddition(term)) {
             return new Addition(leftChild, rightChild);
@@ -78,42 +119,38 @@ public class ExpressionUtils {
         throw new KeYStoneException("Illegal binary function: " + term);
     }
 
-    private IExpression processFunction(final Term term,
-            final Map<String, Variable> variableContext)
+    private IExpression processFunction(final Term term)
             throws KeYStoneException {
 
         if (TermParserTools.isBinaryFunction(term)) {
-            return processBinaryFunction(term, variableContext);
+            return processBinaryFunction(term);
         }
 
         if (TermParserTools.isUnaryFunction(term)) {
-            return processUnaryFunction(term, variableContext);
+            return processUnaryFunction(term);
         }
 
         throw new KeYStoneException("Unsupported Function: " + term.op().name());
     }
 
-    private IExpression processTerm(final Term term,
-            final Map<String, Variable> variableContext)
-            throws KeYStoneException {
+    private IExpression processTerm(final Term term) throws KeYStoneException {
 
         if (TermParserTools.isFunction(term)) {
-            return processFunction(term, variableContext);
+            return processFunction(term);
         }
 
         if (TermParserTools.isProgramVariable(term)) {
-            return processVariable(term, variableContext);
+            return processVariable(term);
         }
 
         if (TermParserTools.isLogicVariable(term)) {
-            return processVariable(term, variableContext);
+            return processVariable(term);
         }
 
         throw new KeYStoneException("Illegal term: " + term);
     }
 
-    private IExpression processUnaryFunction(final Term term,
-            final Map<String, Variable> variableContext)
+    private IExpression processUnaryFunction(final Term term)
             throws KeYStoneException {
 
         if (TermParserTools.isInteger(term)) {
@@ -129,11 +166,9 @@ public class ExpressionUtils {
         throw new KeYStoneException("Illegal unary function: " + term);
     }
 
-    private IExpression processVariable(final Term term,
-            final Map<String, Variable> variableContext) {
+    private IExpression processVariable(final Term term) {
 
-        final String identifier = term.toString();
-        return variableContext.get(identifier);
+        return new Variable(term.toString());
     }
 
     private String resolveNumber(final Term term) {
@@ -145,42 +180,5 @@ public class ExpressionUtils {
         } else {
             return resolveNumber(term.sub(0)) + numberString;
         }
-    }
-
-    public Equals createEqualityFromInequality(IComparator comparator,
-            Map<String, Variable> variableIndex, Variable dummyVariable) {
-
-        /*
-         * Add slack variable.
-         */
-        if (comparator instanceof LessOrEquals) {
-
-            IExpression leftOperand = ((LessOrEquals) comparator).getLeftOperand();
-            IExpression rightOperand = ((LessOrEquals) comparator).getRightOperand();
-
-            Addition slackAddition = new Addition(leftOperand, dummyVariable);
-
-            variableIndex.put(dummyVariable.getName(), dummyVariable);
-
-            return new Equals(slackAddition, rightOperand);
-        }
-
-        /*
-         * Add surplus variable.
-         */
-        if (comparator instanceof GreaterOrEquals) {
-
-            IExpression leftOperand = ((GreaterOrEquals) comparator).getLeftOperand();
-            IExpression rightOperand = ((GreaterOrEquals) comparator).getRightOperand();
-
-            variableIndex.put(dummyVariable.getName(), dummyVariable);
-
-            Subtraction surplusSubtraction = new Subtraction(leftOperand,
-                    dummyVariable);
-
-            return new Equals(surplusSubtraction, rightOperand);
-        }
-
-        return (Equals) comparator;
     }
 }

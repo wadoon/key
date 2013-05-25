@@ -10,10 +10,10 @@ public class PathCoverageBuilder implements ICoverageBuilder {
     private static PathCoverageBuilder instance = null;
 
     public static PathCoverageBuilder getInstance() {
-        if (instance == null) {
-            instance = new PathCoverageBuilder();
+        if (PathCoverageBuilder.instance == null) {
+            PathCoverageBuilder.instance = new PathCoverageBuilder();
         }
-        return instance;
+        return PathCoverageBuilder.instance;
     }
 
     private PathCoverageBuilder() {

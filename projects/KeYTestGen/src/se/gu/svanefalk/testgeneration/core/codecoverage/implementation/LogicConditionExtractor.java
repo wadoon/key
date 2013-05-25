@@ -10,18 +10,18 @@ import de.uka.ilkd.key.java.expression.operator.ComparativeOperator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public class LogicConditionExtractor {
-   
+
     private static LogicConditionExtractor instance = null;
 
     public static LogicConditionExtractor getInstance() {
-        if (instance == null) {
-            instance = new LogicConditionExtractor();
+        if (LogicConditionExtractor.instance == null) {
+            LogicConditionExtractor.instance = new LogicConditionExtractor();
         }
-        return instance;
+        return LogicConditionExtractor.instance;
     }
-    
+
     private LogicConditionExtractor() {
-        
+
     }
 
     public Set<ProgramElement> getConditions(final Expression expression) {

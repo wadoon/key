@@ -17,19 +17,6 @@ import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.If;
 
 public class DecisionCoverageBuilder implements ICoverageBuilder {
-    
-    private static DecisionCoverageBuilder instance = null;
-
-    public static DecisionCoverageBuilder getInstance() {
-        if (instance == null) {
-            instance = new DecisionCoverageBuilder();
-        }
-        return instance;
-    }
-    
-    private DecisionCoverageBuilder() {
-        
-    }
 
     private static class DescendingExecutionBranchComparator implements
             Comparator<ExecutionPath> {
@@ -67,6 +54,19 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
                 return 1;
             }
         }
+    }
+
+    private static DecisionCoverageBuilder instance = null;
+
+    public static DecisionCoverageBuilder getInstance() {
+        if (DecisionCoverageBuilder.instance == null) {
+            DecisionCoverageBuilder.instance = new DecisionCoverageBuilder();
+        }
+        return DecisionCoverageBuilder.instance;
+    }
+
+    private DecisionCoverageBuilder() {
+
     }
 
     /**

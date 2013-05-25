@@ -4,11 +4,7 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
-import javax.naming.OperationNotSupportedException;
-
-import se.gu.svanefalk.testgeneration.frontend.cli.CLIResources;
 import se.gu.svanefalk.testgeneration.keystone.equations.EquationSystem;
-
 import de.uka.ilkd.key.logic.Term;
 
 public class KeYStone {
@@ -16,36 +12,32 @@ public class KeYStone {
     private static KeYStone instance = null;
 
     public static KeYStone getInstance() {
-        if (instance == null) {
-            instance = new KeYStone();
+        if (KeYStone.instance == null) {
+            KeYStone.instance = new KeYStone();
         }
-        return instance;
+        return KeYStone.instance;
     }
+
+    Preprocessor preprocessor = Preprocessor.getInstance();
 
     private KeYStone() {
 
     }
 
-    Preprocessor preprocessor = Preprocessor.getInstance();
-
-    public Map<String, Number> solveConstraint(final Term constraint)
+    public Map<String, Integer> solveConstraint(final Term constraint)
             throws KeYStoneException {
-        try {
-            long time = Calendar.getInstance().getTimeInMillis();
 
-            Set<Term> minimalProblemSet = preprocessor.createMinimalProblemSet(constraint);
+        final long time = Calendar.getInstance().getTimeInMillis();
 
-            EquationSystem equationSystem = EquationSystem.createEquationSystem(minimalProblemSet);
+        final Set<Term> minimalProblemSet = preprocessor.createMinimalProblemSet(constraint);
 
-            equationSystem.solveSystem();
+        final EquationSystem equationSystem = EquationSystem.createEquationSystem(minimalProblemSet);
 
-            System.out.println("Run KeYStone: "
-                    + (Calendar.getInstance().getTimeInMillis() - time));
+        final Map<String, Integer> result = equationSystem.experimentalSolve();
 
-        } catch (OperationNotSupportedException e) {
-            throw new KeYStoneException(e.getMessage());
-        }
+        System.out.println("Run KeYStone: "
+                + (Calendar.getInstance().getTimeInMillis() - time));
 
-        return null;
+        return result;
     }
 }

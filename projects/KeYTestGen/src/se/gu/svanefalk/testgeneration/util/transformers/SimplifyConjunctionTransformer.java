@@ -20,7 +20,7 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
 
     private SimplifyConjunctionTransformer() {
     }
-    
+
     private void collectLiterals(final Term term, final Set<String> literals) {
 
         if (TermParserTools.isAnd(term)) {
@@ -104,7 +104,8 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        final Term orderedTerm = OrderOperandsTransformer.getInstance().transform(term);
+        final Term orderedTerm = OrderOperandsTransformer.getInstance().transform(
+                term);
         return transformTerm(orderedTerm);
     }
 

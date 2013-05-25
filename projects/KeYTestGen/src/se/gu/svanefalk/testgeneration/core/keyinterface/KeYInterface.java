@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
-import se.gu.svanefalk.testgeneration.core.concurrency.CapsuleExecutor;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
@@ -34,18 +33,8 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author christopher
  */
 public class KeYInterface {
-    
+
     private static KeYInterface instance = null;
-
-    public static KeYInterface getInstance() {
-        if (instance == null) {
-            instance = new KeYInterface();
-        }
-        return instance;
-    }
-
-    private KeYInterface() {
-    }
 
     /**
      * The public methods of this singleton must use this {@link ReentrantLock}
@@ -76,11 +65,21 @@ public class KeYInterface {
         }
     }
 
+    public static KeYInterface getInstance() {
+        if (KeYInterface.instance == null) {
+            KeYInterface.instance = new KeYInterface();
+        }
+        return KeYInterface.instance;
+    }
+
     /**
      * Main interface to the KeY system itself.
      */
     private CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
             false);
+
+    private KeYInterface() {
+    }
 
     public void __DEBUG_RESET() {
         userInterface = new CustomConsoleUserInterface(false);

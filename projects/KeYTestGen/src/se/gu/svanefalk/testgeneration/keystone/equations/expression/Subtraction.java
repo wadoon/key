@@ -1,7 +1,5 @@
 package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
@@ -14,7 +12,7 @@ public class Subtraction extends AbstractBinaryExpression {
     }
 
     @Override
-    public Fraction evaluate() throws OperationNotSupportedException {
+    public Fraction evaluate() {
         return getLeftOperand().evaluate().subtract(
                 getRightOperand().evaluate());
     }

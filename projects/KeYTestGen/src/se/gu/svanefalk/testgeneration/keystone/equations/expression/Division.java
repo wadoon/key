@@ -1,7 +1,5 @@
 package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
@@ -14,14 +12,14 @@ public class Division extends AbstractBinaryExpression {
     }
 
     @Override
-    public Fraction evaluate() throws OperationNotSupportedException {
+    public Fraction evaluate() {
         return getLeftOperand().evaluate().divide(getRightOperand().evaluate());
     }
-    
 
     @Override
     public String toString() {
-        
-        return "(" + getLeftOperand().toString() + "/" + getRightOperand().toString() + ")";
+
+        return "(" + getLeftOperand().toString() + "/"
+                + getRightOperand().toString() + ")";
     }
 }

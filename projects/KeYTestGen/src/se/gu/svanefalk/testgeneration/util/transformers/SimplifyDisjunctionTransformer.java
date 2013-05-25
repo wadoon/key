@@ -26,7 +26,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
 
     private SimplifyDisjunctionTransformer() {
     }
-    
+
     private void collectLiterals(final Term term, final Set<String> literals) {
 
         if (TermParserTools.isOr(term)) {

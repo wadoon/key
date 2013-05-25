@@ -415,24 +415,24 @@ public final class TermParserTools {
      * @return true iff. the term represents a negative number, i.e. the Z
      *         function, false otherwise.
      */
-    public static boolean isIntegerNegation(final Term term) {
+    public static boolean isInteger(final Term term) {
 
         final String name = term.op().name().toString();
 
-        return name.equals("neglit");
+        return name.equals("Z");
     }
-    
+
     /**
      * @param term
      *            the term
      * @return true iff. the term represents a negative number, i.e. the Z
      *         function, false otherwise.
      */
-    public static boolean isInteger(final Term term) {
+    public static boolean isIntegerNegation(final Term term) {
 
         final String name = term.op().name().toString();
 
-        return name.equals("Z");
+        return name.equals("neglit");
     }
 
     /**

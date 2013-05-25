@@ -21,7 +21,7 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
 
     private RemoveSDPsTransformer() {
     }
-    
+
     /**
      * Removes all instances of {@link SortDependingFunction} nodes in a given
      * term, replacing them with {@link LocationVariable} instances whose names

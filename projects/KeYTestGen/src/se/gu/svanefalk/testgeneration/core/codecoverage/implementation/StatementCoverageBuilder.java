@@ -10,14 +10,14 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionP
 import de.uka.ilkd.key.java.SourceElement;
 
 public class StatementCoverageBuilder implements ICoverageBuilder {
-    
+
     private static StatementCoverageBuilder instance = null;
 
     public static StatementCoverageBuilder getInstance() {
-        if (instance == null) {
-            instance = new StatementCoverageBuilder();
+        if (StatementCoverageBuilder.instance == null) {
+            StatementCoverageBuilder.instance = new StatementCoverageBuilder();
         }
-        return instance;
+        return StatementCoverageBuilder.instance;
     }
 
     private StatementCoverageBuilder() {

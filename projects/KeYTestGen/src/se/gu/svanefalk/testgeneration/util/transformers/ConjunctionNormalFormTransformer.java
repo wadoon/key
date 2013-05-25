@@ -23,16 +23,6 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
 
     private static ConjunctionNormalFormTransformer instance = null;
 
-    public static ConjunctionNormalFormTransformer getInstance() {
-        if (ConjunctionNormalFormTransformer.instance == null) {
-            ConjunctionNormalFormTransformer.instance = new ConjunctionNormalFormTransformer();
-        }
-        return ConjunctionNormalFormTransformer.instance;
-    }
-
-    private ConjunctionNormalFormTransformer() {
-    }
-
     /**
      * Used for putting the target term into Negation Normal Form.
      */
@@ -42,6 +32,16 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
      * Used for removing implications from the target term.
      */
     private static final RemoveImplicationsTransformer removeImplicationsTransformer = RemoveImplicationsTransformer.getInstance();
+
+    public static ConjunctionNormalFormTransformer getInstance() {
+        if (ConjunctionNormalFormTransformer.instance == null) {
+            ConjunctionNormalFormTransformer.instance = new ConjunctionNormalFormTransformer();
+        }
+        return ConjunctionNormalFormTransformer.instance;
+    }
+
+    private ConjunctionNormalFormTransformer() {
+    }
 
     /**
      * Implements the DISTR routine of the CNF algorithm. It is defined as

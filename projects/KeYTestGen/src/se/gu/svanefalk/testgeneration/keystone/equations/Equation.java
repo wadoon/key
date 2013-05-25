@@ -1,18 +1,26 @@
 package se.gu.svanefalk.testgeneration.keystone.equations;
 
 import java.util.Deque;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.apache.commons.math3.fraction.Fraction;
+
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
+import se.gu.svanefalk.testgeneration.keystone.equations.comparator.GreaterOrEquals;
+import se.gu.svanefalk.testgeneration.keystone.equations.comparator.LessOrEquals;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.AbstractBinaryExpression;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.AbstractUnaryExpression;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Addition;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Division;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.DummyVariable;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.ITreeNode;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Multiplication;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.Negation;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Subtraction;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 
@@ -25,32 +33,68 @@ import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 public class Equation {
 
     /**
-     * The root of the equation itself.
+     * Used for dynamic searches in the tree
      */
-    private final Equals root;
+    private static interface ICondition {
 
-    /**
-     * The variables present in the equation.
-     */
-    private final Set<Variable> variables;
-
-    /**
-     * @return the variables
-     */
-    public Set<Variable> getVariables() {
-        return variables;
+        public boolean check(IExpression expression);
     }
 
-    /**
-     * Creates a new Equation from an expression tree and a set of variables.
-     * 
-     * @param root
-     * @param variables
-     */
-    private Equation(Equals root, Set<Variable> variables) {
-        super();
-        this.root = root;
-        this.variables = variables;
+    private static class isConstant implements ICondition {
+
+        @Override
+        public boolean check(final IExpression expression) {
+
+            if (expression instanceof NumericConstant) {
+                /*
+                 * Check so the constant is not a multiplier.
+                 */
+                final ITreeNode parent = expression.getParent();
+                return (parent instanceof Addition)
+                        || (parent instanceof Subtraction)
+                        || (parent instanceof Negation);
+            }
+
+            return false;
+        }
+    }
+
+    private static final ICondition isConstant = new isConstant();
+
+    private static Equals createEqualityFromInequality(
+            final IComparator comparator) {
+
+        final DummyVariable dummyVariable = DummyVariable.createDummyVariable();
+
+        /*
+         * Add slack variable.
+         */
+        if (comparator instanceof LessOrEquals) {
+
+            final IExpression leftOperand = ((LessOrEquals) comparator).getLeftOperand();
+            final IExpression rightOperand = ((LessOrEquals) comparator).getRightOperand();
+
+            final Addition slackAddition = new Addition(leftOperand,
+                    dummyVariable);
+
+            return new Equals(slackAddition, rightOperand);
+        }
+
+        /*
+         * Add surplus variable.
+         */
+        if (comparator instanceof GreaterOrEquals) {
+
+            final IExpression leftOperand = ((GreaterOrEquals) comparator).getLeftOperand();
+            final IExpression rightOperand = ((GreaterOrEquals) comparator).getRightOperand();
+
+            final Subtraction surplusSubtraction = new Subtraction(leftOperand,
+                    dummyVariable);
+
+            return new Equals(surplusSubtraction, rightOperand);
+        }
+
+        return (Equals) comparator;
     }
 
     /**
@@ -59,10 +103,24 @@ public class Equation {
      * @param root
      * @return
      */
-    public static Equation createEquation(Equals root) {
+    public static Equation createEquation(final IComparator root) {
 
-        Set<Variable> variables = extractVariables(root);
-        return new Equation(root, variables);
+        assert (root != null);
+
+        /*
+         * If the root object is an inequality, convert it to an equality by
+         * introducing extra variables. After that, construct the variable
+         * index.
+         */
+        final Equals equality = Equation.createEqualityFromInequality(root);
+        assert (equality.getLeftOperand() != null);
+        assert (equality.getRightOperand() != null);
+
+        final Map<String, Variable> variables = Equation.extractVariables(equality);
+        final Equation equation = new Equation(equality, variables);
+        equation.isolateConstantPart();
+        return equation;
+
     }
 
     /**
@@ -71,12 +129,12 @@ public class Equation {
      * @param root
      * @return
      */
-    private static Set<Variable> extractVariables(Equals root) {
+    private static Map<String, Variable> extractVariables(final Equals root) {
 
-        Set<Variable> variables = new HashSet<>();
+        final Map<String, Variable> variables = new HashMap<>();
 
-        extractVariables_helper(root.getLeftOperand(), variables);
-        extractVariables_helper(root.getRightOperand(), variables);
+        Equation.extractVariables_helper(root.getLeftOperand(), variables);
+        Equation.extractVariables_helper(root.getRightOperand(), variables);
 
         return variables;
     }
@@ -85,37 +143,185 @@ public class Equation {
      * Helper for {@link #extractVariables(Equals)}.
      * 
      * @param expression
-     * @param variables
+     * @param variables2
      */
-    private static void extractVariables_helper(IExpression expression,
-            Set<Variable> variables) {
+    private static void extractVariables_helper(final IExpression expression,
+            final Map<String, Variable> variables2) {
 
         if (expression instanceof Variable) {
-            variables.add((Variable) expression);
+            final Variable variable = (Variable) expression;
+            variables2.put(variable.getName(), variable);
 
         } else if (expression instanceof AbstractBinaryExpression) {
 
-            AbstractBinaryExpression binaryExpression = (AbstractBinaryExpression) expression;
-            extractVariables_helper(binaryExpression.getLeftOperand(),
-                    variables);
-            extractVariables_helper(binaryExpression.getRightOperand(),
-                    variables);
+            final AbstractBinaryExpression binaryExpression = (AbstractBinaryExpression) expression;
+            Equation.extractVariables_helper(binaryExpression.getLeftOperand(),
+                    variables2);
+            Equation.extractVariables_helper(
+                    binaryExpression.getRightOperand(), variables2);
         }
     }
 
     /**
-     * Solves this equation in order to get a binding for the target variable.
-     * <p>
-     * This does not affect the structure of the equation.
+     * The root of the equation itself.
+     */
+    private final Equals root;
+
+    /**
+     * The variables present in the equation.
+     */
+    private final Map<String, Variable> variables;
+
+    /**
+     * Creates a new Equation from an expression tree and a set of variables.
      * 
+     * @param root
      * @param variables
      */
-    public IExpression solveForVariable(Variable variable) {
+    private Equation(final Equals root, final Map<String, Variable> variables) {
+        super();
+        this.root = root;
+        this.variables = variables;
+    }
+
+    private Deque<IExpression> append(final Deque<IExpression> head,
+            final Deque<IExpression> tail) {
+
+        assert head != null;
+        assert tail != null;
+
+        for (final IExpression expression : tail) {
+            head.addLast(expression);
+        }
+        return head;
+    }
+
+    /**
+     * Constructs a trace of expressions from the root of an equation, down to a
+     * given variable. Assumes the variable only occurs in one place.
+     * 
+     * @param node
+     * @param variable
+     * @return
+     */
+    private Deque<IExpression> buildTrace(final Equals node,
+            final ICondition condition) {
+
+        assert node != null;
+        assert condition != null;
+
+        final LinkedList<IExpression> queue = new LinkedList<>();
+
+        final Deque<IExpression> leftBranch = buildTrace(node.getLeftOperand(),
+                condition);
+        if (!leftBranch.isEmpty()) {
+            return append(queue, leftBranch);
+        }
+
+        final Deque<IExpression> rightBranch = buildTrace(
+                node.getRightOperand(), condition);
+        if (!rightBranch.isEmpty()) {
+            return append(queue, rightBranch);
+        }
+
+        assert queue.isEmpty();
+        return queue;
+    }
+
+    /**
+     * Constructs a trace of expressions from the root of an equation, down to a
+     * given variable. Assumes the variable only occurs in one place.
+     * 
+     * @param node
+     * @param variable
+     * @return
+     */
+    private Deque<IExpression> buildTrace(final IExpression node,
+            final ICondition condition) {
+
+        assert node != null;
+        assert condition != null;
+
+        final LinkedList<IExpression> queue = new LinkedList<>();
+
+        if (condition.check(node)) {
+            queue.add(node);
+            return queue;
+        }
+
+        if (node instanceof AbstractBinaryExpression) {
+
+            final AbstractBinaryExpression binaryExpression = (AbstractBinaryExpression) node;
+
+            final Deque<IExpression> leftBranch = buildTrace(
+                    binaryExpression.getLeftOperand(), condition);
+            if (!leftBranch.isEmpty()) {
+                queue.add(node);
+                return append(queue, leftBranch);
+            }
+
+            final Deque<IExpression> rightBranch = buildTrace(
+                    binaryExpression.getRightOperand(), condition);
+            if (!rightBranch.isEmpty()) {
+                queue.add(node);
+                return append(queue, rightBranch);
+            }
+
+            assert queue.isEmpty();
+            return queue;
+        }
+
+        if (node instanceof AbstractUnaryExpression) {
+
+            final AbstractUnaryExpression unaryExpression = (AbstractUnaryExpression) node;
+
+            final Deque<IExpression> branch = buildTrace(
+                    unaryExpression.getOperand(), condition);
+            if (!branch.isEmpty()) {
+                queue.add(node);
+                return append(queue, branch);
+            }
+
+            assert queue.isEmpty();
+            return queue;
+        }
+
+        assert queue.isEmpty();
+        return queue;
+    }
+
+    public boolean evaluate() throws OperationNotSupportedException {
+        return root.evaluate();
+    }
+
+    public Fraction getConstant() {
+
+        // FIXME: Hack
+        return root.getRightOperand().evaluate();
+    }
+
+    public Variable getVariable(final String id) {
+        return variables.get(id);
+    }
+
+    /**
+     * @return the variables
+     */
+    public Map<String, Variable> getVariables() {
+        return variables;
+    }
+
+    private void isolateConstantPart() {
 
         /*
          * Build a trace to the variable in question.
          */
-        Deque<IExpression> trace = buildTrace(root, variable);
+        Deque<IExpression> trace = buildTrace(root, Equation.isConstant);
+        if (trace.isEmpty() || (trace == null)) {
+            root.setRightOperand(new Addition(root.getRightOperand(),
+                    new NumericConstant(Fraction.ZERO)));
+            trace = buildTrace(root, Equation.isConstant);
+        }
         assert trace != null;
 
         /*
@@ -140,8 +346,8 @@ public class Equation {
              */
             if (variableEquationTop instanceof Addition) {
 
-                Addition addition = (Addition) variableEquationTop;
-                IExpression variableOperand = trace.poll();
+                final Addition addition = (Addition) variableEquationTop;
+                final IExpression variableOperand = trace.poll();
 
                 /*
                  * Identify which operand does /not/ lead to the variable we
@@ -157,7 +363,109 @@ public class Equation {
                 /*
                  * Negate and move it to the opposite side of the equation.
                  */
-                IExpression oldOppositeEquationSide = oppositeEquationTop;
+                final IExpression oldOppositeEquationSide = oppositeEquationTop;
+                oppositeEquationTop = new Subtraction(oldOppositeEquationSide,
+                        nonVariableOperand);
+
+                variableEquationTop = variableOperand;
+            }
+
+            /*
+             * Since subtractions do not commute, the order of the operands will
+             * determine how the move is made.
+             */
+            if (variableEquationTop instanceof Subtraction) {
+
+                final Subtraction subtraction = (Subtraction) variableEquationTop;
+                final IExpression variableOperand = trace.poll();
+                final IExpression oldOppositeEquationSide = oppositeEquationTop;
+
+                IExpression nonVariableOperand = null;
+
+                /*
+                 * If the operand not leading to the variable is the left-hand
+                 * operand of the subtraction, we move it to the other side of
+                 * the equation by subtracting it, just as we would in the case
+                 * of addition.
+                 */
+                if (subtraction.getRightOperand() == variableOperand) {
+                    nonVariableOperand = subtraction.getLeftOperand();
+                    oppositeEquationTop = new Subtraction(
+                            oldOppositeEquationSide, nonVariableOperand);
+                }
+
+                /*
+                 * Conversely, if it is the right-hand operand, we move it by
+                 * adding it to the other side.
+                 */
+                else {
+                    nonVariableOperand = subtraction.getRightOperand();
+                    oppositeEquationTop = new Addition(oldOppositeEquationSide,
+                            nonVariableOperand);
+                }
+                variableEquationTop = variableOperand;
+            }
+        }
+
+        root.setLeftOperand(oppositeEquationTop);
+        root.setRightOperand(variableEquationTop);
+    }
+
+    /**
+     * Solves this equation in order to get a binding for the target variable.
+     * <p>
+     * This does not affect the structure of the equation.
+     * 
+     * @param variables
+     */
+    public IExpression solveForVariable(final Variable variable) {
+
+        /*
+         * Build a trace to the variable in question.
+         */
+        final Deque<IExpression> trace = buildTrace(root, null);
+        assert trace != null;
+
+        /*
+         * Determine which side of the equation the variable is on, and set up
+         * appropriate pointers.
+         */
+        IExpression oppositeEquationTop = null;
+        IExpression variableEquationTop = null;
+
+        variableEquationTop = trace.poll();
+        if (root.getLeftOperand() == variableEquationTop) {
+            oppositeEquationTop = root.getRightOperand();
+        } else {
+            oppositeEquationTop = root.getLeftOperand();
+        }
+
+        while (!trace.isEmpty()) {
+
+            /*
+             * Additions commute, so either non-variable side of the operation
+             * can be move to the other side of the equation.
+             */
+            if (variableEquationTop instanceof Addition) {
+
+                final Addition addition = (Addition) variableEquationTop;
+                final IExpression variableOperand = trace.poll();
+
+                /*
+                 * Identify which operand does /not/ lead to the variable we
+                 * wish to isolate.
+                 */
+                IExpression nonVariableOperand = null;
+                if (addition.getLeftOperand() == variableOperand) {
+                    nonVariableOperand = addition.getRightOperand();
+                } else {
+                    nonVariableOperand = addition.getLeftOperand();
+                }
+
+                /*
+                 * Negate and move it to the opposite side of the equation.
+                 */
+                final IExpression oldOppositeEquationSide = oppositeEquationTop;
                 oppositeEquationTop = new Subtraction(oldOppositeEquationSide,
                         nonVariableOperand);
 
@@ -170,8 +478,8 @@ public class Equation {
              */
             if (variableEquationTop instanceof Multiplication) {
 
-                Multiplication multiplication = (Multiplication) variableEquationTop;
-                IExpression variableOperand = trace.poll();
+                final Multiplication multiplication = (Multiplication) variableEquationTop;
+                final IExpression variableOperand = trace.poll();
 
                 /*
                  * Identify which operand does /not/ lead to the variable we
@@ -188,7 +496,7 @@ public class Equation {
                  * Move the non-variable operands to the other side through
                  * division.
                  */
-                IExpression oldOppositeEquationSide = oppositeEquationTop;
+                final IExpression oldOppositeEquationSide = oppositeEquationTop;
                 oppositeEquationTop = new Division(oldOppositeEquationSide,
                         nonVariableOperand);
 
@@ -201,9 +509,9 @@ public class Equation {
              */
             if (variableEquationTop instanceof Subtraction) {
 
-                Subtraction subtraction = (Subtraction) variableEquationTop;
-                IExpression variableOperand = trace.poll();
-                IExpression oldOppositeEquationSide = oppositeEquationTop;
+                final Subtraction subtraction = (Subtraction) variableEquationTop;
+                final IExpression variableOperand = trace.poll();
+                final IExpression oldOppositeEquationSide = oppositeEquationTop;
 
                 IExpression nonVariableOperand = null;
 
@@ -239,9 +547,9 @@ public class Equation {
              */
             if (variableEquationTop instanceof Subtraction) {
 
-                Subtraction subtraction = (Subtraction) variableEquationTop;
-                IExpression variableOperand = trace.poll();
-                IExpression oldOppositeEquationSide = oppositeEquationTop;
+                final Subtraction subtraction = (Subtraction) variableEquationTop;
+                final IExpression variableOperand = trace.poll();
+                final IExpression oldOppositeEquationSide = oppositeEquationTop;
 
                 IExpression nonVariableOperand = null;
 
@@ -273,123 +581,8 @@ public class Equation {
         return oppositeEquationTop;
     }
 
-    /**
-     * Constructs a trace of expressions from the root of an equation, down to a
-     * given variable. Assumes the variable only occurs in one place.
-     * 
-     * @param node 
-     * @param variable
-     * @return
-     */
-    private Deque<IExpression> buildTrace(Equals node, Variable variable) {
-
-        assert node != null;
-        assert variable != null;
-
-        LinkedList<IExpression> queue = new LinkedList<>();
-
-        Deque<IExpression> leftBranch = buildTrace(node.getLeftOperand(),
-                variable);
-        if (!leftBranch.isEmpty()) {
-            return append(queue, leftBranch);
-        }
-
-        Deque<IExpression> rightBranch = buildTrace(node.getRightOperand(),
-                variable);
-        if (!rightBranch.isEmpty()) {
-            return append(queue, rightBranch);
-        }
-
-        assert queue.isEmpty();
-        return queue;
-    }
-
-
-    /**
-     * Constructs a trace of expressions from the root of an equation, down to a
-     * given variable. Assumes the variable only occurs in one place.
-     * 
-     * @param node 
-     * @param variable
-     * @return
-     */
-    private Deque<IExpression> buildTrace(IExpression node, Variable variable) {
-
-        assert node != null;
-        assert variable != null;
-
-        LinkedList<IExpression> queue = new LinkedList<>();
-
-        if (node instanceof AbstractBinaryExpression) {
-
-            AbstractBinaryExpression binaryExpression = (AbstractBinaryExpression) node;
-
-            Deque<IExpression> leftBranch = buildTrace(
-                    binaryExpression.getLeftOperand(), variable);
-            if (!leftBranch.isEmpty()) {
-                queue.add(node);
-                return append(queue, leftBranch);
-            }
-
-            Deque<IExpression> rightBranch = buildTrace(
-                    binaryExpression.getRightOperand(), variable);
-            if (!rightBranch.isEmpty()) {
-                queue.add(node);
-                return append(queue, rightBranch);
-            }
-
-            assert queue.isEmpty();
-            return queue;
-        }
-
-        if (node instanceof AbstractUnaryExpression) {
-
-            AbstractUnaryExpression unaryExpression = (AbstractUnaryExpression) node;
-
-            Deque<IExpression> branch = buildTrace(
-                    unaryExpression.getOperand(), variable);
-            if (!branch.isEmpty()) {
-                queue.add(node);
-                return append(queue, branch);
-            }
-
-            assert queue.isEmpty();
-            return queue;
-        }
-
-        if (node instanceof Variable) {
-
-            if (node == variable) {
-                queue.add(variable);
-                return queue;
-            }
-
-            assert queue.isEmpty();
-            return queue;
-        }
-
-        assert queue.isEmpty();
-        return queue;
-    }
-
-    private Deque<IExpression> append(Deque<IExpression> head,
-            Deque<IExpression> tail) {
-
-        assert head != null;
-        assert tail != null;
-
-        for (IExpression expression : tail) {
-            head.addLast(expression);
-        }
-        return head;
-    }
-
     @Override
     public String toString() {
         return root.toString();
-    }
-
-    public boolean evaluate() throws OperationNotSupportedException {
-        return root.evaluate();
     }
 }

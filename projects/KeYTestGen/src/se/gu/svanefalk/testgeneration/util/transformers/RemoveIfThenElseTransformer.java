@@ -201,8 +201,8 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                 final Term newTerm = constructConjunction(conditions);
 
                 /*
-                 * Continue parsing normally 
-                 * FIXME: Contains bug, see separate test case 
+                 * Continue parsing normally FIXME: Contains bug, see separate
+                 * test case
                  */
                 return transformAnd(newTerm);
 

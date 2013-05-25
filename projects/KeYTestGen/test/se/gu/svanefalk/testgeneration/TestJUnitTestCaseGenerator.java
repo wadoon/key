@@ -44,7 +44,7 @@ public class TestJUnitTestCaseGenerator {
         final String methodName = "midOneProxyOneInstance";
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                codeCoverageParser, junitConverter, "doStuff");
+                codeCoverageParser, junitConverter, "mid");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(
@@ -86,6 +86,9 @@ public class TestJUnitTestCaseGenerator {
         final File target = new File(
                 "/home/christopher/git/key/eclipse/system/test/PrimitiveIntegerOperationsTestClass/Test_PrimitiveIntegerOperations_"
                         + methodName + ".java");
+        if(!target.exists()) {
+            target.createNewFile();
+        }
         final BufferedWriter bufferedWriter = new BufferedWriter(
                 new FileWriter(target));
         bufferedWriter.write(toWrite);

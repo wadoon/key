@@ -1,10 +1,10 @@
 package se.gu.svanefalk.testgeneration.keystone.equations;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.apache.commons.math3.fraction.Fraction;
 
-public interface IExpression {
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.ITreeNode;
 
-    Fraction evaluate() throws OperationNotSupportedException;
+public interface IExpression extends ITreeNode {
+
+    Fraction evaluate();
 }

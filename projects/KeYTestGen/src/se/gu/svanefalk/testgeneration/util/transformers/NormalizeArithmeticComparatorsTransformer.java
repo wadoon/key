@@ -5,27 +5,28 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
 public class NormalizeArithmeticComparatorsTransformer extends
         AbstractTermTransformer {
 
-    public static NormalizeArithmeticComparatorsTransformer getInstance(
-            Services services) {
-        return new NormalizeArithmeticComparatorsTransformer(services);
-    }
-
-    private NormalizeArithmeticComparatorsTransformer(Services services) {
-        this.services = services;
-    }
+    private static Sort INT_SORT = new SortImpl(new Name("int"));
 
     private static final TermBuilder termBuilder = TermBuilder.DF;
 
-    private final Services services;
+    public static NormalizeArithmeticComparatorsTransformer getInstance(
+            final Services services) {
+        return new NormalizeArithmeticComparatorsTransformer(services);
+    }
 
     private boolean sawNegation = false;
+
+    private final Services services;
+
+    private NormalizeArithmeticComparatorsTransformer(final Services services) {
+        this.services = services;
+    }
 
     @Override
     public Term transform(Term term) throws TermTransformerException {
@@ -39,36 +40,33 @@ public class NormalizeArithmeticComparatorsTransformer extends
     }
 
     @Override
-    protected Term transformNot(Term term) throws TermTransformerException {
-        sawNegation = true;
-        return transformTerm(term.sub(0));
-    }
-
-    @Override
-    protected Term transformBinaryFunction(Term term)
+    protected Term transformBinaryFunction(final Term term)
             throws TermTransformerException {
 
         if (sawNegation && TermParserTools.isArithmeticComparator(term)) {
 
-            Term leftChild = transform(term.sub(0));
-            Term rightChild = transform(term.sub(1));
+            final Term leftChild = transform(term.sub(0));
+            final Term rightChild = transform(term.sub(1));
 
-            Term one = termBuilder.zTerm(services, "1");
+            final Term one = NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(
+                    services, "1");
 
             if (TermParserTools.isGreaterOrEquals(term)) {
 
-                Term incrementedChild = termBuilder.add(services, leftChild,
-                        one);
+                final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder.add(
+                        services, leftChild, one);
 
-                return termBuilder.leq(incrementedChild, rightChild, services);
+                return NormalizeArithmeticComparatorsTransformer.termBuilder.leq(
+                        incrementedChild, rightChild, services);
             }
 
             if (TermParserTools.isLessOrEquals(term)) {
 
-                Term incrementedChild = termBuilder.add(services, rightChild,
-                        one);
+                final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder.add(
+                        services, rightChild, one);
 
-                return termBuilder.geq(leftChild, incrementedChild, services);
+                return NormalizeArithmeticComparatorsTransformer.termBuilder.geq(
+                        leftChild, incrementedChild, services);
             }
 
             if (TermParserTools.isGreaterThan(term)) {
@@ -83,6 +81,11 @@ public class NormalizeArithmeticComparatorsTransformer extends
         return super.transformBinaryFunction(term);
     }
 
-    private static Sort INT_SORT = new SortImpl(new Name("int"));
+    @Override
+    protected Term transformNot(final Term term)
+            throws TermTransformerException {
+        sawNegation = true;
+        return transformTerm(term.sub(0));
+    }
 
 }

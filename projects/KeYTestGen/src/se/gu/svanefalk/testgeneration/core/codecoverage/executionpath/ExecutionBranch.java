@@ -5,19 +5,19 @@ import de.uka.ilkd.key.java.SourceElement;
 public class ExecutionBranch {
 
     /**
-     * The program element which this branch leads from.
-     */
-    private final SourceElement to;
-
-    /**
      * The program element which this branch leads to.
      */
     private final SourceElement from;
 
+    /**
+     * The program element which this branch leads from.
+     */
+    private final SourceElement to;
+
     public ExecutionBranch(final SourceElement first, final SourceElement second) {
         super();
-        this.to = first;
-        this.from = second;
+        to = first;
+        from = second;
     }
 
     /**

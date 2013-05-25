@@ -1,7 +1,5 @@
 package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
@@ -10,13 +8,13 @@ public class Negation extends AbstractUnaryExpression {
 
     private static final Fraction minusOne = new Fraction(-1);
 
-    public Negation(IExpression operand) {
+    public Negation(final IExpression operand) {
         super(operand);
     }
 
     @Override
-    public Fraction evaluate() throws OperationNotSupportedException {
-        return getOperand().evaluate().multiply(minusOne);
+    public Fraction evaluate() {
+        return getOperand().evaluate().multiply(Negation.minusOne);
     }
 
     @Override

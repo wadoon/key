@@ -6,18 +6,18 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionP
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 
 public class ModifiedConditionDecisionBuilder implements ICoverageBuilder {
-    
+
     private static ModifiedConditionDecisionBuilder instance = null;
 
     public static ModifiedConditionDecisionBuilder getInstance() {
-        if (instance == null) {
-            instance = new ModifiedConditionDecisionBuilder();
+        if (ModifiedConditionDecisionBuilder.instance == null) {
+            ModifiedConditionDecisionBuilder.instance = new ModifiedConditionDecisionBuilder();
         }
-        return instance;
+        return ModifiedConditionDecisionBuilder.instance;
     }
-    
+
     private ModifiedConditionDecisionBuilder() {
-        
+
     }
 
     @Override

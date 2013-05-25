@@ -16,7 +16,6 @@ import se.gu.svanefalk.testgeneration.core.concurrency.TestGenerationCapsule;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
-import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
 
 /**
  * API singleton for the core package
@@ -37,13 +36,10 @@ public class CoreInterface {
     private static CoreInterface instance = null;
 
     public static CoreInterface getInstance() {
-        if (instance == null) {
-            instance = new CoreInterface();
+        if (CoreInterface.instance == null) {
+            CoreInterface.instance = new CoreInterface();
         }
-        return instance;
-    }
-
-    private CoreInterface() {
+        return CoreInterface.instance;
     }
 
     private final CapsuleExecutor capsuleExecutor = CapsuleExecutor.getInstance();
@@ -53,6 +49,9 @@ public class CoreInterface {
      * source file
      */
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.getInstance();
+
+    private CoreInterface() {
+    }
 
     /**
      * Creates a set of abstract test suites for a given set of methods belong
