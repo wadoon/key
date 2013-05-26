@@ -1,8 +1,11 @@
 package se.gu.svanefalk.testgeneration.backend.junit;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import junit.framework.Assert;
 
 import se.gu.svanefalk.testgeneration.backend.AbstractJavaSourceGenerator;
 import se.gu.svanefalk.testgeneration.backend.IFrameworkConverter;
@@ -10,6 +13,14 @@ import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelInstance;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleAssertion;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleComparator;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleConstraint;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleExpression;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleLiteral;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleMethodInvocation;
+import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleOperator;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -207,7 +218,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             testSuite.getMethod();
 
             /*
-             * Collect the import assertions
+             * Collect the import assertions.
              */
             final List<ModelInstance> instances = collectInstances(testCases);
             for (final ModelInstance instance : instances) {
@@ -262,14 +273,14 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                             "IllegalArgumentException",
                             "IllegalAccessException" });
 
-            writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
-                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeIndentedLine("Field field = instance.getClass().getDeclaredField(fieldName);");
+            writeNewLine();
 
-            writeLine("field.setAccessible(true);"
-                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeIndentedLine("field.setAccessible(true);");
+            writeNewLine();
 
-            writeLine("return (T)field.get(instance);"
-                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeIndentedLine("return (T)field.get(instance);");
+            writeNewLine();
 
             writeClosingBrace();
         }
@@ -301,8 +312,9 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                     methodInvocation += ",";
                 }
             }
-            methodInvocation += ");" + AbstractJavaSourceGenerator.NEWLINE;
-            writeLine(methodInvocation);
+            methodInvocation += ");";
+            writeIndentedLine(methodInvocation);
+            writeNewLine();
         }
 
         /**
@@ -318,14 +330,14 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                             "IllegalArgumentException",
                             "IllegalAccessException" });
 
-            writeLine("Field field = instance.getClass().getDeclaredField(fieldName);"
-                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeIndentedLine("Field field = instance.getClass().getDeclaredField(fieldName);");
+            writeNewLine();
 
-            writeLine("field.setAccessible(true);"
-                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeIndentedLine("field.setAccessible(true);");
+            writeNewLine();
 
-            writeLine("field.set(instance, value );"
-                    + AbstractJavaSourceGenerator.NEWLINE);
+            writeIndentedLine("field.set(instance, value );");
+            writeNewLine();
 
             writeClosingBrace();
         }
@@ -352,7 +364,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * Declares and instantiates a reference typed instance.
                      */
                     if (variable.getValue() instanceof ModelInstance) {
-                        writeLine(variable.getType() + " "
+                        writeIndentedLine(variable.getType() + " "
                                 + variable.getIdentifier() + " = " + "new"
                                 + " " + variable.getType() + "();");
                     }
@@ -363,12 +375,12 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * be configured as part of the classes they are fields of).
                      */
                     else {
-                        writeLine(variable.getType() + " "
+                        writeIndentedLine(variable.getType() + " "
                                 + variable.getIdentifier() + " = "
                                 + variable.getValue() + ";");
                     }
 
-                    writeLine(AbstractJavaSourceGenerator.NEWLINE);
+                    writeNewLine();
                 }
             }
 
@@ -388,7 +400,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * Declares and instantiates a reference typed instance.
                      */
                     if (variable.getValue() instanceof ModelInstance) {
-                        writeLine(variable.getType() + " "
+                        writeIndentedLine(variable.getType() + " "
                                 + variable.getIdentifier() + " = " + "new"
                                 + " " + variable.getType() + "();");
                     }
@@ -399,11 +411,11 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * be configured as part of the classes they are fields of).
                      */
                     else {
-                        writeLine(variable.getType() + " "
+                        writeIndentedLine(variable.getType() + " "
                                 + variable.getIdentifier() + " = "
                                 + variable.getValue() + ";");
                     }
-                    writeLine(AbstractJavaSourceGenerator.NEWLINE);
+                    writeNewLine();
                 }
             }
 
@@ -436,11 +448,12 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                                 fieldValueIdentifier = fieldValue.toString();
                             }
 
-                            writeLine("setFieldValue(" + variableIdentifier
-                                    + "," + "\"" + field.getVariableName()
-                                    + "\"" + "," + fieldValueIdentifier + ");");
+                            writeIndentedLine("setFieldValue("
+                                    + variableIdentifier + "," + "\""
+                                    + field.getVariableName() + "\"" + ","
+                                    + fieldValueIdentifier + ");");
 
-                            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+                            writeNewLine();
                         }
                     }
                 }
@@ -459,7 +472,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
         private void writeTestMethod(final TestCase testCase)
                 throws JUnitConverterException {
 
-            writeLine(AbstractJavaSourceGenerator.NEWLINE);
+            writeNewLine();
 
             /*
              * Write the method header.
@@ -487,9 +500,104 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             /*
              * Write the oracle
              */
-            // this.writeTestOracle(testCase);
+            writeOracle(testCase);
 
             writeClosingBrace();
+        }
+
+        /**
+         * Writes the test oracle for a given method.
+         * 
+         * @param testCase
+         */
+        private void writeOracle(TestCase testCase) {
+
+            writeComment("Test oracle", false);
+
+            OracleConstraint constraint = testCase.getOracle().getConstraints();
+            for (OracleAssertion assertion : constraint.getAssertions()) {
+                writeOracleAssertion(assertion);
+            }
+        }
+
+        private void writeOracleAssertion(OracleAssertion assertion) {
+
+            /*
+             * Write opening of assertion statement
+             */
+            writeIndentedLine("Assert.assertTrue(");
+            writeNewLine();
+            increaseIndentation();
+            indent();
+
+            /*
+             * Write body
+             */
+            Iterator<OracleExpression> iterator = assertion.getExpressions().iterator();
+            OracleExpression expression = null;
+            while (iterator.hasNext()) {
+                expression = iterator.next();
+                writeOracleExpression(expression);
+
+                if (iterator.hasNext()) {
+                    writeUnindentedLine(" ||");
+                    writeNewLine();
+                    indent();
+                }
+            }
+
+            /*
+             * Close assertion statement
+             */
+            writeNewLine();
+            decreaseIndentation();
+            writeIndentedLine(");");
+            writeNewLine();
+            writeNewLine();
+        }
+
+        private void writeOracleExpression(OracleExpression expression) {
+
+            if (expression instanceof OracleComparator) {
+                OracleComparator comparator = (OracleComparator) expression;
+                writeOracleComparator(comparator);
+            }
+
+            else if (expression instanceof OracleOperator) {
+                OracleOperator operator = (OracleOperator) expression;
+                writeOracleOperator(operator);
+            }
+
+            else if (expression instanceof OracleLiteral) {
+                OracleLiteral literal = (OracleLiteral) expression;
+                writeOracleLiteral(literal);
+            }
+
+            else if (expression instanceof OracleMethodInvocation) {
+                OracleMethodInvocation methodInvocation = (OracleMethodInvocation) expression;
+                writeOracleMethodInvocation(methodInvocation);
+            }
+        }
+
+        private void writeOracleMethodInvocation(
+                OracleMethodInvocation methodInvocation) {
+            // TODO
+        }
+
+        private void writeOracleLiteral(OracleLiteral literal) {
+            writeUnindentedLine(literal.getIdentifier());
+        }
+
+        private void writeOracleOperator(OracleOperator operator) {
+            writeOracleExpression(operator.getFirstOperand());
+            writeUnindentedLine(" " + operator.getOperation() + " ");
+            writeOracleExpression(operator.getSecondOperand());
+        }
+
+        private void writeOracleComparator(OracleComparator comparator) {
+            writeOracleExpression(comparator.getFirstOperand());
+            writeUnindentedLine(" " + comparator.getComparatorType() + " ");
+            writeOracleExpression(comparator.getSecondOperand());
         }
     }
 

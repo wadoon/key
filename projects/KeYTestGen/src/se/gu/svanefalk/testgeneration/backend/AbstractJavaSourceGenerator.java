@@ -89,7 +89,8 @@ public abstract class AbstractJavaSourceGenerator {
 
         if (annotations != null) {
             for (final String annotation : annotations) {
-                writeLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
+                writeIndentedLine(annotation
+                        + AbstractJavaSourceGenerator.NEWLINE);
             }
         }
 
@@ -101,7 +102,7 @@ public abstract class AbstractJavaSourceGenerator {
         output.append(name);
         output.append(" {\n");
 
-        indentation++;
+        increaseIndentation();
     }
 
     /**
@@ -110,9 +111,17 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void writeClosingBrace() {
 
-        indentation--;
+        decreaseIndentation();
         indent();
         output.append("}\n");
+    }
+
+    protected void increaseIndentation() {
+        ++indentation;
+    }
+
+    protected void decreaseIndentation() {
+        --indentation;
     }
 
     /**
@@ -123,17 +132,17 @@ public abstract class AbstractJavaSourceGenerator {
      */
     protected void writeComment(final String text, final boolean isJavadoc) {
 
-        writeLine(AbstractJavaSourceGenerator.NEWLINE);
+        writeIndentedLine(AbstractJavaSourceGenerator.NEWLINE);
 
         if (isJavadoc) {
-            writeLine("/**\n");
+            writeIndentedLine("/**\n");
         } else {
-            writeLine("/*\n");
+            writeIndentedLine("/*\n");
         }
 
         final String[] words = text.split(" ");
 
-        writeLine(" *");
+        writeIndentedLine(" *");
         int characterCount = 0;
         for (final String word : words) {
 
@@ -144,7 +153,7 @@ public abstract class AbstractJavaSourceGenerator {
             if (characterCount >= 50) {
                 characterCount = 0;
                 output.append(" " + word + AbstractJavaSourceGenerator.NEWLINE);
-                writeLine(" *");
+                writeIndentedLine(" *");
                 continue;
             } else {
                 output.append(" " + word);
@@ -153,7 +162,7 @@ public abstract class AbstractJavaSourceGenerator {
         }
         output.append(AbstractJavaSourceGenerator.NEWLINE);
 
-        writeLine(" */\n");
+        writeIndentedLine(" */\n");
     }
 
     /**
@@ -162,10 +171,28 @@ public abstract class AbstractJavaSourceGenerator {
      * @param text
      *            the text to write
      */
-    protected void writeLine(final String text) {
+    protected void writeIndentedLine(final String text) {
 
         indent();
         output.append(text);
+    }
+
+    protected void writeLine(final Object obj) {
+
+        indent();
+        output.append(obj.toString());
+    }
+
+    protected void writeUnindentedLine(String text) {
+        output.append(text);
+    }
+
+    protected void writeUnindentedLine(Object obj) {
+        output.append(obj.toString());
+    }
+
+    protected void writeNewLine() {
+        writeIndentedLine(AbstractJavaSourceGenerator.NEWLINE);
     }
 
     /**
@@ -225,7 +252,8 @@ public abstract class AbstractJavaSourceGenerator {
 
         if (annotations != null) {
             for (final String annotation : annotations) {
-                writeLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
+                writeIndentedLine(annotation
+                        + AbstractJavaSourceGenerator.NEWLINE);
             }
         }
 
@@ -272,7 +300,7 @@ public abstract class AbstractJavaSourceGenerator {
             output.append(AbstractJavaSourceGenerator.NEWLINE);
             indent();
 
-            writeLine("throws ");
+            writeIndentedLine("throws ");
             for (int i = 0; i < exceptions.length; i++) {
                 final String exception = exceptions[i];
                 output.append(exception);
@@ -286,7 +314,7 @@ public abstract class AbstractJavaSourceGenerator {
          * Close the method header.
          */
         output.append(" {\n");
-        indentation++;
+        increaseIndentation();
     }
 
     /**
@@ -296,7 +324,7 @@ public abstract class AbstractJavaSourceGenerator {
     protected void writeOpeningBrace() {
 
         indent();
-        indentation++;
+        increaseIndentation();
         output.append("{\n");
     }
 }
