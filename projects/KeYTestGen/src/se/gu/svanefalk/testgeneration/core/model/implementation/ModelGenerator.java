@@ -1,8 +1,6 @@
 package se.gu.svanefalk.testgeneration.core.model.implementation;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
@@ -15,12 +13,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
-import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTSettings;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SmtLib2Translator;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.SMTInterface;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default
@@ -47,21 +41,7 @@ public class ModelGenerator implements IModelGenerator {
         return ModelGenerator.instance;
     }
 
-    /**
-     * The Configuration to use for the SMT-LIB2 translator used by the
-     * ModelGenerator.
-     */
-    private final Configuration configuration;
-
     KeYStone keYStone = KeYStone.getInstance();
-
-    /**
-     * The settings for the SMT solvers. These follow a default implementation,
-     * although it is possible for the user to use custom settings.
-     */
-    private final SMTSettings settings;
-
-    private final SMTInterface smtInterface = SMTInterface.INSTANCE;
 
     /**
      * Constructs a standard model generator.
@@ -73,8 +53,6 @@ public class ModelGenerator implements IModelGenerator {
      */
     private ModelGenerator() {
 
-        settings = ModelSettings.getDefaultSMTSettings();
-        configuration = ModelSettings.getDefaultTranslatorConfiguration();
     }
 
     /**
@@ -108,22 +86,8 @@ public class ModelGenerator implements IModelGenerator {
             final Model model = new TermToModelConverter().createModel(node);
 
             /*
-             * Get concrete values for any primitive types represented in the
-             * Model, extracting them from an SMT solution for the pathcondition
-             * for this node.
+             * Complete the model with concrete integer values.
              */
-            // final String solverResult =
-            // instantiatePathCondition(pathCondition,
-            // services);
-
-            /*
-             * If any such primitive values were found, merge their concrete
-             * values into the Model
-             */
-            // if (solverResult != null) {
-            // insertSMTOutputIntoModel(solverResult, model);
-            // }
-
             final Map<String, Integer> concreteValues = getConcreteValues(
                     pathCondition, services);
 
@@ -166,89 +130,6 @@ public class ModelGenerator implements IModelGenerator {
         }
     }
 
-    /**
-     * This method takes a {@link Model} instance, and <i>instantiates</i> this
-     * Model using the output of an SMT solver, here represented by
-     * {@link SMTSolverResult}.
-     * <p>
-     * Instantiation means that any concrete values of <i>primitive</i> values
-     * represented in the Model will be extracted from the SMT solver result and
-     * inserted into their respective locations in the Model. The precise
-     * location of a given value instantiation is determined by the
-     * <i>identifier</i> String associated with the value. A concrete value
-     * belonging to a specific {@link ModelVariable} instance will have the same
-     * identifier as that variable.
-     * 
-     * @param model
-     *            the Model to instantiate
-     * @param smtResult
-     *            the output of an SMT solver
-     * @return the instantiated Model
-     * @throws ModelGeneratorException
-     *             in the event that the instantiation went wrong
-     */
-    public void insertSMTOutputIntoModel(final String smtOutput,
-            final Model model) throws ModelGeneratorException {
-
-        /*
-         * Break the SMT output into individual variable declarations and
-         * process them separately.
-         */
-        final String[] definitions = smtOutput.trim().split("\\(define-fun");
-        for (String definition : definitions) {
-
-            if (!definition.isEmpty() && !definition.trim().startsWith("sat")) {
-
-                definition = definition.trim();
-
-                /*
-                 * Extract the variable name
-                 */
-                final String varName = definition.substring(0,
-                        definition.lastIndexOf('_'));
-
-                /*
-                 * Extract the value
-                 */
-                String result = "";
-                boolean negFlag = false;
-                for (int i = definition.indexOf(' '); i < definition.length(); i++) {
-
-                    final char currentChar = definition.charAt(i);
-
-                    if (!negFlag && (currentChar == '-')) {
-                        negFlag = true;
-                    }
-
-                    if (Character.isDigit(currentChar)) {
-                        result += currentChar;
-                    }
-                }
-
-                /*
-                 * Create and set the proper sign for the result.
-                 */
-                Integer value = Integer.parseInt(result);
-                value = negFlag ? value * -1 : value;
-
-                /*
-                 * Finally, retrieve the variable corresponding to the name of
-                 * the result, and insert the corresponding result into it.
-                 */
-                final ModelVariable variable = model.getVariable(varName.trim());
-                if (variable != null) {
-
-                    variable.setValue(value);
-                } else {
-                    final StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("Tried to insert concrete value into invalid abstract heap variable: ");
-                    stringBuilder.append(varName);
-                    throw new ModelGeneratorException(stringBuilder.toString());
-                }
-            }
-        }
-    }
-
     private void instantiateModel(final Model model,
             final Map<String, Integer> concreteValues) {
 
@@ -260,47 +141,5 @@ public class ModelGenerator implements IModelGenerator {
                 variable.setValue(concreteValues.get(variableName));
             }
         }
-    }
-
-    /**
-     * Determines if the output of the concrete integer generation process is
-     * valid or not.
-     * 
-     * @param result
-     * @return
-     */
-    private boolean isValidResult(final String result) {
-
-        /*
-         * FIXME: Very primitive
-         */
-        final Pattern consPattern = Pattern.compile("\\(model");
-        final Matcher consMatcher = consPattern.matcher(result);
-        return consMatcher.find();
-    }
-
-    /**
-     * Translates a {@link Term} into the SMTLIB2 format.
-     * 
-     * @param term
-     * @param services
-     * @return
-     * @throws IllegalFormulaException
-     */
-    private String translateToSMTLIB2(final Term term, final Services services)
-            throws IllegalFormulaException {
-
-        /*
-         * Set up the translator for this term.
-         */
-        final SmtLib2Translator translator = new SmtLib2Translator(services,
-                configuration);
-
-        final StringBuffer result = translator.translateProblem(term, services,
-                settings);
-
-        result.append("\n(get-model)");
-
-        return result.toString();
     }
 }

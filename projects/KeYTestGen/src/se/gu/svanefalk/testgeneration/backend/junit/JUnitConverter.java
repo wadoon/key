@@ -350,7 +350,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
          * @param model
          *            {@link Model} instance representing the fixture
          */
-        private void writeTestFixture2(final TestCase testCase) {
+        private void writeTestFixture(final TestCase testCase) {
 
             /*
              * Begin with declaring all the instance variables needed for the
@@ -360,6 +360,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             for (final ModelVariable variable : testCase.getModel().getVariables()) {
 
                 if (!variable.isParameter()) {
+
                     /*
                      * Declares and instantiates a reference typed instance.
                      */
@@ -424,6 +425,10 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              */
             for (final ModelVariable variable : testCase.getModel().getVariables()) {
 
+                /*
+                 * Again, deal only with those variables which are not
+                 * parameters.
+                 */
                 if (!variable.isParameter()) {
 
                     final Object value = variable.getValue();
@@ -488,7 +493,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             /*
              * Write the test fixture.
              */
-            writeTestFixture2(testCase);
+            writeTestFixture(testCase);
 
             /*
              * Write the invocation of the method itself. If the method return
