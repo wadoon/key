@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.util;
 
 import java.io.File;
@@ -23,6 +36,7 @@ import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchNode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
+import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopCondition;
 import org.key_project.sed.key.core.model.KeYLoopNode;
 import org.key_project.sed.key.core.model.KeYMethodCall;
@@ -47,6 +61,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -158,11 +173,17 @@ public final class KeYModelUtil {
       }
       else if (executionNode instanceof IExecutionTermination) {
          IExecutionTermination terminationExecutionNode = (IExecutionTermination)executionNode;
-         if (terminationExecutionNode.isExceptionalTermination()) {
+         if (terminationExecutionNode.getTerminationKind() == TerminationKind.EXCEPTIONAL) {
             result = new KeYExceptionalTermination(target, parent, thread, (IExecutionTermination)executionNode);
          }
-         else {
+         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.NORMAL) {
             result = new KeYTermination(target, parent, thread, (IExecutionTermination)executionNode);
+         }
+         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.LOOP_BODY) {
+            result = new KeYLoopBodyTermination(target, parent, thread, (IExecutionTermination)executionNode);
+         }
+         else {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination kind \"" + terminationExecutionNode.getTerminationKind() + "\"."));
          }
       }
       else {

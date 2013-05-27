@@ -14,9 +14,9 @@ import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
 import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
@@ -95,7 +95,7 @@ public class TestConditionParsing extends KeYTestGenTest {
         final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = AbstractSymbolicExecutionTestCase.createSymbolicExecutionEnvironment(
                 AbstractSymbolicExecutionTestCase.keyRepDirectory,
                 javaPathInBaseDir, containerTypeName, "max", null, false,
-                false, false);
+                false, false, false);
 
         final Proof proof = environment.getProof();
 

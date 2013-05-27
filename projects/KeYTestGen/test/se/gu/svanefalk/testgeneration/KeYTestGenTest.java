@@ -16,9 +16,9 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
@@ -190,7 +190,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
 
         final SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = AbstractSymbolicExecutionTestCase.createSymbolicExecutionEnvironment(
                 AbstractSymbolicExecutionTestCase.keyRepDirectory, rootFolder,
-                resourceFile, method, null, false, false, false);
+                resourceFile, method, null, false, false, false, false);
 
         Assert.assertNotNull(env);
 

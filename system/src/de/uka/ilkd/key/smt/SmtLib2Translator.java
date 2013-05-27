@@ -110,6 +110,10 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     protected StringBuffer translateNullSort() {
         return NULLSORTSTRING;
     }
+    
+    protected StringBuffer getBoolSort() {
+        return BOOL;
+    }
 
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,

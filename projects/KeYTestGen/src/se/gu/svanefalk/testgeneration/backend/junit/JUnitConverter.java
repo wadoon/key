@@ -446,7 +446,6 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
                             String fieldValueIdentifier = "";
                             if (field.getValue() instanceof ModelInstance) {
-                                ;
                                 fieldValueIdentifier = field.getIdentifier();
                             } else {
                                 final Object fieldValue = field.getValue();

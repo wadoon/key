@@ -558,7 +558,6 @@ public  class Test_PrimitiveIntegerOperations_midOneProxyOneInstance {
             result == self.getProxy().getNestedProxy().instanceInt ||            
             result == x            
         );        
-        
     }
     
     /**

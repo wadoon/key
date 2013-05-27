@@ -45,6 +45,7 @@ class TermToModelConverter {
          * variables and values found in the Term. Done postorder to eliminate
          * buffering penalties in the Model.
          */
+        System.out.println(node.getFormatedPathCondition() + "\n\n");
         final TermToModelVisitor modelVisitor = new TermToModelVisitor(model,
                 node);
         pathCondition.execPostOrder(modelVisitor);

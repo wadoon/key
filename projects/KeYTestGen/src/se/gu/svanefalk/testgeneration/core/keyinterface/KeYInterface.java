@@ -7,12 +7,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
@@ -104,7 +104,7 @@ public class KeYInterface {
             throws ProofInputException {
 
         final ProofOblInput proofObligationInput = new ProgramMethodPO(
-                initConfig, method.getFullName(), method, precondition, true);
+                initConfig, method.getFullName(), method, precondition);
 
         final Proof proof = userInterface.createProof(initConfig,
                 proofObligationInput);
@@ -118,7 +118,7 @@ public class KeYInterface {
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(
                 proof,
                 ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                true, true);
+                true, true, true);
 
         return proof;
     }

@@ -122,8 +122,10 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
             for (final VariableSpecification variableSpecification : parameterDeclaration.getVariables()) {
 
                 /*
-                 * Convert the declaration to a program variable TODO: I DO NOT
-                 * WANT TO HAVE TO FLIPFLOP BETWEEN DIFFERENT ABSTRACTIONS!
+                 * Convert the declaration to a program variable
+                 * 
+                 * FIXME: I DO NOT WANT TO HAVE TO FLIPFLOP BETWEEN DIFFERENT
+                 * ABSTRACTIONS!
                  */
                 final KeYJavaType type = new KeYJavaType(
                         variableSpecification.getType());
@@ -142,7 +144,6 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                 /*
                  * The parameter is primitive.
                  */
-
                 Object value = null;
                 if (TermParserTools.isPrimitiveType(modelParameter.getType())) {
                     value = TermToModelVisitor.resolvePrimitiveType(programVariable);
