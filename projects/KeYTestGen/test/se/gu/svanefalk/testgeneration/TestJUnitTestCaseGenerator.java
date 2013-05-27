@@ -44,7 +44,7 @@ public class TestJUnitTestCaseGenerator {
         final String methodName = "midOneProxyOneInstance";
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                codeCoverageParser, junitConverter, "midOneProxyOneInstance");
+                codeCoverageParser, junitConverter, "mid");
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(
@@ -73,7 +73,6 @@ public class TestJUnitTestCaseGenerator {
 
         System.out.println();
         Benchmark.reset();
-        KeYInterface.getInstance().__DEBUG_RESET();
 
         System.out.println("RESULTS:");
         for (final String id : results.keySet()) {
@@ -145,7 +144,6 @@ public class TestJUnitTestCaseGenerator {
 
             System.out.println();
             Benchmark.reset();
-            KeYInterface.getInstance().__DEBUG_RESET();
         }
 
         System.out.println("RESULTS:");

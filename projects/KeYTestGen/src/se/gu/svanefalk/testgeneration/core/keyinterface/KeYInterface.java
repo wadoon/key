@@ -17,7 +17,9 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -72,17 +74,7 @@ public class KeYInterface {
         return KeYInterface.instance;
     }
 
-    /**
-     * Main interface to the KeY system itself.
-     */
-    private CustomConsoleUserInterface userInterface = new CustomConsoleUserInterface(
-            false);
-
     private KeYInterface() {
-    }
-
-    public void __DEBUG_RESET() {
-        userInterface = new CustomConsoleUserInterface(false);
     }
 
     /**
@@ -99,15 +91,17 @@ public class KeYInterface {
      * @throws ProofInputException
      *             in the event that the proof cannot be created
      */
-    private Proof getProof(final InitConfig initConfig,
+    private Proof getProof(
+            KeYEnvironment<CustomConsoleUserInterface> environment,
             final IProgramMethod method, final String precondition)
             throws ProofInputException {
 
         final ProofOblInput proofObligationInput = new ProgramMethodPO(
-                initConfig, method.getFullName(), method, precondition);
+                environment.getInitConfig(), method.getFullName(), method,
+                precondition, true, true);
 
-        final Proof proof = userInterface.createProof(initConfig,
-                proofObligationInput);
+        final Proof proof = environment.createProof(proofObligationInput);
+
         if (proof == null) {
             throw new ProofInputException("Unable to load proof");
         }
@@ -115,10 +109,11 @@ public class KeYInterface {
         /*
          * Setup a strategy and goal chooser for the proof session
          */
+        SymbolicExecutionUtil.configureProof(proof);
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(
                 proof,
                 ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                true, true, true);
+                false, true, false);
 
         return proof;
     }
@@ -145,37 +140,41 @@ public class KeYInterface {
              * Setup and prepare the proof session, and retrieve the KeYMediator
              * instance to use.
              */
-            final Proof proof = getProof(method.getInitConfig(),
+            final Proof proof = getProof(method.getEnvironment(),
                     method.getProgramMethod(), null);
-            final KeYMediator mediator = userInterface.getMediator();
+            final KeYMediator mediator = method.getEnvironment().getMediator();
 
             /*
-             * Create the symbolic execution tree builder.
+             * Create the symbolic execution tree builder, and associate it with
+             * an environment.
              */
             final SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(
                     mediator, proof, false);
 
-            /*
-             * Add a stop condition for the proof (we use a default in order to
-             * assure maximum coverage of execution paths). Start the proof and
-             * wait for it to finish.
-             */
-            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
-                    new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
-
-            userInterface.startAndWaitForAutoMode(proof);
+            SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = new SymbolicExecutionEnvironment<>(
+                    method.getEnvironment(), builder);
 
             /*
-             * Create the symbolic execution tree, and assert that it indeed
-             * exists.
+             * Setup the stop condition for the symbolic execution process.
              */
-            builder.analyse();
+            ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
+                    ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+            environment.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
+                    stopCondition);
+            SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(environment.getProof());
+
+            /*
+             * Symbolically execute the code, and extract the root of the
+             * resulting symbolic execution tree.
+             */
+            environment.getUi().startAndWaitForAutoMode(environment.getProof());
+            environment.getBuilder().analyse();
+
             final IExecutionStartNode rootNode = builder.getStartNode();
             KeYInterface.assertNotNull(rootNode,
                     "FATAL: unable to initialize proof tree");
 
-            return builder.getStartNode();
+            return rootNode;
 
         } catch (final ProofInputException e) {
 
@@ -200,19 +199,17 @@ public class KeYInterface {
      * @throws IOException
      *             in case the File could not be found, or is not accessible
      */
-    public InitConfig loadJavaFile(final File javaFile)
-            throws KeYInterfaceException {
+    public KeYEnvironment<CustomConsoleUserInterface> loadJavaFile(
+            final File javaFile) throws KeYInterfaceException {
 
         try {
 
             KeYInterface.lock.lock();
 
-            final DefaultProblemLoader loader = userInterface.load(javaFile,
-                    null, null);
+            KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(
+                    javaFile, null, null);
 
-            final InitConfig initConfig = loader.getInitConfig();
-
-            return initConfig;
+            return environment;
 
         } catch (final ProblemLoaderException e) {
 

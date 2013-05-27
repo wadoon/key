@@ -18,6 +18,8 @@ import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Produces instances of {@link KeYJavaClass}.
@@ -45,12 +47,12 @@ public class KeYJavaClassFactory {
     }
 
     private KeYJavaClass constructClass(final KeYJavaType parent,
-            final InitConfig initConfig) {
+            final KeYEnvironment<CustomConsoleUserInterface> environment) {
 
-        final Services services = initConfig.getServices();
+        final Services services = environment.getServices();
         final JavaInfo javaInfo = services.getJavaInfo();
 
-        final KeYJavaClass keYJavaClass = new KeYJavaClass(parent);
+        final KeYJavaClass keYJavaClass = new KeYJavaClass(parent, environment);
 
         for (final IProgramMethod memberMethod : javaInfo.getAllProgramMethods(parent)) {
             if (!memberMethod.getFullName().startsWith("<")) {
@@ -66,7 +68,7 @@ public class KeYJavaClassFactory {
                 for (final ContractWrapper contract : contracts) {
 
                     final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(
-                            keYJavaClass, memberMethod, initConfig, contract);
+                            keYJavaClass, memberMethod, environment, contract);
 
                     keYJavaClass.addMethodMapping(memberMethod.getFullName(),
                             keYJavaMethod);
@@ -92,8 +94,8 @@ public class KeYJavaClassFactory {
         /*
          * Load the file into KeY and get the InitConfig instance for it.
          */
-        final InitConfig initConfig = keyInterface.loadJavaFile(javaFile);
-        final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+        final KeYEnvironment<CustomConsoleUserInterface> environment = keyInterface.loadJavaFile(javaFile);
+        final JavaInfo javaInfo = environment.getServices().getJavaInfo();
 
         /*
          * Retrieve the KeYJavaType for the top level class declaration in this
@@ -102,7 +104,7 @@ public class KeYJavaClassFactory {
         final String fileName = getFileName(javaFile);
         final KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
-        return constructClass(mainClass, initConfig);
+        return constructClass(mainClass, environment);
     }
 
     public KeYJavaClass createKeYJavaClass(final IExecutionMethodCall methodCall) {
@@ -119,7 +121,7 @@ public class KeYJavaClassFactory {
          */
         final KeYJavaType parent = method.getContainerType();
 
-        return constructClass(parent, initConfig);
+        return null; // constructClass(parent, initConfig);
     }
 
     /**

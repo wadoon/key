@@ -37,7 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  * 
  */
 public class TestGenerator {
-    
+
     private static TestGenerator instance = null;
 
     public static TestGenerator getInstance() {

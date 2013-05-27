@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Instances of this class represent an abstract view of a Java class,
@@ -19,13 +22,30 @@ public final class KeYJavaClass {
      */
     private final HashMap<String, KeYJavaMethod> methods = new HashMap<String, KeYJavaMethod>();
 
+    private final InitConfig initConfig;
+
+    private final KeYEnvironment<CustomConsoleUserInterface> environment;
+
+    public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+        return environment;
+    }
+
     /**
      * The {@link KeYJavaType} instance for this class
      */
     private final KeYJavaType type;
 
-    KeYJavaClass(final KeYJavaType type) {
+    KeYJavaClass(final KeYJavaType type,
+            KeYEnvironment<CustomConsoleUserInterface> environment) {
         this.type = type;
+        this.environment = environment;
+        this.initConfig = environment.getInitConfig();
+    }
+
+    KeYJavaClass(final KeYJavaType type, InitConfig initConfig) {
+        this.type = type;
+        this.environment = null;
+        this.initConfig = environment.getInitConfig();
     }
 
     /**

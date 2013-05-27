@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Encapsulates information regarding a single Java method. The information
@@ -32,24 +34,18 @@ public class KeYJavaMethod {
     private final ContractWrapper functionalContract;
 
     /**
-     * The {@link InitConfig} instance for the class which this method is part
-     * of.
-     */
-    private final InitConfig initConfig;
-
-    /**
      * The {@link IProgramMethod} instance for this method, containing the
      * KeY-specific data for it.
      */
     private final IProgramMethod programMethod;
 
     KeYJavaMethod(final KeYJavaClass declaringClass,
-            final IProgramMethod programMethod, final InitConfig initConfig,
+            final IProgramMethod programMethod,
+            final KeYEnvironment<CustomConsoleUserInterface> environment,
             final ContractWrapper functionalContract) {
 
         this.declaringClass = declaringClass;
         this.programMethod = programMethod;
-        this.initConfig = initConfig;
         this.functionalContract = functionalContract;
     }
 
@@ -64,7 +60,7 @@ public class KeYJavaMethod {
      */
     public final InitConfig getInitConfig() {
 
-        return initConfig;
+        return declaringClass.getEnvironment().getInitConfig();
     }
 
     /**
@@ -118,5 +114,9 @@ public class KeYJavaMethod {
     public String getReturnType() {
 
         return programMethod.getReturnType().getName();
+    }
+
+    public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+        return declaringClass.getEnvironment();
     }
 }
