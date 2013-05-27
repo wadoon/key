@@ -35,7 +35,7 @@ public class TestJUnitTestCaseGenerator {
         Assert.assertTrue(new File(
                 "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
 
-        final TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
+        final TestGenerator testCaseGenerator = TestGenerator.getInstance();
         final IFrameworkConverter junitConverter = new JUnitConverter();
         final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.decisionCoverageParser;
 
@@ -105,7 +105,7 @@ public class TestJUnitTestCaseGenerator {
         Assert.assertTrue(new File(
                 "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
 
-        final TestGenerator testCaseGenerator = TestGenerator.INSTANCE;
+        final TestGenerator testCaseGenerator = TestGenerator.getInstance();
         final IFrameworkConverter junitConverter = new JUnitConverter();
         final ICodeCoverageParser codeCoverageParser = new StatementCoverageParser();
 

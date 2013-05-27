@@ -6,6 +6,7 @@ import java.util.List;
 import se.gu.svanefalk.testgeneration.core.CoreException;
 import se.gu.svanefalk.testgeneration.core.CoreInterface;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
+import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
 import de.uka.ilkd.key.java.Services;
@@ -35,8 +36,16 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  * @author christopher
  * 
  */
-public enum TestGenerator {
-    INSTANCE;
+public class TestGenerator {
+    
+    private static TestGenerator instance = null;
+
+    public static TestGenerator getInstance() {
+        if (TestGenerator.instance == null) {
+            TestGenerator.instance = new TestGenerator();
+        }
+        return TestGenerator.instance;
+    }
 
     /**
      * A list of native methods (i.e. those part of any type with {@link Object}
