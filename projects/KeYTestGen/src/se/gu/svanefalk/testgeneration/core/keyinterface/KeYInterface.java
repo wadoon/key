@@ -48,6 +48,9 @@ public class KeYInterface {
      */
     private static final ReentrantLock lock = new ReentrantLock(true);
 
+    private final CustomConsoleUserInterface keyInterface = new CustomConsoleUserInterface(
+            false);
+
     /**
      * Assert that a given object is not null, and generate an exception if it
      * is.

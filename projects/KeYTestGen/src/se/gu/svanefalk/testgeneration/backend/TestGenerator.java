@@ -6,7 +6,6 @@ import java.util.List;
 import se.gu.svanefalk.testgeneration.core.CoreException;
 import se.gu.svanefalk.testgeneration.core.CoreInterface;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
-import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
 import de.uka.ilkd.key.java.Services;
