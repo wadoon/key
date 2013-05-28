@@ -57,13 +57,13 @@ public class CoreInterface {
      * Creates a set of abstract test suites for a given set of methods belong
      * to a Java class. One test suite per method will be generated.
      * 
-     * @param path
+     * @param source
      * @param codeCoverageParser
      * @param methods
      * @return
      * @throws CoreException
      */
-    public List<TestSuite> createTestSuites(final String path,
+    public List<TestSuite> createTestSuites(final File source,
             ICodeCoverageParser codeCoverageParser, final String... methods)
             throws CoreException {
 
@@ -77,7 +77,7 @@ public class CoreInterface {
         /*
          * Get the abstract representation of the class.
          */
-        final KeYJavaClass targetClass = extractKeYJavaClass(path);
+        final KeYJavaClass targetClass = extractKeYJavaClass(source);
 
         /*
          * The result set of abstract test suites.
@@ -137,7 +137,7 @@ public class CoreInterface {
      *             in the event that there is a failure in the KeYInterface, or
      *             if there is a problem finding or reading the source file.
      */
-    private KeYJavaClass extractKeYJavaClass(final String source)
+    private KeYJavaClass extractKeYJavaClass(final File source)
             throws CoreException {
 
         try {
@@ -148,8 +148,8 @@ public class CoreInterface {
              */
             Benchmark.startBenchmarking("1. [KeY] setting up class and method abstractions");
 
-            final KeYJavaClass keYJavaClass = keYJavaClassFactory.createKeYJavaClass(new File(
-                    source));
+            final KeYJavaClass keYJavaClass = keYJavaClassFactory.createKeYJavaClass(
+                    source);
 
             Benchmark.finishBenchmarking("1. [KeY] setting up class and method abstractions");
 

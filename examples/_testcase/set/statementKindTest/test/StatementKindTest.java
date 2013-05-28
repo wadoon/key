@@ -1,5 +1,10 @@
 
 public class StatementKindTest {
+
+  /*@ public normal_behavior 
+    @ requires true;
+    @ ensures true;
+    @*/
 	public void main() {
 		// void method
 		foo();

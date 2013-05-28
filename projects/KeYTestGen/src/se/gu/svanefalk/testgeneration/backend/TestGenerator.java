@@ -1,5 +1,6 @@
 package se.gu.svanefalk.testgeneration.backend;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -108,7 +109,7 @@ public class TestGenerator {
      *            statement coverage is used.
      * @return a test suite for the framework targeted by the implementor.
      */
-    public List<String> generatePartialTestSuite(final String source,
+    public List<String> generatePartialTestSuite(final File source,
             final ICodeCoverageParser coverage,
             final IFrameworkConverter frameworkConverter,
             final String... methods) throws TestGeneratorException {
@@ -143,6 +144,21 @@ public class TestGenerator {
             throw new TestGeneratorException(e.getMessage());
         } catch (final FrameworkConverterException e) {
             throw new TestGeneratorException(e.getMessage());
+        }
+    }
+
+    public List<String> generatePartialTestSuite(final String source,
+            final ICodeCoverageParser coverage,
+            final IFrameworkConverter frameworkConverter,
+            final String... methods) throws TestGeneratorException {
+
+        File file = new File(source);
+        if (!file.exists()) {
+            throw new TestGeneratorException("No such file or directory: "
+                    + source);
+        } else {
+            return generatePartialTestSuite(file, coverage, frameworkConverter,
+                    methods);
         }
     }
 
