@@ -9,10 +9,10 @@ import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
-import se.gu.svanefalk.testgeneration.core.concurrency.Capsule;
-import se.gu.svanefalk.testgeneration.core.concurrency.CapsuleExecutor;
-import se.gu.svanefalk.testgeneration.core.concurrency.ModelGenerationCapsule;
-import se.gu.svanefalk.testgeneration.core.concurrency.OracleGenerationCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.AbstractCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleExecutor;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ModelGenerationCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.OracleGenerationCapsule;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
@@ -68,7 +68,7 @@ public class NodeTestGenerator {
             /*
              * Create and dispatc the Model and Oracle geneators.
              */
-            final List<Capsule> capsules = new LinkedList<Capsule>();
+            final List<AbstractCapsule> capsules = new LinkedList<AbstractCapsule>();
             final ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
                     node);
             capsules.add(modelGenerationCapsule);

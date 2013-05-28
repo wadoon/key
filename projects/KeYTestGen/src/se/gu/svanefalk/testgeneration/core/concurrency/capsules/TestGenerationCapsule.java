@@ -1,4 +1,4 @@
-package se.gu.svanefalk.testgeneration.core.concurrency;
+package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,6 +6,9 @@ import java.util.List;
 import se.gu.svanefalk.testgeneration.core.CoreException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
+import se.gu.svanefalk.testgeneration.core.concurrency.monitor.CaughtException;
+import se.gu.svanefalk.testgeneration.core.concurrency.monitor.ICapsuleMonitor;
+import se.gu.svanefalk.testgeneration.core.concurrency.monitor.IMonitorEvent;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
@@ -23,7 +26,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
  * @author christopher
  * 
  */
-public class TestGenerationCapsule extends Capsule {
+public class TestGenerationCapsule extends AbstractCapsule implements
+        ICapsuleMonitor {
 
     /**
      * Parser for achieving the desired level of code coverage.
@@ -94,7 +98,7 @@ public class TestGenerationCapsule extends Capsule {
             /*
              * Begin preparing the capsules to be executed
              */
-            final List<Capsule> toExecute = new LinkedList<Capsule>();
+            final List<AbstractCapsule> toExecute = new LinkedList<AbstractCapsule>();
 
             /*
              * Setup the module generation capsules for each node.
@@ -103,6 +107,7 @@ public class TestGenerationCapsule extends Capsule {
             for (final IExecutionNode node : nodes) {
                 final ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
                         node);
+                modelGenerationCapsule.addMonitor(this);
                 modelGenerationCapsules.add(modelGenerationCapsule);
                 toExecute.add(modelGenerationCapsule);
             }
@@ -158,5 +163,18 @@ public class TestGenerationCapsule extends Capsule {
 
     public TestSuite getResult() {
         return testSuite;
+    }
+
+    @Override
+    public void doNotify(ICapsule source, IMonitorEvent event) {
+
+        /*
+         * The signalling capsule caught an exception
+         */
+        if (event instanceof CaughtException) {
+            CaughtException caughtException = (CaughtException) event;
+            Throwable payload = caughtException.getPayload();
+            notifyMonitors(event);
+        }
     }
 }

@@ -1,8 +1,12 @@
-package se.gu.svanefalk.testgeneration.core.concurrency;
+package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import se.gu.svanefalk.testgeneration.KeYTestGenException;
+import se.gu.svanefalk.testgeneration.core.concurrency.monitor.ICapsuleMonitor;
+import se.gu.svanefalk.testgeneration.core.concurrency.monitor.IMonitorEvent;
 
 /**
  * Capsules represent autonomous units of functionality within the KeYTestGen2
@@ -11,9 +15,18 @@ import se.gu.svanefalk.testgeneration.KeYTestGenException;
  * @author christopher
  * 
  */
-public abstract class Capsule implements Runnable {
+public abstract class AbstractCapsule implements ICapsule {
 
+    /**
+     * Latch used for the purposeo synchronizing several capsules of the same
+     * type.
+     */
     private CountDownLatch latch;
+
+    /**
+     * Monitors for this capsule.
+     */
+    private final List<ICapsuleMonitor> monitors = new LinkedList<>();
 
     /**
      * Flag to indicate whether or not the outcome of this capsules execution
@@ -22,11 +35,10 @@ public abstract class Capsule implements Runnable {
     private boolean succeeded = false;
 
     /**
-     * Exception potentially thrown during the execution of this Capsule.
+     * Exception potentially thrown during the execution of this
+     * AbstractCapsule.
      */
     private KeYTestGenException thrownException;
-
-    public abstract void doWork();
 
     /**
      * @return the exception thrown during the execution of this capsule, if
@@ -37,7 +49,8 @@ public abstract class Capsule implements Runnable {
     }
 
     /**
-     * @return true if the Capsule executed succesfully, false otherwise.
+     * @return true if the AbstractCapsule executed succesfully, false
+     *         otherwise.
      */
     public boolean isSucceeded() {
         return succeeded;
@@ -61,8 +74,8 @@ public abstract class Capsule implements Runnable {
     }
 
     /**
-     * Indicate that the execution of the the Capsule succeeded. Cannot be
-     * reveresed once set due to the nature of the Capsule itself.
+     * Indicate that the execution of the the AbstractCapsule succeeded. Cannot
+     * be reveresed once set due to the nature of the AbstractCapsule itself.
      */
     protected void setSucceeded() {
         succeeded = true;
@@ -74,5 +87,15 @@ public abstract class Capsule implements Runnable {
      */
     protected void setThrownException(final KeYTestGenException thrownException) {
         this.thrownException = thrownException;
+    }
+
+    public void addMonitor(ICapsuleMonitor capsuleMonitor) {
+        monitors.add(capsuleMonitor);
+    }
+
+    protected void notifyMonitors(IMonitorEvent event) {
+        for (ICapsuleMonitor monitor : monitors) {
+            monitor.doNotify(this, event);
+        }
     }
 }

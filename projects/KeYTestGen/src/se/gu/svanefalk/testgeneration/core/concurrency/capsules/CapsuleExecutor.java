@@ -1,9 +1,10 @@
-package se.gu.svanefalk.testgeneration.core.concurrency;
+package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
 
 /**
  * Encapsulates an {@link Executor} for global use across KeYTestGen2.
@@ -28,19 +29,19 @@ public class CapsuleExecutor {
     }
 
     /**
-     * Execute one or more {@link Capsule} instances, and block until they
+     * Execute one or more {@link AbstractCapsule} instances, and block until they
      * finish executing.
      * 
      * @param runnables
      *            the runnables
      */
-    public void executeCapsulesAndWait(final List<? extends Capsule> capsules) {
+    public void executeCapsulesAndWait(final List<? extends AbstractCapsule> capsules) {
 
         /*
          * Setup and launch capsules
          */
         final CountDownLatch latch = new CountDownLatch(capsules.size());
-        for (final Capsule capsule : capsules) {
+        for (final AbstractCapsule capsule : capsules) {
             capsule.setLatch(latch);
             executor.execute(capsule);
         }

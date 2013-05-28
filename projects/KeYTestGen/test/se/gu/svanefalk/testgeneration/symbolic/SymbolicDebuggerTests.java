@@ -17,7 +17,7 @@ public class SymbolicDebuggerTests {
     private final String pathToExamples = "/home/christopher/git/key/examples/_testcase/set/";
     final TestGenerator testCaseGenerator = TestGenerator.getInstance();
     final IFrameworkConverter junitConverter = new JUnitConverter();
-    final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.decisionCoverageParser;
+    final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.statementCoverageParser;
 
     @Test
     public void testStatementKindTest() throws TestGeneratorException {

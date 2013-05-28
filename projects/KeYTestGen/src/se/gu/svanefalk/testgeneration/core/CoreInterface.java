@@ -5,14 +5,19 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import se.gu.svanefalk.testgeneration.KeYTestGenException;
 import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
-import se.gu.svanefalk.testgeneration.core.concurrency.CapsuleExecutor;
-import se.gu.svanefalk.testgeneration.core.concurrency.TestGenerationCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleExecutor;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ICapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.TestGenerationCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.monitor.CaughtException;
+import se.gu.svanefalk.testgeneration.core.concurrency.monitor.ICapsuleMonitor;
+import se.gu.svanefalk.testgeneration.core.concurrency.monitor.IMonitorEvent;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
@@ -31,7 +36,7 @@ import se.gu.svanefalk.testgeneration.util.Benchmark;
  * @author christopher
  * 
  */
-public class CoreInterface {
+public class CoreInterface implements ICapsuleMonitor {
 
     private static CoreInterface instance = null;
 
@@ -148,8 +153,7 @@ public class CoreInterface {
              */
             Benchmark.startBenchmarking("1. [KeY] setting up class and method abstractions");
 
-            final KeYJavaClass keYJavaClass = keYJavaClassFactory.createKeYJavaClass(
-                    source);
+            final KeYJavaClass keYJavaClass = keYJavaClassFactory.createKeYJavaClass(source);
 
             Benchmark.finishBenchmarking("1. [KeY] setting up class and method abstractions");
 
@@ -159,6 +163,13 @@ public class CoreInterface {
             throw new CoreException(e.getMessage());
         } catch (final IOException e) {
             throw new CoreException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void doNotify(ICapsule source, IMonitorEvent event){
+        if (event instanceof CaughtException) {
+            CaughtException caughtException = (CaughtException) event;
         }
     }
 }
