@@ -1,10 +1,11 @@
 package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
 
 /**
  * Encapsulates an {@link Executor} for global use across KeYTestGen2.
@@ -29,21 +30,22 @@ public class CapsuleExecutor {
     }
 
     /**
-     * Execute one or more {@link AbstractCapsule} instances, and block until they
-     * finish executing.
+     * Execute one or more {@link AbstractCapsule} instances, and block until
+     * they finish executing.
      * 
      * @param runnables
      *            the runnables
      */
-    public void executeCapsulesAndWait(final List<? extends AbstractCapsule> capsules) {
+    public void executeCapsulesAndWait(
+            final Collection<? extends LaunchContainer> containers) {
 
         /*
          * Setup and launch capsules
          */
-        final CountDownLatch latch = new CountDownLatch(capsules.size());
-        for (final AbstractCapsule capsule : capsules) {
-            capsule.setLatch(latch);
-            executor.execute(capsule);
+        final CountDownLatch latch = new CountDownLatch(containers.size());
+        for (final LaunchContainer container : containers) {
+            container.setLatch(latch);
+            executor.execute(container);
         }
 
         /*
@@ -56,6 +58,12 @@ public class CapsuleExecutor {
             } catch (final InterruptedException e) {
                 continue;
             }
+        }
+    }
+
+    public void execute(List<LaunchContainer> capsules) {
+        for (LaunchContainer capsule : capsules) {
+            executor.execute(capsule);
         }
     }
 }

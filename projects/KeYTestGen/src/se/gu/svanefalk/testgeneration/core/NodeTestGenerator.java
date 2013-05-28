@@ -10,9 +10,10 @@ import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.AbstractCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleController;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleExecutor;
-import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ModelGenerationCapsule;
-import se.gu.svanefalk.testgeneration.core.concurrency.capsules.OracleGenerationCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ModelCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.OracleCapsule;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
@@ -68,16 +69,18 @@ public class NodeTestGenerator {
             /*
              * Create and dispatc the Model and Oracle geneators.
              */
-            final List<AbstractCapsule> capsules = new LinkedList<AbstractCapsule>();
-            final ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
-                    node);
-            capsules.add(modelGenerationCapsule);
+            CapsuleController<ModelCapsule> modelController = new CapsuleController<>();
+            CapsuleController<OracleCapsule> oracleController = new CapsuleController<>();
 
-            final OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
+            final ModelCapsule modelGenerationCapsule = new ModelCapsule(node);
+            modelController.addChild(modelGenerationCapsule);
+
+            final OracleCapsule oracleGenerationCapsule = new OracleCapsule(
                     targetMethod);
-            capsules.add(oracleGenerationCapsule);
+            oracleController.addChild(oracleGenerationCapsule);
 
-            capsuleExecutor.executeCapsulesAndWait(capsules);
+            modelController.executeAndWait();
+            oracleController.executeAndWait();
 
             /*
              * Collect the results

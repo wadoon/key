@@ -17,11 +17,12 @@ import se.gu.svanefalk.testgeneration.core.concurrency.monitor.IMonitorEvent;
  */
 public abstract class AbstractCapsule implements ICapsule {
 
+    private CapsuleController controller;
+
     /**
-     * Latch used for the purposeo synchronizing several capsules of the same
-     * type.
+     * Indicates if the capsule has been terminated.
      */
-    private CountDownLatch latch;
+    private boolean isTerminated = false;
 
     /**
      * Monitors for this capsule.
@@ -56,23 +57,6 @@ public abstract class AbstractCapsule implements ICapsule {
         return succeeded;
     }
 
-    @Override
-    public final void run() {
-        try {
-            doWork();
-        } finally {
-            latch.countDown();
-        }
-    }
-
-    /**
-     * @param latch
-     *            the latch to set
-     */
-    void setLatch(final CountDownLatch latch) {
-        this.latch = latch;
-    }
-
     /**
      * Indicate that the execution of the the AbstractCapsule succeeded. Cannot
      * be reveresed once set due to the nature of the AbstractCapsule itself.
@@ -97,5 +81,20 @@ public abstract class AbstractCapsule implements ICapsule {
         for (ICapsuleMonitor monitor : monitors) {
             monitor.doNotify(this, event);
         }
+    }
+
+    @Override
+    public void terminate() {
+        isTerminated = true;
+    }
+
+    @Override
+    public void addController(CapsuleController controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public CapsuleController getController() {
+        return controller;
     }
 }

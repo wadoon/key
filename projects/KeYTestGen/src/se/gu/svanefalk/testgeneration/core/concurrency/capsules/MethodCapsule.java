@@ -26,8 +26,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
  * @author christopher
  * 
  */
-public class TestGenerationCapsule extends AbstractCapsule implements
-        ICapsuleMonitor {
+public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
 
     /**
      * Parser for achieving the desired level of code coverage.
@@ -50,12 +49,7 @@ public class TestGenerationCapsule extends AbstractCapsule implements
      */
     private TestSuite testSuite = null;
 
-    /**
-     * Global thread pool for dispatching other capsules.
-     */
-    CapsuleExecutor threadPool = CapsuleExecutor.getInstance();
-
-    public TestGenerationCapsule(final ICodeCoverageParser codeCoverageParser,
+    public MethodCapsule(final ICodeCoverageParser codeCoverageParser,
             final KeYJavaMethod targetMethod) {
         super();
         this.codeCoverageParser = codeCoverageParser;
@@ -98,37 +92,37 @@ public class TestGenerationCapsule extends AbstractCapsule implements
             /*
              * Begin preparing the capsules to be executed
              */
-            final List<AbstractCapsule> toExecute = new LinkedList<AbstractCapsule>();
+            CapsuleController<OracleCapsule> oracleController = new CapsuleController<>();
+            CapsuleController<ModelCapsule> modelController = new CapsuleController<>();
 
             /*
-             * Setup the module generation capsules for each node.
+             * Setup the model generation capsules for each node.
              */
-            final List<ModelGenerationCapsule> modelGenerationCapsules = new LinkedList<ModelGenerationCapsule>();
             for (final IExecutionNode node : nodes) {
-                final ModelGenerationCapsule modelGenerationCapsule = new ModelGenerationCapsule(
+                final ModelCapsule modelGenerationCapsule = new ModelCapsule(
                         node);
                 modelGenerationCapsule.addMonitor(this);
-                modelGenerationCapsules.add(modelGenerationCapsule);
-                toExecute.add(modelGenerationCapsule);
+                modelController.addChild(modelGenerationCapsule);
             }
 
             /*
              * Setup the Oracle generation capsule for this method
              */
-            final OracleGenerationCapsule oracleGenerationCapsule = new OracleGenerationCapsule(
+            final OracleCapsule oracleGenerationCapsule = new OracleCapsule(
                     targetMethod);
-            toExecute.add(oracleGenerationCapsule);
+            oracleController.addChild(oracleGenerationCapsule);
 
             /*
              * Dispatch and wait for the capsules.
              */
-            threadPool.executeCapsulesAndWait(toExecute);
+            oracleController.executeAndWait();
+            modelController.executeAndWait();
 
             /*
              * Collect the results
              */
             oracle = oracleGenerationCapsule.getResult();
-            for (final ModelGenerationCapsule capsule : modelGenerationCapsules) {
+            for (final ModelCapsule capsule : modelController.getCapsules()) {
                 models.add(capsule.getResult());
             }
 
@@ -172,9 +166,18 @@ public class TestGenerationCapsule extends AbstractCapsule implements
          * The signalling capsule caught an exception
          */
         if (event instanceof CaughtException) {
+
+            /*
+             * Notify monitors about the exceptioon
+             */
             CaughtException caughtException = (CaughtException) event;
             Throwable payload = caughtException.getPayload();
             notifyMonitors(event);
+
+            /*
+             * Terminate all children
+             */
+            source.getController().stopChildren();
         }
     }
 }

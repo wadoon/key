@@ -12,9 +12,11 @@ import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleController;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleExecutor;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ClassCapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ICapsule;
-import se.gu.svanefalk.testgeneration.core.concurrency.capsules.TestGenerationCapsule;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.MethodCapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.CaughtException;
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.ICapsuleMonitor;
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.IMonitorEvent;
@@ -72,62 +74,18 @@ public class CoreInterface implements ICapsuleMonitor {
             ICodeCoverageParser codeCoverageParser, final String... methods)
             throws CoreException {
 
-        /*
-         * If no coverage criteria are specificed, use default.
-         */
-        if (codeCoverageParser == null) {
-            codeCoverageParser = new StatementCoverageParser();
+        CapsuleController<ClassCapsule> classController = new CapsuleController<>();
+
+        classController.addChild(new ClassCapsule(codeCoverageParser, methods,
+                source));
+
+        classController.executeAndWait();
+
+        // FIXME
+        for (ClassCapsule classCapsule : classController.getCapsules()) {
+            return classCapsule.getResult();
         }
-
-        /*
-         * Get the abstract representation of the class.
-         */
-        final KeYJavaClass targetClass = extractKeYJavaClass(source);
-
-        /*
-         * The result set of abstract test suites.
-         */
-        final List<TestSuite> testSuites = new LinkedList<TestSuite>();
-
-        /*
-         * Create a TestGenerationCapsule for method selected for test case
-         * generation. These capsules will then carry out the test generation
-         * process concurrently.
-         */
-        final List<TestGenerationCapsule> testGenerationCapsules = new LinkedList<TestGenerationCapsule>();
-        for (final String method : methods) {
-
-            /*
-             * Abort if the method cannot be found
-             */
-            final KeYJavaMethod targetMethod = targetClass.getMethod(method);
-            if (targetMethod == null) {
-                throw new CoreException("No such method: " + method
-                        + " in class " + targetClass.getName());
-            }
-
-            /*
-             * Setup and ready the capsule
-             */
-            final TestGenerationCapsule testGenerationCapsule = new TestGenerationCapsule(
-                    codeCoverageParser, targetMethod);
-            testGenerationCapsules.add(testGenerationCapsule);
-        }
-
-        /*
-         * Finally, dispatch the capsules and wait for them to finish.
-         */
-        capsuleExecutor.executeCapsulesAndWait(testGenerationCapsules);
-
-        /*
-         * Collect and return the results of the capsules.
-         */
-        for (final TestGenerationCapsule capsule : testGenerationCapsules) {
-            testSuites.add(capsule.getResult());
-            // Benchmark.startBenchmarking("Create abstract test cases");
-        }
-
-        return testSuites;
+        return null;
     }
 
     /**
@@ -167,7 +125,7 @@ public class CoreInterface implements ICapsuleMonitor {
     }
 
     @Override
-    public void doNotify(ICapsule source, IMonitorEvent event){
+    public void doNotify(ICapsule source, IMonitorEvent event) {
         if (event instanceof CaughtException) {
             CaughtException caughtException = (CaughtException) event;
         }
