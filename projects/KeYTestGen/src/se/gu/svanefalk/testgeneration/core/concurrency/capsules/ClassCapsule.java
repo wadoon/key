@@ -39,8 +39,6 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
 
     private List<TestSuite> testSuites = null;
 
-    private Throwable caughtException = null;
-
     @Override
     public void doWork() {
 
@@ -101,7 +99,7 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
             this.testSuites = testSuites;
 
         } catch (CoreException e) {
-            caughtException = e;
+            setThrownException(e);
             notifyMonitors(new CaughtException(e));
             Object object;
             return;
@@ -110,10 +108,6 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
 
     public List<TestSuite> getResult() {
         return testSuites;
-    }
-
-    public Throwable getException() {
-        return caughtException;
     }
 
     @Override
@@ -129,6 +123,7 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
              */
             CaughtException caughtException = (CaughtException) event;
             Throwable payload = caughtException.getPayload();
+            setThrownException(payload);
             notifyMonitors(event);
 
             /*

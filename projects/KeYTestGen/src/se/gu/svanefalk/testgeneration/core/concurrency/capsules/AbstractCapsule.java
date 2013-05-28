@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import java_cup.terminal;
+
 import se.gu.svanefalk.testgeneration.KeYTestGenException;
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.ICapsuleMonitor;
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.IMonitorEvent;
@@ -39,13 +41,13 @@ public abstract class AbstractCapsule implements ICapsule {
      * Exception potentially thrown during the execution of this
      * AbstractCapsule.
      */
-    private KeYTestGenException thrownException;
+    private Throwable thrownException;
 
     /**
      * @return the exception thrown during the execution of this capsule, if
      *         any.
      */
-    public KeYTestGenException getThrownException() {
+    public Throwable getThrownException() {
         return thrownException;
     }
 
@@ -69,7 +71,7 @@ public abstract class AbstractCapsule implements ICapsule {
      * @param thrownException
      *            the thrownException to set
      */
-    protected void setThrownException(final KeYTestGenException thrownException) {
+    protected void setThrownException(final Throwable thrownException) {
         this.thrownException = thrownException;
     }
 
@@ -96,5 +98,9 @@ public abstract class AbstractCapsule implements ICapsule {
     @Override
     public CapsuleController getController() {
         return controller;
+    }
+
+    public boolean isTerminated() {
+        return isTerminated;
     }
 }

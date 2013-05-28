@@ -83,6 +83,10 @@ public class CoreInterface implements ICapsuleMonitor {
 
         // FIXME
         for (ClassCapsule classCapsule : classController.getCapsules()) {
+            if (classCapsule.getThrownException() != null) {
+                Throwable throwable = classCapsule.getThrownException();
+                throw new CoreException(throwable.getMessage());
+            }
             return classCapsule.getResult();
         }
         return null;
