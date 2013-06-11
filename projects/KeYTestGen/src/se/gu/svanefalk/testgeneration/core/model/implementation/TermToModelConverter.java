@@ -3,6 +3,7 @@ package se.gu.svanefalk.testgeneration.core.model.implementation;
 import se.gu.svanefalk.testgeneration.core.model.tools.EliminateConjunctionsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.RemoveIfThenElseTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.RemoveSDPsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -45,7 +46,6 @@ class TermToModelConverter {
          * variables and values found in the Term. Done postorder to eliminate
          * buffering penalties in the Model.
          */
-        System.out.println(node.getFormatedPathCondition() + "\n\n");
         final TermToModelVisitor modelVisitor = new TermToModelVisitor(model,
                 node);
         pathCondition.execPostOrder(modelVisitor);
@@ -55,6 +55,7 @@ class TermToModelConverter {
          */
         pathCondition = NegationNormalFormTransformer.getInstance().transform(
                 pathCondition);
+        
         pathCondition = EliminateConjunctionsTransformer.getInstance().transform(
                 pathCondition);
 

@@ -30,6 +30,18 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
+    
+    @Test
+    public void testWhileTestTest() throws TestGeneratorException {
+
+        String classPath = "whileTest/test/WhileTest.java";
+        String className = "WhileTest";
+        String methodName = "main";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
 
     private File loadFile(String example) {
         File file = new File(pathToExamples + example);

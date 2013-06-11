@@ -116,7 +116,7 @@ public class KeYInterface {
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(
                 proof,
                 ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                false, true, false);
+                false, false, false);
 
         return proof;
     }

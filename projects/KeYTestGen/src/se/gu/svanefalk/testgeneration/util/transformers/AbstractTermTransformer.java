@@ -175,6 +175,9 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformFormula(final Term term)
             throws TermTransformerException {
 
+        if (TermParserTools.isObserverFunction(term)) {
+            return transformObserverFunction(term);
+        }
         return term;
     }
 
@@ -310,7 +313,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         } else if (TermParserTools.isImplication(term)) {
             return transformImplication(term);
-        } else if(TermParserTools.isFormula(term)) {
+        } else if (TermParserTools.isFormula(term)) {
             return transformFormula(term);
         }
 

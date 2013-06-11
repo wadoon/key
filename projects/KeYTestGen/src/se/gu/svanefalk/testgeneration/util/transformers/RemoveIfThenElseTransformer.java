@@ -181,15 +181,16 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                         conditions.add(newSecondChild);
                     }
 
-                    /*
-                     * It is possible that the right operand may be another
-                     * if-then-else statement. If this is the case, we assume
-                     * true as the desired outcome of that if-else-statement
-                     * (since we are free to assume any outcome), and formalize
-                     * by creating and equals term for this if-then-else
-                     * statement.
-                     */
-                } else {
+                }
+
+                /*
+                 * It is possible that the right operand may be another
+                 * if-then-else statement. If this is the case, we assume true
+                 * as the desired outcome of that if-else-statement (since we
+                 * are free to assume any outcome), and formalize by creating
+                 * and equals term for this if-then-else statement.
+                 */
+                else {
                     outcome = true;
                     final Term newSecondChild = termFactory.createTerm(
                             Equality.EQUALS, secondChild, createTrueConstant());

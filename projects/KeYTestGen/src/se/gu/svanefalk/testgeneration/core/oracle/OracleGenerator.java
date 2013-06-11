@@ -522,7 +522,7 @@ public enum OracleGenerator {
              */
             final Term postCondition = method.getPostconditions().get(0);
             if (postCondition == null || postCondition.toString().equals("true")) {
-                
+                return EMPTY_ORACLE;
             }
 
             /*
