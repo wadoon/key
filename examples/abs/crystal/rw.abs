@@ -1,0 +1,92 @@
+module RW;
+
+
+interface CallerI{}
+     
+interface RWinterface{
+   Unit openR(CallerI c);
+   Unit closeR(CallerI c);
+   Unit openW(CallerI c);
+   Unit closeW(CallerI c);
+   String read(CallerI c, Int key);
+   Unit write(CallerI c, Int key, String element);
+}
+
+interface DB{
+   String read(Int key);
+   Unit write(Int key, String element);
+}
+
+class DataBase implements DB{
+   Map<Int, String> map = EmptyMap;
+      
+   String read(Int key){
+      return lookupDefault(map, key, "None");
+   }
+   
+   Unit write(Int key, String element){
+      map = put(map, key, element);
+   }
+}
+
+class RWController implements RWinterface{
+   DB db; Set<CallerI> readers = EmptySet; CallerI writer = null; Int pr= 0;
+
+   {db = new DataBase();}
+      
+   Unit openR(CallerI caller){
+   await writer == null; readers = insertElement(readers, caller);
+   }
+   
+   Unit closeR(CallerI caller){
+   readers = remove(readers, caller);
+   }
+      
+   Unit openW(CallerI caller){
+   await writer == null; writer = caller; readers = insertElement(readers, caller);
+   }
+   
+   Unit closeW(CallerI caller){
+     await writer == caller; 
+     writer = null; 
+     readers = remove(readers, caller);
+   }
+   
+   String read(CallerI caller, Int key){
+      String s = "";
+      await contains(readers, caller);
+      pr = pr + 1; Fut<String> fr = db!read(key); await fr?; s = fr.get; pr = pr -1;
+      return s;
+   }
+   
+   Unit write(CallerI caller, Int key, String value){
+      await caller == writer && pr == 0 && 
+      (readers == EmptySet || (contains(readers, writer) &&  size(readers) == 1));
+      Fut<Unit> fr = db!write(key,value); fr.get;
+   }
+}
+
+class Caller implements CallerI{}
+ 
+class Application{
+Unit run(){
+      RWinterface controller; 
+      controller = new RWController(); 
+      
+      CallerI writer1 = new Caller();
+      controller.openW(writer1);
+      controller.write(writer1, 1, "abc");
+      controller.closeW(writer1);
+
+      CallerI reader1 = new Caller();
+      controller.openR(reader1);
+      controller.read(reader1, 1);
+      controller.closeR(reader1);
+   }
+}
+
+{
+    new Application();
+}
+
+	

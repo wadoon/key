@@ -41,7 +41,7 @@ class Service(Int limit, NewsProducerI np) implements ServiceI{
 	{prod = new Producer(np); proxy = new Proxy(limit,this); lastProxy = proxy; this!produce();}
 	
 	Unit subscribe(ClientI cl){Fut<ProxyI> last = lastProxy!add(cl); lastProxy = last.get;}
-	
+
 	Unit produce(){Fut<News> fut = prod!detectNews(); proxy!publish(fut);}
 }
 
@@ -79,10 +79,10 @@ class Producer(NewsProducerI np) implements ProducerI{
 		List<News> requests = Nil;
 	        News ns = None;
 		Fut<List<News>> newsList = np!getRequests();
-		requests = news.get;
+		requests = newsList.get;
 		while(requests == Nil){
-                	Fut<List<News>> newsList = np!getRequests();
-                	requests = news.get;
+                	newsList = np!getRequests();
+                	requests = newsList.get;
 		}
 		Fut<News> news = np!getNews();
 		ns = news.get;
