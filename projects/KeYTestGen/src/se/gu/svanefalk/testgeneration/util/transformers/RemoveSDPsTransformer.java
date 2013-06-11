@@ -35,6 +35,10 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
+        if(term == null) {
+            return term;
+        }
+        
         return transformTerm(term);
     }
 

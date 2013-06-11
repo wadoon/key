@@ -4,6 +4,7 @@ import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.util.transformers.AbstractTermTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.ConjunctionNormalFormTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.OrderOperandsTransformer;
+import se.gu.svanefalk.testgeneration.util.transformers.RemoveImplicationsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.RemoveObserverFunctionsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.RemoveSDPsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.SimplifyConjunctionTransformer;
@@ -41,10 +42,17 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         oracleTerm = RemoveSDPsTransformer.getInstance().transform(oracleTerm);
 
         /*
+         * Remove all implications
+         */
+        oracleTerm = RemoveImplicationsTransformer.getInstance().transform(
+                oracleTerm);
+
+        /*
          * Remove all observerFunctions.
          */
-        oracleTerm = RemoveObserverFunctionsTransformer.getInstance().transform(oracleTerm);
-        
+        oracleTerm = RemoveObserverFunctionsTransformer.getInstance().transform(
+                oracleTerm);
+
         /*
          * Order the operands of the term
          */
@@ -55,9 +63,6 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
          * Do the transformation
          */
         oracleTerm = transformTerm(oracleTerm);
-        if (oracleTerm == null) {
-            return null;
-        }
 
         /*
          * Put it into Conjunctive Normal Form

@@ -23,7 +23,6 @@ public class SymbolicDebuggerTests {
     public void testStatementKindTest() throws TestGeneratorException {
 
         String classPath = "statementKindTest/test/StatementKindTest.java";
-        String className = "StatementKindTest";
         String methodName = "main";
         File file = loadFile(classPath);
 
@@ -34,9 +33,30 @@ public class SymbolicDebuggerTests {
     @Test
     public void testWhileTestTest() throws TestGeneratorException {
 
-        String classPath = "whileTest/test/WhileTest.java";
-        String className = "WhileTest";
+        String classPath = "whileFalseTest/test/WhileFalseTest.java";
         String methodName = "main";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    @Test
+    public void testWhileFalseTest() throws TestGeneratorException {
+
+        String classPath = "whileTest/test/WhileTest.java";
+        String methodName = "main";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    @Test
+    public void testTryCatchFinally() throws TestGeneratorException {
+
+        String classPath = "tryCatchFinally/test/TryCatchFinally.java";
+        String methodName = "tryCatchFinally";
         File file = loadFile(classPath);
 
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
