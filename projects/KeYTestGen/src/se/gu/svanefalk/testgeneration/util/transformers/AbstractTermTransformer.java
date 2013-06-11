@@ -310,6 +310,8 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         } else if (TermParserTools.isImplication(term)) {
             return transformImplication(term);
+        } else if(TermParserTools.isFormula(term)) {
+            return transformFormula(term);
         }
 
         throw new TermTransformerException("Unsupported Junctor: "

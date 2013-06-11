@@ -7,6 +7,8 @@ import se.gu.svanefalk.testgeneration.targetmodels.PrimitiveIntegerOperations;
 
 public class Test_PrimitiveIntegerOperations_mid {
 
+    @SuppressWarnings("static-access")
+    
     @Test
     public void testmid0() throws NoSuchFieldException, SecurityException,
             IllegalArgumentException, IllegalAccessException {
@@ -32,22 +34,14 @@ public class Test_PrimitiveIntegerOperations_mid {
          * Test oracle
          */
         Assert.assertTrue(result == y || result == x || result == z);
-
         Assert.assertTrue(result >= y || result >= x);
-
         Assert.assertTrue(result >= z || result >= y);
-
         Assert.assertTrue(result <= z || result <= x);
-
         Assert.assertTrue(result >= z || result >= x);
-
         Assert.assertTrue(result <= y || result <= x);
-
         Assert.assertTrue(result <= z || result <= y || result <= y
                 || result <= z || result <= x);
-
         Assert.assertTrue(result >= z || result >= y || result >= x);
-
     }
 
     @Test

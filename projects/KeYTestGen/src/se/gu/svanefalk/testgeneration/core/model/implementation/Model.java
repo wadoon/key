@@ -15,6 +15,11 @@ import de.uka.ilkd.key.logic.Term;
  */
 public class Model {
 
+    public static final Model EMPTY_MODEL;
+    static {
+        EMPTY_MODEL = Model.constructModel();
+    }
+
     /**
      * Factory method for creating a new {@link Model} instance.
      * 

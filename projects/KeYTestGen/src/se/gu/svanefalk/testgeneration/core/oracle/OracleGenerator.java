@@ -36,6 +36,13 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  */
 public enum OracleGenerator {
     INSTANCE;
+    
+    private static final Oracle EMPTY_ORACLE;
+    static {
+        Set<OracleAssertion> assertions = new HashSet<OracleAssertion>();
+        OracleConstraint constraints = new OracleConstraint(assertions);
+        EMPTY_ORACLE = new Oracle(constraints, null);
+    }
 
     /**
      * Transformer used in order to simplify postconditions, turning them into a
@@ -514,9 +521,8 @@ public enum OracleGenerator {
              * Extract the postcondition of the method
              */
             final Term postCondition = method.getPostconditions().get(0);
-
-            if (postCondition == null) {
-                return new Oracle(null, null);
+            if (postCondition == null || postCondition.toString().equals("true")) {
+                
             }
 
             /*
@@ -532,7 +538,7 @@ public enum OracleGenerator {
              */
             final Term simplifiedPostCondition = oracleTermTransformer.transform(postCondition);
             if (simplifiedPostCondition == null) {
-                return new Oracle(null, null);
+                return EMPTY_ORACLE;
             }
 
             /*

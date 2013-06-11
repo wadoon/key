@@ -2,6 +2,7 @@ package se.gu.svanefalk.testgeneration.core.classabstraction;
 
 import java.util.List;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -112,8 +113,12 @@ public class KeYJavaMethod {
      * @return the return type of the method
      */
     public String getReturnType() {
-
-        return programMethod.getReturnType().getName();
+        KeYJavaType returnType = programMethod.getReturnType();
+        if (returnType == KeYJavaType.VOID_TYPE) {
+            return "void";
+        } else {
+            return programMethod.getReturnType().getName();
+        }
     }
 
     public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
