@@ -52,7 +52,7 @@ public class ModelCapsule extends AbstractCapsule {
          */
         try {
             model = modelGenerator.generateModel(node);
-        } catch (final ModelGeneratorException e) {
+        } catch (final Exception e) {
             notifyMonitors(new CaughtException(e));
             setThrownException(e);
             return;

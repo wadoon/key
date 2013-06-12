@@ -8,6 +8,7 @@ import java.util.List;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
+import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -65,13 +66,30 @@ public class KeYJavaClassFactory {
                  */
                 final List<ContractWrapper> contracts = getContracts(
                         memberMethod, services);
-                for (final ContractWrapper contract : contracts) {
+
+                /*
+                 * If the user has not specified a postcondition, simply let it
+                 * be null and delegate to the Oracle Generator.
+                 */
+                if (contracts.isEmpty()) {
 
                     final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(
-                            keYJavaClass, memberMethod, environment, contract);
+                            keYJavaClass, memberMethod, environment, null);
 
                     keYJavaClass.addMethodMapping(memberMethod.getFullName(),
                             keYJavaMethod);
+               
+                } else {
+
+                    for (final ContractWrapper contract : contracts) {
+
+                        final KeYJavaMethod keYJavaMethod = new KeYJavaMethod(
+                                keYJavaClass, memberMethod, environment,
+                                contract);
+
+                        keYJavaClass.addMethodMapping(
+                                memberMethod.getFullName(), keYJavaMethod);
+                    }
                 }
             }
         }

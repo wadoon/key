@@ -85,6 +85,7 @@ public class CoreInterface implements ICapsuleMonitor {
         for (ClassCapsule classCapsule : classController.getCapsules()) {
             if (classCapsule.getThrownException() != null) {
                 Throwable throwable = classCapsule.getThrownException();
+                throwable.printStackTrace();
                 throw new CoreException(throwable.getMessage());
             }
             return classCapsule.getResult();

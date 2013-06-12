@@ -62,7 +62,100 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
+    
+    @Test
+    public void testThrowVariableTest() throws TestGeneratorException {
 
+        String classPath = "throwVariableTest/test/ThrowVariableTest.java";
+        String methodName = "main";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    @Test
+    public void testThrowTest() throws TestGeneratorException {
+
+        String classPath = "throwTest/test/ThrowTest.java";
+        String methodName = "main";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    @Test
+    public void testSwitchCaseTest() throws TestGeneratorException {
+
+        String classPath = "switchCaseTest/test/SwitchCaseTest.java";
+        String methodName = "switchCase";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    @Test
+    public void testStaticMethodCall() throws TestGeneratorException {
+
+        String classPath = "staticMethodCall/test/StaticMethodCall.java";
+        String methodName = "main";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+
+    @Test
+    public void testStatements() throws TestGeneratorException {
+
+        String classPath = "statements/test/FlatSteps.java";
+        String methodName = "doSomething";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    @Test
+    public void testSimpleNullPointerSplitTest() throws TestGeneratorException {
+
+        String classPath = "simpleNullPointerSplitTest/test/SimpleNullPointerSplitTest.java";
+        String methodName = "main";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    @Test
+    public void testSimpleIf() throws TestGeneratorException {
+
+        String classPath = "simpleIf/test/SimpleIf.java";
+        String methodName = "min";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    @Test
+    public void testRecursiveFibonacci_LONG_RUNNING_TEST() throws TestGeneratorException {
+
+        String classPath = "recursiveFibonacci/test/RecursiveFibonacci.java";
+        String methodName = "fibonacci10";
+        File file = loadFile(classPath);
+
+        final List<String> output = testCaseGenerator.generatePartialTestSuite(
+                file, codeCoverageParser, junitConverter, methodName);
+    }
+    
+    /**
+     * Helper for loading files
+     * @param example
+     * @return
+     */
     private File loadFile(String example) {
         File file = new File(pathToExamples + example);
         Assert.assertTrue(file.exists());

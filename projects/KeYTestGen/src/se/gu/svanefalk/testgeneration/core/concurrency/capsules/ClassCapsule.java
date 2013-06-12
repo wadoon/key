@@ -98,12 +98,13 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
 
             this.testSuites = testSuites;
 
-        } catch (CoreException e) {
+        } catch (Exception e) {
             setThrownException(e);
             notifyMonitors(new CaughtException(e));
-            Object object;
             return;
         }
+
+        setSucceeded();
     }
 
     public List<TestSuite> getResult() {

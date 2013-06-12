@@ -148,11 +148,13 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
              */
             setSucceeded();
 
-        } catch (final KeYInterfaceException e) {
+        } catch (final Exception e) {
             setThrownException(e);
-        } catch (final CoreException e) {
-            setThrownException(e);
+            notifyMonitors(new CaughtException(e));
+            return;
         }
+
+        setSucceeded();
     }
 
     public TestSuite getResult() {

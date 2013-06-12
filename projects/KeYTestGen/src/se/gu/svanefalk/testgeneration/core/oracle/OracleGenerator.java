@@ -36,7 +36,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  */
 public enum OracleGenerator {
     INSTANCE;
-    
+
     private static final Oracle EMPTY_ORACLE;
     static {
         Set<OracleAssertion> assertions = new HashSet<OracleAssertion>();
@@ -518,10 +518,19 @@ public enum OracleGenerator {
         try {
 
             /*
+             * Handle methods which have no postcondition at all, simply giving
+             * them an empty oracle.
+             */
+            if (method.getPostconditions() == null) {
+                return EMPTY_ORACLE;
+            }
+
+            /*
              * Extract the postcondition of the method
              */
             final Term postCondition = method.getPostconditions().get(0);
-            if (postCondition == null || postCondition.toString().equals("true")) {
+            if (postCondition == null
+                    || postCondition.toString().equals("true")) {
                 return EMPTY_ORACLE;
             }
 

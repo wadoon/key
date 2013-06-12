@@ -1,8 +1,11 @@
 package se.gu.svanefalk.testgeneration.core.classabstraction;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -75,8 +78,11 @@ public class KeYJavaMethod {
          * TODO: This violates the abstraction in a very ugly way, is there no
          * nicer way to get the parameters?
          */
-        programMethod.getParameters();
-        return functionalContract.getParameters();
+        List<IProgramVariable> parameters = new LinkedList<>();
+        for (ParameterDeclaration declaration : programMethod.getParameters()) {
+            parameters.add(declaration.getVariableSpecification().getProgramVariable());
+        }
+        return parameters;
     }
 
     /**
@@ -86,7 +92,8 @@ public class KeYJavaMethod {
      */
     public List<Term> getPostconditions() {
 
-        return functionalContract.getPostconditions();
+        return functionalContract == null ? null
+                : functionalContract.getPostconditions();
     }
 
     /**
