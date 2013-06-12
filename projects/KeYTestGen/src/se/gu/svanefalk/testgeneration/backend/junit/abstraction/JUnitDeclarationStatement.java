@@ -35,7 +35,7 @@ public class JUnitDeclarationStatement {
     private final String value;
 
     public JUnitDeclarationStatement(final ModelVariable variable) {
-        type = variable.getType();
+        type = variable.getTypeName();
         identifier = variable.getIdentifier();
 
         final Object value = variable.getValue();

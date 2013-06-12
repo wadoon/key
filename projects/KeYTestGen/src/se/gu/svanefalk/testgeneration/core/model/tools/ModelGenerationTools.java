@@ -113,11 +113,24 @@ public class ModelGenerationTools {
             final Term secondChild = transformTerm(term.sub(1));
 
             if ((firstChild != null) && (secondChild == null)) {
-                return firstChild;
+
+                /*
+                 * Make a distinction based on whether the equality is between
+                 * primitive or reference types.
+                 */
+                if (TermParserTools.isPrimitiveType(firstChild)) {
+                    return firstChild;
+                } else {
+                    return null;
+                }
             }
 
             if ((firstChild == null) && (secondChild != null)) {
-                return secondChild;
+                if (TermParserTools.isPrimitiveType(firstChild)) {
+                    return secondChild;
+                } else {
+                    return null;
+                }
             }
 
             if ((firstChild != null) && (secondChild != null)) {

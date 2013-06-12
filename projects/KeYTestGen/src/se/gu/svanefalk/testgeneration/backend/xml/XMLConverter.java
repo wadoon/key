@@ -459,7 +459,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         writeStartTag(XMLHandler.VARIABLE_ROOT);
 
         final String identifier = variable.getIdentifier();
-        final String type = variable.getType();
+        final String type = variable.getTypeName();
 
         /*
          * Write the identifier of this particular variable

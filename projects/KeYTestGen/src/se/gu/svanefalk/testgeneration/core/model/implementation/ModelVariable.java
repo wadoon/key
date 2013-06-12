@@ -46,7 +46,7 @@ public class ModelVariable {
 
     public static boolean isValidValueType(final Object object) {
 
-        return (object.getClass() == ModelInstance.class)
+        return (object == null || object.getClass() == ModelInstance.class)
                 || (object.getClass() == Integer.class)
                 || (object.getClass() == Byte.class)
                 || (object.getClass() == Long.class)
@@ -134,7 +134,7 @@ public class ModelVariable {
      * Returns a String representation of the {@link KeYJavaType} of this
      * variable.
      */
-    public String getType() {
+    public String getTypeName() {
 
         return variable.getKeYJavaType().getName();
     }
@@ -199,6 +199,10 @@ public class ModelVariable {
     @Override
     public String toString() {
 
-        return getType() + " : " + identifier;
+        return getTypeName() + " : " + identifier;
+    }
+
+    public KeYJavaType getType() {
+        return variable.getKeYJavaType();
     }
 }

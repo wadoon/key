@@ -250,6 +250,7 @@ public strictfp class Simplex {
              * Store the exiting variable.
              */
             boundVariables.put(largestColumnIndex, largestRowIndex);
+            int x = 0;
         }
 
         /*
@@ -260,9 +261,9 @@ public strictfp class Simplex {
         for (final Variable variable : variableIndex.values()) {
             result.put(variable, Fraction.ZERO);
         }
-        for (final Integer integer : boundVariables.keySet()) {
-            final Variable variable = variableIndex.get(integer);
-            final Fraction value = initialTableaux[boundVariables.get(integer)][valueIndex];
+        for (final Integer variableNumber : boundVariables.keySet()) {
+            final Variable variable = variableIndex.get(variableNumber);
+            final Fraction value = initialTableaux[boundVariables.get(variableNumber)][valueIndex];
             result.put(variable, value);
         }
 

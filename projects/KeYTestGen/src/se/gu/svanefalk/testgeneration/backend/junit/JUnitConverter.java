@@ -365,9 +365,9 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * Declares and instantiates a reference typed instance.
                      */
                     if (variable.getValue() instanceof ModelInstance) {
-                        writeIndentedLine(variable.getType() + " "
+                        writeIndentedLine(variable.getTypeName() + " "
                                 + variable.getIdentifier() + " = " + "new"
-                                + " " + variable.getType() + "();");
+                                + " " + variable.getTypeName() + "();");
                     }
 
                     /*
@@ -376,7 +376,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * be configured as part of the classes they are fields of).
                      */
                     else {
-                        writeIndentedLine(variable.getType() + " "
+                        writeIndentedLine(variable.getTypeName() + " "
                                 + variable.getIdentifier() + " = "
                                 + variable.getValue() + ";");
                     }
@@ -401,9 +401,9 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * Declares and instantiates a reference typed instance.
                      */
                     if (variable.getValue() instanceof ModelInstance) {
-                        writeIndentedLine(variable.getType() + " "
+                        writeIndentedLine(variable.getTypeName() + " "
                                 + variable.getIdentifier() + " = " + "new"
-                                + " " + variable.getType() + "();");
+                                + " " + variable.getTypeName() + "();");
                     }
 
                     /*
@@ -412,7 +412,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                      * be configured as part of the classes they are fields of).
                      */
                     else {
-                        writeIndentedLine(variable.getType() + " "
+                        writeIndentedLine(variable.getTypeName() + " "
                                 + variable.getIdentifier() + " = "
                                 + variable.getValue() + ";");
                     }

@@ -1,6 +1,7 @@
 package se.gu.svanefalk.testgeneration.core.model.implementation;
 
 import se.gu.svanefalk.testgeneration.StringConstants;
+import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import se.gu.svanefalk.testgeneration.util.visitors.KeYTestGenTermVisitor;
@@ -96,25 +97,44 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                         boolean value = TermParserTools.isBooleanTrue(rightOperand);
                         value = sawNot ? !value : value;
                         model.add(modelVariable, value);
-                    } else {
                     }
-
-                    /*
-                     * Process reference variables.
-                     */
-                } else if (!sawNot) {
-
-                    leftOperandIdentifier = TermParserTools.resolveIdentifierString(
-                            leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
-                    rightOperandIdentifier = TermParserTools.resolveIdentifierString(
-                            rightOperand, ResolveAssignmentsVisitor.SEPARATOR);
-
-                    final ModelVariable leftModelVariable = model.getVariable(leftOperandIdentifier);
-
-                    final ModelVariable rightModelVariable = model.getVariable(rightOperandIdentifier);
-
-                    model.assignPointer(leftModelVariable, rightModelVariable);
                 }
+            }
+
+            /*
+             * Process reference variables.
+             */
+            else if (!sawNot) {
+
+                leftOperandIdentifier = TermParserTools.resolveIdentifierString(
+                        leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
+                rightOperandIdentifier = TermParserTools.resolveIdentifierString(
+                        rightOperand, ResolveAssignmentsVisitor.SEPARATOR);
+
+                final ModelVariable leftModelVariable = model.getVariable(leftOperandIdentifier);
+                final ModelVariable rightModelVariable = model.getVariable(rightOperandIdentifier);
+
+                model.assignPointer(leftModelVariable, rightModelVariable);
+            }
+
+            /*
+             * For not-null constraints, simply create a default instance
+             */
+            else if (sawNot && TermParserTools.isNullSort(rightOperand)) {
+
+                leftOperandIdentifier = TermParserTools.resolveIdentifierString(
+                        leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
+
+                final ModelVariable leftModelVariable = model.getVariable(leftOperandIdentifier);
+
+                leftModelVariable.setValue(ModelInstance.constructModelInstance(leftModelVariable.getType()));
+            }
+
+            /*
+             * for non-equality between existing references, simply move on.
+             */
+            else {
+                ;
             }
 
         } catch (final TermParserException e) {

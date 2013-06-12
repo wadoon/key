@@ -29,7 +29,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testWhileTestTest() throws TestGeneratorException {
 
@@ -40,7 +40,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testWhileFalseTest() throws TestGeneratorException {
 
@@ -51,7 +51,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testTryCatchFinally() throws TestGeneratorException {
 
@@ -62,7 +62,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testThrowVariableTest() throws TestGeneratorException {
 
@@ -73,7 +73,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testThrowTest() throws TestGeneratorException {
 
@@ -84,7 +84,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testSwitchCaseTest() throws TestGeneratorException {
 
@@ -95,7 +95,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testStaticMethodCall() throws TestGeneratorException {
 
@@ -117,7 +117,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testSimpleNullPointerSplitTest() throws TestGeneratorException {
 
@@ -128,7 +128,7 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     @Test
     public void testSimpleIf() throws TestGeneratorException {
 
@@ -139,9 +139,10 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
-    @Test
-    public void testRecursiveFibonacci_LONG_RUNNING_TEST() throws TestGeneratorException {
+
+    // @Test
+    public void testRecursiveFibonacci_LONG_RUNNING_TEST()
+            throws TestGeneratorException {
 
         String classPath = "recursiveFibonacci/test/RecursiveFibonacci.java";
         String methodName = "fibonacci10";
@@ -150,9 +151,10 @@ public class SymbolicDebuggerTests {
         final List<String> output = testCaseGenerator.generatePartialTestSuite(
                 file, codeCoverageParser, junitConverter, methodName);
     }
-    
+
     /**
      * Helper for loading files
+     * 
      * @param example
      * @return
      */

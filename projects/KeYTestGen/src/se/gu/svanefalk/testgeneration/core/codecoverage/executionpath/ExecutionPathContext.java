@@ -143,7 +143,7 @@ public class ExecutionPathContext {
                          * node.
                          */
                         final SourceElement parent = findParentExecutionBranch(node);
-                        while (true) {
+                        while (!branchesForSubtree.isEmpty()) {
                             final ExecutionBranch branch = branchesForSubtree.peek();
                             if (branch.getSecond() != parent) {
                                 branchesForSubtree.pop();
