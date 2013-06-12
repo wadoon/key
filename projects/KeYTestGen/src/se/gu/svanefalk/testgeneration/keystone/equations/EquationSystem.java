@@ -140,6 +140,10 @@ public class EquationSystem {
      */
     public Map<String, Integer> experimentalSolve() {
 
+//        if (equations.size() == 1) {
+//            return solveSingleEquation();
+//        }
+
         return Simplex.experimentalSolve(this);
     }
 
@@ -157,8 +161,8 @@ public class EquationSystem {
         }
     }
 
-    private Map<String, Fraction> solveSingleEquation() {
-        // TODO Auto-generated method stub
+    private Map<String, Integer> solveSingleEquation() {
+        Equation equation = equations.get(0);
         return null;
     }
 
@@ -176,9 +180,9 @@ public class EquationSystem {
          * If the system consists of a single equation, it is technically not a
          * system, but we make no such distincation and resolve it anyway.
          */
-        if (equations.size() == 1) {
-            return solveSingleEquation();
-        }
+        // if (equations.size() == 1) {
+        // return solveSingleEquation();
+        // }
 
         /*
          * Solve a regular system. Begin with separating the system into

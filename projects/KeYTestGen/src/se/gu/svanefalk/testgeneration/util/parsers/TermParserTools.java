@@ -204,7 +204,8 @@ public final class TermParserTools {
         return TermParserTools.isGreaterOrEquals(term)
                 || TermParserTools.isGreaterThan(term)
                 || TermParserTools.isLessOrEquals(term)
-                || TermParserTools.isLessThan(term);
+                || TermParserTools.isLessThan(term)
+                || TermParserTools.isIntegerType(term.sub(0));
     }
 
     public static boolean isBinaryFunction(final Term term) {
@@ -420,6 +421,11 @@ public final class TermParserTools {
         final String name = term.op().name().toString();
 
         return name.equals("Z");
+    }
+
+    public static boolean isIntegerType(final Term term) {
+        final String name = term.sort().toString();
+        return name.equals("int");
     }
 
     /**
@@ -740,6 +746,17 @@ public final class TermParserTools {
         } else {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
+        }
+    }
+    
+    public static String resolveNumber(final Term term) {
+
+        final String numberString = term.op().name().toString();
+
+        if (numberString.equals("#")) {
+            return "";
+        } else {
+            return resolveNumber(term.sub(0)) + numberString;
         }
     }
 }

@@ -62,8 +62,9 @@ public class Preprocessor {
             /*
              * Do preprocessing of the Term itself.
              */
-            final Term processedTerm = NegationNormalFormTransformer.getInstance().transform(
+            Term processedTerm = NegationNormalFormTransformer.getInstance().transform(
                     term);
+
 
             createMinimalProblemSet_helper(processedTerm, minimalProblemSet);
 

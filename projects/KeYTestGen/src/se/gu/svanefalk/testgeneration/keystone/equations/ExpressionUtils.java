@@ -156,10 +156,10 @@ public class ExpressionUtils {
         if (TermParserTools.isInteger(term)) {
             if (TermParserTools.isIntegerNegation(term.sub(0))) {
                 final int value = Integer.parseInt("-"
-                        + resolveNumber(term.sub(0).sub(0)));
+                        + TermParserTools.resolveNumber(term.sub(0).sub(0)));
                 return new NumericConstant(new Fraction(value));
             } else {
-                final int value = Integer.parseInt(resolveNumber(term.sub(0)));
+                final int value = Integer.parseInt(TermParserTools.resolveNumber(term.sub(0)));
                 return new NumericConstant(new Fraction(value));
             }
         }
@@ -169,16 +169,5 @@ public class ExpressionUtils {
     private IExpression processVariable(final Term term) {
 
         return new Variable(term.toString());
-    }
-
-    private String resolveNumber(final Term term) {
-
-        final String numberString = term.op().name().toString();
-
-        if (numberString.equals("#")) {
-            return "";
-        } else {
-            return resolveNumber(term.sub(0)) + numberString;
-        }
     }
 }
