@@ -164,7 +164,7 @@ public class KeYInterface {
                     ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
             environment.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
                     stopCondition);
-            SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(environment.getProof());
+           // SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(environment.getProof());
 
             /*
              * Symbolically execute the code, and extract the root of the
