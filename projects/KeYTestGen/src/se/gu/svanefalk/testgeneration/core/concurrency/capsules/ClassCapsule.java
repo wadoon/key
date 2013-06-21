@@ -26,11 +26,11 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
      */
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.getInstance();
     private final ICodeCoverageParser codeCoverageParser;
-    private final String[] methods;
+    private final List<String> methods;
     private final File source;
 
     public ClassCapsule(ICodeCoverageParser codeCoverageParser,
-            String[] methods, File source) {
+            List<String> methods, File source) {
         super();
         this.codeCoverageParser = codeCoverageParser;
         this.methods = methods;
@@ -70,7 +70,6 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
 
                     throw new CoreException("No such method: " + method
                             + " in class " + targetClass.getName());
-
                 }
 
                 /*

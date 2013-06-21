@@ -16,6 +16,7 @@ import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.DummyVariable;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.ExpressionUtils;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 import se.gu.svanefalk.testgeneration.keystone.equations.restriction.IRestriction;
@@ -45,14 +46,13 @@ public class EquationSystem {
         /*
          * Create the equations
          */
-        final ExpressionUtils expressionUtils = ExpressionUtils.getInstance();
         final List<Equation> equations = new ArrayList<>();
         for (final Term term : terms) {
 
             /*
              * Convert the Term to an inequality.
              */
-            final IComparator relation = expressionUtils.constructRelation(term);
+            final IComparator relation = EquationUtils.constructRelation(term);
 
             /*
              * Convert the inequality to an equation.
@@ -140,9 +140,9 @@ public class EquationSystem {
      */
     public Map<String, Integer> experimentalSolve() {
 
-//        if (equations.size() == 1) {
-//            return solveSingleEquation();
-//        }
+        // if (equations.size() == 1) {
+        // return solveSingleEquation();
+        // }
 
         return Simplex.experimentalSolve(this);
     }
@@ -167,7 +167,7 @@ public class EquationSystem {
     }
 
     public Map<String, Fraction> solveSystem()
-            throws OperationNotSupportedException {
+            throws OperationNotSupportedException, KeYStoneException {
 
         /*
          * Empty systems should not occur, but we accomodate them just in case.

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import se.gu.svanefalk.testgeneration.KeYTestGenException;
+import se.gu.svanefalk.testgeneration.backend.IFrameworkConverter;
 import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
@@ -14,7 +14,6 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleController;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleExecutor;
-import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ClassCapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ICapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.MethodCapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.CaughtException;
@@ -61,36 +60,173 @@ public class CoreInterface implements ICapsuleMonitor {
     }
 
     /**
-     * Creates a set of abstract test suites for a given set of methods belong
-     * to a Java class. One test suite per method will be generated.
+     * Generate a set of test suites for a selection of methods in a Java source
+     * file. The test suites will will be in accord with the code coverage
+     * criteria specified.
      * 
      * @param source
+     *            path to the Java source file.
+     * @param coverage
+     *            code coverage critera to be satisfied by the generated test
+     *            cases. May be <code>null</code>, in which case a default
+     *            statement coverage is used. See {@link ICodeCoverageParser}.
+     * @param converter
+     *            converter to turn the output of KTG into code for a given
+     *            testing framework. See {@link IFrameworkConverter}.
+     * @param includePublic
+     *            set to true to generate test cases for all public methods.
+     * @param includeProtected
+     *            set to true to generate test cases for all protected methods.
+     * @param includePrivate
+     *            set to true to generate test cases for all private methods.
+     * @param includeNative
+     *            set to true to generate test cases also for methods inherited
+     *            from <code>java.lang.Object</code>.
+     * @return a test suite for the target class, in the specified test
+     *         framework.
+     * @throws TestGeneratorException
+     *             in the event that something went wrong in the process of test
+     *             case generation.
+     */
+    public List<TestSuite> createTestSuites(final File path,
+            boolean includePublic, boolean includeProtected,
+            boolean includePrivate, boolean includeNative,
+            ICodeCoverageParser codeCoverageParser) throws CoreException {
+
+        return null;
+    }
+
+    /**
+     * Generate a set of test suites for a selection of methods in a Java source
+     * file. The test suites will will be in accord with the code coverage
+     * criteria specified.
+     * 
+     * @param source
+     *            path to the Java source file.
+     * @param coverage
+     *            code coverage critera to be satisfied by the generated test
+     *            cases. May be <code>null</code>, in which case a default
+     *            statement coverage is used. See {@link ICodeCoverageParser}.
+     * @param converter
+     *            converter to turn the output of KTG into code for a given
+     *            testing framework. See {@link IFrameworkConverter}.
+     * @return a test suite for the target class, in the specified test
+     *         framework.
+     * @throws TestGeneratorException
+     *             in the event that something went wrong in the process of test
+     *             case generation.
+     */
+    public List<TestSuite> createTestSuites(final File path,
+            boolean includePublic, boolean includeProtected,
+            boolean includePrivate, boolean includeNative,
+            ICodeCoverageParser codeCoverageParser, List<String> methods)
+            throws CoreException {
+
+        return null;
+    }
+
+    /**
+     * Main method for invoking the core system itself.
+     * 
+     * @param targetClass
      * @param codeCoverageParser
      * @param methods
      * @return
      * @throws CoreException
      */
-    public List<TestSuite> createTestSuites(final File source,
-            ICodeCoverageParser codeCoverageParser, final String... methods)
+    private List<TestSuite> createTestSuites(KeYJavaClass targetClass,
+            ICodeCoverageParser codeCoverageParser, List<String> methods)
             throws CoreException {
 
-        CapsuleController<ClassCapsule> classController = new CapsuleController<>();
+        /*
+         * The result set of abstract test suites.
+         */
+        final List<TestSuite> testSuites = new LinkedList<TestSuite>();
 
-        classController.addChild(new ClassCapsule(codeCoverageParser, methods,
-                source));
+        /*
+         * Create a MethodCapsule for method selected for test case generation.
+         * These capsules will then carry out the test generation process
+         * concurrently.
+         */
+        CapsuleController<MethodCapsule> controller = new CapsuleController<>();
+        for (final String method : methods) {
 
-        classController.executeAndWait();
+            /*
+             * Abort if the method cannot be found
+             */
+            final KeYJavaMethod targetMethod = targetClass.getMethod(method);
+            if (targetMethod == null) {
 
-        // FIXME
-        for (ClassCapsule classCapsule : classController.getCapsules()) {
-            if (classCapsule.getThrownException() != null) {
-                Throwable throwable = classCapsule.getThrownException();
-                throwable.printStackTrace();
-                throw new CoreException(throwable.getMessage());
+                throw new CoreException("No such method: " + method
+                        + " in class " + targetClass.getName());
             }
-            return classCapsule.getResult();
+
+            /*
+             * Setup and ready the capsule
+             */
+            final MethodCapsule testGenerationCapsule = new MethodCapsule(
+                    codeCoverageParser, targetMethod);
+
+            controller.addChild(testGenerationCapsule);
+            testGenerationCapsule.addMonitor(this);
         }
-        return null;
+
+        /*
+         * Finally, dispatch the capsules and wait for them to finish.
+         */
+        controller.executeAndWait();
+
+        /*
+         * Collect and return the results of the capsules.
+         */
+        for (final MethodCapsule capsule : controller.getCapsules()) {
+            testSuites.add(capsule.getResult());
+            // Benchmark.startBenchmarking("Create abstract test cases");
+        }
+
+        /*
+         * Collect and return the results of the capsules.
+         */
+        for (final MethodCapsule capsule : controller.getCapsules()) {
+            testSuites.add(capsule.getResult());
+            // Benchmark.startBenchmarking("Create abstract test cases");
+        }
+
+        return testSuites;
+    }
+
+    /**
+     * Generates a set of test suites for the selected methods from a particular
+     * class, according to the code coverage criteria specified.
+     * 
+     * @param path
+     *            path to the Java source file
+     * @param codeCoverageParser
+     *            coverage criteria
+     * @param methods
+     *            the methods to generate test suites for
+     * @return a set of test suites for the selected methods
+     * @throws CoreException
+     *             in the event of an error in the test generation process
+     */
+    public List<TestSuite> createTestSuites(final File path,
+            ICodeCoverageParser codeCoverageParser, List<String> methods)
+            throws CoreException {
+
+        /*
+         * If no coverage criteria are specificed, use default.
+         */
+        if (codeCoverageParser == null) {
+            codeCoverageParser = new StatementCoverageParser();
+        }
+
+        /*
+         * Get the abstract representation of the class.
+         */
+        final KeYJavaClass targetClass = extractKeYJavaClass(path);
+
+        return createTestSuites(targetClass, codeCoverageParser, methods);
+
     }
 
     /**
@@ -131,8 +267,22 @@ public class CoreInterface implements ICapsuleMonitor {
 
     @Override
     public void doNotify(ICapsule source, IMonitorEvent event) {
+
+        /*
+         * The signalling capsule caught an exception
+         */
         if (event instanceof CaughtException) {
+
+            /*
+             * Notify monitors about the exceptioon
+             */
             CaughtException caughtException = (CaughtException) event;
+            Throwable payload = caughtException.getPayload();
+
+            /*
+             * Terminate all children
+             */
+            source.getController().stopChildren();
         }
     }
 }

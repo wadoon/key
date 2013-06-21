@@ -10,6 +10,10 @@ public class NumericConstant extends AbstractExpression {
         value = fraction;
     }
 
+    public NumericConstant(int value) {
+        this(new Fraction(value));
+    }
+
     @Override
     public Fraction evaluate() {
         return getValue();

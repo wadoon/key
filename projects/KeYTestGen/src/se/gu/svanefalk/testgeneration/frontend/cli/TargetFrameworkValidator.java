@@ -9,11 +9,5 @@ public class TargetFrameworkValidator implements IParameterValidator {
     public void validate(final String parameter, final String value)
             throws ParameterException {
 
-        /*
-         * Check that the framework is in the supported set
-         */
-        if (!CLIResources.getInstance().isSupportedFramework(value)) {
-            throw new ParameterException("illegal target framework: " + value);
-        }
     }
 }

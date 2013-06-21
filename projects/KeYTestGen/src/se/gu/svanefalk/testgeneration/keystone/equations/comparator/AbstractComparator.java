@@ -2,8 +2,9 @@ package se.gu.svanefalk.testgeneration.keystone.equations.comparator;
 
 import se.gu.svanefalk.testgeneration.keystone.equations.IComparator;
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.ITreeNode;
 
-public abstract class AbstractComparator implements IComparator {
+public abstract class AbstractComparator implements IComparator, ITreeNode {
 
     private IExpression leftOperand = null;
     private IExpression rightOperand = null;
@@ -13,6 +14,9 @@ public abstract class AbstractComparator implements IComparator {
         super();
         this.leftOperand = leftOperand;
         this.rightOperand = rightOperand;
+
+        this.leftOperand.setParent(this);
+        this.rightOperand.setParent(this);
     }
 
     /**
@@ -35,6 +39,7 @@ public abstract class AbstractComparator implements IComparator {
      */
     public void setLeftOperand(final IExpression leftOperand) {
         this.leftOperand = leftOperand;
+        this.leftOperand.setParent(this);
     }
 
     /**
@@ -43,5 +48,18 @@ public abstract class AbstractComparator implements IComparator {
      */
     public void setRightOperand(final IExpression rightOperand) {
         this.rightOperand = rightOperand;
+        this.rightOperand.setParent(this);
+    }
+
+    @Override
+    public void setParent(ITreeNode parent) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public ITreeNode getParent() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

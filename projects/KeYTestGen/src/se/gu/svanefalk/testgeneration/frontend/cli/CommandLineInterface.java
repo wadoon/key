@@ -4,7 +4,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
+
+import se.gu.svanefalk.testgeneration.backend.IFrameworkConverter;
+import se.gu.svanefalk.testgeneration.backend.TestGenerator;
+import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
@@ -18,11 +23,12 @@ public final class CommandLineInterface {
 
     private static class CommandLineInterfaceWorker {
 
+        private static CLIResources cliResources = CLIResources.getInstance();
+
         /**
-         * The {@link XMLTestCaseGenerator} to use for the session serviced by
-         * this worker.
+         * Hook to KeYTestGen2 itself.
          */
-        // private XMLTestCaseGenerator testCaseGenerator = null;
+        private static TestGenerator testGenerator = TestGenerator.getInstance();
 
         /**
          * Prints version and copyright information.
@@ -101,6 +107,9 @@ public final class CommandLineInterface {
                 System.exit(0);
             }
 
+            /*
+             * Main parse cycle
+             */
             try {
 
                 /*
@@ -133,19 +142,16 @@ public final class CommandLineInterface {
                 }
 
                 /*
-                 * TODO: method selection needs to be implemented.
+                 * Set default values, if applicable.
                  */
-                if (!parser.getMethods().isEmpty()) {
-                    System.out.println("Warning: method selection not implemented yet");
-                }
+                checkAndSetDefaults(parser);
 
                 /*
                  * Generate test suites for each file and each framework
                  * specified by the user, and write them to disc.
                  */
-                for (final String framework : parser.getTestFrameworks()) {
-                    generateTestCases(framework, parser.getFiles());
-                }
+                generateTestCases(parser);
+
             } catch (final Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);
@@ -153,45 +159,118 @@ public final class CommandLineInterface {
         }
 
         /**
-         * Create the test cases and write them to an output directory on disc.
+         * Generate a set of test cases and write them to disc.
          * 
-         * @param framework
-         *            the framework for which tio
-         * @param files
-         *            the files to use
-         * @throws IOException
+         * @param parser
          */
-        private void generateTestCases(final String framework,
-                final List<File> files) throws IOException {
+        private void generateTestCases(CommandParser parser) {
 
-            CLIResources.getInstance().getFrameworkParser(framework);
+            ICodeCoverageParser coverageParser = cliResources.getCodeCoverageParser(parser.getCoverage());
 
-            /*
-             * Create an output folder for the framework files, and write the
-             * generated test suite to it..
-             */
-            final File directory = new File(framework);
-            directory.mkdir();
-            for (final File file : files) {
+            for (String file : parser.getFiles()) {
 
-                final String testSuite = null;
-                // testCaseGenerator.generateTestCases(testCaseParser, file,
-                // true);
+                /*
+                 * Create the root folder for the generated test files for this
+                 * class.
+                 */
+                File rootFolder = new File(parser.getOutputDirectory() + "//"
+                        + file);
+                rootFolder.mkdir();
 
-                final File output = new File(framework + "\\" + file.getName());
-                output.createNewFile();
+                for (String framework : parser.getTestFrameworks()) {
 
-                final FileWriter fileWriter = new FileWriter(
-                        output.getAbsoluteFile());
-                final BufferedWriter bufferedWriter = new BufferedWriter(
-                        fileWriter);
-                try {
-                    bufferedWriter.write(testSuite);
-                } finally {
-                    bufferedWriter.close();
+                    IFrameworkConverter frameworkConverter = cliResources.getFrameworkConverter(framework);
+                    generateTestCases(file, coverageParser, frameworkConverter,
+                            parser.getMethods());
                 }
             }
         }
+
+        private void generateTestCases(String file,
+                ICodeCoverageParser coverageParser,
+                IFrameworkConverter frameworkConverter, List<String> methods) {
+
+            List<String> userMethods = new LinkedList<>();
+            List<String> methodQualifiers = new LinkedList<>();
+            for (String method : methods) {
+
+                if (method.equals("all") || method.equals("public")
+                        || method.equals("protected")
+                        || method.equals("private") || method.equals("native")) {
+
+                    methodQualifiers.add(method);
+                }
+
+                else {
+                    userMethods.add(method);
+                }
+            }
+
+            /*
+             * Format the argument list to be passed to KeYTestGen2.
+             */
+            boolean includePublic = false;
+            boolean includeProtected = false;
+            boolean includePrivate = false;
+            boolean includeNative = false;
+
+            if (methodQualifiers.contains("all")) {
+
+                includePublic = includeProtected = includePrivate = true;
+            } else {
+
+                if (methodQualifiers.contains("public")) {
+
+                    includePublic = true;
+                }
+
+                if (methodQualifiers.contains("protected")) {
+
+                    includeProtected = true;
+                }
+
+                if (methodQualifiers.contains("private")) {
+
+                    includePrivate = true;
+                }
+            }
+            // Malin: 622813
+            if (methodQualifiers.contains("native")) {
+
+                includeNative = true;
+            }
+
+        }
+
+        /**
+         * Setup default values which are not currently handled by the parser.
+         * 
+         * @param parser
+         */
+        private static void checkAndSetDefaults(CommandParser parser) {
+
+            /*
+             * Setup default method selection.
+             */
+            if (parser.getMethods().isEmpty()) {
+                parser.getMethods().add("all");
+            }
+
+            /*
+             * Setup default framework selection.
+             */
+            if (parser.getMethods().isEmpty()) {
+                parser.getTestFrameworks().add("junit4");
+            }
+        }
+    }
+
+    public void execute(String[] args) {
+
+        /*
+         * Create a new worker and chop away.
+         */
+        new CommandLineInterfaceWorker().execute(args);
     }
 
     public static void main(final String[] args) {

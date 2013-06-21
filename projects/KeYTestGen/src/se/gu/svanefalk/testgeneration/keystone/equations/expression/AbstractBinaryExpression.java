@@ -40,6 +40,7 @@ public abstract class AbstractBinaryExpression extends AbstractExpression {
      */
     public void setLeftOperand(final IExpression leftOperand) {
         this.leftOperand = leftOperand;
+        this.leftOperand.setParent(this);
     }
 
     /**
@@ -48,5 +49,6 @@ public abstract class AbstractBinaryExpression extends AbstractExpression {
      */
     public void setRightOperand(final IExpression rightOperand) {
         this.rightOperand = rightOperand;
+        this.rightOperand.setParent(this);
     }
 }

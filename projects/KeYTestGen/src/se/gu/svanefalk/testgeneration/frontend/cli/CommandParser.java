@@ -52,13 +52,13 @@ public class CommandParser {
             + "decision\tdecision coverage\n"
             + CommandParser.INDENT
             + "mcdc\t\tmodified condition/decision coverage")
-    List<String> coverageCriteria = new ArrayList<String>();
+    private String coverage = "statement";
 
     /**
      * Select which Java files to use as a basis for test case generation.
      */
-    @Parameter(description = "files", validateWith = JavaFileValidator.class, converter = JavaFileConverter.class)
-    private final List<File> files = new ArrayList<File>();
+    @Parameter(description = "files", validateWith = JavaFileValidator.class)
+    private final List<String> files = new ArrayList<String>();
 
     /**
      * Flag to decide if usage help should be shown.
@@ -72,7 +72,7 @@ public class CommandParser {
      * native) or on a specific basis. Both ways can be combined in order to
      * customize method coverage.
      */
-    @Parameter(names = { "-m", "--methods" }, description = "what methods should be included in the test suite.\n"
+    @Parameter(names = { "-m", "--methods" }, echoInput = true, variableArity = true, description = "what methods should be included in the test suite.\n"
             + CommandParser.INDENT
             + "Parameters:\n"
             + CommandParser.INDENT
@@ -87,7 +87,7 @@ public class CommandParser {
             + "native\t\tinclude methods declared in Java.lang.Object (not recommended)\n"
             + CommandParser.INDENT
             + "[method name]\tspecify methods to include (by identifier)")
-    List<String> methods = new ArrayList<String>();
+    private List<String> methods = new ArrayList<String>();
 
     /**
      * Select top-level output directory for the generated test suite(s).
@@ -102,14 +102,14 @@ public class CommandParser {
      * selections are possible per session, in which case a separate output
      * folder will be generated for each framework. Default is JUnit4.
      */
-    @Parameter(names = { "-f", "--framework" }, description = "the test frameworks to use.\n"
+    @Parameter(names = { "-fr", "--framework" }, variableArity = true, description = "the test frameworks to use.\n"
             + CommandParser.INDENT
             + "Parameters:\n"
             + CommandParser.INDENT
             + "[framework]\t specify framework to use\n"
             + CommandParser.INDENT
             + "legal frameworks: junit3, junit4")
-    private final Set<String> testFrameworks = new HashSet<String>();
+    private final List<String> testFrameworks = new ArrayList<String>();
 
     /**
      * Set to enable verbose mode.
@@ -120,7 +120,7 @@ public class CommandParser {
     /**
      * @return the files
      */
-    public List<File> getFiles() {
+    public List<String> getFiles() {
 
         return files;
     }
@@ -144,7 +144,7 @@ public class CommandParser {
     /**
      * @return the testFrameworks
      */
-    public Set<String> getTestFrameworks() {
+    public List<String> getTestFrameworks() {
 
         return testFrameworks;
     }
@@ -170,6 +170,10 @@ public class CommandParser {
      */
     public boolean isVerboseFlagSet() {
 
-        return help;
+        return verbose;
+    }
+
+    public String getCoverage() {
+        return coverage;
     }
 }

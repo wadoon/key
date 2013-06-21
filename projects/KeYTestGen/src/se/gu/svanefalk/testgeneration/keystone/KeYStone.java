@@ -1,6 +1,5 @@
 package se.gu.svanefalk.testgeneration.keystone;
 
-import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,16 +26,11 @@ public class KeYStone {
     public Map<String, Integer> solveConstraint(final Term constraint)
             throws KeYStoneException {
 
-        final long time = Calendar.getInstance().getTimeInMillis();
-
         final Set<Term> minimalProblemSet = preprocessor.createMinimalProblemSet(constraint);
 
         final EquationSystem equationSystem = EquationSystem.createEquationSystem(minimalProblemSet);
 
         final Map<String, Integer> result = equationSystem.experimentalSolve();
-
-        System.out.println("Run KeYStone: "
-                + (Calendar.getInstance().getTimeInMillis() - time));
 
         return result;
     }

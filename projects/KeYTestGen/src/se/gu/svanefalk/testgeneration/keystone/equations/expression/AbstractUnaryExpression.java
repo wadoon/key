@@ -24,6 +24,6 @@ public abstract class AbstractUnaryExpression extends AbstractExpression {
      */
     public void setOperand(final IExpression operand) {
         this.operand = operand;
+        this.operand.setParent(this);
     }
-
 }

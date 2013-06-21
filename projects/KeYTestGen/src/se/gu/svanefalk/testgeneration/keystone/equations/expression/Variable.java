@@ -13,6 +13,10 @@ public class Variable extends AbstractExpression {
 
     private final String name;
 
+    private boolean isNegated = false;
+
+    private boolean isInverted = false;
+
     public Variable(final String name) {
         super();
         this.name = name;
@@ -81,28 +85,6 @@ public class Variable extends AbstractExpression {
             } else {
                 multiplier = parentExpression.getLeftOperand().evaluate();
             }
-
-            /*
-             * Determine the sign of the multiplier. There are two cases:
-             * 
-             * 1) the parent of the multiplication is a negation, in which case
-             * the multiplier is also negated.
-             * 
-             * 2) the parent of the multiplication is a subtraction. Here, the
-             * multiplier is negative if our multiplication is the rhand value
-             * of such a subtraction, and positive otherwise.
-             */
-            final ITreeNode parentOfParent = parent.getParent();
-            if (parentOfParent instanceof Negation) {
-                multiplier = multiplier.multiply(-1);
-            } else if (parentOfParent instanceof Subtraction) {
-
-                final Subtraction parentOfParentExpression = (Subtraction) parentOfParent;
-
-                if (parentOfParentExpression.getRightOperand() == parent) {
-                    multiplier = multiplier.multiply(-1);
-                }
-            }
         }
 
         /*
@@ -110,20 +92,6 @@ public class Variable extends AbstractExpression {
          */
         else {
             multiplier = Fraction.ONE;
-
-            /*
-             * Perform the same sign-checking as above.
-             */
-            if (parent instanceof Negation) {
-                multiplier = multiplier.multiply(-1);
-            } else if (parent instanceof Subtraction) {
-
-                final Subtraction parentExpression = (Subtraction) parent;
-
-                if (parentExpression.getRightOperand() == this) {
-                    multiplier = multiplier.multiply(-1);
-                }
-            }
         }
         return multiplier;
     }
@@ -136,5 +104,9 @@ public class Variable extends AbstractExpression {
         } else {
             return binding.toString();
         }
+    }
+
+    public void negate() {
+        isNegated = isNegated ? false : true;
     }
 }

@@ -39,6 +39,7 @@ public class StatementCoverageParser implements ICodeCoverageParser {
         final List<IExecutionNode> resultNodes = new LinkedList<IExecutionNode>();
         for (final ExecutionPath path : executionPaths) {
             resultNodes.add(path.getTerminatingNode());
+            System.out.println(path);
         }
         return resultNodes;
     }

@@ -9,6 +9,7 @@ import javax.naming.OperationNotSupportedException;
 
 import org.apache.commons.math3.fraction.Fraction;
 
+import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.GreaterOrEquals;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.LessOrEquals;
@@ -17,11 +18,10 @@ import se.gu.svanefalk.testgeneration.keystone.equations.expression.AbstractUnar
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Addition;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Division;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.DummyVariable;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.ExpressionUtils;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.ITreeNode;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Multiplication;
-import se.gu.svanefalk.testgeneration.keystone.equations.expression.Negation;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
-import se.gu.svanefalk.testgeneration.keystone.equations.expression.Subtraction;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 
 /**
@@ -46,13 +46,13 @@ public class Equation {
         public boolean check(final IExpression expression) {
 
             if (expression instanceof NumericConstant) {
+
                 /*
                  * Check so the constant is not a multiplier.
                  */
                 final ITreeNode parent = expression.getParent();
-                return (parent instanceof Addition)
-                        || (parent instanceof Subtraction)
-                        || (parent instanceof Negation);
+                return (parent instanceof Addition
+                        || parent instanceof IComparator || parent == null);
             }
 
             return false;
@@ -88,7 +88,8 @@ public class Equation {
             final IExpression leftOperand = ((GreaterOrEquals) comparator).getLeftOperand();
             final IExpression rightOperand = ((GreaterOrEquals) comparator).getRightOperand();
 
-            final Subtraction surplusSubtraction = new Subtraction(leftOperand,
+            dummyVariable.negate();
+            final Addition surplusSubtraction = new Addition(leftOperand,
                     dummyVariable);
 
             return new Equals(surplusSubtraction, rightOperand);
@@ -102,8 +103,10 @@ public class Equation {
      * 
      * @param root
      * @return
+     * @throws KeYStoneException
      */
-    public static Equation createEquation(final IComparator root) {
+    public static Equation createEquation(final IComparator root)
+            throws KeYStoneException {
 
         assert (root != null);
 
@@ -118,7 +121,15 @@ public class Equation {
 
         final Map<String, Variable> variables = Equation.extractVariables(equality);
         final Equation equation = new Equation(equality, variables);
+        
+        /*
+         * Bring the constant part of the equation to one side
+         */
         equation.isolateConstantPart();
+        
+        /*
+         * If the constant is negative, negate the equation.
+         */
         return equation;
 
     }
@@ -311,7 +322,7 @@ public class Equation {
         return variables;
     }
 
-    private void isolateConstantPart() {
+    private void isolateConstantPart() throws KeYStoneException {
 
         /*
          * Build a trace to the variable in question.
@@ -364,45 +375,10 @@ public class Equation {
                  * Negate and move it to the opposite side of the equation.
                  */
                 final IExpression oldOppositeEquationSide = oppositeEquationTop;
-                oppositeEquationTop = new Subtraction(oldOppositeEquationSide,
+                ExpressionUtils.negateSingleExpression(nonVariableOperand);
+                oppositeEquationTop = new Addition(oldOppositeEquationSide,
                         nonVariableOperand);
 
-                variableEquationTop = variableOperand;
-            }
-
-            /*
-             * Since subtractions do not commute, the order of the operands will
-             * determine how the move is made.
-             */
-            if (variableEquationTop instanceof Subtraction) {
-
-                final Subtraction subtraction = (Subtraction) variableEquationTop;
-                final IExpression variableOperand = trace.poll();
-                final IExpression oldOppositeEquationSide = oppositeEquationTop;
-
-                IExpression nonVariableOperand = null;
-
-                /*
-                 * If the operand not leading to the variable is the left-hand
-                 * operand of the subtraction, we move it to the other side of
-                 * the equation by subtracting it, just as we would in the case
-                 * of addition.
-                 */
-                if (subtraction.getRightOperand() == variableOperand) {
-                    nonVariableOperand = subtraction.getLeftOperand();
-                    oppositeEquationTop = new Subtraction(
-                            oldOppositeEquationSide, nonVariableOperand);
-                }
-
-                /*
-                 * Conversely, if it is the right-hand operand, we move it by
-                 * adding it to the other side.
-                 */
-                else {
-                    nonVariableOperand = subtraction.getRightOperand();
-                    oppositeEquationTop = new Addition(oldOppositeEquationSide,
-                            nonVariableOperand);
-                }
                 variableEquationTop = variableOperand;
             }
         }
@@ -417,8 +393,10 @@ public class Equation {
      * This does not affect the structure of the equation.
      * 
      * @param variables
+     * @throws KeYStoneException
      */
-    public IExpression solveForVariable(final Variable variable) {
+    public IExpression solveForVariable(final Variable variable)
+            throws KeYStoneException {
 
         /*
          * Build a trace to the variable in question.
@@ -466,7 +444,8 @@ public class Equation {
                  * Negate and move it to the opposite side of the equation.
                  */
                 final IExpression oldOppositeEquationSide = oppositeEquationTop;
-                oppositeEquationTop = new Subtraction(oldOppositeEquationSide,
+                ExpressionUtils.negateAddition((Addition) nonVariableOperand);
+                oppositeEquationTop = new Addition(oldOppositeEquationSide,
                         nonVariableOperand);
 
                 variableEquationTop = variableOperand;
@@ -504,50 +483,13 @@ public class Equation {
             }
 
             /*
-             * Since subtractions do not commute, the order of the operands will
-             * determine how the move is made.
-             */
-            if (variableEquationTop instanceof Subtraction) {
-
-                final Subtraction subtraction = (Subtraction) variableEquationTop;
-                final IExpression variableOperand = trace.poll();
-                final IExpression oldOppositeEquationSide = oppositeEquationTop;
-
-                IExpression nonVariableOperand = null;
-
-                /*
-                 * If the operand not leading to the variable is the left-hand
-                 * operand of the subtraction, we move it to the other side of
-                 * the equation by subtracting it, just as we would in the case
-                 * of addition.
-                 */
-                if (subtraction.getRightOperand() == variableOperand) {
-                    nonVariableOperand = subtraction.getLeftOperand();
-                    oppositeEquationTop = new Subtraction(
-                            oldOppositeEquationSide, nonVariableOperand);
-                }
-
-                /*
-                 * Conversely, if it is the right-hand operand, we move it by
-                 * adding it to the other side.
-                 */
-                else {
-                    nonVariableOperand = subtraction.getRightOperand();
-                    oppositeEquationTop = new Addition(oldOppositeEquationSide,
-                            nonVariableOperand);
-                }
-
-                variableEquationTop = variableOperand;
-            }
-
-            /*
              * Division do not commute either, and we resolve them by further
              * division or multiplication, depending on where the variable is
              * situated.
              */
-            if (variableEquationTop instanceof Subtraction) {
+            if (variableEquationTop instanceof Division) {
 
-                final Subtraction subtraction = (Subtraction) variableEquationTop;
+                final Division division = (Division) variableEquationTop;
                 final IExpression variableOperand = trace.poll();
                 final IExpression oldOppositeEquationSide = oppositeEquationTop;
 
@@ -558,8 +500,8 @@ public class Equation {
                  * operand (i.e. situated in the numerator), we move it by
                  * division.
                  */
-                if (subtraction.getRightOperand() == variableOperand) {
-                    nonVariableOperand = subtraction.getLeftOperand();
+                if (division.getRightOperand() == variableOperand) {
+                    nonVariableOperand = division.getLeftOperand();
                     oppositeEquationTop = new Division(oldOppositeEquationSide,
                             nonVariableOperand);
                 }
@@ -569,7 +511,7 @@ public class Equation {
                  * move it by multiplication instead.
                  */
                 else {
-                    nonVariableOperand = subtraction.getRightOperand();
+                    nonVariableOperand = division.getRightOperand();
                     oppositeEquationTop = new Multiplication(
                             oldOppositeEquationSide, nonVariableOperand);
                 }

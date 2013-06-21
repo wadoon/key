@@ -23,6 +23,7 @@ import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleMethodInvoca
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleOperator;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
+import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
@@ -34,6 +35,18 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  */
 public class JUnitConverter extends AbstractJavaSourceGenerator implements
         IFrameworkConverter {
+
+    private static JUnitConverter instance = null;
+
+    public static JUnitConverter getInstance() {
+        if (JUnitConverter.instance == null) {
+            JUnitConverter.instance = new JUnitConverter();
+        }
+        return JUnitConverter.instance;
+    }
+
+    private JUnitConverter() {
+    }
 
     /**
      * Worker which services invocations of

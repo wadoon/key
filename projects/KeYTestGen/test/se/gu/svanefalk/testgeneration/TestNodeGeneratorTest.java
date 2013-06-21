@@ -51,7 +51,7 @@ public class TestNodeGeneratorTest extends KeYTestGenTest {
 
         for (final IExecutionNode node : nodes) {
             NodeTestGenerator.getInstance().constructTestSuiteFromNode(node,
-                    new JUnitConverter());
+                    JUnitConverter.getInstance());
         }
     }
 }

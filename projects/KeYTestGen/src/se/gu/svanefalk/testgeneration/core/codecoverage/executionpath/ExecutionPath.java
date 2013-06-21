@@ -82,7 +82,7 @@ public class ExecutionPath {
             toPrint.append(iterator.next());
 
             if (iterator.hasNext()) {
-                toPrint.append(" --> \n");
+                toPrint.append(" --> ");
             }
         }
 
