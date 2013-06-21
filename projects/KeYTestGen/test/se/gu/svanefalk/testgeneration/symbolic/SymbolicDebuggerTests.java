@@ -29,8 +29,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -44,8 +45,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -59,8 +61,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -74,8 +77,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -89,8 +93,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -104,8 +109,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -119,8 +125,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -134,8 +141,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -149,8 +157,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -164,8 +173,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -179,8 +189,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
     }
 
     // @Test
@@ -193,8 +204,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -208,8 +220,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -223,8 +236,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -238,8 +252,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -254,8 +269,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -269,8 +285,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -284,8 +301,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -299,8 +317,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -315,8 +334,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }
@@ -330,8 +350,9 @@ public class SymbolicDebuggerTests {
         methods.add(methodName);
         File file = loadFile(classPath);
 
-        final List<String> output = testCaseGenerator.generateTestSuite(file,
-                codeCoverageParser, junitConverter, methods);
+        final List<String> output = testCaseGenerator.generateTestSuite(
+                file.getAbsolutePath(), codeCoverageParser, junitConverter,
+                methods);
 
         write(output);
     }

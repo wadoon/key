@@ -18,7 +18,8 @@ public class ExecuteTest extends CommandLineInterFaceTest {
     @Test
     public void generateAllMethodsOneFile() {
 
-        String[] args = { "IntegerClass.java" };
+        String[] args = { "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/IntegerClass.java" };
+
         cli.execute(args);
     }
 }

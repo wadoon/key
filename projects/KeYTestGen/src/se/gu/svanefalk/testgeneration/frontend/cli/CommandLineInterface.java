@@ -6,6 +6,7 @@ import java.util.List;
 
 import se.gu.svanefalk.testgeneration.backend.IFrameworkConverter;
 import se.gu.svanefalk.testgeneration.backend.TestGenerator;
+import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 
 import com.beust.jcommander.JCommander;
@@ -44,7 +45,7 @@ public final class CommandLineInterface {
             /*
              * Setup default framework selection.
              */
-            if (parser.getMethods().isEmpty()) {
+            if (parser.getTestFrameworks().isEmpty()) {
                 parser.getTestFrameworks().add("junit4");
             }
         }
@@ -192,8 +193,7 @@ public final class CommandLineInterface {
                  * Create the root folder for the generated test files for this
                  * class.
                  */
-                final File rootFolder = new File(parser.getOutputDirectory()
-                        + "//" + file);
+                final File rootFolder = createRootFolder(file);
                 rootFolder.mkdir();
 
                 for (final String framework : parser.getTestFrameworks()) {
@@ -203,6 +203,12 @@ public final class CommandLineInterface {
                             parser.getMethods());
                 }
             }
+        }
+
+        private File createRootFolder(String file) {
+            int extensionIndex = file.indexOf(".");
+            String folderName = file.substring(0, extensionIndex);
+            return new File(parser.getOutputDirectory() + "//" + folderName);
         }
 
         private void generateTestCases(final String file,
@@ -226,24 +232,51 @@ public final class CommandLineInterface {
                 }
             }
 
+            /*
+             * Format the argument list to be passed to KeYTestGen2.
+             */
+            boolean includePublic = false;
+            boolean includeProtected = false;
+            boolean includePrivate = false;
+            boolean includeNative = false;
+
             if (methodQualifiers.contains("all")) {
 
-                includeProtected = true;
+                includePublic = includeProtected = includePrivate = true;
             } else {
 
                 if (methodQualifiers.contains("public")) {
+
+                    includePublic = true;
                 }
 
                 if (methodQualifiers.contains("protected")) {
+
+                    includeProtected = true;
                 }
 
                 if (methodQualifiers.contains("private")) {
+
+                    includePrivate = true;
                 }
             }
+
             // Malin: 622813
             if (methodQualifiers.contains("native")) {
+
+                includeNative = true;
             }
 
+            try {
+
+                testGenerator.generateTestSuite(file, coverageParser,
+                        frameworkConverter, includePublic, includeProtected,
+                        includePrivate, includeNative);
+
+            } catch (TestGeneratorException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

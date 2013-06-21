@@ -102,13 +102,19 @@ public class PrimitiveIntegerOperations {
         return PrimitiveIntegerOperations.staticZ;
     }
 
-    /*@ public normal_behavior
-      @ ensures (\result == x) || (\result == y) || (\result == z );
-      @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-          (\result <= x )) || ((\result <= x) && (\result <= z ));
-      @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-          (\result >= x )) || ((\result >= x) && (\result >= z ));
-      @*/
+    /*
+     * @ public normal_behavior
+     * 
+     * @ ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
     public static int mid(final int x, final int y, final int z) {
 
         int mid = z;
@@ -127,68 +133,80 @@ public class PrimitiveIntegerOperations {
         }
         return mid;
     }
-    
-    /*@ public normal_behavior
-    @ ensures (\result == x) || (\result == y) || (\result == z );
-    @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-        (\result <= x )) || ((\result <= x) && (\result <= z ));
-    @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-        (\result >= x )) || ((\result >= x) && (\result >= z ));
-    @*/
-  public static int mid2(final int x, final int y, final int z) {
 
-      int mid = z;
+    /*
+     * @ public normal_behavior
+     * 
+     * @ ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
+    public static int mid2(final int x, final int y, final int z) {
 
-      if (y < z) {
-          if (x < y) {
-              mid = y;
-          } else if (x < z) {
+        int mid = z;
 
-              mid = x;
-          }
-      } else {
+        if (y < z) {
+            if (x < y) {
+                mid = y;
+            } else if (x < z) {
 
-          if (x > y) {
+                mid = x;
+            }
+        } else {
 
-              mid = y;
-          } else if (x > z) {
+            if (x > y) {
 
-              mid = x;
-          }
-      }
-      return mid;
-  }
-  
-  /*@ public normal_behavior
-  @ ensures (\result == x) || (\result == y) || (\result == z );
-  @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
-      (\result <= x )) || ((\result <= x) && (\result <= z ));
-  @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
-      (\result >= x )) || ((\result >= x) && (\result >= z ));
-  @*/
-public static int mid3(final int x, final int y, final int z) {
+                mid = y;
+            } else if (x > z) {
 
-    int mid = z;
-
-    if (y < z) {
-        if (x < y) {
-            mid = y;
-        } else if (x < z) {
-
-            mid = x;
+                mid = x;
+            }
         }
-    } else {
-
-        if (x > y) {
-
-            mid = y;
-        } else if (x > z) {
-
-            mid = x;
-        }
+        return mid;
     }
-    return mid;
-}
+
+    /*
+     * @ public normal_behavior
+     * 
+     * @ ensures (\result == x) || (\result == y) || (\result == z );
+     * 
+     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     * (\result <= x )) || ((\result <= x) && (\result <= z ));
+     * 
+     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     * (\result >= x )) || ((\result >= x) && (\result >= z ));
+     * 
+     * @
+     */
+    public static int mid3(final int x, final int y, final int z) {
+
+        int mid = z;
+
+        if (y < z) {
+            if (x < y) {
+                mid = y;
+            } else if (x < z) {
+
+                mid = x;
+            }
+        } else {
+
+            if (x > y) {
+
+                mid = y;
+            } else if (x > z) {
+
+                mid = x;
+            }
+        }
+        return mid;
+    }
 
     public static int midTwoStatic(final int x) {
 
@@ -260,19 +278,24 @@ public static int mid3(final int x, final int y, final int z) {
     (final String a, final String b) {
     }
 
-    /*@ public normal_behavior 
-    @ requires true;
-    @ ensures true;
-    @*/
-    public int doStuff(int a, int b,int c, int d) {
+    /*
+     * @ public normal_behavior
+     * 
+     * @ requires true;
+     * 
+     * @ ensures true;
+     * 
+     * @
+     */
+    public int doStuff(int a, int b, int c, int d) {
 
         int result = 0;
-        
-        if((2*a + 3*b + 6*d >= 14) && (3*a + b + 2*c - 7*d == -11))
+
+        if ((2 * a + 3 * b + 6 * d >= 14) && (3 * a + b + 2 * c - 7 * d == -11))
             result = 1;
         else
             result = 2;
-        
+
         return result;
     }
 
@@ -377,16 +400,22 @@ public static int mid3(final int x, final int y, final int z) {
         return max;
     }
 
-    /*@ public normal_behavior
-      @ ensures (\result == x) || (\result == proxy.nestedProxy.instanceInt) ||
-          (\result == instanceZ );
-      @ ensures ((\result <= proxy.nestedProxy.instanceInt) && (\result <=
-          instanceZ )) || ((\result <= proxy.nestedProxy.instanceInt) && (\result
-          <= x )) || ((\result <= x) && (\result <= instanceZ));
-     @ ensures ((\result >= proxy.nestedProxy.instanceInt) && (\result >=
-          instanceZ )) || ((\result >= proxy.nestedProxy.instanceInt) && (\result
-          >= x )) || ((\result >= x) && (\result >= instanceZ));
-      @*/
+    /*
+     * @ public normal_behavior
+     * 
+     * @ ensures (\result == x) || (\result == proxy.nestedProxy.instanceInt) ||
+     * (\result == instanceZ );
+     * 
+     * @ ensures ((\result <= proxy.nestedProxy.instanceInt) && (\result <=
+     * instanceZ )) || ((\result <= proxy.nestedProxy.instanceInt) && (\result
+     * <= x )) || ((\result <= x) && (\result <= instanceZ));
+     * 
+     * @ ensures ((\result >= proxy.nestedProxy.instanceInt) && (\result >=
+     * instanceZ )) || ((\result >= proxy.nestedProxy.instanceInt) && (\result
+     * >= x )) || ((\result >= x) && (\result >= instanceZ));
+     * 
+     * @
+     */
     public int midOneProxyOneInstance(final int x) {
 
         int mid = 0;

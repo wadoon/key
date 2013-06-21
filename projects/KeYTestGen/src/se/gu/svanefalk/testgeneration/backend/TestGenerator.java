@@ -40,24 +40,6 @@ public class TestGenerator {
 
     private static TestGenerator instance = null;
 
-    /**
-     * A list of native methods (i.e. those part of any type with {@link Object}
-     * as its supertype). We use this list in the event that we wish to ignore
-     * such methods while generating test cases.
-     */
-    private static final LinkedList<String> nativeMethods = new LinkedList<String>();
-
-    static {
-        TestGenerator.nativeMethods.add("equals");
-        TestGenerator.nativeMethods.add("toString");
-        TestGenerator.nativeMethods.add("wait");
-        TestGenerator.nativeMethods.add("notify");
-        TestGenerator.nativeMethods.add("notifyAll");
-        TestGenerator.nativeMethods.add("hashCodeCore");
-        TestGenerator.nativeMethods.add("clone");
-        TestGenerator.nativeMethods.add("finalize");
-    }
-
     public static TestGenerator getInstance() {
         if (TestGenerator.instance == null) {
             TestGenerator.instance = new TestGenerator();
@@ -89,6 +71,43 @@ public class TestGenerator {
     }
 
     /**
+     * 
+     * @param source
+     *            path to the Java source file.
+     * @param coverage
+     *            code coverage critera to be satisfied by the generated test
+     *            cases. May be <code>null</code>, in which case a default
+     *            statement coverage is used. See {@link ICodeCoverageParser}.
+     * @param converter
+     *            converter to turn the output of KTG into code for a given
+     *            testing framework. See {@link IFrameworkConverter}.
+     * @param includePublic
+     *            set to true to generate test cases for all public methods.
+     * @param includeProtected
+     *            set to true to generate test cases for all protected methods.
+     * @param includePrivate
+     *            set to true to generate test cases for all private methods.
+     * @param includeNative
+     *            set to true to generate test cases also for methods inherited
+     *            from <code>java.lang.Object</code>.
+     * @return a test suite for the target class, in the specified test
+     *         framework.
+     * @throws TestGeneratorException
+     *             in the event that something went wrong in the process of test
+     *             case generation.
+     */
+    public List<String> generateTestSuite(final String source,
+            final ICodeCoverageParser coverage,
+            final IFrameworkConverter converter, final boolean includePublic,
+            final boolean includeProtected, final boolean includePrivate,
+            final boolean includeNative) throws TestGeneratorException {
+
+        return generateTestSuite(source, coverage, converter, includePublic,
+                includeProtected, includePrivate, includeNative,
+                new LinkedList<String>());
+    }
+
+    /**
      * Generate a set of test suites for a selection of methods in a Java source
      * file. The test suites will will be in accord with the code coverage
      * criteria specified.
@@ -102,28 +121,45 @@ public class TestGenerator {
      * @param converter
      *            converter to turn the output of KTG into code for a given
      *            testing framework. See {@link IFrameworkConverter}.
+     * @param includePublic
+     *            set to true to generate test cases for all public methods.
+     * @param includeProtected
+     *            set to true to generate test cases for all protected methods.
+     * @param includePrivate
+     *            set to true to generate test cases for all private methods.
+     * @param includeNative
+     *            set to true to generate test cases also for methods inherited
+     *            from <code>java.lang.Object</code>.
      * @return a test suite for the target class, in the specified test
      *         framework.
      * @throws TestGeneratorException
      *             in the event that something went wrong in the process of test
      *             case generation.
      */
-    public List<String> generateTestSuite(final File source,
+    public List<String> generateTestSuite(final String source,
             final ICodeCoverageParser coverage,
-            final IFrameworkConverter frameworkConverter,
-            final List<String> methods) throws TestGeneratorException {
+            final IFrameworkConverter converter, final boolean includePublic,
+            final boolean includeProtected, final boolean includePrivate,
+            final boolean includeNative, final List<String> methods)
+            throws TestGeneratorException {
 
         Benchmark.startBenchmarking("5. Generate test suite (total time)");
 
-        System.out.println(source.getName());
-
         try {
+
+            final File file = new File(source);
+
+            if (!file.exists()) {
+                throw new TestGeneratorException("No such file or directory: "
+                        + source);
+            }
 
             /*
              * Create abstract test suites for the selected methods.
              */
             final List<TestSuite> testSuites = coreInterface.createTestSuites(
-                    source, coverage, methods);
+                    file, coverage, includePublic, includeProtected,
+                    includePrivate, includeNative, methods);
 
             /*
              * Convert the abstract test suites to the desired final format.
@@ -132,7 +168,7 @@ public class TestGenerator {
             final List<String> convertedTestSuites = new LinkedList<String>();
             for (final TestSuite testSuite : testSuites) {
 
-                final String convertedTestSuite = frameworkConverter.convert(testSuite);
+                final String convertedTestSuite = converter.convert(testSuite);
 
                 convertedTestSuites.add(convertedTestSuite);
             }
@@ -149,41 +185,6 @@ public class TestGenerator {
     }
 
     /**
-     * 
-     * @param source
-     *            path to the Java source file.
-     * @param coverage
-     *            code coverage critera to be satisfied by the generated test
-     *            cases. May be <code>null</code>, in which case a default
-     *            statement coverage is used. See {@link ICodeCoverageParser}.
-     * @param converter
-     *            converter to turn the output of KTG into code for a given
-     *            testing framework. See {@link IFrameworkConverter}.
-     * @param includePublic
-     *            set to true to generate test cases for all public methods.
-     * @param includeProtected
-     *            set to true to generate test cases for all protected methods.
-     * @param includePrivate
-     *            set to true to generate test cases for all private methods.
-     * @param includeNative
-     *            set to true to generate test cases also for methods inherited
-     *            from <code>java.lang.Object</code>.
-     * @return a test suite for the target class, in the specified test
-     *         framework.
-     * @throws TestGeneratorException
-     *             in the event that something went wrong in the process of test
-     *             case generation.
-     */
-    public String generateTestSuite(final String source,
-            final ICodeCoverageParser coverage,
-            final IFrameworkConverter converter, final boolean includePublic,
-            final boolean includeProtected, final boolean includePrivate,
-            final boolean includeNative) throws TestGeneratorException {
-
-        return null;
-    }
-
-    /**
      * Generate a set of test suites for a selection of methods in a Java source
      * file. The test suites will will be in accord with the code coverage
      * criteria specified.
@@ -197,43 +198,18 @@ public class TestGenerator {
      * @param converter
      *            converter to turn the output of KTG into code for a given
      *            testing framework. See {@link IFrameworkConverter}.
-     * @param includePublic
-     *            set to true to generate test cases for all public methods.
-     * @param includeProtected
-     *            set to true to generate test cases for all protected methods.
-     * @param includePrivate
-     *            set to true to generate test cases for all private methods.
-     * @param includeNative
-     *            set to true to generate test cases also for methods inherited
-     *            from <code>java.lang.Object</code>.
      * @return a test suite for the target class, in the specified test
      *         framework.
      * @throws TestGeneratorException
      *             in the event that something went wrong in the process of test
      *             case generation.
      */
-    public String generateTestSuite(final String source,
-            final ICodeCoverageParser coverage,
-            final IFrameworkConverter converter, final boolean includePublic,
-            final boolean includeProtected, final boolean includePrivate,
-            final boolean includeNative, final List<String> methods)
-            throws TestGeneratorException {
-
-        return null;
-    }
-
     public List<String> generateTestSuite(final String source,
             final ICodeCoverageParser coverage,
-            final IFrameworkConverter frameworkConverter,
-            final List<String> methods) throws TestGeneratorException {
+            final IFrameworkConverter converter, final List<String> methods)
+            throws TestGeneratorException {
 
-        final File file = new File(source);
-        if (!file.exists()) {
-            throw new TestGeneratorException("No such file or directory: "
-                    + source);
-        } else {
-            return generateTestSuite(file, coverage, frameworkConverter,
-                    methods);
-        }
+        return generateTestSuite(source, coverage, converter, false, false,
+                false, false, methods);
     }
 }

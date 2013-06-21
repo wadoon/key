@@ -130,4 +130,38 @@ public class KeYJavaMethod {
             return programMethod.getReturnType().getName();
         }
     }
+
+    /**
+     * 
+     * @return the name of the method
+     */
+    public String getName() {
+        return programMethod.getFullName();
+    }
+
+    /**
+     * @return true if the method is public, false otherwise.
+     */
+    public boolean isPublic() {
+        return programMethod.isPublic();
+    }
+
+    /**
+     * @return true if the method is protected, false otherwise.
+     */
+    public boolean isProtected() {
+        return programMethod.isProtected();
+    }
+
+    /**
+     * @return true if the method is private, false otherwise.
+     */
+    public boolean isPrivate() {
+        return programMethod.isPrivate();
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }
