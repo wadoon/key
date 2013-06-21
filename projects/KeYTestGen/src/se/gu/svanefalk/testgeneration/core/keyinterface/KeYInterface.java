@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
@@ -48,9 +47,6 @@ public class KeYInterface {
      */
     private static final ReentrantLock lock = new ReentrantLock(true);
 
-    private final CustomConsoleUserInterface keyInterface = new CustomConsoleUserInterface(
-            false);
-
     /**
      * Assert that a given object is not null, and generate an exception if it
      * is.
@@ -77,6 +73,9 @@ public class KeYInterface {
         return KeYInterface.instance;
     }
 
+    private final CustomConsoleUserInterface keyInterface = new CustomConsoleUserInterface(
+            false);
+
     private KeYInterface() {
     }
 
@@ -95,7 +94,7 @@ public class KeYInterface {
      *             in the event that the proof cannot be created
      */
     private Proof getProof(
-            KeYEnvironment<CustomConsoleUserInterface> environment,
+            final KeYEnvironment<CustomConsoleUserInterface> environment,
             final IProgramMethod method, final String precondition)
             throws ProofInputException {
 
@@ -154,13 +153,13 @@ public class KeYInterface {
             final SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(
                     mediator, proof, false);
 
-            SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = new SymbolicExecutionEnvironment<>(
+            final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment = new SymbolicExecutionEnvironment<>(
                     method.getEnvironment(), builder);
 
             /*
              * Setup the stop condition for the symbolic execution process.
              */
-            ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
+            final ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
                     ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
             environment.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
                     stopCondition);
@@ -209,7 +208,7 @@ public class KeYInterface {
 
             KeYInterface.lock.lock();
 
-            KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(
+            final KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(
                     javaFile, null, null);
 
             return environment;

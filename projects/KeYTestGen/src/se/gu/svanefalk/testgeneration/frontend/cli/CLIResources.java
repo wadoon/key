@@ -3,7 +3,6 @@ package se.gu.svanefalk.testgeneration.frontend.cli;
 import java.util.HashMap;
 
 import se.gu.svanefalk.testgeneration.backend.IFrameworkConverter;
-import se.gu.svanefalk.testgeneration.backend.custom.ITestCaseParser;
 import se.gu.svanefalk.testgeneration.backend.junit.JUnitConverter;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 
@@ -26,18 +25,20 @@ public class CLIResources {
 
     static {
         COVERAGE_PARSERS = new HashMap<>();
-        COVERAGE_PARSERS.put("statement",
+        CLIResources.COVERAGE_PARSERS.put("statement",
                 ICodeCoverageParser.statementCoverageParser);
-        COVERAGE_PARSERS.put("branch", ICodeCoverageParser.branchCoverageParser);
-        COVERAGE_PARSERS.put("condition",
+        CLIResources.COVERAGE_PARSERS.put("branch",
+                ICodeCoverageParser.branchCoverageParser);
+        CLIResources.COVERAGE_PARSERS.put("condition",
                 ICodeCoverageParser.conditionCoverageParser);
-        COVERAGE_PARSERS.put("decision",
+        CLIResources.COVERAGE_PARSERS.put("decision",
                 ICodeCoverageParser.decisionCoverageParser);
-        COVERAGE_PARSERS.put("mcdc",
+        CLIResources.COVERAGE_PARSERS.put("mcdc",
                 ICodeCoverageParser.modifiedConditionDecisionCoverageParser);
 
         FRAMEWORK_CONVERTERS = new HashMap<>();
-        FRAMEWORK_CONVERTERS.put("junit4", JUnitConverter.getInstance());
+        CLIResources.FRAMEWORK_CONVERTERS.put("junit4",
+                JUnitConverter.getInstance());
     }
 
     public static CLIResources getInstance() {
@@ -56,8 +57,8 @@ public class CLIResources {
         return CLIResources.COVERAGE_PARSERS.get(framework);
     }
 
-    public IFrameworkConverter getFrameworkConverter(String name) {
+    public IFrameworkConverter getFrameworkConverter(final String name) {
 
-        return FRAMEWORK_CONVERTERS.get(name);
+        return CLIResources.FRAMEWORK_CONVERTERS.get(name);
     }
 }

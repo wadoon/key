@@ -11,11 +11,9 @@ public class Variable extends AbstractExpression {
      */
     private IExpression binding = null;
 
-    private final String name;
-
     private boolean isNegated = false;
 
-    private boolean isInverted = false;
+    private final String name;
 
     public Variable(final String name) {
         super();
@@ -68,6 +66,10 @@ public class Variable extends AbstractExpression {
         return result;
     }
 
+    public void negate() {
+        isNegated = isNegated ? false : true;
+    }
+
     public Fraction resolveMultiplier() {
 
         final ITreeNode parent = getParent();
@@ -104,9 +106,5 @@ public class Variable extends AbstractExpression {
         } else {
             return binding.toString();
         }
-    }
-
-    public void negate() {
-        isNegated = isNegated ? false : true;
     }
 }

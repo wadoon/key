@@ -423,11 +423,6 @@ public final class TermParserTools {
         return name.equals("Z");
     }
 
-    public static boolean isIntegerType(final Term term) {
-        final String name = term.sort().toString();
-        return name.equals("int");
-    }
-
     /**
      * @param term
      *            the term
@@ -439,6 +434,11 @@ public final class TermParserTools {
         final String name = term.op().name().toString();
 
         return name.equals("neglit");
+    }
+
+    public static boolean isIntegerType(final Term term) {
+        final String name = term.sort().toString();
+        return name.equals("int");
     }
 
     /**
@@ -734,6 +734,17 @@ public final class TermParserTools {
         }
     }
 
+    public static String resolveNumber(final Term term) {
+
+        final String numberString = term.op().name().toString();
+
+        if (numberString.equals("#")) {
+            return "";
+        } else {
+            return TermParserTools.resolveNumber(term.sub(0)) + numberString;
+        }
+    }
+
     /**
      * @param term
      *            a term of boolean type
@@ -746,17 +757,6 @@ public final class TermParserTools {
         } else {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
-        }
-    }
-    
-    public static String resolveNumber(final Term term) {
-
-        final String numberString = term.op().name().toString();
-
-        if (numberString.equals("#")) {
-            return "";
-        } else {
-            return resolveNumber(term.sub(0)) + numberString;
         }
     }
 }

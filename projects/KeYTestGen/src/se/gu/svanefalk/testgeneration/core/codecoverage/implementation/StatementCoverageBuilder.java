@@ -95,7 +95,7 @@ public class StatementCoverageBuilder implements ICoverageBuilder {
              */
             if (targetSet.contains(firstPath)) {
                 for (final ExecutionPath secondPath : originalList) {
-                    if (firstPath != secondPath
+                    if ((firstPath != secondPath)
                             && subsumes(firstPath, secondPath)) {
                         targetSet.remove(secondPath);
                     }

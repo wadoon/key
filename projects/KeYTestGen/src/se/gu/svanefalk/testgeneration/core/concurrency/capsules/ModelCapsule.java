@@ -1,7 +1,6 @@
 package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.CaughtException;
-import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;

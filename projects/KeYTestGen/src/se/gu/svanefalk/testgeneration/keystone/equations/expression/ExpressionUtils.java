@@ -3,13 +3,7 @@ package se.gu.svanefalk.testgeneration.keystone.equations.expression;
 import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
-import se.gu.svanefalk.testgeneration.keystone.equations.IComparator;
 import se.gu.svanefalk.testgeneration.keystone.equations.IExpression;
-import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
-import se.gu.svanefalk.testgeneration.keystone.equations.comparator.GreaterOrEquals;
-import se.gu.svanefalk.testgeneration.keystone.equations.comparator.LessOrEquals;
-import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
-import de.uka.ilkd.key.logic.Term;
 
 public class ExpressionUtils {
 
@@ -23,11 +17,6 @@ public class ExpressionUtils {
         return ExpressionUtils.instance;
     }
 
-    private ExpressionUtils() {
-
-    }
-
-
     /**
      * Negates an expression
      * 
@@ -35,17 +24,17 @@ public class ExpressionUtils {
      *            the expression
      * @return the negated expression
      */
-    public static void negate(IExpression expression) {
+    public static void negate(final IExpression expression) {
 
         /*
          * The expression is an addition - swap it to a subtraction, and negate
          * the lhand side.
          */
         if (expression instanceof Addition) {
-            Addition addition = (Addition) expression;
+            final Addition addition = (Addition) expression;
 
-            negate(addition.getLeftOperand());
-            negate(addition.getRightOperand());
+            ExpressionUtils.negate(addition.getLeftOperand());
+            ExpressionUtils.negate(addition.getRightOperand());
         }
 
         /*
@@ -53,9 +42,9 @@ public class ExpressionUtils {
          * lhand side.
          */
         else if (expression instanceof Multiplication) {
-            Multiplication multiplication = (Multiplication) expression;
+            final Multiplication multiplication = (Multiplication) expression;
 
-            negate(multiplication.getLeftOperand());
+            ExpressionUtils.negate(multiplication.getLeftOperand());
         }
 
         /*
@@ -63,16 +52,16 @@ public class ExpressionUtils {
          * lhand side.
          */
         else if (expression instanceof Division) {
-            Division division = (Division) expression;
+            final Division division = (Division) expression;
 
-            negate(division.getLeftOperand());
+            ExpressionUtils.negate(division.getLeftOperand());
         }
 
         /*
          * The expression is a numeric constant - swap its sign.
          */
         else if (expression instanceof NumericConstant) {
-            NumericConstant constant = (NumericConstant) expression;
+            final NumericConstant constant = (NumericConstant) expression;
             constant.setValue(constant.getValue().multiply(Fraction.MINUS_ONE));
         }
 
@@ -85,10 +74,6 @@ public class ExpressionUtils {
         }
     }
 
-    
-
-   
-
     /**
      * Negate an addition at one level only, i.e. turn 1 + 2 + 3 into 1 - 2 + 3
      * 
@@ -97,34 +82,34 @@ public class ExpressionUtils {
      * @throws KeYStoneException
      *             in case of an error
      */
-    public static void negateAddition(Addition addition)
+    public static void negateAddition(final Addition addition)
             throws KeYStoneException {
 
         final IExpression rightOperand = addition.getRightOperand();
 
         if (rightOperand instanceof NumericConstant) {
-            NumericConstant constant = (NumericConstant) rightOperand;
-            negateConstant(constant);
+            final NumericConstant constant = (NumericConstant) rightOperand;
+            ExpressionUtils.negateConstant(constant);
         }
 
         else if (rightOperand instanceof Addition) {
-            Addition additionChild = (Addition) rightOperand;
+            final Addition additionChild = (Addition) rightOperand;
 
-            IExpression additionLeftOperand = additionChild.getLeftOperand();
+            final IExpression additionLeftOperand = additionChild.getLeftOperand();
             if (additionLeftOperand instanceof NumericConstant) {
-                NumericConstant constant = (NumericConstant) additionLeftOperand;
-                negateConstant(constant);
+                final NumericConstant constant = (NumericConstant) additionLeftOperand;
+                ExpressionUtils.negateConstant(constant);
             }
 
             else if (additionLeftOperand instanceof Variable) {
-                Variable variable = (Variable) additionLeftOperand;
-                negateVariable(variable);
+                final Variable variable = (Variable) additionLeftOperand;
+                ExpressionUtils.negateVariable(variable);
             }
         }
 
         else if (rightOperand instanceof Multiplication) {
-            Multiplication multiplication = (Multiplication) rightOperand;
-            negateMultiplication(multiplication);
+            final Multiplication multiplication = (Multiplication) rightOperand;
+            ExpressionUtils.negateMultiplication(multiplication);
         }
 
         else {
@@ -133,63 +118,59 @@ public class ExpressionUtils {
         }
     }
 
-    public static void negateMultiplication(Multiplication multiplication)
-            throws KeYStoneException {
-
-        final IExpression leftOperand = multiplication.getLeftOperand();
-
-        if (leftOperand instanceof NumericConstant) {
-            NumericConstant constant = (NumericConstant) leftOperand;
-            negateConstant(constant);
-        } else {
-            throw new KeYStoneException(
-                    "Illegal operation in trying to negate multiplication");
-        }
+    public static void negateConstant(final NumericConstant constant) {
+        constant.setValue(constant.getValue().multiply(Fraction.MINUS_ONE));
     }
 
-    public static void negateDivision(Division division)
+    public static void negateDivision(final Division division)
             throws KeYStoneException {
 
         final IExpression leftOperand = division.getLeftOperand();
 
         if (leftOperand instanceof NumericConstant) {
-            NumericConstant constant = (NumericConstant) leftOperand;
-            negateConstant(constant);
+            final NumericConstant constant = (NumericConstant) leftOperand;
+            ExpressionUtils.negateConstant(constant);
         } else {
             throw new KeYStoneException(
                     "Illegal operation in trying to negate multiplication");
         }
     }
 
-    public static void negateConstant(NumericConstant constant) {
-        constant.setValue(constant.getValue().multiply(Fraction.MINUS_ONE));
+    public static void negateMultiplication(final Multiplication multiplication)
+            throws KeYStoneException {
+
+        final IExpression leftOperand = multiplication.getLeftOperand();
+
+        if (leftOperand instanceof NumericConstant) {
+            final NumericConstant constant = (NumericConstant) leftOperand;
+            ExpressionUtils.negateConstant(constant);
+        } else {
+            throw new KeYStoneException(
+                    "Illegal operation in trying to negate multiplication");
+        }
     }
 
-    public static void negateVariable(Variable variable) {
-        variable.negate();
-    }
-
-    public static void negateSingleExpression(IExpression expression)
+    public static void negateSingleExpression(final IExpression expression)
             throws KeYStoneException {
 
         if (expression instanceof Addition) {
-            negateAddition((Addition) expression);
+            ExpressionUtils.negateAddition((Addition) expression);
         }
 
         else if (expression instanceof NumericConstant) {
-            negateConstant((NumericConstant) expression);
+            ExpressionUtils.negateConstant((NumericConstant) expression);
         }
 
         else if (expression instanceof Multiplication) {
-            negateMultiplication((Multiplication) expression);
+            ExpressionUtils.negateMultiplication((Multiplication) expression);
         }
 
         else if (expression instanceof Division) {
-            negateDivision((Division) expression);
+            ExpressionUtils.negateDivision((Division) expression);
         }
 
         else if (expression instanceof Variable) {
-            negateVariable((Variable) expression);
+            ExpressionUtils.negateVariable((Variable) expression);
         }
 
         else {
@@ -197,5 +178,13 @@ public class ExpressionUtils {
                     "Error when trying to negate an expression: no such expression: "
                             + expression);
         }
+    }
+
+    public static void negateVariable(final Variable variable) {
+        variable.negate();
+    }
+
+    private ExpressionUtils() {
+
     }
 }

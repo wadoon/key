@@ -4,8 +4,6 @@ import java.util.Map;
 
 import org.apache.commons.math3.fraction.Fraction;
 
-import de.uka.ilkd.key.logic.Term;
-
 import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.Equals;
 import se.gu.svanefalk.testgeneration.keystone.equations.comparator.GreaterOrEquals;
@@ -17,10 +15,33 @@ import se.gu.svanefalk.testgeneration.keystone.equations.expression.Multiplicati
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
+import de.uka.ilkd.key.logic.Term;
 
 public class EquationUtils {
 
     private static EquationUtils instance = null;
+
+    public static IComparator constructRelation(final Term term)
+            throws KeYStoneException {
+
+        assert (term != null);
+
+        final IExpression leftChild = EquationUtils.processTerm(term.sub(0));
+        assert (leftChild != null);
+
+        final IExpression rightChild = EquationUtils.processTerm(term.sub(1));
+        assert (rightChild != null);
+
+        if (TermParserTools.isEquals(term)) {
+            return new Equals(leftChild, rightChild);
+        } else if (TermParserTools.isGreaterOrEquals(term)) {
+            return new GreaterOrEquals(leftChild, rightChild);
+        } else if (TermParserTools.isLessOrEquals(term)) {
+            return new LessOrEquals(leftChild, rightChild);
+        }
+
+        throw new KeYStoneException("Illegal comparator: " + term);
+    }
 
     public static EquationUtils getInstance() {
 
@@ -28,6 +49,91 @@ public class EquationUtils {
             EquationUtils.instance = new EquationUtils();
         }
         return EquationUtils.instance;
+    }
+
+    private static IExpression processBinaryFunction(final Term term)
+            throws KeYStoneException {
+
+        final IExpression leftChild = EquationUtils.processTerm(term.sub(0));
+        final IExpression rightChild = EquationUtils.processTerm(term.sub(1));
+
+        if (TermParserTools.isAddition(term)) {
+            final Addition addition = new Addition(leftChild, rightChild);
+            return addition;
+        }
+
+        /*
+         * Subtraction requires case distinction depending on exactly what is
+         * being subtracted.
+         */
+        if (TermParserTools.isSubtraction(term)) {
+            final Addition addition = new Addition(leftChild, rightChild);
+            ExpressionUtils.negateAddition(addition);
+            return addition;
+        }
+
+        if (TermParserTools.isDivision(term)) {
+            return new Division(leftChild, rightChild);
+        }
+
+        if (TermParserTools.isMultiplication(term)) {
+            return new Multiplication(leftChild, rightChild);
+        }
+
+        throw new KeYStoneException("Illegal binary function: " + term);
+    }
+
+    private static IExpression processFunction(final Term term)
+            throws KeYStoneException {
+
+        if (TermParserTools.isBinaryFunction(term)) {
+            return EquationUtils.processBinaryFunction(term);
+        }
+
+        if (TermParserTools.isUnaryFunction(term)) {
+            return EquationUtils.processUnaryFunction(term);
+        }
+
+        throw new KeYStoneException("Unsupported Function: " + term.op().name());
+    }
+
+    private static IExpression processTerm(final Term term)
+            throws KeYStoneException {
+
+        if (TermParserTools.isFunction(term)) {
+            return EquationUtils.processFunction(term);
+        }
+
+        if (TermParserTools.isProgramVariable(term)) {
+            return EquationUtils.processVariable(term);
+        }
+
+        if (TermParserTools.isLogicVariable(term)) {
+            return EquationUtils.processVariable(term);
+        }
+
+        throw new KeYStoneException("Illegal term: " + term);
+    }
+
+    private static IExpression processUnaryFunction(final Term term)
+            throws KeYStoneException {
+
+        if (TermParserTools.isInteger(term)) {
+            if (TermParserTools.isIntegerNegation(term.sub(0))) {
+                final int value = Integer.parseInt("-"
+                        + TermParserTools.resolveNumber(term.sub(0).sub(0)));
+                return new NumericConstant(new Fraction(value));
+            } else {
+                final int value = Integer.parseInt(TermParserTools.resolveNumber(term.sub(0)));
+                return new NumericConstant(new Fraction(value));
+            }
+        }
+        throw new KeYStoneException("Illegal unary function: " + term);
+    }
+
+    private static IExpression processVariable(final Term term) {
+
+        return new Variable(term.toString());
     }
 
     private EquationUtils() {
@@ -73,112 +179,5 @@ public class EquationUtils {
         }
 
         return (Equals) comparator;
-    }
-
-    public static IComparator constructRelation(final Term term)
-            throws KeYStoneException {
-
-        assert (term != null);
-
-        final IExpression leftChild = processTerm(term.sub(0));
-        assert (leftChild != null);
-
-        final IExpression rightChild = processTerm(term.sub(1));
-        assert (rightChild != null);
-
-        if (TermParserTools.isEquals(term)) {
-            return new Equals(leftChild, rightChild);
-        } else if (TermParserTools.isGreaterOrEquals(term)) {
-            return new GreaterOrEquals(leftChild, rightChild);
-        } else if (TermParserTools.isLessOrEquals(term)) {
-            return new LessOrEquals(leftChild, rightChild);
-        }
-
-        throw new KeYStoneException("Illegal comparator: " + term);
-    }
-
-    private static IExpression processBinaryFunction(final Term term)
-            throws KeYStoneException {
-
-        final IExpression leftChild = processTerm(term.sub(0));
-        final IExpression rightChild = processTerm(term.sub(1));
-
-        if (TermParserTools.isAddition(term)) {
-            Addition addition = new Addition(leftChild, rightChild);
-            return addition;
-        }
-
-        /*
-         * Subtraction requires case distinction depending on exactly what is
-         * being subtracted.
-         */
-        if (TermParserTools.isSubtraction(term)) {
-            Addition addition = new Addition(leftChild, rightChild);
-            ExpressionUtils.negateAddition(addition);
-            return addition;
-        }
-
-        if (TermParserTools.isDivision(term)) {
-            return new Division(leftChild, rightChild);
-        }
-
-        if (TermParserTools.isMultiplication(term)) {
-            return new Multiplication(leftChild, rightChild);
-        }
-
-        throw new KeYStoneException("Illegal binary function: " + term);
-    }
-
-    private static IExpression processFunction(final Term term)
-            throws KeYStoneException {
-
-        if (TermParserTools.isBinaryFunction(term)) {
-            return processBinaryFunction(term);
-        }
-
-        if (TermParserTools.isUnaryFunction(term)) {
-            return processUnaryFunction(term);
-        }
-
-        throw new KeYStoneException("Unsupported Function: " + term.op().name());
-    }
-
-    private static IExpression processTerm(final Term term)
-            throws KeYStoneException {
-
-        if (TermParserTools.isFunction(term)) {
-            return processFunction(term);
-        }
-
-        if (TermParserTools.isProgramVariable(term)) {
-            return processVariable(term);
-        }
-
-        if (TermParserTools.isLogicVariable(term)) {
-            return processVariable(term);
-        }
-
-        throw new KeYStoneException("Illegal term: " + term);
-    }
-
-    private static IExpression processUnaryFunction(final Term term)
-            throws KeYStoneException {
-
-        if (TermParserTools.isInteger(term)) {
-            if (TermParserTools.isIntegerNegation(term.sub(0))) {
-                final int value = Integer.parseInt("-"
-                        + TermParserTools.resolveNumber(term.sub(0).sub(0)));
-                return new NumericConstant(new Fraction(value));
-            } else {
-                final int value = Integer.parseInt(TermParserTools.resolveNumber(term.sub(0)));
-                return new NumericConstant(new Fraction(value));
-            }
-        }
-        throw new KeYStoneException("Illegal unary function: " + term);
-    }
-
-    private static IExpression processVariable(final Term term) {
-
-        return new Variable(term.toString());
     }
 }

@@ -1,7 +1,6 @@
 package se.gu.svanefalk.testgeneration.core.model.implementation;
 
 import se.gu.svanefalk.testgeneration.StringConstants;
-import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import se.gu.svanefalk.testgeneration.util.visitors.KeYTestGenTermVisitor;

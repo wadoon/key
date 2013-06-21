@@ -3,7 +3,6 @@ package se.gu.svanefalk.testgeneration.core.model.implementation;
 import se.gu.svanefalk.testgeneration.core.model.tools.EliminateConjunctionsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.RemoveIfThenElseTransformer;
-import se.gu.svanefalk.testgeneration.util.transformers.RemoveSDPsTransformer;
 import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -35,7 +34,6 @@ class TermToModelConverter {
 
         final Model model = Model.constructModel();
 
-        
         /*
          * Remove if-then-else assertions from the pathcondition
          */
@@ -56,7 +54,7 @@ class TermToModelConverter {
          */
         pathCondition = NegationNormalFormTransformer.getInstance().transform(
                 pathCondition);
-        
+
         pathCondition = EliminateConjunctionsTransformer.getInstance().transform(
                 pathCondition);
 

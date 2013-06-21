@@ -26,6 +26,12 @@ public abstract class AbstractComparator implements IComparator, ITreeNode {
         return leftOperand;
     }
 
+    @Override
+    public ITreeNode getParent() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     /**
      * @return the rightOperand
      */
@@ -42,6 +48,12 @@ public abstract class AbstractComparator implements IComparator, ITreeNode {
         this.leftOperand.setParent(this);
     }
 
+    @Override
+    public void setParent(final ITreeNode parent) {
+        // TODO Auto-generated method stub
+
+    }
+
     /**
      * @param rightOperand
      *            the rightOperand to set
@@ -49,17 +61,5 @@ public abstract class AbstractComparator implements IComparator, ITreeNode {
     public void setRightOperand(final IExpression rightOperand) {
         this.rightOperand = rightOperand;
         this.rightOperand.setParent(this);
-    }
-
-    @Override
-    public void setParent(ITreeNode parent) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public ITreeNode getParent() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

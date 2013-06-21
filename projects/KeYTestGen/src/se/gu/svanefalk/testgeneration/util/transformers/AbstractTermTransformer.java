@@ -537,10 +537,10 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     protected Term transformTerm(final Term term)
             throws TermTransformerException {
 
-        if(term == null) {
+        if (term == null) {
             return term;
         }
-        
+
         /*
          * Order matters here, since SortedOperator is a subclass of Operator.
          */

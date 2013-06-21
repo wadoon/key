@@ -10,7 +10,7 @@ public class NumericConstant extends AbstractExpression {
         value = fraction;
     }
 
-    public NumericConstant(int value) {
+    public NumericConstant(final int value) {
         this(new Fraction(value));
     }
 

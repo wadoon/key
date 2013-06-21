@@ -5,7 +5,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -57,6 +56,10 @@ public class KeYJavaMethod {
         return declaringClass;
     }
 
+    public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+        return declaringClass.getEnvironment();
+    }
+
     /**
      * Return the {@link InitConfig} instance for this method.
      * 
@@ -78,8 +81,8 @@ public class KeYJavaMethod {
          * TODO: This violates the abstraction in a very ugly way, is there no
          * nicer way to get the parameters?
          */
-        List<IProgramVariable> parameters = new LinkedList<>();
-        for (ParameterDeclaration declaration : programMethod.getParameters()) {
+        final List<IProgramVariable> parameters = new LinkedList<>();
+        for (final ParameterDeclaration declaration : programMethod.getParameters()) {
             parameters.add(declaration.getVariableSpecification().getProgramVariable());
         }
         return parameters;
@@ -120,15 +123,11 @@ public class KeYJavaMethod {
      * @return the return type of the method
      */
     public String getReturnType() {
-        KeYJavaType returnType = programMethod.getReturnType();
+        final KeYJavaType returnType = programMethod.getReturnType();
         if (returnType == KeYJavaType.VOID_TYPE) {
             return "void";
         } else {
             return programMethod.getReturnType().getName();
         }
-    }
-
-    public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
-        return declaringClass.getEnvironment();
     }
 }

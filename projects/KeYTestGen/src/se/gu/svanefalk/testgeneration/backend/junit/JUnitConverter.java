@@ -5,15 +5,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import se.gu.svanefalk.testgeneration.backend.AbstractJavaSourceGenerator;
 import se.gu.svanefalk.testgeneration.backend.IFrameworkConverter;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelInstance;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
-import se.gu.svanefalk.testgeneration.core.oracle.abstraction.Oracle;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleAssertion;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleComparator;
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleConstraint;
@@ -23,7 +20,6 @@ import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleMethodInvoca
 import se.gu.svanefalk.testgeneration.core.oracle.abstraction.OracleOperator;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
-import se.gu.svanefalk.testgeneration.util.transformers.NegationNormalFormTransformer;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
@@ -35,18 +31,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  */
 public class JUnitConverter extends AbstractJavaSourceGenerator implements
         IFrameworkConverter {
-
-    private static JUnitConverter instance = null;
-
-    public static JUnitConverter getInstance() {
-        if (JUnitConverter.instance == null) {
-            JUnitConverter.instance = new JUnitConverter();
-        }
-        return JUnitConverter.instance;
-    }
-
-    private JUnitConverter() {
-    }
 
     /**
      * Worker which services invocations of
@@ -331,6 +315,101 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
         }
 
         /**
+         * Writes the test oracle for a given method.
+         * 
+         * @param testCase
+         */
+        private void writeOracle(final TestCase testCase) {
+
+            writeComment("Test oracle", false);
+
+            final OracleConstraint constraint = testCase.getOracle().getConstraints();
+            for (final OracleAssertion assertion : constraint.getAssertions()) {
+                writeOracleAssertion(assertion);
+            }
+        }
+
+        private void writeOracleAssertion(final OracleAssertion assertion) {
+
+            /*
+             * Write opening of assertion statement
+             */
+            writeIndentedLine("Assert.assertTrue(");
+            writeNewLine();
+            increaseIndentation();
+            indent();
+
+            /*
+             * Write body
+             */
+            final Iterator<OracleExpression> iterator = assertion.getExpressions().iterator();
+            OracleExpression expression = null;
+            while (iterator.hasNext()) {
+                expression = iterator.next();
+                writeOracleExpression(expression);
+
+                if (iterator.hasNext()) {
+                    writeUnindentedLine(" ||");
+                    writeNewLine();
+                    indent();
+                }
+            }
+
+            /*
+             * Close assertion statement
+             */
+            writeNewLine();
+            decreaseIndentation();
+            writeIndentedLine(");");
+            writeNewLine();
+            writeNewLine();
+        }
+
+        private void writeOracleComparator(final OracleComparator comparator) {
+            writeOracleExpression(comparator.getFirstOperand());
+            writeUnindentedLine(" " + comparator.getComparatorType() + " ");
+            writeOracleExpression(comparator.getSecondOperand());
+        }
+
+        private void writeOracleExpression(final OracleExpression expression) {
+
+            if (expression instanceof OracleComparator) {
+                final OracleComparator comparator = (OracleComparator) expression;
+                writeOracleComparator(comparator);
+            }
+
+            else if (expression instanceof OracleOperator) {
+                final OracleOperator operator = (OracleOperator) expression;
+                writeOracleOperator(operator);
+            }
+
+            else if (expression instanceof OracleLiteral) {
+                final OracleLiteral literal = (OracleLiteral) expression;
+                writeOracleLiteral(literal);
+            }
+
+            else if (expression instanceof OracleMethodInvocation) {
+                final OracleMethodInvocation methodInvocation = (OracleMethodInvocation) expression;
+                writeOracleMethodInvocation(methodInvocation);
+            }
+        }
+
+        private void writeOracleLiteral(final OracleLiteral literal) {
+            writeUnindentedLine(literal.getIdentifier());
+        }
+
+        private void writeOracleMethodInvocation(
+                final OracleMethodInvocation methodInvocation) {
+            // TODO
+        }
+
+        private void writeOracleOperator(final OracleOperator operator) {
+            writeOracleExpression(operator.getFirstOperand());
+            writeUnindentedLine(" " + operator.getOperation() + " ");
+            writeOracleExpression(operator.getSecondOperand());
+        }
+
+        /**
          * Writes the setField method.
          */
         private void writeSetFieldMethod() {
@@ -521,101 +600,18 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
             writeClosingBrace();
         }
+    }
 
-        /**
-         * Writes the test oracle for a given method.
-         * 
-         * @param testCase
-         */
-        private void writeOracle(TestCase testCase) {
+    private static JUnitConverter instance = null;
 
-            writeComment("Test oracle", false);
-
-            OracleConstraint constraint = testCase.getOracle().getConstraints();
-            for (OracleAssertion assertion : constraint.getAssertions()) {
-                writeOracleAssertion(assertion);
-            }
+    public static JUnitConverter getInstance() {
+        if (JUnitConverter.instance == null) {
+            JUnitConverter.instance = new JUnitConverter();
         }
+        return JUnitConverter.instance;
+    }
 
-        private void writeOracleAssertion(OracleAssertion assertion) {
-
-            /*
-             * Write opening of assertion statement
-             */
-            writeIndentedLine("Assert.assertTrue(");
-            writeNewLine();
-            increaseIndentation();
-            indent();
-
-            /*
-             * Write body
-             */
-            Iterator<OracleExpression> iterator = assertion.getExpressions().iterator();
-            OracleExpression expression = null;
-            while (iterator.hasNext()) {
-                expression = iterator.next();
-                writeOracleExpression(expression);
-
-                if (iterator.hasNext()) {
-                    writeUnindentedLine(" ||");
-                    writeNewLine();
-                    indent();
-                }
-            }
-
-            /*
-             * Close assertion statement
-             */
-            writeNewLine();
-            decreaseIndentation();
-            writeIndentedLine(");");
-            writeNewLine();
-            writeNewLine();
-        }
-
-        private void writeOracleExpression(OracleExpression expression) {
-
-            if (expression instanceof OracleComparator) {
-                OracleComparator comparator = (OracleComparator) expression;
-                writeOracleComparator(comparator);
-            }
-
-            else if (expression instanceof OracleOperator) {
-                OracleOperator operator = (OracleOperator) expression;
-                writeOracleOperator(operator);
-            }
-
-            else if (expression instanceof OracleLiteral) {
-                OracleLiteral literal = (OracleLiteral) expression;
-                writeOracleLiteral(literal);
-            }
-
-            else if (expression instanceof OracleMethodInvocation) {
-                OracleMethodInvocation methodInvocation = (OracleMethodInvocation) expression;
-                writeOracleMethodInvocation(methodInvocation);
-            }
-        }
-
-        private void writeOracleMethodInvocation(
-                OracleMethodInvocation methodInvocation) {
-            // TODO
-        }
-
-        private void writeOracleLiteral(OracleLiteral literal) {
-            writeUnindentedLine(literal.getIdentifier());
-        }
-
-        private void writeOracleOperator(OracleOperator operator) {
-            writeOracleExpression(operator.getFirstOperand());
-            writeUnindentedLine(" " + operator.getOperation() + " ");
-            writeOracleExpression(operator.getSecondOperand());
-        }
-
-        private void writeOracleComparator(OracleComparator comparator) {
-            writeOracleExpression(comparator.getFirstOperand());
-            writeUnindentedLine(" " + comparator.getComparatorType() + " ");
-            writeOracleExpression(comparator.getSecondOperand());
-        }
+    private JUnitConverter() {
     }
 
     /**

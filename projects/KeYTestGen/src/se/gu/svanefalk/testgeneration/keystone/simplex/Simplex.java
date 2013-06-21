@@ -250,7 +250,6 @@ public strictfp class Simplex {
              * Store the exiting variable.
              */
             boundVariables.put(largestColumnIndex, largestRowIndex);
-            int x = 0;
         }
 
         /*

@@ -9,7 +9,6 @@ import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
-import se.gu.svanefalk.testgeneration.core.concurrency.capsules.AbstractCapsule;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleController;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleExecutor;
 import se.gu.svanefalk.testgeneration.core.concurrency.capsules.ModelCapsule;
@@ -69,8 +68,8 @@ public class NodeTestGenerator {
             /*
              * Create and dispatc the Model and Oracle geneators.
              */
-            CapsuleController<ModelCapsule> modelController = new CapsuleController<>();
-            CapsuleController<OracleCapsule> oracleController = new CapsuleController<>();
+            final CapsuleController<ModelCapsule> modelController = new CapsuleController<>();
+            final CapsuleController<OracleCapsule> oracleController = new CapsuleController<>();
 
             final ModelCapsule modelGenerationCapsule = new ModelCapsule(node);
             modelController.addChild(modelGenerationCapsule);

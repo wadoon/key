@@ -16,36 +16,32 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public final class KeYJavaClass {
 
+    private final KeYEnvironment<CustomConsoleUserInterface> environment;
+
+    private final InitConfig initConfig;
+
     /**
      * Maps the name of a method to its corresponding {@link KeYJavaMethod}
      * instance.
      */
     private final HashMap<String, KeYJavaMethod> methods = new HashMap<String, KeYJavaMethod>();
 
-    private final InitConfig initConfig;
-
-    private final KeYEnvironment<CustomConsoleUserInterface> environment;
-
-    public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
-        return environment;
-    }
-
     /**
      * The {@link KeYJavaType} instance for this class
      */
     private final KeYJavaType type;
 
-    KeYJavaClass(final KeYJavaType type,
-            KeYEnvironment<CustomConsoleUserInterface> environment) {
+    KeYJavaClass(final KeYJavaType type, final InitConfig initConfig) {
         this.type = type;
-        this.environment = environment;
+        environment = null;
         this.initConfig = environment.getInitConfig();
     }
 
-    KeYJavaClass(final KeYJavaType type, InitConfig initConfig) {
+    KeYJavaClass(final KeYJavaType type,
+            final KeYEnvironment<CustomConsoleUserInterface> environment) {
         this.type = type;
-        this.environment = null;
-        this.initConfig = environment.getInitConfig();
+        this.environment = environment;
+        initConfig = environment.getInitConfig();
     }
 
     /**
@@ -58,6 +54,10 @@ public final class KeYJavaClass {
     void addMethodMapping(final String methodName, final KeYJavaMethod method) {
 
         methods.put(methodName, method);
+    }
+
+    public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+        return environment;
     }
 
     /**

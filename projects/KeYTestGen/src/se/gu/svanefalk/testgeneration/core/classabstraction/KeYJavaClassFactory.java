@@ -8,12 +8,10 @@ import java.util.List;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.oracle.OracleGeneratorException;
-import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -78,7 +76,7 @@ public class KeYJavaClassFactory {
 
                     keYJavaClass.addMethodMapping(memberMethod.getFullName(),
                             keYJavaMethod);
-               
+
                 } else {
 
                     for (final ContractWrapper contract : contracts) {
@@ -127,17 +125,14 @@ public class KeYJavaClassFactory {
 
     public KeYJavaClass createKeYJavaClass(final IExecutionMethodCall methodCall) {
 
-        final InitConfig initConfig = methodCall.getMediator().getProof().env().getInitConfig();
+        methodCall.getMediator().getProof().env().getInitConfig();
 
         /*
          * Get and process the method call node
          */
         final IProgramMethod method = methodCall.getProgramMethod();
 
-        /*
-         * Construct the KeYJavaClass itself
-         */
-        final KeYJavaType parent = method.getContainerType();
+        method.getContainerType();
 
         return null; // constructClass(parent, initConfig);
     }

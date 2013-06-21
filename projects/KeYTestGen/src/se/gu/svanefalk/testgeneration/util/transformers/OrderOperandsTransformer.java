@@ -71,7 +71,7 @@ public class OrderOperandsTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        if(term == null) {
+        if (term == null) {
             return term;
         }
 

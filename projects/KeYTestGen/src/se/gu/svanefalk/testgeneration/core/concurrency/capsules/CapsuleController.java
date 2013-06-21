@@ -2,8 +2,6 @@ package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class CapsuleController<T extends ICapsule> {
@@ -18,20 +16,9 @@ public class CapsuleController<T extends ICapsule> {
      */
     private final Map<T, LaunchContainer> childCapsules = new HashMap<>();
 
-    public void addChild(T capsule) {
+    public void addChild(final T capsule) {
         capsule.addController(this);
         childCapsules.put(capsule, new LaunchContainer(capsule));
-    }
-
-    public void stopChild(T capsule) {
-        childCapsules.get(capsule).stop();
-        childCapsules.remove(capsule);
-    }
-
-    public void stopChildren() {
-        for (LaunchContainer capsule : childCapsules.values()) {
-            capsule.stop();
-        }
     }
 
     public void executeAndWait() {
@@ -40,5 +27,16 @@ public class CapsuleController<T extends ICapsule> {
 
     public Collection<T> getCapsules() {
         return childCapsules.keySet();
+    }
+
+    public void stopChild(final T capsule) {
+        childCapsules.get(capsule).stop();
+        childCapsules.remove(capsule);
+    }
+
+    public void stopChildren() {
+        for (final LaunchContainer capsule : childCapsules.values()) {
+            capsule.stop();
+        }
     }
 }

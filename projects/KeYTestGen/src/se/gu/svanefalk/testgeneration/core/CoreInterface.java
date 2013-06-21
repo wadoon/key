@@ -89,9 +89,9 @@ public class CoreInterface implements ICapsuleMonitor {
      *             case generation.
      */
     public List<TestSuite> createTestSuites(final File path,
-            boolean includePublic, boolean includeProtected,
-            boolean includePrivate, boolean includeNative,
-            ICodeCoverageParser codeCoverageParser) throws CoreException {
+            final boolean includePublic, final boolean includeProtected,
+            final boolean includePrivate, final boolean includeNative,
+            final ICodeCoverageParser codeCoverageParser) throws CoreException {
 
         return null;
     }
@@ -117,12 +117,46 @@ public class CoreInterface implements ICapsuleMonitor {
      *             case generation.
      */
     public List<TestSuite> createTestSuites(final File path,
-            boolean includePublic, boolean includeProtected,
-            boolean includePrivate, boolean includeNative,
-            ICodeCoverageParser codeCoverageParser, List<String> methods)
-            throws CoreException {
+            final boolean includePublic, final boolean includeProtected,
+            final boolean includePrivate, final boolean includeNative,
+            final ICodeCoverageParser codeCoverageParser,
+            final List<String> methods) throws CoreException {
 
         return null;
+    }
+
+    /**
+     * Generates a set of test suites for the selected methods from a particular
+     * class, according to the code coverage criteria specified.
+     * 
+     * @param path
+     *            path to the Java source file
+     * @param codeCoverageParser
+     *            coverage criteria
+     * @param methods
+     *            the methods to generate test suites for
+     * @return a set of test suites for the selected methods
+     * @throws CoreException
+     *             in the event of an error in the test generation process
+     */
+    public List<TestSuite> createTestSuites(final File path,
+            ICodeCoverageParser codeCoverageParser, final List<String> methods)
+            throws CoreException {
+
+        /*
+         * If no coverage criteria are specificed, use default.
+         */
+        if (codeCoverageParser == null) {
+            codeCoverageParser = new StatementCoverageParser();
+        }
+
+        /*
+         * Get the abstract representation of the class.
+         */
+        final KeYJavaClass targetClass = extractKeYJavaClass(path);
+
+        return createTestSuites(targetClass, codeCoverageParser, methods);
+
     }
 
     /**
@@ -134,9 +168,9 @@ public class CoreInterface implements ICapsuleMonitor {
      * @return
      * @throws CoreException
      */
-    private List<TestSuite> createTestSuites(KeYJavaClass targetClass,
-            ICodeCoverageParser codeCoverageParser, List<String> methods)
-            throws CoreException {
+    private List<TestSuite> createTestSuites(final KeYJavaClass targetClass,
+            final ICodeCoverageParser codeCoverageParser,
+            final List<String> methods) throws CoreException {
 
         /*
          * The result set of abstract test suites.
@@ -148,7 +182,7 @@ public class CoreInterface implements ICapsuleMonitor {
          * These capsules will then carry out the test generation process
          * concurrently.
          */
-        CapsuleController<MethodCapsule> controller = new CapsuleController<>();
+        final CapsuleController<MethodCapsule> controller = new CapsuleController<>();
         for (final String method : methods) {
 
             /*
@@ -195,38 +229,25 @@ public class CoreInterface implements ICapsuleMonitor {
         return testSuites;
     }
 
-    /**
-     * Generates a set of test suites for the selected methods from a particular
-     * class, according to the code coverage criteria specified.
-     * 
-     * @param path
-     *            path to the Java source file
-     * @param codeCoverageParser
-     *            coverage criteria
-     * @param methods
-     *            the methods to generate test suites for
-     * @return a set of test suites for the selected methods
-     * @throws CoreException
-     *             in the event of an error in the test generation process
-     */
-    public List<TestSuite> createTestSuites(final File path,
-            ICodeCoverageParser codeCoverageParser, List<String> methods)
-            throws CoreException {
+    @Override
+    public void doNotify(final ICapsule source, final IMonitorEvent event) {
 
         /*
-         * If no coverage criteria are specificed, use default.
+         * The signalling capsule caught an exception
          */
-        if (codeCoverageParser == null) {
-            codeCoverageParser = new StatementCoverageParser();
+        if (event instanceof CaughtException) {
+
+            /*
+             * Notify monitors about the exceptioon
+             */
+            final CaughtException caughtException = (CaughtException) event;
+            caughtException.getPayload();
+
+            /*
+             * Terminate all children
+             */
+            source.getController().stopChildren();
         }
-
-        /*
-         * Get the abstract representation of the class.
-         */
-        final KeYJavaClass targetClass = extractKeYJavaClass(path);
-
-        return createTestSuites(targetClass, codeCoverageParser, methods);
-
     }
 
     /**
@@ -262,27 +283,6 @@ public class CoreInterface implements ICapsuleMonitor {
             throw new CoreException(e.getMessage());
         } catch (final IOException e) {
             throw new CoreException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void doNotify(ICapsule source, IMonitorEvent event) {
-
-        /*
-         * The signalling capsule caught an exception
-         */
-        if (event instanceof CaughtException) {
-
-            /*
-             * Notify monitors about the exceptioon
-             */
-            CaughtException caughtException = (CaughtException) event;
-            Throwable payload = caughtException.getPayload();
-
-            /*
-             * Terminate all children
-             */
-            source.getController().stopChildren();
         }
     }
 }

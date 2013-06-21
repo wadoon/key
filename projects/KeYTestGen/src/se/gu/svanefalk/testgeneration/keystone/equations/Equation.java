@@ -51,8 +51,8 @@ public class Equation {
                  * Check so the constant is not a multiplier.
                  */
                 final ITreeNode parent = expression.getParent();
-                return (parent instanceof Addition
-                        || parent instanceof IComparator || parent == null);
+                return ((parent instanceof Addition)
+                        || (parent instanceof IComparator) || (parent == null));
             }
 
             return false;
@@ -121,12 +121,12 @@ public class Equation {
 
         final Map<String, Variable> variables = Equation.extractVariables(equality);
         final Equation equation = new Equation(equality, variables);
-        
+
         /*
          * Bring the constant part of the equation to one side
          */
         equation.isolateConstantPart();
-        
+
         /*
          * If the constant is negative, negate the equation.
          */

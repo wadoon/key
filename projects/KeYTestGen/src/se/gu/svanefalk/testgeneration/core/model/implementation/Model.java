@@ -82,7 +82,7 @@ public class Model {
 
             variable.setValue(instance);
 
-            if (instance instanceof ModelInstance && instance != null) {
+            if ((instance instanceof ModelInstance) && (instance != null)) {
                 ((ModelInstance) instance).addReferee(variable);
             }
 

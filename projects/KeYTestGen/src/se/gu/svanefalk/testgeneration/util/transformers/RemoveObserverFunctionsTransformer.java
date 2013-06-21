@@ -20,13 +20,8 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
     }
 
     @Override
-    public Term transform(Term term) throws TermTransformerException {
+    public Term transform(final Term term) throws TermTransformerException {
         return transformTerm(term);
-    }
-
-    @Override
-    protected Term transformObserverFunction(Term term) {
-        return null;
     }
 
     /**
@@ -58,16 +53,6 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
         }
 
         return null;
-    }
-    
-    @Override
-    protected Term transformLocationVariable(Term term) {
-        
-        if(TermParserTools.isExceptionSort(term)) {
-            return null;
-        }
-        
-        return super.transformLocationVariable(term);
     }
 
     /**
@@ -102,6 +87,16 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
         return null;
     }
 
+    @Override
+    protected Term transformLocationVariable(final Term term) {
+
+        if (TermParserTools.isExceptionSort(term)) {
+            return null;
+        }
+
+        return super.transformLocationVariable(term);
+    }
+
     /**
      * Simplify a negation. If the child is simplified to null, simply return
      * null. Otherwise, create a new negation of the simplification of the
@@ -132,6 +127,11 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
     @Override
     protected Term transformNull(final Term term) {
 
+        return null;
+    }
+
+    @Override
+    protected Term transformObserverFunction(final Term term) {
         return null;
     }
 

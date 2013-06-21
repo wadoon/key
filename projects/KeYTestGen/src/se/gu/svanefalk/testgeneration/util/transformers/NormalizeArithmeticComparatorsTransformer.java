@@ -1,14 +1,10 @@
 package se.gu.svanefalk.testgeneration.util.transformers;
 
-import org.apache.commons.math3.fraction.Fraction;
-
-import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
@@ -32,6 +28,29 @@ public class NormalizeArithmeticComparatorsTransformer extends
         this.services = services;
     }
 
+    private Term addToZValue(final Term term, final int toAdd) {
+
+        if (TermParserTools.isInteger(term)) {
+            int currentValue = 0;
+            if (TermParserTools.isIntegerNegation(term.sub(0))) {
+                currentValue = Integer.parseInt("-"
+                        + TermParserTools.resolveNumber(term.sub(0).sub(0)));
+            } else {
+                currentValue = Integer.parseInt(TermParserTools.resolveNumber(term.sub(0)));
+            }
+
+            final int newValue = currentValue + toAdd;
+            return NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(
+                    services, Integer.toString(newValue));
+
+        } else {
+            final Term val = NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(
+                    services, Integer.toString(toAdd));
+            return NormalizeArithmeticComparatorsTransformer.termBuilder.add(
+                    services, term, val);
+        }
+    }
+
     @Override
     public Term transform(Term term) throws TermTransformerException {
 
@@ -41,16 +60,6 @@ public class NormalizeArithmeticComparatorsTransformer extends
         term = NegationNormalFormTransformer.getInstance().transform(term);
 
         return transformTerm(term);
-    }
-
-    @Override
-    protected Term transformEquals(Term term) throws TermTransformerException {
-        if (TermParserTools.isArithmeticComparator(term)) {
-            return transformBinaryFunction(term);
-        } else {
-            return super.transformEquals(term);
-        }
-
     }
 
     @Override
@@ -94,15 +103,16 @@ public class NormalizeArithmeticComparatorsTransformer extends
              */
             if (TermParserTools.isEquals(term)) {
 
-                Term rhandMinusOne = addToZValue(rightChild, -1);
-                Term rhandPlusOne = addToZValue(rightChild, 1);
+                final Term rhandMinusOne = addToZValue(rightChild, -1);
+                final Term rhandPlusOne = addToZValue(rightChild, 1);
 
-                Term lessThanConstraint = termBuilder.leq(leftChild,
-                        rhandMinusOne, services);
-                Term greaterThanConstraint = termBuilder.geq(leftChild,
-                        rhandPlusOne, services);
+                final Term lessThanConstraint = NormalizeArithmeticComparatorsTransformer.termBuilder.leq(
+                        leftChild, rhandMinusOne, services);
+                final Term greaterThanConstraint = NormalizeArithmeticComparatorsTransformer.termBuilder.geq(
+                        leftChild, rhandPlusOne, services);
 
-                return termBuilder.or(lessThanConstraint, greaterThanConstraint);
+                return NormalizeArithmeticComparatorsTransformer.termBuilder.or(
+                        lessThanConstraint, greaterThanConstraint);
                 /*
                  * Term valueMinusOne = termBuilder.add(services, rightChild,
                  * t2) Term leftInequality = termBuilder.leq( incrementedChild,
@@ -115,29 +125,20 @@ public class NormalizeArithmeticComparatorsTransformer extends
     }
 
     @Override
+    protected Term transformEquals(final Term term)
+            throws TermTransformerException {
+        if (TermParserTools.isArithmeticComparator(term)) {
+            return transformBinaryFunction(term);
+        } else {
+            return super.transformEquals(term);
+        }
+
+    }
+
+    @Override
     protected Term transformNot(final Term term)
             throws TermTransformerException {
         sawNegation = true;
         return transformTerm(term.sub(0));
-    }
-
-    private Term addToZValue(Term term, int toAdd) {
-
-        if (TermParserTools.isInteger(term)) {
-            int currentValue = 0;
-            if (TermParserTools.isIntegerNegation(term.sub(0))) {
-                currentValue = Integer.parseInt("-"
-                        + TermParserTools.resolveNumber(term.sub(0).sub(0)));
-            } else {
-                currentValue = Integer.parseInt(TermParserTools.resolveNumber(term.sub(0)));
-            }
-
-            int newValue = currentValue + toAdd;
-            return termBuilder.zTerm(services, Integer.toString(newValue));
-
-        } else {
-            Term val = termBuilder.zTerm(services, Integer.toString(toAdd));
-            return termBuilder.add(services, term, val);
-        }
     }
 }

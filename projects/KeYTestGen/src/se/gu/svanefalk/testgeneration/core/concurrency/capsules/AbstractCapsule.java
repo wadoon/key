@@ -2,11 +2,7 @@ package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
-import java_cup.terminal;
-
-import se.gu.svanefalk.testgeneration.KeYTestGenException;
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.ICapsuleMonitor;
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.IMonitorEvent;
 
@@ -43,6 +39,21 @@ public abstract class AbstractCapsule implements ICapsule {
      */
     private Throwable thrownException;
 
+    @Override
+    public void addController(final CapsuleController controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public void addMonitor(final ICapsuleMonitor capsuleMonitor) {
+        monitors.add(capsuleMonitor);
+    }
+
+    @Override
+    public CapsuleController getController() {
+        return controller;
+    }
+
     /**
      * @return the exception thrown during the execution of this capsule, if
      *         any.
@@ -57,6 +68,16 @@ public abstract class AbstractCapsule implements ICapsule {
      */
     public boolean isSucceeded() {
         return succeeded;
+    }
+
+    public boolean isTerminated() {
+        return isTerminated;
+    }
+
+    protected void notifyMonitors(final IMonitorEvent event) {
+        for (final ICapsuleMonitor monitor : monitors) {
+            monitor.doNotify(this, event);
+        }
     }
 
     /**
@@ -75,32 +96,8 @@ public abstract class AbstractCapsule implements ICapsule {
         this.thrownException = thrownException;
     }
 
-    public void addMonitor(ICapsuleMonitor capsuleMonitor) {
-        monitors.add(capsuleMonitor);
-    }
-
-    protected void notifyMonitors(IMonitorEvent event) {
-        for (ICapsuleMonitor monitor : monitors) {
-            monitor.doNotify(this, event);
-        }
-    }
-
     @Override
     public void terminate() {
         isTerminated = true;
-    }
-
-    @Override
-    public void addController(CapsuleController controller) {
-        this.controller = controller;
-    }
-
-    @Override
-    public CapsuleController getController() {
-        return controller;
-    }
-
-    public boolean isTerminated() {
-        return isTerminated;
     }
 }

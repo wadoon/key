@@ -9,12 +9,12 @@ public class LaunchContainer implements Runnable {
      */
     private CountDownLatch latch;
 
-    public LaunchContainer(ICapsule wrappedCapsule) {
+    private final ICapsule wrappedCapsule;
+
+    public LaunchContainer(final ICapsule wrappedCapsule) {
         super();
         this.wrappedCapsule = wrappedCapsule;
     }
-
-    private final ICapsule wrappedCapsule;
 
     public ICapsule getWrappedCapsule() {
         return wrappedCapsule;
@@ -31,8 +31,8 @@ public class LaunchContainer implements Runnable {
         }
     }
 
-    public void setLatch(CountDownLatch latch2) {
-        this.latch = latch2;
+    public void setLatch(final CountDownLatch latch2) {
+        latch = latch2;
     }
 
     public void stop() {

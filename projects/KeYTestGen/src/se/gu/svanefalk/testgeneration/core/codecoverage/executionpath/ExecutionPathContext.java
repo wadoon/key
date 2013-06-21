@@ -231,7 +231,8 @@ public class ExecutionPathContext {
                          * branching node, since we will have to return to it
                          * that many times.
                          */
-                        if (isExecutionBranchNode(node) || isBranchingNode(node)) {
+                        if (isExecutionBranchNode(node)
+                                || isBranchingNode(node)) {
                             for (int i = 0; i < node.getChildren().length; i++) {
                                 lastSeenPathBranchNode.push(currentElement);
                             }

@@ -39,8 +39,8 @@ public enum OracleGenerator {
 
     private static final Oracle EMPTY_ORACLE;
     static {
-        Set<OracleAssertion> assertions = new HashSet<OracleAssertion>();
-        OracleConstraint constraints = new OracleConstraint(assertions);
+        final Set<OracleAssertion> assertions = new HashSet<OracleAssertion>();
+        final OracleConstraint constraints = new OracleConstraint(assertions);
         EMPTY_ORACLE = new Oracle(constraints, null);
     }
 
@@ -522,16 +522,16 @@ public enum OracleGenerator {
              * them an empty oracle.
              */
             if (method.getPostconditions() == null) {
-                return EMPTY_ORACLE;
+                return OracleGenerator.EMPTY_ORACLE;
             }
 
             /*
              * Extract the postcondition of the method
              */
             final Term postCondition = method.getPostconditions().get(0);
-            if (postCondition == null
+            if ((postCondition == null)
                     || postCondition.toString().equals("true")) {
-                return EMPTY_ORACLE;
+                return OracleGenerator.EMPTY_ORACLE;
             }
 
             /*
@@ -547,7 +547,7 @@ public enum OracleGenerator {
              */
             final Term simplifiedPostCondition = oracleTermTransformer.transform(postCondition);
             if (simplifiedPostCondition == null) {
-                return EMPTY_ORACLE;
+                return OracleGenerator.EMPTY_ORACLE;
             }
 
             /*

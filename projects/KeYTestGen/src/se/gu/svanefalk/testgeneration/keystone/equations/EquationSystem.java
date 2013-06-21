@@ -16,7 +16,6 @@ import org.apache.commons.math3.fraction.Fraction;
 
 import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.DummyVariable;
-import se.gu.svanefalk.testgeneration.keystone.equations.expression.ExpressionUtils;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.keystone.equations.expression.Variable;
 import se.gu.svanefalk.testgeneration.keystone.equations.restriction.IRestriction;
@@ -159,11 +158,6 @@ public class EquationSystem {
         for (final Variable variable : variableIndex.values()) {
             variable.bind(null);
         }
-    }
-
-    private Map<String, Integer> solveSingleEquation() {
-        Equation equation = equations.get(0);
-        return null;
     }
 
     public Map<String, Fraction> solveSystem()

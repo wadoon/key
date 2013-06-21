@@ -1,7 +1,6 @@
 package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
@@ -27,6 +26,12 @@ public class CapsuleExecutor {
     private final Executor executor = Executors.newCachedThreadPool();
 
     private CapsuleExecutor() {
+    }
+
+    public void execute(final List<LaunchContainer> capsules) {
+        for (final LaunchContainer capsule : capsules) {
+            executor.execute(capsule);
+        }
     }
 
     /**
@@ -58,12 +63,6 @@ public class CapsuleExecutor {
             } catch (final InterruptedException e) {
                 continue;
             }
-        }
-    }
-
-    public void execute(List<LaunchContainer> capsules) {
-        for (LaunchContainer capsule : capsules) {
-            executor.execute(capsule);
         }
     }
 }

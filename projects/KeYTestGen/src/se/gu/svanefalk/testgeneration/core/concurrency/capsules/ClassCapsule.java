@@ -20,24 +20,47 @@ import se.gu.svanefalk.testgeneration.util.Benchmark;
 
 public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
 
+    private final ICodeCoverageParser codeCoverageParser;
     /**
      * Used in order to generate instances of {@link KeYJavaClass} for a given
      * source file
      */
     protected final KeYJavaClassFactory keYJavaClassFactory = KeYJavaClassFactory.getInstance();
-    private final ICodeCoverageParser codeCoverageParser;
     private final List<String> methods;
     private final File source;
 
-    public ClassCapsule(ICodeCoverageParser codeCoverageParser,
-            List<String> methods, File source) {
+    private List<TestSuite> testSuites = null;
+
+    public ClassCapsule(final ICodeCoverageParser codeCoverageParser,
+            final List<String> methods, final File source) {
         super();
         this.codeCoverageParser = codeCoverageParser;
         this.methods = methods;
         this.source = source;
     }
 
-    private List<TestSuite> testSuites = null;
+    @Override
+    public void doNotify(final ICapsule source, final IMonitorEvent event) {
+
+        /*
+         * The signalling capsule caught an exception
+         */
+        if (event instanceof CaughtException) {
+
+            /*
+             * Notify monitors about the exceptioon
+             */
+            final CaughtException caughtException = (CaughtException) event;
+            final Throwable payload = caughtException.getPayload();
+            setThrownException(payload);
+            notifyMonitors(event);
+
+            /*
+             * Terminate all children
+             */
+            source.getController().stopChildren();
+        }
+    }
 
     @Override
     public void doWork() {
@@ -59,7 +82,7 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
              * generation. These capsules will then carry out the test
              * generation process concurrently.
              */
-            CapsuleController<MethodCapsule> controller = new CapsuleController<>();
+            final CapsuleController<MethodCapsule> controller = new CapsuleController<>();
             for (final String method : methods) {
 
                 /*
@@ -97,40 +120,13 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
 
             this.testSuites = testSuites;
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             setThrownException(e);
             notifyMonitors(new CaughtException(e));
             return;
         }
 
         setSucceeded();
-    }
-
-    public List<TestSuite> getResult() {
-        return testSuites;
-    }
-
-    @Override
-    public void doNotify(ICapsule source, IMonitorEvent event) {
-
-        /*
-         * The signalling capsule caught an exception
-         */
-        if (event instanceof CaughtException) {
-
-            /*
-             * Notify monitors about the exceptioon
-             */
-            CaughtException caughtException = (CaughtException) event;
-            Throwable payload = caughtException.getPayload();
-            setThrownException(payload);
-            notifyMonitors(event);
-
-            /*
-             * Terminate all children
-             */
-            source.getController().stopChildren();
-        }
     }
 
     /**
@@ -167,6 +163,10 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
         } catch (final IOException e) {
             throw new CoreException(e.getMessage());
         }
+    }
+
+    public List<TestSuite> getResult() {
+        return testSuites;
     }
 
 }

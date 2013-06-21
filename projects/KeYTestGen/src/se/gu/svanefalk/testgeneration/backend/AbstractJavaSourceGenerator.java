@@ -34,8 +34,16 @@ public abstract class AbstractJavaSourceGenerator {
         output.append(text);
     }
 
+    protected void decreaseIndentation() {
+        --indentation;
+    }
+
     protected String getCurrentOutput() {
         return output.toString();
+    }
+
+    protected void increaseIndentation() {
+        ++indentation;
     }
 
     /**
@@ -116,14 +124,6 @@ public abstract class AbstractJavaSourceGenerator {
         output.append("}\n");
     }
 
-    protected void increaseIndentation() {
-        ++indentation;
-    }
-
-    protected void decreaseIndentation() {
-        --indentation;
-    }
-
     /**
      * Writes a nested Java comment.
      * 
@@ -181,18 +181,6 @@ public abstract class AbstractJavaSourceGenerator {
 
         indent();
         output.append(obj.toString());
-    }
-
-    protected void writeUnindentedLine(String text) {
-        output.append(text);
-    }
-
-    protected void writeUnindentedLine(Object obj) {
-        output.append(obj.toString());
-    }
-
-    protected void writeNewLine() {
-        writeIndentedLine(AbstractJavaSourceGenerator.NEWLINE);
     }
 
     /**
@@ -317,6 +305,10 @@ public abstract class AbstractJavaSourceGenerator {
         increaseIndentation();
     }
 
+    protected void writeNewLine() {
+        writeIndentedLine(AbstractJavaSourceGenerator.NEWLINE);
+    }
+
     /**
      * Writes an opening brace ("{") to the Java source file. This will increase
      * the indentation level for the text.
@@ -326,5 +318,13 @@ public abstract class AbstractJavaSourceGenerator {
         indent();
         increaseIndentation();
         output.append("{\n");
+    }
+
+    protected void writeUnindentedLine(final Object obj) {
+        output.append(obj.toString());
+    }
+
+    protected void writeUnindentedLine(final String text) {
+        output.append(text);
     }
 }

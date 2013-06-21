@@ -1,10 +1,7 @@
 package se.gu.svanefalk.testgeneration.frontend.cli;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.beust.jcommander.Parameter;
 
@@ -52,7 +49,7 @@ public class CommandParser {
             + "decision\tdecision coverage\n"
             + CommandParser.INDENT
             + "mcdc\t\tmodified condition/decision coverage")
-    private String coverage = "statement";
+    private final String coverage = "statement";
 
     /**
      * Select which Java files to use as a basis for test case generation.
@@ -87,7 +84,7 @@ public class CommandParser {
             + "native\t\tinclude methods declared in Java.lang.Object (not recommended)\n"
             + CommandParser.INDENT
             + "[method name]\tspecify methods to include (by identifier)")
-    private List<String> methods = new ArrayList<String>();
+    private final List<String> methods = new ArrayList<String>();
 
     /**
      * Select top-level output directory for the generated test suite(s).
@@ -116,6 +113,10 @@ public class CommandParser {
      */
     @Parameter(names = { "-v", "--verbose" }, description = "enable verbose output")
     private boolean verbose;
+
+    public String getCoverage() {
+        return coverage;
+    }
 
     /**
      * @return the files
@@ -171,9 +172,5 @@ public class CommandParser {
     public boolean isVerboseFlagSet() {
 
         return verbose;
-    }
-
-    public String getCoverage() {
-        return coverage;
     }
 }

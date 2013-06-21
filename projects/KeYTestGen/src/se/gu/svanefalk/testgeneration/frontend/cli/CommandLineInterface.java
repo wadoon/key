@@ -1,9 +1,6 @@
 package se.gu.svanefalk.testgeneration.frontend.cli;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,6 +26,28 @@ public final class CommandLineInterface {
          * Hook to KeYTestGen2 itself.
          */
         private static TestGenerator testGenerator = TestGenerator.getInstance();
+
+        /**
+         * Setup default values which are not currently handled by the parser.
+         * 
+         * @param parser
+         */
+        private static void checkAndSetDefaults(final CommandParser parser) {
+
+            /*
+             * Setup default method selection.
+             */
+            if (parser.getMethods().isEmpty()) {
+                parser.getMethods().add("all");
+            }
+
+            /*
+             * Setup default framework selection.
+             */
+            if (parser.getMethods().isEmpty()) {
+                parser.getTestFrameworks().add("junit4");
+            }
+        }
 
         /**
          * Prints version and copyright information.
@@ -144,7 +163,7 @@ public final class CommandLineInterface {
                 /*
                  * Set default values, if applicable.
                  */
-                checkAndSetDefaults(parser);
+                CommandLineInterfaceWorker.checkAndSetDefaults(parser);
 
                 /*
                  * Generate test suites for each file and each framework
@@ -163,36 +182,37 @@ public final class CommandLineInterface {
          * 
          * @param parser
          */
-        private void generateTestCases(CommandParser parser) {
+        private void generateTestCases(final CommandParser parser) {
 
-            ICodeCoverageParser coverageParser = cliResources.getCodeCoverageParser(parser.getCoverage());
+            final ICodeCoverageParser coverageParser = CommandLineInterfaceWorker.cliResources.getCodeCoverageParser(parser.getCoverage());
 
-            for (String file : parser.getFiles()) {
+            for (final String file : parser.getFiles()) {
 
                 /*
                  * Create the root folder for the generated test files for this
                  * class.
                  */
-                File rootFolder = new File(parser.getOutputDirectory() + "//"
-                        + file);
+                final File rootFolder = new File(parser.getOutputDirectory()
+                        + "//" + file);
                 rootFolder.mkdir();
 
-                for (String framework : parser.getTestFrameworks()) {
+                for (final String framework : parser.getTestFrameworks()) {
 
-                    IFrameworkConverter frameworkConverter = cliResources.getFrameworkConverter(framework);
+                    final IFrameworkConverter frameworkConverter = CommandLineInterfaceWorker.cliResources.getFrameworkConverter(framework);
                     generateTestCases(file, coverageParser, frameworkConverter,
                             parser.getMethods());
                 }
             }
         }
 
-        private void generateTestCases(String file,
-                ICodeCoverageParser coverageParser,
-                IFrameworkConverter frameworkConverter, List<String> methods) {
+        private void generateTestCases(final String file,
+                final ICodeCoverageParser coverageParser,
+                final IFrameworkConverter frameworkConverter,
+                final List<String> methods) {
 
-            List<String> userMethods = new LinkedList<>();
-            List<String> methodQualifiers = new LinkedList<>();
-            for (String method : methods) {
+            final List<String> userMethods = new LinkedList<>();
+            final List<String> methodQualifiers = new LinkedList<>();
+            for (final String method : methods) {
 
                 if (method.equals("all") || method.equals("public")
                         || method.equals("protected")
@@ -206,71 +226,25 @@ public final class CommandLineInterface {
                 }
             }
 
-            /*
-             * Format the argument list to be passed to KeYTestGen2.
-             */
-            boolean includePublic = false;
-            boolean includeProtected = false;
-            boolean includePrivate = false;
-            boolean includeNative = false;
-
             if (methodQualifiers.contains("all")) {
 
-                includePublic = includeProtected = includePrivate = true;
+                includeProtected = true;
             } else {
 
                 if (methodQualifiers.contains("public")) {
-
-                    includePublic = true;
                 }
 
                 if (methodQualifiers.contains("protected")) {
-
-                    includeProtected = true;
                 }
 
                 if (methodQualifiers.contains("private")) {
-
-                    includePrivate = true;
                 }
             }
             // Malin: 622813
             if (methodQualifiers.contains("native")) {
-
-                includeNative = true;
             }
 
         }
-
-        /**
-         * Setup default values which are not currently handled by the parser.
-         * 
-         * @param parser
-         */
-        private static void checkAndSetDefaults(CommandParser parser) {
-
-            /*
-             * Setup default method selection.
-             */
-            if (parser.getMethods().isEmpty()) {
-                parser.getMethods().add("all");
-            }
-
-            /*
-             * Setup default framework selection.
-             */
-            if (parser.getMethods().isEmpty()) {
-                parser.getTestFrameworks().add("junit4");
-            }
-        }
-    }
-
-    public void execute(String[] args) {
-
-        /*
-         * Create a new worker and chop away.
-         */
-        new CommandLineInterfaceWorker().execute(args);
     }
 
     public static void main(final String[] args) {
@@ -282,6 +256,14 @@ public final class CommandLineInterface {
             System.out.println("No arguments specified. Type -h or --help for usage instructions");
             System.exit(0);
         }
+
+        /*
+         * Create a new worker and chop away.
+         */
+        new CommandLineInterfaceWorker().execute(args);
+    }
+
+    public void execute(final String[] args) {
 
         /*
          * Create a new worker and chop away.
