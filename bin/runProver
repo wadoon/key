@@ -58,13 +58,11 @@ if [ -z "$KEY_HOME" ] ; then
 fi
 echo "Using KeY installation from:      $KEY_HOME"
 
-
 if [ -z "$KEY_LIB" ] ; then
    KEY_LIB="$KEY_HOME/key-ext-jars"
 else
-echo "Using libraries from:             $KEY_LIB"
+    echo "Using libraries from:             $KEY_LIB"
 fi
-
 
 #
 # KeY CLASSPATH
@@ -86,8 +84,6 @@ for i in $key_ext_jars ; do
        keyclasspath="${keyclasspath}:$current_jar"
     fi
 done
-
-
 
 #
 #Function prints help message
@@ -228,7 +224,11 @@ export PATH
 #-server \
 #-XX:CompileThreshold=1500 \
 # -ea:de.uka.ilkd.key... -Xms64m -Xmx2048m \
-
+#
+echo "$KEY_HOME"
+echo "$keysysprops"
+echo "$KEY_SIMPLIFY_LOG_DIR"
+echo "$keyclasspath"
 
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="build" name="KeYTestGen">
+
+	<property environment="env" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.7" />
+	<property name="source" value="1.7" />
+	<property name="key.home" value="${basedir}/dependencies/key" />
+	<property name="ktg.dep" value="${basedir}/dependencies" />
+	<property name="key.dep" value="${basedir}/dependencies/key/key-ext-jars" />
+	<property name="target.binary" value="${basedir}/bin" />
+	<property name="target.root" value="keytestgen2" />
+	<property name="target.dep" value="${target.root}/dependencies" />
+	<property name="target.system" value="${target.root}/system" />
+
+	<target name="all">
+
+		<!-- perform initial cleanup -->
+		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
+			target="get-key-jar">
+		</ant>
+
+		<!-- set up the folders -->
+		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
+			target="build-ktg-jar">
+		</ant>
+
+		<!-- copy the dependencies -->
+		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
+			target="copydeps">
+		</ant>
+
+		<!-- copy the dependencies -->
+		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
+			target="copy-resources">
+		</ant>
+
+		<!-- clean -->
+		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
+			target="finalize">
+		</ant>
+	</target>
+
+	<!-- main entry for the build. Simply delegates to other sub-builds -->
+	<target name="build" depends="all" />
+
+	<!-- set up the folder hierarchies -->
+	<target name="init">
+		<mkdir dir="${target.binary}" />
+		<mkdir dir="${target.root}" />
+		<mkdir dir="${target.dep}" />
+		<mkdir dir="${target.system}" />
+		<copy includeemptydirs="false" todir="${target.binary}">
+			<fileset dir="src">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+
+	<!-- build the key jar -->
+	<target name="build-key" depends="init">
+		<ant antfile="build.xml" dir="${key.home}/system" inheritAll="false"
+			target="jar">
+		</ant>
+	</target>
+
+
+	<target name="get-key-jar" depends="build-key">
+		<copy file="${key.home}/system/key.jar" todir="${target.dep}" />
+	</target>
+
+
+	<!-- compile the ktg jarfile -->
+	<target name="build-ktg-jar" depends="build-ktg">
+		<jar destfile="${target.system}/ktg2.jar" basedir="${target.binary}"
+			manifest="${basedir}/resources/MANIFEST.MF" />
+	</target>
+
+	<!-- compile ktg2 itself -->
+	<target name="build-ktg" depends="build-key">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.binary}"
+			includeantruntime="false" source="${source}" target="${target}">
+			<src path="src" />
+			<classpath>
+				<pathelement location="${target.binary}" />
+				<pathelement location="${ktg.dep}/apache-commons-math.jar" />
+				<pathelement location="${ktg.dep}/jcommander-1.31.jar" />
+				<pathelement location="${key.home}/system/binary" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="copy-resources" depends="init">
+		<copy file="${basedir}/resources/ktg2" todir="${target.root}" />
+		<chmod file="${target.root}/ktg2" perm="+x" />
+	</target>
+
+	<target name="copydeps">
+		<copy file="${ktg.dep}/apache-commons-math.jar" todir="${target.dep}" />
+		<copy file="${ktg.dep}/jcommander-1.31.jar" todir="${target.dep}" />
+		<copy file="${key.dep}/antlr.jar" todir="${target.dep}" />
+		<copy file="${key.dep}/recoderKey.jar" todir="${target.dep}" />
+	</target>
+
+	<!-- clean up -->
+	<target name="finalize">
+		<ant antfile="build.xml" dir="${key.home}/system" inheritAll="false"
+			target="clean">
+		</ant>
+		<delete dir="${target.binary}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="keytestgen2" />
+	</target>
+
+	<target depends="clean" name="cleanall">
+		<ant antfile="build.xml" dir="${key-devel.location}" inheritAll="false"
+			target="clean" />
+	</target>
+</project>

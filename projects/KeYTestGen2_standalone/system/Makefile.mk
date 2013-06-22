@@ -1,1 +1,0 @@
-CLASSPATH="./binary/:/home/christopher/Research/KeYExtLib-1.6//antlr.jar:/home/christopher/Research/KeYExtLib-1.6//recoderKey.jar:/home/christopher/Research/KeYExtLib-1.6//javacc.jar:/home/christopher/Research/KeYExtLib-1.6//junit.jar"

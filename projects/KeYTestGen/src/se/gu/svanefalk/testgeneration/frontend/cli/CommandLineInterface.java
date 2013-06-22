@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -361,11 +363,17 @@ public final class CommandLineInterface {
      * 
      * @param args
      */
-    public void execute(final String[] args) {
+    public static void main(String[] args) {
 
         /*
          * Create a new worker and chop away.
          */
+        RuntimeMXBean RuntimemxBean = ManagementFactory.getRuntimeMXBean();
+        List<String> arguments = RuntimemxBean.getInputArguments();
+        for(String str : arguments) {
+            System.out.println(str);
+        }
         new CommandLineInterfaceWorker().execute(args);
+
     }
 }

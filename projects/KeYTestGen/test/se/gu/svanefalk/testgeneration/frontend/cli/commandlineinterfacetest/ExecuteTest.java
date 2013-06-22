@@ -20,6 +20,6 @@ public class ExecuteTest extends CommandLineInterFaceTest {
 
         String[] args = { "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/IntegerClass.java" };
 
-        cli.execute(args);
+        cli.main(args);
     }
 }

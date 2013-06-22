@@ -10,17 +10,16 @@
   <property name="gen.dir"  value="${basedir}/genSrc" />
   <property name="docs.dir"  value="${basedir}/doc"   />
 
+<!--
   <condition property="ext.dir" value="${env.KEY_LIB}">
   	<isset property="env.KEY_LIB"/>
   </condition>
-	
+	-->
   <property name="ext.dir" value="${basedir}/../key-ext-jars"   />
 	
   <property name="instrument.dir" value="${basedir}/instrumented/" />
   <property name="junit.jar"  value="${ext.dir}/junit.jar"  />
-
   <property name="jcoverage.jar" value="${ext.dir}/jcoverage.jar" />
-
   <property file="local.properties" />
 
   <property name="test.reports"   value="${basedir}/testresults/" />
@@ -45,7 +44,6 @@
       <pathelement location="${ext.dir}/recoderKey.jar"/>
       <pathelement location="${ext.dir}/javacc.jar"/>
       <pathelement location="${ext.dir}/junit.jar"/>
-      <pathelement location="${ext.dir}/z3parser.jar"/>
       <pathelement path="${dist.dir}"/>
     </classpath>
 
@@ -63,8 +61,6 @@
    </batchtest>
   </junit>
   </target>
-
-
 
   <target name="hudsonUnitTest" depends="compile">
      <junit printsummary="yes" haltonfailure="yes" fork="yes" showoutput="true">
@@ -248,6 +244,7 @@
     	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/proofjava/Token.java">
             <fileset file="${src.dir}/de/uka/ilkd/key/parser/proofjava/Token.java.source"/>
     	</copy>
+    	<echo message="This is error message. ${ext.dir}" level="error" />
 	<javacc
 	    target="${src.dir}/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
 	    outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/proofjava"
