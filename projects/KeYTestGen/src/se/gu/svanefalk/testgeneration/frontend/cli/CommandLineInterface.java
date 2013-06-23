@@ -228,8 +228,6 @@ public final class CommandLineInterface {
                         File javaFile = new File(rootFolder,
                                 testSuite.getTestSuiteName() + ".java");
 
-                        System.out.println(rootFolder.getAbsolutePath());
-                        System.out.println(javaFile.getAbsolutePath());
                         if (!javaFile.exists()) {
                             javaFile.createNewFile();
                         }
@@ -368,12 +366,6 @@ public final class CommandLineInterface {
         /*
          * Create a new worker and chop away.
          */
-        RuntimeMXBean RuntimemxBean = ManagementFactory.getRuntimeMXBean();
-        List<String> arguments = RuntimemxBean.getInputArguments();
-        for(String str : arguments) {
-            System.out.println(str);
-        }
         new CommandLineInterfaceWorker().execute(args);
-
     }
 }

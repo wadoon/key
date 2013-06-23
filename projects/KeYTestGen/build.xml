@@ -17,6 +17,9 @@
 	<target name="all">
 
 		<!-- perform initial cleanup -->
+		<!-- <ant antfile="build.xml" dir="${basedir}" inheritAll="false" target="finalize"> 
+			</ant> -->
+
 		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
 			target="get-key-jar">
 		</ant>
@@ -34,11 +37,6 @@
 		<!-- copy the dependencies -->
 		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
 			target="copy-resources">
-		</ant>
-
-		<!-- clean -->
-		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
-			target="finalize">
 		</ant>
 	</target>
 
@@ -95,6 +93,7 @@
 
 	<target name="copy-resources" depends="init">
 		<copy file="${basedir}/resources/ktg2" todir="${target.root}" />
+		<copy file="${basedir}/resources/IntegerClass.java" todir="${target.root}" />
 		<chmod file="${target.root}/ktg2" perm="+x" />
 	</target>
 
@@ -115,10 +114,17 @@
 
 	<target name="clean">
 		<delete dir="keytestgen2" />
+		<delete dir="${target.binary}" />
+		<ant antfile="build.xml" dir="${key.home}/system" inheritAll="false"
+			target="clean">
+		</ant>
+
 	</target>
 
 	<target depends="clean" name="cleanall">
-		<ant antfile="build.xml" dir="${key-devel.location}" inheritAll="false"
-			target="clean" />
+		<ant antfile="build.xml" dir="${key.home}/system" inheritAll="false"
+			target="clean">
+		</ant>
+		<delete dir="${target.binary}" />
 	</target>
 </project>

@@ -61,7 +61,6 @@ for i in $ktg_jars ; do
        ktgclasspath="${ktgclasspath}:$current_jar"
     fi
 done
-echo $ktgclasspath
 
 # Begin execution
 #-ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \

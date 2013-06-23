@@ -97,9 +97,8 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
          * Construct the default base class.
          */
         final KeYJavaType container = methodCall.getProgramMethod().getContainerType();
-
-        default_self = new LocationVariable(new ProgramElementName("self"),
-                new KeYJavaType(container));
+        ProgramElementName elementName = new ProgramElementName("self");
+        default_self = new LocationVariable(elementName, container);
 
         /*
          * Add the root variable and instance to the Model
@@ -127,8 +126,7 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                  * FIXME: I DO NOT WANT TO HAVE TO FLIPFLOP BETWEEN DIFFERENT
                  * ABSTRACTIONS!
                  */
-                final KeYJavaType type = new KeYJavaType(
-                        variableSpecification.getType());
+                final KeYJavaType type = (KeYJavaType) variableSpecification.getType();
 
                 final ProgramElementName name = new ProgramElementName(
                         variableSpecification.getName());
