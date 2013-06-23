@@ -15,28 +15,9 @@
 	<property name="target.system" value="${target.root}/system" />
 
 	<target name="all">
-
-		<!-- perform initial cleanup -->
-		<!-- <ant antfile="build.xml" dir="${basedir}" inheritAll="false" target="finalize"> 
-			</ant> -->
-
-		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
-			target="get-key-jar">
-		</ant>
-
-		<!-- set up the folders -->
-		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
-			target="build-ktg-jar">
-		</ant>
-
 		<!-- copy the dependencies -->
 		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
-			target="copydeps">
-		</ant>
-
-		<!-- copy the dependencies -->
-		<ant antfile="build.xml" dir="${basedir}" inheritAll="false"
-			target="copy-resources">
+			target="-copydeps">
 		</ant>
 	</target>
 
@@ -44,7 +25,7 @@
 	<target name="build" depends="all" />
 
 	<!-- set up the folder hierarchies -->
-	<target name="init">
+	<target name="-init">
 		<mkdir dir="${target.binary}" />
 		<mkdir dir="${target.root}" />
 		<mkdir dir="${target.dep}" />
@@ -56,28 +37,20 @@
 		</copy>
 	</target>
 
-
 	<!-- build the key jar -->
-	<target name="build-key" depends="init">
+	<target name="-build-key" depends="-init">
 		<ant antfile="build.xml" dir="${key.home}/system" inheritAll="false"
 			target="jar">
 		</ant>
 	</target>
 
 
-	<target name="get-key-jar" depends="build-key">
+	<target name="-get-key-jar" depends="-build-key">
 		<copy file="${key.home}/system/key.jar" todir="${target.dep}" />
 	</target>
 
-
-	<!-- compile the ktg jarfile -->
-	<target name="build-ktg-jar" depends="build-ktg">
-		<jar destfile="${target.system}/ktg2.jar" basedir="${target.binary}"
-			manifest="${basedir}/resources/MANIFEST.MF" />
-	</target>
-
 	<!-- compile ktg2 itself -->
-	<target name="build-ktg" depends="build-key">
+	<target name="-build-ktg" depends="-get-key-jar">
 		<echo message="${ant.project.name}: ${ant.file}" />
 		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.binary}"
 			includeantruntime="false" source="${source}" target="${target}">
@@ -91,13 +64,21 @@
 		</javac>
 	</target>
 
-	<target name="copy-resources" depends="init">
+	<!-- compile the ktg jarfile -->
+	<target name="-build-ktg-jar" depends="-build-ktg">
+		<jar destfile="${target.system}/ktg2.jar" basedir="${target.binary}"
+			manifest="${basedir}/resources/MANIFEST.MF" />
+	</target>
+
+	<!-- copy the Resources needed for the distributable -->
+	<target name="-copy-resources" depends="-build-ktg-jar">
 		<copy file="${basedir}/resources/ktg2" todir="${target.root}" />
 		<copy file="${basedir}/resources/IntegerClass.java" todir="${target.root}" />
 		<chmod file="${target.root}/ktg2" perm="+x" />
 	</target>
 
-	<target name="copydeps">
+	<!-- copy the dependencies for the distributable -->
+	<target name="-copydeps" depends="-copy-resources">
 		<copy file="${ktg.dep}/apache-commons-math.jar" todir="${target.dep}" />
 		<copy file="${ktg.dep}/jcommander-1.31.jar" todir="${target.dep}" />
 		<copy file="${key.dep}/antlr.jar" todir="${target.dep}" />
@@ -105,7 +86,7 @@
 	</target>
 
 	<!-- clean up -->
-	<target name="finalize">
+	<target name="-finalize">
 		<ant antfile="build.xml" dir="${key.home}/system" inheritAll="false"
 			target="clean">
 		</ant>

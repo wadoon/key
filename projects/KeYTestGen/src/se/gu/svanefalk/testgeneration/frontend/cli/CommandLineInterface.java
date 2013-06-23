@@ -14,6 +14,7 @@ import se.gu.svanefalk.testgeneration.backend.ITestSuite;
 import se.gu.svanefalk.testgeneration.backend.TestGenerator;
 import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
+import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleExecutor;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
@@ -202,13 +203,6 @@ public final class CommandLineInterface {
             for (final String file : parser.getFiles()) {
 
                 /*
-                 * Create the root folder for the generated test files for this
-                 * class.
-                 */
-                final File rootFolder = createRootFolder(file);
-                rootFolder.mkdir();
-
-                /*
                  * Generate the test suites themselves.
                  */
                 List<ITestSuite> testSuites = null;
@@ -219,14 +213,28 @@ public final class CommandLineInterface {
                 }
 
                 /*
+                 * Create the root folder in which we will put all the generated
+                 * test cases.
+                 */
+                final File rootFolder = new File(parser.getOutputDirectory());
+                if (!rootFolder.exists()) {
+                    rootFolder.mkdirs();
+                }
+
+                /*
                  * Write the files to the folder.
                  */
                 for (ITestSuite testSuite : testSuites) {
 
                     try {
 
-                        File javaFile = new File(rootFolder,
-                                testSuite.getTestSuiteName() + ".java");
+                        File testFolder = getTestFolder(rootFolder, testSuite);
+                        if (!testFolder.exists()) {
+                            testFolder.mkdirs();
+                        }
+
+                        File javaFile = new File(testFolder,
+                                testSuite.getClassName() + ".java");
 
                         if (!javaFile.exists()) {
                             javaFile.createNewFile();
@@ -246,26 +254,22 @@ public final class CommandLineInterface {
         }
 
         /**
-         * Creates a root folder, where source files can be written. Does not
-         * create the folder itself, but only returns a handler.
+         * Get a handler for the folder to which a given test suite should be
+         * written.
          * 
-         * @param file
-         *            the path to the folder
-         * @return a reference to the folder
+         * @param rootFolder
+         * @param testSuite
+         * @return
          */
-        private File createRootFolder(String file) {
+        private File getTestFolder(File rootFolder, ITestSuite testSuite) {
 
-            int extensionIndex = file.indexOf(".");
-            int lastSeparatorIndex = file.lastIndexOf(File.separator);
-            String folderName = null;
-            if (lastSeparatorIndex < 0) {
-                folderName = file.substring(0, extensionIndex);
-            } else {
-                folderName = file.substring(lastSeparatorIndex + 1,
-                        extensionIndex);
+            String javaPackage = testSuite.getPackage();
+            String[] packageElements = javaPackage.split("[.]");
+            String path = "";
+            for (int i = 0; i < packageElements.length; i++) {
+                path += packageElements[i] + File.separator;
             }
-
-            return new File(parser.getOutputDirectory() + "//" + folderName);
+            return new File(rootFolder, path);
         }
 
         /**
@@ -357,7 +361,7 @@ public final class CommandLineInterface {
     }
 
     /**
-     * Main entry point for the frontend.
+     * Main entry point for the CLI frontend.
      * 
      * @param args
      */
@@ -367,5 +371,6 @@ public final class CommandLineInterface {
          * Create a new worker and chop away.
          */
         new CommandLineInterfaceWorker().execute(args);
+        System.exit(0);
     }
 }

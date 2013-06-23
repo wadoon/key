@@ -211,6 +211,10 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                 throws JUnitConverterException {
 
             final List<TestCase> testCases = testSuite.getTestCases();
+            if (testCases.isEmpty()) {
+                return null;
+            }
+
             final KeYJavaClass klass = testSuite.getJavaClass();
             testSuite.getMethod();
 
@@ -254,7 +258,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              */
             writeClosingBrace();
 
-            return new JUnitTestSuite(header, getCurrentOutput());
+            return new JUnitTestSuite(testSuite, getCurrentOutput());
         }
 
         /**

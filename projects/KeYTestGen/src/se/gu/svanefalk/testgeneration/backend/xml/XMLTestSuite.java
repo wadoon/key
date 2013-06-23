@@ -4,14 +4,28 @@ import se.gu.svanefalk.testgeneration.backend.ITestSuite;
 
 public class XMLTestSuite implements ITestSuite {
 
+
+
     @Override
-    public String getTestSuiteName() {
+    public String getTestSuiteBody() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String getTestSuiteBody() {
+    public int getTestMethods() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public String getClassName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getPackage() {
         // TODO Auto-generated method stub
         return null;
     }

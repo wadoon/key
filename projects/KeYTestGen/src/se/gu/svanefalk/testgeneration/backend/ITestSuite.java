@@ -2,6 +2,11 @@ package se.gu.svanefalk.testgeneration.backend;
 
 public interface ITestSuite {
 
-    String getTestSuiteName();
+    int getTestMethods();
+
+    String getClassName();
+
+    String getPackage();
+
     String getTestSuiteBody();
 }
