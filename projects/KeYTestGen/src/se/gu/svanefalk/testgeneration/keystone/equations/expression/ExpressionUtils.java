@@ -69,8 +69,8 @@ public class ExpressionUtils {
          * The expression is a variable - simply negate it. //TODO: fix this
          */
         else if (expression instanceof Variable) {
-
-            // TODO;
+            Variable variable = (Variable) expression;
+            variable.negate();
         }
     }
 

@@ -278,6 +278,7 @@ public class EquationUtils {
         equation.setLeftOperand(simplifiedLeftHand);
         equation.setRightOperand(simplifiedRightHand);
         isolateConstantPart(equation);
+        int x = 1;
         return equation;
     }
 
