@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.key-project.org/JavaClass"
+	elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:class="http://www.key-project.org/JavaClass">
+
+	<annotation>
+		<documentation>
+			This schema contains a set of definitions for the
+			purpose of modelling
+			Java classes.
+		</documentation>
+	</annotation>
+
+	<element name="class" type="class:javaclass"></element>
+
+	<complexType name="javaclass" mixed="true">
+		<annotation>
+			<documentation>
+				This type provides a simple model of a Java Class, for
+				the primary purpose of use in KeYTestGen. Because of this, for
+				example, there currently are no types for modelling methods.
+				Providing a complete implementation is beyond the scope of this
+				project, but may be completed in the future.
+			</documentation>
+		</annotation>
+
+		<sequence>
+			<!-- Access level of the class -->
+			<element name="access" type="class:accessmodifier" minOccurs="0"></element>
+
+			<!-- Volatility of the class -->
+			<element name="volatility" type="class:volatility" minOccurs="0"></element>
+
+			<!-- Data fields of the class -->
+			<element name="fields" type="class:field" maxOccurs="unbounded"
+				minOccurs="0"></element>
+		</sequence>
+
+		<attribute name="created" type="boolean"></attribute>
+	</complexType>
+
+	<complexType name="field">
+		<annotation>
+			<documentation>
+				Models a Java data field. Such a field has a type, a
+				value, and a finite
+				set of modifiers
+			</documentation>
+		</annotation>
+		<sequence>
+			<!-- The access setting of the field -->
+			<element name="access" type="class:accessmodifier" minOccurs="0"></element>
+
+			<!-- The volatility of the field -->
+			<element name="volatility" type="class:volatility" minOccurs="0"></element>
+
+			<!-- The type and value of the field -->
+			<element name="value" type="class:javatype" minOccurs="0"></element>
+
+		</sequence>
+	</complexType>
+
+	<complexType name="method">
+		<annotation>
+			<documentation>
+				Models a Java method signature and modifiers
+			</documentation>
+		</annotation>
+
+		<sequence>
+			<element name="parentclass" type="class:javaclass"></element>
+			<element name="access" type="class:accessmodifier"></element>
+			<element name="modifiers" type="class:javatype"></element>
+			<element name="parameters" type="class:javatype" minOccurs="0"
+				maxOccurs="unbounded"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="javatype">
+		<annotation>
+			<documentation>
+				Encapsulates the set of root java types
+			</documentation>
+		</annotation>
+		<sequence>
+			<choice minOccurs="0">
+				<element name="boolean" type="boolean"></element>
+				<element name="int" type="int"></element>
+				<element name="double" type="double"></element>
+				<element name="float" type="float"></element>
+				<element name="object" type="class:javaclass"></element>
+			</choice>
+		</sequence>
+	</complexType>
+
+	<simpleType name="volatility">
+		<annotation>
+			<documentation>
+				Models the volatility of a Java data field - it can be
+				either final or volatile.
+			</documentation>
+		</annotation>
+
+		<restriction base="string">
+			<enumeration value="volatile"></enumeration>
+			<enumeration value="final"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="accessmodifier">
+		<annotation>
+			<documentation>
+				Models the various access modifiers found in Java.
+			</documentation>
+		</annotation>
+
+		<restriction base="string">
+			<enumeration value="public"></enumeration>
+			<enumeration value="private"></enumeration>
+			<enumeration value="protected"></enumeration>
+			<enumeration value="packet"></enumeration>
+		</restriction>
+	</simpleType>
+</schema>

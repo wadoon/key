@@ -232,13 +232,23 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              */
             className = klass.getName();
 
-            final String methodName = testCases.get(0).getMethodName();
+            String methodName = testCases.get(0).getMethodName();
 
             /*
              * Print the new class header
              */
-            String header = "Test_" + klass.getName() + "_" + methodName;
-            writeClassHeader(null, "public", "", header);
+            String name = "";
+            String className = testSuite.getJavaClass().getName();
+            // make the first letter of the method name capital
+            char firstLetter = Character.toUpperCase(methodName.charAt(0));
+            if (methodName.length() > 1) {
+                methodName = firstLetter + methodName.substring(1);
+            } else {
+                methodName = firstLetter + "";
+            }
+            name = "Test" + className + methodName;
+
+            writeClassHeader(null, "public", "", name);
 
             /*
              * Create one test method for each test case.
@@ -258,7 +268,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
              */
             writeClosingBrace();
 
-            return new JUnitTestSuite(testSuite, getCurrentOutput());
+            return new JUnitTestSuite(testSuite, name, getCurrentOutput());
         }
 
         /**

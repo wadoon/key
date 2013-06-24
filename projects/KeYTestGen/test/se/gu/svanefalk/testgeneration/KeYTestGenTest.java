@@ -414,7 +414,6 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         for (int i = 0; i < term.arity(); i++) {
             printVars(term.sub(i));
         }
-
     }
 
     /**
@@ -443,6 +442,10 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
             }
         }
 
+        for (IExecutionNode node : nodes) {
+            Assert.assertNotNull(node);
+        }
+        
         return nodes;
     }
 }

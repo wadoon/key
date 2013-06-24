@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="dotest">
+    
+	<property environment="env" />
+	
+	<!-- Properties to be passed to the compiler -->
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.7" />
+	<property name="source" value="1.7" />
+	
+	<!-- Native dependencies -->
+	<property name="dependencies" value="${basedir}/dependencies" />
+	<property name="target.source" value="${basedir}/src" />
+	<property name="target.output" value="${basedir}/bin" />
+
+<path id="dep.jars">
+    <fileset dir="${dependencies}">
+        <include name="**/*.jar"/>
+    </fileset>
+</path>
+
+	<!-- main entry for the build. Simply delegates to other sub-builds -->
+	<target name="build" depends="-build-tests" />
+
+	<!-- set up the folder hierarchies -->
+	<target name="-init">
+		<mkdir dir="${target.source}" />
+		<mkdir dir="${target.output}" />
+		<copy includeemptydirs="false" todir="${target.output}">
+			<fileset dir="src">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- build the test files -->
+	<target name="-build-tests" depends="-init">
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.output}"
+			includeantruntime="false" source="${source}" target="${target}">
+			<src path="${target.output}" />
+			
+                <classpath refid="dep.jars" />
+			    <classpath refid="dep.jars" />
+		</javac>
+	</target>
+
+	<target name="clean">
+		<delete dir="keytestgen2" />
+		<delete dir="${target.binary}" />
+		<ant antfile="build.xml" dir="${key.home}/system" inheritAll="false"
+			target="clean">
+		</ant>
+
+	</target>
+
+	<target depends="clean" name="cleanall">
+		<ant antfile="build.xml" dir="${key.home}/system" inheritAll="false"
+			target="clean">
+		</ant>
+		<delete dir="${target.binary}" />
+	</target>
+</project>

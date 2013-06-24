@@ -95,6 +95,9 @@ public class Variable extends AbstractExpression {
         else {
             multiplier = Fraction.ONE;
         }
+        if (isNegated) {
+            multiplier = multiplier.multiply(Fraction.MINUS_ONE);
+        }
         return multiplier;
     }
 
@@ -102,7 +105,8 @@ public class Variable extends AbstractExpression {
     public String toString() {
 
         if (binding == null) {
-            return name;
+
+            return isNegated ? "-" + name : name;
         } else {
             return binding.toString();
         }

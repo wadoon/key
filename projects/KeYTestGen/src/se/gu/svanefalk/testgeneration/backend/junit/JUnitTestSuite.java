@@ -9,15 +9,18 @@ public class JUnitTestSuite implements ITestSuite {
     private final String body;
     private final String name;
 
-    public JUnitTestSuite(TestSuite testSuite, String body) {
-        super();
+    public JUnitTestSuite(TestSuite testSuite, String name, String body) {
         this.testSuite = testSuite;
         this.body = body;
+        this.name = name;
+    }
 
+    public JUnitTestSuite(TestSuite testSuite, String body) {
+        this.testSuite = testSuite;
+        this.body = body;
         /*
          * Construct the name of the test suite
          */
-        String name = "";
         String className = testSuite.getJavaClass().getName();
         String methodName = testSuite.getMethod().getName();
 

@@ -4,8 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,7 +12,6 @@ import se.gu.svanefalk.testgeneration.backend.ITestSuite;
 import se.gu.svanefalk.testgeneration.backend.TestGenerator;
 import se.gu.svanefalk.testgeneration.backend.TestGeneratorException;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
-import se.gu.svanefalk.testgeneration.core.concurrency.capsules.CapsuleExecutor;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
@@ -200,7 +197,7 @@ public final class CommandLineInterface {
 
             final ICodeCoverageParser coverageParser = CommandLineInterfaceWorker.cliResources.getCodeCoverageParser(parser.getCoverage());
 
-            for (final String file : parser.getFiles()) {
+            for (final String sourceFile : parser.getFiles()) {
 
                 /*
                  * Generate the test suites themselves.
@@ -208,7 +205,7 @@ public final class CommandLineInterface {
                 List<ITestSuite> testSuites = null;
                 for (final String framework : parser.getTestFrameworks()) {
                     final IFrameworkConverter frameworkConverter = CommandLineInterfaceWorker.cliResources.getFrameworkConverter(framework);
-                    testSuites = generateTestCases(file, coverageParser,
+                    testSuites = generateTestCases(sourceFile, coverageParser,
                             frameworkConverter, parser.getMethods());
                 }
 
@@ -233,16 +230,16 @@ public final class CommandLineInterface {
                             testFolder.mkdirs();
                         }
 
-                        File javaFile = new File(testFolder,
+                        File testFile = new File(testFolder,
                                 testSuite.getClassName() + ".java");
 
-                        if (!javaFile.exists()) {
-                            javaFile.createNewFile();
+                        if (!testFile.exists()) {
+                            testFile.createNewFile();
                         }
 
                         BufferedWriter writer = null;
 
-                        writer = new BufferedWriter(new FileWriter(javaFile));
+                        writer = new BufferedWriter(new FileWriter(testFile));
                         writer.write(testSuite.getTestSuiteBody());
                         writer.close();
 
@@ -265,7 +262,8 @@ public final class CommandLineInterface {
 
             String javaPackage = testSuite.getPackage();
             String[] packageElements = javaPackage.split("[.]");
-            String path = "";
+            String path = testSuite.getClassName() + File.separator;
+            path += "src" + File.separator;
             for (int i = 0; i < packageElements.length; i++) {
                 path += packageElements[i] + File.separator;
             }
