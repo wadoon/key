@@ -1,4 +1,4 @@
-package se.gu.svanefalk.testgeneration.targetmodels.unclassified;
+package se.gu.svanefalk.testgeneration.targetmodels.own.deps;
 
 /**
  * Some other class, for the purpose of working with variables resident to

@@ -16,7 +16,8 @@ public class CoreTest extends KeYTestGenTest {
     private static TestEnvironment testEnvironment;
 
     public CoreTest() throws KeYInterfaceException, IOException {
-        testEnvironment = TestEnvironment.getInstance("/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/IntegerClass.java");
+        testEnvironment = TestEnvironment.loadEnvironmentForDirectory("",
+                true);
     }
 
     protected IExecutionStartNode getSymbolicTreeForMethod(String identifier) {

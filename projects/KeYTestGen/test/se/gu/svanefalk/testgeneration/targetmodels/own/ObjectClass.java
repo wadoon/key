@@ -1,6 +1,7 @@
-package se.gu.svanefalk.testgeneration.targetmodels.objects;
+package se.gu.svanefalk.testgeneration.targetmodels.own;
 
-import se.gu.svanefalk.testgeneration.targetmodels.unclassified.ClassProxy;
+import se.gu.svanefalk.testgeneration.targetmodels.own.deps.ClassProxy;
+
 
 public class ObjectClass {
 
