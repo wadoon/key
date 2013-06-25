@@ -106,7 +106,9 @@ public class ModelGenerator implements IModelGenerator {
             throw new ModelGeneratorException(e.getMessage());
         } catch (final TermTransformerException e) {
             throw new ModelGeneratorException(e.getMessage());
-        }
+        } catch (final Exception e) {
+            throw new ModelGeneratorException(e.getMessage());
+        } 
     }
 
     private Map<String, Integer> getConcreteValues(final Term pathCondition,

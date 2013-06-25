@@ -31,7 +31,6 @@ public strictfp class Simplex {
             final Fraction targetVal = table[indexOfSourceRow][i].multiply(multiplier);
             table[indexOfTargetRow][i] = sourceVal.add(targetVal);
         }
-
     }
 
     private static Fraction[][] constructInitialTableaux(

@@ -116,7 +116,7 @@ public class CoreInterface implements ICapsuleMonitor {
 
         List<String> selectedMethods = filterMethods(targetClass,
                 includePublic, includeProtected, includePrivate, includeNative);
-
+        selectedMethods.addAll(methods);
         return createTestSuites(targetClass, codeCoverageParser,
                 selectedMethods);
     }

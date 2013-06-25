@@ -126,7 +126,13 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
 
                 final ModelVariable leftModelVariable = model.getVariable(leftOperandIdentifier);
 
-                leftModelVariable.setValue(ModelInstance.constructModelInstance(leftModelVariable.getType()));
+                /*
+                 * Check if the variable already has a set instance. Create one
+                 * if it does not.
+                 */
+                if (leftModelVariable.getValue() == null) {
+                    leftModelVariable.setValue(ModelInstance.constructModelInstance(leftModelVariable.getType()));
+                }
             }
 
             /*

@@ -88,7 +88,6 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
     public TermToModelVisitor(final Model model, final IExecutionNode node) {
 
         final IExecutionMethodCall methodCall = getMethodCallNode(node);
-
         this.model = model;
 
         javaInfo = methodCall.getServices().getJavaInfo();
@@ -145,6 +144,8 @@ class TermToModelVisitor extends KeYTestGenTermVisitor {
                 Object value = null;
                 if (TermParserTools.isPrimitiveType(modelParameter.getTypeName())) {
                     value = TermToModelVisitor.resolvePrimitiveType(programVariable);
+                } else {
+                    value = ModelInstance.constructModelInstance(type);
                 }
                 model.add(modelParameter, value);
             }

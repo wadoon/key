@@ -405,6 +405,8 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
             else if (expression instanceof OracleMethodInvocation) {
                 final OracleMethodInvocation methodInvocation = (OracleMethodInvocation) expression;
                 writeOracleMethodInvocation(methodInvocation);
+            } else if (expression == null) {
+                writeUnindentedLine("null");
             }
         }
 
@@ -533,9 +535,9 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
                 /*
                  * Again, deal only with those variables which are not
-                 * parameters.
+                 * primitives.
                  */
-                if (!variable.isParameter()) {
+                if (!variable.isPrimitive()) {
 
                     final Object value = variable.getValue();
 

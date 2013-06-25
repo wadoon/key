@@ -29,25 +29,25 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class TestJUnitTestCaseGenerator {
 
-    // @Test
+    @Test
     public void test() throws IOException, ProofInputException,
             ModelGeneratorException, TestGeneratorException,
             KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
         Assert.assertTrue(new File(
-                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
+                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/ObjectClass.java").exists());
 
         final TestGenerator testCaseGenerator = TestGenerator.getInstance();
         final IFrameworkConverter junitConverter = JUnitConverter.getInstance();
-        final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.decisionCoverageParser;
+        final ICodeCoverageParser codeCoverageParser = ICodeCoverageParser.statementCoverageParser;
 
         final HashMap<String, Double> results = new HashMap<String, Double>();
 
-        final String methodName = "midOneProxyOneInstance";
+        final String methodName = "max";
         List<String> methods = new LinkedList<>();
         methods.add(methodName);
         final List<ITestSuite> output = testCaseGenerator.generateTestSuite(
-                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
+                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/ObjectClass.java",
                 codeCoverageParser, junitConverter, methods);
 
         /*
@@ -59,6 +59,9 @@ public class TestJUnitTestCaseGenerator {
         /*
          * Discard outliers
          */
+        for (ITestSuite testSuite : output) {
+            System.out.println(testSuite.getTestSuiteBody());
+        }
 
         final PriorityQueue<String> queue = new PriorityQueue<String>();
         final HashMap<String, Long> readings = Benchmark.getReadings();
@@ -83,16 +86,6 @@ public class TestJUnitTestCaseGenerator {
             final double value = results.get(id);
             System.out.println(id + " : " + value + " milliseconds");
         }
-
-        final ITestSuite toWrite = output.get(0);
-        System.out.println(toWrite);
-        final File target = new File(
-                "/home/christopher/git/key/eclipse/system/test/PrimitiveIntegerOperationsTestClass/Test_PrimitiveIntegerOperations_"
-                        + methodName + ".java");
-        if (!target.exists()) {
-            target.createNewFile();
-        }
-
     }
 
     @Ignore

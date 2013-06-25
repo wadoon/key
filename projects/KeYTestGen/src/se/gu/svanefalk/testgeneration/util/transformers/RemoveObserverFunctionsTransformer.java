@@ -73,11 +73,21 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
         final Term secondChild = transformTerm(term.sub(1));
 
         if ((firstChild != null) && (secondChild == null)) {
-            return firstChild;
+            // FIXME: Hack...make sure results are handled correctly
+            if (firstChild.toString().equalsIgnoreCase("result")) {
+                return term;
+            } else {
+                return firstChild;
+            }
         }
 
         if ((firstChild == null) && (secondChild != null)) {
-            return secondChild;
+            // FIXME: Hack...make sure results are handled correctly
+            if (firstChild.toString().equalsIgnoreCase("result")) {
+                return term;
+            } else {
+                return secondChild;
+            }
         }
 
         if ((firstChild != null) && (secondChild != null)) {

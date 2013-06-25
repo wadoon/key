@@ -205,4 +205,8 @@ public class ModelVariable {
 
         return getTypeName() + " : " + identifier;
     }
+
+    public boolean isPrimitive() {
+        return boundValue instanceof Number || boundValue instanceof Boolean;
+    }
 }
