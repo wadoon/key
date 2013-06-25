@@ -305,6 +305,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
          */
         private void writeMethodInvocation(final TestCase testCase) {
 
+            writeNewLine();
             final String returnType = testCase.getMethod().getReturnType();
             String methodInvocation = "";
             if (!returnType.equals("void")) {
@@ -406,7 +407,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                 final OracleMethodInvocation methodInvocation = (OracleMethodInvocation) expression;
                 writeOracleMethodInvocation(methodInvocation);
             } else if (expression == null) {
-                writeUnindentedLine("null");
+                writeUnindentedLine("null;");
             }
         }
 
@@ -542,30 +543,32 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
                     final Object value = variable.getValue();
 
                     if (value instanceof ModelInstance) {
-
-                        writeComment(
-                                "Configuring variable: "
-                                        + variable.getIdentifier(), false);
-
-                        final String variableIdentifier = variable.getIdentifier();
                         final ModelInstance instance = (ModelInstance) value;
 
-                        for (final ModelVariable field : instance.getFields()) {
+                        if (!instance.getFields().isEmpty()) {
+                            final String variableIdentifier = variable.getIdentifier();
 
-                            String fieldValueIdentifier = "";
-                            if (field.getValue() instanceof ModelInstance) {
-                                fieldValueIdentifier = field.getIdentifier();
-                            } else {
-                                final Object fieldValue = field.getValue();
-                                fieldValueIdentifier = fieldValue.toString();
+                            writeComment(
+                                    "Configuring variable: "
+                                            + variable.getIdentifier(), false);
+
+                            for (final ModelVariable field : instance.getFields()) {
+
+                                String fieldValueIdentifier = "";
+                                if (field.getValue() instanceof ModelInstance) {
+                                    fieldValueIdentifier = field.getIdentifier();
+                                } else {
+                                    final Object fieldValue = field.getValue();
+                                    fieldValueIdentifier = fieldValue.toString();
+                                }
+
+                                writeIndentedLine("setFieldValue("
+                                        + variableIdentifier + "," + "\""
+                                        + field.getVariableName() + "\"" + ","
+                                        + fieldValueIdentifier + ");");
+
+                                writeNewLine();
                             }
-
-                            writeIndentedLine("setFieldValue("
-                                    + variableIdentifier + "," + "\""
-                                    + field.getVariableName() + "\"" + ","
-                                    + fieldValueIdentifier + ");");
-
-                            writeNewLine();
                         }
                     }
                 }

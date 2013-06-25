@@ -2,26 +2,25 @@ package se.gu.svanefalk.testgeneration.core;
 
 import java.io.IOException;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
 
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import org.junit.Test;
 
 import se.gu.svanefalk.testgeneration.KeYTestGenTest;
-import se.gu.svanefalk.testgeneration.SymbolicExecutionTrees;
+import se.gu.svanefalk.testgeneration.TestEnvironment;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class CoreTest extends KeYTestGenTest {
 
-    private static SymbolicExecutionTrees symbolicExecutionTrees;
+    private static TestEnvironment testEnvironment;
 
     public CoreTest() throws KeYInterfaceException, IOException {
-        symbolicExecutionTrees = SymbolicExecutionTrees.getInstance("/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/IntegerClass.java");
+        testEnvironment = TestEnvironment.getInstance("/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/IntegerClass.java");
     }
 
     protected IExecutionStartNode getSymbolicTreeForMethod(String identifier) {
-        IExecutionStartNode tree = symbolicExecutionTrees.getSymbolicTreeForNode(identifier);
+        IExecutionStartNode tree = testEnvironment.getSymbolicTreeForNode(identifier);
         Assert.assertNotNull("Could not find tree for method: " + identifier,
                 tree);
         return tree;
