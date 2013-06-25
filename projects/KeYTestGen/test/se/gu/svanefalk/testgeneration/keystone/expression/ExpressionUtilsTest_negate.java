@@ -279,11 +279,8 @@ public class ExpressionUtilsTest_negate {
                                 new NumericConstant(15),
                                 new NumericConstant(25)))));
 
-        System.out.println(expression);
         ExpressionUtils.negate(expression);
-        System.out.println(expression);
         Fraction negatedValue = expression.evaluate();
-        System.out.println(negatedValue);
         Fraction expected = new Fraction(4);
 
         Assert.assertEquals(expected, negatedValue);

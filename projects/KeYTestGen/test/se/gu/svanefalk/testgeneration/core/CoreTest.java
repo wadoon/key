@@ -2,6 +2,8 @@ package se.gu.svanefalk.testgeneration.core;
 
 import java.io.IOException;
 
+import org.junit.Test;
+
 import junit.framework.Assert;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
@@ -20,7 +22,13 @@ public class CoreTest extends KeYTestGenTest {
 
     protected IExecutionStartNode getSymbolicTreeForMethod(String identifier) {
         IExecutionStartNode tree = symbolicExecutionTrees.getSymbolicTreeForNode(identifier);
-        Assert.assertNotNull(tree);
+        Assert.assertNotNull("Could not find tree for method: " + identifier,
+                tree);
         return tree;
+    }
+
+    @Test
+    public void normal() {
+        Assert.assertTrue(true);
     }
 }

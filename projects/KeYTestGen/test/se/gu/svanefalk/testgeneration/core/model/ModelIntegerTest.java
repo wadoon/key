@@ -53,9 +53,6 @@ public class ModelIntegerTest extends CoreTest {
         Integer valueB = variableB.getValue();
         Assert.assertNotNull(valueB);
 
-        System.out.println(targetNode.getFormatedPathCondition());
-        System.out.println(valueA);
-        System.out.println(valueB);
         // Check that the constraint holds
         Assert.assertTrue(valueA < valueB);
     }
@@ -88,9 +85,6 @@ public class ModelIntegerTest extends CoreTest {
         Integer valueB = variableB.getValue();
         Assert.assertNotNull(valueB);
 
-        System.out.println(targetNode.getFormatedPathCondition());
-        System.out.println(valueA);
-        System.out.println(valueB);
         // Check that the constraint holds
         Assert.assertTrue(valueA <= valueB);
     }
@@ -123,9 +117,6 @@ public class ModelIntegerTest extends CoreTest {
         Integer valueB = variableB.getValue();
         Assert.assertNotNull(valueB);
 
-        System.out.println(targetNode.getFormatedPathCondition());
-        System.out.println(valueA);
-        System.out.println(valueB);
         // Check that the constraint holds
         Assert.assertTrue(valueA > valueB);
     }
@@ -158,9 +149,6 @@ public class ModelIntegerTest extends CoreTest {
         Integer valueB = variableB.getValue();
         Assert.assertNotNull(valueB);
 
-        System.out.println(targetNode.getFormatedPathCondition());
-        System.out.println(valueA);
-        System.out.println(valueB);
         // Check that the constraint holds
         Assert.assertTrue(valueA >= valueB);
     }
@@ -279,7 +267,7 @@ public class ModelIntegerTest extends CoreTest {
         Assert.assertTrue(variableZ.getValue() instanceof Integer);
         Integer valueZ = variableZ.getValue();
         Assert.assertNotNull(valueZ);
-
+        System.out.println(targetNode.getFormatedPathCondition());
         // Check that the constraint holds
         Assert.assertTrue(valueY < valueZ);
         Assert.assertTrue(valueX <= valueZ);

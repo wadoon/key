@@ -29,7 +29,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class TestJUnitTestCaseGenerator {
 
-    @Test
+    // @Test
     public void test() throws IOException, ProofInputException,
             ModelGeneratorException, TestGeneratorException,
             KeYInterfaceException, XMLGeneratorException, InterruptedException {
@@ -92,7 +92,6 @@ public class TestJUnitTestCaseGenerator {
         if (!target.exists()) {
             target.createNewFile();
         }
-
 
     }
 
