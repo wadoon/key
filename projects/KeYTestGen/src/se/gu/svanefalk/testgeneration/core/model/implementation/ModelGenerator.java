@@ -1,10 +1,12 @@
 package se.gu.svanefalk.testgeneration.core.model.implementation;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
+import se.gu.svanefalk.testgeneration.core.model.SMT.PaperTest;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
 import se.gu.svanefalk.testgeneration.keystone.KeYStone;
 import se.gu.svanefalk.testgeneration.keystone.KeYStoneException;
@@ -41,6 +43,10 @@ public class ModelGenerator implements IModelGenerator {
     }
 
     KeYStone keYStone = KeYStone.getInstance();
+
+    public static void __DEBUG_DISPOSE() {
+        instance = null;
+    }
 
     /**
      * Constructs a standard model generator.
@@ -108,7 +114,7 @@ public class ModelGenerator implements IModelGenerator {
             throw new ModelGeneratorException(e.getMessage());
         } catch (final Exception e) {
             throw new ModelGeneratorException(e.getMessage());
-        } 
+        }
     }
 
     private Map<String, Integer> getConcreteValues(final Term pathCondition,
@@ -126,11 +132,19 @@ public class ModelGenerator implements IModelGenerator {
             simplifiedPathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(
                     services).transform(simplifiedPathCondition);
 
+            long time = Calendar.getInstance().getTimeInMillis();
+
+            Map<String, Integer> result = null;
             if (simplifiedPathCondition == null) {
-                return new HashMap<String, Integer>();
+                result = new HashMap<String, Integer>();
             } else {
-                return keYStone.solveConstraint(simplifiedPathCondition);
+                result = keYStone.solveConstraint(simplifiedPathCondition);
             }
+
+            PaperTest.addResult(pathCondition + "_KEYSTONE",
+                    Calendar.getInstance().getTimeInMillis() - time);
+
+            return result;
 
         } catch (final TermTransformerException e) {
             throw new ModelGeneratorException(e.getMessage());
@@ -151,4 +165,5 @@ public class ModelGenerator implements IModelGenerator {
             }
         }
     }
+
 }

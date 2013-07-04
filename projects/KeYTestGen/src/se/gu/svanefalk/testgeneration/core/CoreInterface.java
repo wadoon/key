@@ -287,4 +287,9 @@ public class CoreInterface implements ICapsuleMonitor {
             throw new CoreException(e.getMessage());
         }
     }
+
+    public static void __DEBUG_DISPOSE() {
+        instance = null;
+        CapsuleExecutor.__DEBUG_DISPOSE();
+    }
 }

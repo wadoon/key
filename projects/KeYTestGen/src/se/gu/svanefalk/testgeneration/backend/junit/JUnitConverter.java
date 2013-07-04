@@ -646,4 +646,8 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements
 
         return new JUnitGeneratorWorker().serviceConvert(testSuite);
     }
+    
+    public void __DEBUG_DISPOSE() {
+        instance = null;
+    }
 }

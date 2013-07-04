@@ -34,4 +34,8 @@ public class KeYStone {
 
         return result;
     }
+    
+    public void __DEBUG_DISPOSE() {
+        instance = null;
+    }
 }

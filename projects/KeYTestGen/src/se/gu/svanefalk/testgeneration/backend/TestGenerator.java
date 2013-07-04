@@ -212,4 +212,9 @@ public class TestGenerator {
         return generateTestSuite(source, coverage, converter, false, false,
                 false, false, methods);
     }
+    
+    public static void __DEBUG_DISPOSE() {
+        instance = null;
+        CoreInterface.__DEBUG_DISPOSE();
+    }
 }

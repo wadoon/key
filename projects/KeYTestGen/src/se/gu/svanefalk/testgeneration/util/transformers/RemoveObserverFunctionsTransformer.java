@@ -3,7 +3,9 @@ package se.gu.svanefalk.testgeneration.util.transformers;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.util.parsers.TermParserTools;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
 
 public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer {
 
@@ -73,7 +75,6 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
         final Term secondChild = transformTerm(term.sub(1));
 
         if ((firstChild != null) && (secondChild == null)) {
-            // FIXME: Hack...make sure results are handled correctly
             if (firstChild.toString().equalsIgnoreCase("result")) {
                 return term;
             } else {
@@ -82,7 +83,6 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
         }
 
         if ((firstChild == null) && (secondChild != null)) {
-            // FIXME: Hack...make sure results are handled correctly
             if (firstChild.toString().equalsIgnoreCase("result")) {
                 return term;
             } else {
@@ -94,7 +94,12 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
             return termFactory.createTerm(term.op(), firstChild, secondChild);
         }
 
-        return null;
+        if ((firstChild == null) && (secondChild == null)) {
+
+            return null;
+        }
+
+        return term;
     }
 
     @Override
@@ -129,15 +134,6 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
         }
 
         return termFactory.createTerm(Junctor.NOT, newChild);
-    }
-
-    /**
-     * The transformation of the nulltype is simply to return a null value.
-     */
-    @Override
-    protected Term transformNull(final Term term) {
-
-        return null;
     }
 
     @Override

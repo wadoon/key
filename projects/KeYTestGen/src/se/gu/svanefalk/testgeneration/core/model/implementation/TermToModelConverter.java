@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
-class TermToModelConverter {
+public class TermToModelConverter {
 
     /**
      * Creates a skeletal {@link Model} instance from a {@link Term}. The Term

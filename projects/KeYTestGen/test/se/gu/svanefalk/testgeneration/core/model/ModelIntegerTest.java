@@ -22,7 +22,7 @@ public class ModelIntegerTest extends CoreTest {
     private final ModelGenerator modelGenerator = ModelGenerator.getInstance();
 
     public ModelIntegerTest() throws KeYInterfaceException, IOException {
-        super();
+        super("own");
     }
 
     @Test
@@ -30,7 +30,7 @@ public class ModelIntegerTest extends CoreTest {
             throws ProofInputException, ModelGeneratorException {
 
         IExecutionStartNode methodTree = getSymbolicTreeForMethod("min");
-        List<IExecutionNode> nodes = retrieveNode(methodTree, "return a");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return a");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -62,11 +62,45 @@ public class ModelIntegerTest extends CoreTest {
             throws ProofInputException, ModelGeneratorException {
 
         IExecutionStartNode methodTree = getSymbolicTreeForMethod("max");
-        List<IExecutionNode> nodes = retrieveNode(methodTree, "return b");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
         Model model = modelGenerator.generateModel(targetNode);
+
+        ModelVariable variableSelf = model.getVariable("self");
+        Assert.assertNotNull(variableSelf);
+
+        // Check variable a
+        ModelVariable variableA = model.getVariable("a");
+        Assert.assertNotNull(variableA);
+        Assert.assertTrue(variableA.getValue() instanceof Integer);
+        Integer valueA = variableA.getValue();
+        Assert.assertNotNull(valueA);
+
+        // Check variable b
+        ModelVariable variableB = model.getVariable("b");
+        Assert.assertNotNull(variableB);
+        Assert.assertTrue(variableB.getValue() instanceof Integer);
+        Integer valueB = variableB.getValue();
+        Assert.assertNotNull(valueB);
+
+        // Check that the constraint holds
+        Assert.assertTrue(valueA <= valueB);
+    }
+    
+    @Test
+    public void testSolveSingleLessThanConstraintMax_2()
+            throws ProofInputException, ModelGeneratorException {
+
+        IExecutionStartNode methodTree = getSymbolicTreeForMethod("max_2");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
+        Assert.assertTrue(nodes.size() == 1);
+
+        IExecutionNode targetNode = nodes.get(0);
+        Model model = modelGenerator.generateModel(targetNode);
+        System.out.println("COND: " + targetNode.getFormatedPathCondition());
+        System.out.println(targetNode.getPathCondition());
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);
@@ -94,7 +128,7 @@ public class ModelIntegerTest extends CoreTest {
             throws ProofInputException, ModelGeneratorException {
 
         IExecutionStartNode methodTree = getSymbolicTreeForMethod("max");
-        List<IExecutionNode> nodes = retrieveNode(methodTree, "return a");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return a");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -126,7 +160,7 @@ public class ModelIntegerTest extends CoreTest {
             throws ProofInputException, ModelGeneratorException {
 
         IExecutionStartNode methodTree = getSymbolicTreeForMethod("min");
-        List<IExecutionNode> nodes = retrieveNode(methodTree, "return b");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -158,7 +192,7 @@ public class ModelIntegerTest extends CoreTest {
             ModelGeneratorException {
 
         IExecutionStartNode methodTree = getSymbolicTreeForMethod("mid");
-        List<IExecutionNode> nodes = retrieveNode(methodTree, "mid=y");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=y");
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -198,7 +232,7 @@ public class ModelIntegerTest extends CoreTest {
             ModelGeneratorException {
 
         IExecutionStartNode methodTree = getSymbolicTreeForMethod("mid");
-        List<IExecutionNode> nodes = retrieveNode(methodTree, "mid=y");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=y");
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(1);
@@ -238,7 +272,7 @@ public class ModelIntegerTest extends CoreTest {
             ModelGeneratorException {
 
         IExecutionStartNode methodTree = getSymbolicTreeForMethod("mid");
-        List<IExecutionNode> nodes = retrieveNode(methodTree, "mid=x");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=x");
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -278,7 +312,7 @@ public class ModelIntegerTest extends CoreTest {
             ModelGeneratorException {
 
         IExecutionStartNode methodTree = getSymbolicTreeForMethod("mid");
-        List<IExecutionNode> nodes = retrieveNode(methodTree, "mid=x");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=x");
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(1);

@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
+import testutils.TestEnvironment;
 
 import junit.framework.Assert;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -43,7 +47,58 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christopher Svanefalk
  */
-public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
+public abstract class KeYTestGenTest {
+
+    private final TestEnvironment testEnvironment;
+
+    public KeYTestGenTest(String directory) throws KeYInterfaceException,
+            IOException {
+
+        testEnvironment = TestEnvironment.loadEnvironmentForDirectory(
+                directory, false);
+    }
+
+    public KeYTestGenTest() {
+        testEnvironment = null;
+    }
+
+    protected IExecutionNode getFirstSymbolicNodeForStatement(String method,
+            String statement) throws ProofInputException {
+
+        IExecutionStartNode symbolicTree = getSymbolicTreeForMethod(method);
+        Assert.assertTrue(symbolicTree != null);
+
+        List<IExecutionNode> symbolicNodes = getSymbolicExecutionNode(
+                symbolicTree, statement);
+        Assert.assertTrue(symbolicNodes != null);
+        Assert.assertFalse(symbolicNodes.isEmpty());
+
+        // Get the first node corresponding to the statement
+        IExecutionNode targetNode = symbolicNodes.get(0);
+
+        return targetNode;
+    }
+
+    protected List<IExecutionNode> getSymbolicNodesForStatement(String method,
+            String statement) throws ProofInputException {
+
+        IExecutionStartNode symbolicTree = getSymbolicTreeForMethod(method);
+        Assert.assertTrue(symbolicTree != null);
+
+        List<IExecutionNode> symbolicNodes = getSymbolicExecutionNode(
+                symbolicTree, statement);
+        Assert.assertTrue(symbolicNodes != null);
+        Assert.assertFalse(symbolicNodes.isEmpty());
+
+        return symbolicNodes;
+    }
+
+    protected IExecutionStartNode getSymbolicTreeForMethod(String identifier) {
+        IExecutionStartNode tree = testEnvironment.getSymbolicTreeForNode(identifier);
+        Assert.assertNotNull("Could not find tree for method: " + identifier,
+                tree);
+        return tree;
+    }
 
     protected static class SMTSettings implements
             de.uka.ilkd.key.smt.SMTSettings {
@@ -52,7 +107,6 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         public boolean checkForSupport() {
 
             return false;
-
         }
 
         @Override
@@ -156,57 +210,6 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
             }
         }
         return null;
-    }
-
-    /**
-     * Creates a {@link SymbolicExecutionEnvironment} which consists of loading
-     * a file to load, finding the method to proof, instantiation of proof and
-     * creation with configuration of {@link SymbolicExecutionTreeBuilder}.
-     * 
-     * @param baseDir
-     *            The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir
-     *            The path to the java file inside the base directory.
-     * @param containerTypeName
-     *            The name of the type which contains the method.
-     * @param methodFullName
-     *            The method name to search.
-     * @param precondition
-     *            An optional precondition to use.
-     * @param mergeBranchConditions
-     *            Merge branch conditions?
-     * @return The created {@link SymbolicExecutionEnvironment}.
-     * @throws ProofInputException
-     *             Occurred Exception.
-     * @author Martin Hentschel (mods by Christopher)
-     * @throws IOException
-     * @throws ProblemLoaderException
-     */
-    protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> getPreparedEnvironment(
-            final File keyRepo, final String rootFolder,
-            final String resourceFile, final String method,
-            final String precondition, final boolean mergeBranchConditions)
-            throws ProofInputException, IOException, ProblemLoaderException {
-
-        final SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = AbstractSymbolicExecutionTestCase.createSymbolicExecutionEnvironment(
-                AbstractSymbolicExecutionTestCase.keyRepDirectory, rootFolder,
-                resourceFile, method, null, false, false, false, false);
-
-        Assert.assertNotNull(env);
-
-        final Proof proof = env.getProof();
-
-        final ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
-
-        proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
-                stopCondition);
-
-        env.getUi().startAndWaitForAutoMode(proof);
-
-        env.getBuilder().analyse();
-
-        return env;
     }
 
     protected void printBranchNodes(final IExecutionStartNode root)
@@ -426,7 +429,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
      * @return
      * @throws ProofInputException
      */
-    protected ArrayList<IExecutionNode> retrieveNode(
+    protected ArrayList<IExecutionNode> getSymbolicExecutionNode(
             final IExecutionStartNode rootNode, final String statement)
             throws ProofInputException {
 
@@ -445,7 +448,7 @@ public abstract class KeYTestGenTest extends AbstractSymbolicExecutionTestCase {
         for (IExecutionNode node : nodes) {
             Assert.assertNotNull(node);
         }
-        
+
         return nodes;
     }
 }

@@ -187,5 +187,9 @@ public class KeYJavaClassFactory {
         final int delimiter = name.indexOf('.');
         return name.substring(0, delimiter);
     }
-
+    
+    public static  void __DEBUG_DISPOSE() {
+        instance = null;
+        KeYInterface.__DEBUG_DISPOSE();
+    }
 }

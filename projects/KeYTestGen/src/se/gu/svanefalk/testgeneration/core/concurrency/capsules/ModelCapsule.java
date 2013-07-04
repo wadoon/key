@@ -1,8 +1,13 @@
 package se.gu.svanefalk.testgeneration.core.concurrency.capsules;
 
+import java.util.Calendar;
+
 import se.gu.svanefalk.testgeneration.core.concurrency.monitor.CaughtException;
+import se.gu.svanefalk.testgeneration.core.model.IModelGenerator;
+import se.gu.svanefalk.testgeneration.core.model.SMT.PaperTest;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelGenerator;
+import se.gu.svanefalk.testgeneration.core.model.implementation.SMT.ModelGenerator_SMT;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
@@ -25,8 +30,8 @@ public class ModelCapsule extends AbstractCapsule {
      * concrete fixtures for test cases. Default implementation based on SMT
      * solvers is available, but the user can choose to use her own.
      */
-    protected final ModelGenerator modelGenerator = ModelGenerator.getInstance();
-
+    //protected final IModelGenerator modelGenerator = ModelGenerator_SMT.INSTANCE;
+    protected final IModelGenerator modelGenerator = ModelGenerator.getInstance();
     /**
      * The {@link IExecutionNode} instance associated with this capsule.
      */
@@ -50,7 +55,10 @@ public class ModelCapsule extends AbstractCapsule {
          * just kill the AbstractCapsule.
          */
         try {
+            long time = Calendar.getInstance().getTimeInMillis();
             model = modelGenerator.generateModel(node);
+            PaperTest.addResult(node.getPathCondition().toString(),
+                    Calendar.getInstance().getTimeInMillis() - time);
         } catch (final Exception e) {
             notifyMonitors(new CaughtException(e));
             setThrownException(e);

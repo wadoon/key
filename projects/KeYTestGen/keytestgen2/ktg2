@@ -1,0 +1,75 @@
+#!/bin/sh
+#Based on the original KeY run script by Grebing et al.
+
+resolve_symlink  ()
+{ 
+   TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
+   if [ -n "$TARGET" ] ; then
+      RESULT="$TARGET"
+      case "$RESULT" in
+         /*) break ;;				# absolute symlink
+         *)  RESULT=`dirname "$0"`/"$RESULT" ;;	# relative symlink
+      esac
+   else
+      RESULT=$1
+      
+   fi
+}
+
+# Resolve the path to KeYTestGens home
+if [ -z "$KTG_HOME" ] ; then
+   KTG_HOME=`resolve_symlink "$0"`	# resolve symlink name
+   KTG_HOME=`dirname "$KTG_HOME"`   # strip executable filename
+   KTG_HOME=`cd "$KTG_HOME";pwd`	# and now expand the path to full
+fi
+
+UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
+ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
+
+# Resolve the path to the Java runtime itself.
+if [ -z "$JAVA_HOME" ] ; then
+    JAVA=`which java`
+    if [ -z "$JAVA" ] ; then
+	echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
+	exit 1
+    fi
+else
+    echo "Using JDK installation from:      $JAVA_HOME"
+    if [ "$UNAME" = "darwin" ] ; then
+	JRE=$JAVA_HOME/Home
+	JAVA=$JRE/bin/java
+# other OS
+    else
+	JRE=$JAVA_HOME/jre
+	JAVA=$JRE/bin/java
+    fi
+fi
+
+# Setup paths for all dependencies.
+KTG_LIB="$KTG_HOME/dependencies"
+ktgclasspath="$KTG_HOME/system/ktg2.jar"
+ktg_jars="apache-commons-math.jar jcommander-1.31.jar antlr.jar recoderKey.jar key.jar"
+for i in $ktg_jars ; do
+    current_jar="$KTG_LIB/$i"
+    if [ ! -f "$current_jar" ]
+    then
+       echo Cannot find $current_jar. 
+       echo Copy or link the file into the
+       echo $KTG_LIB directory.
+       exit 1
+    else
+       ktgclasspath="${ktgclasspath}:$current_jar"
+    fi
+done
+ls
+# Begin execution
+#-ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
+#-ea:se.gu.svanefalk.testgeneration... $javaOptionXms $javaOptionXmx \
+
+$JAVA $JAVA_OPTIONS $keysysprops \
+-ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
+-Dkey.home="$KEY_LIBS/key.jar" \
+-Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
+-Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
+-Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
+-classpath "$ktgclasspath" se.gu.svanefalk.testgeneration.frontend.cli.CommandLineInterface "$@"

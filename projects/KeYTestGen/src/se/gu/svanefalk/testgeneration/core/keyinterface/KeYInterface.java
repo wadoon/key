@@ -66,15 +66,16 @@ public class KeYInterface {
         }
     }
 
+    public static void __DEBUG_DISPOSE() {
+        instance = null;
+    }
+
     public static KeYInterface getInstance() {
         if (KeYInterface.instance == null) {
             KeYInterface.instance = new KeYInterface();
         }
         return KeYInterface.instance;
     }
-
-    private final CustomConsoleUserInterface keyInterface = new CustomConsoleUserInterface(
-            false);
 
     private KeYInterface() {
     }

@@ -7,28 +7,15 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import se.gu.svanefalk.testgeneration.KeYTestGenTest;
-import se.gu.svanefalk.testgeneration.TestEnvironment;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
+import testutils.TestEnvironment;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 public class CoreTest extends KeYTestGenTest {
 
     private static TestEnvironment testEnvironment;
 
-    public CoreTest() throws KeYInterfaceException, IOException {
-        testEnvironment = TestEnvironment.loadEnvironmentForDirectory("",
-                true);
-    }
-
-    protected IExecutionStartNode getSymbolicTreeForMethod(String identifier) {
-        IExecutionStartNode tree = testEnvironment.getSymbolicTreeForNode(identifier);
-        Assert.assertNotNull("Could not find tree for method: " + identifier,
-                tree);
-        return tree;
-    }
-
-    @Test
-    public void normal() {
-        Assert.assertTrue(true);
+    public CoreTest(String dir) throws KeYInterfaceException, IOException {
+        super(dir);
     }
 }

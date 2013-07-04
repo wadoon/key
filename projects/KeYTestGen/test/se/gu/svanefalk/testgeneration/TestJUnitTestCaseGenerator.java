@@ -1,8 +1,6 @@
 package se.gu.svanefalk.testgeneration;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,7 +19,6 @@ import se.gu.svanefalk.testgeneration.backend.junit.JUnitConverter;
 import se.gu.svanefalk.testgeneration.backend.xml.XMLGeneratorException;
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
-import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
@@ -29,6 +26,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class TestJUnitTestCaseGenerator {
 
+    @Ignore
     @Test
     public void test() throws IOException, ProofInputException,
             ModelGeneratorException, TestGeneratorException,

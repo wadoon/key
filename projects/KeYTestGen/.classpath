@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="/usr/share/java/commons-math3.jar"/>
 	<classpathentry kind="lib" path="dependencies/apache-commons-math.jar"/>
 	<classpathentry kind="lib" path="dependencies/jcommander-1.31.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SmtInterpol"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

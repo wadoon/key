@@ -65,4 +65,8 @@ public class CapsuleExecutor {
             }
         }
     }
+
+    public static void __DEBUG_DISPOSE() {
+        instance = null;
+    }
 }

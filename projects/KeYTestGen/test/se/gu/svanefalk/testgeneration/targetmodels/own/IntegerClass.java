@@ -3,17 +3,17 @@ package se.gu.svanefalk.testgeneration.targetmodels.own;
 public class IntegerClass {
 
     /*
-     * @ public normal_behavior
+     *@ public normal_behavior
      * 
-     * @ ensures (\result == x) || (\result == y) || (\result == z );
+     *@ ensures (\result == x) || (\result == y) || (\result == z );
      * 
-     * @ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
+     *@ ensures ((\result <= y) && (\result <= z )) || ((\result <= y) &&
      * (\result <= x )) || ((\result <= x) && (\result <= z ));
      * 
-     * @ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
+     *@ ensures ((\result >= y) && (\result >= z )) || ((\result >= y) &&
      * (\result >= x )) || ((\result >= x) && (\result >= z ));
      * 
-     * @
+     *@
      */
     public static int mid(final int x, final int y, final int z) {
 
@@ -35,11 +35,11 @@ public class IntegerClass {
     }
 
     /*
-     * @ public normal_behavior
+     *@ public normal_behavior
      * 
-     * @ ensures true;
+     *@ ensures true;
      * 
-     * @
+     *@
      */
     public int max(final int a, final int b) {
 
@@ -49,13 +49,29 @@ public class IntegerClass {
             return b;
         }
     }
+    
+    /*
+     *@ public normal_behavior
+     *@ requires c == 10;
+     *@ ensures true;
+     * 
+     *@
+     */
+    public int max_2(final int a, final int b, final int c) {
+
+        if (a > b) {
+            return a;
+        } else {
+            return b;
+        }
+    }
 
     /*
-     * @ public normal_behavior
+     *@ public normal_behavior
      * 
-     * @ ensures true;
+     *@ ensures true;
      * 
-     * @
+     *@
      */
     public int min(final int a, final int b) {
 

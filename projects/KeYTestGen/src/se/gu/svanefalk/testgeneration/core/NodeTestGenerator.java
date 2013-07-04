@@ -135,4 +135,8 @@ public class NodeTestGenerator {
             return getMethodCallNode(node.getParent());
         }
     }
+    
+    public void __DEBUG_DISPOSE() {
+        instance = null;
+    }
 }
