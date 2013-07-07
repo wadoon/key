@@ -23,7 +23,7 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
 
     /**
      * The {@link Model} instance associated with the Term being visited.
-     * Constructed separately by an instance of {@link TermToModelVisitor}.
+     * Constructed separately by an instance of {@link ModelBuilderVisitor}.
      */
     private final Model model;
 

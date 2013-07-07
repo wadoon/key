@@ -41,4 +41,6 @@ public final class StringConstants {
     public static final String TAB = "    ";
     public static final String TRUE = "TRUE";
     public static final String Z = "Z";
+    public static final String LENGTH = "length";
+    public static final String ARRAYSTOREVALID = "arrayStoreValid";
 }

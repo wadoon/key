@@ -9,7 +9,7 @@ import se.gu.svanefalk.testgeneration.core.model.ModelGeneratorException;
 import se.gu.svanefalk.testgeneration.core.model.SMT.PaperTest;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
-import se.gu.svanefalk.testgeneration.core.model.implementation.TermToModelConverter;
+import se.gu.svanefalk.testgeneration.core.model.implementation.ModelBuilder;
 import se.gu.svanefalk.testgeneration.core.model.tools.ModelGenerationTools;
 import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.java.Services;
@@ -96,7 +96,8 @@ public enum ModelGenerator_SMT implements IModelGenerator {
              * Create the initial Model, without any concrete values assigned to
              * primitive integer values in it.
              */
-            final Model model = new TermToModelConverter().createModel(node);
+            final Model model = new ModelBuilder().createModel(node,
+                    pathCondition);
 
             /*
              * Get concrete values for any primitive types represented in the

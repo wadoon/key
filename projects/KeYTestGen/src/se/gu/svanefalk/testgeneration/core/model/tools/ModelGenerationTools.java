@@ -305,10 +305,6 @@ public class ModelGenerationTools {
 
         return ModelGenerationTools.termSimplificationTransformer.transform(targetNodeCondition);
     }
-
-    /**
-     * Allow only static access
-     */
     private ModelGenerationTools() {
 
     }

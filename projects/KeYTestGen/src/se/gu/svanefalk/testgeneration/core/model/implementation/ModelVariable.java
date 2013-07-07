@@ -46,7 +46,7 @@ public class ModelVariable {
 
     public static boolean isValidValueType(final Object object) {
 
-        return ((object == null) || (object.getClass() == ModelInstance.class))
+        return ((object == null) || (object instanceof ModelInstance))
                 || (object.getClass() == Integer.class)
                 || (object.getClass() == Byte.class)
                 || (object.getClass() == Long.class)

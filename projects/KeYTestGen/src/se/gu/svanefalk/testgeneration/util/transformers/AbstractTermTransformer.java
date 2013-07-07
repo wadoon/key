@@ -229,6 +229,10 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
                 return transformFormula(term);
             }
 
+            if (TermParserTools.isBuiltinFunction(term)) {
+                return transformBuiltinFunction(term);
+            }
+
             if (TermParserTools.isBooleanConstant(term)) {
                 return transformBooleanConstant(term);
             }
@@ -240,6 +244,11 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         throw new TermTransformerException("Unsupported Function: "
                 + term.op().name());
+    }
+
+    private Term transformBuiltinFunction(Term term) {
+
+        return term;
     }
 
     /**
@@ -313,6 +322,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         } else if (TermParserTools.isImplication(term)) {
             return transformImplication(term);
+
         } else if (TermParserTools.isFormula(term)) {
             return transformFormula(term);
         }
@@ -352,6 +362,22 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      */
     protected Term transformLocationVariable(final Term term) {
 
+        if (TermParserTools.isArray(term)) {
+            return transformArray(term);
+        }
+
+        return term;
+    }
+
+    /**
+     * Transforms a {@link Term} corresponding to an Array.
+     * 
+     * @param term
+     *            the term
+     * @return the transformed term
+     * @throws TermTransformerException
+     */
+    private Term transformArray(Term term) {
         return term;
     }
 

@@ -15,6 +15,9 @@ public class CoreTest extends KeYTestGenTest {
 
     private static TestEnvironment testEnvironment;
 
+    public CoreTest() {
+    }
+
     public CoreTest(String dir) throws KeYInterfaceException, IOException {
         super(dir);
     }

@@ -62,12 +62,19 @@ public class TestEnvironment {
          */
         Map<String, IExecutionStartNode> trees = new HashMap<>();
         for (KeYJavaClass keYJavaClass : keYJavaClasses) {
+
             for (String methoIdentifier : keYJavaClass.getMethods()) {
+
                 KeYJavaMethod method = keYJavaClass.getMethod(methoIdentifier);
+
                 if (!isNativeMethod(method)) {
+
                     IExecutionStartNode tree = keYInterface.getSymbolicExecutionTree(method);
                     Assert.assertNotNull(tree);
-                    trees.put(methoIdentifier, tree);
+
+                    String fullMethodName = method.getDeclaringClass().getName()
+                            + "." + methoIdentifier;
+                    trees.put(fullMethodName, tree);
                 }
             }
         }

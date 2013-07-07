@@ -55,6 +55,7 @@ public class KeYJavaClassFactory {
 
         final KeYJavaClass keYJavaClass = new KeYJavaClass(parent, environment);
 
+        System.out.println(parent);
         for (final IProgramMethod memberMethod : javaInfo.getAllProgramMethods(parent)) {
             if (!memberMethod.getFullName().startsWith("<")) {
 
@@ -120,6 +121,7 @@ public class KeYJavaClassFactory {
          * file
          */
         final String fileName = getFileName(javaFile);
+        System.out.println(fileName);
         final KeYJavaType mainClass = javaInfo.getKeYJavaType(fileName);
 
         return constructClass(mainClass, environment);

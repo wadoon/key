@@ -2,9 +2,12 @@ package se.gu.svanefalk.testgeneration.util.parsers;
 
 import java.util.LinkedList;
 
+import org.apache.commons.math3.fraction.Fraction;
+
 import se.gu.svanefalk.testgeneration.StringConstants;
 import se.gu.svanefalk.testgeneration.core.model.implementation.Model;
 import se.gu.svanefalk.testgeneration.core.model.implementation.ModelVariable;
+import se.gu.svanefalk.testgeneration.keystone.equations.expression.NumericConstant;
 import se.gu.svanefalk.testgeneration.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -21,7 +24,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This class contains utility methods for parsers which can be used to in
@@ -48,11 +53,13 @@ public final class TermParserTools {
      * The sort names of the literal kinds supported by KeYTestGen.
      */
     private static final LinkedList<String> literals;
+
     /**
      * Used for storing an index over all operator types currently handled by
      * KeYTestGen
      */
     private static final LinkedList<String> operators;
+
     /**
      * The names of the various primitive types in Java. As of the
      * implementation of this class (November 2012), KeY does not support
@@ -60,6 +67,7 @@ public final class TermParserTools {
      * does KeYTestGen2.
      */
     private static final LinkedList<String> primitiveTypes;
+
     /**
      * The names of the quantifiers supported by KeY: forall and exists
      */
@@ -70,22 +78,27 @@ public final class TermParserTools {
      */
     private static final LinkedList<String> unaryFunctions;
 
+    /**
+     *   
+     */
+    private static final LinkedList<String> builtinFunctions;
+
     static {
 
-        primitiveTypes = new LinkedList<String>();
+        primitiveTypes = new LinkedList<>();
         TermParserTools.primitiveTypes.add(StringConstants.INTEGER);
         TermParserTools.primitiveTypes.add(StringConstants.BOOLEAN);
         TermParserTools.primitiveTypes.add(StringConstants.LONG);
         TermParserTools.primitiveTypes.add(StringConstants.BYTE);
 
-        literals = new LinkedList<String>();
+        literals = new LinkedList<>();
         TermParserTools.literals.add(StringConstants.NUMBERS);
 
-        unaryFunctions = new LinkedList<String>();
+        unaryFunctions = new LinkedList<>();
         TermParserTools.unaryFunctions.add(StringConstants.Z);
         TermParserTools.unaryFunctions.add(StringConstants.NEGATE_LITERAL);
 
-        binaryFunctions = new LinkedList<String>();
+        binaryFunctions = new LinkedList<>();
         TermParserTools.binaryFunctions.add(StringConstants.GREATER_OR_EQUALS);
         TermParserTools.binaryFunctions.add(StringConstants.LESS_OR_EQUALS);
         TermParserTools.binaryFunctions.add(StringConstants.GREATER_THAN);
@@ -95,7 +108,7 @@ public final class TermParserTools {
         TermParserTools.binaryFunctions.add(StringConstants.ADDITION);
         TermParserTools.binaryFunctions.add(StringConstants.SUBTRACTION);
 
-        operators = new LinkedList<String>();
+        operators = new LinkedList<>();
         TermParserTools.operators.add(StringConstants.AND);
         TermParserTools.operators.add(StringConstants.OR);
         TermParserTools.operators.add(StringConstants.NOT);
@@ -110,12 +123,16 @@ public final class TermParserTools {
         TermParserTools.operators.add(StringConstants.EQUALS);
         TermParserTools.operators.add(StringConstants.IMPLIES);
 
-        exceptionSorts = new LinkedList<String>();
+        exceptionSorts = new LinkedList<>();
         TermParserTools.exceptionSorts.add(StringConstants.EXCEPTION_BASE);
 
-        quantifiers = new LinkedList<String>();
+        quantifiers = new LinkedList<>();
         TermParserTools.quantifiers.add(StringConstants.FORALL);
         TermParserTools.quantifiers.add(StringConstants.EXISTS);
+
+        builtinFunctions = new LinkedList<>();
+        builtinFunctions.add(StringConstants.LENGTH);
+        builtinFunctions.add(StringConstants.ARRAYSTOREVALID);
     }
 
     /**
@@ -651,9 +668,9 @@ public final class TermParserTools {
      */
     public static boolean isUnaryFunction(final Term term) {
 
-        final String sortName = term.op().name().toString();
+        final String operatorName = term.op().name().toString();
 
-        return TermParserTools.unaryFunctions.contains(sortName);
+        return TermParserTools.unaryFunctions.contains(operatorName);
     }
 
     /**
@@ -665,8 +682,32 @@ public final class TermParserTools {
 
         final Operator operator = term.op();
 
-        return (operator instanceof Function)
-                || (operator instanceof ProgramVariable);
+        return operator instanceof Function
+                || operator instanceof ProgramVariable;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents an array, false otherwise.
+     */
+    public static boolean isArray(final Term term) {
+
+        return term.sort() instanceof ArraySort;
+    }
+
+    /**
+     * @param term
+     *            the term
+     * @return true iff. the term represents a built-in function, false
+     *         otherwise.
+     */
+    public static boolean isBuiltinFunction(final Term term) {
+
+        final Operator operator = term.op();
+        final String operatorName = term.op().name().toString();
+        return operator instanceof Function
+                && builtinFunctions.contains(operatorName);
     }
 
     /**
@@ -758,5 +799,16 @@ public final class TermParserTools {
             throw new TermTransformerException(
                     "Attempted to apply boolean operation to non-boolean literal");
         }
+    }
+
+    public static int getIntegerValue(Term term) {
+        int value = Integer.MAX_VALUE;
+        if (TermParserTools.isIntegerNegation(term.sub(0))) {
+            value = Integer.parseInt("-"
+                    + TermParserTools.resolveNumber(term.sub(0).sub(0)));
+        } else {
+            value = Integer.parseInt(TermParserTools.resolveNumber(term.sub(0)));
+        }
+        return value;
     }
 }

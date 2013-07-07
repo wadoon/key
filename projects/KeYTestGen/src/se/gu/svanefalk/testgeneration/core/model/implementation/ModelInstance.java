@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 
 /**
  * Instances of this class represent concrete Java objects on the heap. Such
@@ -32,6 +33,10 @@ public class ModelInstance {
     public static ModelInstance constructModelInstance(
             final KeYJavaType keYJavaType) {
 
+        if (keYJavaType.getSort() instanceof ArraySort) {
+            return new ModelArrayInstance(keYJavaType);
+        }
+
         return new ModelInstance(keYJavaType);
     }
 
@@ -56,7 +61,7 @@ public class ModelInstance {
      */
     private final KeYJavaType type;
 
-    private ModelInstance(final KeYJavaType keYJavaType) {
+    protected ModelInstance(final KeYJavaType keYJavaType) {
 
         type = keYJavaType;
         identifier = Integer.toString(++ModelInstance.ID);
