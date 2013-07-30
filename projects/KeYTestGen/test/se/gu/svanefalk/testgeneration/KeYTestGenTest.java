@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Assert;
+
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
 import testutils.TestEnvironment;
-
-import junit.framework.Assert;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -20,23 +20,18 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
-import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -65,7 +60,7 @@ public abstract class KeYTestGenTest {
     protected IExecutionNode getFirstSymbolicNodeForStatement(String method,
             String statement) throws ProofInputException {
 
-        IExecutionStartNode symbolicTree = getSymbolicTreeForMethod(method);
+        IExecutionStart symbolicTree = getSymbolicTreeForMethod(method);
         Assert.assertTrue(symbolicTree != null);
 
         List<IExecutionNode> symbolicNodes = getSymbolicExecutionNode(
@@ -82,7 +77,7 @@ public abstract class KeYTestGenTest {
     protected List<IExecutionNode> getSymbolicNodesForStatement(String method,
             String statement) throws ProofInputException {
 
-        IExecutionStartNode symbolicTree = getSymbolicTreeForMethod(method);
+        IExecutionStart symbolicTree = getSymbolicTreeForMethod(method);
         Assert.assertTrue(symbolicTree != null);
 
         List<IExecutionNode> symbolicNodes = getSymbolicExecutionNode(
@@ -93,8 +88,8 @@ public abstract class KeYTestGenTest {
         return symbolicNodes;
     }
 
-    protected IExecutionStartNode getSymbolicTreeForMethod(String identifier) {
-        IExecutionStartNode tree = testEnvironment.getSymbolicTreeForNode(identifier);
+    protected IExecutionStart getSymbolicTreeForMethod(String identifier) {
+        IExecutionStart tree = testEnvironment.getSymbolicTreeForNode(identifier);
         Assert.assertNotNull("Could not find tree for method: " + identifier,
                 tree);
         return tree;
@@ -195,8 +190,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected IExecutionMethodCall getMethodCallNode(
-            final IExecutionStartNode root) {
+    protected IExecutionMethodCall getMethodCallNode(final IExecutionStart root) {
 
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
                 root);
@@ -212,7 +206,7 @@ public abstract class KeYTestGenTest {
         return null;
     }
 
-    protected void printBranchNodes(final IExecutionStartNode root)
+    protected void printBranchNodes(final IExecutionStart root)
             throws ProofInputException {
 
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
@@ -222,16 +216,16 @@ public abstract class KeYTestGenTest {
 
             final IExecutionNode next = iterator.next();
 
-            if (next instanceof IExecutionBranchNode) {
-                System.out.println(((IExecutionBranchNode) next).getActivePositionInfo());
-                System.out.println(((IExecutionBranchNode) next).getActiveStatement());
+            if (next instanceof IExecutionBranchStatement) {
+                System.out.println(((IExecutionBranchStatement) next).getActivePositionInfo());
+                System.out.println(((IExecutionBranchStatement) next).getActiveStatement());
                 printSingleNode(next);
             }
         }
     }
 
-    protected void printExecutionReturnStatementNodes(
-            final IExecutionStartNode root) throws ProofInputException {
+    protected void printExecutionReturnStatementNodes(final IExecutionStart root)
+            throws ProofInputException {
 
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
                 root);
@@ -246,7 +240,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printExecutionStatementNodes(final IExecutionStartNode root)
+    protected void printExecutionStatementNodes(final IExecutionStart root)
             throws ProofInputException {
 
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
@@ -262,7 +256,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printExecutionStateNodes(final IExecutionStartNode root)
+    protected void printExecutionStateNodes(final IExecutionStart root)
             throws ProofInputException {
 
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
@@ -287,7 +281,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printJavaInfo(final IExecutionStartNode root) {
+    protected void printJavaInfo(final IExecutionStart root) {
 
         final JavaInfo info = root.getMediator().getJavaInfo();
 
@@ -348,7 +342,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printSymbolicExecutionTree(final IExecutionStartNode root)
+    protected void printSymbolicExecutionTree(final IExecutionStart root)
             throws ProofInputException {
 
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
@@ -363,7 +357,7 @@ public abstract class KeYTestGenTest {
     }
 
     protected void printSymbolicExecutionTreePathConditions(
-            final IExecutionStartNode root) throws ProofInputException {
+            final IExecutionStart root) throws ProofInputException {
 
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
                 root);
@@ -430,7 +424,7 @@ public abstract class KeYTestGenTest {
      * @throws ProofInputException
      */
     protected ArrayList<IExecutionNode> getSymbolicExecutionNode(
-            final IExecutionStartNode rootNode, final String statement)
+            final IExecutionStart rootNode, final String statement)
             throws ProofInputException {
 
         final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(

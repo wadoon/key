@@ -11,9 +11,9 @@ import java.util.Stack;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionStateNode;
@@ -104,7 +104,7 @@ public class ExecutionPathContext {
          *            root node of the symbolic execution tree
          * @return the execution context
          */
-        public ExecutionPathContext build(final IExecutionStartNode root) {
+        public ExecutionPathContext build(final IExecutionStart root) {
 
             // FIXME: This method is an absolute terror.
 
@@ -339,13 +339,13 @@ public class ExecutionPathContext {
         }
 
         private boolean isExecutionBranchNode(final IExecutionNode node) {
-            return node instanceof IExecutionBranchNode;
+            return node instanceof IExecutionBranchStatement;
         }
 
         private boolean isExecutionPathNode(final IExecutionNode node) {
 
             return (node instanceof IExecutionStatement)
-                    || (node instanceof IExecutionBranchNode)
+                    || (node instanceof IExecutionBranchStatement)
                     || (node instanceof IExecutionBranchCondition)
                     || (node instanceof IExecutionTermination);
         }
@@ -367,7 +367,7 @@ public class ExecutionPathContext {
     }
 
     public static ExecutionPathContext constructExecutionContext(
-            final IExecutionStartNode root) {
+            final IExecutionStart root) {
         return new ExecutionContextBuilder().build(root);
     }
 

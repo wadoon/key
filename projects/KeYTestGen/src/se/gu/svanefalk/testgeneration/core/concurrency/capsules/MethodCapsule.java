@@ -15,7 +15,7 @@ import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestCase;
 import se.gu.svanefalk.testgeneration.core.testsuiteabstraction.TestSuite;
 import se.gu.svanefalk.testgeneration.util.Benchmark;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 
 /**
  * Instances of this capsule enables KeYTestGen2 to concurrently generate test
@@ -101,7 +101,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
              * code coverage.
              */
             Benchmark.startBenchmarking("2. [KeY] Create symbolic execution tree");
-            final IExecutionStartNode root = keYInterface.getSymbolicExecutionTree(targetMethod);
+            final IExecutionStart root = keYInterface.getSymbolicExecutionTree(targetMethod);
 
             final List<IExecutionNode> nodes = codeCoverageParser.retrieveNodes(root);
 

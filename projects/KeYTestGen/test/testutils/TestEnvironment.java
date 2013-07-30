@@ -1,28 +1,20 @@
 package testutils;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.junit.Assert;
-import org.junit.Test;
-
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClass;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaClassFactory;
 import se.gu.svanefalk.testgeneration.core.classabstraction.KeYJavaMethod;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterface;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
-import se.gu.svanefalk.testgeneration.util.transformers.RemoveObserverFunctionsTransformer;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 
 public class TestEnvironment {
 
@@ -60,7 +52,7 @@ public class TestEnvironment {
         /*
          * Symbolically execute all methods, and prepare the mapping.
          */
-        Map<String, IExecutionStartNode> trees = new HashMap<>();
+        Map<String, IExecutionStart> trees = new HashMap<>();
         for (KeYJavaClass keYJavaClass : keYJavaClasses) {
 
             for (String methoIdentifier : keYJavaClass.getMethods()) {
@@ -69,7 +61,7 @@ public class TestEnvironment {
 
                 if (!isNativeMethod(method)) {
 
-                    IExecutionStartNode tree = keYInterface.getSymbolicExecutionTree(method);
+                    IExecutionStart tree = keYInterface.getSymbolicExecutionTree(method);
                     Assert.assertNotNull(tree);
 
                     String fullMethodName = method.getDeclaringClass().getName()
@@ -86,9 +78,9 @@ public class TestEnvironment {
     /**
      * Symbolic trees for the methods mapped by this environment.
      */
-    private final Map<String, IExecutionStartNode> symbolicTrees;
+    private final Map<String, IExecutionStart> symbolicTrees;
 
-    private TestEnvironment(Map<String, IExecutionStartNode> trees) {
+    private TestEnvironment(Map<String, IExecutionStart> trees) {
         this.symbolicTrees = trees;
     }
 
@@ -98,7 +90,7 @@ public class TestEnvironment {
      * @param identifier
      * @return
      */
-    public IExecutionStartNode getSymbolicTreeForNode(String identifier) {
+    public IExecutionStart getSymbolicTreeForNode(String identifier) {
         return symbolicTrees.get(identifier);
     }
 

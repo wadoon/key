@@ -4,7 +4,7 @@ import java.util.List;
 
 import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 
 public class ConditionCoverageParser implements ICodeCoverageParser {
 
@@ -52,7 +52,7 @@ public class ConditionCoverageParser implements ICodeCoverageParser {
      * @return
      */
     @Override
-    public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
+    public List<IExecutionNode> retrieveNodes(final IExecutionStart root) {
 
         throw new UnsupportedOperationException("Not implemented yet");
     }

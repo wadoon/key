@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -116,7 +116,7 @@ public class KeYInterface {
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(
                 proof,
                 ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                false, false, false);
+                false, false, false, false);
 
         return proof;
     }
@@ -132,8 +132,8 @@ public class KeYInterface {
      *             in the event that a symbolic execution tree cannot be
      *             generated.
      */
-    public IExecutionStartNode getSymbolicExecutionTree(
-            final KeYJavaMethod method) throws KeYInterfaceException {
+    public IExecutionStart getSymbolicExecutionTree(final KeYJavaMethod method)
+            throws KeYInterfaceException {
 
         try {
 
@@ -173,7 +173,7 @@ public class KeYInterface {
             environment.getUi().startAndWaitForAutoMode(environment.getProof());
             environment.getBuilder().analyse();
 
-            final IExecutionStartNode rootNode = builder.getStartNode();
+            final IExecutionStart rootNode = builder.getStartNode();
             KeYInterface.assertNotNull(rootNode,
                     "FATAL: unable to initialize proof tree");
 

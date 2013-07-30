@@ -8,7 +8,7 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.ICodeCoverageParser;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPath;
 import se.gu.svanefalk.testgeneration.core.codecoverage.executionpath.ExecutionPathContext;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 
 public class StatementCoverageParser implements ICodeCoverageParser {
 
@@ -31,7 +31,7 @@ public class StatementCoverageParser implements ICodeCoverageParser {
      * @return
      */
     @Override
-    public List<IExecutionNode> retrieveNodes(final IExecutionStartNode root) {
+    public List<IExecutionNode> retrieveNodes(final IExecutionStart root) {
 
         final ExecutionPathContext context = ExecutionPathContext.constructExecutionContext(root);
 

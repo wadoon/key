@@ -4,13 +4,10 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
-
 import se.gu.svanefalk.testgeneration.KeYTestGenTest;
 import se.gu.svanefalk.testgeneration.core.keyinterface.KeYInterfaceException;
-import testutils.TestEnvironment;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 public class QuantifierTest extends KeYTestGenTest {
 

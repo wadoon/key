@@ -9,7 +9,7 @@ import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.ModifiedC
 import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.PathCoverageParser;
 import se.gu.svanefalk.testgeneration.core.codecoverage.implementation.StatementCoverageParser;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 
 /**
  * Instances of this interface are used in order to parse a tree consisting of
@@ -32,5 +32,5 @@ public interface ICodeCoverageParser {
     static ICodeCoverageParser pathCoverageParser = new PathCoverageParser();
     static ICodeCoverageParser statementCoverageParser = new StatementCoverageParser();
 
-    public List<IExecutionNode> retrieveNodes(IExecutionStartNode root);
+    public List<IExecutionNode> retrieveNodes(IExecutionStart root);
 }
