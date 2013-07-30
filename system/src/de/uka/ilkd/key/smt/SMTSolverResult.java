@@ -1,20 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -60,8 +60,6 @@ public class SMTSolverResult {
     /** This is to identify where the result comes from. E.g. for user feedback. */
     public final String solverName;
 
-    private List<String> output;
-
     private SMTSolverResult(ThreeValuedTruth isValid, String solverName) {
         this.solverName = solverName;
 
@@ -99,6 +97,8 @@ public class SMTSolverResult {
         SMTSolverResult ssr = (SMTSolverResult) o;
         return isValid == ssr.isValid;
     }
+
+    List<String> output = new LinkedList<String>();
 
     /**
      * Retrieve the model satisfying the formula
