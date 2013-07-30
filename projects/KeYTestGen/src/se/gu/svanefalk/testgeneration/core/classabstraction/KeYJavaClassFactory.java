@@ -129,7 +129,7 @@ public class KeYJavaClassFactory {
 
     public KeYJavaClass createKeYJavaClass(final IExecutionMethodCall methodCall) {
 
-        methodCall.getMediator().getProof().env().getInitConfig();
+        methodCall.getMediator().getSelectedProof().env().getInitConfig();
 
         /*
          * Get and process the method call node
