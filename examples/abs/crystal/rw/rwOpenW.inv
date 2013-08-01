@@ -1,0 +1,6 @@
+\invariants(Seq historySV, Heap heapSV, ABSAnyInterface self) {
+      writerInv : RW.RWController {
+      	  containsWriter(historySV, self, any::select(heapSV, self, RW.RWController::writer))
+      };
+}
+
