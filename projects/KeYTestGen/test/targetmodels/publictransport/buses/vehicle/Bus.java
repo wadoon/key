@@ -1,8 +1,8 @@
-package casestudies.publictransport.buses.vehicle;
+package targetmodels.publictransport.buses.vehicle;
 
-import casestudies.publictransport.buses.admin.Company;
-import casestudies.publictransport.buses.travel.Driver;
-import casestudies.publictransport.buses.travel.Route;
+import targetmodels.publictransport.buses.admin.Company;
+import targetmodels.publictransport.buses.travel.Driver;
+import targetmodels.publictransport.buses.travel.Route;
 
 /**
  * Represents a bus used in a public transportation system.

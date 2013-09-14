@@ -1,8 +1,8 @@
-package casestudies.publictransport.trains.person;
+package targetmodels.publictransport.trains.person;
 
-import casestudies.publictransport.trains.train.Station;
-import casestudies.publictransport.trains.train.Train;
-import casestudies.publictransport.trains.train.Wagon;
+import targetmodels.publictransport.trains.train.Station;
+import targetmodels.publictransport.trains.train.Train;
+import targetmodels.publictransport.trains.train.Wagon;
 
 public class Passenger {
 

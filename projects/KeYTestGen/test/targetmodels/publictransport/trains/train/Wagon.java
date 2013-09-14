@@ -1,4 +1,4 @@
-package casestudies.publictransport.trains.train;
+package targetmodels.publictransport.trains.train;
 
 public class Wagon {
 

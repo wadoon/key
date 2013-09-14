@@ -1,9 +1,9 @@
-package casestudies.publictransport.trains.train;
+package targetmodels.publictransport.trains.train;
 
-import casestudies.publictransport.buses.admin.Company;
-import casestudies.publictransport.buses.travel.Driver;
-import casestudies.publictransport.buses.travel.Route;
-import casestudies.publictransport.buses.vehicle.Bus;
+import targetmodels.publictransport.buses.admin.Company;
+import targetmodels.publictransport.buses.travel.Driver;
+import targetmodels.publictransport.buses.travel.Route;
+import targetmodels.publictransport.buses.vehicle.Bus;
 
 public class TrainBusConnection {
     Train t;

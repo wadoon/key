@@ -1,4 +1,4 @@
-package casestudies.publictransport.buses.admin;
+package targetmodels.publictransport.buses.admin;
 
 /**
  * Represents a company responsible for managing a segment of the public

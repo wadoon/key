@@ -5,4 +5,4 @@
  * @author christopher
  *
  */
-package casestudies.publictransport;
+package targetmodels.publictransport.buses;

@@ -1,8 +1,9 @@
-package casestudies.publictransport.trains.train;
+package targetmodels.publictransport.trains.train;
 
 public class Train {
 
-    // @ public instance ghost non_null Wagon[] _wagons ;
+    /*@ public instance ghost non_null Wagon[] _wagons;
+     */
     Station nextStation;
 
     /*@ public normal_behavior
@@ -15,10 +16,11 @@ public class Train {
 
     MyList /* @ non_null @ */wagons;
 
-    /*
-     * public static Train createLocomotive(){ Train t = new Train();
-     * t.nextStation = new Station("Central"); return t; }
-     */
+    public static Train createLocomotive(){ 
+        Train t = new Train();
+        t.nextStation = new Station("Central"); return t; 
+    }
+
     Train() {
         wagons = new MyList();
     }
@@ -26,7 +28,7 @@ public class Train {
     /*@ public normal_behavior 
      *@ ensures \result == wagons.contains(w);
      */
-    public boolean /* @ pure @ */hasWagon(Wagon w) {
+    public boolean /* @ pure @ */ hasWagon(Wagon w) {
         return wagons.contains(w);
     }
 

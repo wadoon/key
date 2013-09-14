@@ -5,4 +5,4 @@
  * @author christopher
  *
  */
-package casestudies.publictransport.trains;
+package targetmodels.publictransport.trains;

@@ -1,4 +1,4 @@
-package casestudies.publictransport.buses.travel;
+package targetmodels.publictransport.buses.travel;
 
 /**
  * Represents a bus driver enrolled in a public transportation system.
