@@ -10,12 +10,11 @@ public class Passenger {
     public Station currentStation = null;
     public Wagon currentWagon = null;
 
-    /*
-     *@ public normal_behavior 
+    /*@ public normal_behavior 
      *@ requires t != null; 
      *@ ensures \old(currentStation) == t.getNextStation() && 
-     *@         ((\exists int i ; 0<=i && i< t.length(); t.getWagon(i) == currentWagon) 
-     *@         ==> currentTrain == t && currentStation == null);
+                 ((\exists int i ; 0<=i && i< t.length(); t.getWagon(i) == currentWagon) ==> 
+                       currentTrain == t && currentStation == null);
      */
     public boolean takeTrain(Train t) {
         if (currentTrain == null && this.currentStation == t.getNextStation()) {
@@ -31,19 +30,10 @@ public class Passenger {
                 }
             }
         }
-        
-        /*
-         *@ \assignable currentTrain; 
-         *@ \assignable currentStation; 
-         *@ \assignable currentWagon;
-         * 
-         * && st != null
-         */
         return false;
     }
 
-    /*
-     *@ public normal_behavior 
+    /*@ public normal_behavior 
      *@ ensures \old(currentTrain) == null ==> !\result;
      *@ ensures \old(currentTrain) != null ==> \result &&
      *@ currentTrain == null &&
