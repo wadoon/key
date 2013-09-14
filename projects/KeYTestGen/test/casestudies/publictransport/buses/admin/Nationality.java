@@ -1,4 +1,4 @@
-package buses.admin;
+package casestudies.publictransport.buses.admin;
 
 /**
  * Represents a nationality associated with a public transportation system.

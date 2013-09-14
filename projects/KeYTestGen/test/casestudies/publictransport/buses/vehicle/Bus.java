@@ -1,9 +1,8 @@
-package buses.vehicle;
+package casestudies.publictransport.buses.vehicle;
 
-import buses.admin.Company;
-import buses.admin.Nationality;
-import buses.travel.Driver;
-import buses.travel.Route;
+import casestudies.publictransport.buses.admin.Company;
+import casestudies.publictransport.buses.travel.Driver;
+import casestudies.publictransport.buses.travel.Route;
 
 /**
  * Represents a bus used in a public transportation system.

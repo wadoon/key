@@ -1,4 +1,4 @@
-package trains.train;
+package casestudies.publictransport.trains.train;
 
 public class Train {
 

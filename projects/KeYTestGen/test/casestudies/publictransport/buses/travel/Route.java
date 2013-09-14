@@ -1,4 +1,4 @@
-package buses.travel;
+package casestudies.publictransport.buses.travel;
 
 /**
  * Represents a transportation route between two points (intermediary stops are

@@ -1,4 +1,4 @@
-package trains.train;
+package casestudies.publictransport.trains.train;
 
 import java.util.Collection;
 import java.util.Iterator;

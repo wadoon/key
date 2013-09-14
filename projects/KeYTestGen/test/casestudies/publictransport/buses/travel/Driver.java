@@ -1,4 +1,4 @@
-package buses.travel;
+package casestudies.publictransport.buses.travel;
 
 /**
  * Represents a bus driver enrolled in a public transportation system.
