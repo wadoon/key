@@ -30,15 +30,10 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
 
     private final Services services;
 
-    
-    
-    
     public InspectorForFormulas(Services services) {
         super();
         this.services = services;
     }
-
-
 
     @Override
     public String check(String toBeChecked) {
