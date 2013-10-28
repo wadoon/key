@@ -115,14 +115,15 @@ public abstract class TermBuilder<S extends IServices> {
         final NamespaceSet namespaces = services.getNamespaces();
 
         int i = 0;
-        String result = baseName;
-        while(namespaces.lookup(new Name(result)) != null) {
-            result = baseName + "_" + i++;
+        Name result = new Name(baseName);
+        while(namespaces.lookup(result) != null || 
+        		services.getNameRecorder().getProposals().contains(result)) {
+            result = new Name(baseName + "_" + i++);
         }
 
-        services.getNameRecorder().addProposal(new Name(result));
+        services.getNameRecorder().addProposal(result);
 
-        return result;
+        return result.toString();
     }
 
 

@@ -45,7 +45,7 @@ public class SortBuilder {
     }
 
     public static String createFullyQualifiedName(final Decl interf) {
-        return interf.getModule().getName() + "." + interf.getName();
+        return interf.moduleName() + "." + interf.getName();
     }
 
     public static String createFullyQualifiedName(final TypeUse interf) {

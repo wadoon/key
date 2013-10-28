@@ -10,6 +10,13 @@
 
 package de.uka.ilkd.keyabs.proof.io;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -28,20 +35,13 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
-import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
+import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.proof.init.ABSTacletGenerator;
 import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
 import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /** 
@@ -82,6 +82,8 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
 
 
     private Includes includes;
+
+	private String proofObligation;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -355,7 +357,7 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
                 specRepos.addClassInvariants(problemParser.getClassInvariants());
                 //specRepos.addContracts(problemParser.getContracts());
                 //specRepos.addClassInvariants(problemParser.getInvariants());
-                //chooseContract = problemParser.getChooseContract();
+                chooseContract = problemParser.getChooseContract();
                 Debug.out("Read ABSKeY file   ", file);
             } finally {
                 cinp.close();
@@ -528,4 +530,11 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
         }
         return result;
     }
+
+
+	public String getProofObligation() {
+        return proofObligation;
+	}
+
+
 }

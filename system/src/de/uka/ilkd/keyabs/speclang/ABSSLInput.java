@@ -57,6 +57,7 @@ public class ABSSLInput extends AbstractEnvInput<ABSServices, ABSInitConfig> {
         for (File inv : files) {
             FileReader fileReader = null;
             try {
+                System.out.println(inv.getAbsolutePath());
                 fileReader = new FileReader(inv);
             } catch (FileNotFoundException e) {
                 return;

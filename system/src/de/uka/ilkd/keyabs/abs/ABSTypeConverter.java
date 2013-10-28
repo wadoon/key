@@ -145,7 +145,7 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 	return null;
     }
 
-    private Function getThisConstant() {
+    public Function getThisConstant() {
         return (Function) services.getNamespaces().functions().lookup(new Name("this"));
     }
 

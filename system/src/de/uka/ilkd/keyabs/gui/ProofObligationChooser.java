@@ -149,6 +149,7 @@ public class ProofObligationChooser {
         try {
             pi.startProver(initConfig, po, 0);
         } catch (ProofInputException exc) {
+        	exc.printStackTrace();
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }
     }

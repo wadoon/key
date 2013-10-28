@@ -1,16 +1,22 @@
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.io.DefaultProofFileParser;
-import de.uka.ilkd.key.proof.io.EnvInput;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.proof.init.AbstractProblemInitializer;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.init.IProofReader;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.DefaultProofFileParser;
+import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.IKeYFile;
 
 /**
  * <p>
@@ -114,8 +120,8 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
          finally {
     	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
             getMediator().resetNrGoalsClosedByHeuristics();
-            if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-               ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+            if (poContainer != null && poContainer.getProofOblInput() instanceof IKeYFile) {
+               ((IKeYFile<S, IC>)poContainer.getProofOblInput()).close();
             }  
          }
       }
@@ -167,9 +173,9 @@ public abstract class DefaultProblemLoader<S extends IServices, IC extends InitC
 
       mediator.stopInterface(true); // first stop (above) is not enough
 
-      if (envInput instanceof KeYUserProblemFile) {
+      if (envInput instanceof IProofReader) {
          problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator),
-                 (KeYUserProblemFile) envInput);
+                 (IProofReader) envInput);
       }
       mediator.getUI().resetStatus(this);
    }

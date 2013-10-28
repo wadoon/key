@@ -1,9 +1,11 @@
 package de.uka.ilkd.keyabs.proof.init;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.DeclPicker;
 import de.uka.ilkd.key.parser.ParserConfig;
@@ -11,25 +13,19 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.IProofReader;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.keyabs.abs.ABSServices;
-import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
-import de.uka.ilkd.keyabs.proof.io.ABSKeYFile;
 import de.uka.ilkd.keyabs.parser.ABSKeYLexer;
 import de.uka.ilkd.keyabs.parser.ABSKeYParser;
-import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
-import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
-import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
+import de.uka.ilkd.keyabs.proof.io.ABSKeYFile;
+import de.uka.ilkd.keyabs.speclang.ABSSLInput;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
+public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput, IProofReader {
 
     private Term problemTerm = null;
     private String problemHeader = "";
@@ -117,16 +113,16 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
             throw new ProofInputException(fnfe);
         }
 
-        // read in-code specifications
-
-        /*
-         * SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(),
-         * readClassPath(), readBootClassPath());
-         * slEnvInput.setInitConfig(initConfig); slEnvInput.read();
-         */
-
         // read key file itself
         super.read();
+
+        // read in-code specifications
+        
+        ABSSLInput slEnvInput = new ABSSLInput(readJavaPath(),
+          readClassPath(), readBootClassPath());
+          slEnvInput.setInitConfig(initConfig); 
+          slEnvInput.read();
+         
     }
 
     @Override
@@ -187,6 +183,10 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput {
         }
     }
 
+    public boolean hasProblemTerm() {
+    	return problemTerm != null;
+    }
+    
     /**
      * Reads a saved proof of a .key file.
      */

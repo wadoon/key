@@ -463,7 +463,8 @@ public class KeYFile implements IKeYFile<Services, JavaDLInitConfig> {
     }
     
     
-    public String getProofObligation() {
+    @Override
+	public String getProofObligation() {
         return proofObligation;
     }
 

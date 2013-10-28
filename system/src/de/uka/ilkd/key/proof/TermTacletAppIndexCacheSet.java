@@ -70,7 +70,7 @@ public class TermTacletAppIndexCacheSet {
      * (well, almost), and that different proofs and different areas within one
      * proof compete for cache space
      */
-    private final static Map cacheBackend = new LRUCache ( MAX_INDEX_ENTRIES );//chrisg made public
+    private final Map cacheBackend = new LRUCache ( MAX_INDEX_ENTRIES );//chrisg made public
     
     /**
      * dummy cache that is not caching at all, and from which no other cache is
@@ -163,7 +163,7 @@ public class TermTacletAppIndexCacheSet {
         return t instanceof FindTaclet;
     }
 
-    public static void clearCache(){
+    public void clearCache(){
         cacheBackend.clear();
     }
     ////////////////////////////////////////////////////////////////////////////

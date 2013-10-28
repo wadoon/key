@@ -255,7 +255,7 @@ public abstract class AbstractABS2KeYABSConverter {
     }
 
     public ABSFnApp convert(FnApp x) {
-        ProgramElementName fctName = new ProgramElementName(x.getName(), x.getDecl().getModule().getName());
+        ProgramElementName fctName = new ProgramElementName(x.getName(), x.getDecl().moduleName());
         IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
 
         int i = 0;
@@ -278,7 +278,7 @@ public abstract class AbstractABS2KeYABSConverter {
     public ABSDataConstructorExp convert(DataConstructorExp x) {
         ProgramElementName pen = new ProgramElementName(x.getDataConstructor()
                 .getName(), x.getDataConstructor().getDataTypeDecl()
-                .getModule().getName()
+                .moduleName()
                 + "." + x.getDataConstructor().getDataTypeDecl().getName());
 
         IABSPureExpression[] args = new IABSPureExpression[x.getNumParam()];

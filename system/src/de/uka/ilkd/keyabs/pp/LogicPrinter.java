@@ -1920,11 +1920,15 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     private void printStatementList(StatementContainer x) throws IOException {
-        if (x.getStatementCount() <= 0) return;
+        if (x.getStatementCount() <= 0) {
+        	return;
+        }
         layouter.print(" ");
         for (int i = 0; i < x.getStatementCount(); i++) {
-            boolean fstStmnt = markFirstStatement && (!(x.getChildAt(i) instanceof ProgramPrefix) ||
-                       (!(x.getChildAt(i) instanceof NonTerminalProgramElement) || ((NonTerminalProgramElement)x).getChildCount() == 0));
+            boolean fstStmnt = markFirstStatement &&
+            		(!(x.getChildAt(i) instanceof ProgramPrefix) ||
+                       (!(x.getChildAt(i) instanceof NonTerminalProgramElement) || 
+                    		   ((NonTerminalProgramElement)x).getChildCount() == 0));
             if (fstStmnt) {
                 markFirstStatement = false;
                 mark(MARK_START_FIRST_STMT);
@@ -2076,7 +2080,7 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSMethodFrame(ABSMethodFrame x) throws IOException {
-        layouter.print("methodframe");
+    	layouter.print("methodframe");
         x.getExecutionContext().visit(programPrettyPrinter);
         layouter.print(":{");
         layouter.beginC(2).ind();

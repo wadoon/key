@@ -64,25 +64,26 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
         Term wellFormedHistory = tb.wellFormedHistory(history, services);
         Term wellFormedHeap = tb.wellFormed(heap, services);
 
-        Function _this = new Function(new Name(tb.newName(services, "this")),
-                anyInterfaceSort);
-
+        Function _this = services.getTypeConverter().getThisConstant();
+        
         problemTerm = tb.and(wellFormedHeap, wellFormedHistory, tb.not(tb.equals(tb.func(_this),
                 tb.NULL(services))));
 
-        LocationVariable result = new LocationVariable(new ProgramElementName(tb.newName(services, "result")),
-                services.getProgramInfo().getKeYJavaType(method.getType().getQualifiedName()));
-        LocationVariable future = new LocationVariable(new ProgramElementName(tb.newName(services, "future")),
-                services.getProgramInfo().getKeYJavaType("ABS.StdLib.Fut"));
-        LogicVariable caller = new LogicVariable(new Name(tb.newName(services, "caller")),anyInterfaceSort);
 
 
         Pair<ABSStatementBlock, ImmutableList<IProgramVariable>> methodAndParams =
                 services.getProgramInfo().getMethodBody(method);
 
-        services.getNamespaces().programVariables().add(methodAndParams.second);
+        services.getNamespaces().programVariables().addSafely(methodAndParams.second);
+                
 
         Function methodLabel = services.getProgramInfo().getMethodLabelFor(method);
+
+        LocationVariable result = new LocationVariable(new ProgramElementName(tb.newName(services, "result")),
+                services.getProgramInfo().getKeYJavaType(method.getType().getQualifiedName()));
+        LocationVariable future = new LocationVariable(new ProgramElementName(tb.newName(services, "future")),
+                services.getProgramInfo().getKeYJavaType("ABS.StdLib.Fut"));
+        
         ABSMethodFrame frame =
                 new ABSMethodFrame(new ABSExecutionContext(
                         new ABSMethodLabel(methodLabel),
@@ -90,13 +91,17 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
                         methodAndParams.first.getBody());
 
         ABSStatementBlock block = new ABSStatementBlock(frame);
+        
+        Term pre = tb.func((Function)services.getNamespaces().functions().lookup(new Name("Pre")), 
+        		tb.var(history), tb.var(heap), tb.func(_this));
 
+        problemTerm = tb.and(problemTerm, pre);
         problemTerm = tb.and(problemTerm, tb.classInvariant(history, heap, _this, services));
-
 
         Term post = tb.box(JavaBlock.createJavaBlock(block),
                 tb.classInvariant(history, heap, _this, services));
 
+        final LogicVariable caller = new LogicVariable(new Name(tb.newName(services, "caller")), anyInterfaceSort);
         final Term invocREv = createInvocationReactionEvent(_this, future, caller, methodAndParams.second, methodLabel);
 
 
@@ -131,28 +136,31 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
                 tb.func(methodLabel), argSeq);
     }
 
-    private Term assignMethodParameters(ImmutableList<IProgramVariable> methodAndParams,
-                                        Term post) {
-        for (IProgramVariable p : methodAndParams) {
+    private Term assignMethodParameters(ImmutableList<IProgramVariable> methodParameters,
+                                        Term formula) {
+    	Term result = formula;
+    	for (IProgramVariable p : methodParameters) {
             LogicVariable plv = new LogicVariable(new Name(tb.newName(services, p.name().toString())), p.sort());
-            problemTerm = tb.all(plv, tb.applyElementary(services, tb.var(p), tb.var(plv), problemTerm));
+            result = tb.all(plv, tb.applyElementary(services, tb.var(p), tb.var(plv), result));
         }
-        return post;
+        return result;
     }
 
     @Override
     public ProofAggregate getPO() throws ProofInputException {
-        String name = name();
         ProofSettings settings = initConfig.getSettings() != null
                 ? initConfig.getSettings()
                 : new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-        JavaModel absModel = initConfig.getProofEnv().getJavaModel();
-        createProofHeader(absModel.getModelDir(), absModel.getClassPath(), absModel.getBootClassPath());
+        final JavaModel absModel = initConfig.getProofEnv().getJavaModel();
+        createProofHeader(absModel.getModelDir(), 
+        		absModel.getClassPath(), 
+        		absModel.getBootClassPath());
+        
         return ProofAggregate.createProofAggregate(
-                new Proof(name, problemTerm, header, initConfig
+                new Proof(name(), problemTerm, header, initConfig
                         .createTacletIndex(), initConfig
                         .createBuiltInRuleIndex(), initConfig.getServices(),
-                        settings), name);
+                        settings), name());
     }
 
     @Override

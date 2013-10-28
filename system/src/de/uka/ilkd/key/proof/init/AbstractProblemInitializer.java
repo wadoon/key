@@ -398,7 +398,7 @@ public abstract class AbstractProblemInitializer<S extends IServices, IC extends
         }
     }
 
-    public void tryReadProof(IProofFileParser prl, KeYUserProblemFile kupf)
+    public void tryReadProof(IProofFileParser prl, IProofReader kupf)
             throws ProofInputException {
         reportStatus("Loading proof", kupf.getNumberOfChars());
         kupf.readProof(prl);

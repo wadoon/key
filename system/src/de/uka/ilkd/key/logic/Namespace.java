@@ -259,7 +259,7 @@ public class Namespace<T extends Named> implements java.io.Serializable {
 		}
 	}
 
-	public void addSafely(ImmutableSet<? extends T> names) {
+	public void addSafely(Iterable<? extends T> names) {
 		for (T name : names) {
 			addSafely(name);
 		}

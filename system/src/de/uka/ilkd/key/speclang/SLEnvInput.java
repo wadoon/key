@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
+import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.ISpecificationRepository;
@@ -200,7 +201,7 @@ public final class SLEnvInput extends AbstractEnvInput<Services, JavaDLInitConfi
                 
                 //rule source found? -> read
                 if(rs != null) {
-                    final KeYFile keyFile = new KeYFile(path, rs, null);
+                    final IKeYFile<Services, JavaDLInitConfig> keyFile = new KeYFile(path, rs, null);
                     keyFile.setInitConfig(getInitConfig());
                     keyFile.read();
                 }

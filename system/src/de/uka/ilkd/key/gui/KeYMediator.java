@@ -250,7 +250,6 @@ public class KeYMediator<S extends IServices, IC extends InitConfig<S, IC>> {
                                                         (proof.openGoals().size()+" open goals remain."));
                                 }
                         });
-        TermTacletAppIndexCacheSet.clearCache();
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
     }

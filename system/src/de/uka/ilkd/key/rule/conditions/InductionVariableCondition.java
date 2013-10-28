@@ -28,10 +28,11 @@ public class InductionVariableCondition extends VariableConditionAdapter<IServic
 	@Override
 	public boolean check(SchemaVariable var, SVSubstitute instCandidate,
 			SVInstantiations instMap, IServices services) {
-		// TODO Auto-generated method stub
-		StrategyProperties strategyProperties = services.getProof().getSettings().
-		                                         getStrategySettings().getActiveStrategyProperties();
-		final String queryProp = strategyProperties.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
+		final StrategyProperties strategyProperties = 
+				services.getProof().getSettings().
+				getStrategySettings().getActiveStrategyProperties();
+		final String queryProp = 
+				strategyProperties.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
 		
 		if(queryProp.equals(StrategyProperties.AUTO_INDUCTION_ON) ||
 		   queryProp.equals(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)){

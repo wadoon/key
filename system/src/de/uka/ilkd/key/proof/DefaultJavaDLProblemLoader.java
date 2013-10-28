@@ -11,9 +11,14 @@ import java.util.Properties;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.io.IKeYFile;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 
@@ -68,8 +73,8 @@ public class DefaultJavaDLProblemLoader extends
     protected IPersistablePO.LoadedPOContainer createProofObligationContainer() throws IOException {
         final String chooseContract;
         final String proofObligation;
-        if (envInput instanceof KeYFile) {
-            KeYFile keyFile = (KeYFile)envInput;
+        if (envInput instanceof IKeYFile) {
+        	IKeYFile<Services, JavaDLInitConfig> keyFile = (IKeYFile<Services, JavaDLInitConfig>) envInput;
             chooseContract = keyFile.chooseContract();
             proofObligation = keyFile.getProofObligation();
         }

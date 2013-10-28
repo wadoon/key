@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
  * Represents an input from a .key user problem file producing an environment
  * as well as a proof obligation.
  */
-public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
+public final class KeYUserProblemFile extends KeYFile implements ProofOblInput, IProofReader {
 
     private Term problemTerm = null;
     private String problemHeader = "";
@@ -191,10 +191,11 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
     
     
-    /** 
-     * Reads a saved proof of a .key file.
-     */
-    public void readProof(IProofFileParser prl) throws ProofInputException {
+    /* (non-Javadoc)
+	 * @see de.uka.ilkd.key.proof.init.IProofReader#readProof(de.uka.ilkd.key.proof.io.IProofFileParser)
+	 */
+    @Override
+	public void readProof(IProofFileParser prl) throws ProofInputException {
 	if(lastParser == null) {
 	    readProblem();
 	}

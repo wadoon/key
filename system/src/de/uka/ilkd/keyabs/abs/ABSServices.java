@@ -79,7 +79,7 @@ public class ABSServices extends AbstractServices {
     @Override
     public ABSServices copyProofSpecific(Proof p_proof) {
         ABSServices s = new ABSServices(getProgramInfo().rec2key(), info);
-        s.proof = proof;
+        s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setExceptionHandler(getExceptionHandler());

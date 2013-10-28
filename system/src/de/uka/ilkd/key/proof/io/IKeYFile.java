@@ -27,4 +27,6 @@ public interface IKeYFile<S extends IServices, IC extends InitConfig<S, IC>> ext
 
     public abstract String chooseContract();
 
+	public abstract String getProofObligation();
+
 }

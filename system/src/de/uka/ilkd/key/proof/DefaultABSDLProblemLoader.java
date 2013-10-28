@@ -1,22 +1,22 @@
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.proofobligations.ABSPreservesInvariantPO;import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.gui.POBrowserData;
 import de.uka.ilkd.keyabs.gui.ProofObligationChooser;
 import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.proof.init.ABSKeYUserProblemFile;
+import de.uka.ilkd.keyabs.proof.io.ABSKeYFile;
 import de.uka.ilkd.keyabs.speclang.ABSSLInput;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-import java.util.StringTokenizer;
 
 public class DefaultABSDLProblemLoader extends
         ProblemLoader<ABSServices, ABSInitConfig> {
@@ -58,8 +58,23 @@ public class DefaultABSDLProblemLoader extends
 
     @Override
     protected IPersistablePO.LoadedPOContainer createProofObligationContainer() throws IOException {
-        if (envInput instanceof ProofOblInput) {
-            return new IPersistablePO.LoadedPOContainer((ProofOblInput)envInput);
+        final String chooseContract;
+        final String proofObligation;
+        if (envInput instanceof ABSKeYFile) {
+        	ABSKeYFile keyFile = (ABSKeYFile)envInput;
+            chooseContract = keyFile.chooseContract();
+            proofObligation = keyFile.getProofObligation();
+        }
+        else {
+            chooseContract = null;
+            proofObligation = null;
+        }
+    	
+    	if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
+    		if (envInput instanceof ABSKeYUserProblemFile &&
+    				((ABSKeYUserProblemFile)envInput).hasProblemTerm()) {
+    			return new IPersistablePO.LoadedPOContainer((ProofOblInput)envInput);
+    		}
         }
         return null;
     }
@@ -68,7 +83,6 @@ public class DefaultABSDLProblemLoader extends
     protected EnvInput<ABSServices, ABSInitConfig> createEnvInput() throws IOException {
     
           final String filename = file.getName();
-    
           if (filename.endsWith(".key") || filename.endsWith(".proof")) {
                   return new ABSKeYUserProblemFile(filename, file, mediator.getUI());
           } else if (file.isDirectory()) {

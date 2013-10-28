@@ -5,7 +5,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class GetThisReference extends AbstractTermTransformer {
@@ -16,7 +15,7 @@ public class GetThisReference extends AbstractTermTransformer {
 
     @Override
     public Term transform(Term term, SVInstantiations svInst, IServices services) {
-	return services.getTermBuilder().
+    	return services.getTermBuilder().
 		func((Function) services.getNamespaces().functions().lookup(new Name("this")));
     }
 

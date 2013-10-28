@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import abs.frontend.analyser.SemanticErrorList;
+import abs.frontend.analyser.TypeError;
 import abs.frontend.ast.*;
 import abs.frontend.typechecker.Type;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -25,7 +27,8 @@ public class FunctionBuilder {
     private Sort getType(Type t, ABSInfo info) {
         if (t.isTypeParameter()) {
             return Sort.ANY;
-        } else {
+        } else {        	
+        	System.out.println("====" + t);
             return info.getTypeByName(t.getQualifiedName()).getSort();
         }
     }
@@ -53,7 +56,7 @@ public class FunctionBuilder {
 
         System.out.println("Register Global Functions");
         for (Map.Entry<Name, FunctionDecl> func : info.getABSParserInfo().getFunctions().entrySet()) {
-
+        	System.out.println(func.getKey());
             final Sort[] argSorts = new Sort[func.getValue().getNumParam()];
             int count = 0;
             for (ParamDecl arg : func.getValue().getParamList()) {
@@ -144,7 +147,7 @@ public class FunctionBuilder {
     }
 
     public static Name createNameFor(FunctionDecl fd) {
-        return new ProgramElementName(fd.getName(), fd.getModule().getName());
+        return new ProgramElementName(fd.getName(), fd.moduleName());
     }
 
 
@@ -177,7 +180,7 @@ public class FunctionBuilder {
                     }
                     if (count == argSorts.length) {
                         // create unique function symbol
-                        final String fullyQualifiedName = c.getModule().getName()
+                        final String fullyQualifiedName = c.moduleName()
                                 + "."
                                 + c.getDataTypeDecl().getName();
 
