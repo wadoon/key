@@ -34,6 +34,7 @@ header {
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.speclang.HeapContext;
     import de.uka.ilkd.key.speclang.PositionedString;
+    import de.uka.ilkd.key.speclang.Definition;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
@@ -311,6 +312,7 @@ options {
 	}
 
 	SLExpression result = null;
+	
 	try {
 	 result = resolverManager.resolve(receiver,
 	   			      lookupName,
@@ -345,9 +347,12 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = dependsclause
     |   result = declassifyclause
     |   result = ensuresclause
+    |	result = defclause
+    |	result = ensuresabsclause
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
+    |	result = requiresabsclause
     |   result = decreasesclause
     |   result = respectsclause
     |   result = returnsclause
@@ -422,13 +427,52 @@ requiresclause returns [Term result = null] throws SLTranslationException
     req:REQUIRES result=predornot
             { result = translator.translate(req.getText(), Term.class, result, services); }
     ;
-
+    
+requiresabsclause returns [Term result = null] throws SLTranslationException
+:	
+	req:REQUIRES_ABS id:IDENT
+		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
+				Function f = new Function(new Name(id.getText()), Sort.FORMULA, 
+								heapLDT.targetSort());				
+				javaInfo.getServices().getNamespaces().functions().add(f);	
+				result = TB.func(f, TB.var(heapLDT.getHeap()));
+			} else{
+				raiseError("The name " + id.getText() + " already exists in this namespace");
+			}
+		}
+	;
 
 ensuresclause returns [Term result = null] throws SLTranslationException
 :
     ens:ENSURES result=predornot
             { result = translator.translate(ens.getText(), Term.class, result, services); }
     ;
+
+ensuresabsclause returns [Term result = null] throws SLTranslationException
+:	
+	req:ENSURES_ABS id:IDENT
+		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
+				Function f = new Function(new Name(id.getText()), Sort.FORMULA);
+				javaInfo.getServices().getNamespaces().functions().add(f);	
+				result = TB.func(f);
+			} else{
+				raiseError("The name " + id.getText() + " already exists in this namespace");
+			}
+		}
+	;
+	
+defclause returns [Definition result = null] throws SLTranslationException
+{
+    Term pr = null;
+}
+:
+	def:DEF id:IDENT EQUAL_SINGLE pr=predornot
+		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null) {
+				raiseError("Undeclared " + id.getText() + " appeared in def clause");
+			} else
+			result = new Definition(id.getText(), TB.convertToFormula(pr, services));
+		} 
+	;
 
 axiomsclause returns [Term result = null] throws SLTranslationException
 :
@@ -1251,7 +1295,7 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
 }
 :
 	result=constant
-    |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
+    |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id);}
     |   inv:INV      { result = translator.translate(inv.getText(),services,
                                 selfVar==null? null: TB.var(selfVar),containerType);}
     |   TRUE         { result = new SLExpression(TB.tt()); }

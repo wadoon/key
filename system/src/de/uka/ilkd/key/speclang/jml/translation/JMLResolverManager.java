@@ -37,6 +37,7 @@ final class JMLResolverManager extends SLResolverManager {
                               SLTranslationExceptionManager eManager) {
         super(eManager, specInClass, selfVar, false);
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
+        addResolver(new SLAbstractPlaceholderResolver(javaInfo, this, specInClass));
         addResolver(new SLAttributeResolver(javaInfo, this, specInClass));        
         addResolver(new SLMethodResolver(javaInfo, this, specInClass));
         addResolver(new SLTypeResolver(javaInfo, this, specInClass));

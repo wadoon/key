@@ -61,12 +61,14 @@ tokens {
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";
     DECREASING_REDUNDANTLY  	= "decreasing_redundantly";
+    DEF					= "def";
     DIVERGES 			= "diverges";
     DIVERGES_RED 		= "diverges_redundantly";
     DURATION 			= "duration";
     DURATION_RED 		= "duration_redundantly";
     ENSURES 			= "ensures";
     ENSURES_RED 		= "ensures_redundantly";
+    ENSURES_ABS			= "ensures_abs";
     EXCEPTIONAL_BEHAVIOR 	= "exceptional_behavior";
     EXCEPTIONAL_BEHAVIOUR 	= "exceptional_behaviour";
     EXSURES                     = "exsures";
@@ -120,6 +122,7 @@ tokens {
     REPRESENTS_RED		= "represents_redundantly";
     REQUIRES 			= "requires";
     REQUIRES_RED 		= "requires_redundantly";
+    REQUIRES_ABS		= "requires_abs";
 	RETURNS				= "returns";
 	RETURN_BEHAVIOR 	= "return_behavior";
     RETURN_BEHAVIOUR 	= "return_behaviour";

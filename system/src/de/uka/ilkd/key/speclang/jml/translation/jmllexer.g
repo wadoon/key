@@ -45,11 +45,14 @@ tokens {
     ACCESSIBLE      = "accessible";
     ASSIGNABLE      = "assignable";
     ENSURES         = "ensures";
+    ENSURES_ABS		= "ensures_abs";
     DECLASSIFY      = "declassify";
+    DEF				= "def";
     DEPENDS         = "depends";
     MODEL_METHOD_AXIOM    = "model_method_axiom";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
+    REQUIRES_ABS 	= "requires_abs";
     RESPECTS        = "respects";
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";

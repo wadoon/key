@@ -574,6 +574,8 @@ requires_clause
 	throws SLTranslationException
 :
     requires_keyword result=expression { result = flipHeaps("requires", result); }
+    |
+    REQUIRES_ABS result=expression {result = flipHeaps("requires_abs", result); }
 ;
 
 
@@ -582,7 +584,6 @@ requires_keyword
     REQUIRES |
     REQUIRES_RED
 ;
-
 
 generic_spec_body[ImmutableList<String> mods, Behavior b]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
@@ -646,6 +647,8 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	    ps=assignable_clause     { sc.addAssignable(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
+	|	ps=ensures_abs_clause	 { sc.addEnsures(ps); }
+	|	ps=def_clause			 { sc.addDef(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
@@ -749,6 +752,20 @@ ensures_keyword
 :
     	ENSURES
     |   ENSURES_RED
+;
+
+ensures_abs_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	ENSURES_ABS result=expression {result = flipHeaps("ensures_abs", result); }
+;
+
+def_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	DEF result=expression {result = flipHeaps("def", result); }
 ;
 
 

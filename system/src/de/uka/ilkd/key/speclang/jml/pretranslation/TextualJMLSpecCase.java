@@ -64,7 +64,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private Map<String, ImmutableList<PositionedString>>
       axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
-
+    
+    private Map<String, ImmutableList<PositionedString>>
+      defs = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
         super(mods);
@@ -77,6 +80,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           accessibles.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           accessibles.put(hName.toString()+"AtPre", ImmutableSLList.<PositionedString>nil());
           axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          defs.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
 
@@ -102,6 +106,19 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addRequires(ImmutableList<PositionedString> l) {
         for(PositionedString ps : l) {
            addRequires(ps);
+        }
+    }
+    
+    public void addDef(PositionedString ps) {
+    	System.out.println("Is it a def? " + ps);
+        addGeneric(defs, ps);
+        System.out.println(defs.get(HeapLDT.BASE_HEAP_NAME.toString()).size());
+    }
+
+
+    public void addDef(ImmutableList<PositionedString> l) {
+        for(PositionedString ps : l) {
+           addDef(ps);
         }
     }
 
@@ -234,6 +251,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getRequires(String hName) {
         return requires.get(hName);
     }
+    
+    public ImmutableList<PositionedString> getDefs() {
+        return defs.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+
+    public ImmutableList<PositionedString> getDefs(String hName) {
+
+        System.out.println(defs.get(HeapLDT.BASE_HEAP_NAME.toString()).size());
+        System.out.println(defs.get(hName).size());
+        return defs.get(hName);
+    }
+    
 
     public ImmutableList<PositionedString> getMeasuredBy() {
         return measuredBy;
@@ -345,6 +374,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           }
         }
         for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = defs.get(h.toString()).iterator();
+            while(it.hasNext()) {
+              sb.append("def<"+h+">: " + it.next() + "\n");
+            }
+          }
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
           it = assignables.get(h.toString()).iterator();
           while(it.hasNext()) {
             sb.append("assignable<"+h+">: " + it.next() + "\n");
@@ -414,6 +449,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && behavior.equals(sc.behavior)
                && abbreviations.equals(sc.abbreviations)
                && requires.equals(sc.requires)
+               && defs.equals(sc.defs)
                && assignables.equals(sc.assignables)
                && accessibles.equals(sc.accessibles)
                && axioms.equals(sc.axioms)
@@ -434,6 +470,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + behavior.hashCode()
                + abbreviations.hashCode()
                + requires.hashCode()
+               + defs.hashCode()
                + assignables.hashCode()
                + accessibles.hashCode()
                + axioms.hashCode()

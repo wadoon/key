@@ -170,7 +170,6 @@ public abstract class SLResolverManager {
                 return result;
             }
         }
-       
         return null;
     }
     
