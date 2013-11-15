@@ -99,7 +99,7 @@ public class JMLSpecFactory {
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
         public Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable,Term>();;
         public Map<LocationVariable,Term> ensures = new LinkedHashMap<LocationVariable,Term>();
-        public Map<LocationVariable,Definition> defs = new LinkedHashMap<LocationVariable,Definition>();
+        public Map<LocationVariable,ImmutableList<Definition>> defs = new LinkedHashMap<LocationVariable,ImmutableList<Definition>>();
         public Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
         public Term signals;
         public Term signalsOnly;
@@ -269,17 +269,6 @@ public class JMLSpecFactory {
                                     textualSpecCase.getRequires(heap.name().toString())));
            }
            
-           if(heap == savedHeap && textualSpecCase.getDefs(heap.name().toString()).isEmpty()) {
-               clauses.defs.put(heap, null);
-             }else{
-               if (!textualSpecCase.getDefs(heap.name().toString()).isEmpty()) {	 
-            	   clauses.defs.put(heap, translateDefs(pm, progVars.selfVar, progVars.paramVars,
-            		   				  progVars.resultVar, progVars.excVar, 
-            		   				  progVars.atPres,
-                                      textualSpecCase.getDefs(heap.name().toString())));
-               }
-             }
-           
            if(heap == savedHeap && textualSpecCase.getEnsures(heap.name().toString()).isEmpty()) {
              clauses.ensures.put(heap, null);
            }else{
@@ -290,6 +279,18 @@ public class JMLSpecFactory {
                                            originalBehavior,
                                            textualSpecCase.getEnsures(heap.name().toString())));
           }
+           
+           if(heap == savedHeap && textualSpecCase.getDefs(heap.name().toString()).isEmpty()) {
+               clauses.defs.put(heap, null);
+             }else{
+               if (!textualSpecCase.getDefs(heap.name().toString()).isEmpty()) {	 
+            	   clauses.defs.put(heap, translateDefs(pm, progVars.selfVar, progVars.paramVars,
+            		   				  progVars.resultVar, progVars.excVar, 
+            		   				  progVars.atPres,
+                                      textualSpecCase.getDefs(heap.name().toString())));
+               }
+             } 
+           
           if(textualSpecCase.getAxioms(heap.name().toString()).isEmpty()) {
         	  clauses.axioms.put(heap, null);
           }else{
@@ -549,7 +550,7 @@ public class JMLSpecFactory {
                                 originalBehavior, originalClauses);
     }
 
-    private Definition translateDefs(IProgramMethod pm,
+    private ImmutableList<Definition> translateDefs(IProgramMethod pm,
 					            ProgramVariable selfVar,
 					            ImmutableList<ProgramVariable> paramVars,
 					            ProgramVariable resultVar,
@@ -558,12 +559,16 @@ public class JMLSpecFactory {
 					            ImmutableList<PositionedString> originalClauses)
 				 throws SLTranslationException {
     	// TODO Handle many Defs, not only one
-    	System.out.println("number of defs " + originalClauses.size());
-    	return JMLTranslator.translate(originalClauses.head(), 
+    	//System.out.println("number of defs " + originalClauses.size());
+    	ImmutableList<Definition> defs = ImmutableSLList.<Definition>nil();
+    	for (PositionedString def: originalClauses) {
+    		defs.prepend(JMLTranslator.translate(def, 
     									pm.getContainerType(), 
     									selfVar, paramVars, 
     									resultVar, excVar, 
-    									atPres, Definition.class, services);	
+    									atPres, Definition.class, services));	
+    	}
+    	return defs.reverse();
     }
     
     private Term translateEnsures(IProgramMethod pm,

@@ -47,6 +47,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.Definition;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
@@ -57,6 +58,8 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
+
 
 
 
@@ -88,9 +91,12 @@ final class JMLTranslator {
         ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
+        ENSURES_ABS ("ensures_abs"),
         MODEL_METHOD_AXIOM ("model_method_axiom"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
+        REQUIRES_ABS ("requires_abs"),
+        DEF ("def"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
 
@@ -278,6 +284,81 @@ final class JMLTranslator {
                 return TB.convertToFormula(ensuresTerm, services);
             }
         });
+        translationMethods.put(JMLKeyWord.ENSURES_ABS, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, String.class, ImmutableList.class, ProgramVariable.class, Services.class);
+                String name = (String) params[0];
+                ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
+                ProgramVariable resultVar = (ProgramVariable) params[2];
+                Services services = (Services) params[3];
+                
+                HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+                JavaInfo javaInfo = services.getJavaInfo();
+                
+                List<Sort> sorts = new ArrayList<Sort>();
+				for (ProgramVariable param: paramVars) {
+					sorts.add(param.getKeYJavaType().getSort());
+				}
+				sorts.add(resultVar.getKeYJavaType().getSort());
+				sorts.add(heapLDT.targetSort());
+				
+				Function f = new Function(new Name(name), Sort.FORMULA, 
+								sorts.toArray(new Sort[sorts.size()]));									
+				javaInfo.getServices().getNamespaces().functions().add(f);	
+				
+				List<Term> subterms = new ArrayList<Term>();
+				for (ProgramVariable param: paramVars) {
+					subterms.add(TB.var(param));
+				}
+				subterms.add(TB.var(resultVar));
+				subterms.add(TB.var(heapLDT.getHeap()));
+				
+				return TB.func(f, subterms.toArray(new Term[subterms.size()]), null);
+            }
+        });
+        translationMethods.put(JMLKeyWord.DEF, new JMLTranslationMethod() {
+        	// gets the function (placeholder) and the corresponding Term (its value), builds a Definition
+            @Override
+            public Definition translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Function.class, Term.class, ImmutableList.class, ProgramVariable.class, Services.class);
+                Function function = (Function) params[0];
+                Term value = (Term) params[1];
+                ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[2];
+                ProgramVariable resultVar = (ProgramVariable) params[3];
+                Services services = (Services) params[4];
+                
+                HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+                
+                //TODO That is a very naive way to distinguish between a "requires" placeholder
+                // and an "ensures" placeholder, based on a number of its argument sorts.
+                //Think of a better way, that would also suit an "assignable" placeholder
+                // Also, shouldn't it be checked that the placeholder and its value have matching sorts and arguments?
+                List<Term> subterms = new ArrayList<Term>();
+				for (ProgramVariable param: paramVars) {
+					subterms.add(TB.var(param));
+				}
+				
+				//result should be added only to the "ensures" placeholder
+                if (function.argSorts().size() == paramVars.size() + 2) {
+                	//metavariable represents ensures
+                	subterms.add(TB.var(resultVar));
+                } else {
+                	//metavariable represents requires, nothing else to do
+                }
+                subterms.add(TB.var(heapLDT.getHeap()));
+                
+                //Does it even make sense, to keep function as a term in Definition, with all its subterms by default?
+                return new Definition(TB.func(function, subterms.toArray(new Term[subterms.size()]), null), value);
+                	
+			
+            }
+        });
         translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, new JMLTranslationMethod() {
 
         	@Override
@@ -318,6 +399,42 @@ final class JMLTranslator {
                 return TB.convertToFormula(requiresTerm, services);
             }
         });
+        
+        translationMethods.put(JMLKeyWord.REQUIRES_ABS, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, String.class, ImmutableList.class, Services.class);
+                String name = (String) params[0];
+                ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
+                Services services = (Services) params[2];
+                
+                HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+                JavaInfo javaInfo = services.getJavaInfo();
+                
+                List<Sort> sorts = new ArrayList<Sort>();
+				for (ProgramVariable param: paramVars) {
+					sorts.add(param.getKeYJavaType().getSort());
+				}
+				sorts.add(heapLDT.targetSort());
+				
+				Function f = new Function(new Name(name), Sort.FORMULA, 
+								sorts.toArray(new Sort[sorts.size()]));									
+				javaInfo.getServices().getNamespaces().functions().add(f);	
+				
+				List<Term> subterms = new ArrayList<Term>();
+				for (ProgramVariable param: paramVars) {
+					subterms.add(TB.var(param));
+				}
+				subterms.add(TB.var(heapLDT.getHeap()));
+				
+				return TB.func(f, subterms.toArray(new Term[subterms.size()]), null);
+            }
+        });
+        
+        
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
 
             @Override

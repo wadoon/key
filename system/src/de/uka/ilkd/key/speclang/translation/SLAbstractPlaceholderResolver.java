@@ -12,6 +12,9 @@
 //
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -54,7 +57,7 @@ public class SLAbstractPlaceholderResolver extends SLExpressionResolver {
 				 javaInfo.getServices().getNamespaces().functions().add(f);
 				 
 				 Term[] arguments = new Term[parameters.getParameters().size()];
-				 
+				
 				 ImmutableList<SLExpression> argumentsAsSLExp = parameters.getParameters();
 				 for (int i = 0; i<arguments.length; i++) {
 					 arguments[i] = argumentsAsSLExp.head().getTerm();

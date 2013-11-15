@@ -110,9 +110,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     public void addDef(PositionedString ps) {
-    	System.out.println("Is it a def? " + ps);
         addGeneric(defs, ps);
-        System.out.println(defs.get(HeapLDT.BASE_HEAP_NAME.toString()).size());
     }
 
 
@@ -257,9 +255,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public ImmutableList<PositionedString> getDefs(String hName) {
-
-        System.out.println(defs.get(HeapLDT.BASE_HEAP_NAME.toString()).size());
-        System.out.println(defs.get(hName).size());
         return defs.get(hName);
     }
     

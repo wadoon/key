@@ -18,6 +18,7 @@ header {
     package de.uka.ilkd.key.speclang.jml.translation;
 
     import java.io.StringReader;
+	
 
     import de.uka.ilkd.key.collection.*;
     import de.uka.ilkd.key.java.JavaInfo;
@@ -432,10 +433,8 @@ requiresabsclause returns [Term result = null] throws SLTranslationException
 :	
 	req:REQUIRES_ABS id:IDENT
 		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
-				Function f = new Function(new Name(id.getText()), Sort.FORMULA, 
-								heapLDT.targetSort());				
-				javaInfo.getServices().getNamespaces().functions().add(f);	
-				result = TB.func(f, TB.var(heapLDT.getHeap()));
+				result = translator.translate(req.getText(), Term.class, id.getText(), paramVars, services);
+			
 			} else{
 				raiseError("The name " + id.getText() + " already exists in this namespace");
 			}
@@ -452,9 +451,8 @@ ensuresabsclause returns [Term result = null] throws SLTranslationException
 :	
 	req:ENSURES_ABS id:IDENT
 		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
-				Function f = new Function(new Name(id.getText()), Sort.FORMULA);
-				javaInfo.getServices().getNamespaces().functions().add(f);	
-				result = TB.func(f);
+				result = translator.translate(req.getText(), Term.class, id.getText(), 
+													paramVars, resultVar, services);
 			} else{
 				raiseError("The name " + id.getText() + " already exists in this namespace");
 			}
@@ -467,10 +465,15 @@ defclause returns [Definition result = null] throws SLTranslationException
 }
 :
 	def:DEF id:IDENT EQUAL_SINGLE pr=predornot
-		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null) {
+		{	
+			Function f = (Function)javaInfo.getServices().getNamespaces().functions().lookup(id.getText());
+			if (f == null) {
 				raiseError("Undeclared " + id.getText() + " appeared in def clause");
 			} else
-			result = new Definition(id.getText(), TB.convertToFormula(pr, services));
+			//result = new Definition(TB.func(f), TB.convertToFormula(pr, services));
+			result = translator.translate(def.getText(), Definition.class, 
+												f, pr,
+												paramVars, resultVar, services);
 		} 
 	;
 
