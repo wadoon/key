@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -119,17 +118,11 @@ public final class JavaInfo {
     private HashMap<Type, KeYJavaType> type2KJTCache = null;
     private HashMap<String, KeYJavaType> name2KJTCache = null;
 
-    // the simple name lookup is errorprone and should be removed soon
-    // where it is used, force to specify a context class for unique type
-    // resolution
-    @Deprecated
-    private HashMap<String, Object> sName2KJTCache = null;
 
     private LRUCache<CacheKey, ImmutableList<KeYJavaType>> commonSubtypeCache
     	= new LRUCache<CacheKey, ImmutableList<KeYJavaType>>(200);
 
     private int nameCachedSize = 0;
-    private int sNameCachedSize = 0;
     private int sortCachedSize = 0;
 
     /**
@@ -251,9 +244,7 @@ public final class JavaInfo {
 	sort2KJTCache = null;
 	type2KJTCache = null;
 	name2KJTCache = null;
-	sName2KJTCache = null;
 	nameCachedSize = 0;
-	sNameCachedSize = 0;
 	sortCachedSize = 0;
     }
 
@@ -336,71 +327,14 @@ public final class JavaInfo {
     /**
      * looks up a KeYJavaType with given name. If the name is a fully
      * qualifying name with package prefix an element with this full name is
-     * taken. If the name does not contain a full package prefix some
-     * KeYJavaType with this short name is taken.
-     * @param className the name to look for (either full or short)
+     * taken. In case of an unqualified name to which no type is found in the default package,
+     * the type is looked for in package <code>cjava.lang</code>
+     * @param className the fully qualified class name (or an unqualified name from package java.lang)
      * @return a class matching the name
      */
     public KeYJavaType getTypeByClassName(String className) {
-	KeYJavaType result = getTypeByName(className);
-	className = translateArrayType(className);
-        /* TODO: get rid of this short name thing; introduce second parameter
-                 with the context in which to look for
-         */
-        if (result == null) {
-	    final int dotpos = className.lastIndexOf(".");
-            String shortName = className.substring(dotpos+1);
-	    if(sName2KJTCache == null){
-		buildShortNameCache();
-	    }
-	    result = (KeYJavaType) sName2KJTCache.get(shortName);
-	}
-	if(result != null){
-	    Debug.out("javaInfo: type found (className, type):",
-		      className, result);
-	} else {
-	    //this is for the case that the cache has been established to early
-	    //(i.e. when not all types were known)
-	    if (kpmi.rec2key().size() > sNameCachedSize){
-		sName2KJTCache = null;
-		return getTypeByClassName(className);
-	    }
-            // maybe a not yet known array type
-            if(className.endsWith("]")){
-                readJavaBlock("{" + className + " k;}");
-                result = getKeYJavaType(className);
-                if(result!=null) return result;
-            }
-	    Debug.out("javaInfo: type not found. Looked for:", className);
-	}
-	return result;
+    	return getTypeByClassName(className, null);
     }
-
-    /**
-     * caches all known types according to their short name
-     */
-    private void buildShortNameCache() {
-        sName2KJTCache = new LinkedHashMap<String, Object>();
-        sNameCachedSize = kpmi.rec2key().size();
-        final HashSet<String> duplicates = new LinkedHashSet<String>();
-        for (Object o : kpmi.allElements()) {
-            if (o instanceof KeYJavaType){
-                KeYJavaType t = (KeYJavaType)o;
-                String name = getFullName(t);
-                //TODO array types [[I vs. int[]
-                int pos     = name.lastIndexOf(".");
-                final String shortName = name.substring(pos+1);
-                if (!sName2KJTCache.containsKey(shortName) &&
-                        !duplicates.contains(shortName)) {
-                    sName2KJTCache.put(shortName, o);
-                } else {
-                    duplicates.add(shortName);
-                    sName2KJTCache.remove(shortName);
-                }
-            }
-        }
-    }
-
 
     /**
      * returns a type declaration with the full name of the given String fullName
@@ -470,16 +404,8 @@ public final class JavaInfo {
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ?
-            (KeYJavaType)getKeYJavaTypeByClassName(fullName) :
+            getTypeByClassName(fullName) :
             result);
-    }
-
-
-    /**
-     * this is an alias for getTypeByClassName
-     */
-    public KeYJavaType getKeYJavaTypeByClassName(String className) {
-        return getTypeByClassName(className);
     }
 
 
@@ -673,7 +599,7 @@ public final class JavaInfo {
 				     Term[] args,
 				     String className) {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
-	KeYJavaType clType = getKeYJavaTypeByClassName(className);
+	KeYJavaType clType = getTypeByClassName(className);
 	for(int i=0; i < args.length; i++) {
         sig = sig.append(getServices().getTypeConverter()
                 .getKeYJavaType(args[i]));
@@ -1017,7 +943,7 @@ public final class JavaInfo {
 
     	KeYJavaType kjt = null;
     	try {
-    		kjt = getKeYJavaTypeByClassName(qualifiedClassName);
+    		kjt = getTypeByClassName(qualifiedClassName);
     	} catch (Exception e) {
     		if (qualifiedClassName.endsWith("]")) {
     			readJavaBlock("{" + qualifiedClassName + " k;}");
@@ -1138,7 +1064,7 @@ public final class JavaInfo {
 		"java.lang.Cloneable", "java.io.Serializable"};
 
 	for (int i = 0; i<fullNames.length; i++) {
-	    commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);
+	    commonTypes[i] = getTypeByClassName(fullNames[i]);
 	}
 	commonTypesCacheValid = true;
     }
@@ -1148,7 +1074,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getJavaLangObject() {
         if (commonTypes[0] == null) {
-            commonTypes[0] = getKeYJavaTypeByClassName("java.lang.Object");
+            commonTypes[0] = getTypeByClassName("java.lang.Object");
         }
         return commonTypes[0];
     }
@@ -1159,7 +1085,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getJavaLangCloneable() {
         if (commonTypes[1] == null) {
-            commonTypes[1] = getKeYJavaTypeByClassName("java.lang.Cloneable");
+            commonTypes[1] = getTypeByClassName("java.lang.Cloneable");
         }
         return commonTypes[1];
     }
@@ -1169,7 +1095,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getJavaIoSerializable() {
         if (commonTypes[2] == null) {
-            commonTypes[2] = getKeYJavaTypeByClassName("java.io.Serializable");
+            commonTypes[2] = getTypeByClassName("java.io.Serializable");
         }
         return commonTypes[2];
     }
@@ -1224,7 +1150,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getNullType() {
 	if (nullType==null) {
-	    nullType = getKeYJavaTypeByClassName("null");
+	    nullType = getTypeByClassName("null");
 	    Debug.assertTrue(nullType!=null
 			 , "we should already have it in the map");
 	}
@@ -1244,7 +1170,7 @@ public final class JavaInfo {
                 readJava("{}");
             }
             final KeYJavaType kjt =
-                getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+                getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             defaultExecutionContext =
                 new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
         }
@@ -1442,6 +1368,35 @@ public final class JavaInfo {
          * condition
          */
         public abstract boolean isSatisfiedBy(ProgramElement pe);
+    }
+
+    /**
+     * retrieves the KeYJavaType of the given type name. If the type is not fully qualified,
+     * it is looked for in the context of the <code>containerType</code> first and 
+     * then in the <code>java.lang</code>
+     * package.  
+     * @param name the name of the type (if possible fully qualified)
+     * @param containerType the KeYJavaType of the context in which the type should be resolved
+     * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
+     */
+    public KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
+        KeYJavaType result = getTypeByName(name);
+        if (result == null) {
+            final int lastSep = (containerType == null ? 
+                    -1 : containerType.getFullName().lastIndexOf('.')); 
+                        
+            // try if class is in same package
+            if (lastSep >= 0) {
+                result = getTypeByClassName(
+                        containerType.getFullName().substring(0, lastSep) +
+                        "." + name);
+            }                       
+            
+            if (result == null) {
+                return getTypeByName("java.lang." + name);                
+            }
+        }         
+        return result;        
     }
 
 }

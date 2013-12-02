@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="key">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/key.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/key.jar!/de/uka/ilkd/key/java/JavaRedux" />
+    </SOURCES>
+  </library>
+</component>

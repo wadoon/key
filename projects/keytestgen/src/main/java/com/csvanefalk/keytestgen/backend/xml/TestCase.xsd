@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.key-project.org/TestCase"
+        elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:case="http://www.key-project.org/TestCase" xmlns:class="http://www.key-project.org/JavaClass">
+
+    <import schemaLocation="JavaClass.xsd" namespace="http://www.key-project.org/JavaClass"></import>
+
+    <element name="testcase" type="case:testcase"></element>
+
+    <complexType name="testcase">
+
+        <!-- the precondition (or fixture) and postcondition (oracle) of the test
+            case are both sets of type instances, representing program states -->
+        <sequence>
+            <element name="precondition" type="case:partialstate"></element>
+            <element name="postcondition" type="case:partialstate"></element>
+            <element name="testedmethod" type="class:method"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="partialstate">
+        <annotation>
+            <documentation>
+                Models part of the state of a Java program at a given
+                point of execution. Primarily, this type is intended to model the
+                precondition (fixture) and postcondition (oracle) for a given test
+                case.
+            </documentation>
+        </annotation>
+        <sequence minOccurs="0">
+            <element name="typeinstance" type="class:javatype"></element>
+        </sequence>
+    </complexType>
+</schema>

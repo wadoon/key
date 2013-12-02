@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="Maven: de.uka.ilkd:key:2.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0-sources.jar!/" />
+      <root url="file://$USER_HOME$/key/system/src" />
+      <root url="file://$PROJECT_DIR$/../key/system/src" />
+      <root url="file://$PROJECT_DIR$/../key/system/src" />
+      <root url="file://$PROJECT_DIR$/../key/system/src" />
+    </SOURCES>
+  </library>
+</component>
