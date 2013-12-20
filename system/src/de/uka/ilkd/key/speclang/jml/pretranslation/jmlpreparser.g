@@ -458,6 +458,7 @@ normal_behavior_keyword
     | 	NORMAL_BEHAVIOUR
 ;
 
+
 model_behavior_spec_case[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
