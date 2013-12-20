@@ -99,7 +99,6 @@ public class JMLSpecFactory {
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
         public Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable,Term>();;
         public Map<LocationVariable,Term> ensures = new LinkedHashMap<LocationVariable,Term>();
-        public Map<LocationVariable,ImmutableList<Definition>> defs = new LinkedHashMap<LocationVariable,ImmutableList<Definition>>();
         public Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
         public Term signals;
         public Term signalsOnly;
@@ -279,17 +278,6 @@ public class JMLSpecFactory {
                                            originalBehavior,
                                            textualSpecCase.getEnsures(heap.name().toString())));
           }
-           
-           if(heap == savedHeap && textualSpecCase.getDefs(heap.name().toString()).isEmpty()) {
-               clauses.defs.put(heap, null);
-             }else{
-               if (!textualSpecCase.getDefs(heap.name().toString()).isEmpty()) {	 
-            	   clauses.defs.put(heap, translateDefs(pm, progVars.selfVar, progVars.paramVars,
-            		   				  progVars.resultVar, progVars.excVar, 
-            		   				  progVars.atPres,
-                                      textualSpecCase.getDefs(heap.name().toString())));
-               }
-             } 
            
           if(textualSpecCase.getAxioms(heap.name().toString()).isEmpty()) {
         	  clauses.axioms.put(heap, null);
@@ -550,7 +538,7 @@ public class JMLSpecFactory {
                                 originalBehavior, originalClauses);
     }
 
-    private ImmutableList<Definition> translateDefs(IProgramMethod pm,
+    private ImmutableList<AbstractContractDefinition> translateDefs(IProgramMethod pm,
 					            ProgramVariable selfVar,
 					            ImmutableList<ProgramVariable> paramVars,
 					            ProgramVariable resultVar,
@@ -558,15 +546,16 @@ public class JMLSpecFactory {
 					            Map<LocationVariable,Term> atPres,
 					            ImmutableList<PositionedString> originalClauses)
 				 throws SLTranslationException {
-    	// TODO Handle many Defs, not only one
     	//System.out.println("number of defs " + originalClauses.size());
-    	ImmutableList<Definition> defs = ImmutableSLList.<Definition>nil();
+    	ImmutableList<AbstractContractDefinition> defs = ImmutableSLList.<AbstractContractDefinition>nil();
     	for (PositionedString def: originalClauses) {
-    		defs.prepend(JMLTranslator.translate(def, 
-    									pm.getContainerType(), 
-    									selfVar, paramVars, 
-    									resultVar, excVar, 
-    									atPres, Definition.class, services));	
+    		AbstractContractDefinition acDef = JMLTranslator.translate(def, 
+					pm.getContainerType(), 
+					selfVar, paramVars, 
+					resultVar, excVar, 
+					atPres, AbstractContractDefinition.class, services);
+    		acDef.setKJT(pm.getContainerType());
+    		defs = defs.prepend(acDef);
     	}
     	return defs.reverse();
     }
@@ -1134,7 +1123,44 @@ public class JMLSpecFactory {
 
         return result;
     }
+    
+    public ImmutableSet<AbstractContractDefinition> createJMLAbstractContractDefinition (IProgramMethod pm,
+            																			 TextualJMLSpecCase textualSpecCase) throws SLTranslationException {
+    	assert pm != null;
+        assert textualSpecCase != null;
+        
+        ProgramVariableCollection progVars = createProgramVariables(pm);
+        // TODO maybe change list to set?
+        Map<LocationVariable,ImmutableList<AbstractContractDefinition>> defs = 
+        		new LinkedHashMap<LocationVariable,ImmutableList<AbstractContractDefinition>>();
+        final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
 
+        //translate definitions
+        //definitions stored by heaps (might be useful later)
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        	if(heap == savedHeap && textualSpecCase.getDefs(heap.name().toString()).isEmpty()) {
+        		defs.put(heap, null);
+        	}else{
+        		defs.put(heap, translateDefs(pm, progVars.selfVar, progVars.paramVars,
+     		   				  progVars.resultVar, progVars.excVar, 
+     		   				  progVars.atPres,
+                               textualSpecCase.getDefs(heap.name().toString())));}		
+        }
+        
+        //create definition
+        ImmutableSet<AbstractContractDefinition> result = DefaultImmutableSet.<AbstractContractDefinition>nil();
+        //ignore heaps, put everything into one set
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        	// tedious conversion from list to set
+        	if (!(defs.get(heap) == null)) {
+        		for (AbstractContractDefinition def : defs.get(heap)){
+        			result = result.add(def);
+        		}
+        	}
+        }
+        return result;   
+    }
+    
     public ImmutableSet<BlockContract> createJMLBlockContracts(final IProgramMethod method,
                                                                final List<Label> labels,
                                                                final StatementBlock block,

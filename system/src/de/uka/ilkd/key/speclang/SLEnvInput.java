@@ -293,11 +293,11 @@ public final class SLEnvInput extends AbstractEnvInput {
                 }
             }
             
-            //contracts, loop invariants
+            //contracts, loop invariants, abstract contract definitions
             final ImmutableList<IProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for(IProgramMethod pm : pms) {
-                //contracts
+                //contracts, abstract contract definitions
         	final ImmutableSet<SpecificationElement> methodSpecs
         	    = specExtractor.extractMethodSpecs(pm,staticInvPresent);
         	specRepos.addSpecs(methodSpecs);

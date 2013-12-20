@@ -243,6 +243,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
       // add axioms
       collectClassAxioms(getCalleeKeYJavaType());
+      
+      // 
+      collectAbstractContractDefinitions(getCalleeKeYJavaType());
    }
 
    /**

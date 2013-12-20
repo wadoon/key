@@ -487,6 +487,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 for(Contract contract : contracts) {
                     result = result.add(contract);
                 }
+                // translate abstract contract definitions of given pm (@def)
+                ImmutableSet<AbstractContractDefinition> defs
+                = jsf.createJMLAbstractContractDefinition(pm, specCase);
+                for(AbstractContractDefinition def : defs) {
+                    result = result.add(def);
+                }
             } catch (SLWarningException e) {
                 warnings = warnings.add(e.getWarning());
             }

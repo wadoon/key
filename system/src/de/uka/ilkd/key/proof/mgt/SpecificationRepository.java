@@ -57,6 +57,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.speclang.AbstractContractDefinition;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -111,6 +112,8 @@ public final class SpecificationRepository {
 		= new LinkedHashMap<IObserverFunction,IObserverFunction>();
     private final Map<IObserverFunction,ImmutableSet<Taclet>> unlimitedToLimitTaclets
 		= new LinkedHashMap<IObserverFunction,ImmutableSet<Taclet>>();
+    private final Map<KeYJavaType,ImmutableSet<AbstractContractDefinition>> defs
+	= new LinkedHashMap<KeYJavaType, ImmutableSet<AbstractContractDefinition>>();
 
     /**
      * <p>
@@ -792,6 +795,8 @@ public final class SpecificationRepository {
             addInitiallyClause(inv);
         }
     }
+    
+    
 
     /**
      * Returns all class axioms visible in the passed class, including
@@ -913,7 +918,38 @@ public final class SpecificationRepository {
             addClassAxiom(ax);
         }
     }
+    
+    /**
+     * Returns all abstract contract definitions of this class
+     */
+    public ImmutableSet<AbstractContractDefinition> getAbstractContractDefinitions(KeYJavaType selfKjt) {
+    	//TODO: definitions from superclasses?
+    	return defs.get(selfKjt); 
+    }
+    
+    /**
+     * Registers the passed abstract contract definition.
+     */
+    public void addAbstractContractDefinition(AbstractContractDefinition def) {
+        KeYJavaType kjt = def.getKJT();
+        ImmutableSet<AbstractContractDefinition> currentDefinitions = defs.get(kjt);
+        if(currentDefinitions == null) {
+        	currentDefinitions = DefaultImmutableSet.<AbstractContractDefinition>nil();
+        }
+        defs.put(kjt, currentDefinitions.add(def));
 
+    }
+    
+    
+    /**
+     * Registers the passed abstract contract definitions.
+     */
+    private void addAbstractContractDefinitions(ImmutableSet<AbstractContractDefinition> toAdd) {
+        for(AbstractContractDefinition def : toAdd) {
+            addAbstractContractDefinition(def);
+        }
+		
+	}
 
     /**
      * Returns all proofs registered for the passed PO (or stronger POs).
@@ -1156,6 +1192,9 @@ public final class SpecificationRepository {
             else if (spec instanceof ClassAxiom) {
                 addClassAxiom((ClassAxiom)spec);
             }
+            else if (spec instanceof AbstractContractDefinition) {
+            	addAbstractContractDefinition((AbstractContractDefinition)spec);
+            }
             else if (spec instanceof LoopInvariant) {
                 addLoopInvariant((LoopInvariant)spec);
             }
@@ -1169,7 +1208,7 @@ public final class SpecificationRepository {
     }
 
 
-    public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(
+	public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(
 	    					IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null
 	       : " observer is already limited: " + obs;
