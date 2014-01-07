@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class RemoveImplicationsTransformerTest extends TransformerTest {
 
-    public RemoveImplicationsTransformerTest() throws KeYInterfaceException,
-            IOException {
+    public RemoveImplicationsTransformerTest() throws KeYInterfaceException, IOException {
         transformer = RemoveImplicationsTransformer.getInstance();
     }
 }

@@ -49,7 +49,7 @@ public class OracleCapsule extends AbstractCapsule {
         /*
          * Attempt to generate an Oracle. Any exception thrown in this process
          * indicates permanent failure on the part of the OracleGenerator, and
-         * we hence just kill the AbstractCapsule.
+         * we hence just kill the Capsule.
          */
         try {
             oracle = oracleGenerator.generateOracle(method);

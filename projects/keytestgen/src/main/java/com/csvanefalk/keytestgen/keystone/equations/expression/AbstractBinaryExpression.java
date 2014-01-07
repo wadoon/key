@@ -7,8 +7,7 @@ public abstract class AbstractBinaryExpression extends AbstractExpression {
     private IExpression leftOperand = null;
     private IExpression rightOperand = null;
 
-    public AbstractBinaryExpression(final IExpression leftOperand,
-                                    final IExpression rightOperand) {
+    public AbstractBinaryExpression(final IExpression leftOperand, final IExpression rightOperand) {
 
         assert (leftOperand != null);
         assert (rightOperand != null);

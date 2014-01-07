@@ -35,16 +35,13 @@ public class RemoveImplicationsTransformer extends AbstractTermTransformer {
     }
 
     @Override
-    protected Term transformImplication(final Term term)
-            throws TermTransformerException {
+    protected Term transformImplication(final Term term) throws TermTransformerException {
 
         final Term newFirstChild = transformTerm(term.sub(0));
-        final Term negatedNewFirstChild = termFactory.createTerm(Junctor.NOT,
-                newFirstChild);
+        final Term negatedNewFirstChild = termFactory.createTerm(Junctor.NOT, newFirstChild);
 
         final Term newSecondChild = transformTerm(term.sub(1));
 
-        return termFactory.createTerm(Junctor.OR, negatedNewFirstChild,
-                newSecondChild);
+        return termFactory.createTerm(Junctor.OR, negatedNewFirstChild, newSecondChild);
     }
 }

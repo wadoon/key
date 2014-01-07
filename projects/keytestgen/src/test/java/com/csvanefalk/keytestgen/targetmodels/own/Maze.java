@@ -157,7 +157,7 @@ public class Maze {
         // TO BE IMPLEMENTED
         throw new RuntimeException();
     }
-	
+
     /* alternative specification for move (ensures postcondition proof is smaller)
        public normal_behavior 
        requires direction >= MOVE_UP && direction <= MOVE_RIGHT;

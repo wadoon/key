@@ -85,11 +85,9 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     public XMLConverter() throws XMLGeneratorException {
 
         try {
-            eventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(
-                    outputStream);
+            eventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(outputStream);
         } catch (final XMLStreamException e) {
-            throw new XMLGeneratorException(
-                    "FATAL: failed to initialize XMLVisitor" + e.getMessage());
+            throw new XMLGeneratorException("FATAL: failed to initialize XMLVisitor" + e.getMessage());
         }
     }
 
@@ -153,18 +151,15 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @param documentName
      * @throws XMLStreamException
      */
-    private void writeDocumentEnd(final String documentName)
-            throws XMLStreamException {
+    private void writeDocumentEnd(final String documentName) throws XMLStreamException {
 
         if (format) {
-            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
-                    documentName));
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "", documentName));
             eventWriter.add(XMLConverter.newline);
             eventWriter.add(XMLConverter.eventFactory.createEndDocument());
             eventWriter.add(XMLConverter.newline);
         } else {
-            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
-                    documentName));
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "", documentName));
             eventWriter.add(XMLConverter.eventFactory.createEndDocument());
         }
     }
@@ -175,19 +170,16 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @param documentName the root tag of the document
      * @throws XMLStreamException
      */
-    private void writeDocumentStart(final String documentName)
-            throws XMLStreamException {
+    private void writeDocumentStart(final String documentName) throws XMLStreamException {
 
         if (format) {
             eventWriter.add(XMLConverter.eventFactory.createStartDocument());
             eventWriter.add(XMLConverter.newline);
-            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
-                    "", documentName));
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("", "", documentName));
             eventWriter.add(XMLConverter.newline);
         } else {
             eventWriter.add(XMLConverter.eventFactory.createStartDocument());
-            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
-                    "", documentName));
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("", "", documentName));
         }
     }
 
@@ -201,13 +193,11 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
 
         if (format) {
             addIndentation();
-            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
-                    tagName));
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "", tagName));
             eventWriter.add(XMLConverter.newline);
             indentationCounter--;
         } else {
-            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "",
-                    tagName));
+            eventWriter.add(XMLConverter.eventFactory.createEndElement("", "", tagName));
         }
     }
 
@@ -244,8 +234,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         writeEndTag(XMLHandler.TESTFIXTURE_ROOT);
     }
 
-    private void writeInstance(final Integer instance)
-            throws XMLStreamException {
+    private void writeInstance(final Integer instance) throws XMLStreamException {
 
         final String identifier = Integer.toString(instance.hashCode());
         final String type = "int";
@@ -278,8 +267,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @param instance the instance to write
      * @throws XMLStreamException in case the XML could not be generated
      */
-    private void writeInstance(final ModelInstance instance)
-            throws XMLStreamException {
+    private void writeInstance(final ModelInstance instance) throws XMLStreamException {
 
         final String identifier = instance.getIdentifier();
         final String type = instance.getType();
@@ -333,8 +321,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @param method the {@link KeYJavaMethod} instance
      * @throws XMLStreamException in case the XML could not be generated
      */
-    private void writeMethodInfo(final KeYJavaMethod method)
-            throws XMLStreamException {
+    private void writeMethodInfo(final KeYJavaMethod method) throws XMLStreamException {
 
         writeStartTag(XMLHandler.METHOD_ROOT);
 
@@ -368,12 +355,10 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
         if (format) {
             indentationCounter++;
             addIndentation();
-            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
-                    "", tagName));
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("", "", tagName));
             eventWriter.add(XMLConverter.newline);
         } else {
-            eventWriter.add(XMLConverter.eventFactory.createStartElement("",
-                    "", tagName));
+            eventWriter.add(XMLConverter.eventFactory.createStartElement("", "", tagName));
         }
     }
 
@@ -384,8 +369,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @throws XMLStreamException  in case the XML could not be generated
      * @throws XMLVisitorException
      */
-    private void writeTestCase(final TestCase testCase)
-            throws XMLStreamException, XMLVisitorException {
+    private void writeTestCase(final TestCase testCase) throws XMLStreamException, XMLVisitorException {
 
         writeStartTag(XMLHandler.TESTCASE_ROOT);
 
@@ -428,8 +412,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @param variable the variable to write
      * @throws XMLStreamException in case the XML could not be generated
      */
-    private void writeVariable(final ModelVariable variable)
-            throws XMLStreamException {
+    private void writeVariable(final ModelVariable variable) throws XMLStreamException {
 
         writeStartTag(XMLHandler.VARIABLE_ROOT);
 

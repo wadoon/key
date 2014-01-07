@@ -98,8 +98,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          */
         final ModelInstance selfInstance = ModelInstance.constructModelInstance(container);
 
-        final ModelVariable self = ModelVariable.constructModelVariable(
-                default_self, "self");
+        final ModelVariable self = ModelVariable.constructModelVariable(default_self, "self");
 
         model.add(self, selfInstance);
 
@@ -107,7 +106,8 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          * Insert the method parameters by default. Their value do not matter at
          * this stage, as they will be instantiated later as needed.
          */
-        final ImmutableArray<ParameterDeclaration> parameterDeclarations = methodCall.getProgramMethod().getParameters();
+        final ImmutableArray<ParameterDeclaration> parameterDeclarations = methodCall.getProgramMethod()
+                                                                                     .getParameters();
 
         for (final ParameterDeclaration parameterDeclaration : parameterDeclarations) {
 
@@ -121,14 +121,12 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
                  */
                 final KeYJavaType type = (KeYJavaType) variableSpecification.getType();
 
-                final ProgramElementName name = new ProgramElementName(
-                        variableSpecification.getName());
+                final ProgramElementName name = new ProgramElementName(variableSpecification.getName());
 
-                final IProgramVariable programVariable = new LocationVariable(
-                        name, type);
+                final IProgramVariable programVariable = new LocationVariable(name, type);
 
-                final ModelVariable modelParameter = ModelVariable.constructModelVariable(
-                        programVariable, name.toString());
+                final ModelVariable modelParameter = ModelVariable.constructModelVariable(programVariable,
+                                                                                          name.toString());
 
                 modelParameter.setParameter(true);
 
@@ -168,8 +166,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
         return methodCall;
     }
 
-    private IExecutionMethodCall getMethodCallNode_helper(
-            final IExecutionNode node) {
+    private IExecutionMethodCall getMethodCallNode_helper(final IExecutionNode node) {
         if (node == null || node instanceof IExecutionMethodCall) {
             return (IExecutionMethodCall) node;
         } else {
@@ -193,7 +190,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
      *
      * @param term a {@link Term} with a sort of type Field
      * @return the {@link ProgramVariable} instance corresponding to the field
-     *         represented by the Term
+     * represented by the Term
      */
     private ProgramVariable getProgramVariableForField(final Term term) {
 
@@ -211,7 +208,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
      *
      * @param term the term to process
      * @return the {@link ProgramVariable} corresponding to the Term, iff. the
-     *         Term represents a variable.
+     * Term represents a variable.
      */
     private ProgramVariable getVariable(final Term term) {
 
@@ -296,8 +293,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          */
         final ProgramVariable programVariable = getVariable(term);
 
-        if ((programVariable == null)
-                || programVariable.toString().equals("self")) {
+        if ((programVariable == null) || programVariable.toString().equals("self")) {
             return;
         }
 
@@ -308,8 +304,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          * primitive, we simply create a new ModelInstance to hold any reference
          * object.
          */
-        final String identifier = TermParserTools.resolveIdentifierString(term,
-                ModelBuilderVisitor.SEPARATOR);
+        final String identifier = TermParserTools.resolveIdentifierString(term, ModelBuilderVisitor.SEPARATOR);
 
         /*
          * Check that the variable we found is not already present in the model.
@@ -319,8 +314,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
             return;
         }
 
-        final ModelVariable variable = ModelVariable.constructModelVariable(
-                programVariable, identifier);
+        final ModelVariable variable = ModelVariable.constructModelVariable(programVariable, identifier);
 
         Object instance = null;
         if (TermParserTools.isPrimitiveType(term)) {
@@ -366,18 +360,17 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
              */
             if (parentVariable != null) {
 
-                final String parentIdentifier = TermParserTools.resolveIdentifierString(
-                        term.sub(1), ModelBuilderVisitor.SEPARATOR);
+                final String parentIdentifier = TermParserTools.resolveIdentifierString(term.sub(1),
+                                                                                        ModelBuilderVisitor.SEPARATOR);
 
-                final ModelVariable parentModelVariable = ModelVariable.constructModelVariable(
-                        parentVariable, parentIdentifier);
+                final ModelVariable parentModelVariable = ModelVariable.constructModelVariable(parentVariable,
+                                                                                               parentIdentifier);
 
                 model.assignField(variable, parentModelVariable);
 
             } else if (!programVariable.isStatic()) {
 
-                final ModelVariable self = ModelVariable.constructModelVariable(
-                        default_self, "self");
+                final ModelVariable self = ModelVariable.constructModelVariable(default_self, "self");
                 model.assignField(variable, self);
             }
         }
@@ -395,8 +388,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          */
         else {
 
-            final ModelVariable self = ModelVariable.constructModelVariable(
-                    default_self, "self");
+            final ModelVariable self = ModelVariable.constructModelVariable(default_self, "self");
 
             model.assignField(variable, self);
 

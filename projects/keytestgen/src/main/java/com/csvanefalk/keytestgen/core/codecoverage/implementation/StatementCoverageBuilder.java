@@ -45,8 +45,7 @@ public class StatementCoverageBuilder implements ICoverageBuilder {
      * @param second the second set
      * @return true if the first set is a subset of the second, false otherwise.
      */
-    private boolean isSubsetOf(final Set<SourceElement> first,
-                               final Set<SourceElement> second) {
+    private boolean isSubsetOf(final Set<SourceElement> first, final Set<SourceElement> second) {
         if (first.size() > second.size()) {
             return false;
         }
@@ -60,8 +59,7 @@ public class StatementCoverageBuilder implements ICoverageBuilder {
     }
 
     @Override
-    public Set<ExecutionPath> retrieveExecutionPaths(
-            final ExecutionPathContext context) {
+    public Set<ExecutionPath> retrieveExecutionPaths(final ExecutionPathContext context) {
 
         /*
          * Create a list of the execution paths existing prior to the execution
@@ -92,8 +90,7 @@ public class StatementCoverageBuilder implements ICoverageBuilder {
              */
             if (targetSet.contains(firstPath)) {
                 for (final ExecutionPath secondPath : originalList) {
-                    if ((firstPath != secondPath)
-                            && subsumes(firstPath, secondPath)) {
+                    if ((firstPath != secondPath) && subsumes(firstPath, secondPath)) {
                         targetSet.remove(secondPath);
                     }
                 }
@@ -102,9 +99,7 @@ public class StatementCoverageBuilder implements ICoverageBuilder {
         return targetSet;
     }
 
-    private boolean subsumes(final ExecutionPath firstPath,
-                             final ExecutionPath secondPath) {
-        return isSubsetOf(secondPath.getCoveredNodes(),
-                firstPath.getCoveredNodes());
+    private boolean subsumes(final ExecutionPath firstPath, final ExecutionPath secondPath) {
+        return isSubsetOf(secondPath.getCoveredNodes(), firstPath.getCoveredNodes());
     }
 }

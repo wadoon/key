@@ -79,19 +79,26 @@ public class TestGenerator {
      * @param includeNative    set to true to generate test cases also for methods inherited
      *                         from <code>java.lang.Object</code>.
      * @return a test suite for the target class, in the specified test
-     *         framework.
+     * framework.
      * @throws TestGeneratorException in the event that something went wrong in the process of test
      *                                case generation.
      */
     public List<ITestSuite> generateTestSuite(final String source,
                                               final ICodeCoverageParser coverage,
-                                              final IFrameworkConverter converter, final boolean includePublic,
-                                              final boolean includeProtected, final boolean includePrivate,
+                                              final IFrameworkConverter converter,
+                                              final boolean includePublic,
+                                              final boolean includeProtected,
+                                              final boolean includePrivate,
                                               final boolean includeNative) throws TestGeneratorException {
 
-        return generateTestSuite(source, coverage, converter, includePublic,
-                includeProtected, includePrivate, includeNative,
-                new LinkedList<String>());
+        return generateTestSuite(source,
+                                 coverage,
+                                 converter,
+                                 includePublic,
+                                 includeProtected,
+                                 includePrivate,
+                                 includeNative,
+                                 new LinkedList<String>());
     }
 
     /**
@@ -111,16 +118,18 @@ public class TestGenerator {
      * @param includeNative    set to true to generate test cases also for methods inherited
      *                         from <code>java.lang.Object</code>.
      * @return a test suite for the target class, in the specified test
-     *         framework.
+     * framework.
      * @throws TestGeneratorException in the event that something went wrong in the process of test
      *                                case generation.
      */
     public List<ITestSuite> generateTestSuite(final String source,
                                               final ICodeCoverageParser coverage,
-                                              final IFrameworkConverter converter, final boolean includePublic,
-                                              final boolean includeProtected, final boolean includePrivate,
-                                              final boolean includeNative, final List<String> methods)
-            throws TestGeneratorException {
+                                              final IFrameworkConverter converter,
+                                              final boolean includePublic,
+                                              final boolean includeProtected,
+                                              final boolean includePrivate,
+                                              final boolean includeNative,
+                                              final List<String> methods) throws TestGeneratorException {
 
         Benchmark.startBenchmarking("5. Generate test suite (total time)");
 
@@ -129,16 +138,19 @@ public class TestGenerator {
             final File file = new File(source);
 
             if (!file.exists()) {
-                throw new TestGeneratorException("No such file or directory: "
-                        + source);
+                throw new TestGeneratorException("No such file or directory: " + source);
             }
 
             /*
              * Create abstract test suites for the selected methods.
              */
-            final List<TestSuite> testSuites = coreInterface.createTestSuites(
-                    file, coverage, includePublic, includeProtected,
-                    includePrivate, includeNative, methods);
+            final List<TestSuite> testSuites = coreInterface.createTestSuites(file,
+                                                                              coverage,
+                                                                              includePublic,
+                                                                              includeProtected,
+                                                                              includePrivate,
+                                                                              includeNative,
+                                                                              methods);
 
             /*
              * Convert the abstract test suites to the desired final format.
@@ -175,17 +187,16 @@ public class TestGenerator {
      * @param converter converter to turn the output of KTG into code for a given
      *                  testing framework. See {@link IFrameworkConverter}.
      * @return a test suite for the target class, in the specified test
-     *         framework.
+     * framework.
      * @throws TestGeneratorException in the event that something went wrong in the process of test
      *                                case generation.
      */
     public List<ITestSuite> generateTestSuite(final String source,
                                               final ICodeCoverageParser coverage,
-                                              final IFrameworkConverter converter, final List<String> methods)
-            throws TestGeneratorException {
+                                              final IFrameworkConverter converter,
+                                              final List<String> methods) throws TestGeneratorException {
 
-        return generateTestSuite(source, coverage, converter, false, false,
-                false, false, methods);
+        return generateTestSuite(source, coverage, converter, false, false, false, false, methods);
     }
 
     public static void __DEBUG_DISPOSE() {

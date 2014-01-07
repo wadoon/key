@@ -18,8 +18,7 @@ import java.util.List;
  *
  * @author christopher
  */
-public class ModifiedConditionDecisionCoverageParser implements
-        ICodeCoverageParser {
+public class ModifiedConditionDecisionCoverageParser implements ICodeCoverageParser {
 
     @Override
     public List<IExecutionNode> retrieveNodes(final IExecutionStart root) {

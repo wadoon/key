@@ -46,8 +46,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
      */
     private TestSuite testSuite = null;
 
-    public MethodCapsule(final ICodeCoverageParser codeCoverageParser,
-                         final KeYJavaMethod targetMethod) {
+    public MethodCapsule(final ICodeCoverageParser codeCoverageParser, final KeYJavaMethod targetMethod) {
         super();
         this.codeCoverageParser = codeCoverageParser;
         this.targetMethod = targetMethod;
@@ -118,8 +117,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
              * Setup the model generation capsules for each node.
              */
             for (final IExecutionNode node : nodes) {
-                final ModelCapsule modelGenerationCapsule = new ModelCapsule(
-                        node);
+                final ModelCapsule modelGenerationCapsule = new ModelCapsule(node);
                 modelGenerationCapsule.addMonitor(this);
                 modelController.addChild(modelGenerationCapsule);
             }
@@ -127,8 +125,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
             /*
              * Setup the Oracle generation capsule for this method
              */
-            final OracleCapsule oracleGenerationCapsule = new OracleCapsule(
-                    targetMethod);
+            final OracleCapsule oracleGenerationCapsule = new OracleCapsule(targetMethod);
             oracleController.addChild(oracleGenerationCapsule);
 
             /*
@@ -150,8 +147,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
              */
             final List<TestCase> testCases = new LinkedList<TestCase>();
             for (final Model model : models) {
-                final TestCase testCase = TestCase.constructTestCase(
-                        targetMethod, model, oracle);
+                final TestCase testCase = TestCase.constructTestCase(targetMethod, model, oracle);
                 testCases.add(testCase);
             }
             Benchmark.finishBenchmarking("3. generating models");
@@ -159,8 +155,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
             /*
              * Construct the test suite.
              */
-            testSuite = TestSuite.constructTestSuite(
-                    targetMethod.getDeclaringClass(), targetMethod, testCases);
+            testSuite = TestSuite.constructTestSuite(targetMethod.getDeclaringClass(), targetMethod, testCases);
 
             /*
              * Finish execution.

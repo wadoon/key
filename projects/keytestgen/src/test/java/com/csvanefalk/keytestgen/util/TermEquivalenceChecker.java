@@ -65,8 +65,7 @@ public class TermEquivalenceChecker {
      * @return true if the term is a boolean comparator, false otherwise.
      */
     public static boolean isBooleanComparator(Term term) {
-        return TermParserTools.isArithmeticComparator(term)
-                || TermParserTools.isEquals(term);
+        return TermParserTools.isArithmeticComparator(term) || TermParserTools.isEquals(term);
     }
 
     private class TruthTable {
@@ -129,53 +128,42 @@ public class TermEquivalenceChecker {
         }
     }
 
-    private boolean compareTerms(Term firstTerm, Term secondTerm,
-                                 Map<Term, Boolean> truthMapping) {
+    private boolean compareTerms(Term firstTerm, Term secondTerm, Map<Term, Boolean> truthMapping) {
 
-        return evaluateTerm(firstTerm, truthMapping) == evaluateTerm(
-                secondTerm, truthMapping);
+        return evaluateTerm(firstTerm, truthMapping) == evaluateTerm(secondTerm, truthMapping);
 
     }
 
-    protected boolean evaluateAnd(final Term term,
-                                  Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateAnd(final Term term, Map<Term, Boolean> truthMapping) {
 
-        return evaluateTerm(term.sub(0), truthMapping)
-                && evaluateTerm(term.sub(1), truthMapping);
+        return evaluateTerm(term.sub(0), truthMapping) && evaluateTerm(term.sub(1), truthMapping);
     }
 
-    protected boolean evaluateBinaryFunction(final Term term,
-                                             Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateBinaryFunction(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateBooleanConstant(final Term term,
-                                              Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateBooleanConstant(final Term term, Map<Term, Boolean> truthMapping) {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateEquals(final Term term,
-                                     Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateEquals(final Term term, Map<Term, Boolean> truthMapping) {
 
-        return evaluateTerm(term.sub(0), truthMapping) == evaluateTerm(
-                term.sub(1), truthMapping);
+        return evaluateTerm(term.sub(0), truthMapping) == evaluateTerm(term.sub(1), truthMapping);
     }
 
-    protected boolean evaluateExistsQuantifier(final Term term,
-                                               Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateExistsQuantifier(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateForAllQuantifier(final Term term,
-                                               Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateForAllQuantifier(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateFormula(final Term term,
-                                      Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateFormula(final Term term, Map<Term, Boolean> truthMapping) {
 
         if (TermParserTools.isObserverFunction(term)) {
             return evaluateObserverFunction(term, truthMapping);
@@ -183,8 +171,7 @@ public class TermEquivalenceChecker {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateFunction(final Term term,
-                                       Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateFunction(final Term term, Map<Term, Boolean> truthMapping) {
 
         if (TermParserTools.isNullSort(term)) {
             return evaluateNull(term, truthMapping);
@@ -226,27 +213,22 @@ public class TermEquivalenceChecker {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateIfExThenElse(final Term term,
-                                           Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateIfExThenElse(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateIfThenElse(final Term term,
-                                         Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateIfThenElse(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateImplication(final Term term,
-                                          Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateImplication(final Term term, Map<Term, Boolean> truthMapping) {
 
-        return !evaluateTerm(term.sub(0), truthMapping)
-                || evaluateTerm(term.sub(1), truthMapping);
+        return !evaluateTerm(term.sub(0), truthMapping) || evaluateTerm(term.sub(1), truthMapping);
     }
 
-    protected boolean evaluateJunctor(final Term term,
-                                      Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateJunctor(final Term term, Map<Term, Boolean> truthMapping) {
 
         if (TermParserTools.isAnd(term)) {
             return evaluateAnd(term, truthMapping);
@@ -270,8 +252,7 @@ public class TermEquivalenceChecker {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateLiteral(final Term term,
-                                      Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateLiteral(final Term term, Map<Term, Boolean> truthMapping) {
 
         /*
          * Literals may or may not declare children, such as 1(#);
@@ -284,22 +265,18 @@ public class TermEquivalenceChecker {
         }
     }
 
-    protected boolean evaluateNot(final Term term,
-                                  Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateNot(final Term term, Map<Term, Boolean> truthMapping) {
 
         return !evaluateTerm(term.sub(0), truthMapping);
 
     }
 
-    protected boolean evaluateOr(final Term term,
-                                 Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateOr(final Term term, Map<Term, Boolean> truthMapping) {
 
-        return evaluateTerm(term.sub(0), truthMapping)
-                || evaluateTerm(term.sub(1), truthMapping);
+        return evaluateTerm(term.sub(0), truthMapping) || evaluateTerm(term.sub(1), truthMapping);
     }
 
-    protected boolean evaluateProgramMethod(final Term term,
-                                            Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateProgramMethod(final Term term, Map<Term, Boolean> truthMapping) {
 
         if (TermParserTools.isObserverFunction(term)) {
             return evaluateObserverFunction(term, truthMapping);
@@ -308,8 +285,7 @@ public class TermEquivalenceChecker {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateProgramVariable(final Term term,
-                                              Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateProgramVariable(final Term term, Map<Term, Boolean> truthMapping) {
 
         if (TermParserTools.isLocationVariable(term)) {
             return evaluateLocationVariable(term, truthMapping);
@@ -318,8 +294,7 @@ public class TermEquivalenceChecker {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateQuantifier(final Term term,
-                                         Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateQuantifier(final Term term, Map<Term, Boolean> truthMapping) {
 
         if (TermParserTools.isExistsQuantifier(term)) {
             return evaluateExistsQuantifier(term, truthMapping);
@@ -332,14 +307,12 @@ public class TermEquivalenceChecker {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateSortDependentFunction(final Term term,
-                                                    Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateSortDependentFunction(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateSortedOperator(final Term term,
-                                             Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateSortedOperator(final Term term, Map<Term, Boolean> truthMapping) {
 
         if (TermParserTools.isFunction(term)) {
             return evaluateFunction(term, truthMapping);
@@ -367,8 +340,7 @@ public class TermEquivalenceChecker {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateTerm(final Term term,
-                                   Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateTerm(final Term term, Map<Term, Boolean> truthMapping) {
 
         if (TermParserTools.isSortedOperator(term)) {
             return evaluateSortedOperator(term, truthMapping);
@@ -382,32 +354,27 @@ public class TermEquivalenceChecker {
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateLocationVariable(final Term term,
-                                               Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateLocationVariable(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateLogicVariable(final Term term,
-                                            Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateLogicVariable(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateNull(final Term term,
-                                   Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateNull(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateObserverFunction(final Term term,
-                                               Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateObserverFunction(final Term term, Map<Term, Boolean> truthMapping) {
 
         return truthMapping.get(term);
     }
 
-    protected boolean evaluateUnaryFunction(final Term term,
-                                            Map<Term, Boolean> truthMapping) {
+    protected boolean evaluateUnaryFunction(final Term term, Map<Term, Boolean> truthMapping) {
 
         return evaluateTerm(term.sub(0), truthMapping);
     }

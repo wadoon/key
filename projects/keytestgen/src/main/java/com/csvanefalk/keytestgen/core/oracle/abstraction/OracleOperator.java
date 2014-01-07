@@ -91,7 +91,8 @@ public class OracleOperator extends OracleExpression {
      */
     public OracleOperator(final OperatorType comparatorType,
                           final OracleExpression firstOperand,
-                          final OracleExpression secondOperand, final OracleType type) {
+                          final OracleExpression secondOperand,
+                          final OracleType type) {
         super(type);
 
         operatorType = comparatorType;
@@ -125,7 +126,6 @@ public class OracleOperator extends OracleExpression {
 
     @Override
     public String toString() {
-        return firstOperand.toString() + " " + operatorType.toString() + " "
-                + secondOperand.toString();
+        return firstOperand.toString() + " " + operatorType.toString() + " " + secondOperand.toString();
     }
 }

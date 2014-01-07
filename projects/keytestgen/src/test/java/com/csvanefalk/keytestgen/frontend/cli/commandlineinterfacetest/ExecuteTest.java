@@ -8,6 +8,8 @@ public class ExecuteTest extends CommandLineInterFaceTest {
 
     CommandLineInterface cli = null;
 
+    String path = "/Users/christopher/IdeaProjects/keytestgen/src/test/java/com/csvanefalk/keytestgen/targetmodels/own/";
+
     @Before
     public void setup() {
 
@@ -17,7 +19,7 @@ public class ExecuteTest extends CommandLineInterFaceTest {
     //@Test
     public void generateAllIntegerMethodsOneFile() {
 
-        String[] args = {"/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/JavaUtilClass.java"};
+        String[] args = {"/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/JavaUtilClass.java/"};
 
         cli.main(args);
     }
@@ -25,7 +27,7 @@ public class ExecuteTest extends CommandLineInterFaceTest {
     @Test
     public void generateAllUtilMethodsOneFile() {
 
-        String[] args = {"/home/christopher/git/keytestgen/src/test/java/com/csvanefalk/keytestgen/targetmodels/own/IntegerClass.java"};
+        String[] args = {path + "IntegerClass.java"};
 
         cli.main(args);
     }

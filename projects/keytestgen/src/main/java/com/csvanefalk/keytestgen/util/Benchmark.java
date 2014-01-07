@@ -30,8 +30,7 @@ public class Benchmark {
             final long finalClockValue = Calendar.getInstance().getTimeInMillis();
 
             if (Benchmark.verbose) {
-                System.out.println("BENCHMARK: " + event + " took "
-                        + (finalClockValue - clockValue));
+                System.out.println("BENCHMARK: " + event + " took " + (finalClockValue - clockValue));
             }
 
             Benchmark.readings.put(event, finalClockValue - clockValue);

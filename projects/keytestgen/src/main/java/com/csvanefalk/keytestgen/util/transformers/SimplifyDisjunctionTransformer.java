@@ -70,8 +70,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return termFactory.createTerm(Junctor.OR, firstChild,
-                        secondChild);
+                return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
             }
 
             return null;
@@ -137,8 +136,7 @@ public class SimplifyDisjunctionTransformer extends AbstractTermTransformer {
         } else {
             final Term transformedSimplifiedFirstChild = transformTerm(simplifiedFirstChild);
             final Term transformedRightChild = transformTerm(secondChild);
-            return termFactory.createTerm(Junctor.OR,
-                    transformedSimplifiedFirstChild, transformedRightChild);
+            return termFactory.createTerm(Junctor.OR, transformedSimplifiedFirstChild, transformedRightChild);
         }
     }
 }

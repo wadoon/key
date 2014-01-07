@@ -12,13 +12,11 @@ import java.util.*;
 
 public class DecisionCoverageBuilder implements ICoverageBuilder {
 
-    private static class DescendingExecutionBranchComparator implements
-            Comparator<ExecutionPath> {
+    private static class DescendingExecutionBranchComparator implements Comparator<ExecutionPath> {
 
         private final Map<ExecutionPath, Set<BranchStatement>> map;
 
-        public DescendingExecutionBranchComparator(
-                final Map<ExecutionPath, Set<BranchStatement>> map) {
+        public DescendingExecutionBranchComparator(final Map<ExecutionPath, Set<BranchStatement>> map) {
             this.map = map;
         }
 
@@ -70,8 +68,7 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
      * @param visitedProgramNodes
      * @return
      */
-    private Set<BranchStatement> collectBranchStatements(
-            final Set<SourceElement> visitedProgramNodes) {
+    private Set<BranchStatement> collectBranchStatements(final Set<SourceElement> visitedProgramNodes) {
 
         final Set<BranchStatement> branchStatements = new HashSet<BranchStatement>();
         for (final SourceElement element : visitedProgramNodes) {
@@ -82,9 +79,8 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
         return branchStatements;
     }
 
-    private Set<ExecutionPath> constructMinimalSetForMapping(
-            final PriorityQueue<ExecutionPath> sortedPaths,
-            final Map<ExecutionPath, Set<BranchStatement>> mapping) {
+    private Set<ExecutionPath> constructMinimalSetForMapping(final PriorityQueue<ExecutionPath> sortedPaths,
+                                                             final Map<ExecutionPath, Set<BranchStatement>> mapping) {
 
         while (!sortedPaths.isEmpty()) {
             final ExecutionPath executionPath = sortedPaths.poll();
@@ -93,8 +89,7 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
                 for (final ExecutionPath pathToCompare : sortedPaths) {
                     final Set<BranchStatement> branchStatementsToCompare = mapping.get(pathToCompare);
                     if (branchStatementsToCompare != null) {
-                        if (subsumes(branchStatements,
-                                branchStatementsToCompare)) {
+                        if (subsumes(branchStatements, branchStatementsToCompare)) {
                             mapping.remove(pathToCompare);
                         }
                     }
@@ -109,8 +104,7 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
         return minimalSet;
     }
 
-    private boolean contains(final ExecutionPath path,
-                             final SourceElement branchResult) {
+    private boolean contains(final ExecutionPath path, final SourceElement branchResult) {
 
         if (branchResult == null) {
             return false;
@@ -131,8 +125,7 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
      * @param thenBranchResult
      * @return
      */
-    private SourceElement getStatementOnBranch(
-            final SourceElement thenBranchResult) {
+    private SourceElement getStatementOnBranch(final SourceElement thenBranchResult) {
         if (thenBranchResult instanceof StatementBlock) {
             return ((StatementBlock) thenBranchResult).getChildAt(0);
         } else {
@@ -141,8 +134,7 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
     }
 
     @Override
-    public Set<ExecutionPath> retrieveExecutionPaths(
-            final ExecutionPathContext context) {
+    public Set<ExecutionPath> retrieveExecutionPaths(final ExecutionPathContext context) {
 
         /*
          * Create two separate mappings - one which maps, for each execution
@@ -212,10 +204,12 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
          * these two sets. This is most likely NOT an optimal algorithm for
          * calculating a minimal set.
          */
-        final PriorityQueue<ExecutionPath> thenSortedPaths = new PriorityQueue<ExecutionPath>(
-                20, new DescendingExecutionBranchComparator(thenMapping));
-        final PriorityQueue<ExecutionPath> elseSortedPaths = new PriorityQueue<ExecutionPath>(
-                20, new DescendingExecutionBranchComparator(elseMapping));
+        final PriorityQueue<ExecutionPath> thenSortedPaths = new PriorityQueue<ExecutionPath>(20,
+                                                                                              new DescendingExecutionBranchComparator(
+                                                                                                      thenMapping));
+        final PriorityQueue<ExecutionPath> elseSortedPaths = new PriorityQueue<ExecutionPath>(20,
+                                                                                              new DescendingExecutionBranchComparator(
+                                                                                                      elseMapping));
 
         for (final ExecutionPath executionPath : executionPaths) {
             thenSortedPaths.add(executionPath);
@@ -225,10 +219,8 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
         /*
          * Construct minimum set for the both mappings
          */
-        final Set<ExecutionPath> minimalThenPaths = constructMinimalSetForMapping(
-                thenSortedPaths, thenMapping);
-        final Set<ExecutionPath> minimalElsePaths = constructMinimalSetForMapping(
-                elseSortedPaths, elseMapping);
+        final Set<ExecutionPath> minimalThenPaths = constructMinimalSetForMapping(thenSortedPaths, thenMapping);
+        final Set<ExecutionPath> minimalElsePaths = constructMinimalSetForMapping(elseSortedPaths, elseMapping);
 
         /*
          * Return the union of the sets.
@@ -237,8 +229,7 @@ public class DecisionCoverageBuilder implements ICoverageBuilder {
         return minimalThenPaths;
     }
 
-    private boolean subsumes(final Set<BranchStatement> first,
-                             final Set<BranchStatement> second) {
+    private boolean subsumes(final Set<BranchStatement> first, final Set<BranchStatement> second) {
 
         if (second.size() > first.size()) {
             return false;

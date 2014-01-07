@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class OrderOperandsTransformerTest extends TransformerTest {
 
-    public OrderOperandsTransformerTest() throws KeYInterfaceException,
-            IOException {
+    public OrderOperandsTransformerTest() throws KeYInterfaceException, IOException {
         transformer = OrderOperandsTransformer.getInstance();
     }
 }

@@ -11,8 +11,7 @@ public class ArraySizeDoWhile {
         do {
             result++;
             i++;
-        }
-        while (i < array.length);
+        } while (i < array.length);
         return result;
     }
 }

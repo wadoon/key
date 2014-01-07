@@ -78,8 +78,7 @@ public class ExpressionUtils {
      * @param addition the operation
      * @throws KeYStoneException in case of an error
      */
-    public static void negateAddition(final Addition addition)
-            throws KeYStoneException {
+    public static void negateAddition(final Addition addition) throws KeYStoneException {
 
         final IExpression rightOperand = addition.getRightOperand();
 
@@ -101,8 +100,7 @@ public class ExpressionUtils {
             final Multiplication multiplication = (Multiplication) rightOperand;
             ExpressionUtils.negateMultiplication(multiplication);
         } else {
-            throw new KeYStoneException(
-                    "Illegal operation in trying to negate addition");
+            throw new KeYStoneException("Illegal operation in trying to negate addition");
         }
     }
 
@@ -110,8 +108,7 @@ public class ExpressionUtils {
         constant.setValue(constant.getValue().multiply(Fraction.MINUS_ONE));
     }
 
-    public static void negateDivision(final Division division)
-            throws KeYStoneException {
+    public static void negateDivision(final Division division) throws KeYStoneException {
 
         final IExpression leftOperand = division.getLeftOperand();
 
@@ -119,13 +116,11 @@ public class ExpressionUtils {
             final NumericConstant constant = (NumericConstant) leftOperand;
             ExpressionUtils.negateConstant(constant);
         } else {
-            throw new KeYStoneException(
-                    "Illegal operation in trying to negate multiplication");
+            throw new KeYStoneException("Illegal operation in trying to negate multiplication");
         }
     }
 
-    public static void negateMultiplication(final Multiplication multiplication)
-            throws KeYStoneException {
+    public static void negateMultiplication(final Multiplication multiplication) throws KeYStoneException {
 
         final IExpression leftOperand = multiplication.getLeftOperand();
 
@@ -133,13 +128,11 @@ public class ExpressionUtils {
             final NumericConstant constant = (NumericConstant) leftOperand;
             ExpressionUtils.negateConstant(constant);
         } else {
-            throw new KeYStoneException(
-                    "Illegal operation in trying to negate multiplication");
+            throw new KeYStoneException("Illegal operation in trying to negate multiplication");
         }
     }
 
-    public static void negateSingleExpression(final IExpression expression)
-            throws KeYStoneException {
+    public static void negateSingleExpression(final IExpression expression) throws KeYStoneException {
 
         if (isAddition(expression)) {
             ExpressionUtils.negateAddition((Addition) expression);
@@ -152,9 +145,7 @@ public class ExpressionUtils {
         } else if (isVariable(expression)) {
             ExpressionUtils.negateVariable((Variable) expression);
         } else {
-            throw new KeYStoneException(
-                    "Error when trying to negate an expression: no such expression: "
-                            + expression);
+            throw new KeYStoneException("Error when trying to negate an expression: no such expression: " + expression);
         }
     }
 
@@ -189,8 +180,7 @@ public class ExpressionUtils {
         if (expression instanceof Addition) {
 
             Addition addition = (Addition) expression;
-            return addAllConstants(addition.getLeftOperand()).add(
-                    addAllConstants(addition.getRightOperand()));
+            return addAllConstants(addition.getLeftOperand()).add(addAllConstants(addition.getRightOperand()));
         } else if (expression instanceof NumericConstant) {
 
             NumericConstant constant = (NumericConstant) expression;
@@ -265,10 +255,9 @@ public class ExpressionUtils {
             return true;
         } else if (isBinaryExpression(target)) {
             AbstractBinaryExpression binaryExpression = (AbstractBinaryExpression) target;
-            return containsExpressionType(binaryExpression.getLeftOperand(),
-                    type)
-                    || containsExpressionType(
-                    binaryExpression.getRightOperand(), type);
+            return containsExpressionType(binaryExpression.getLeftOperand(), type) || containsExpressionType(
+                    binaryExpression.getRightOperand(),
+                    type);
         } else if (isUnaryExpression(target)) {
             AbstractUnaryExpression unaryExpression = (AbstractUnaryExpression) target;
             return containsExpressionType(unaryExpression.getOperand(), type);

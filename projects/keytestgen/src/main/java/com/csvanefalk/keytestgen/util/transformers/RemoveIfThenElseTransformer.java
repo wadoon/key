@@ -52,8 +52,8 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
     }
 
     private void resolveIfThenElse(final Term term,
-                                   final boolean expectedOutcome, final Queue<Term> conditions)
-            throws TermTransformerException {
+                                   final boolean expectedOutcome,
+                                   final Queue<Term> conditions) throws TermTransformerException {
 
         try {
 
@@ -82,8 +82,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                     conditions.add(condition);
                     return;
                 } else {
-                    conditionToSave = termFactory.createTerm(Junctor.NOT,
-                            condition);
+                    conditionToSave = termFactory.createTerm(Junctor.NOT, condition);
                 }
             } else {
                 nestedBranch = thenBranch;
@@ -95,8 +94,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
             if (isEndBranch(elseBranch)) {
                 realOutcome = TermParserTools.translateToJavaBoolean(elseBranch);
                 if (realOutcome == expectedOutcome) {
-                    conditions.add(termFactory.createTerm(Junctor.NOT,
-                            condition));
+                    conditions.add(termFactory.createTerm(Junctor.NOT, condition));
                     return;
                 } else {
                     conditionToSave = condition;
@@ -137,8 +135,7 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
      * now, the only way I can see to do this is via equals assertions.
      */
     @Override
-    protected Term transformEquals(final Term term)
-            throws TermTransformerException {
+    protected Term transformEquals(final Term term) throws TermTransformerException {
 
         try {
             final Term firstChild = term.sub(0);
@@ -173,9 +170,9 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                     } else {
                         outcome = true;
                         createTrueConstant();
-                        final Term newSecondChild = termFactory.createTerm(
-                                Equality.EQUALS, secondChild,
-                                createTrueConstant());
+                        final Term newSecondChild = termFactory.createTerm(Equality.EQUALS,
+                                                                           secondChild,
+                                                                           createTrueConstant());
 
                         conditions.add(newSecondChild);
                     }
@@ -191,8 +188,9 @@ public class RemoveIfThenElseTransformer extends AbstractTermTransformer {
                  */
                 else {
                     outcome = true;
-                    final Term newSecondChild = termFactory.createTerm(
-                            Equality.EQUALS, secondChild, createTrueConstant());
+                    final Term newSecondChild = termFactory.createTerm(Equality.EQUALS,
+                                                                       secondChild,
+                                                                       createTrueConstant());
 
                     conditions.add(newSecondChild);
                 }

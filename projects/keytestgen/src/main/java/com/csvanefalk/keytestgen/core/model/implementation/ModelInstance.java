@@ -29,8 +29,7 @@ public class ModelInstance {
      *                    instance.
      * @return the created instance.
      */
-    public static ModelInstance constructModelInstance(
-            final KeYJavaType keYJavaType) {
+    public static ModelInstance constructModelInstance(final KeYJavaType keYJavaType) {
 
         if (keYJavaType.getSort() instanceof ArraySort) {
             return new ModelArrayInstance(keYJavaType);

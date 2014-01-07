@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class SimplifyDisjunctionTransformerTest extends TransformerTest {
 
-    public SimplifyDisjunctionTransformerTest() throws KeYInterfaceException,
-            IOException {
+    public SimplifyDisjunctionTransformerTest() throws KeYInterfaceException, IOException {
         transformer = SimplifyDisjunctionTransformer.getInstance();
     }
 }

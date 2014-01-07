@@ -13,8 +13,7 @@ import java.io.File;
 public class JavaFileValidator implements IParameterValidator {
 
     @Override
-    public void validate(final String parameter, final String value)
-            throws ParameterException {
+    public void validate(final String parameter, final String value) throws ParameterException {
 
         /*
          * Check that the filename is properly prefixed

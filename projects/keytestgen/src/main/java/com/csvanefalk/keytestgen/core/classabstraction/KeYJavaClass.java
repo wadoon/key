@@ -37,8 +37,7 @@ public final class KeYJavaClass {
         this.initConfig = environment.getInitConfig();
     }
 
-    KeYJavaClass(final KeYJavaType type,
-                 final KeYEnvironment<CustomConsoleUserInterface> environment) {
+    KeYJavaClass(final KeYJavaType type, final KeYEnvironment<CustomConsoleUserInterface> environment) {
         this.type = type;
         this.environment = environment;
         initConfig = environment.getInitConfig();

@@ -6,13 +6,11 @@ public class RestrictionFactory {
 
     private abstract class FractionRestrictions implements IRestriction {
 
-        protected final boolean greaterOrEquals(final Fraction left,
-                                                final Fraction right) {
+        protected final boolean greaterOrEquals(final Fraction left, final Fraction right) {
             return (left.getNumerator() * right.getDenominator()) >= (left.getDenominator() * right.getNumerator());
         }
 
-        protected final boolean lessOrEquals(final Fraction left,
-                                             final Fraction right) {
+        protected final boolean lessOrEquals(final Fraction left, final Fraction right) {
             return (left.getNumerator() * right.getDenominator()) <= (left.getDenominator() * right.getNumerator());
         }
     }
@@ -31,8 +29,7 @@ public class RestrictionFactory {
             if (greaterOrEquals(value, bound)) {
                 return value;
             } else {
-                return new Fraction(bound.getNumerator(),
-                        bound.getDenominator());
+                return new Fraction(bound.getNumerator(), bound.getDenominator());
             }
         }
     }
@@ -42,12 +39,9 @@ public class RestrictionFactory {
         private final IRestriction enforceLowerBound;
         private final IRestriction enforceUpperBound;
 
-        public IntervalRestriction(final Fraction lowerBound,
-                                   final Fraction upperBound) {
-            enforceLowerBound = RestrictionFactory.getInstance().createLessOrEqualsRestriction(
-                    lowerBound);
-            enforceUpperBound = RestrictionFactory.getInstance().createLessOrEqualsRestriction(
-                    upperBound);
+        public IntervalRestriction(final Fraction lowerBound, final Fraction upperBound) {
+            enforceLowerBound = RestrictionFactory.getInstance().createLessOrEqualsRestriction(lowerBound);
+            enforceUpperBound = RestrictionFactory.getInstance().createLessOrEqualsRestriction(upperBound);
         }
 
         @Override
@@ -71,8 +65,7 @@ public class RestrictionFactory {
             if (lessOrEquals(value, bound)) {
                 return value;
             } else {
-                return new Fraction(bound.getNumerator(),
-                        bound.getDenominator());
+                return new Fraction(bound.getNumerator(), bound.getDenominator());
             }
         }
     }
@@ -92,10 +85,9 @@ public class RestrictionFactory {
 
         maxInteger = new Fraction(Integer.MAX_VALUE);
         minInteger = new Fraction(Integer.MIN_VALUE);
-        integerValueRestriction = restrictionFactory.createRangeRestriction(
-                RestrictionFactory.minInteger, RestrictionFactory.maxInteger);
-        greaterThanZeroRestriction = restrictionFactory.createGreaterOrEqualsRestriction(new Fraction(
-                0));
+        integerValueRestriction = restrictionFactory.createRangeRestriction(RestrictionFactory.minInteger,
+                                                                            RestrictionFactory.maxInteger);
+        greaterThanZeroRestriction = restrictionFactory.createGreaterOrEqualsRestriction(new Fraction(0));
     }
 
     public static RestrictionFactory getInstance() {
@@ -120,8 +112,7 @@ public class RestrictionFactory {
         return new LessOrEqualsRestriction(value);
     }
 
-    public IRestriction createRangeRestriction(final Fraction lowerLimit,
-                                               final Fraction upperLimit) {
+    public IRestriction createRangeRestriction(final Fraction lowerLimit, final Fraction upperLimit) {
 
         assert upperLimit != null;
         assert lowerLimit != null;

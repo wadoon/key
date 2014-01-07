@@ -37,11 +37,9 @@ public class TransformerTest extends UtilTest {
     }
 
     @Test
-    public void testTransformIntegerComparisons() throws ProofInputException,
-            TermTransformerException {
+    public void testTransformIntegerComparisons() throws ProofInputException, TermTransformerException {
 
-        IExecutionNode targetNode = getFirstSymbolicNodeForStatement("max",
-                "return a");
+        IExecutionNode targetNode = getFirstSymbolicNodeForStatement("max", "return a");
 
         Term originalTerm = targetNode.getPathCondition();
         // Artificially impose an external negation
@@ -54,11 +52,9 @@ public class TransformerTest extends UtilTest {
     }
 
     @Test
-    public void testTransformIntegerComparisons2() throws ProofInputException,
-            TermTransformerException {
+    public void testTransformIntegerComparisons2() throws ProofInputException, TermTransformerException {
 
-        IExecutionNode targetNode = getFirstSymbolicNodeForStatement("max",
-                "return b");
+        IExecutionNode targetNode = getFirstSymbolicNodeForStatement("max", "return b");
 
         Term originalTerm = targetNode.getPathCondition();
         // Artificially impose an external negation
@@ -71,11 +67,9 @@ public class TransformerTest extends UtilTest {
     }
 
     @Test
-    public void testTransformMixedComparisons() throws ProofInputException,
-            TermTransformerException {
+    public void testTransformMixedComparisons() throws ProofInputException, TermTransformerException {
 
-        IExecutionNode targetNode = getFirstSymbolicNodeForStatement(
-                "midOneProxyOneInstance", "mid=x");
+        IExecutionNode targetNode = getFirstSymbolicNodeForStatement("midOneProxyOneInstance", "mid=x");
 
         Term originalTerm = targetNode.getPathCondition();
         // Artificially impose an external negation

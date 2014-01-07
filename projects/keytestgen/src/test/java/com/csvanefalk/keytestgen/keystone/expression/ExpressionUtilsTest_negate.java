@@ -12,8 +12,7 @@ public class ExpressionUtilsTest_negate {
 
     @Test
     public void testNegateAdditionTwoOperands() {
-        IExpression expression = new Addition(new NumericConstant(10),
-                new NumericConstant(5));
+        IExpression expression = new Addition(new NumericConstant(10), new NumericConstant(5));
 
         ExpressionUtils.negate(expression);
         Fraction negatedValue = expression.evaluate();
@@ -26,8 +25,8 @@ public class ExpressionUtilsTest_negate {
     public void testNegateAdditionThreeOperands() {
 
         // 10 + 15 + 5
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(15), new NumericConstant(5)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(15),
+                                                                                    new NumericConstant(5)));
 
         // -10 - 15 - 5
         ExpressionUtils.negate(expression);
@@ -42,9 +41,9 @@ public class ExpressionUtilsTest_negate {
     public void testNegateAdditionFourOperands() {
 
         // 5 + 15 + 15 + 25
-        IExpression expression = new Addition(new NumericConstant(5),
-                new Addition(new NumericConstant(15), new Addition(
-                        new NumericConstant(15), new NumericConstant(25))));
+        IExpression expression = new Addition(new NumericConstant(5), new Addition(new NumericConstant(15),
+                                                                                   new Addition(new NumericConstant(15),
+                                                                                                new NumericConstant(25))));
 
         // 5 - 15 - 15 - 25
         ExpressionUtils.negate(expression);
@@ -59,8 +58,7 @@ public class ExpressionUtilsTest_negate {
 
     @Test
     public void testNegateSubtractionTwoOperands() {
-        IExpression expression = new Addition(new NumericConstant(10),
-                new NumericConstant(-5));
+        IExpression expression = new Addition(new NumericConstant(10), new NumericConstant(-5));
 
         ExpressionUtils.negate(expression);
         Fraction negatedValue = expression.evaluate();
@@ -72,8 +70,8 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateSubtractionThreeOperands() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(-15), new NumericConstant(-5)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(-15),
+                                                                                    new NumericConstant(-5)));
 
         ExpressionUtils.negate(expression);
 
@@ -87,9 +85,9 @@ public class ExpressionUtilsTest_negate {
     public void testNegateSubtractionFourOperands() {
 
         // 5 - 15 - 15 - 25
-        IExpression expression = new Addition(new NumericConstant(5),
-                new Addition(new NumericConstant(-15), new Addition(
-                        new NumericConstant(-15), new NumericConstant(-25))));
+        IExpression expression = new Addition(new NumericConstant(5), new Addition(new NumericConstant(-15),
+                                                                                   new Addition(new NumericConstant(-15),
+                                                                                                new NumericConstant(-25))));
 
         ExpressionUtils.negate(expression);
 
@@ -103,8 +101,7 @@ public class ExpressionUtilsTest_negate {
 
     @Test
     public void testNegateMultiplicationTwoOperands() {
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new NumericConstant(5));
+        IExpression expression = new Multiplication(new NumericConstant(10), new NumericConstant(5));
 
         ExpressionUtils.negate(expression);
         Fraction negatedValue = expression.evaluate();
@@ -116,9 +113,8 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateMultiplicationThreeOperands() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new Multiplication(new NumericConstant(15),
-                        new NumericConstant(5)));
+        IExpression expression = new Multiplication(new NumericConstant(10), new Multiplication(new NumericConstant(15),
+                                                                                                new NumericConstant(5)));
 
         ExpressionUtils.negate(expression);
 
@@ -131,9 +127,11 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateMultiplicationFourOperands() {
 
-        IExpression expression = new Multiplication(new NumericConstant(5),
-                new Multiplication(new NumericConstant(15), new Multiplication(
-                        new NumericConstant(15), new NumericConstant(25))));
+        IExpression expression = new Multiplication(new NumericConstant(5), new Multiplication(new NumericConstant(15),
+                                                                                               new Multiplication(new NumericConstant(
+                                                                                                       15),
+                                                                                                                  new NumericConstant(
+                                                                                                                          25))));
 
         ExpressionUtils.negate(expression);
 
@@ -147,8 +145,7 @@ public class ExpressionUtilsTest_negate {
 
     @Test
     public void testNegateDivisionTwoOperands() {
-        IExpression expression = new Division(new NumericConstant(10),
-                new NumericConstant(5));
+        IExpression expression = new Division(new NumericConstant(10), new NumericConstant(5));
 
         ExpressionUtils.negate(expression);
         Fraction negatedValue = expression.evaluate();
@@ -160,8 +157,8 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateDivisionThreeOperands() {
 
-        IExpression expression = new Division(new NumericConstant(10),
-                new Division(new NumericConstant(15), new NumericConstant(5)));
+        IExpression expression = new Division(new NumericConstant(10), new Division(new NumericConstant(15),
+                                                                                    new NumericConstant(5)));
 
         ExpressionUtils.negate(expression);
 
@@ -174,9 +171,9 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateDivisionFourOperands() {
 
-        IExpression expression = new Division(new NumericConstant(5),
-                new Division(new NumericConstant(15), new Division(
-                        new NumericConstant(15), new NumericConstant(25))));
+        IExpression expression = new Division(new NumericConstant(5), new Division(new NumericConstant(15),
+                                                                                   new Division(new NumericConstant(15),
+                                                                                                new NumericConstant(25))));
 
         ExpressionUtils.negate(expression);
 
@@ -191,8 +188,8 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateAdditionSubtraction() {
 
-        IExpression expression = new Addition(new NumericConstant(20),
-                new Addition(new NumericConstant(15), new NumericConstant(-15)));
+        IExpression expression = new Addition(new NumericConstant(20), new Addition(new NumericConstant(15),
+                                                                                    new NumericConstant(-15)));
 
         ExpressionUtils.negate(expression);
 
@@ -205,8 +202,8 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateSubtractionAddition() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(-15), new NumericConstant(5)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(-15),
+                                                                                    new NumericConstant(5)));
 
         ExpressionUtils.negate(expression);
 
@@ -219,8 +216,8 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateMultiplicationDivision() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new Division(new NumericConstant(15), new NumericConstant(5)));
+        IExpression expression = new Multiplication(new NumericConstant(10), new Division(new NumericConstant(15),
+                                                                                          new NumericConstant(5)));
 
         ExpressionUtils.negate(expression);
 
@@ -233,9 +230,8 @@ public class ExpressionUtilsTest_negate {
     @Test
     public void testNegateDivisionMultiplication() {
 
-        IExpression expression = new Division(new NumericConstant(10),
-                new Multiplication(new NumericConstant(15),
-                        new NumericConstant(5)));
+        IExpression expression = new Division(new NumericConstant(10), new Multiplication(new NumericConstant(15),
+                                                                                          new NumericConstant(5)));
 
         ExpressionUtils.negate(expression);
 
@@ -249,11 +245,13 @@ public class ExpressionUtilsTest_negate {
     public void testNegateAdditionSubtractionMultiplicationDivision() {
 
         // 5 + (15 - (10 * (15/25))
-        IExpression expression = new Addition(new NumericConstant(5),
-                new Addition(new NumericConstant(15), new Multiplication(
-                        new NumericConstant(-10), new Division(
-                        new NumericConstant(15),
-                        new NumericConstant(25)))));
+        IExpression expression = new Addition(new NumericConstant(5), new Addition(new NumericConstant(15),
+                                                                                   new Multiplication(new NumericConstant(
+                                                                                           -10),
+                                                                                                      new Division(new NumericConstant(
+                                                                                                              15),
+                                                                                                                   new NumericConstant(
+                                                                                                                           25)))));
 
         ExpressionUtils.negate(expression);
 
@@ -267,11 +265,13 @@ public class ExpressionUtilsTest_negate {
     public void testNegateSubtractionAdditionMultiplicationDivision() {
 
         // 5 - (15 + (10 * (15/25))
-        IExpression expression = new Addition(new NumericConstant(5),
-                new Addition(new NumericConstant(-15), new Multiplication(
-                        new NumericConstant(10), new Division(
-                        new NumericConstant(15),
-                        new NumericConstant(25)))));
+        IExpression expression = new Addition(new NumericConstant(5), new Addition(new NumericConstant(-15),
+                                                                                   new Multiplication(new NumericConstant(
+                                                                                           10),
+                                                                                                      new Division(new NumericConstant(
+                                                                                                              15),
+                                                                                                                   new NumericConstant(
+                                                                                                                           25)))));
 
         ExpressionUtils.negate(expression);
         Fraction negatedValue = expression.evaluate();

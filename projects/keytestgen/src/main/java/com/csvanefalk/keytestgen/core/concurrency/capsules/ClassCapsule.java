@@ -31,8 +31,7 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
 
     private List<TestSuite> testSuites = null;
 
-    public ClassCapsule(final ICodeCoverageParser codeCoverageParser,
-                        final List<String> methods, final File source) {
+    public ClassCapsule(final ICodeCoverageParser codeCoverageParser, final List<String> methods, final File source) {
         super();
         this.codeCoverageParser = codeCoverageParser;
         this.methods = methods;
@@ -91,15 +90,13 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
                 final KeYJavaMethod targetMethod = targetClass.getMethod(method);
                 if (targetMethod == null) {
 
-                    throw new CoreException("No such method: " + method
-                            + " in class " + targetClass.getName());
+                    throw new CoreException("No such method: " + method + " in class " + targetClass.getName());
                 }
 
                 /*
                  * Setup and ready the capsule
                  */
-                final MethodCapsule testGenerationCapsule = new MethodCapsule(
-                        codeCoverageParser, targetMethod);
+                final MethodCapsule testGenerationCapsule = new MethodCapsule(codeCoverageParser, targetMethod);
 
                 controller.addChild(testGenerationCapsule);
                 testGenerationCapsule.addMonitor(this);
@@ -135,12 +132,11 @@ public class ClassCapsule extends AbstractCapsule implements ICapsuleMonitor {
      *
      * @param source path to the source file
      * @return a {@link KeYJavaClass} instance corresponding to the public class
-     *         in the source file
+     * in the source file
      * @throws TestGeneratorException in the event that there is a failure in the KeYInterface, or
      *                                if there is a problem finding or reading the source file.
      */
-    private KeYJavaClass extractKeYJavaClass(final File source)
-            throws CoreException {
+    private KeYJavaClass extractKeYJavaClass(final File source) throws CoreException {
 
         try {
 

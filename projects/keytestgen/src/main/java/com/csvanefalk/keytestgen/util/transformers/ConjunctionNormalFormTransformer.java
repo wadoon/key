@@ -71,23 +71,17 @@ public class ConjunctionNormalFormTransformer extends AbstractTermTransformer {
 
         if (TermParserTools.isAnd(firstTerm)) {
 
-            final Term firstDistributedChild = distribute(firstTerm.sub(0),
-                    secondTerm);
-            final Term secondDistributedChild = distribute(firstTerm.sub(1),
-                    secondTerm);
+            final Term firstDistributedChild = distribute(firstTerm.sub(0), secondTerm);
+            final Term secondDistributedChild = distribute(firstTerm.sub(1), secondTerm);
 
-            return termFactory.createTerm(Junctor.AND, firstDistributedChild,
-                    secondDistributedChild);
+            return termFactory.createTerm(Junctor.AND, firstDistributedChild, secondDistributedChild);
 
         } else if (TermParserTools.isAnd(secondTerm)) {
 
-            final Term firstDistributedChild = distribute(firstTerm,
-                    secondTerm.sub(0));
-            final Term secondDistributedChild = distribute(firstTerm,
-                    secondTerm.sub(1));
+            final Term firstDistributedChild = distribute(firstTerm, secondTerm.sub(0));
+            final Term secondDistributedChild = distribute(firstTerm, secondTerm.sub(1));
 
-            return termFactory.createTerm(Junctor.AND, firstDistributedChild,
-                    secondDistributedChild);
+            return termFactory.createTerm(Junctor.AND, firstDistributedChild, secondDistributedChild);
 
         } else {
 

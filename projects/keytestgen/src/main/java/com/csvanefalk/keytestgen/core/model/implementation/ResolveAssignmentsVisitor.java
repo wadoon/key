@@ -80,8 +80,8 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
                  */
                 if (TermParserTools.isBoolean(leftOperand)) {
 
-                    leftOperandIdentifier = TermParserTools.resolveIdentifierString(
-                            leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
+                    leftOperandIdentifier = TermParserTools.resolveIdentifierString(leftOperand,
+                                                                                    ResolveAssignmentsVisitor.SEPARATOR);
 
                     /*
                      * If the right-hand operator is a boolean constant (TRUE or
@@ -104,10 +104,10 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
              */
             else if (!sawNot) {
 
-                leftOperandIdentifier = TermParserTools.resolveIdentifierString(
-                        leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
-                rightOperandIdentifier = TermParserTools.resolveIdentifierString(
-                        rightOperand, ResolveAssignmentsVisitor.SEPARATOR);
+                leftOperandIdentifier = TermParserTools.resolveIdentifierString(leftOperand,
+                                                                                ResolveAssignmentsVisitor.SEPARATOR);
+                rightOperandIdentifier = TermParserTools.resolveIdentifierString(rightOperand,
+                                                                                 ResolveAssignmentsVisitor.SEPARATOR);
 
                 final ModelVariable leftModelVariable = model.getVariable(leftOperandIdentifier);
                 final ModelVariable rightModelVariable = model.getVariable(rightOperandIdentifier);
@@ -120,8 +120,8 @@ class ResolveAssignmentsVisitor extends KeYTestGenTermVisitor {
              */
             else if (sawNot && TermParserTools.isNullSort(rightOperand)) {
 
-                leftOperandIdentifier = TermParserTools.resolveIdentifierString(
-                        leftOperand, ResolveAssignmentsVisitor.SEPARATOR);
+                leftOperandIdentifier = TermParserTools.resolveIdentifierString(leftOperand,
+                                                                                ResolveAssignmentsVisitor.SEPARATOR);
 
                 final ModelVariable leftModelVariable = model.getVariable(leftOperandIdentifier);
 

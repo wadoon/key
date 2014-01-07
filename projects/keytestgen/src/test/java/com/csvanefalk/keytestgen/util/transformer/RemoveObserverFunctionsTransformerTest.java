@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class RemoveObserverFunctionsTransformerTest extends TransformerTest {
 
-    public RemoveObserverFunctionsTransformerTest()
-            throws KeYInterfaceException, IOException {
+    public RemoveObserverFunctionsTransformerTest() throws KeYInterfaceException, IOException {
         transformer = RemoveObserverFunctionsTransformer.getInstance();
     }
 }

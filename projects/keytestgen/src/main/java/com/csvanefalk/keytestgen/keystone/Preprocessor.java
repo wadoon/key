@@ -52,8 +52,7 @@ public class Preprocessor {
         return variableSet;
     }
 
-    public Set<Term> createMinimalProblemSet(final Term term)
-            throws KeYStoneException {
+    public Set<Term> createMinimalProblemSet(final Term term) throws KeYStoneException {
 
         final Set<Term> minimalProblemSet = new HashSet<Term>();
 
@@ -62,8 +61,7 @@ public class Preprocessor {
             /*
              * Do preprocessing of the Term itself.
              */
-            final Term processedTerm = NegationNormalFormTransformer.getInstance().transform(
-                    term);
+            final Term processedTerm = NegationNormalFormTransformer.getInstance().transform(term);
 
             createMinimalProblemSet_helper(processedTerm, minimalProblemSet);
 
@@ -98,14 +96,12 @@ public class Preprocessor {
             return;
         }
 
-        if (TermParserTools.isBinaryFunction(term)
-                || TermParserTools.isEquals(term)) {
+        if (TermParserTools.isBinaryFunction(term) || TermParserTools.isEquals(term)) {
             minimalProblemSet.add(term);
             return;
         }
 
-        throw new KeYStoneException("Path condition contains illegal Term: "
-                + term);
+        throw new KeYStoneException("Path condition contains illegal Term: " + term);
 
     }
 
@@ -115,8 +111,7 @@ public class Preprocessor {
 
     private int price(final Term term) {
         final Tuple<Integer, Set<ProgramVariable>> priceTuple = priceGather(term);
-        return priceTuple.getFirst()
-                + (priceTuple.getSecond().size() * Preprocessor.VARIABLE_PRICE);
+        return priceTuple.getFirst() + (priceTuple.getSecond().size() * Preprocessor.VARIABLE_PRICE);
     }
 
     private Tuple<Integer, Set<ProgramVariable>> priceGather(final Term term) {
@@ -130,8 +125,7 @@ public class Preprocessor {
             newVariableSet.addAll(leftTuple.getSecond());
             newVariableSet.addAll(leftTuple.getSecond());
 
-            return new Tuple<Integer, Set<ProgramVariable>>(newWeight,
-                    newVariableSet);
+            return new Tuple<Integer, Set<ProgramVariable>>(newWeight, newVariableSet);
         }
 
         if (TermParserTools.isOr(term)) {
@@ -149,7 +143,6 @@ public class Preprocessor {
             return priceGather(term.sub(0));
         }
 
-        return new Tuple<Integer, Set<ProgramVariable>>(
-                Preprocessor.PROBLEM_PRICE, collectVariables(term));
+        return new Tuple<Integer, Set<ProgramVariable>>(Preprocessor.PROBLEM_PRICE, collectVariables(term));
     }
 }

@@ -20,8 +20,7 @@ public class ExecutionPath {
         // TODO Auto-generated constructor stub
     }
 
-    public ExecutionPath(final Set<SourceElement> coveredNodes,
-                         final IExecutionNode terminatingNode) {
+    public ExecutionPath(final Set<SourceElement> coveredNodes, final IExecutionNode terminatingNode) {
         super();
         this.coveredNodes = coveredNodes;
         this.terminatingNode = terminatingNode;
@@ -51,8 +50,7 @@ public class ExecutionPath {
     /**
      * @param branchConditionMappings the branchConditionMappings to set
      */
-    void setBranchConditionMappings(
-            final Map<SourceElement, List<IExecutionBranchCondition>> branchConditionMappings) {
+    void setBranchConditionMappings(final Map<SourceElement, List<IExecutionBranchCondition>> branchConditionMappings) {
         this.branchConditionMappings = branchConditionMappings;
     }
 

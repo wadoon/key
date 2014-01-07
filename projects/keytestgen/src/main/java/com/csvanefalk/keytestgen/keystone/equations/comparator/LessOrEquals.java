@@ -7,8 +7,7 @@ import javax.naming.OperationNotSupportedException;
 
 public class LessOrEquals extends AbstractComparator {
 
-    public LessOrEquals(final IExpression leftOperand,
-                        final IExpression rightOperand) {
+    public LessOrEquals(final IExpression leftOperand, final IExpression rightOperand) {
         super(leftOperand, rightOperand);
     }
 
@@ -18,10 +17,8 @@ public class LessOrEquals extends AbstractComparator {
         final Fraction leftOperand = getLeftOperand().evaluate();
         final Fraction rightOperand = getRightOperand().evaluate();
 
-        final int leftDividend = rightOperand.getDenominator()
-                * leftOperand.getNumerator();
-        final int rightDividend = rightOperand.getNumerator()
-                * leftOperand.getDenominator();
+        final int leftDividend = rightOperand.getDenominator() * leftOperand.getNumerator();
+        final int rightDividend = rightOperand.getNumerator() * leftOperand.getDenominator();
 
         return leftDividend <= rightDividend;
     }
@@ -29,7 +26,6 @@ public class LessOrEquals extends AbstractComparator {
     @Override
     public String toString() {
 
-        return getLeftOperand().toString() + " <= "
-                + getRightOperand().toString();
+        return getLeftOperand().toString() + " <= " + getRightOperand().toString();
     }
 }

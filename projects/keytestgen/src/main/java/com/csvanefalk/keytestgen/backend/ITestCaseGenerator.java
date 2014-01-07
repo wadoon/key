@@ -40,9 +40,10 @@ public interface ITestCaseGenerator {
      * @return a test suite for the framework targeted by the implementor.
      */
     public String generateFullTestSuite(final String source,
-                                        final ICodeCoverageParser coverage, final boolean includeProtected,
-                                        final boolean includePrivate, final boolean includeNative)
-            throws TestGeneratorException;
+                                        final ICodeCoverageParser coverage,
+                                        final boolean includeProtected,
+                                        final boolean includePrivate,
+                                        final boolean includeNative) throws TestGeneratorException;
 
     /**
      * Generates a test suite covering a subset of methods in a Java source
@@ -56,6 +57,6 @@ public interface ITestCaseGenerator {
      * @return a test suite for the framework targeted by the implementor.
      */
     public String generatePartialTestSuite(final String source,
-                                           final ICodeCoverageParser coverage, final String... methods)
-            throws TestGeneratorException;
+                                           final ICodeCoverageParser coverage,
+                                           final String... methods) throws TestGeneratorException;
 }

@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class RemoveSDPsTransformerTest extends TransformerTest {
 
-    public RemoveSDPsTransformerTest() throws KeYInterfaceException,
-            IOException {
+    public RemoveSDPsTransformerTest() throws KeYInterfaceException, IOException {
         transformer = RemoveSDPsTransformer.getInstance();
     }
 }

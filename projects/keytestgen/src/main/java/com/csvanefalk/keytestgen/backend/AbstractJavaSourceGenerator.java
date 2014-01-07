@@ -89,12 +89,13 @@ public abstract class AbstractJavaSourceGenerator {
      * @param name       the Name for the class
      */
     protected void writeClassHeader(final String[] annotations,
-                                    final String visibility, final String modifier, final String name) {
+                                    final String visibility,
+                                    final String modifier,
+                                    final String name) {
 
         if (annotations != null) {
             for (final String annotation : annotations) {
-                writeIndentedLine(annotation
-                        + AbstractJavaSourceGenerator.NEWLINE);
+                writeIndentedLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
             }
         }
 
@@ -223,14 +224,16 @@ public abstract class AbstractJavaSourceGenerator {
      * @param name        the Name for the method
      */
     protected void writeMethodHeader(final String[] annotations,
-                                     final String visibility, final String[] modifiers,
-                                     final String returnType, final String name,
-                                     final String[] parameters, final String[] exceptions) {
+                                     final String visibility,
+                                     final String[] modifiers,
+                                     final String returnType,
+                                     final String name,
+                                     final String[] parameters,
+                                     final String[] exceptions) {
 
         if (annotations != null) {
             for (final String annotation : annotations) {
-                writeIndentedLine(annotation
-                        + AbstractJavaSourceGenerator.NEWLINE);
+                writeIndentedLine(annotation + AbstractJavaSourceGenerator.NEWLINE);
             }
         }
 
@@ -271,7 +274,7 @@ public abstract class AbstractJavaSourceGenerator {
         output.append(")");
 
 		/*
-		 * Write the exceptions, if any.
+         * Write the exceptions, if any.
 		 */
         if (exceptions != null) {
             output.append(AbstractJavaSourceGenerator.NEWLINE);
@@ -288,7 +291,7 @@ public abstract class AbstractJavaSourceGenerator {
         }
 
 		/*
-		 * Close the method header.
+         * Close the method header.
 		 */
         output.append(" {\n");
         increaseIndentation();

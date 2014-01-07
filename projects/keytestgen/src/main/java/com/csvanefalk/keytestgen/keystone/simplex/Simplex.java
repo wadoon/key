@@ -17,7 +17,8 @@ import java.util.Map;
 public strictfp class Simplex {
 
     public static void addRows(final Fraction[][] table,
-                               final int indexOfSourceRow, final int indexOfTargetRow,
+                               final int indexOfSourceRow,
+                               final int indexOfTargetRow,
                                Fraction multiplier) {
 
         if (multiplier == null) {
@@ -31,15 +32,13 @@ public strictfp class Simplex {
         }
     }
 
-    private static Fraction[][] constructInitialTableaux(
-            final Fraction[][] table) {
+    private static Fraction[][] constructInitialTableaux(final Fraction[][] table) {
 
         /*
          * Create a new, temporary tableaux which will contain the virtual
          * function, as well as the virtual variables.
          */
-        final Fraction[][] newTable = new Fraction[table.length + 1][table[0].length
-                + table.length];
+        final Fraction[][] newTable = new Fraction[table.length + 1][table[0].length + table.length];
 
         // index of the constant part of each equation.
         final int constantIndex = table[0].length - 1;
@@ -102,8 +101,7 @@ public strictfp class Simplex {
      *
      * @return
      */
-    public static Map<String, Integer> experimentalSolve(
-            final EquationSystem equationSystem) {
+    public static Map<String, Integer> experimentalSolve(final EquationSystem equationSystem) {
 
         final List<Equation> equations = equationSystem.getEquations();
         final Map<String, Variable> variables = equationSystem.getVariableIndex();
@@ -133,8 +131,7 @@ public strictfp class Simplex {
             final Equation equation = equations.get(i);
 
             for (int j = 0; j < variableIndex.size(); j++) {
-                final Variable variable = equation.getVariable(variableIndex.get(
-                        j).getName());
+                final Variable variable = equation.getVariable(variableIndex.get(j).getName());
                 if (variable != null) {
                     tableaux[i][j] = variable.resolveMultiplier();
                 } else {
@@ -151,8 +148,7 @@ public strictfp class Simplex {
         /*
          * Apply Simplex to solve the system.
          */
-        final Map<Variable, Fraction> solution = Simplex.solvePhaseOne(
-                tableaux, variableIndex);
+        final Map<Variable, Fraction> solution = Simplex.solvePhaseOne(tableaux, variableIndex);
 
         final Map<String, Integer> finalSolution = new HashMap<String, Integer>();
         for (final Variable variable : solution.keySet()) {
@@ -169,8 +165,7 @@ public strictfp class Simplex {
         return new Fraction(fraction.getDenominator(), fraction.getNumerator());
     }
 
-    private static int indexOfLargestColumnValue(final Fraction[][] table,
-                                                 final int rowIndex) {
+    private static int indexOfLargestColumnValue(final Fraction[][] table, final int rowIndex) {
         int resultIndex = -1;
         Fraction largest = Fraction.ZERO;
         for (int i = 0; i < (table[rowIndex].length - 1); i++) {
@@ -182,8 +177,7 @@ public strictfp class Simplex {
         return resultIndex;
     }
 
-    private static int indexOfLargestRowValue(final Fraction[][] table,
-                                              final int columnIndex) {
+    private static int indexOfLargestRowValue(final Fraction[][] table, final int columnIndex) {
         int resultIndex = -1;
         Fraction largest = Fraction.ZERO;
         for (int i = 1; i < table.length; i++) {
@@ -195,16 +189,15 @@ public strictfp class Simplex {
         return resultIndex;
     }
 
-    private static void multiplyRow(final Fraction[][] table,
-                                    final int rowIndex, final Fraction multiplier) {
+    private static void multiplyRow(final Fraction[][] table, final int rowIndex, final Fraction multiplier) {
 
         for (int i = 0; i < table[rowIndex].length; i++) {
             table[rowIndex][i] = table[rowIndex][i].multiply(multiplier);
         }
     }
 
-    private static Map<Variable, Fraction> solvePhaseOne(
-            final Fraction[][] table, final Map<Integer, Variable> variableIndex) {
+    private static Map<Variable, Fraction> solvePhaseOne(final Fraction[][] table,
+                                                         final Map<Integer, Variable> variableIndex) {
 
         final Fraction[][] initialTableaux = Simplex.constructInitialTableaux(table);
 
@@ -224,10 +217,8 @@ public strictfp class Simplex {
             /*
              * Perform the actual minimization.
              */
-            final int largestColumnIndex = Simplex.indexOfLargestColumnValue(
-                    initialTableaux, 0);
-            final int largestRowIndex = Simplex.indexOfLargestRowValue(
-                    initialTableaux, largestColumnIndex);
+            final int largestColumnIndex = Simplex.indexOfLargestColumnValue(initialTableaux, 0);
+            final int largestRowIndex = Simplex.indexOfLargestRowValue(initialTableaux, largestColumnIndex);
 
             /*
              * Take the reciprocal of the selected value of the entering
@@ -238,8 +229,7 @@ public strictfp class Simplex {
             for (int i = 0; i < initialTableaux.length; i++) {
                 if (i != largestRowIndex) {
                     final Fraction eliminationValue = initialTableaux[i][largestColumnIndex].multiply(-1);
-                    Simplex.addRows(initialTableaux, largestRowIndex, i,
-                            eliminationValue);
+                    Simplex.addRows(initialTableaux, largestRowIndex, i, eliminationValue);
                 }
             }
 

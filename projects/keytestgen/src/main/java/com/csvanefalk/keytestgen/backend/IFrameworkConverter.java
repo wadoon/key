@@ -10,6 +10,5 @@ import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestSuite;
  */
 public interface IFrameworkConverter {
 
-    public ITestSuite convert(TestSuite testSuite)
-            throws FrameworkConverterException;
+    public ITestSuite convert(TestSuite testSuite) throws FrameworkConverterException;
 }

@@ -37,8 +37,7 @@ import de.uka.ilkd.key.logic.Term;
  *
  * @author christopher
  */
-public class RemoveAxiomaticExpressionsTransformer extends
-        AbstractTermTransformer {
+public class RemoveAxiomaticExpressionsTransformer extends AbstractTermTransformer {
 
     private static RemoveAxiomaticExpressionsTransformer instance = null;
 
@@ -86,8 +85,7 @@ public class RemoveAxiomaticExpressionsTransformer extends
     }
 
     @Override
-    protected Term transformImplication(Term term)
-            throws TermTransformerException {
+    protected Term transformImplication(Term term) throws TermTransformerException {
 
         Term firstChild = term.sub(0);
         if (isAxiomatic(firstChild)) {

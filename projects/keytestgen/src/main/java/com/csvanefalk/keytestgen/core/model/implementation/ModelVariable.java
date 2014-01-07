@@ -36,19 +36,16 @@ public class ModelVariable {
      * @param identifier      a unique identifier for the variable.
      * @return the created instance.
      */
-    public static ModelVariable constructModelVariable(
-            final IProgramVariable programVariable, final String identifier) {
+    public static ModelVariable constructModelVariable(final IProgramVariable programVariable,
+                                                       final String identifier) {
 
         return new ModelVariable(programVariable, identifier);
     }
 
     public static boolean isValidValueType(final Object object) {
 
-        return ((object == null) || (object instanceof ModelInstance))
-                || (object.getClass() == Integer.class)
-                || (object.getClass() == Byte.class)
-                || (object.getClass() == Long.class)
-                || (object.getClass() == Boolean.class);
+        return ((object == null) || (object instanceof ModelInstance)) || (object.getClass() == Integer.class) || (object
+                .getClass() == Byte.class) || (object.getClass() == Long.class) || (object.getClass() == Boolean.class);
     }
 
     /**
@@ -83,8 +80,7 @@ public class ModelVariable {
      */
     private final IProgramVariable variable;
 
-    private ModelVariable(final IProgramVariable programVariable,
-                          final String identifier) {
+    private ModelVariable(final IProgramVariable programVariable, final String identifier) {
 
         variable = programVariable;
         this.identifier = identifier;

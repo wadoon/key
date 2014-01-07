@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class RemoveIfThenElseTransformerTest extends TransformerTest {
 
-    public RemoveIfThenElseTransformerTest() throws KeYInterfaceException,
-            IOException {
+    public RemoveIfThenElseTransformerTest() throws KeYInterfaceException, IOException {
         transformer = RemoveIfThenElseTransformer.getInstance();
     }
 }

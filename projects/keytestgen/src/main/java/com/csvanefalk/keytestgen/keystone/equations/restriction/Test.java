@@ -18,13 +18,11 @@ public class Test {
         final long start = System.nanoTime();
 
         for (int j = 0; j < batch; j++) {
-            strings[j] = new Addition(new NumericConstant(new Fraction(j)),
-                    new NumericConstant(new Fraction(j)));
+            strings[j] = new Addition(new NumericConstant(new Fraction(j)), new NumericConstant(new Fraction(j)));
         }
 
         final long time = System.nanoTime() - start;
-        System.out.printf("Average object allocation took %.1f ns.%n",
-                (double) time / batch);
+        System.out.printf("Average object allocation took %.1f ns.%n", (double) time / batch);
 
         System.out.println(Calendar.getInstance().getTimeInMillis() - millis);
     }

@@ -12,16 +12,13 @@ public class NestedDoWhileTest {
                 do {
                     result++;
                     i++;
-                }
-                while (i < 2);
+                } while (i < 2);
                 result++;
                 i++;
-            }
-            while (i < 3);
+            } while (i < 3);
             result++;
             i++;
-        }
-        while (i < 3);
+        } while (i < 3);
         return result;
     }
 }

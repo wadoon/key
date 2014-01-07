@@ -11,8 +11,7 @@ public class ExpressionUtilsTest_simplifyExpression {
 
     @Test
     public void testSimplifyAdditionTwoOperands() {
-        IExpression expression = new Addition(new NumericConstant(10),
-                new NumericConstant(5));
+        IExpression expression = new Addition(new NumericConstant(10), new NumericConstant(5));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -26,8 +25,8 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyAdditionThreeOperands() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(15), new NumericConstant(5)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(15),
+                                                                                    new NumericConstant(5)));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -41,9 +40,9 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyAdditionFourOperands() {
 
-        IExpression expression = new Addition(new NumericConstant(5),
-                new Addition(new NumericConstant(15), new Addition(
-                        new NumericConstant(15), new NumericConstant(25))));
+        IExpression expression = new Addition(new NumericConstant(5), new Addition(new NumericConstant(15),
+                                                                                   new Addition(new NumericConstant(15),
+                                                                                                new NumericConstant(25))));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -58,8 +57,7 @@ public class ExpressionUtilsTest_simplifyExpression {
 
     @Test
     public void testSimplifySubtractionTwoOperands() {
-        IExpression expression = new Addition(new NumericConstant(10),
-                new NumericConstant(-5));
+        IExpression expression = new Addition(new NumericConstant(10), new NumericConstant(-5));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -73,8 +71,8 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifySubtractionThreeOperands() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(-15), new NumericConstant(-5)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(-15),
+                                                                                    new NumericConstant(-5)));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -89,9 +87,9 @@ public class ExpressionUtilsTest_simplifyExpression {
     public void testSimplifySubtractionFourOperands() {
 
         // 5 - 15 - 15 - 25
-        IExpression expression = new Addition(new NumericConstant(5),
-                new Addition(new NumericConstant(-15), new Addition(
-                        new NumericConstant(-15), new NumericConstant(-25))));
+        IExpression expression = new Addition(new NumericConstant(5), new Addition(new NumericConstant(-15),
+                                                                                   new Addition(new NumericConstant(-15),
+                                                                                                new NumericConstant(-25))));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -106,8 +104,7 @@ public class ExpressionUtilsTest_simplifyExpression {
 
     @Test
     public void testSimplifyMultiplicationTwoOperands() {
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new NumericConstant(5));
+        IExpression expression = new Multiplication(new NumericConstant(10), new NumericConstant(5));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -121,9 +118,8 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyMultiplicationThreeOperands() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new Multiplication(new NumericConstant(15),
-                        new NumericConstant(5)));
+        IExpression expression = new Multiplication(new NumericConstant(10), new Multiplication(new NumericConstant(15),
+                                                                                                new NumericConstant(5)));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -137,9 +133,11 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyMultiplicationFourOperands() {
 
-        IExpression expression = new Multiplication(new NumericConstant(5),
-                new Multiplication(new NumericConstant(15), new Multiplication(
-                        new NumericConstant(15), new NumericConstant(25))));
+        IExpression expression = new Multiplication(new NumericConstant(5), new Multiplication(new NumericConstant(15),
+                                                                                               new Multiplication(new NumericConstant(
+                                                                                                       15),
+                                                                                                                  new NumericConstant(
+                                                                                                                          25))));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -154,8 +152,7 @@ public class ExpressionUtilsTest_simplifyExpression {
 
     @Test
     public void testSimplifyDivisionTwoOperands() {
-        IExpression expression = new Division(new NumericConstant(10),
-                new NumericConstant(5));
+        IExpression expression = new Division(new NumericConstant(10), new NumericConstant(5));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -169,8 +166,8 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyDivisionThreeOperands() {
 
-        IExpression expression = new Division(new NumericConstant(10),
-                new Division(new NumericConstant(15), new NumericConstant(5)));
+        IExpression expression = new Division(new NumericConstant(10), new Division(new NumericConstant(15),
+                                                                                    new NumericConstant(5)));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -184,9 +181,9 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyDivisionFourOperands() {
 
-        IExpression expression = new Division(new NumericConstant(5),
-                new Division(new NumericConstant(15), new Division(
-                        new NumericConstant(15), new NumericConstant(25))));
+        IExpression expression = new Division(new NumericConstant(5), new Division(new NumericConstant(15),
+                                                                                   new Division(new NumericConstant(15),
+                                                                                                new NumericConstant(25))));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -202,8 +199,8 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyAdditionSubtraction() {
 
-        IExpression expression = new Addition(new NumericConstant(20),
-                new Addition(new NumericConstant(15), new NumericConstant(-15)));
+        IExpression expression = new Addition(new NumericConstant(20), new Addition(new NumericConstant(15),
+                                                                                    new NumericConstant(-15)));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -217,8 +214,8 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifySubtractionAddition() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(-15), new NumericConstant(5)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(-15),
+                                                                                    new NumericConstant(5)));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -232,8 +229,8 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyMultiplicationDivision() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new Division(new NumericConstant(15), new NumericConstant(5)));
+        IExpression expression = new Multiplication(new NumericConstant(10), new Division(new NumericConstant(15),
+                                                                                          new NumericConstant(5)));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -247,9 +244,8 @@ public class ExpressionUtilsTest_simplifyExpression {
     @Test
     public void testSimplifyDivisionMultiplication() {
 
-        IExpression expression = new Division(new NumericConstant(10),
-                new Multiplication(new NumericConstant(15),
-                        new NumericConstant(5)));
+        IExpression expression = new Division(new NumericConstant(10), new Multiplication(new NumericConstant(15),
+                                                                                          new NumericConstant(5)));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -264,11 +260,13 @@ public class ExpressionUtilsTest_simplifyExpression {
     public void testSimplifyAdditionSubtractionMultiplicationDivision() {
 
         // 5 + (15 - (10 * (15/25))
-        IExpression expression = new Addition(new NumericConstant(5),
-                new Addition(new NumericConstant(15), new Multiplication(
-                        new NumericConstant(-10), new Division(
-                        new NumericConstant(15),
-                        new NumericConstant(25)))));
+        IExpression expression = new Addition(new NumericConstant(5), new Addition(new NumericConstant(15),
+                                                                                   new Multiplication(new NumericConstant(
+                                                                                           -10),
+                                                                                                      new Division(new NumericConstant(
+                                                                                                              15),
+                                                                                                                   new NumericConstant(
+                                                                                                                           25)))));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();
@@ -283,11 +281,13 @@ public class ExpressionUtilsTest_simplifyExpression {
     public void testSimplifySubtractionAdditionMultiplicationDivision() {
 
         // 5 - (15 + (10 * (15/25))
-        IExpression expression = new Addition(new NumericConstant(5),
-                new Addition(new NumericConstant(-15), new Multiplication(
-                        new NumericConstant(10), new Division(
-                        new NumericConstant(15),
-                        new NumericConstant(25)))));
+        IExpression expression = new Addition(new NumericConstant(5), new Addition(new NumericConstant(-15),
+                                                                                   new Multiplication(new NumericConstant(
+                                                                                           10),
+                                                                                                      new Division(new NumericConstant(
+                                                                                                              15),
+                                                                                                                   new NumericConstant(
+                                                                                                                           25)))));
 
         IExpression simplifiedExpression = ExpressionUtils.simplifyExpression(expression);
         Fraction simplifiedValue = simplifiedExpression.evaluate();

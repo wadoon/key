@@ -27,12 +27,11 @@ public class TestJUnitTestCaseGenerator {
 
     @Ignore
     @Test
-    public void test() throws IOException, ProofInputException,
-            ModelGeneratorException, TestGeneratorException,
-            KeYInterfaceException, XMLGeneratorException, InterruptedException {
+    public void test() throws IOException, ProofInputException, ModelGeneratorException, TestGeneratorException, KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
         Assert.assertTrue(new File(
-                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/ObjectClass.java").exists());
+                "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/ObjectClass.java")
+                                  .exists());
 
         final TestGenerator testCaseGenerator = TestGenerator.getInstance();
         final IFrameworkConverter junitConverter = JUnitConverter.getInstance();
@@ -45,7 +44,9 @@ public class TestJUnitTestCaseGenerator {
         methods.add(methodName);
         final List<ITestSuite> output = testCaseGenerator.generateTestSuite(
                 "/home/christopher/git/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/ObjectClass.java",
-                codeCoverageParser, junitConverter, methods);
+                codeCoverageParser,
+                junitConverter,
+                methods);
 
         /*
          * String output = testCaseGenerator .generatePartialTestSuite(
@@ -87,12 +88,11 @@ public class TestJUnitTestCaseGenerator {
 
     @Ignore
     @Test
-    public void test2() throws IOException, ProofInputException,
-            ModelGeneratorException, TestGeneratorException,
-            KeYInterfaceException, XMLGeneratorException, InterruptedException {
+    public void test2() throws IOException, ProofInputException, ModelGeneratorException, TestGeneratorException, KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
         Assert.assertTrue(new File(
-                "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java").exists());
+                "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java")
+                                  .exists());
 
         final TestGenerator testCaseGenerator = TestGenerator.getInstance();
         final IFrameworkConverter junitConverter = JUnitConverter.getInstance();
@@ -109,7 +109,9 @@ public class TestJUnitTestCaseGenerator {
 
             testCaseGenerator.generateTestSuite(
                     "/home/christopher/git/key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                    codeCoverageParser, junitConverter, methods);
+                    codeCoverageParser,
+                    junitConverter,
+                    methods);
 
             /*
              * String output = testCaseGenerator .generatePartialTestSuite(

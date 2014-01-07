@@ -9,8 +9,7 @@ public abstract class AbstractComparator implements IComparator, ITreeNode {
     private IExpression leftOperand = null;
     private IExpression rightOperand = null;
 
-    public AbstractComparator(final IExpression leftOperand,
-                              final IExpression rightOperand) {
+    public AbstractComparator(final IExpression leftOperand, final IExpression rightOperand) {
         super();
         this.leftOperand = leftOperand;
         this.rightOperand = rightOperand;

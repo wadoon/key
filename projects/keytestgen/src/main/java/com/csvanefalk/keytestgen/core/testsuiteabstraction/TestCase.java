@@ -44,8 +44,7 @@ public class TestCase implements Comparable<TestCase> {
      * @param oracle the oracle for the test case.
      * @return the test case.
      */
-    public static TestCase constructTestCase(final KeYJavaMethod method,
-                                             final Model model, final Oracle oracle) {
+    public static TestCase constructTestCase(final KeYJavaMethod method, final Model model, final Oracle oracle) {
 
         return new TestCase(method, model, oracle);
     }
@@ -77,8 +76,7 @@ public class TestCase implements Comparable<TestCase> {
      */
     private final Oracle oracle;
 
-    private TestCase(final KeYJavaMethod method, final Model model,
-                     final Oracle oracle) {
+    private TestCase(final KeYJavaMethod method, final Model model, final Oracle oracle) {
 
         this.method = method;
         this.model = model;
@@ -112,7 +110,7 @@ public class TestCase implements Comparable<TestCase> {
     }
 
     /**
-     * Retrieve the {@link IModel} instance for this test case.
+     * Retrieve the {@link Model} instance for this test case.
      *
      * @return
      */

@@ -31,8 +31,7 @@ public class LogicConditionExtractor {
         return returnSet;
     }
 
-    private void getConditionsHelper(final ProgramElement element,
-                                     final Set<ProgramElement> returnSet) {
+    private void getConditionsHelper(final ProgramElement element, final Set<ProgramElement> returnSet) {
 
         if (element instanceof Operator) {
 

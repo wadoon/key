@@ -10,8 +10,7 @@ public class DoWhileTest {
         do {
             result++;
             i++;
-        }
-        while (i < 3);
+        } while (i < 3);
         return result;
     }
 
@@ -24,8 +23,7 @@ public class DoWhileTest {
         do {
             result++;
             i++;
-        }
-        while (i < count);
+        } while (i < count);
         return result;
     }
 }

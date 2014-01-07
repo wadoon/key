@@ -98,7 +98,6 @@ public class OracleQuantifier extends OracleExpression {
 
     @Override
     public String toString() {
-        return getQuantifierType() + "(" + getQuantifiableVariable() + ")"
-                + " {" + getBoundExpression() + " } ";
+        return getQuantifierType() + "(" + getQuantifiableVariable() + ")" + " {" + getBoundExpression() + " } ";
     }
 }

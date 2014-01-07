@@ -24,8 +24,7 @@ public class Oracle {
      * @param constraints       the constraints on the poststate
      * @param expectedException the expected exception
      */
-    public Oracle(final OracleConstraint constraints,
-                  final OracleType expectedException) {
+    public Oracle(final OracleConstraint constraints, final OracleType expectedException) {
         super();
         this.constraints = constraints;
         this.expectedException = expectedException;

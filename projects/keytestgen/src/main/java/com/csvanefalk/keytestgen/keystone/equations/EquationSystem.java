@@ -28,14 +28,14 @@ public class EquationSystem {
      * @return
      * @throws KeYStoneException
      */
-    public static EquationSystem createEquationSystem(
-            final Collection<Term> terms) throws KeYStoneException {
+    public static EquationSystem createEquationSystem(final Collection<Term> terms) throws KeYStoneException {
 
         /*
          * Create the equations
          */
         final List<Equation> equations = new ArrayList<Equation>();
         for (final Term term : terms) {
+            assert (term != null);
 
             /*
              * Convert the Term to an inequality.
@@ -76,22 +76,18 @@ public class EquationSystem {
      */
     Map<String, Variable> variableIndex = null;
 
-    private EquationSystem(final List<Equation> equations,
-                           final Map<String, Variable> variableIndex2) {
+    private EquationSystem(final List<Equation> equations, final Map<String, Variable> variableIndex2) {
         super();
         this.equations = equations;
         variableIndex = variableIndex2;
     }
 
-    private boolean __debug_AssertCorrectness(
-            final Map<String, Fraction> valueMapping)
-            throws OperationNotSupportedException {
+    private boolean __debug_AssertCorrectness(final Map<String, Fraction> valueMapping) throws OperationNotSupportedException {
         resetAllVariables();
 
         for (final String setVariableIdentifier : valueMapping.keySet()) {
             final Variable variableToBind = variableIndex.get(setVariableIdentifier);
-            final NumericConstant valueToBind = new NumericConstant(
-                    valueMapping.get(variableToBind));
+            final NumericConstant valueToBind = new NumericConstant(valueMapping.get(variableToBind));
             variableToBind.bind(valueToBind);
         }
 
@@ -108,10 +104,9 @@ public class EquationSystem {
      * @param equation
      * @param variableToSolve
      * @return true if the equation contains the variable, false otherwise.
-     *         Reference based comparisons are enforced.
+     * Reference based comparisons are enforced.
      */
-    private boolean constainsVariable(final Equation equation,
-                                      final Variable variableToSolve) {
+    private boolean constainsVariable(final Equation equation, final Variable variableToSolve) {
 
         for (final Variable variable : equation.getVariables().values()) {
             if (variable == variableToSolve) {
@@ -149,8 +144,7 @@ public class EquationSystem {
         }
     }
 
-    public Map<String, Fraction> solveSystem()
-            throws OperationNotSupportedException, KeYStoneException {
+    public Map<String, Fraction> solveSystem() throws OperationNotSupportedException, KeYStoneException {
 
         /*
          * Empty systems should not occur, but we accomodate them just in case.
@@ -238,8 +232,7 @@ public class EquationSystem {
         return valueMapping;
     }
 
-    private void substituteVariable(final Variable variableToSolve,
-                                    final IExpression solution) {
+    private void substituteVariable(final Variable variableToSolve, final IExpression solution) {
 
         assert variableIndex.values().contains(variableToSolve);
 

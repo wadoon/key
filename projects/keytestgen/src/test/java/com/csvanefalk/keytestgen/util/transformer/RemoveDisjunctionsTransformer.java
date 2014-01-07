@@ -76,8 +76,7 @@ public class RemoveDisjunctionsTransformer extends AbstractTermTransformer {
      */
     private int price(final Term term) {
         final Tuple<Integer, Set<ProgramVariable>> priceTuple = priceGather(term);
-        return priceTuple.getFirst()
-                + (priceTuple.getSecond().size() * VARIABLE_PRICE);
+        return priceTuple.getFirst() + (priceTuple.getSecond().size() * VARIABLE_PRICE);
     }
 
     /**
@@ -102,8 +101,7 @@ public class RemoveDisjunctionsTransformer extends AbstractTermTransformer {
             final Set<ProgramVariable> newVariableSet = new HashSet<ProgramVariable>();
             newVariableSet.addAll(leftTuple.getSecond());
             newVariableSet.addAll(leftTuple.getSecond());
-            return new Tuple<Integer, Set<ProgramVariable>>(newWeight,
-                    newVariableSet);
+            return new Tuple<Integer, Set<ProgramVariable>>(newWeight, newVariableSet);
         }
 
         /*
@@ -125,8 +123,7 @@ public class RemoveDisjunctionsTransformer extends AbstractTermTransformer {
             return priceGather(term.sub(0));
         }
 
-        return new Tuple<Integer, Set<ProgramVariable>>(PROBLEM_PRICE,
-                collectVariables(term));
+        return new Tuple<Integer, Set<ProgramVariable>>(PROBLEM_PRICE, collectVariables(term));
     }
 
     /**

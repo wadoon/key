@@ -26,8 +26,8 @@ public class TestSuite {
      * @throws CoreException
      */
     public static TestSuite constructTestSuite(final KeYJavaClass javaClass,
-                                               final KeYJavaMethod method, final List<TestCase> testCases)
-            throws CoreException {
+                                               final KeYJavaMethod method,
+                                               final List<TestCase> testCases) throws CoreException {
 
         /*
          * Verify that each provided test case belongs to the same exact method
@@ -61,8 +61,7 @@ public class TestSuite {
      */
     private final List<TestCase> testCases = new LinkedList<TestCase>();
 
-    private TestSuite(final KeYJavaClass javaClass, final KeYJavaMethod method,
-                      final List<TestCase> testCases) {
+    private TestSuite(final KeYJavaClass javaClass, final KeYJavaMethod method, final List<TestCase> testCases) {
 
         this.javaClass = javaClass;
         this.method = method;

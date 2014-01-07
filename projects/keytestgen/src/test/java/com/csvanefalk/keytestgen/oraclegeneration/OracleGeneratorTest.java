@@ -8,8 +8,7 @@ import java.io.IOException;
 
 public class OracleGeneratorTest extends KeYTestGenTest {
 
-    public OracleGeneratorTest(String directory) throws KeYInterfaceException,
-            IOException {
+    public OracleGeneratorTest(String directory) throws KeYInterfaceException, IOException {
         super(directory);
     }
 

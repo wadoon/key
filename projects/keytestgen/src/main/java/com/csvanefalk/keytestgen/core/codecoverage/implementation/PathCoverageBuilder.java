@@ -21,8 +21,7 @@ public class PathCoverageBuilder implements ICoverageBuilder {
     }
 
     @Override
-    public Set<ExecutionPath> retrieveExecutionPaths(
-            final ExecutionPathContext context) {
+    public Set<ExecutionPath> retrieveExecutionPaths(final ExecutionPathContext context) {
         // TODO Auto-generated method stub
         return null;
     }

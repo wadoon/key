@@ -18,7 +18,7 @@ public class QuantifierTest extends KeYTestGenTest {
     public void testHandleExists() throws ProofInputException {
 
         IExecutionNode node = getFirstSymbolicNodeForStatement("arrAddandComp",
-                "return this.arr[index1]+this.arr[index2]>20");
+                                                               "return this.arr[index1]+this.arr[index2]>20");
 
         System.out.println("1:" + node.getFormatedPathCondition());
         System.out.println("2:" + node.getPathCondition());

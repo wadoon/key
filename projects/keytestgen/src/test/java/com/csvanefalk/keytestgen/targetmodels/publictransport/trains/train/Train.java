@@ -3,8 +3,7 @@ package com.csvanefalk.keytestgen.targetmodels.publictransport.trains.train;
 public class Train {
 
     /*@ public instance ghost non_null Wagon[] _wagons;
-     */
-    Station nextStation;
+     */ Station nextStation;
 
     /*@ public normal_behavior
      *@ ensures \result == nextStation;

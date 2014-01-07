@@ -99,8 +99,7 @@ public class ExecutionPathContext {
             /*
              * Iterator for walking the symbolic execution tree.
              */
-            final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                    root);
+            final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
             /*
              * Iteratively construct the execution paths.
@@ -171,8 +170,7 @@ public class ExecutionPathContext {
                         List<IExecutionNode> symbolicNodes = symbolicNodesForSourceElements.get(currentElement);
                         if (symbolicNodes == null) {
                             symbolicNodes = new LinkedList<IExecutionNode>();
-                            symbolicNodesForSourceElements.put(currentElement,
-                                    symbolicNodes);
+                            symbolicNodesForSourceElements.put(currentElement, symbolicNodes);
                         }
                         symbolicNodes.add(node);
 
@@ -195,8 +193,8 @@ public class ExecutionPathContext {
                          */
                         if (lastVisitedSourceElement != null) {
 
-                            final ExecutionBranch executionBranch = new ExecutionBranch(
-                                    lastVisitedSourceElement, currentElement);
+                            final ExecutionBranch executionBranch = new ExecutionBranch(lastVisitedSourceElement,
+                                                                                        currentElement);
 
                             executionBranches.add(executionBranch);
 
@@ -219,8 +217,7 @@ public class ExecutionPathContext {
                          * branching node, since we will have to return to it
                          * that many times.
                          */
-                        if (isExecutionBranchNode(node)
-                                || isBranchingNode(node)) {
+                        if (isExecutionBranchNode(node) || isBranchingNode(node)) {
                             for (int i = 0; i < node.getChildren().length; i++) {
                                 lastSeenPathBranchNode.push(currentElement);
                             }
@@ -256,12 +253,11 @@ public class ExecutionPathContext {
                      * which has been visited by this execution path.
                      */
                     if (ExecutionContextBuilder.isBranchCondition(node)) {
-                        List<IExecutionBranchCondition> pathBranchConditions = pathConditionMappings.get(lastSeenPathBranchNode);
+                        List<IExecutionBranchCondition> pathBranchConditions = pathConditionMappings.get(
+                                lastSeenPathBranchNode);
                         if (pathBranchConditions == null) {
                             pathBranchConditions = new LinkedList<IExecutionBranchCondition>();
-                            pathConditionMappings.put(
-                                    lastSeenPathBranchNode.peek(),
-                                    pathBranchConditions);
+                            pathConditionMappings.put(lastSeenPathBranchNode.peek(), pathBranchConditions);
                         }
                         pathBranchConditions.add((IExecutionBranchCondition) node);
                     }
@@ -284,8 +280,7 @@ public class ExecutionPathContext {
                             List<ExecutionPath> pathsForBranch = executionPathsForBranch.get(executionBranch);
                             if (pathsForBranch == null) {
                                 pathsForBranch = new LinkedList<ExecutionPath>();
-                                executionPathsForBranch.put(executionBranch,
-                                        pathsForBranch);
+                                executionPathsForBranch.put(executionBranch, pathsForBranch);
                             }
                             pathsForBranch.add(executionPath);
                         }
@@ -295,8 +290,7 @@ public class ExecutionPathContext {
                 }
             }
 
-            return new ExecutionPathContext(executionPaths,
-                    executionPathsForBranch, visitedNodes, executionBranches);
+            return new ExecutionPathContext(executionPaths, executionPathsForBranch, visitedNodes, executionBranches);
         }
 
         private SourceElement findParentExecutionBranch(IExecutionNode node) {
@@ -330,16 +324,13 @@ public class ExecutionPathContext {
 
         private boolean isExecutionPathNode(final IExecutionNode node) {
 
-            return (node instanceof IExecutionStatement)
-                    || (node instanceof IExecutionBranchStatement)
-                    || (node instanceof IExecutionBranchCondition)
-                    || (node instanceof IExecutionTermination);
+            return (node instanceof IExecutionStatement) || (node instanceof IExecutionBranchStatement) || (node instanceof IExecutionBranchCondition) || (node instanceof IExecutionTermination);
         }
 
         /**
          * @param node the node
          * @return true if the node corresponds to a program statement, false
-         *         otherwise
+         * otherwise
          */
         private boolean isProgramStatementNode(final IExecutionNode node) {
             return node instanceof AbstractExecutionStateNode;
@@ -351,8 +342,7 @@ public class ExecutionPathContext {
         }
     }
 
-    public static ExecutionPathContext constructExecutionContext(
-            final IExecutionStart root) {
+    public static ExecutionPathContext constructExecutionContext(final IExecutionStart root) {
         return new ExecutionContextBuilder().build(root);
     }
 
@@ -368,11 +358,10 @@ public class ExecutionPathContext {
 
     private final Set<SourceElement> visitedProgramNodes;
 
-    public ExecutionPathContext(
-            final List<ExecutionPath> executionPaths,
-            final Map<ExecutionBranch, List<ExecutionPath>> executionPathsForBranch,
-            final Set<SourceElement> visitedProgramNodes,
-            final List<ExecutionBranch> executionBranches) {
+    public ExecutionPathContext(final List<ExecutionPath> executionPaths,
+                                final Map<ExecutionBranch, List<ExecutionPath>> executionPathsForBranch,
+                                final Set<SourceElement> visitedProgramNodes,
+                                final List<ExecutionBranch> executionBranches) {
         super();
         this.executionPaths = executionPaths;
         this.executionPathsForBranch = executionPathsForBranch;
@@ -394,8 +383,7 @@ public class ExecutionPathContext {
         return executionPaths;
     }
 
-    public List<ExecutionPath> getExecutionPathsForBranch(
-            final ExecutionBranch branch) {
+    public List<ExecutionPath> getExecutionPathsForBranch(final ExecutionBranch branch) {
         return executionPathsForBranch.get(branch);
     }
 

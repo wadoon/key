@@ -2,8 +2,7 @@ package com.csvanefalk.keytestgen.targetmodels.publictransport.trains.train;
 
 public class Wagon {
 
-    /*@ public invariant freeSeats >= 0; @*/
-    int freeSeats;
+    /*@ public invariant freeSeats >= 0; @*/ int freeSeats;
 
     /*@ public normal_behavior
      *@ requires true;

@@ -39,8 +39,7 @@ public class CapsuleExecutor {
      *
      * @param containers the runnables
      */
-    public void executeCapsulesAndWait(
-            final Collection<? extends LaunchContainer> containers) {
+    public void executeCapsulesAndWait(final Collection<? extends LaunchContainer> containers) {
 
         /*
          * Setup and launch capsules

@@ -39,22 +39,19 @@ public class JavaSourceParser {
      * @return
      * @throws IOException
      */
-    public static boolean declaresNoArgsConstructor(final String path)
-            throws IOException {
+    public static boolean declaresNoArgsConstructor(final String path) throws IOException {
 
         final long time = Calendar.getInstance().getTimeInMillis();
 
         final String source = JavaSourceParser.readFile(path);
 
         // TODO: make OS agnostic
-        final String className = path.substring(path.lastIndexOf("/") + 1,
-                path.length() - 5);
+        final String className = path.substring(path.lastIndexOf("/") + 1, path.length() - 5);
 
         /*
          * Look for an explicitly declared no-args constructor
          */
-        final Pattern consPattern = Pattern.compile("public\\s+" + className
-                + "\\s*\\(\\s*\\)");
+        final Pattern consPattern = Pattern.compile("public\\s+" + className + "\\s*\\(\\s*\\)");
         final Matcher consMatcher = consPattern.matcher(source);
         if (consMatcher.find()) {
             return true;
@@ -74,8 +71,7 @@ public class JavaSourceParser {
      * @return the package declaration
      * @throws FileNotFoundException
      */
-    public static String getPackageDeclaration(final File file)
-            throws FileNotFoundException {
+    public static String getPackageDeclaration(final File file) throws FileNotFoundException {
 
         final Scanner scanner = new Scanner(file);
         String packageDeclaration = "";
@@ -95,8 +91,7 @@ public class JavaSourceParser {
         return packageDeclaration;
     }
 
-    public static String getPackageDeclaration(final String path)
-            throws FileNotFoundException {
+    public static String getPackageDeclaration(final String path) throws FileNotFoundException {
 
         final File file = new File(path);
         return JavaSourceParser.getPackageDeclaration(file);
@@ -104,7 +99,8 @@ public class JavaSourceParser {
 
     public static void main(final String[] args) throws IOException {
 
-        System.out.println(JavaSourceParser.declaresNoArgsConstructor("/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"));
+        System.out.println(JavaSourceParser.declaresNoArgsConstructor(
+                "/home/christopher/workspace/Key/system/test/de/uka/ilkd/key/testgeneration/targetmodels/PrimitiveIntegerOperations.java"));
     }
 
     /**
@@ -122,8 +118,7 @@ public class JavaSourceParser {
         final FileInputStream stream = new FileInputStream(new File(path));
         try {
             final FileChannel fc = stream.getChannel();
-            final MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY,
-                    0, fc.size());
+            final MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             /* Instead of using default, pass in a decoder. */
             return Charset.defaultCharset().decode(bb).toString();
         } finally {

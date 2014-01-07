@@ -5,8 +5,7 @@ import org.apache.commons.math3.fraction.Fraction;
 
 public class Division extends AbstractBinaryExpression {
 
-    public Division(final IExpression leftOperand,
-                    final IExpression rightOperand) {
+    public Division(final IExpression leftOperand, final IExpression rightOperand) {
         super(leftOperand, rightOperand);
     }
 
@@ -18,7 +17,6 @@ public class Division extends AbstractBinaryExpression {
     @Override
     public String toString() {
 
-        return "(" + getLeftOperand().toString() + "/"
-                + getRightOperand().toString() + ")";
+        return "(" + getLeftOperand().toString() + "/" + getRightOperand().toString() + ")";
     }
 }

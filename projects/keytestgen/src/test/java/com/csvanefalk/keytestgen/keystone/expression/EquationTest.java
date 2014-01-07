@@ -16,10 +16,8 @@ public class EquationTest {
 
     @Test
     public void TestEquationCreation() throws KeYStoneException {
-        IExpression leftHand = new Multiplication(new NumericConstant(
-                new Fraction(2)), new Variable("a"));
-        IExpression rightHand = new Addition(new NumericConstant(new Fraction(
-                10)), new Variable("b"));
+        IExpression leftHand = new Multiplication(new NumericConstant(new Fraction(2)), new Variable("a"));
+        IExpression rightHand = new Addition(new NumericConstant(new Fraction(10)), new Variable("b"));
         IComparator equals = new Equals(leftHand, rightHand);
 
         Equation equation = Equation.createEquation(equals);

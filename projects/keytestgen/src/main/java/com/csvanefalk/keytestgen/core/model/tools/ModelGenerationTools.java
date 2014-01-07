@@ -20,8 +20,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  */
 public class ModelGenerationTools {
 
-    private static class TermSimplificationTransformer extends
-            AbstractTermTransformer {
+    private static class TermSimplificationTransformer extends AbstractTermTransformer {
 
         /**
          * Given an initial {@link Term}, constructs a simpler Term which
@@ -71,8 +70,7 @@ public class ModelGenerationTools {
          * @throws ModelGeneratorException
          */
         @Override
-        protected Term transformAnd(final Term term)
-                throws TermTransformerException {
+        protected Term transformAnd(final Term term) throws TermTransformerException {
 
             final Term firstChild = transformTerm(term.sub(0));
             final Term secondChild = transformTerm(term.sub(1));
@@ -86,8 +84,7 @@ public class ModelGenerationTools {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return termFactory.createTerm(Junctor.AND, firstChild,
-                        secondChild);
+                return termFactory.createTerm(Junctor.AND, firstChild, secondChild);
             }
 
             return null;
@@ -105,8 +102,7 @@ public class ModelGenerationTools {
          * @throws ModelGeneratorException
          */
         @Override
-        protected Term transformEquals(final Term term)
-                throws TermTransformerException {
+        protected Term transformEquals(final Term term) throws TermTransformerException {
 
             final Term firstChild = transformTerm(term.sub(0));
             final Term secondChild = transformTerm(term.sub(1));
@@ -133,8 +129,7 @@ public class ModelGenerationTools {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return termFactory.createTerm(term.op(), firstChild,
-                        secondChild);
+                return termFactory.createTerm(term.op(), firstChild, secondChild);
             }
 
             return null;
@@ -151,8 +146,7 @@ public class ModelGenerationTools {
          * @throws ModelGeneratorException
          */
         @Override
-        protected Term transformNot(final Term term)
-                throws TermTransformerException {
+        protected Term transformNot(final Term term) throws TermTransformerException {
 
             final Term newChild = transformTerm(term.sub(0));
 
@@ -183,8 +177,7 @@ public class ModelGenerationTools {
          * @throws ModelGeneratorException
          */
         @Override
-        protected Term transformOr(final Term term)
-                throws TermTransformerException {
+        protected Term transformOr(final Term term) throws TermTransformerException {
 
             final Term firstChild = transformTerm(term.sub(0));
             final Term secondChild = transformTerm(term.sub(1));
@@ -198,8 +191,7 @@ public class ModelGenerationTools {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return termFactory.createTerm(Junctor.OR, firstChild,
-                        secondChild);
+                return termFactory.createTerm(Junctor.OR, firstChild, secondChild);
             }
 
             return null;
@@ -229,12 +221,11 @@ public class ModelGenerationTools {
              */
             if (TermParserTools.isPrimitiveType(term)) {
 
-                final ProgramElementName resolvedVariableName = new ProgramElementName(
-                        TermParserTools.resolveIdentifierString(term,
-                                ModelGenerationTools.SEPARATOR));
+                final ProgramElementName resolvedVariableName = new ProgramElementName(TermParserTools.resolveIdentifierString(
+                        term,
+                        ModelGenerationTools.SEPARATOR));
 
-                final LocationVariable resolvedVariable = new LocationVariable(
-                        resolvedVariableName, term.sort());
+                final LocationVariable resolvedVariable = new LocationVariable(resolvedVariableName, term.sort());
 
                 return termFactory.createTerm(resolvedVariable);
             }
@@ -247,14 +238,12 @@ public class ModelGenerationTools {
          * variables and constants in the Term.
          */
         @Override
-        public Term transformTerm(final Term term)
-                throws TermTransformerException {
+        public Term transformTerm(final Term term) throws TermTransformerException {
 
             /*
              * Booleans are removed without reservation
              */
-            if (TermParserTools.isBoolean(term)
-                    || TermParserTools.isIfThenElse(term)) {
+            if (TermParserTools.isBoolean(term) || TermParserTools.isIfThenElse(term)) {
                 return null;
             }
             return super.transformTerm(term);
@@ -296,8 +285,7 @@ public class ModelGenerationTools {
      * @throws TermTransformerException
      * @throws ModelGeneratorException
      */
-    public static Term simplifyTerm(final Term targetNodeCondition)
-            throws TermTransformerException {
+    public static Term simplifyTerm(final Term targetNodeCondition) throws TermTransformerException {
 
         return ModelGenerationTools.termSimplificationTransformer.transform(targetNodeCondition);
     }

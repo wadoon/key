@@ -13,6 +13,5 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  */
 public interface IModelGenerator {
 
-    public Model generateModel(IExecutionNode node)
-            throws ModelGeneratorException;
+    public Model generateModel(IExecutionNode node) throws ModelGeneratorException;
 }

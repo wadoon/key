@@ -10,8 +10,7 @@ public class FunctionalDoWhileTest {
         do {
             result++;
             i++;
-        }
-        while (invert(i) > -3);
+        } while (invert(i) > -3);
         return result;
     }
 

@@ -34,14 +34,15 @@ public class GetMethodsTest extends CommandParserTest {
     // @Test
     public void testGetMethodsSpecific() {
 
-        String[] args = {"--methods", "publicMethod", "publicMethod2",
-                "protectedMethod", "protectedMethod2", "privateMethod",
-                "privateMethod2", "-c", "stat", "hey.java"};
+        String[] args = {"--methods", "publicMethod", "publicMethod2", "protectedMethod", "protectedMethod2", "privateMethod", "privateMethod2", "-c", "stat", "hey.java"};
         processor.parse(args);
 
-        List<String> expectedMethods = getList("publicMethod", "publicMethod",
-                "protectedMethod", "protectedMethod2", "privateMethod",
-                "privateMethod2");
+        List<String> expectedMethods = getList("publicMethod",
+                                               "publicMethod",
+                                               "protectedMethod",
+                                               "protectedMethod2",
+                                               "privateMethod",
+                                               "privateMethod2");
         List<String> actualMethods = commandParser.getMethods();
 
         Assert.assertTrue(assertListEquality(expectedMethods, actualMethods));

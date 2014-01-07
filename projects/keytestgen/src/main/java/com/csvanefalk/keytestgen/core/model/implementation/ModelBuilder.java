@@ -19,8 +19,8 @@ public class ModelBuilder {
      * @throws TermTransformerException
      * @throws ProofInputException
      */
-    public Model createModel(IExecutionNode node, Term pathCondition)
-            throws TermTransformerException, ProofInputException {
+    public Model createModel(IExecutionNode node,
+                             Term pathCondition) throws TermTransformerException, ProofInputException {
 
         final Model model = Model.constructModel();
 
@@ -35,19 +35,16 @@ public class ModelBuilder {
         /*
          * Distribute negations and remove conjunctions
          */
-        pathCondition = NegationNormalFormTransformer.getInstance().transform(
-                pathCondition);
+        pathCondition = NegationNormalFormTransformer.getInstance().transform(pathCondition);
 
-        pathCondition = EliminateConjunctionsTransformer.getInstance().transform(
-                pathCondition);
+        pathCondition = EliminateConjunctionsTransformer.getInstance().transform(pathCondition);
 
         /*
          * Setup all reference relationships expressed in the Term. Done
          * preorder to correctly handle non-assigning operations, such as
          * not-equals.
          */
-        final ResolveAssignmentsVisitor referenceVisitor = new ResolveAssignmentsVisitor(
-                model);
+        final ResolveAssignmentsVisitor referenceVisitor = new ResolveAssignmentsVisitor(model);
         pathCondition.execPreOrder(referenceVisitor);
 
         return visitor.getModel();

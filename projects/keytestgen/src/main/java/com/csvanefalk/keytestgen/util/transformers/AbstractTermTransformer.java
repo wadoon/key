@@ -57,8 +57,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformAnd(final Term term)
-            throws TermTransformerException {
+    protected Term transformAnd(final Term term) throws TermTransformerException {
 
         final Term firstChild = transformTerm(term.sub(0));
         final Term secondChild = transformTerm(term.sub(1));
@@ -75,14 +74,12 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformBinaryFunction(final Term term)
-            throws TermTransformerException {
+    protected Term transformBinaryFunction(final Term term) throws TermTransformerException {
 
         final Term firstChild = transformTerm(term.sub(0));
         final Term secondChild = transformTerm(term.sub(1));
 
-        final Term newTerm = termFactory.createTerm(term.op(), firstChild,
-                secondChild);
+        final Term newTerm = termFactory.createTerm(term.op(), firstChild, secondChild);
 
         return newTerm;
     }
@@ -105,17 +102,14 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformEquals(final Term term)
-            throws TermTransformerException {
+    protected Term transformEquals(final Term term) throws TermTransformerException {
 
         final Term firstChild = transformTerm(term.sub(0));
         final Term secondChild = transformTerm(term.sub(1));
 
-        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
-                firstChild, secondChild);
+        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(firstChild, secondChild);
 
-        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
-                term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(), term.javaBlock());
     }
 
     /**
@@ -125,15 +119,12 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @return the transformed term
      * @throws TermTransformerException
      */
-    protected Term transformExistsQuantifier(final Term term)
-            throws TermTransformerException {
+    protected Term transformExistsQuantifier(final Term term) throws TermTransformerException {
 
         final Term newChild = transformTerm(term.sub(0));
-        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
-                newChild);
+        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(newChild);
 
-        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
-                term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(), term.javaBlock());
     }
 
     /**
@@ -143,19 +134,15 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @return the transformed term
      * @throws TermTransformerException
      */
-    protected Term transformForAllQuantifier(final Term term)
-            throws TermTransformerException {
+    protected Term transformForAllQuantifier(final Term term) throws TermTransformerException {
 
         final Term newChild = transformTerm(term.sub(0));
-        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
-                newChild);
+        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(newChild);
 
-        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
-                term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(), term.javaBlock());
     }
 
-    protected Term transformFormula(final Term term)
-            throws TermTransformerException {
+    protected Term transformFormula(final Term term) throws TermTransformerException {
 
         if (TermParserTools.isObserverFunction(term)) {
             return transformObserverFunction(term);
@@ -170,8 +157,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformFunction(final Term term)
-            throws TermTransformerException {
+    protected Term transformFunction(final Term term) throws TermTransformerException {
 
         try {
 
@@ -223,8 +209,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             throw new TermTransformerException(e.getMessage());
         }
 
-        throw new TermTransformerException("Unsupported Function: "
-                + term.op().name());
+        throw new TermTransformerException("Unsupported Function: " + term.op().name());
     }
 
     private Term transformBuiltinFunction(Term term) {
@@ -263,17 +248,14 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @return the transformed term
      * @throws TermTransformerException
      */
-    protected Term transformImplication(final Term term)
-            throws TermTransformerException {
+    protected Term transformImplication(final Term term) throws TermTransformerException {
 
         final Term newFirstChild = transformTerm(term.sub(0));
         final Term newSecondChild = transformTerm(term.sub(1));
 
-        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
-                newFirstChild, newSecondChild);
+        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(newFirstChild, newSecondChild);
 
-        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
-                term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(), term.javaBlock());
     }
 
     /**
@@ -282,8 +264,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformJunctor(final Term term)
-            throws TermTransformerException {
+    protected Term transformJunctor(final Term term) throws TermTransformerException {
 
         if (TermParserTools.isAnd(term)) {
             return transformAnd(term);
@@ -304,8 +285,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             return transformFormula(term);
         }
 
-        throw new TermTransformerException("Unsupported Junctor: "
-                + term.op().name());
+        throw new TermTransformerException("Unsupported Junctor: " + term.op().name());
     }
 
     /**
@@ -315,8 +295,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @return
      * @throws TermTransformerException
      */
-    protected Term transformLiteral(final Term term)
-            throws TermTransformerException {
+    protected Term transformLiteral(final Term term) throws TermTransformerException {
 
         /*
          * Literals may or may not declare children, such as 1(#);
@@ -373,8 +352,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformNot(final Term term)
-            throws TermTransformerException {
+    protected Term transformNot(final Term term) throws TermTransformerException {
 
         final Term newChild = transformTerm(term.sub(0));
 
@@ -440,19 +418,16 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformProgramVariable(final Term term)
-            throws TermTransformerException {
+    protected Term transformProgramVariable(final Term term) throws TermTransformerException {
 
         if (TermParserTools.isLocationVariable(term)) {
             return transformLocationVariable(term);
         }
 
-        throw new TermTransformerException("Unsupported SortedOperator: "
-                + term.op().name());
+        throw new TermTransformerException("Unsupported SortedOperator: " + term.op().name());
     }
 
-    protected Term transformQuantifier(final Term term)
-            throws TermTransformerException {
+    protected Term transformQuantifier(final Term term) throws TermTransformerException {
 
         if (TermParserTools.isExistsQuantifier(term)) {
             return transformExistsQuantifier(term);
@@ -462,8 +437,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             return transformForAllQuantifier(term);
         }
 
-        throw new TermTransformerException("Unsupported quantifier: "
-                + term.op().name());
+        throw new TermTransformerException("Unsupported quantifier: " + term.op().name());
     }
 
     /**
@@ -486,8 +460,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformSortedOperator(final Term term)
-            throws TermTransformerException {
+    protected Term transformSortedOperator(final Term term) throws TermTransformerException {
 
         if (TermParserTools.isFunction(term)) {
             return transformFunction(term);
@@ -513,8 +486,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
             return transformQuantifier(term);
         }
 
-        throw new TermTransformerException("Unsupported SortedOperator: "
-                + term.op().name());
+        throw new TermTransformerException("Unsupported SortedOperator: " + term.op().name());
     }
 
     /**
@@ -526,8 +498,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term
      * @return
      */
-    protected Term transformTerm(final Term term)
-            throws TermTransformerException {
+    protected Term transformTerm(final Term term) throws TermTransformerException {
 
         if (term == null) {
             return term;
@@ -547,8 +518,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
 
         }
 
-        throw new TermTransformerException("Unsupported SortedOperator: "
-                + term.op().name());
+        throw new TermTransformerException("Unsupported SortedOperator: " + term.op().name());
     }
 
     /**
@@ -557,8 +527,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
      * @param term the term
      * @return the transformed term
      */
-    protected Term transformUnaryFunction(final Term term)
-            throws TermTransformerException {
+    protected Term transformUnaryFunction(final Term term) throws TermTransformerException {
 
         final Term child = transformTerm(term.sub(0));
 

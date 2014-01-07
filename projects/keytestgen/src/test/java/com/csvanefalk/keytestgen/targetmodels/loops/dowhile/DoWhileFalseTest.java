@@ -8,8 +8,7 @@ public class DoWhileFalseTest {
         int result = 0;
         do {
             result++;
-        }
-        while (false);
+        } while (false);
         return result;
     }
 }

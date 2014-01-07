@@ -50,12 +50,12 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
          */
         final Term parentObject = term.sub(1);
 
-        final ProgramElementName parentObjectIdentifier = new ProgramElementName(
-                TermParserTools.resolveIdentifierString(parentObject,
-                        StringConstants.FIELD_SEPARATOR));
+        final ProgramElementName parentObjectIdentifier = new ProgramElementName(TermParserTools.resolveIdentifierString(
+                parentObject,
+                StringConstants.FIELD_SEPARATOR));
 
-        final LocationVariable transformedParentObjectVariable = new LocationVariable(
-                parentObjectIdentifier, parentObject.sort());
+        final LocationVariable transformedParentObjectVariable = new LocationVariable(parentObjectIdentifier,
+                                                                                      parentObject.sort());
 
         final Term transformedParentObject = termFactory.createTerm(transformedParentObjectVariable);
 
@@ -81,22 +81,19 @@ public class RemoveSDPsTransformer extends AbstractTermTransformer {
                 childBuffer[i] = transformedParentObject;
             }
         }
-        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(
-                childBuffer);
+        final ImmutableArray<Term> newChildren = new ImmutableArray<Term>(childBuffer);
 
-        return termFactory.createTerm(term.op(), newChildren, term.boundVars(),
-                term.javaBlock());
+        return termFactory.createTerm(term.op(), newChildren, term.boundVars(), term.javaBlock());
     }
 
     @Override
     protected Term transformSortDependentFunction(final Term term) {
 
-        final ProgramElementName resolvedVariableName = new ProgramElementName(
-                TermParserTools.resolveIdentifierString(term,
-                        StringConstants.FIELD_SEPARATOR));
+        final ProgramElementName resolvedVariableName = new ProgramElementName(TermParserTools.resolveIdentifierString(
+                term,
+                StringConstants.FIELD_SEPARATOR));
 
-        final LocationVariable resolvedVariable = new LocationVariable(
-                resolvedVariableName, term.sort());
+        final LocationVariable resolvedVariable = new LocationVariable(resolvedVariableName, term.sort());
 
         return termFactory.createTerm(resolvedVariable);
     }

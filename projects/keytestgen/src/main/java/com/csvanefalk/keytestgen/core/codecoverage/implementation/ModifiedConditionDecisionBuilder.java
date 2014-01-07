@@ -21,8 +21,7 @@ public class ModifiedConditionDecisionBuilder implements ICoverageBuilder {
     }
 
     @Override
-    public Set<ExecutionPath> retrieveExecutionPaths(
-            final ExecutionPathContext context) {
+    public Set<ExecutionPath> retrieveExecutionPaths(final ExecutionPathContext context) {
 
         return null;
     }

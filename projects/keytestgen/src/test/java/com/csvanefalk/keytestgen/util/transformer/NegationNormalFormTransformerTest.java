@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class NegationNormalFormTransformerTest extends TransformerTest {
 
-    public NegationNormalFormTransformerTest() throws KeYInterfaceException,
-            IOException {
+    public NegationNormalFormTransformerTest() throws KeYInterfaceException, IOException {
         transformer = NegationNormalFormTransformer.getInstance();
     }
 }

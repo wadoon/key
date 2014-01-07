@@ -1,5 +1,6 @@
 package com.csvanefalk.keytestgen.util.transformers;
 
+import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.core.model.ModelGeneratorException;
 import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
 import de.uka.ilkd.key.logic.Term;
@@ -34,8 +35,7 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
      * @throws ModelGeneratorException
      */
     @Override
-    protected Term transformAnd(final Term term)
-            throws TermTransformerException {
+    protected Term transformAnd(final Term term) throws TermTransformerException {
 
         final Term firstChild = transformTerm(term.sub(0));
         final Term secondChild = transformTerm(term.sub(1));
@@ -66,14 +66,14 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
      * @throws ModelGeneratorException
      */
     @Override
-    protected Term transformEquals(final Term term)
-            throws TermTransformerException {
+    protected Term transformEquals(final Term term) throws TermTransformerException {
 
         final Term firstChild = transformTerm(term.sub(0));
         final Term secondChild = transformTerm(term.sub(1));
 
         if ((firstChild != null) && (secondChild == null)) {
-            if (firstChild.toString().equalsIgnoreCase("result")) {
+            if (firstChild.toString().equalsIgnoreCase(StringConstants.RESULT) ||
+                    firstChild.toString().equalsIgnoreCase(StringConstants.EXCEPTION)) {
                 return term;
             } else {
                 return firstChild;
@@ -81,7 +81,8 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
         }
 
         if ((firstChild == null) && (secondChild != null)) {
-            if (firstChild.toString().equalsIgnoreCase("result")) {
+            if (secondChild.toString().equalsIgnoreCase(StringConstants.RESULT) ||
+                    secondChild.toString().equalsIgnoreCase(StringConstants.EXCEPTION)) {
                 return term;
             } else {
                 return secondChild;
@@ -103,6 +104,13 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
     @Override
     protected Term transformLocationVariable(final Term term) {
 
+        // Result and Exception labels should be untouched.
+        if (term.toString().equalsIgnoreCase(StringConstants.RESULT) ||
+                term.toString().equalsIgnoreCase(StringConstants.EXCEPTION)) {
+
+            return term;
+        }
+
         if (TermParserTools.isExceptionSort(term)) {
             return null;
         }
@@ -121,8 +129,7 @@ public class RemoveObserverFunctionsTransformer extends AbstractTermTransformer 
      * @throws ModelGeneratorException
      */
     @Override
-    protected Term transformNot(final Term term)
-            throws TermTransformerException {
+    protected Term transformNot(final Term term) throws TermTransformerException {
 
         final Term newChild = transformTerm(term.sub(0));
 

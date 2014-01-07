@@ -22,9 +22,7 @@ public class Model_SMTTest {
     public int counter = 0;
 
     //@Test
-    public void test() throws IOException, ProofInputException,
-            ModelGeneratorException, TestGeneratorException,
-            KeYInterfaceException, XMLGeneratorException, InterruptedException {
+    public void test() throws IOException, ProofInputException, ModelGeneratorException, TestGeneratorException, KeYInterfaceException, XMLGeneratorException, InterruptedException {
 
         final TestGenerator testCaseGenerator = TestGenerator.getInstance();
         final IFrameworkConverter junitConverter = JUnitConverter.getInstance();
@@ -40,11 +38,12 @@ public class Model_SMTTest {
             final String methodName = "midOneProxyOneInstance";
             testCaseGenerator.generateTestSuite(
                     "/home/christopher/git/ktg_smt/key/projects/KeYTestGen/test/se/gu/svanefalk/testgeneration/targetmodels/PrimitiveIntegerOperations.java",
-                    codeCoverageParser, junitConverter, methods);
+                    codeCoverageParser,
+                    junitConverter,
+                    methods);
 
             System.out.println("Trial: " + counter++);
-            PaperTest.addResult("TOTAL",
-                    Calendar.getInstance().getTimeInMillis() - time);
+            PaperTest.addResult("TOTAL", Calendar.getInstance().getTimeInMillis() - time);
         }
 
         PaperTest.printResults();

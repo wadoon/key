@@ -38,11 +38,9 @@ public abstract class KeYTestGenTest {
 
     private final TestEnvironment testEnvironment;
 
-    public KeYTestGenTest(String directory) throws KeYInterfaceException,
-            IOException {
+    public KeYTestGenTest(String directory) throws KeYInterfaceException, IOException {
 
-        testEnvironment = TestEnvironment.loadEnvironmentForDirectory(
-                directory, false);
+        testEnvironment = TestEnvironment.loadEnvironmentForDirectory(directory, false);
     }
 
     public KeYTestGenTest() {
@@ -55,8 +53,7 @@ public abstract class KeYTestGenTest {
         IExecutionStart symbolicTree = getSymbolicTreeForMethod(method);
         Assert.assertTrue(symbolicTree != null);
 
-        List<IExecutionNode> symbolicNodes = getSymbolicExecutionNode(
-                symbolicTree, statement);
+        List<IExecutionNode> symbolicNodes = getSymbolicExecutionNode(symbolicTree, statement);
         Assert.assertTrue(symbolicNodes != null);
         Assert.assertFalse(symbolicNodes.isEmpty());
 
@@ -72,8 +69,7 @@ public abstract class KeYTestGenTest {
         IExecutionStart symbolicTree = getSymbolicTreeForMethod(method);
         Assert.assertTrue(symbolicTree != null);
 
-        List<IExecutionNode> symbolicNodes = getSymbolicExecutionNode(
-                symbolicTree, statement);
+        List<IExecutionNode> symbolicNodes = getSymbolicExecutionNode(symbolicTree, statement);
         Assert.assertTrue(symbolicNodes != null);
         Assert.assertFalse(symbolicNodes.isEmpty());
 
@@ -82,13 +78,11 @@ public abstract class KeYTestGenTest {
 
     protected IExecutionStart getSymbolicTreeForMethod(String identifier) {
         IExecutionStart tree = testEnvironment.getSymbolicTreeForNode(identifier);
-        Assert.assertNotNull("Could not find tree for method: " + identifier,
-                tree);
+        Assert.assertNotNull("Could not find tree for method: " + identifier, tree);
         return tree;
     }
 
-    protected static class SMTSettings implements
-            de.uka.ilkd.key.smt.SMTSettings {
+    protected static class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings {
 
         @Override
         public boolean checkForSupport() {
@@ -129,8 +123,7 @@ public abstract class KeYTestGenTest {
         @Override
         public String getSMTTemporaryFolder() {
 
-            return PathConfig.getKeyConfigDir() + File.separator
-                    + "smt_formula";
+            return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
         }
 
         @Override
@@ -184,8 +177,7 @@ public abstract class KeYTestGenTest {
 
     protected IExecutionMethodCall getMethodCallNode(final IExecutionStart root) {
 
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
@@ -198,11 +190,9 @@ public abstract class KeYTestGenTest {
         return null;
     }
 
-    protected void printBranchNodes(final IExecutionStart root)
-            throws ProofInputException {
+    protected void printBranchNodes(final IExecutionStart root) throws ProofInputException {
 
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
@@ -216,11 +206,9 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printExecutionReturnStatementNodes(final IExecutionStart root)
-            throws ProofInputException {
+    protected void printExecutionReturnStatementNodes(final IExecutionStart root) throws ProofInputException {
 
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
@@ -232,11 +220,9 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printExecutionStatementNodes(final IExecutionStart root)
-            throws ProofInputException {
+    protected void printExecutionStatementNodes(final IExecutionStart root) throws ProofInputException {
 
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
@@ -248,11 +234,9 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printExecutionStateNodes(final IExecutionStart root)
-            throws ProofInputException {
+    protected void printExecutionStateNodes(final IExecutionStart root) throws ProofInputException {
 
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
@@ -283,8 +267,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printNamespaceProgramVariables(
-            final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
+    protected void printNamespaceProgramVariables(final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
 
         final int i = 0;
         Namespace namespace = environment.getInitConfig().progVarNS();
@@ -300,8 +283,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printNamespaceVariables(
-            final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
+    protected void printNamespaceVariables(final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
 
         final int i = 0;
         Namespace namespace = environment.getInitConfig().varNS();
@@ -317,14 +299,12 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printSingleNode(final IExecutionNode node)
-            throws ProofInputException {
+    protected void printSingleNode(final IExecutionNode node) throws ProofInputException {
 
-        System.out.println("\nNode " + node.getName() + "\nType: "
-                + node.getClass() + "\nPath condition "
-                + node.getPathCondition() + "\nHuman readable: "
-                + node.getFormatedPathCondition().replaceAll("\n|\t", "")
-                + "\nAddress: " + node.hashCode());
+        System.out
+              .println("\nNode " + node.getName() + "\nType: " + node.getClass() + "\nPath condition " + node.getPathCondition() + "\nHuman readable: " + node
+                      .getFormatedPathCondition()
+                      .replaceAll("\n|\t", "") + "\nAddress: " + node.hashCode());
 
         System.out.println("Children:");
         for (final IExecutionNode child : node.getChildren()) {
@@ -334,11 +314,9 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printSymbolicExecutionTree(final IExecutionStart root)
-            throws ProofInputException {
+    protected void printSymbolicExecutionTree(final IExecutionStart root) throws ProofInputException {
 
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
@@ -348,11 +326,9 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printSymbolicExecutionTreePathConditions(
-            final IExecutionStart root) throws ProofInputException {
+    protected void printSymbolicExecutionTreePathConditions(final IExecutionStart root) throws ProofInputException {
 
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                root);
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(root);
 
         while (iterator.hasNext()) {
 
@@ -361,25 +337,22 @@ public abstract class KeYTestGenTest {
             if (next instanceof IExecutionStateNode<?>) {
 
                 final IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>) next;
-                System.out.println("Node "
-                        + stateNode.getName()
-                        + "\nPath condition "
-                        + stateNode.getPathCondition()
-                        + "\nHuman readable: "
-                        + stateNode.getFormatedPathCondition().replaceAll(
-                        "\n|\t", "") + "\n");
+                System.out
+                      .println("Node " + stateNode.getName() + "\nPath condition " + stateNode.getPathCondition() + "\nHuman readable: " + stateNode
+                              .getFormatedPathCondition()
+                              .replaceAll("\n|\t", "") + "\n");
             }
         }
     }
 
     protected void printTermAST(final Term term) {
 
-        System.out.println("\nTerm: " + term + "\nhas runtime class: "
-                + term.getClass() + "\nand sort: "
-                + term.sort().declarationString() + "\n\twith runtime type: "
-                + term.sort().getClass() + "\nand op: " + term.op()
-                + "\n\twith runtime type: " + term.op().getClass() + "\n"
-                + "Number of subs: " + term.arity() + "\n");
+        System.out.println("\nTerm: " + term + "\nhas runtime class: " + term.getClass() + "\nand sort: " + term.sort()
+                                                                                                                .declarationString() + "\n\twith runtime type: " + term
+                .sort()
+                .getClass() + "\nand op: " + term.op() + "\n\twith runtime type: " + term.op()
+                                                                                         .getClass() + "\n" + "Number of subs: " + term
+                .arity() + "\n");
 
         for (int i = 0; i < term.arity(); i++) {
 
@@ -413,12 +386,10 @@ public abstract class KeYTestGenTest {
      * @return
      * @throws ProofInputException
      */
-    protected ArrayList<IExecutionNode> getSymbolicExecutionNode(
-            final IExecutionStart rootNode, final String statement)
-            throws ProofInputException {
+    protected ArrayList<IExecutionNode> getSymbolicExecutionNode(final IExecutionStart rootNode,
+                                                                 final String statement) throws ProofInputException {
 
-        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(
-                rootNode);
+        final ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(rootNode);
 
         final ArrayList<IExecutionNode> nodes = new ArrayList<IExecutionNode>();
 

@@ -6,6 +6,7 @@
     <JAVADOC />
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/lib/key.jar!/de/uka/ilkd/key/java/JavaRedux" />
+      <root url="file://$PROJECT_DIR$/../key/system/src" />
     </SOURCES>
   </library>
 </component>

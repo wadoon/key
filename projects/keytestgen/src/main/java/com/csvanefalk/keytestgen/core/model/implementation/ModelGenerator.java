@@ -70,8 +70,7 @@ public class ModelGenerator implements IModelGenerator {
      * @throws ModelGeneratorException in the event that there was a failure to generate the Model
      */
     @Override
-    public Model generateModel(final IExecutionNode node)
-            throws ModelGeneratorException {
+    public Model generateModel(final IExecutionNode node) throws ModelGeneratorException {
 
         try {
 
@@ -100,14 +99,12 @@ public class ModelGenerator implements IModelGenerator {
              * Create the initial Model, without any concrete values assigned to
              * primitive integer values in it.
              */
-            final Model model = new ModelBuilder().createModel(node,
-                    pathCondition);
+            final Model model = new ModelBuilder().createModel(node, pathCondition);
 
             /*
              * Complete the model with concrete integer values.
              */
-            final Map<String, Integer> concreteValues = getConcreteValues(
-                    pathCondition, services);
+            final Map<String, Integer> concreteValues = getConcreteValues(pathCondition, services);
 
             instantiateModel(model, concreteValues);
 
@@ -122,8 +119,7 @@ public class ModelGenerator implements IModelGenerator {
         }
     }
 
-    private Term simplifyPathCondition(Term pathCondition)
-            throws TermTransformerException {
+    private Term simplifyPathCondition(Term pathCondition) throws TermTransformerException {
 
         /*
          * Resolve and remove axiomatic statements (hack...)
@@ -134,8 +130,7 @@ public class ModelGenerator implements IModelGenerator {
         /*
          * Remove all implications from the path condition.
          */
-        pathCondition = RemoveImplicationsTransformer.getInstance().transform(
-                pathCondition);
+        pathCondition = RemoveImplicationsTransformer.getInstance().transform(pathCondition);
 
         /*
          * Remove disjunctions from the path condition.
@@ -146,16 +141,24 @@ public class ModelGenerator implements IModelGenerator {
         /*
          * Remove if-then-else assertions from the path condition.
          */
-        pathCondition = RemoveIfThenElseTransformer.getInstance().transform(
-                pathCondition);
+        pathCondition = RemoveIfThenElseTransformer.getInstance().transform(pathCondition);
 
         return pathCondition;
     }
 
+    /**
+     * Uses KeYStone in order to retrieve a set of concrete values for any integers found in the path condition.
+     *
+     * @param pathCondition the pathcondition.
+     * @param services      services associated with the pathcondition
+     * @return a map of variable names to their concrete values
+     * @throws ModelGeneratorException
+     */
     private Map<String, Integer> getConcreteValues(final Term pathCondition,
                                                    final Services services) throws ModelGeneratorException {
 
         try {
+
             /*
              * Simplify the path condition. If the simplified path condition is
              * null, this means that it does not contain any primitive values.
@@ -164,12 +167,12 @@ public class ModelGenerator implements IModelGenerator {
              */
             Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
 
-            simplifiedPathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(
-                    services).transform(simplifiedPathCondition);
+            simplifiedPathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(services)
+                                                                               .transform(simplifiedPathCondition);
 
             long time = Calendar.getInstance().getTimeInMillis();
 
-            Map<String, Integer> result = null;
+            Map<String, Integer> result;
             if (simplifiedPathCondition == null) {
                 result = new HashMap<String, Integer>();
             } else {
@@ -188,8 +191,7 @@ public class ModelGenerator implements IModelGenerator {
         }
     }
 
-    private void instantiateModel(final Model model,
-                                  final Map<String, Integer> concreteValues) {
+    private void instantiateModel(final Model model, final Map<String, Integer> concreteValues) {
 
         for (final String variableName : concreteValues.keySet()) {
 

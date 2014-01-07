@@ -10,6 +10,5 @@ package com.csvanefalk.keytestgen.backend.custom;
  */
 public interface ITestCaseParser<T> {
 
-    public T generateTestCaseFromXML(String representation)
-            throws XMLParserException;
+    public T generateTestCaseFromXML(String representation) throws XMLParserException;
 }

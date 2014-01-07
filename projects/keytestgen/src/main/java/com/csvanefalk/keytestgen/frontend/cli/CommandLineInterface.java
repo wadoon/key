@@ -63,20 +63,8 @@ public final class CommandLineInterface {
          */
         private static void printAbout() {
 
-            System.out.println("\nKeYTestGen version 2.0\n\n"
-                    + "KeYTestGen2 is part of the KeY project, a system for integrated, deductive\n"
-                    + "software design. For more info, please visit: <www.key-project.org>\n\n"
-                    + "Copyright (C) 2013 Christopher Svanefalk\n"
-                    + "This program is free software: you can redistribute it and/or modify\n"
-                    + "it under the terms of the GNU General Public License as published by\n"
-                    + "the Free Software Foundation, either version 3 of the License, or\n"
-                    + "(at your option) any later version.\n\n"
-                    + "This program is distributed in the hope that it will be useful,\n"
-                    + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-                    + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-                    + "GNU General Public License for more details.\n\n"
-                    + "You should have received a copy of the GNU General Public License\n"
-                    + "along with this program.  If not, see <http://www.gnu.org/licenses/>.");
+            System.out
+                  .println("\nKeYTestGen version 2.0\n\n" + "KeYTestGen2 is part of the KeY project, a system for integrated, deductive\n" + "software design. For more info, please visit: <www.key-project.org>\n\n" + "Copyright (C) 2013 Christopher Svanefalk\n" + "This program is free software: you can redistribute it and/or modify\n" + "it under the terms of the GNU General Public License as published by\n" + "the Free Software Foundation, either version 3 of the License, or\n" + "(at your option) any later version.\n\n" + "This program is distributed in the hope that it will be useful,\n" + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n" + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" + "GNU General Public License for more details.\n\n" + "You should have received a copy of the GNU General Public License\n" + "along with this program.  If not, see <http://www.gnu.org/licenses/>.");
         }
 
         /**
@@ -90,8 +78,7 @@ public final class CommandLineInterface {
             System.out.println("\nOptions:");
 
             for (final ParameterDescription parameter : processor.getParameters()) {
-                System.out.println("\t" + parameter.getNames() + "\t"
-                        + parameter.getDescription() + "\n");
+                System.out.println("\t" + parameter.getNames() + "\t" + parameter.getDescription() + "\n");
             }
         }
 
@@ -192,7 +179,8 @@ public final class CommandLineInterface {
          */
         private void generateTestCases(final CommandParser parser) {
 
-            final ICodeCoverageParser coverageParser = CommandLineInterfaceWorker.cliResources.getCodeCoverageParser(parser.getCoverage());
+            final ICodeCoverageParser coverageParser = CommandLineInterfaceWorker.cliResources.getCodeCoverageParser(
+                    parser.getCoverage());
 
             for (final String sourceFile : parser.getFiles()) {
 
@@ -201,9 +189,10 @@ public final class CommandLineInterface {
                  */
                 List<ITestSuite> testSuites = null;
                 for (final String framework : parser.getTestFrameworks()) {
-                    final IFrameworkConverter frameworkConverter = CommandLineInterfaceWorker.cliResources.getFrameworkConverter(framework);
-                    testSuites = generateTestCases(sourceFile, coverageParser,
-                            frameworkConverter, parser.getMethods());
+                    final IFrameworkConverter frameworkConverter = CommandLineInterfaceWorker.cliResources
+                                                                                             .getFrameworkConverter(
+                                                                                                     framework);
+                    testSuites = generateTestCases(sourceFile, coverageParser, frameworkConverter, parser.getMethods());
                 }
 
                 /*
@@ -227,8 +216,7 @@ public final class CommandLineInterface {
                             testFolder.mkdirs();
                         }
 
-                        File testFile = new File(testFolder,
-                                testSuite.getClassName() + ".java");
+                        File testFile = new File(testFolder, testSuite.getClassName() + ".java");
 
                         if (!testFile.exists()) {
                             testFile.createNewFile();
@@ -286,9 +274,8 @@ public final class CommandLineInterface {
             final List<String> methodQualifiers = new LinkedList<String>();
             for (final String method : methods) {
 
-                if (method.equals("all") || method.equals("public")
-                        || method.equals("protected")
-                        || method.equals("private") || method.equals("native")) {
+                if (method.equals("all") || method.equals("public") || method.equals("protected") || method.equals(
+                        "private") || method.equals("native")) {
 
                     methodQualifiers.add(method);
                 } else {
@@ -338,8 +325,12 @@ public final class CommandLineInterface {
                  * Get the test suites.
                  */
                 testCases = testGenerator.generateTestSuite(file,
-                        coverageParser, frameworkConverter, includePublic,
-                        includeProtected, includePrivate, includeNative);
+                                                            coverageParser,
+                                                            frameworkConverter,
+                                                            includePublic,
+                                                            includeProtected,
+                                                            includePrivate,
+                                                            includeNative);
 
             } catch (TestGeneratorException e) {
                 e.printStackTrace();

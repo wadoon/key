@@ -56,8 +56,7 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
     }
 
     @Override
-    protected Term transformNot(final Term term)
-            throws TermTransformerException {
+    protected Term transformNot(final Term term) throws TermTransformerException {
 
         if (TermParserTools.hasChildren(term)) {
             final Term child = term.sub(0);
@@ -82,11 +81,9 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
                 /*
                  * Negate the two subterms to the AND operator.
                  */
-                final Term negatedFirstSub = termFactory.createTerm(
-                        Junctor.NOT, child.sub(0));
+                final Term negatedFirstSub = termFactory.createTerm(Junctor.NOT, child.sub(0));
 
-                final Term negatedSecondSub = termFactory.createTerm(
-                        Junctor.NOT, child.sub(1));
+                final Term negatedSecondSub = termFactory.createTerm(Junctor.NOT, child.sub(1));
 
                 /*
                  * Parse them both normally.
@@ -98,8 +95,7 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
                  * Finally, return an OR operator with the new terms as
                  * subterms.
                  */
-                return termFactory.createTerm(Junctor.OR, parsedFirstSub,
-                        parsedSecondSub);
+                return termFactory.createTerm(Junctor.OR, parsedFirstSub, parsedSecondSub);
             }
 
             /*
@@ -111,11 +107,9 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
                 /*
                  * Negate the two subterms.
                  */
-                final Term negatedFirstSub = termFactory.createTerm(
-                        Junctor.NOT, child.sub(0));
+                final Term negatedFirstSub = termFactory.createTerm(Junctor.NOT, child.sub(0));
 
-                final Term negatedSecondSub = termFactory.createTerm(
-                        Junctor.NOT, child.sub(1));
+                final Term negatedSecondSub = termFactory.createTerm(Junctor.NOT, child.sub(1));
 
                 /*
                  * Parse both negated subterms.
@@ -126,8 +120,7 @@ public class NegationNormalFormTransformer extends AbstractTermTransformer {
                 /*
                  * Return the new AND operator.
                  */
-                return termFactory.createTerm(Junctor.AND, parsedFirstSub,
-                        parsedSecondSub);
+                return termFactory.createTerm(Junctor.AND, parsedFirstSub, parsedSecondSub);
             }
         }
 

@@ -35,7 +35,8 @@ public class OracleMethodInvocation extends OracleExpression {
      * @param arguments    arguments passed to the invocation
      */
     public OracleMethodInvocation(final OracleType returnType,
-                                  final String identifier, final OracleLiteral parentObject,
+                                  final String identifier,
+                                  final OracleLiteral parentObject,
                                   final OracleExpression[] arguments) {
         super(returnType);
 

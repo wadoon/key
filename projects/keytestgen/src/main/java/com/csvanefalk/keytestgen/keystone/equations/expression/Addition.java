@@ -5,8 +5,7 @@ import org.apache.commons.math3.fraction.Fraction;
 
 public class Addition extends AbstractBinaryExpression {
 
-    public Addition(final IExpression leftOperand,
-                    final IExpression rightOperand) {
+    public Addition(final IExpression leftOperand, final IExpression rightOperand) {
         super(leftOperand, rightOperand);
     }
 
@@ -18,7 +17,6 @@ public class Addition extends AbstractBinaryExpression {
     @Override
     public String toString() {
 
-        return "(" + getLeftOperand().toString() + " + "
-                + getRightOperand().toString() + ")";
+        return "(" + getLeftOperand().toString() + " + " + getRightOperand().toString() + ")";
     }
 }

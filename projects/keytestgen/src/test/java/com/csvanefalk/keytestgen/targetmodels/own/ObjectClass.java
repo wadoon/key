@@ -42,8 +42,7 @@ public class ObjectClass {
 
         int mid = 0;
 
-        if ((proxy == proxy.nestedProxy) && (x == proxy.instanceInt)
-                && (proxy.nestedProxy.nestedProxy == null)) {
+        if ((proxy == proxy.nestedProxy) && (x == proxy.instanceInt) && (proxy.nestedProxy.nestedProxy == null)) {
             mid = 15;
         }
 

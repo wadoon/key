@@ -8,8 +8,7 @@ public class StepOverOnTwoBranches {
             int x = valueLonger(i);
             int y = value(j);
             int z = valueLonger(x) + valueLonger(y);
-            int zz = value(-3) +
-                    value(-4);
+            int zz = value(-3) + value(-4);
             return value(z + zz);
         } else {
             int i = 2;
@@ -17,8 +16,7 @@ public class StepOverOnTwoBranches {
             int x = value(i);
             int y = valueLonger(j);
             int z = value(x) + value(y);
-            int zz = valueLonger(-3) +
-                    valueLonger(-4);
+            int zz = valueLonger(-3) + valueLonger(-4);
             return valueLonger(z + zz);
         }
     }

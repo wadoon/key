@@ -158,7 +158,7 @@ public class Model {
      *
      * @param reference the reference
      * @return the found instance, null if no instance is found with the
-     *         specified reference
+     * specified reference
      */
     public ModelVariable getVariable(final String reference) {
 

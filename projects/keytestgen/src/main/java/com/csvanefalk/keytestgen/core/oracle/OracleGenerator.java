@@ -117,27 +117,22 @@ public enum OracleGenerator {
      * @return the generated OracleExpression
      * @throws OracleGeneratorException
      */
-    private OracleExpression constructExpressionFromBinaryFunction(
-            final Term term, final boolean negate)
-            throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromBinaryFunction(final Term term,
+                                                                   final boolean negate) throws OracleGeneratorException {
 
         /*
          * Retrieve a comparator for the OracleConstraint expression
          */
-        final ComparatorType comparator = OracleTypeFactory.getComparatorType(
-                term, negate);
+        final ComparatorType comparator = OracleTypeFactory.getComparatorType(term, negate);
 
-        final OracleExpression firstOperand = constructExpressionFromTerm(
-                term.sub(0), negate);
+        final OracleExpression firstOperand = constructExpressionFromTerm(term.sub(0), negate);
 
-        final OracleExpression secondOperand = constructExpressionFromTerm(
-                term.sub(1), negate);
+        final OracleExpression secondOperand = constructExpressionFromTerm(term.sub(1), negate);
 
         return new OracleComparator(comparator, firstOperand, secondOperand);
     }
 
-    private OracleExpression constructExpressionFromFormula(final Term term,
-                                                            final boolean negate) {
+    private OracleExpression constructExpressionFromFormula(final Term term, final boolean negate) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -193,8 +188,7 @@ public enum OracleGenerator {
             throw new OracleGeneratorException(e.getMessage());
         }
 
-        throw new OracleGeneratorException("Unsupported Function: "
-                + term.op().name());
+        throw new OracleGeneratorException("Unsupported Function: " + term.op().name());
     }
 
     /**
@@ -204,8 +198,7 @@ public enum OracleGenerator {
      * @param term the term
      * @return the constructExpressionFromed term
      */
-    private OracleExpression constructExpressionFromIfExThenElse(
-            final Term term, final boolean negate) {
+    private OracleExpression constructExpressionFromIfExThenElse(final Term term, final boolean negate) {
 
         return null;
     }
@@ -221,15 +214,13 @@ public enum OracleGenerator {
      * @throws OracleGeneratorException
      */
     private OracleExpression constructExpressionFromJunctor(final Term term,
-                                                            final boolean negate) throws OracleGeneratorException,
-            OracleGeneratorException {
+                                                            final boolean negate) throws OracleGeneratorException, OracleGeneratorException {
 
         if (TermParserTools.isNot(term)) {
             return constructExpressionFromTerm(term.sub(0), true);
         }
 
-        throw new OracleGeneratorException("Unsupported Junctor: "
-                + term.op().name());
+        throw new OracleGeneratorException("Unsupported Junctor: " + term.op().name());
     }
 
     /**
@@ -241,16 +232,14 @@ public enum OracleGenerator {
      * @return the generated OracleExpression
      * @throws OracleGeneratorException
      */
-    private OracleExpression constructExpressionFromProgramMethod(
-            final Term term, final boolean negate)
-            throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromProgramMethod(final Term term,
+                                                                  final boolean negate) throws OracleGeneratorException {
 
         /*
          * Get the identifier for the method
          */
         final int lastColon = term.op().name().toString().lastIndexOf(':');
-        final String identifier = term.op().name().toString().substring(
-                lastColon + 1);
+        final String identifier = term.op().name().toString().substring(lastColon + 1);
 
         /*
          * Construct the return type
@@ -263,8 +252,7 @@ public enum OracleGenerator {
         final Term parentObjectTerm = term.sub(1);
         final OracleType type = OracleTypeFactory.getOracleType(parentObjectTerm);
         final String parentIdentifier = term.toString();
-        final OracleLiteral parentObject = new OracleLiteral(type,
-                parentIdentifier);
+        final OracleLiteral parentObject = new OracleLiteral(type, parentIdentifier);
 
         /*
          * Construct the parameter list. Note that this corresponds to a
@@ -275,12 +263,10 @@ public enum OracleGenerator {
         final OracleExpression[] parameters = new OracleExpression[bufferSize - 2];
         for (int i = 2; i < bufferSize; i++) {
             final Term parameterTerm = term.sub(i);
-            parameters[i - 2] = constructExpressionFromTerm(parameterTerm,
-                    negate);
+            parameters[i - 2] = constructExpressionFromTerm(parameterTerm, negate);
         }
 
-        return new OracleMethodInvocation(returnType, identifier, parentObject,
-                parameters);
+        return new OracleMethodInvocation(returnType, identifier, parentObject, parameters);
     }
 
     /**
@@ -314,11 +300,9 @@ public enum OracleGenerator {
         final QuantifiableVariable variable = term.boundVars().get(0);
         final String identifier = variable.name().toString();
         final OracleType type = OracleTypeFactory.getOracleType(variable);
-        final OracleLiteral quantifiableVariable = new OracleLiteral(type,
-                identifier);
+        final OracleLiteral quantifiableVariable = new OracleLiteral(type, identifier);
 
-        return new OracleQuantifier(quantifierType, quantifiableVariable,
-                boundExpression);
+        return new OracleQuantifier(quantifierType, quantifiableVariable, boundExpression);
     }
 
     /**
@@ -328,9 +312,8 @@ public enum OracleGenerator {
      * @param term the term
      * @return the constructExpressionFromed term
      */
-    private OracleExpression constructExpressionFromSortedOperator(
-            final Term term, final boolean negate)
-            throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromSortedOperator(final Term term,
+                                                                   final boolean negate) throws OracleGeneratorException {
 
         if (TermParserTools.isFunction(term)) {
             return constructExpressionFromFunction(term, negate);
@@ -356,8 +339,7 @@ public enum OracleGenerator {
             return constructExpressionFromQuantifier(term, negate);
         }
 
-        throw new OracleGeneratorException("Unsupported SortedOperator: "
-                + term.op().name());
+        throw new OracleGeneratorException("Unsupported SortedOperator: " + term.op().name());
     }
 
     /**
@@ -380,8 +362,9 @@ public enum OracleGenerator {
 
         }
         throw new OracleGeneratorException(
-                "Attempting to construct OracleConstraint from corrupt Term. Expected SortedOperator or IfThenElse, but found "
-                        + term.op().name());
+                "Attempting to construct OracleConstraint from corrupt Term. Expected SortedOperator or IfThenElse, but found " + term
+                        .op()
+                        .name());
     }
 
     /**
@@ -394,9 +377,8 @@ public enum OracleGenerator {
      * @return the generated OracleExpression
      * @throws OracleGeneratorException
      */
-    private OracleExpression constructExpressionFromUnaryFunction(
-            final Term term, final boolean negate)
-            throws OracleGeneratorException {
+    private OracleExpression constructExpressionFromUnaryFunction(final Term term,
+                                                                  final boolean negate) throws OracleGeneratorException {
 
         if (TermParserTools.isIntegerNegation(term)) {
             final String value = "-" + resolveNumbers(term.sub(0));
@@ -431,8 +413,7 @@ public enum OracleGenerator {
      * @throws OracleGeneratorException
      */
     private void constructExpressions(final Term term,
-                                      final Set<OracleExpression> expressions)
-            throws OracleGeneratorException {
+                                      final Set<OracleExpression> expressions) throws OracleGeneratorException {
 
         /*
          * If the Term is an Or-term, resolve both sub-expressions recursively
@@ -442,8 +423,7 @@ public enum OracleGenerator {
             constructExpressions(term.sub(1), expressions);
         } else {
 
-            final OracleExpression expression = constructExpressionFromTerm(
-                    term, false);
+            final OracleExpression expression = constructExpressionFromTerm(term, false);
             expressions.add(expression);
         }
     }
@@ -457,8 +437,7 @@ public enum OracleGenerator {
      * @return the oracle
      * @throws OracleGeneratorException
      */
-    private OracleConstraint constructOracle(final Term term)
-            throws OracleGeneratorException {
+    private OracleConstraint constructOracle(final Term term) throws OracleGeneratorException {
 
         /*
          * Create and return the OracleConstraint.
@@ -479,8 +458,7 @@ public enum OracleGenerator {
      * @return an OracleConstraint for the method
      * @throws OracleGeneratorException
      */
-    public Oracle generateOracle(final KeYJavaMethod method)
-            throws OracleGeneratorException {
+    public Oracle generateOracle(final KeYJavaMethod method) throws OracleGeneratorException {
 
         try {
 
@@ -496,8 +474,7 @@ public enum OracleGenerator {
              * Extract the postcondition of the method
              */
             final Term postCondition = method.getPostconditions().get(0);
-            if ((postCondition == null)
-                    || postCondition.toString().equals("true")) {
+            if ((postCondition == null) || postCondition.toString().equals("true")) {
                 return OracleGenerator.EMPTY_ORACLE;
             }
 

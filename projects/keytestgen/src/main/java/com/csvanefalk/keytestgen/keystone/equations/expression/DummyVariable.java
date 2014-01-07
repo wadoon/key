@@ -7,8 +7,7 @@ public class DummyVariable extends Variable {
     private static String dummyVariablePrefix = "keystone_dummyvariable";
 
     public static DummyVariable createDummyVariable() {
-        return new DummyVariable(DummyVariable.dummyVariablePrefix
-                + DummyVariable.dummyVariableIndex++);
+        return new DummyVariable(DummyVariable.dummyVariablePrefix + DummyVariable.dummyVariableIndex++);
     }
 
     private DummyVariable(final String name) {

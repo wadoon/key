@@ -7,8 +7,7 @@ package com.csvanefalk.keytestgen.core.oracle.abstraction;
  */
 public final class OracleType {
 
-    public static final OracleType BOOLEAN = new OracleType("boolean",
-            "boolean");
+    public static final OracleType BOOLEAN = new OracleType("boolean", "boolean");
     public static final OracleType BYTE = new OracleType("byte", "byte");
     public static final OracleType DOUBLE = new OracleType("double", "double");
     public static final OracleType FLOAT = new OracleType("float", "float");

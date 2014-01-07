@@ -34,20 +34,17 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         /*
          * Remove all implications
          */
-        oracleTerm = RemoveImplicationsTransformer.getInstance().transform(
-                oracleTerm);
+        oracleTerm = RemoveImplicationsTransformer.getInstance().transform(oracleTerm);
 
         /*
          * Remove all observerFunctions.
          */
-        oracleTerm = RemoveObserverFunctionsTransformer.getInstance().transform(
-                oracleTerm);
+        oracleTerm = RemoveObserverFunctionsTransformer.getInstance().transform(oracleTerm);
 
         /*
          * Order the operands of the term
          */
-        oracleTerm = OrderOperandsTransformer.getInstance().transform(
-                oracleTerm);
+        oracleTerm = OrderOperandsTransformer.getInstance().transform(oracleTerm);
 
         /*
          * Do the transformation
@@ -57,20 +54,17 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         /*
          * Put it into Conjunctive Normal Form
          */
-        oracleTerm = ConjunctionNormalFormTransformer.getInstance().transform(
-                oracleTerm);
+        oracleTerm = ConjunctionNormalFormTransformer.getInstance().transform(oracleTerm);
 
         /*
          * Simplify the disjunctions in the postcondition
          */
-        oracleTerm = SimplifyDisjunctionTransformer.getInstance().transform(
-                oracleTerm);
+        oracleTerm = SimplifyDisjunctionTransformer.getInstance().transform(oracleTerm);
 
         /*
          * Simplify the remaining conjunctions
          */
-        oracleTerm = SimplifyConjunctionTransformer.getInstance().transform(
-                oracleTerm);
+        oracleTerm = SimplifyConjunctionTransformer.getInstance().transform(oracleTerm);
 
         return oracleTerm;
     }
@@ -85,8 +79,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
      * @throws ModelGeneratorException
      */
     @Override
-    protected Term transformAnd(final Term term)
-            throws TermTransformerException {
+    protected Term transformAnd(final Term term) throws TermTransformerException {
 
         final Term firstChild = transformTerm(term.sub(0));
         final Term secondChild = transformTerm(term.sub(1));
@@ -115,8 +108,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
      * @throws ModelGeneratorException
      */
     @Override
-    protected Term transformEquals(final Term term)
-            throws TermTransformerException {
+    protected Term transformEquals(final Term term) throws TermTransformerException {
 
         final Term firstChild = transformTerm(term.sub(0));
         final Term secondChild = transformTerm(term.sub(1));
@@ -134,8 +126,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
      * include the various logical functions introduced by Key.
      */
     @Override
-    protected Term transformFormula(final Term term)
-            throws TermTransformerException {
+    protected Term transformFormula(final Term term) throws TermTransformerException {
 
         final String formulaName = term.op().name().toString();
 
@@ -143,8 +134,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
          * Remove the common logical functions introduced by KeY, as they have
          * no meaning (?) with regard to the postcondition itself.
          */
-        if (formulaName.equals("inInt")
-                || formulaName.equals("java.lang.Object::<inv>")) {
+        if (formulaName.equals("inInt") || formulaName.equals("java.lang.Object::<inv>")) {
             return null;
         } else {
             return term;
@@ -180,8 +170,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
      * @throws ModelGeneratorException
      */
     @Override
-    protected Term transformNot(final Term term)
-            throws TermTransformerException {
+    protected Term transformNot(final Term term) throws TermTransformerException {
 
         final Term newChild = transformTerm(term.sub(0));
 

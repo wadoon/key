@@ -5,4 +5,5 @@
   <groupId>antlr_custom</groupId>
   <artifactId>antlr_custom</artifactId>
   <version>2.7.2</version>
+  <description>POM was created from install:install-file</description>
 </project>

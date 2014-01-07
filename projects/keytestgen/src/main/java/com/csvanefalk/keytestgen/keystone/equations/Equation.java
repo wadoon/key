@@ -18,8 +18,7 @@ import java.util.Map;
  */
 public class Equation extends Equals {
 
-    private static Equals createEqualityFromInequality(
-            final IComparator comparator) {
+    private static Equals createEqualityFromInequality(final IComparator comparator) {
 
         final DummyVariable dummyVariable = DummyVariable.createDummyVariable();
 
@@ -31,8 +30,7 @@ public class Equation extends Equals {
             final IExpression leftOperand = ((LessOrEquals) comparator).getLeftOperand();
             final IExpression rightOperand = ((LessOrEquals) comparator).getRightOperand();
 
-            final Addition slackAddition = new Addition(leftOperand,
-                    dummyVariable);
+            final Addition slackAddition = new Addition(leftOperand, dummyVariable);
 
             return new Equals(slackAddition, rightOperand);
         }
@@ -46,8 +44,7 @@ public class Equation extends Equals {
             final IExpression rightOperand = ((GreaterOrEquals) comparator).getRightOperand();
 
             dummyVariable.negate();
-            final Addition surplusSubtraction = new Addition(leftOperand,
-                    dummyVariable);
+            final Addition surplusSubtraction = new Addition(leftOperand, dummyVariable);
 
             return new Equals(surplusSubtraction, rightOperand);
         }
@@ -62,8 +59,7 @@ public class Equation extends Equals {
      * @return
      * @throws KeYStoneException
      */
-    public static Equation createEquation(final IComparator root)
-            throws KeYStoneException {
+    public static Equation createEquation(final IComparator root) throws KeYStoneException {
 
         assert (root != null);
 
@@ -105,8 +101,7 @@ public class Equation extends Equals {
      * @param expression
      * @param variables2
      */
-    private static void extractVariables_helper(final IExpression expression,
-                                                final Map<String, Variable> variables2) {
+    private static void extractVariables_helper(final IExpression expression, final Map<String, Variable> variables2) {
 
         if (expression instanceof Variable) {
             final Variable variable = (Variable) expression;
@@ -115,10 +110,8 @@ public class Equation extends Equals {
         } else if (expression instanceof AbstractBinaryExpression) {
 
             final AbstractBinaryExpression binaryExpression = (AbstractBinaryExpression) expression;
-            Equation.extractVariables_helper(binaryExpression.getLeftOperand(),
-                    variables2);
-            Equation.extractVariables_helper(
-                    binaryExpression.getRightOperand(), variables2);
+            Equation.extractVariables_helper(binaryExpression.getLeftOperand(), variables2);
+            Equation.extractVariables_helper(binaryExpression.getRightOperand(), variables2);
         }
     }
 
@@ -163,8 +156,7 @@ public class Equation extends Equals {
      * @param variables
      * @throws KeYStoneException
      */
-    public IExpression solveForVariable(final Variable variable)
-            throws KeYStoneException {
+    public IExpression solveForVariable(final Variable variable) throws KeYStoneException {
 
         /*
          * Build a trace to the variable in question.
@@ -213,8 +205,7 @@ public class Equation extends Equals {
                  */
                 final IExpression oldOppositeEquationSide = oppositeEquationTop;
                 ExpressionUtils.negateAddition((Addition) nonVariableOperand);
-                oppositeEquationTop = new Addition(oldOppositeEquationSide,
-                        nonVariableOperand);
+                oppositeEquationTop = new Addition(oldOppositeEquationSide, nonVariableOperand);
 
                 variableEquationTop = variableOperand;
             }
@@ -244,8 +235,7 @@ public class Equation extends Equals {
                  * division.
                  */
                 final IExpression oldOppositeEquationSide = oppositeEquationTop;
-                oppositeEquationTop = new Division(oldOppositeEquationSide,
-                        nonVariableOperand);
+                oppositeEquationTop = new Division(oldOppositeEquationSide, nonVariableOperand);
 
                 variableEquationTop = variableOperand;
             }
@@ -270,8 +260,7 @@ public class Equation extends Equals {
                  */
                 if (division.getRightOperand() == variableOperand) {
                     nonVariableOperand = division.getLeftOperand();
-                    oppositeEquationTop = new Division(oldOppositeEquationSide,
-                            nonVariableOperand);
+                    oppositeEquationTop = new Division(oldOppositeEquationSide, nonVariableOperand);
                 }
 
                 /*
@@ -280,8 +269,7 @@ public class Equation extends Equals {
                  */
                 else {
                     nonVariableOperand = division.getRightOperand();
-                    oppositeEquationTop = new Multiplication(
-                            oldOppositeEquationSide, nonVariableOperand);
+                    oppositeEquationTop = new Multiplication(oldOppositeEquationSide, nonVariableOperand);
                 }
 
                 variableEquationTop = variableOperand;

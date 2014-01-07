@@ -19,12 +19,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveSingleLessThanConstraintMin()
-            throws ProofInputException, ModelGeneratorException {
+    public void testSolveSingleLessThanConstraintMin() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("min");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "return a");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return a");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -52,12 +50,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveSingleLessThanConstraintMax()
-            throws ProofInputException, ModelGeneratorException {
+    public void testSolveSingleLessThanConstraintMax() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("max");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "return b");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -85,12 +81,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveSingleLessThanConstraintMax_2()
-            throws ProofInputException, ModelGeneratorException {
+    public void testSolveSingleLessThanConstraintMax_2() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("max_2");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "return b");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -120,12 +114,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveSingleGreaterThanConstraintMax()
-            throws ProofInputException, ModelGeneratorException {
+    public void testSolveSingleGreaterThanConstraintMax() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("max");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "return a");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return a");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -153,12 +145,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveSingleGreaterThanConstraintMin()
-            throws ProofInputException, ModelGeneratorException {
+    public void testSolveSingleGreaterThanConstraintMin() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("min");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "return b");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -186,12 +176,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveCompoundConstraintMid() throws ProofInputException,
-            ModelGeneratorException {
+    public void testSolveCompoundConstraintMid() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("mid");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "mid=y");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=y");
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -227,12 +215,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveCompoundConstraintMid2() throws ProofInputException,
-            ModelGeneratorException {
+    public void testSolveCompoundConstraintMid2() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("mid");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "mid=y");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=y");
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(1);
@@ -268,12 +254,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveCompoundConstraintMid3() throws ProofInputException,
-            ModelGeneratorException {
+    public void testSolveCompoundConstraintMid3() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("mid");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "mid=x");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=x");
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(0);
@@ -309,12 +293,10 @@ public class ModelIntegerTest extends ModelTest {
     }
 
     @Test
-    public void testSolveCompoundConstraintMid4() throws ProofInputException,
-            ModelGeneratorException {
+    public void testSolveCompoundConstraintMid4() throws ProofInputException, ModelGeneratorException {
 
         IExecutionStart methodTree = getSymbolicTreeForMethod("mid");
-        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree,
-                "mid=x");
+        List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=x");
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(1);

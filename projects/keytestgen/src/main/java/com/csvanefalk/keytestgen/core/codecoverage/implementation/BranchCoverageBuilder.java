@@ -8,13 +8,11 @@ import java.util.*;
 
 public class BranchCoverageBuilder implements ICoverageBuilder {
 
-    private static class DescendingExecutionBranchComparator implements
-            Comparator<ExecutionPath> {
+    private static class DescendingExecutionBranchComparator implements Comparator<ExecutionPath> {
 
         private final Map<ExecutionPath, List<ExecutionBranch>> map;
 
-        public DescendingExecutionBranchComparator(
-                final Map<ExecutionPath, List<ExecutionBranch>> map) {
+        public DescendingExecutionBranchComparator(final Map<ExecutionPath, List<ExecutionBranch>> map) {
             this.map = map;
         }
 
@@ -51,8 +49,7 @@ public class BranchCoverageBuilder implements ICoverageBuilder {
     }
 
     @Override
-    public Set<ExecutionPath> retrieveExecutionPaths(
-            final ExecutionPathContext context) {
+    public Set<ExecutionPath> retrieveExecutionPaths(final ExecutionPathContext context) {
 
         final List<ExecutionBranch> executionBranches = context.getExecutionBranches();
         final List<ExecutionPath> executionPaths = context.getExecutionPaths();
@@ -79,8 +76,8 @@ public class BranchCoverageBuilder implements ICoverageBuilder {
          */
         final DescendingExecutionBranchComparator descendingExecutionBranchComparator = new DescendingExecutionBranchComparator(
                 branchesCoveredByPath);
-        final PriorityQueue<ExecutionPath> sortedPaths = new PriorityQueue<ExecutionPath>(
-                20, descendingExecutionBranchComparator);
+        final PriorityQueue<ExecutionPath> sortedPaths = new PriorityQueue<ExecutionPath>(20,
+                                                                                          descendingExecutionBranchComparator);
         sortedPaths.addAll(executionPaths);
 
         /*
@@ -104,8 +101,7 @@ public class BranchCoverageBuilder implements ICoverageBuilder {
         return branchesCoveredByPath.keySet();
     }
 
-    private boolean subsumes(final List<ExecutionBranch> first,
-                             final List<ExecutionBranch> second) {
+    private boolean subsumes(final List<ExecutionBranch> first, final List<ExecutionBranch> second) {
 
         if (second.size() > first.size()) {
             return false;

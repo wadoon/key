@@ -16,8 +16,7 @@ public class AdditionTest {
     @Test
     public void testAddTwoPositives() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new NumericConstant(5));
+        IExpression expression = new Addition(new NumericConstant(10), new NumericConstant(5));
 
         Fraction expected = new Fraction(15);
         Fraction actual = expression.evaluate();
@@ -27,8 +26,8 @@ public class AdditionTest {
     @Test
     public void testAddThreePositives() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(5), new NumericConstant(15)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(5),
+                                                                                    new NumericConstant(15)));
 
         Fraction expected = new Fraction(30);
         Fraction actual = expression.evaluate();
@@ -38,8 +37,7 @@ public class AdditionTest {
     @Test
     public void testAddTwoNegatives() {
 
-        IExpression expression = new Addition(new NumericConstant(-10),
-                new NumericConstant(-5));
+        IExpression expression = new Addition(new NumericConstant(-10), new NumericConstant(-5));
 
         Fraction expected = new Fraction(-15);
         Fraction actual = expression.evaluate();
@@ -49,8 +47,8 @@ public class AdditionTest {
     @Test
     public void testAddThreeNegatives() {
 
-        IExpression expression = new Addition(new NumericConstant(-10),
-                new Addition(new NumericConstant(-5), new NumericConstant(-15)));
+        IExpression expression = new Addition(new NumericConstant(-10), new Addition(new NumericConstant(-5),
+                                                                                     new NumericConstant(-15)));
 
         Fraction expected = new Fraction(-30);
         Fraction actual = expression.evaluate();
@@ -60,8 +58,7 @@ public class AdditionTest {
     @Test
     public void testAddOnePositiveOneNegative() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new NumericConstant(-5));
+        IExpression expression = new Addition(new NumericConstant(10), new NumericConstant(-5));
 
         Fraction expected = new Fraction(5);
         Fraction actual = expression.evaluate();
@@ -71,8 +68,7 @@ public class AdditionTest {
     @Test
     public void testAddOneNegativeOnePositive() {
 
-        IExpression expression = new Addition(new NumericConstant(-10),
-                new NumericConstant(5));
+        IExpression expression = new Addition(new NumericConstant(-10), new NumericConstant(5));
 
         Fraction expected = new Fraction(-5);
         Fraction actual = expression.evaluate();
@@ -82,8 +78,8 @@ public class AdditionTest {
     @Test
     public void testAddOnePositiveOneNegativeOnePositive() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(-5), new NumericConstant(15)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(-5),
+                                                                                    new NumericConstant(15)));
 
         Fraction expected = new Fraction(20);
         Fraction actual = expression.evaluate();
@@ -93,8 +89,8 @@ public class AdditionTest {
     @Test
     public void testAddOnePositiveOnePositiveOneNegative() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(5), new NumericConstant(-15)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(5),
+                                                                                    new NumericConstant(-15)));
 
         Fraction expected = new Fraction(0);
         Fraction actual = expression.evaluate();
@@ -104,8 +100,8 @@ public class AdditionTest {
     @Test
     public void testAddOnePositiveOneNegativeOneNegative() {
 
-        IExpression expression = new Addition(new NumericConstant(10),
-                new Addition(new NumericConstant(-5), new NumericConstant(-15)));
+        IExpression expression = new Addition(new NumericConstant(10), new Addition(new NumericConstant(-5),
+                                                                                    new NumericConstant(-15)));
 
         Fraction expected = new Fraction(-10);
         Fraction actual = expression.evaluate();
@@ -115,8 +111,8 @@ public class AdditionTest {
     @Test
     public void testAddOneNegativeOnePositiveOnePositive() {
 
-        IExpression expression = new Addition(new NumericConstant(-10),
-                new Addition(new NumericConstant(5), new NumericConstant(15)));
+        IExpression expression = new Addition(new NumericConstant(-10), new Addition(new NumericConstant(5),
+                                                                                     new NumericConstant(15)));
 
         Fraction expected = new Fraction(10);
         Fraction actual = expression.evaluate();
@@ -126,8 +122,8 @@ public class AdditionTest {
     @Test
     public void testAddOneNegativeOnePositiveOneNegative() {
 
-        IExpression expression = new Addition(new NumericConstant(-10),
-                new Addition(new NumericConstant(5), new NumericConstant(-15)));
+        IExpression expression = new Addition(new NumericConstant(-10), new Addition(new NumericConstant(5),
+                                                                                     new NumericConstant(-15)));
 
         Fraction expected = new Fraction(-20);
         Fraction actual = expression.evaluate();
@@ -137,8 +133,8 @@ public class AdditionTest {
     @Test
     public void testAddOneNegativeOneNegativeOnePositive() {
 
-        IExpression expression = new Addition(new NumericConstant(-10),
-                new Addition(new NumericConstant(-5), new NumericConstant(15)));
+        IExpression expression = new Addition(new NumericConstant(-10), new Addition(new NumericConstant(-5),
+                                                                                     new NumericConstant(15)));
 
         Fraction expected = new Fraction(0);
         Fraction actual = expression.evaluate();

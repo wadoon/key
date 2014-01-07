@@ -5,4 +5,5 @@
   <groupId>javacc</groupId>
   <artifactId>javacc</artifactId>
   <version>1.6</version>
+  <description>POM was created from install:install-file</description>
 </project>

@@ -15,8 +15,7 @@ public class CLITest {
         return stringList;
     }
 
-    protected <T> boolean assertListEquality(List<T> firstList,
-                                             List<T> secondList) {
+    protected <T> boolean assertListEquality(List<T> firstList, List<T> secondList) {
 
         boolean passedLoop = false;
         for (T firstObject : firstList) {

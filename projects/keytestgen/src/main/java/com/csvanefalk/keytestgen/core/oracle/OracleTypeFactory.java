@@ -44,57 +44,39 @@ public class OracleTypeFactory {
          * Setup the comparators
          */
         comparators = new HashMap<String, ComparatorType>();
-        OracleTypeFactory.comparators.put(StringConstants.EQUALS,
-                ComparatorType.EQUALS);
-        OracleTypeFactory.comparators.put(StringConstants.LESS_OR_EQUALS,
-                ComparatorType.LESS_OR_EQUALS);
-        OracleTypeFactory.comparators.put(StringConstants.LESS_THAN,
-                ComparatorType.LESS_THAN);
-        OracleTypeFactory.comparators.put(StringConstants.GREATER_OR_EQUALS,
-                ComparatorType.GREATER_OR_EQUALS);
-        OracleTypeFactory.comparators.put(StringConstants.GREATER_THAN,
-                ComparatorType.GREATER_THAN);
+        OracleTypeFactory.comparators.put(StringConstants.EQUALS, ComparatorType.EQUALS);
+        OracleTypeFactory.comparators.put(StringConstants.LESS_OR_EQUALS, ComparatorType.LESS_OR_EQUALS);
+        OracleTypeFactory.comparators.put(StringConstants.LESS_THAN, ComparatorType.LESS_THAN);
+        OracleTypeFactory.comparators.put(StringConstants.GREATER_OR_EQUALS, ComparatorType.GREATER_OR_EQUALS);
+        OracleTypeFactory.comparators.put(StringConstants.GREATER_THAN, ComparatorType.GREATER_THAN);
 
         /*
          * Setup the numeric types
          */
         numericTypes = new HashMap<String, OracleType>();
-        OracleTypeFactory.numericTypes.put(StringConstants.INTEGER,
-                OracleType.INTEGER);
-        OracleTypeFactory.numericTypes.put(StringConstants.BYTE,
-                OracleType.BYTE);
-        OracleTypeFactory.numericTypes.put(StringConstants.LONG,
-                OracleType.LONG);
-        OracleTypeFactory.numericTypes.put(StringConstants.FLOAT,
-                OracleType.FLOAT);
-        OracleTypeFactory.numericTypes.put(StringConstants.DOUBLE,
-                OracleType.DOUBLE);
-        OracleTypeFactory.numericTypes.put(StringConstants.BOOLEAN,
-                OracleType.BOOLEAN);
+        OracleTypeFactory.numericTypes.put(StringConstants.INTEGER, OracleType.INTEGER);
+        OracleTypeFactory.numericTypes.put(StringConstants.BYTE, OracleType.BYTE);
+        OracleTypeFactory.numericTypes.put(StringConstants.LONG, OracleType.LONG);
+        OracleTypeFactory.numericTypes.put(StringConstants.FLOAT, OracleType.FLOAT);
+        OracleTypeFactory.numericTypes.put(StringConstants.DOUBLE, OracleType.DOUBLE);
+        OracleTypeFactory.numericTypes.put(StringConstants.BOOLEAN, OracleType.BOOLEAN);
 
         /*
          * Setup the negated comparators
          */
         negatedComparators = new HashMap<String, ComparatorType>();
-        OracleTypeFactory.negatedComparators.put(StringConstants.EQUALS,
-                ComparatorType.NOT_EQUALS);
-        OracleTypeFactory.negatedComparators.put(
-                StringConstants.LESS_OR_EQUALS, ComparatorType.GREATER_THAN);
-        OracleTypeFactory.negatedComparators.put(StringConstants.LESS_THAN,
-                ComparatorType.GREATER_OR_EQUALS);
-        OracleTypeFactory.negatedComparators.put(
-                StringConstants.GREATER_OR_EQUALS, ComparatorType.LESS_THAN);
-        OracleTypeFactory.negatedComparators.put(StringConstants.GREATER_THAN,
-                ComparatorType.LESS_OR_EQUALS);
+        OracleTypeFactory.negatedComparators.put(StringConstants.EQUALS, ComparatorType.NOT_EQUALS);
+        OracleTypeFactory.negatedComparators.put(StringConstants.LESS_OR_EQUALS, ComparatorType.GREATER_THAN);
+        OracleTypeFactory.negatedComparators.put(StringConstants.LESS_THAN, ComparatorType.GREATER_OR_EQUALS);
+        OracleTypeFactory.negatedComparators.put(StringConstants.GREATER_OR_EQUALS, ComparatorType.LESS_THAN);
+        OracleTypeFactory.negatedComparators.put(StringConstants.GREATER_THAN, ComparatorType.LESS_OR_EQUALS);
 
         /*
          * Setup the quantifiers
          */
         quantifiers = new HashMap<String, QuantifierType>();
-        OracleTypeFactory.quantifiers.put(StringConstants.FORALL,
-                QuantifierType.FORALL);
-        OracleTypeFactory.quantifiers.put(StringConstants.EXISTS,
-                QuantifierType.EXISTS);
+        OracleTypeFactory.quantifiers.put(StringConstants.FORALL, QuantifierType.FORALL);
+        OracleTypeFactory.quantifiers.put(StringConstants.EXISTS, QuantifierType.EXISTS);
     }
 
     /**
@@ -120,9 +102,7 @@ public class OracleTypeFactory {
         }
 
         if (comparatorType == null) {
-            throw new OracleGeneratorException(
-                    "Could not construct comparator type: found "
-                            + operatorName);
+            throw new OracleGeneratorException("Could not construct comparator type: found " + operatorName);
         } else {
             return comparatorType;
         }
@@ -137,8 +117,7 @@ public class OracleTypeFactory {
      * @param quantifiableVariable the variable
      * @return the corresponding type
      */
-    public static OracleType getOracleType(
-            final QuantifiableVariable quantifiableVariable) {
+    public static OracleType getOracleType(final QuantifiableVariable quantifiableVariable) {
 
         final String typeName = quantifiableVariable.sort().name().toString();
 
@@ -191,16 +170,13 @@ public class OracleTypeFactory {
      * @return the quantifier type
      * @throws OracleGeneratorException
      */
-    public static QuantifierType getQuantifierType(final Term term)
-            throws OracleGeneratorException {
+    public static QuantifierType getQuantifierType(final Term term) throws OracleGeneratorException {
         final String operatorName = term.op().name().toString();
 
         final QuantifierType type = OracleTypeFactory.quantifiers.get(operatorName);
 
         if (type == null) {
-            throw new OracleGeneratorException(
-                    "Could not construct quantifier type: found "
-                            + operatorName);
+            throw new OracleGeneratorException("Could not construct quantifier type: found " + operatorName);
         } else {
 
             return type;

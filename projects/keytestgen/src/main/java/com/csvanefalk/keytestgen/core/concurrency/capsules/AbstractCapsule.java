@@ -55,7 +55,7 @@ public abstract class AbstractCapsule implements ICapsule {
 
     /**
      * @return the exception thrown during the execution of this capsule, if
-     *         any.
+     * any.
      */
     public Throwable getThrownException() {
         return thrownException;
@@ -63,7 +63,7 @@ public abstract class AbstractCapsule implements ICapsule {
 
     /**
      * @return true if the AbstractCapsule executed succesfully, false
-     *         otherwise.
+     * otherwise.
      */
     public boolean isSucceeded() {
         return succeeded;

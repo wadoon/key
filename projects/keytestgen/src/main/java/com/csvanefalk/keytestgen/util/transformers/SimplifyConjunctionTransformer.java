@@ -65,8 +65,7 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
             }
 
             if ((firstChild != null) && (secondChild != null)) {
-                return termFactory.createTerm(Junctor.AND, firstChild,
-                        secondChild);
+                return termFactory.createTerm(Junctor.AND, firstChild, secondChild);
             }
 
             return null;
@@ -103,14 +102,12 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(final Term term) throws TermTransformerException {
 
-        final Term orderedTerm = OrderOperandsTransformer.getInstance().transform(
-                term);
+        final Term orderedTerm = OrderOperandsTransformer.getInstance().transform(term);
         return transformTerm(orderedTerm);
     }
 
     @Override
-    protected Term transformAnd(final Term term)
-            throws TermTransformerException {
+    protected Term transformAnd(final Term term) throws TermTransformerException {
 
         final Term firstChild = term.sub(0);
         final Term secondChild = term.sub(1);
@@ -135,8 +132,7 @@ public class SimplifyConjunctionTransformer extends AbstractTermTransformer {
         } else {
             final Term transformedSimplifiedFirstChild = transformTerm(simplifiedFirstChild);
             final Term transformedRightChild = transformTerm(secondChild);
-            return termFactory.createTerm(Junctor.AND,
-                    transformedSimplifiedFirstChild, transformedRightChild);
+            return termFactory.createTerm(Junctor.AND, transformedSimplifiedFirstChild, transformedRightChild);
         }
     }
 }

@@ -48,8 +48,7 @@ public class NodeTestGenerator {
     }
 
     public ITestSuite constructTestSuiteFromNode(final IExecutionNode node,
-                                                 final IFrameworkConverter frameworkConverter)
-            throws TestGeneratorException {
+                                                 final IFrameworkConverter frameworkConverter) throws TestGeneratorException {
 
         try {
 
@@ -75,8 +74,7 @@ public class NodeTestGenerator {
             final ModelCapsule modelGenerationCapsule = new ModelCapsule(node);
             modelController.addChild(modelGenerationCapsule);
 
-            final OracleCapsule oracleGenerationCapsule = new OracleCapsule(
-                    targetMethod);
+            final OracleCapsule oracleGenerationCapsule = new OracleCapsule(targetMethod);
             oracleController.addChild(oracleGenerationCapsule);
 
             modelController.executeAndWait();
@@ -92,8 +90,7 @@ public class NodeTestGenerator {
              * Construct the test cases.
              */
             final List<TestCase> testCases = new LinkedList<TestCase>();
-            final TestCase testCase = TestCase.constructTestCase(targetMethod,
-                    model, oracle);
+            final TestCase testCase = TestCase.constructTestCase(targetMethod, model, oracle);
             testCases.add(testCase);
 
             Benchmark.finishBenchmarking("3. generating models");
@@ -102,8 +99,9 @@ public class NodeTestGenerator {
              * Construct the test suite.
              */
 
-            final TestSuite testSuite = TestSuite.constructTestSuite(
-                    targetMethod.getDeclaringClass(), targetMethod, testCases);
+            final TestSuite testSuite = TestSuite.constructTestSuite(targetMethod.getDeclaringClass(),
+                                                                     targetMethod,
+                                                                     testCases);
 
             /*
              * Convert to JUnit and return

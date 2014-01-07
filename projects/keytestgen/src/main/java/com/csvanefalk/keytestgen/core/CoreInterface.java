@@ -1,6 +1,5 @@
 package com.csvanefalk.keytestgen.core;
 
-import com.csvanefalk.keytestgen.backend.IFrameworkConverter;
 import com.csvanefalk.keytestgen.backend.TestGeneratorException;
 import com.csvanefalk.keytestgen.core.classabstraction.KeYJavaClass;
 import com.csvanefalk.keytestgen.core.classabstraction.KeYJavaClassFactory;
@@ -23,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * API singleton for the core package
+ * API singleton for the core of KeYTestGen.
  * <p/>
  * Instances of this class provide a single interface between backend modules
  * and KeYTestGen itself, allowing them to request services related to test case
@@ -85,21 +84,21 @@ public class CoreInterface implements ICapsuleMonitor {
      * file. The test suites will will be in accord with the code coverage
      * criteria specified.
      *
-     * @param source    path to the Java source file.
-     * @param coverage  code coverage critera to be satisfied by the generated test
-     *                  cases. May be <code>null</code>, in which case a default
-     *                  statement coverage is used. See {@link ICodeCoverageParser}.
-     * @param converter converter to turn the output of KTG into code for a given
-     *                  testing framework. See {@link IFrameworkConverter}.
+     * @param source             path to the Java source file.
+     * @param codeCoverageParser code coverage critera to be satisfied by the generated test
+     *                           cases. May be <code>null</code>, in which case a default
+     *                           statement coverage is used. See {@link ICodeCoverageParser}.
      * @return a test suite for the target class, in the specified test
-     *         framework.
+     * framework.
      * @throws TestGeneratorException in the event that something went wrong in the process of test
      *                                case generation.
      */
     public List<TestSuite> createTestSuites(final File source,
                                             final ICodeCoverageParser codeCoverageParser,
-                                            final boolean includePublic, final boolean includeProtected,
-                                            final boolean includePrivate, final boolean includeNative,
+                                            final boolean includePublic,
+                                            final boolean includeProtected,
+                                            final boolean includePrivate,
+                                            final boolean includeNative,
                                             final List<String> methods) throws CoreException {
 
         /*
@@ -107,16 +106,35 @@ public class CoreInterface implements ICapsuleMonitor {
          */
         final KeYJavaClass targetClass = extractKeYJavaClass(source);
 
+        /*
+         * Extract the identifiers for the methods in the class
+         * which we should generate test cases for.
+         */
         List<String> selectedMethods = filterMethods(targetClass,
-                includePublic, includeProtected, includePrivate, includeNative);
+                                                     includePublic,
+                                                     includeProtected,
+                                                     includePrivate,
+                                                     includeNative);
         selectedMethods.addAll(methods);
-        return createTestSuites(targetClass, codeCoverageParser,
-                selectedMethods);
+
+        return createTestSuites(targetClass, codeCoverageParser, selectedMethods);
     }
 
+    /**
+     * Extracts a set of method identifier from a KeYJavaClass instance.
+     *
+     * @param targetClass      class to extract methods from
+     * @param includePublic    include public methods?
+     * @param includeProtected include protected methods?
+     * @param includePrivate   include private methods?
+     * @param includeNative    include native (Object.await() etc) methods?
+     * @return the set of method identifiers.
+     */
     private List<String> filterMethods(KeYJavaClass targetClass,
-                                       boolean includePublic, boolean includeProtected,
-                                       boolean includePrivate, boolean includeNative) {
+                                       boolean includePublic,
+                                       boolean includeProtected,
+                                       boolean includePrivate,
+                                       boolean includeNative) {
 
         List<String> filteredMethod = new LinkedList<String>();
         for (String methodIdentifier : targetClass.getMethods()) {
@@ -146,10 +164,11 @@ public class CoreInterface implements ICapsuleMonitor {
     }
 
     /**
-     * Main method for invoking the core system itself.
+     * Requests the core system to generate a set of test suites for a given Java class.
      *
-     * @param targetClass
-     * @param codeCoverageParser
+     * @param targetClass        the class to generate test suites for.
+     * @param codeCoverageParser ICodeCoverageParser instance dictating what
+     *                           level of code coverage the test suites should guarantee.
      * @param methods
      * @return
      * @throws CoreException
@@ -177,15 +196,13 @@ public class CoreInterface implements ICapsuleMonitor {
             final KeYJavaMethod targetMethod = targetClass.getMethod(method);
             if (targetMethod == null) {
 
-                throw new CoreException("No such method: " + method
-                        + " in class " + targetClass.getName());
+                throw new CoreException("No such method: " + method + " in class " + targetClass.getName());
             }
 
             /*
              * Setup and ready the capsule
              */
-            final MethodCapsule testGenerationCapsule = new MethodCapsule(
-                    codeCoverageParser, targetMethod);
+            final MethodCapsule testGenerationCapsule = new MethodCapsule(codeCoverageParser, targetMethod);
 
             controller.addChild(testGenerationCapsule);
             testGenerationCapsule.addMonitor(this);
@@ -245,12 +262,11 @@ public class CoreInterface implements ICapsuleMonitor {
      *
      * @param source path to the source file
      * @return a {@link KeYJavaClass} instance corresponding to the public class
-     *         in the source file
+     * in the source file
      * @throws TestGeneratorException in the event that there is a failure in the KeYInterface, or
      *                                if there is a problem finding or reading the source file.
      */
-    private KeYJavaClass extractKeYJavaClass(final File source)
-            throws CoreException {
+    private KeYJavaClass extractKeYJavaClass(final File source) throws CoreException {
 
         try {
 

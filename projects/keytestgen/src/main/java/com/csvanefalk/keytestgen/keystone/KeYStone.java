@@ -23,8 +23,7 @@ public class KeYStone {
 
     }
 
-    public Map<String, Integer> solveConstraint(final Term constraint)
-            throws KeYStoneException {
+    public Map<String, Integer> solveConstraint(final Term constraint) throws KeYStoneException {
 
         final Set<Term> minimalProblemSet = preprocessor.createMinimalProblemSet(constraint);
 

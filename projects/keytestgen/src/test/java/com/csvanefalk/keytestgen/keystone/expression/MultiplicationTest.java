@@ -16,8 +16,7 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyTwoPositives() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new NumericConstant(5));
+        IExpression expression = new Multiplication(new NumericConstant(10), new NumericConstant(5));
 
         Fraction expected = new Fraction(50);
         Fraction actual = expression.evaluate();
@@ -27,8 +26,8 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyThreePositives() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new Multiplication(new NumericConstant(5), new NumericConstant(15)));
+        IExpression expression = new Multiplication(new NumericConstant(10), new Multiplication(new NumericConstant(5),
+                                                                                                new NumericConstant(15)));
 
         Fraction expected = new Fraction(750);
         Fraction actual = expression.evaluate();
@@ -38,8 +37,7 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyTwoNegatives() {
 
-        IExpression expression = new Multiplication(new NumericConstant(-10),
-                new NumericConstant(-5));
+        IExpression expression = new Multiplication(new NumericConstant(-10), new NumericConstant(-5));
 
         Fraction expected = new Fraction(50);
         Fraction actual = expression.evaluate();
@@ -50,7 +48,8 @@ public class MultiplicationTest {
     public void testMultiplyThreeNegatives() {
 
         IExpression expression = new Multiplication(new NumericConstant(-10),
-                new Multiplication(new NumericConstant(-5), new NumericConstant(-15)));
+                                                    new Multiplication(new NumericConstant(-5),
+                                                                       new NumericConstant(-15)));
 
         Fraction expected = new Fraction(-750);
         Fraction actual = expression.evaluate();
@@ -60,8 +59,7 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyOnePositiveOneNegative() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new NumericConstant(-5));
+        IExpression expression = new Multiplication(new NumericConstant(10), new NumericConstant(-5));
 
         Fraction expected = new Fraction(-50);
         Fraction actual = expression.evaluate();
@@ -71,8 +69,7 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyOneNegativeOnePositive() {
 
-        IExpression expression = new Multiplication(new NumericConstant(-10),
-                new NumericConstant(5));
+        IExpression expression = new Multiplication(new NumericConstant(-10), new NumericConstant(5));
 
         Fraction expected = new Fraction(-50);
         Fraction actual = expression.evaluate();
@@ -82,8 +79,8 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyOnePositiveOneNegativeOnePositive() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new Multiplication(new NumericConstant(-5), new NumericConstant(15)));
+        IExpression expression = new Multiplication(new NumericConstant(10), new Multiplication(new NumericConstant(-5),
+                                                                                                new NumericConstant(15)));
 
         Fraction expected = new Fraction(-750);
         Fraction actual = expression.evaluate();
@@ -93,8 +90,8 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyOnePositiveOnePositiveOneNegative() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new Multiplication(new NumericConstant(5), new NumericConstant(-15)));
+        IExpression expression = new Multiplication(new NumericConstant(10), new Multiplication(new NumericConstant(5),
+                                                                                                new NumericConstant(-15)));
 
         Fraction expected = new Fraction(-750);
         Fraction actual = expression.evaluate();
@@ -104,8 +101,8 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyOnePositiveOneNegativeOneNegative() {
 
-        IExpression expression = new Multiplication(new NumericConstant(10),
-                new Multiplication(new NumericConstant(-5), new NumericConstant(-15)));
+        IExpression expression = new Multiplication(new NumericConstant(10), new Multiplication(new NumericConstant(-5),
+                                                                                                new NumericConstant(-15)));
 
         Fraction expected = new Fraction(750);
         Fraction actual = expression.evaluate();
@@ -115,8 +112,8 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyOneNegativeOnePositiveOnePositive() {
 
-        IExpression expression = new Multiplication(new NumericConstant(-10),
-                new Multiplication(new NumericConstant(5), new NumericConstant(15)));
+        IExpression expression = new Multiplication(new NumericConstant(-10), new Multiplication(new NumericConstant(5),
+                                                                                                 new NumericConstant(15)));
 
         Fraction expected = new Fraction(-750);
         Fraction actual = expression.evaluate();
@@ -126,8 +123,8 @@ public class MultiplicationTest {
     @Test
     public void testMultiplyOneNegativeOnePositiveOneNegative() {
 
-        IExpression expression = new Multiplication(new NumericConstant(-10),
-                new Multiplication(new NumericConstant(5), new NumericConstant(-15)));
+        IExpression expression = new Multiplication(new NumericConstant(-10), new Multiplication(new NumericConstant(5),
+                                                                                                 new NumericConstant(-15)));
 
         Fraction expected = new Fraction(750);
         Fraction actual = expression.evaluate();
@@ -138,7 +135,8 @@ public class MultiplicationTest {
     public void testMultiplyOneNegativeOneNegativeOnePositive() {
 
         IExpression expression = new Multiplication(new NumericConstant(-10),
-                new Multiplication(new NumericConstant(-5), new NumericConstant(15)));
+                                                    new Multiplication(new NumericConstant(-5),
+                                                                       new NumericConstant(15)));
 
         Fraction expected = new Fraction(750);
         Fraction actual = expression.evaluate();

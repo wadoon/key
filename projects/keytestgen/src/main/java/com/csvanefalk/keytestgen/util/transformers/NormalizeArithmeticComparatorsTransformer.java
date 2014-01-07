@@ -8,15 +8,13 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
-public class NormalizeArithmeticComparatorsTransformer extends
-        AbstractTermTransformer {
+public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTransformer {
 
     private static Sort INT_SORT = new SortImpl(new Name("int"));
 
     private static final TermBuilder termBuilder = TermBuilder.DF;
 
-    public static NormalizeArithmeticComparatorsTransformer getInstance(
-            final Services services) {
+    public static NormalizeArithmeticComparatorsTransformer getInstance(final Services services) {
         return new NormalizeArithmeticComparatorsTransformer(services);
     }
 
@@ -33,21 +31,18 @@ public class NormalizeArithmeticComparatorsTransformer extends
         if (TermParserTools.isInteger(term)) {
             int currentValue = 0;
             if (TermParserTools.isIntegerNegation(term.sub(0))) {
-                currentValue = Integer.parseInt("-"
-                        + TermParserTools.resolveNumber(term.sub(0).sub(0)));
+                currentValue = Integer.parseInt("-" + TermParserTools.resolveNumber(term.sub(0).sub(0)));
             } else {
                 currentValue = Integer.parseInt(TermParserTools.resolveNumber(term.sub(0)));
             }
 
             final int newValue = currentValue + toAdd;
-            return NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(
-                    services, Integer.toString(newValue));
+            return NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(services, Integer.toString(newValue));
 
         } else {
-            final Term val = NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(
-                    services, Integer.toString(toAdd));
-            return NormalizeArithmeticComparatorsTransformer.termBuilder.add(
-                    services, term, val);
+            final Term val = NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                      .zTerm(services, Integer.toString(toAdd));
+            return NormalizeArithmeticComparatorsTransformer.termBuilder.add(services, term, val);
         }
     }
 
@@ -63,61 +58,118 @@ public class NormalizeArithmeticComparatorsTransformer extends
     }
 
     @Override
-    protected Term transformBinaryFunction(final Term term)
-            throws TermTransformerException {
+    protected Term transformBinaryFunction(final Term term) throws TermTransformerException {
 
-        if (sawNegation && TermParserTools.isArithmeticComparator(term)) {
-
-            sawNegation = false;
+        if (TermParserTools.isArithmeticComparator(term)) {
 
             final Term leftChild = transform(term.sub(0));
             final Term rightChild = transform(term.sub(1));
 
-            /*
-             * Represents the value 1.
-             */
-            final Term one = NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(
-                    services, "1");
+            // Represents the value 1
+            final Term one = NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(services, "1");
 
-            if (TermParserTools.isGreaterOrEquals(term)) {
+            if (sawNegation) {
+                sawNegation = false;
 
-                final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder.add(
-                        services, leftChild, one);
-
-                return NormalizeArithmeticComparatorsTransformer.termBuilder.leq(
-                        incrementedChild, rightChild, services);
-            }
-
-            if (TermParserTools.isLessOrEquals(term)) {
-
-                final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder.add(
-                        services, rightChild, one);
-
-                return NormalizeArithmeticComparatorsTransformer.termBuilder.geq(
-                        leftChild, incrementedChild, services);
-            }
-
-            /*
-             * Negations of equalities translate to a pair of inequalities
-             * around the excluded value.
-             */
-            if (TermParserTools.isEquals(term)) {
-
-                final Term rhandMinusOne = addToZValue(rightChild, -1);
-                final Term rhandPlusOne = addToZValue(rightChild, 1);
-
-                final Term lessThanConstraint = NormalizeArithmeticComparatorsTransformer.termBuilder.leq(
-                        leftChild, rhandMinusOne, services);
-                final Term greaterThanConstraint = NormalizeArithmeticComparatorsTransformer.termBuilder.geq(
-                        leftChild, rhandPlusOne, services);
-
-                return NormalizeArithmeticComparatorsTransformer.termBuilder.or(
-                        lessThanConstraint, greaterThanConstraint);
                 /*
-                 * Term valueMinusOne = termBuilder.add(services, rightChild,
-                 * t2) Term leftInequality = termBuilder.leq( incrementedChild,
-                 * rightChild, services); Term inequalities;
+                 * The negation of a x >= y is x + 1 <= y.
                  */
+                if (TermParserTools.isGreaterOrEquals(term)) {
+
+                    final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                                           .add(services,
+                                                                                                leftChild,
+                                                                                                one);
+
+                    return NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                    .leq(incrementedChild, rightChild, services);
+                }
+
+                /*
+                 * The negation of a x <= y is x >= y + 1.
+                 */
+                if (TermParserTools.isLessOrEquals(term)) {
+
+                    final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                                           .add(services,
+                                                                                                rightChild,
+                                                                                                one);
+
+                    return NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                    .geq(leftChild, incrementedChild, services);
+                }
+
+                /*
+                 * The negation of a x < y is x >= y.
+                 */
+                if (TermParserTools.isLessThan(term)) {
+                    return NormalizeArithmeticComparatorsTransformer.termBuilder.geq(leftChild, rightChild, services);
+                }
+
+                /*
+                 * The negation of a x > y is x <= y.
+                 */
+                if (TermParserTools.isGreaterThan(term)) {
+                    return NormalizeArithmeticComparatorsTransformer.termBuilder.leq(leftChild, rightChild, services);
+                }
+
+                /*
+                 * Negations of equalities translate to a pair of inequalities around the excluded value.
+                 * For example, the negation of x==y is (x + 1 <= y) || (x >= y + 1).
+                 */
+                if (TermParserTools.isEquals(term)) {
+
+                    final Term lhandPlusOne = addToZValue(leftChild, 1);
+                    final Term rhandPlusOne = addToZValue(rightChild, 1);
+
+                    final Term lessThanConstraint = NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                                             .leq(lhandPlusOne,
+                                                                                                  rightChild,
+                                                                                                  services);
+
+                    final Term greaterThanConstraint = NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                                                .geq(leftChild,
+                                                                                                     rhandPlusOne,
+                                                                                                     services);
+
+                    return NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                    .or(lessThanConstraint, greaterThanConstraint);
+                }
+            }
+
+            /*
+             * If there is nothing to negate, simply transform less-than and greater-then inequalities
+             * into equivalent less-or-equals and greater-or-equals inequalities.
+             */
+            else {
+
+                /*
+                 * x < y is equivalent to x + 1 <= y.
+                 */
+                if (TermParserTools.isLessThan(term)) {
+
+                    final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                                           .add(services,
+                                                                                                leftChild,
+                                                                                                one);
+
+                    return NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                    .leq(incrementedChild, rightChild, services);
+                }
+
+                /*
+                 * x > y is equivalent to x >= y + 1.
+                 */
+                if (TermParserTools.isGreaterThan(term)) {
+
+                    final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                                           .add(services,
+                                                                                                rightChild,
+                                                                                                one);
+
+                    return NormalizeArithmeticComparatorsTransformer.termBuilder
+                                                                    .geq(leftChild, incrementedChild, services);
+                }
             }
         }
 
@@ -125,8 +177,7 @@ public class NormalizeArithmeticComparatorsTransformer extends
     }
 
     @Override
-    protected Term transformEquals(final Term term)
-            throws TermTransformerException {
+    protected Term transformEquals(final Term term) throws TermTransformerException {
         if (TermParserTools.isArithmeticComparator(term)) {
             return transformBinaryFunction(term);
         } else {
@@ -136,8 +187,7 @@ public class NormalizeArithmeticComparatorsTransformer extends
     }
 
     @Override
-    protected Term transformNot(final Term term)
-            throws TermTransformerException {
+    protected Term transformNot(final Term term) throws TermTransformerException {
         sawNegation = true;
         return transformTerm(term.sub(0));
     }
