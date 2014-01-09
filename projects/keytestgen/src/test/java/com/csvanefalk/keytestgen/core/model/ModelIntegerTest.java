@@ -2,7 +2,7 @@ package com.csvanefalk.keytestgen.core.model;
 
 import com.csvanefalk.keytestgen.core.keyinterface.KeYInterfaceException;
 import com.csvanefalk.keytestgen.core.model.implementation.Model;
-import com.csvanefalk.keytestgen.core.model.implementation.ModelVariable;
+import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
@@ -15,13 +15,13 @@ import java.util.List;
 public class ModelIntegerTest extends ModelTest {
 
     public ModelIntegerTest() throws KeYInterfaceException, IOException {
-        super("own");
+        super("own", false, "IntegerClass.java");
     }
 
     @Test
     public void testSolveSingleLessThanConstraintMin() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("min");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.min");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return a");
         Assert.assertTrue(nodes.size() == 1);
 
@@ -52,7 +52,7 @@ public class ModelIntegerTest extends ModelTest {
     @Test
     public void testSolveSingleLessThanConstraintMax() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("max");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.max");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
         Assert.assertTrue(nodes.size() == 1);
 
@@ -83,7 +83,7 @@ public class ModelIntegerTest extends ModelTest {
     @Test
     public void testSolveSingleLessThanConstraintMax_2() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("max_2");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.max_2");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
         Assert.assertTrue(nodes.size() == 1);
 
@@ -116,7 +116,7 @@ public class ModelIntegerTest extends ModelTest {
     @Test
     public void testSolveSingleGreaterThanConstraintMax() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("max");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.max");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return a");
         Assert.assertTrue(nodes.size() == 1);
 
@@ -147,7 +147,7 @@ public class ModelIntegerTest extends ModelTest {
     @Test
     public void testSolveSingleGreaterThanConstraintMin() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("min");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.min");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "return b");
         Assert.assertTrue(nodes.size() == 1);
 
@@ -178,7 +178,7 @@ public class ModelIntegerTest extends ModelTest {
     @Test
     public void testSolveCompoundConstraintMid() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("mid");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.mid");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=y");
         Assert.assertTrue(nodes.size() == 2);
 
@@ -217,7 +217,7 @@ public class ModelIntegerTest extends ModelTest {
     @Test
     public void testSolveCompoundConstraintMid2() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("mid");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.mid");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=y");
         Assert.assertTrue(nodes.size() == 2);
 
@@ -256,7 +256,7 @@ public class ModelIntegerTest extends ModelTest {
     @Test
     public void testSolveCompoundConstraintMid3() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("mid");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.mid");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=x");
         Assert.assertTrue(nodes.size() == 2);
 
@@ -295,7 +295,7 @@ public class ModelIntegerTest extends ModelTest {
     @Test
     public void testSolveCompoundConstraintMid4() throws ProofInputException, ModelGeneratorException {
 
-        IExecutionStart methodTree = getSymbolicTreeForMethod("mid");
+        IExecutionStart methodTree = getSymbolicTreeForMethod("IntegerClass.mid");
         List<IExecutionNode> nodes = getSymbolicExecutionNode(methodTree, "mid=x");
         Assert.assertTrue(nodes.size() == 2);
 

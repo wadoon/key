@@ -29,7 +29,7 @@ class SimplifyPostconditionTransformer extends AbstractTermTransformer {
         /*
          * Remove all SortDependingFunction instances from the Term.
          */
-        oracleTerm = RemoveSDPsTransformer.getInstance().transform(oracleTerm);
+        oracleTerm = RemoveSortDependingFunctionsTransformer.getInstance().transform(oracleTerm);
 
         /*
          * Remove all implications

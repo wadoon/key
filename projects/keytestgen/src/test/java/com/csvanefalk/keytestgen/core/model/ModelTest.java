@@ -17,4 +17,10 @@ public class ModelTest extends CoreTest {
         super(dir);
     }
 
+    public ModelTest(String dir,
+                     boolean loadSubDirectories,
+                     String... files) throws KeYInterfaceException, IOException {
+        super(dir, loadSubDirectories, files);
+    }
+
 }

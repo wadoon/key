@@ -36,7 +36,6 @@ public class ModelBuilder {
          * Distribute negations and remove conjunctions
          */
         pathCondition = NegationNormalFormTransformer.getInstance().transform(pathCondition);
-
         pathCondition = EliminateConjunctionsTransformer.getInstance().transform(pathCondition);
 
         /*
@@ -44,7 +43,7 @@ public class ModelBuilder {
          * preorder to correctly handle non-assigning operations, such as
          * not-equals.
          */
-        final ResolveAssignmentsVisitor referenceVisitor = new ResolveAssignmentsVisitor(model);
+        final ModelAssignmentResolvingVisitor referenceVisitor = new ModelAssignmentResolvingVisitor(model);
         pathCondition.execPreOrder(referenceVisitor);
 
         return visitor.getModel();

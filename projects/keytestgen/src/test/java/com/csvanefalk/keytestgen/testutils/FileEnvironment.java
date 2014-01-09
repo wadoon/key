@@ -28,11 +28,21 @@ public class FileEnvironment {
                                                            final boolean includeSubdirectories,
                                                            String... files) {
 
-        List<File> javaFiles = loadAllJavaFilesInDirectory(directory, false);
+        List<File> javaFiles;
 
-        //Filter out all non-desired files
-        for (File file : javaFiles) {
-
+        if (files.length == 0) {
+            javaFiles = loadAllJavaFilesInDirectory(directory, includeSubdirectories);
+        } else {
+            //Filter out all non-desired files
+            javaFiles = new LinkedList<File>();
+            for (File file : loadAllJavaFilesInDirectory(directory, includeSubdirectories)) {
+                for (String acceptedFileName : files) {
+                    if (file.getName().equalsIgnoreCase(acceptedFileName)) {
+                        javaFiles.add(file);
+                        break;
+                    }
+                }
+            }
         }
 
         Map<String, File> sourceFiles = new HashMap<String, File>();

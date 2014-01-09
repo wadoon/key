@@ -5,7 +5,7 @@ import com.csvanefalk.keytestgen.core.model.ModelGeneratorException;
 import com.csvanefalk.keytestgen.core.model.SMT.PaperTest;
 import com.csvanefalk.keytestgen.core.model.implementation.Model;
 import com.csvanefalk.keytestgen.core.model.implementation.ModelBuilder;
-import com.csvanefalk.keytestgen.core.model.implementation.ModelVariable;
+import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import com.csvanefalk.keytestgen.core.model.tools.ModelGenerationTools;
 import com.csvanefalk.keytestgen.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.java.Services;

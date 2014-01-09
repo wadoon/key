@@ -1,5 +1,7 @@
 package com.csvanefalk.keytestgen.core.model.implementation;
 
+import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
+import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import de.uka.ilkd.key.logic.Term;
 
 import java.util.HashMap;
@@ -7,8 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Represents an abstract heap state, consisting of {@link ModelVariable}
- * instances together with associated {@link ModelInstance} instances. See
+ * Represents an abstract heap state, consisting of {@link com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable}
+ * instances together with associated {@link com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance} instances. See
  * separate documentation for both.
  *
  * @author christopher
@@ -63,10 +65,11 @@ public class Model {
 
         /*
          * TODO: This should throw an exception, not fail silently.
-         */
+
         if (!ModelVariable.isValidValueType(instance)) {
             return;
         }
+        */
 
         /*
          * Check if the variable already exists in the buffer.
@@ -101,32 +104,40 @@ public class Model {
         }
     }
 
+    public void add(final ModelVariable variable) {
+        add(variable, variable.getValue());
+    }
+
     /**
      * Places the variable target as a field of the {@link ModelInstance}
-     * referred to by the variable other.
+     * referred to by the variable targetVariable.
      *
-     * @param target the variable to insert as a field
-     * @param other  the variable pointing to the object instance we are inserting
-     *               into
+     * @param toBeInserted   the variable to insert as a field
+     * @param targetVariable the variable pointing to the object instance we are inserting
+     *                       into
      */
-    public void assignField(ModelVariable target, final ModelVariable other) {
+    public void assignField(ModelVariable toBeInserted, final ModelVariable targetVariable) {
 
-        if (!target.equals(other)) {
-            target = lookupVariable(target);
-            final ModelVariable localOther = lookupVariable(other);
+        if (!toBeInserted.equals(targetVariable)) {
+            toBeInserted = lookupVariable(toBeInserted);
+            ModelVariable localOther = lookupVariable(targetVariable);
+
+            if (localOther == null) {
+                localOther = targetVariable;
+            }
 
             /*
-             * If the other currently does not exist in the Model, buffer it for
+             * If the targetVariable currently does not exist in the Model, buffer it for
              * subsequent insertion.
              */
-            if (other == null) {
-                buffer.put(other, target);
+            if (targetVariable == null) {
+                buffer.put(targetVariable, toBeInserted);
                 return;
             }
 
             final ModelInstance instance = (ModelInstance) localOther.getValue();
-            instance.addField(target);
-            target.setParentModelInstance(instance);
+            instance.addField(toBeInserted);
+            toBeInserted.setParentModelInstance(instance);
         }
     }
 

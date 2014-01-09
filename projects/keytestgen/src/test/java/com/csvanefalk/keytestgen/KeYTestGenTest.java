@@ -43,6 +43,13 @@ public abstract class KeYTestGenTest {
         testEnvironment = TestEnvironment.loadEnvironmentForDirectory(directory, false);
     }
 
+    public KeYTestGenTest(String directory,
+                          boolean loadSubDirectories,
+                          String... files) throws KeYInterfaceException, IOException {
+
+        testEnvironment = TestEnvironment.loadEnvironmentForDirectory(directory, false, files);
+    }
+
     public KeYTestGenTest() {
         testEnvironment = null;
     }

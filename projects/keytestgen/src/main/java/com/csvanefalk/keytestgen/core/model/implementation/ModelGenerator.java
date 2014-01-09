@@ -3,13 +3,11 @@ package com.csvanefalk.keytestgen.core.model.implementation;
 import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.core.model.IModelGenerator;
 import com.csvanefalk.keytestgen.core.model.ModelGeneratorException;
+import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import com.csvanefalk.keytestgen.core.model.tools.ModelGenerationTools;
 import com.csvanefalk.keytestgen.keystone.KeYStone;
 import com.csvanefalk.keytestgen.keystone.KeYStoneException;
-import com.csvanefalk.keytestgen.util.transformers.NormalizeArithmeticComparatorsTransformer;
-import com.csvanefalk.keytestgen.util.transformers.RemoveIfThenElseTransformer;
-import com.csvanefalk.keytestgen.util.transformers.RemoveImplicationsTransformer;
-import com.csvanefalk.keytestgen.util.transformers.TermTransformerException;
+import com.csvanefalk.keytestgen.util.transformers.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -31,7 +29,7 @@ import java.util.Map;
  * the pathcondition (if such an assignment exits).
  * <p/>
  * The set of assignments found are further processed into an instance of
- * {@link IModel}, which constitutes the final representaiton of the model.
+ * {@link Model}, which constitutes the final representaiton of the model.
  */
 public class ModelGenerator implements IModelGenerator {
 
@@ -46,16 +44,6 @@ public class ModelGenerator implements IModelGenerator {
 
     KeYStone keYStone = KeYStone.getInstance();
 
-    public static void __DEBUG_DISPOSE() {
-        instance = null;
-    }
-
-    /**
-     * Constructs a standard model generator.
-     *
-     * @param solvers  the solvers to use
-     * @param settings the settings for the used solvers
-     */
     private ModelGenerator() {
 
     }
@@ -64,8 +52,7 @@ public class ModelGenerator implements IModelGenerator {
      * generates a {@link Model} for the pathcondition of a single
      * {@link IExecutionNode}, i.e. a single program statement.
      *
-     * @param node     the node for which to generate a Model
-     * @param mediator session mediator
+     * @param node the node for which to generate a Model
      * @return the Model instance for the node
      * @throws ModelGeneratorException in the event that there was a failure to generate the Model
      */
@@ -90,10 +77,9 @@ public class ModelGenerator implements IModelGenerator {
             }
 
             /*
-             * Bring the pathcondition into a simplified form suitable for model
-             * generation.
+             * Bring the pathcondition into a simplified form suitable for model generation.
              */
-            pathCondition = simplifyPathCondition(pathCondition);
+            pathCondition = configurePathConditionForModelGeneration(pathCondition);
 
             /*
              * Create the initial Model, without any concrete values assigned to
@@ -119,29 +105,43 @@ public class ModelGenerator implements IModelGenerator {
         }
     }
 
-    private Term simplifyPathCondition(Term pathCondition) throws TermTransformerException {
+    /**
+     * Brings a pathcondition into a state which is suitable for model generation.
+     *
+     * @param pathCondition
+     * @return
+     * @throws TermTransformerException
+     */
+    private Term configurePathConditionForModelGeneration(Term pathCondition) throws TermTransformerException {
 
-        /*
-         * Resolve and remove axiomatic statements (hack...)
-
-        pathCondition = RemoveAxiomaticExpressionsTransformer.getInstance().transform(
-                pathCondition);
-         */
         /*
          * Remove all implications from the path condition.
          */
         pathCondition = RemoveImplicationsTransformer.getInstance().transform(pathCondition);
 
         /*
-         * Remove disjunctions from the path condition.
-
-        pathCondition = RemoveDisjunctionsTransformer.getInstance().transform(
-                pathCondition);
-         */
-        /*
          * Remove if-then-else assertions from the path condition.
          */
         pathCondition = RemoveIfThenElseTransformer.getInstance().transform(pathCondition);
+
+        return pathCondition;
+    }
+
+    /**
+     * Configures a path condition for generating concrete integer values.
+     *
+     * @param pathCondition
+     * @return
+     */
+    private Term configurePathConditionForIntegerGeneration(Term pathCondition,
+                                                            Services services) throws TermTransformerException {
+
+        pathCondition = RemoveObserverFunctionsTransformer.getInstance().transform(pathCondition);
+
+        pathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
+
+        pathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(services)
+                                                                 .transform(pathCondition);
 
         return pathCondition;
     }
@@ -159,16 +159,7 @@ public class ModelGenerator implements IModelGenerator {
 
         try {
 
-            /*
-             * Simplify the path condition. If the simplified path condition is
-             * null, this means that it does not contain any primitive values.
-             * There is hence nothing useful we can do with it, and we just
-             * return it as null.
-             */
-            Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
-
-            simplifiedPathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(services)
-                                                                               .transform(simplifiedPathCondition);
+            Term simplifiedPathCondition = configurePathConditionForIntegerGeneration(pathCondition, services);
 
             long time = Calendar.getInstance().getTimeInMillis();
 
@@ -202,5 +193,4 @@ public class ModelGenerator implements IModelGenerator {
             }
         }
     }
-
 }

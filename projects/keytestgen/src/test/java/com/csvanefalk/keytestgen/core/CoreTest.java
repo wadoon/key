@@ -16,4 +16,8 @@ public class CoreTest extends KeYTestGenTest {
     public CoreTest(String dir) throws KeYInterfaceException, IOException {
         super(dir);
     }
+
+    public CoreTest(String dir, boolean loadSubDirectories, String... files) throws KeYInterfaceException, IOException {
+        super(dir, loadSubDirectories, files);
+    }
 }

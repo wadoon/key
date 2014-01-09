@@ -2,7 +2,7 @@ package com.csvanefalk.keytestgen.util.parsers;
 
 import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.core.model.implementation.Model;
-import com.csvanefalk.keytestgen.core.model.implementation.ModelVariable;
+import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import com.csvanefalk.keytestgen.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -510,7 +510,6 @@ public final class TermParserTools {
     }
 
     /**
-     * @param term the term
      * @return true iff. the term is of a primitive type, false otherwise.
      */
     public static boolean isPrimitiveType(final String type) {
@@ -673,7 +672,6 @@ public final class TermParserTools {
          * symbolic heap here, so we simply return the root name.
          */
         else if ((operator.getClass() == Function.class) && !operator.toString().equals("heap")) {
-
             return "self";
         }
 
@@ -684,16 +682,33 @@ public final class TermParserTools {
         else {
 
             if (TermParserTools.isNullSort(term.sub(1))) {
-
                 return TermParserTools.getVariableNameForTerm(term.sub(2));
+            }
 
+            // Handle the special case where the SDF is an array accessor
+            else if (term.sub(2).toString().startsWith(StringConstants.ARRAY)) {
+                return TermParserTools.resolveIdentifierString(term.sub(1),
+                                                               separator) + TermParserTools.resolveArrayAccessor(term.sub(
+                        2));
             } else {
-
                 return TermParserTools.resolveIdentifierString(term.sub(1),
                                                                separator) + separator + TermParserTools.getVariableNameForTerm(
                         term.sub(2));
             }
         }
+    }
+
+    /**
+     * @param term the term to check
+     * @return true if the term represents and Array, or false otherwise
+     */
+    public static boolean isArrayType(Term term) {
+        return term.sort() instanceof ArraySort;
+    }
+
+    private static String resolveArrayAccessor(final Term term) {
+
+        return "[" + TermParserTools.resolveNumber(term.sub(0)) + "]";
     }
 
     public static String resolveNumber(final Term term) {
@@ -702,6 +717,8 @@ public final class TermParserTools {
 
         if (numberString.equals("#")) {
             return "";
+        } else if (numberString.equalsIgnoreCase(StringConstants.Z)) {
+            return TermParserTools.resolveNumber(term.sub(0)) + "";
         } else {
             return TermParserTools.resolveNumber(term.sub(0)) + numberString;
         }
