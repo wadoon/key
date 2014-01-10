@@ -6,18 +6,7 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="56178314-d8da-4be1-b105-b411ca0889c3" name="Default" comment="Array accessors now rendering correctly in the ModelGenerator.">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/key.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/antlr.jar" afterPath="$PROJECT_DIR$/lib/antlr.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/repo/antlr_custom/antlr_custom/2.7.2/antlr_custom-2.7.2.jar" afterPath="$PROJECT_DIR$/repo/antlr_custom/antlr_custom/2.7.2/antlr_custom-2.7.2.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/repo/de/uka/ilkd/key/2.0/key-2.0.jar" afterPath="$PROJECT_DIR$/repo/de/uka/ilkd/key/2.0/key-2.0.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/key.jar" afterPath="$PROJECT_DIR$/lib/key.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__de_uka_ilkd_key_2_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__de_uka_ilkd_key_2_0.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/keytestgen.iml" afterPath="$PROJECT_DIR$/keytestgen.iml" />
-    </list>
+    <list default="true" id="56178314-d8da-4be1-b105-b411ca0889c3" name="Default" comment="Cleaning redundant dependencies." />
     <ignored path="keytestgen.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -238,10 +227,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="pom.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="21" selection-start="392" selection-end="392" vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="1335">
+            <state line="19" column="34" selection-start="694" selection-end="694" vertical-scroll-proportion="0.4357798" vertical-offset="0" max-vertical-offset="1260">
               <folding />
             </state>
           </provider>
@@ -256,10 +245,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="KeYInterface.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="KeYInterface.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="271" column="28" selection-start="13394" selection-end="13394" vertical-scroll-proportion="3.8135593" vertical-offset="2100" max-vertical-offset="4275">
+            <state line="270" column="87" selection-start="13365" selection-end="13365" vertical-scroll-proportion="0.0" vertical-offset="2719" max-vertical-offset="4275">
               <folding />
             </state>
           </provider>
@@ -314,7 +303,6 @@
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/backend/AbstractJavaSourceGenerator.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/frontend/cli/commandlineinterfacetest/ExecuteTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaClassFactory.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/Preprocessor.java" />
@@ -352,6 +340,7 @@
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
   </component>
@@ -412,7 +401,7 @@
     <option name="STATE" value="0" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+    <navigator proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -423,100 +412,7 @@
       <autoscrollFromSource />
       <sortByType />
     </navigator>
-    <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Maven: de.uka.ilkd:key:2.0" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key-2.0.jar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Maven: de.uka.ilkd:key:2.0" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key-2.0.jar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Maven: de.uka.ilkd:key:2.0" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key-2.0.jar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="key" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="speclang" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="project.structure.last.edited" value="Project" />
@@ -999,7 +895,8 @@
       <workItem from="1389367032737" duration="748000" />
       <workItem from="1389372031705" duration="360000" />
       <workItem from="1389372781011" duration="990000" />
-      <workItem from="1389374287103" duration="221000" />
+      <workItem from="1389374287103" duration="411000" />
+      <workItem from="1389375094045" duration="376000" />
     </task>
     <task id="LOCAL-00001" summary="Fixing project setup. Should build cleanly now.">
       <created>1385056912112</created>
@@ -1073,14 +970,18 @@
       <created>1389197948062</created>
       <updated>1389197948062</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Cleaning redundant dependencies.">
+      <created>1389375666405</created>
+      <updated>1389375666405</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72578000" />
+    <option name="totallyTimeSpent" value="73144000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1280" height="774" extended-state="0" />
+    <frame x="0" y="22" width="1280" height="774" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1104,7 +1005,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21171875" sideWeight="0.672949" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29140624" sideWeight="0.672949" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32340425" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32340425" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1148,7 +1049,8 @@
     <MESSAGE value="Revamping FileEnvironment to provide filtering for select files. Reintegrated ModelIntegerTest and verified that all test cases are in the green." />
     <MESSAGE value="Refactoring the ModelGenerator" />
     <MESSAGE value="Array accessors now rendering correctly in the ModelGenerator." />
-    <option name="LAST_COMMIT_MESSAGE" value="Array accessors now rendering correctly in the ModelGenerator." />
+    <MESSAGE value="Cleaning redundant dependencies." />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaning redundant dependencies." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -1189,11 +1091,6 @@
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/src.zip!/java/util/zip/ZipFile.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="759" column="31" selection-start="25570" selection-end="25570" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="11145" />
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/key.jar!/de/uka/ilkd/key/parser/KeYParser.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="30" selection-start="127" selection-end="149" vertical-scroll-proportion="-1.8" vertical-offset="0" max-vertical-offset="11160" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java">
@@ -1254,11 +1151,6 @@
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/SMT/ArrayIndexReadAccessTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="23" column="24" selection-start="914" selection-end="914" vertical-scroll-proportion="0.0" vertical-offset="54" max-vertical-offset="480" />
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/key.jar!/de/uka/ilkd/key/logic/TermImpl.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="43" selection-start="2651" selection-end="2651" vertical-scroll-proportion="0.0" vertical-offset="553" max-vertical-offset="1575" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/java/JavaInfo.java">
@@ -1406,20 +1298,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="21" selection-start="392" selection-end="392" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1335">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="105" column="0" selection-start="3431" selection-end="3431" vertical-scroll-proportion="0.0" vertical-offset="1245" max-vertical-offset="2520">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/speclang/ContractWrapper.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="13" selection-start="167" selection-end="167" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="300">
@@ -1434,9 +1312,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="105" column="0" selection-start="3431" selection-end="3431" vertical-scroll-proportion="0.0" vertical-offset="1245" max-vertical-offset="2520">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="271" column="28" selection-start="13394" selection-end="13394" vertical-scroll-proportion="3.8135593" vertical-offset="2100" max-vertical-offset="4275">
+        <state line="270" column="87" selection-start="13365" selection-end="13365" vertical-scroll-proportion="0.0" vertical-offset="2719" max-vertical-offset="4275">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="34" selection-start="694" selection-end="694" vertical-scroll-proportion="0.4357798" vertical-offset="0" max-vertical-offset="1260">
           <folding />
         </state>
       </provider>
