@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/system/proofExamples/standard_key/BookExamples/10UsingKeY/Bank-JML/BankJML.iml" filepath="$PROJECT_DIR$/system/proofExamples/standard_key/BookExamples/10UsingKeY/Bank-JML/BankJML.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key-devel.iml" filepath="$PROJECT_DIR$/key-devel.iml" />
+    </modules>
+  </component>
+</project>
+
