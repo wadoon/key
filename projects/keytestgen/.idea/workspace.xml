@@ -6,8 +6,17 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="56178314-d8da-4be1-b105-b411ca0889c3" name="Default" comment="Adding basic array datatypes. Refactoring.">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    <list default="true" id="56178314-d8da-4be1-b105-b411ca0889c3" name="Default" comment="Array accessors now rendering correctly in the ModelGenerator.">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/key.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/antlr.jar" afterPath="$PROJECT_DIR$/lib/antlr.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/repo/antlr_custom/antlr_custom/2.7.2/antlr_custom-2.7.2.jar" afterPath="$PROJECT_DIR$/repo/antlr_custom/antlr_custom/2.7.2/antlr_custom-2.7.2.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/repo/de/uka/ilkd/key/2.0/key-2.0.jar" afterPath="$PROJECT_DIR$/repo/de/uka/ilkd/key/2.0/key-2.0.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/key.jar" afterPath="$PROJECT_DIR$/lib/key.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__de_uka_ilkd_key_2_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__de_uka_ilkd_key_2_0.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/keytestgen.iml" afterPath="$PROJECT_DIR$/keytestgen.iml" />
     </list>
     <ignored path="keytestgen.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -211,19 +220,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelArrayInstance.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java">
+      <file leaf-file-name="ModelArrayVariable.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelArrayVariable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="47" selection-start="644" selection-end="644" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="510">
+            <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="330">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelGenerator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
+      <file leaf-file-name="ModelInstanceFactory.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstanceFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="90" column="8" selection-start="3464" selection-end="3464" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2790">
+            <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="360" max-vertical-offset="480">
               <folding />
             </state>
           </provider>
@@ -232,7 +241,7 @@
       <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="11" column="38" selection-start="469" selection-end="508" vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="1335">
+            <state line="7" column="21" selection-start="392" selection-end="392" vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="1335">
               <folding />
             </state>
           </provider>
@@ -241,100 +250,25 @@
       <file leaf-file-name="KeYJavaMethod.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="116" column="31" selection-start="3736" selection-end="3736" vertical-scroll-proportion="0.0" vertical-offset="1315" max-vertical-offset="2325">
+            <state line="105" column="0" selection-start="3431" selection-end="3431" vertical-scroll-proportion="0.0" vertical-offset="1575" max-vertical-offset="2610">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MAVEN/com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" pinned="false" current="true" current-in-tab="true">
-        <entry file="uml://MAVEN/com.csvanefalk:keytestgen:0.0.1-SNAPSHOT">
-          <provider selected="true" editor-type-id="UmlEditorProvider">
-            <state>
-              <ID>MAVEN</ID>
-              <OriginalElement>com.csvanefalk:keytestgen:0.0.1-SNAPSHOT</OriginalElement>
-              <nodes>
-                <node x="131.0" y="273.0">com.beust:jcommander:jar:1.32</node>
-                <node x="496.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1/org.hamcrest:hamcrest-core:jar:1.3</node>
-                <node x="222.0" y="156.0">junit:junit:jar:4.11/org.hamcrest:hamcrest-core:jar:1.3</node>
-                <node x="131.0" y="0.0">antlr_custom:antlr_custom:jar:2.7.2</node>
-                <node x="0.0" y="0.0">com.csvanefalk:keytestgen:0.0.1-SNAPSHOT</node>
-                <node x="131.0" y="78.0">de.uka.ilkd:key:jar:2.0</node>
-                <node x="131.0" y="39.0">javacc:javacc:jar:1.6</node>
-                <node x="131.0" y="195.0">org.apache.commons:commons-math3:jar:3.0</node>
-                <node x="328.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1</node>
-                <node x="131.0" y="156.0">junit:junit:jar:4.11</node>
-                <node x="131.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1</node>
-                <node x="131.0" y="117.0">de.uka.ilkd:recoderKey:jar:2.0</node>
-              </nodes>
-              <notes />
-              <edges>
-                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="org.hamcrest:hamcrest-integration:jar:1.2.1">
-                  <point x="0.0" y="0.0" />
-                  <point x="50.5" y="248.5" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="antlr_custom:antlr_custom:jar:2.7.2">
-                  <point x="0.0" y="0.0" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1" target="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1/org.hamcrest:hamcrest-core:jar:1.3">
-                  <point x="0.0" y="0.0" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="com.beust:jcommander:jar:1.32">
-                  <point x="0.0" y="0.0" />
-                  <point x="50.5" y="287.5" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="de.uka.ilkd:recoderKey:jar:2.0">
-                  <point x="0.0" y="0.0" />
-                  <point x="50.5" y="131.5" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="javacc:javacc:jar:1.6">
-                  <point x="0.0" y="0.0" />
-                  <point x="50.5" y="53.5" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="de.uka.ilkd:key:jar:2.0">
-                  <point x="0.0" y="0.0" />
-                  <point x="50.5" y="92.5" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="junit:junit:jar:4.11" target="junit:junit:jar:4.11/org.hamcrest:hamcrest-core:jar:1.3">
-                  <point x="0.0" y="0.0" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="org.apache.commons:commons-math3:jar:3.0">
-                  <point x="0.0" y="0.0" />
-                  <point x="50.5" y="209.5" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="org.hamcrest:hamcrest-integration:jar:1.2.1" target="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1">
-                  <point x="0.0" y="0.0" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="junit:junit:jar:4.11">
-                  <point x="0.0" y="0.0" />
-                  <point x="50.5" y="170.5" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-              </edges>
-              <settings layout="Hierarchic Group" zoom="1.0" x="310.5" y="271.5" />
-              <SelectedNodes>
-                <node>com.beust:jcommander:jar:1.32</node>
-              </SelectedNodes>
-              <Categories />
-              <VISIBILITY>All</VISIBILITY>
+      <file leaf-file-name="KeYInterface.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="271" column="28" selection-start="13394" selection-end="13394" vertical-scroll-proportion="3.8135593" vertical-offset="2100" max-vertical-offset="4275">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelBuilder.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilder.java">
+      <file leaf-file-name="ContractWrapper.class" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/speclang/ContractWrapper.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="14" selection-start="1974" selection-end="1974" vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="840">
+            <state line="6" column="13" selection-start="167" selection-end="167" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="300">
               <folding />
             </state>
           </provider>
@@ -380,8 +314,9 @@
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/backend/AbstractJavaSourceGenerator.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/frontend/cli/commandlineinterfacetest/ExecuteTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaClassFactory.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/Preprocessor.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/NormalizeArithmeticComparatorsTransformer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/KeYStone.java" />
@@ -416,8 +351,7 @@
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelInstance.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" />
       </list>
     </option>
   </component>
@@ -435,31 +369,14 @@
           <option name="myItemId" value="" />
           <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
         </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="keytestgen" />
-          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Dependencies" />
-          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$DependenciesNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="" />
-          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="keytestgen" />
-          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
-        </PATH_ELEMENT>
       </PATH>
     </treeState>
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds">
+    <option name="y" value="22" />
     <option name="width" value="1280" />
-    <option name="height" value="800" />
+    <option name="height" value="774" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -507,8 +424,8 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -516,15 +433,9 @@
               <option name="myItemId" value="keytestgen" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -533,37 +444,15 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+              <option name="myItemId" value="Maven: de.uka.ilkd:key:2.0" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
+              <option name="myItemId" value="key-2.0.jar" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -573,23 +462,19 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Maven: de.uka.ilkd:key:2.0" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key-2.0.jar" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
+              <option name="myItemId" value="key" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -599,27 +484,23 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Maven: de.uka.ilkd:key:2.0" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key-2.0.jar" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
+              <option name="myItemId" value="key" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="util" />
+              <option name="myItemId" value="speclang" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -630,246 +511,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="util" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="transformers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="frontend" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="model" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="model" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="implementation" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="model" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="implementation" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="variable" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="keytestgen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="model" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="implementation" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="instance" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -883,9 +524,9 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="recentsLimit" value="5" />
-    <property name="options.lastSelected" value="fileTemplates" />
+    <property name="options.lastSelected" value="reference.idesettings.debugger.dataviews" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../system/src" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../eclipse" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
@@ -911,13 +552,15 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="1063" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
-    <property name="FullScreen" value="true" />
+    <property name="FullScreen" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="SearchEverywhereHistory" value="pom&#10;mode&#10;S&#10;POM" />
+    <property name="SearchEverywhereHistory" value="mode&#10;S&#10;POM&#10;pom" />
     <property name="LayoutCode.rearrangeEntries" value="false" />
     <property name="LayoutCode.rearrangeEntriesJava" value="true" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="OverrideImplement.overriding.sorted" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
   </component>
   <component name="RunManager" selected="JUnit.ModelIntegerTest">
     <configuration default="false" name="ModelIntegerTest.testSolveCompoundConstraintMid2" type="JUnit" factoryName="JUnit" temporary="true">
@@ -1077,28 +720,6 @@
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m" />
       <option name="PROGRAM_PARAMETERS" />
-      <method />
-    </configuration>
-    <configuration default="true" type="MavenRunConfiguration" factoryName="Maven">
-      <MavenSettings>
-        <option name="myGeneralSettings" />
-        <option name="myRunnerSettings" />
-        <option name="myRunnerParameters">
-          <MavenRunnerParameters>
-            <option name="profiles">
-              <set />
-            </option>
-            <option name="goals">
-              <list />
-            </option>
-            <option name="profilesMap">
-              <map />
-            </option>
-            <option name="resolveToWorkspace" value="false" />
-            <option name="workingDirPath" value="" />
-          </MavenRunnerParameters>
-        </option>
-      </MavenSettings>
       <method />
     </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
@@ -1372,8 +993,13 @@
       <workItem from="1389034745766" duration="14158000" />
       <workItem from="1389093856760" duration="435000" />
       <workItem from="1389098454528" duration="15596000" />
-      <workItem from="1389190300293" duration="21436000" />
-      <workItem from="1389353405211" duration="990000" />
+      <workItem from="1389190300293" duration="19812000" />
+      <workItem from="1389366718173" duration="5000" />
+      <workItem from="1389366946276" duration="79000" />
+      <workItem from="1389367032737" duration="748000" />
+      <workItem from="1389372031705" duration="360000" />
+      <workItem from="1389372781011" duration="990000" />
+      <workItem from="1389374287103" duration="221000" />
     </task>
     <task id="LOCAL-00001" summary="Fixing project setup. Should build cleanly now.">
       <created>1385056912112</created>
@@ -1447,18 +1073,14 @@
       <created>1389197948062</created>
       <updated>1389197948062</updated>
     </task>
-    <task id="LOCAL-00019" summary="Adding basic array datatypes. Refactoring.">
-      <created>1389295072603</created>
-      <updated>1389295072603</updated>
-    </task>
-    <option name="localTasksCounter" value="20" />
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72789000" />
+    <option name="totallyTimeSpent" value="72578000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
+    <frame x="0" y="22" width="1280" height="774" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1475,14 +1097,14 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32979852" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23373175" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2496454" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2296875" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="1410" y="97" width="510" height="943" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31640625" sideWeight="0.672949" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21171875" sideWeight="0.672949" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29140624" sideWeight="0.672949" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3240372" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32340425" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1526,8 +1148,7 @@
     <MESSAGE value="Revamping FileEnvironment to provide filtering for select files. Reintegrated ModelIntegerTest and verified that all test cases are in the green." />
     <MESSAGE value="Refactoring the ModelGenerator" />
     <MESSAGE value="Array accessors now rendering correctly in the ModelGenerator." />
-    <MESSAGE value="Adding basic array datatypes. Refactoring." />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding basic array datatypes. Refactoring." />
+    <option name="LAST_COMMIT_MESSAGE" value="Array accessors now rendering correctly in the ModelGenerator." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -1543,6 +1164,13 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="690" max-vertical-offset="1875">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/src.zip!/java/lang/ClassLoader.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="436" column="0" selection-start="16714" selection-end="16714" vertical-scroll-proportion="0.0" vertical-offset="5533" max-vertical-offset="32730" />
@@ -1570,9 +1198,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="168" column="0" selection-start="5856" selection-end="5856" vertical-scroll-proportion="0.0" vertical-offset="1788" max-vertical-offset="2490">
-          <folding />
-        </state>
+        <state line="168" column="0" selection-start="5856" selection-end="5856" vertical-scroll-proportion="0.0" vertical-offset="1788" max-vertical-offset="2490" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/Preprocessor.java">
@@ -1617,9 +1243,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/KeYTestGenTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="0" selection-start="2250" selection-end="2250" vertical-scroll-proportion="0.0" vertical-offset="358" max-vertical-offset="5835">
-          <folding />
-        </state>
+        <state line="59" column="0" selection-start="2250" selection-end="2250" vertical-scroll-proportion="0.0" vertical-offset="358" max-vertical-offset="5835" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelIntegerTest.java">
@@ -1679,9 +1303,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="53" selection-start="776" selection-end="776" vertical-scroll-proportion="0.014084507" vertical-offset="294" max-vertical-offset="780">
-          <folding />
-        </state>
+        <state line="20" column="53" selection-start="776" selection-end="776" vertical-scroll-proportion="0.014084507" vertical-offset="294" max-vertical-offset="780" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/logic/Name.java">
@@ -1721,42 +1343,37 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelVariable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="122" column="42" selection-start="4032" selection-end="4032" vertical-scroll-proportion="0.0" vertical-offset="1438" max-vertical-offset="2595">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="100" selection-start="1118" selection-end="1122" vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="1290">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelArrayVariable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstanceFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="46" max-vertical-offset="480">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="531" max-vertical-offset="1755">
-          <folding />
-        </state>
+        <state line="122" column="42" selection-start="4032" selection-end="4032" vertical-scroll-proportion="0.0" vertical-offset="1438" max-vertical-offset="2595" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="47" selection-start="644" selection-end="644" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="510">
+        <state line="15" column="47" selection-start="644" selection-end="644" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="510" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="27300" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="124" column="31" selection-start="4664" selection-end="4664" vertical-scroll-proportion="0.0" vertical-offset="1455" max-vertical-offset="2790" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="14" selection-start="1974" selection-end="1974" vertical-scroll-proportion="0.0" vertical-offset="249" max-vertical-offset="765" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="100" selection-start="1118" selection-end="1122" vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="1290" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="375" column="9" selection-start="14497" selection-end="14497" vertical-scroll-proportion="0.0" vertical-offset="5481" max-vertical-offset="7170">
           <folding />
         </state>
       </provider>
@@ -1775,120 +1392,52 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelArrayVariable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="375" column="9" selection-start="14497" selection-end="14497" vertical-scroll-proportion="0.0" vertical-offset="5481" max-vertical-offset="7170">
+        <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilder.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstanceFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="14" selection-start="1974" selection-end="1974" vertical-scroll-proportion="0.0" vertical-offset="249" max-vertical-offset="765">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="90" column="8" selection-start="3464" selection-end="3464" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2790">
+        <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="46" max-vertical-offset="480">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="38" selection-start="469" selection-end="508" vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="1335">
+        <state line="7" column="21" selection-start="392" selection-end="392" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1335">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="116" column="31" selection-start="3736" selection-end="3736" vertical-scroll-proportion="0.0" vertical-offset="1315" max-vertical-offset="2325">
+        <state line="105" column="0" selection-start="3431" selection-end="3431" vertical-scroll-proportion="0.0" vertical-offset="1245" max-vertical-offset="2520">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="uml://MAVEN/com.csvanefalk:keytestgen:0.0.1-SNAPSHOT">
-      <provider selected="true" editor-type-id="UmlEditorProvider">
-        <state>
-          <ID>MAVEN</ID>
-          <OriginalElement>com.csvanefalk:keytestgen:0.0.1-SNAPSHOT</OriginalElement>
-          <nodes>
-            <node x="131.0" y="273.0">com.beust:jcommander:jar:1.32</node>
-            <node x="496.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1/org.hamcrest:hamcrest-core:jar:1.3</node>
-            <node x="222.0" y="156.0">junit:junit:jar:4.11/org.hamcrest:hamcrest-core:jar:1.3</node>
-            <node x="131.0" y="0.0">antlr_custom:antlr_custom:jar:2.7.2</node>
-            <node x="0.0" y="0.0">com.csvanefalk:keytestgen:0.0.1-SNAPSHOT</node>
-            <node x="131.0" y="78.0">de.uka.ilkd:key:jar:2.0</node>
-            <node x="131.0" y="39.0">javacc:javacc:jar:1.6</node>
-            <node x="131.0" y="195.0">org.apache.commons:commons-math3:jar:3.0</node>
-            <node x="328.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1</node>
-            <node x="131.0" y="156.0">junit:junit:jar:4.11</node>
-            <node x="131.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1</node>
-            <node x="131.0" y="117.0">de.uka.ilkd:recoderKey:jar:2.0</node>
-          </nodes>
-          <notes />
-          <edges>
-            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="org.hamcrest:hamcrest-integration:jar:1.2.1">
-              <point x="0.0" y="0.0" />
-              <point x="50.5" y="248.5" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="antlr_custom:antlr_custom:jar:2.7.2">
-              <point x="0.0" y="0.0" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1" target="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1/org.hamcrest:hamcrest-core:jar:1.3">
-              <point x="0.0" y="0.0" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="com.beust:jcommander:jar:1.32">
-              <point x="0.0" y="0.0" />
-              <point x="50.5" y="287.5" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="de.uka.ilkd:recoderKey:jar:2.0">
-              <point x="0.0" y="0.0" />
-              <point x="50.5" y="131.5" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="javacc:javacc:jar:1.6">
-              <point x="0.0" y="0.0" />
-              <point x="50.5" y="53.5" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="de.uka.ilkd:key:jar:2.0">
-              <point x="0.0" y="0.0" />
-              <point x="50.5" y="92.5" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="junit:junit:jar:4.11" target="junit:junit:jar:4.11/org.hamcrest:hamcrest-core:jar:1.3">
-              <point x="0.0" y="0.0" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="org.apache.commons:commons-math3:jar:3.0">
-              <point x="0.0" y="0.0" />
-              <point x="50.5" y="209.5" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="org.hamcrest:hamcrest-integration:jar:1.2.1" target="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1">
-              <point x="0.0" y="0.0" />
-              <point x="0.0" y="0.0" />
-            </edge>
-            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="junit:junit:jar:4.11">
-              <point x="0.0" y="0.0" />
-              <point x="50.5" y="170.5" />
-              <point x="0.0" y="0.0" />
-            </edge>
-          </edges>
-          <settings layout="Hierarchic Group" zoom="1.0" x="310.5" y="271.5" />
-          <SelectedNodes>
-            <node>com.beust:jcommander:jar:1.32</node>
-          </SelectedNodes>
-          <Categories />
-          <VISIBILITY>All</VISIBILITY>
+    <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/speclang/ContractWrapper.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="13" selection-start="167" selection-end="167" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="300">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="531" max-vertical-offset="1755">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="271" column="28" selection-start="13394" selection-end="13394" vertical-scroll-proportion="3.8135593" vertical-offset="2100" max-vertical-offset="4275">
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1899,8 +1448,8 @@
         <settings>
           <artifact-editor>
             <show-content>
-              <type id="library" />
               <type id="artifact" />
+              <type id="library" />
             </show-content>
           </artifact-editor>
           <last-edited>keytestgen:jar</last-edited>
@@ -1939,7 +1488,7 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>1.7</last-edited>
+          <last-edited>1.6</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -1956,6 +1505,7 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>
@@ -1975,7 +1525,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>Maven: javacc:javacc:1.6</last-edited>
+          <last-edited>Maven: de.uka.ilkd:key:2.0</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -1986,10 +1536,6 @@
         </settings>
       </state>
     </states>
-  </component>
-  <component name="mavenExecuteGoalHistory">
-    <option value="$PROJECT_DIR$" />
-    <option value="install" />
   </component>
 </project>
 

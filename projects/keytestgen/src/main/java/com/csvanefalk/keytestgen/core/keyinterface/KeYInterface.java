@@ -267,7 +267,8 @@ public class KeYInterface {
         // Create symbolic execution tree which contains only the start node at beginning
         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(),
                                                                                 proof,
-                                                                                mergeBranchConditions);
+                                                                                mergeBranchConditions,
+                                                                                false);
         //builder.analyse();
         //assert (builder.getStartNode() != null);
         return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(environment, builder);
