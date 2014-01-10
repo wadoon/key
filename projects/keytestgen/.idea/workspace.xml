@@ -211,15 +211,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelArrayVariable.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelArrayVariable.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="330">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="ModelArrayInstance.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -229,20 +220,113 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelInstanceFactory.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstanceFactory.java">
+      <file leaf-file-name="ModelGenerator.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="46" max-vertical-offset="480">
+            <state line="90" column="8" selection-start="3464" selection-end="3464" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2790">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelGenerator.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
+      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="90" column="8" selection-start="3464" selection-end="3464" vertical-scroll-proportion="-0.32051283" vertical-offset="1350" max-vertical-offset="2790">
+            <state line="11" column="38" selection-start="469" selection-end="508" vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="1335">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="KeYJavaMethod.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="116" column="31" selection-start="3736" selection-end="3736" vertical-scroll-proportion="0.0" vertical-offset="1315" max-vertical-offset="2325">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MAVEN/com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" pinned="false" current="true" current-in-tab="true">
+        <entry file="uml://MAVEN/com.csvanefalk:keytestgen:0.0.1-SNAPSHOT">
+          <provider selected="true" editor-type-id="UmlEditorProvider">
+            <state>
+              <ID>MAVEN</ID>
+              <OriginalElement>com.csvanefalk:keytestgen:0.0.1-SNAPSHOT</OriginalElement>
+              <nodes>
+                <node x="131.0" y="273.0">com.beust:jcommander:jar:1.32</node>
+                <node x="496.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1/org.hamcrest:hamcrest-core:jar:1.3</node>
+                <node x="222.0" y="156.0">junit:junit:jar:4.11/org.hamcrest:hamcrest-core:jar:1.3</node>
+                <node x="131.0" y="0.0">antlr_custom:antlr_custom:jar:2.7.2</node>
+                <node x="0.0" y="0.0">com.csvanefalk:keytestgen:0.0.1-SNAPSHOT</node>
+                <node x="131.0" y="78.0">de.uka.ilkd:key:jar:2.0</node>
+                <node x="131.0" y="39.0">javacc:javacc:jar:1.6</node>
+                <node x="131.0" y="195.0">org.apache.commons:commons-math3:jar:3.0</node>
+                <node x="328.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1</node>
+                <node x="131.0" y="156.0">junit:junit:jar:4.11</node>
+                <node x="131.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1</node>
+                <node x="131.0" y="117.0">de.uka.ilkd:recoderKey:jar:2.0</node>
+              </nodes>
+              <notes />
+              <edges>
+                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="org.hamcrest:hamcrest-integration:jar:1.2.1">
+                  <point x="0.0" y="0.0" />
+                  <point x="50.5" y="248.5" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="antlr_custom:antlr_custom:jar:2.7.2">
+                  <point x="0.0" y="0.0" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1" target="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1/org.hamcrest:hamcrest-core:jar:1.3">
+                  <point x="0.0" y="0.0" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="com.beust:jcommander:jar:1.32">
+                  <point x="0.0" y="0.0" />
+                  <point x="50.5" y="287.5" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="de.uka.ilkd:recoderKey:jar:2.0">
+                  <point x="0.0" y="0.0" />
+                  <point x="50.5" y="131.5" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="javacc:javacc:jar:1.6">
+                  <point x="0.0" y="0.0" />
+                  <point x="50.5" y="53.5" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="de.uka.ilkd:key:jar:2.0">
+                  <point x="0.0" y="0.0" />
+                  <point x="50.5" y="92.5" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="junit:junit:jar:4.11" target="junit:junit:jar:4.11/org.hamcrest:hamcrest-core:jar:1.3">
+                  <point x="0.0" y="0.0" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="org.apache.commons:commons-math3:jar:3.0">
+                  <point x="0.0" y="0.0" />
+                  <point x="50.5" y="209.5" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="org.hamcrest:hamcrest-integration:jar:1.2.1" target="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1">
+                  <point x="0.0" y="0.0" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="junit:junit:jar:4.11">
+                  <point x="0.0" y="0.0" />
+                  <point x="50.5" y="170.5" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+              </edges>
+              <settings layout="Hierarchic Group" zoom="1.0" x="310.5" y="271.5" />
+              <SelectedNodes>
+                <node>com.beust:jcommander:jar:1.32</node>
+              </SelectedNodes>
+              <Categories />
+              <VISIBILITY>All</VISIBILITY>
             </state>
           </provider>
         </entry>
@@ -251,15 +335,6 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="45" column="14" selection-start="1974" selection-end="1974" vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="840">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ModelArrayTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="100" selection-start="1118" selection-end="1122" vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="1395">
               <folding />
             </state>
           </provider>
@@ -305,9 +380,7 @@
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/backend/AbstractJavaSourceGenerator.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/frontend/cli/commandlineinterfacetest/ExecuteTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaClassFactory.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/Preprocessor.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/NormalizeArithmeticComparatorsTransformer.java" />
@@ -343,6 +416,8 @@
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelInstance.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java" />
       </list>
     </option>
   </component>
@@ -359,6 +434,24 @@
         <PATH_ELEMENT>
           <option name="myItemId" value="" />
           <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="keytestgen" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Dependencies" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$DependenciesNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="keytestgen" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
         </PATH_ELEMENT>
       </PATH>
     </treeState>
@@ -820,13 +913,13 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
     <property name="FullScreen" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="SearchEverywhereHistory" value="mode&#10;S&#10;POM&#10;pom" />
+    <property name="SearchEverywhereHistory" value="pom&#10;mode&#10;S&#10;POM" />
     <property name="LayoutCode.rearrangeEntries" value="false" />
     <property name="LayoutCode.rearrangeEntriesJava" value="true" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="OverrideImplement.overriding.sorted" value="false" />
   </component>
-  <component name="RunManager" selected="JUnit.ArrayIndexReadAccessTest">
+  <component name="RunManager" selected="JUnit.ModelIntegerTest">
     <configuration default="false" name="ModelIntegerTest.testSolveCompoundConstraintMid2" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="keytestgen" />
@@ -984,6 +1077,28 @@
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m" />
       <option name="PROGRAM_PARAMETERS" />
+      <method />
+    </configuration>
+    <configuration default="true" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list />
+            </option>
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
       <method />
     </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
@@ -1200,8 +1315,8 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.ArrayIndexReadAccessTest" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.ArrayIndexReadAccessTest" />
         <item index="2" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest.testSolveCompoundConstraintMid2" />
         <item index="3" class="java.lang.String" itemvalue="JUnit.ExecuteTest" />
         <item index="4" class="java.lang.String" itemvalue="JUnit.com.csvanefalk.keytestgen.frontend.cli.commandlineinterfacetest in keytestgen" />
@@ -1258,7 +1373,7 @@
       <workItem from="1389093856760" duration="435000" />
       <workItem from="1389098454528" duration="15596000" />
       <workItem from="1389190300293" duration="21436000" />
-      <workItem from="1389353405211" duration="23000" />
+      <workItem from="1389353405211" duration="990000" />
     </task>
     <task id="LOCAL-00001" summary="Fixing project setup. Should build cleanly now.">
       <created>1385056912112</created>
@@ -1340,7 +1455,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="71822000" />
+    <option name="totallyTimeSpent" value="72789000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -1360,10 +1475,11 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32979852" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23373175" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2296875" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="1410" y="97" width="510" height="943" />
+      <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2296875" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="1410" y="97" width="510" height="943" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21197917" sideWeight="0.672949" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31640625" sideWeight="0.672949" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29140624" sideWeight="0.672949" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3240372" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -1372,7 +1488,6 @@
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3187251" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23373175" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -1448,16 +1563,6 @@
         <state line="759" column="31" selection-start="25570" selection-end="25570" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="11145" />
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/antlr_custom/antlr_custom/2.7.2/antlr_custom-2.7.2.jar!/antlr/collections/impl/LList.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="28" selection-start="1263" selection-end="1263" vertical-scroll-proportion="-11.84" vertical-offset="214" max-vertical-offset="615" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/antlr_custom/antlr_custom/2.7.2/antlr_custom-2.7.2.jar!/antlr/Parser.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="96" column="16" selection-start="4303" selection-end="4303" vertical-scroll-proportion="-6.96" vertical-offset="1251" max-vertical-offset="1875" />
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/key.jar!/de/uka/ilkd/key/parser/KeYParser.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="4" column="30" selection-start="127" selection-end="149" vertical-scroll-proportion="-1.8" vertical-offset="0" max-vertical-offset="11160" />
@@ -1465,7 +1570,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="168" column="0" selection-start="5856" selection-end="5856" vertical-scroll-proportion="0.0" vertical-offset="1788" max-vertical-offset="2490" />
+        <state line="168" column="0" selection-start="5856" selection-end="5856" vertical-scroll-proportion="0.0" vertical-offset="1788" max-vertical-offset="2490">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/Preprocessor.java">
@@ -1510,7 +1617,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/KeYTestGenTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="0" selection-start="2250" selection-end="2250" vertical-scroll-proportion="0.0" vertical-offset="358" max-vertical-offset="5835" />
+        <state line="59" column="0" selection-start="2250" selection-end="2250" vertical-scroll-proportion="0.0" vertical-offset="358" max-vertical-offset="5835">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelIntegerTest.java">
@@ -1521,11 +1630,6 @@
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/SMT/ArrayIndexReadAccessTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="23" column="24" selection-start="914" selection-end="914" vertical-scroll-proportion="0.0" vertical-offset="54" max-vertical-offset="480" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runner/JUnitCore.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="35" selection-start="1403" selection-end="1403" vertical-scroll-proportion="-8.92" vertical-offset="227" max-vertical-offset="645" />
       </provider>
     </entry>
     <entry file="jar://$PROJECT_DIR$/lib/key.jar!/de/uka/ilkd/key/logic/TermImpl.class">
@@ -1546,21 +1650,6 @@
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/targetmodels/arrays/ArrayIndexReadAccess.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="8" column="30" selection-start="268" selection-end="278" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="390" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runners/BlockJUnit4ClassRunner.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="1425" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runners/ParentRunner.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1095" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="40" selection-start="388" selection-end="388" vertical-scroll-proportion="0.4114713" vertical-offset="0" max-vertical-offset="401" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/AbstractTermTransformer.java">
@@ -1590,7 +1679,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="53" selection-start="776" selection-end="776" vertical-scroll-proportion="0.014084507" vertical-offset="294" max-vertical-offset="780" />
+        <state line="20" column="53" selection-start="776" selection-end="776" vertical-scroll-proportion="0.014084507" vertical-offset="294" max-vertical-offset="780">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/logic/Name.java">
@@ -1630,7 +1721,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelVariable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="122" column="42" selection-start="4032" selection-end="4032" vertical-scroll-proportion="0.0" vertical-offset="1438" max-vertical-offset="2595" />
+        <state line="122" column="42" selection-start="4032" selection-end="4032" vertical-scroll-proportion="0.0" vertical-offset="1438" max-vertical-offset="2595">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java">
@@ -1698,8 +1791,104 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="90" column="8" selection-start="3464" selection-end="3464" vertical-scroll-proportion="-0.32051283" vertical-offset="1350" max-vertical-offset="2790">
+        <state line="90" column="8" selection-start="3464" selection-end="3464" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2790">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="38" selection-start="469" selection-end="508" vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="1335">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="116" column="31" selection-start="3736" selection-end="3736" vertical-scroll-proportion="0.0" vertical-offset="1315" max-vertical-offset="2325">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://MAVEN/com.csvanefalk:keytestgen:0.0.1-SNAPSHOT">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>MAVEN</ID>
+          <OriginalElement>com.csvanefalk:keytestgen:0.0.1-SNAPSHOT</OriginalElement>
+          <nodes>
+            <node x="131.0" y="273.0">com.beust:jcommander:jar:1.32</node>
+            <node x="496.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1/org.hamcrest:hamcrest-core:jar:1.3</node>
+            <node x="222.0" y="156.0">junit:junit:jar:4.11/org.hamcrest:hamcrest-core:jar:1.3</node>
+            <node x="131.0" y="0.0">antlr_custom:antlr_custom:jar:2.7.2</node>
+            <node x="0.0" y="0.0">com.csvanefalk:keytestgen:0.0.1-SNAPSHOT</node>
+            <node x="131.0" y="78.0">de.uka.ilkd:key:jar:2.0</node>
+            <node x="131.0" y="39.0">javacc:javacc:jar:1.6</node>
+            <node x="131.0" y="195.0">org.apache.commons:commons-math3:jar:3.0</node>
+            <node x="328.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1</node>
+            <node x="131.0" y="156.0">junit:junit:jar:4.11</node>
+            <node x="131.0" y="234.0">org.hamcrest:hamcrest-integration:jar:1.2.1</node>
+            <node x="131.0" y="117.0">de.uka.ilkd:recoderKey:jar:2.0</node>
+          </nodes>
+          <notes />
+          <edges>
+            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="org.hamcrest:hamcrest-integration:jar:1.2.1">
+              <point x="0.0" y="0.0" />
+              <point x="50.5" y="248.5" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="antlr_custom:antlr_custom:jar:2.7.2">
+              <point x="0.0" y="0.0" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1" target="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1/org.hamcrest:hamcrest-core:jar:1.3">
+              <point x="0.0" y="0.0" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="com.beust:jcommander:jar:1.32">
+              <point x="0.0" y="0.0" />
+              <point x="50.5" y="287.5" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="de.uka.ilkd:recoderKey:jar:2.0">
+              <point x="0.0" y="0.0" />
+              <point x="50.5" y="131.5" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="javacc:javacc:jar:1.6">
+              <point x="0.0" y="0.0" />
+              <point x="50.5" y="53.5" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="de.uka.ilkd:key:jar:2.0">
+              <point x="0.0" y="0.0" />
+              <point x="50.5" y="92.5" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="junit:junit:jar:4.11" target="junit:junit:jar:4.11/org.hamcrest:hamcrest-core:jar:1.3">
+              <point x="0.0" y="0.0" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="org.apache.commons:commons-math3:jar:3.0">
+              <point x="0.0" y="0.0" />
+              <point x="50.5" y="209.5" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="org.hamcrest:hamcrest-integration:jar:1.2.1" target="org.hamcrest:hamcrest-integration:jar:1.2.1/org.hamcrest:hamcrest-library:jar:1.2.1">
+              <point x="0.0" y="0.0" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="com.csvanefalk:keytestgen:0.0.1-SNAPSHOT" target="junit:junit:jar:4.11">
+              <point x="0.0" y="0.0" />
+              <point x="50.5" y="170.5" />
+              <point x="0.0" y="0.0" />
+            </edge>
+          </edges>
+          <settings layout="Hierarchic Group" zoom="1.0" x="310.5" y="271.5" />
+          <SelectedNodes>
+            <node>com.beust:jcommander:jar:1.32</node>
+          </SelectedNodes>
+          <Categories />
+          <VISIBILITY>All</VISIBILITY>
         </state>
       </provider>
     </entry>
@@ -1797,6 +1986,10 @@
         </settings>
       </state>
     </states>
+  </component>
+  <component name="mavenExecuteGoalHistory">
+    <option value="$PROJECT_DIR$" />
+    <option value="install" />
   </component>
 </project>
 
