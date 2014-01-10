@@ -188,11 +188,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="375" column="9" selection-start="14497" selection-end="14497" vertical-scroll-proportion="0.0" vertical-offset="5481" max-vertical-offset="7170">
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#6972#6973#0" expanded="true" />
-                <element signature="e#7001#7002#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -200,7 +196,7 @@
       <file leaf-file-name="Model.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/Model.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="71" column="10" selection-start="2443" selection-end="2443" vertical-scroll-proportion="0.0" vertical-offset="1070" max-vertical-offset="3045">
+            <state line="71" column="10" selection-start="2443" selection-end="2443" vertical-scroll-proportion="0.0" vertical-offset="1065" max-vertical-offset="3180">
               <folding />
             </state>
           </provider>
@@ -209,7 +205,7 @@
       <file leaf-file-name="ModelAssignmentResolvingVisitor.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="135" column="67" selection-start="5721" selection-end="5721" vertical-scroll-proportion="0.0" vertical-offset="1798" max-vertical-offset="2445">
+            <state line="135" column="67" selection-start="5721" selection-end="5721" vertical-scroll-proportion="0.0" vertical-offset="2025" max-vertical-offset="2550">
               <folding />
             </state>
           </provider>
@@ -218,7 +214,7 @@
       <file leaf-file-name="ModelArrayVariable.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelArrayVariable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
+            <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="330">
               <folding />
             </state>
           </provider>
@@ -228,9 +224,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="15" column="47" selection-start="644" selection-end="644" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="510">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -239,9 +233,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstanceFactory.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="46" max-vertical-offset="480">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -249,7 +241,7 @@
       <file leaf-file-name="ModelGenerator.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="97" column="0" selection-start="3717" selection-end="3717" vertical-scroll-proportion="0.83651227" vertical-offset="923" max-vertical-offset="2790">
+            <state line="90" column="8" selection-start="3464" selection-end="3464" vertical-scroll-proportion="-0.32051283" vertical-offset="1350" max-vertical-offset="2790">
               <folding />
             </state>
           </provider>
@@ -258,7 +250,7 @@
       <file leaf-file-name="ModelBuilder.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="14" selection-start="1974" selection-end="1974" vertical-scroll-proportion="0.0" vertical-offset="249" max-vertical-offset="765">
+            <state line="45" column="14" selection-start="1974" selection-end="1974" vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="840">
               <folding />
             </state>
           </provider>
@@ -267,7 +259,7 @@
       <file leaf-file-name="ModelArrayTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="100" selection-start="1118" selection-end="1122" vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="1290">
+            <state line="30" column="100" selection-start="1118" selection-end="1122" vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="1395">
               <folding />
             </state>
           </provider>
@@ -276,7 +268,7 @@
       <file leaf-file-name="ModelInstance.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="531" max-vertical-offset="1755">
+            <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="690" max-vertical-offset="1875">
               <folding />
             </state>
           </provider>
@@ -798,7 +790,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="recentsLimit" value="5" />
-    <property name="options.lastSelected" value="reference.idesettings.debugger.dataviews" />
+    <property name="options.lastSelected" value="fileTemplates" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../system/src" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -1265,7 +1257,8 @@
       <workItem from="1389034745766" duration="14158000" />
       <workItem from="1389093856760" duration="435000" />
       <workItem from="1389098454528" duration="15596000" />
-      <workItem from="1389190300293" duration="19923000" />
+      <workItem from="1389190300293" duration="21436000" />
+      <workItem from="1389353405211" duration="23000" />
     </task>
     <task id="LOCAL-00001" summary="Fixing project setup. Should build cleanly now.">
       <created>1385056912112</created>
@@ -1347,7 +1340,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="70286000" />
+    <option name="totallyTimeSpent" value="71822000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -1359,27 +1352,27 @@
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32907802" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3187251" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.36653388" sideWeight="0.70436186" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36653388" sideWeight="0.70436186" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36712328" sideWeight="0.2956381" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32979852" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23373175" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2296875" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="1410" y="97" width="510" height="943" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21197917" sideWeight="0.672949" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.29140624" sideWeight="0.672949" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29140624" sideWeight="0.672949" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3240372" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3187251" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23373175" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -1472,37 +1465,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="168" column="0" selection-start="5856" selection-end="5856" vertical-scroll-proportion="0.0" vertical-offset="1788" max-vertical-offset="2490">
-          <folding />
-        </state>
+        <state line="168" column="0" selection-start="5856" selection-end="5856" vertical-scroll-proportion="0.0" vertical-offset="1788" max-vertical-offset="2490" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/Preprocessor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="98" column="0" selection-start="3164" selection-end="3164" vertical-scroll-proportion="0.0" vertical-offset="1193" max-vertical-offset="2160">
-          <folding />
-        </state>
+        <state line="98" column="0" selection-start="3164" selection-end="3164" vertical-scroll-proportion="0.0" vertical-offset="1193" max-vertical-offset="2160" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveObserverFunctionsTransformer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="23" selection-start="8" selection-end="23" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2745">
-          <folding />
-        </state>
+        <state line="0" column="23" selection-start="8" selection-end="23" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2745" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/CoreTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="0" selection-start="657" selection-end="657" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
-          <folding />
-        </state>
+        <state line="21" column="0" selection-start="657" selection-end="657" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="0" selection-start="747" selection-end="747" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="420">
-          <folding />
-        </state>
+        <state line="23" column="0" selection-start="747" selection-end="747" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="420" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.idea/copyright/profiles_settings.xml">
@@ -1512,50 +1495,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/targetmodels/arrays/ObjectArrayIndexWriteAccess.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="13" selection-start="69" selection-end="69" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="435">
-          <folding />
-        </state>
+        <state line="2" column="13" selection-start="69" selection-end="69" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="435" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/testutils/FileEnvironment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="0" selection-start="1887" selection-end="1887" vertical-scroll-proportion="0.0" vertical-offset="578" max-vertical-offset="2010">
-          <folding>
-            <element signature="e#1680#1694#0" expanded="false" />
-          </folding>
-        </state>
+        <state line="54" column="0" selection-start="1887" selection-end="1887" vertical-scroll-proportion="0.0" vertical-offset="578" max-vertical-offset="2010" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/testutils/TestEnvironment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="0" selection-start="2119" selection-end="2119" vertical-scroll-proportion="0.0" vertical-offset="478" max-vertical-offset="1995">
-          <folding>
-            <element signature="e#2175#2200#0" expanded="false" />
-          </folding>
-        </state>
+        <state line="54" column="0" selection-start="2119" selection-end="2119" vertical-scroll-proportion="0.0" vertical-offset="478" max-vertical-offset="1995" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/KeYTestGenTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="0" selection-start="2250" selection-end="2250" vertical-scroll-proportion="0.0" vertical-offset="358" max-vertical-offset="5835">
-          <folding />
-        </state>
+        <state line="59" column="0" selection-start="2250" selection-end="2250" vertical-scroll-proportion="0.0" vertical-offset="358" max-vertical-offset="5835" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelIntegerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="0" selection-start="601" selection-end="727" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4935">
-          <folding />
-        </state>
+        <state line="19" column="0" selection-start="601" selection-end="727" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4935" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/SMT/ArrayIndexReadAccessTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="24" selection-start="914" selection-end="914" vertical-scroll-proportion="0.0" vertical-offset="54" max-vertical-offset="480">
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
+        <state line="23" column="24" selection-start="914" selection-end="914" vertical-scroll-proportion="0.0" vertical-offset="54" max-vertical-offset="480" />
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runner/JUnitCore.class">
@@ -1570,144 +1535,102 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/java/JavaInfo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="997" column="0" selection-start="34265" selection-end="34265" vertical-scroll-proportion="0.0" vertical-offset="13873" max-vertical-offset="20055">
-          <folding />
-        </state>
+        <state line="997" column="0" selection-start="34265" selection-end="34265" vertical-scroll-proportion="0.0" vertical-offset="13873" max-vertical-offset="20055" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/SystemControl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="10" selection-start="415" selection-end="415" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="315">
-          <folding />
-        </state>
+        <state line="12" column="10" selection-start="415" selection-end="415" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="315" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/targetmodels/arrays/ArrayIndexReadAccess.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="30" selection-start="268" selection-end="278" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="390">
-          <folding />
-        </state>
+        <state line="8" column="30" selection-start="268" selection-end="278" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="390" />
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runners/BlockJUnit4ClassRunner.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="1425">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="1425" />
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runners/ParentRunner.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1095">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1095" />
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="40" selection-start="388" selection-end="388" vertical-scroll-proportion="0.4114713" vertical-offset="0" max-vertical-offset="401">
-          <folding />
-        </state>
+        <state line="11" column="40" selection-start="388" selection-end="388" vertical-scroll-proportion="0.4114713" vertical-offset="0" max-vertical-offset="401" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/AbstractTermTransformer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="503" column="24" selection-start="15460" selection-end="15460" vertical-scroll-proportion="1.5980148" vertical-offset="6751" max-vertical-offset="8010">
-          <folding />
-        </state>
+        <state line="503" column="24" selection-start="15460" selection-end="15460" vertical-scroll-proportion="1.5980148" vertical-offset="6751" max-vertical-offset="8010" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/tools/ModelGenerationTools.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="213" column="23" selection-start="8366" selection-end="8366" vertical-scroll-proportion="0.0" vertical-offset="2968" max-vertical-offset="4365">
-          <folding />
-        </state>
+        <state line="213" column="23" selection-start="8366" selection-end="8366" vertical-scroll-proportion="0.0" vertical-offset="2968" max-vertical-offset="4365" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveSortDependingFunctionsTransformer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="91" column="98" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.5422535" vertical-offset="1044" max-vertical-offset="1485">
-          <folding />
-        </state>
+        <state line="91" column="98" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.5422535" vertical-offset="1044" max-vertical-offset="1485" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/collection/ImmutableArray.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="0" selection-start="1869" selection-end="1869" vertical-scroll-proportion="0.0" vertical-offset="578" max-vertical-offset="2655">
-          <folding />
-        </state>
+        <state line="63" column="0" selection-start="1869" selection-end="1869" vertical-scroll-proportion="0.0" vertical-offset="578" max-vertical-offset="2655" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/logic/op/AbstractOperator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="0" selection-start="2043" selection-end="2043" vertical-scroll-proportion="0.0" vertical-offset="653" max-vertical-offset="1890">
-          <folding />
-        </state>
+        <state line="69" column="0" selection-start="2043" selection-end="2043" vertical-scroll-proportion="0.0" vertical-offset="653" max-vertical-offset="1890" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="53" selection-start="776" selection-end="776" vertical-scroll-proportion="0.014084507" vertical-offset="294" max-vertical-offset="780">
-          <folding />
-        </state>
+        <state line="20" column="53" selection-start="776" selection-end="776" vertical-scroll-proportion="0.014084507" vertical-offset="294" max-vertical-offset="780" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/logic/Name.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="0" selection-start="1558" selection-end="1558" vertical-scroll-proportion="0.26291078" vertical-offset="443" max-vertical-offset="960">
-          <folding />
-        </state>
+        <state line="48" column="0" selection-start="1558" selection-end="1558" vertical-scroll-proportion="0.26291078" vertical-offset="443" max-vertical-offset="960" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/logic/TermImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="246" column="0" selection-start="7239" selection-end="7239" vertical-scroll-proportion="0.31625834" vertical-offset="3323" max-vertical-offset="8265">
-          <folding />
-        </state>
+        <state line="246" column="0" selection-start="7239" selection-end="7239" vertical-scroll-proportion="0.31625834" vertical-offset="3323" max-vertical-offset="8265" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/NormalizeArrayTermsTransformer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="13" selection-start="321" selection-end="321" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="345">
-          <folding />
-        </state>
+        <state line="10" column="13" selection-start="321" selection-end="321" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="345" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/EquationUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="121" column="0" selection-start="4104" selection-end="4104" vertical-scroll-proportion="0.0" vertical-offset="1168" max-vertical-offset="6915">
-          <folding />
-        </state>
+        <state line="121" column="0" selection-start="4104" selection-end="4104" vertical-scroll-proportion="0.0" vertical-offset="1168" max-vertical-offset="6915" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/parsers/TermParserTools.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="619" column="52" selection-start="19294" selection-end="19294" vertical-scroll-proportion="0.33171913" vertical-offset="9013" max-vertical-offset="11175">
-          <folding />
-        </state>
+        <state line="619" column="52" selection-start="19294" selection-end="19294" vertical-scroll-proportion="0.33171913" vertical-offset="9013" max-vertical-offset="11175" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/PathconditionPrerocessor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="13" selection-start="75" selection-end="75" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165">
-          <folding />
-        </state>
+        <state line="2" column="13" selection-start="75" selection-end="75" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelVariableFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="35" selection-start="1748" selection-end="1748" vertical-scroll-proportion="0.0" vertical-offset="353" max-vertical-offset="780">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+        <state line="43" column="35" selection-start="1748" selection-end="1748" vertical-scroll-proportion="0.0" vertical-offset="353" max-vertical-offset="780" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelVariable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="122" column="42" selection-start="4032" selection-end="4032" vertical-scroll-proportion="0.0" vertical-offset="1438" max-vertical-offset="2595">
-          <folding />
-        </state>
+        <state line="122" column="42" selection-start="4032" selection-end="4032" vertical-scroll-proportion="0.0" vertical-offset="1438" max-vertical-offset="2595" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java">
@@ -1727,9 +1650,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstanceFactory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="46" max-vertical-offset="480">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1743,9 +1664,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="15" column="47" selection-start="644" selection-end="644" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="510">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1766,11 +1685,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="375" column="9" selection-start="14497" selection-end="14497" vertical-scroll-proportion="0.0" vertical-offset="5481" max-vertical-offset="7170">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#6972#6973#0" expanded="true" />
-            <element signature="e#7001#7002#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1783,7 +1698,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="97" column="0" selection-start="3717" selection-end="3717" vertical-scroll-proportion="0.83651227" vertical-offset="923" max-vertical-offset="2790">
+        <state line="90" column="8" selection-start="3464" selection-end="3464" vertical-scroll-proportion="-0.32051283" vertical-offset="1350" max-vertical-offset="2790">
           <folding />
         </state>
       </provider>
