@@ -290,18 +290,25 @@ final class JMLTranslator {
             public Term translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, String.class, ImmutableList.class, ProgramVariable.class, Services.class);
+                checkParameters(params, String.class, ImmutableList.class, ProgramVariable.class, ProgramVariable.class, Services.class);
                 String name = (String) params[0];
                 ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
-                ProgramVariable resultVar = (ProgramVariable) params[2];
-                Services services = (Services) params[3];
+                ProgramVariable selfVar = (ProgramVariable) params[2];
+                ProgramVariable resultVar = (ProgramVariable) params[3];
+                Services services = (Services) params[4];
                 
                 HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
                 JavaInfo javaInfo = services.getJavaInfo();
                 
                 List<Sort> sorts = new ArrayList<Sort>();
 				sorts.add(heapLDT.targetSort());
-				sorts.add(resultVar.getKeYJavaType().getSort());
+				if (selfVar != null) {
+					sorts.add(selfVar.getKeYJavaType().getSort());
+				}
+				// resultVar is null when method returns void
+				if (resultVar != null) {
+					sorts.add(resultVar.getKeYJavaType().getSort());
+				}
 				for (ProgramVariable param: paramVars) {
 					sorts.add(param.getKeYJavaType().getSort());
 				}
@@ -311,8 +318,13 @@ final class JMLTranslator {
 				javaInfo.getServices().getNamespaces().functions().add(f);	
 				
 				List<Term> subterms = new ArrayList<Term>();
-				subterms.add(TB.var(heapLDT.getHeap()));	
-				subterms.add(TB.var(resultVar));
+				subterms.add(TB.var(heapLDT.getHeap()));
+				if (selfVar != null) {
+					subterms.add(TB.var(selfVar));
+				}
+				if (resultVar != null) {
+					subterms.add(TB.var(resultVar));
+				}
 				for (ProgramVariable param: paramVars) {
 					subterms.add(TB.var(param));
 				}
@@ -326,12 +338,13 @@ final class JMLTranslator {
             public AbstractContractDefinition translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Function.class, Term.class, ImmutableList.class, ProgramVariable.class, Services.class);
+                checkParameters(params, Function.class, Term.class, ImmutableList.class, ProgramVariable.class, ProgramVariable.class, Services.class);
                 Function function = (Function) params[0];
                 Term value = (Term) params[1];
                 ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[2];
-                ProgramVariable resultVar = (ProgramVariable) params[3];
-                Services services = (Services) params[4];
+                ProgramVariable selfVar = (ProgramVariable) params[3];
+                ProgramVariable resultVar = (ProgramVariable) params[4];
+                Services services = (Services) params[5];
                 
                 HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
                 
@@ -342,19 +355,23 @@ final class JMLTranslator {
                 List<Term> subterms = new ArrayList<Term>();
                 
                 subterms.add(TB.var(heapLDT.getHeap()));
-				//result should be added only to the "ensures" placeholder
-                if (function.argSorts().size() == paramVars.size() + 2) {
+				//both ensures and requires depend on selfVar when it exists
+                int hasSelf = 0;
+                if (selfVar != null) {
+                	subterms.add(TB.var(selfVar));
+                	hasSelf = 1;
+                }
+               //depending on the number of sorts in the function decide, whether to add resultVar
+                if (function.argSorts().size() == paramVars.size() + 2 + hasSelf) {
                 	//metavariable represents ensures
                 	subterms.add(TB.var(resultVar));
-                } else {
-                	//metavariable represents requires, nothing else to do
-                }
+                } 
 				for (ProgramVariable param: paramVars) {
 					subterms.add(TB.var(param));
 				}
 				
-                //Does it even make sense, to keep function as a term in Definition, with all its subterms by default?
-                return new AbstractContractDefinition(TB.func(function, subterms.toArray(new Term[subterms.size()]), null), value);
+                return new AbstractContractDefinition(TB.func(function, subterms.toArray(new Term[subterms.size()]), null), 
+                		TB.convertToFormula(value, services));
                 	
 			
             }
@@ -406,16 +423,20 @@ final class JMLTranslator {
             public Term translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, String.class, ImmutableList.class, Services.class);
+                checkParameters(params, String.class, ImmutableList.class, ProgramVariable.class, Services.class);
                 String name = (String) params[0];
                 ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
-                Services services = (Services) params[2];
+                ProgramVariable selfVar = (ProgramVariable) params[2];
+                Services services = (Services) params[3];
                 
                 HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
                 JavaInfo javaInfo = services.getJavaInfo();
                 
                 List<Sort> sorts = new ArrayList<Sort>();
                 sorts.add(heapLDT.targetSort());
+                if (selfVar != null) {
+					sorts.add(selfVar.getKeYJavaType().getSort());
+				}
 				for (ProgramVariable param: paramVars) {
 					sorts.add(param.getKeYJavaType().getSort());
 				}
@@ -426,6 +447,9 @@ final class JMLTranslator {
 				
 				List<Term> subterms = new ArrayList<Term>();
 				subterms.add(TB.var(heapLDT.getHeap()));
+				if (selfVar != null) {
+					subterms.add(TB.var(selfVar));
+				}
 				for (ProgramVariable param: paramVars) {
 					subterms.add(TB.var(param));
 				}

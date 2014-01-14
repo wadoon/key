@@ -35,7 +35,7 @@ header {
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.speclang.HeapContext;
     import de.uka.ilkd.key.speclang.PositionedString;
-    import de.uka.ilkd.key.speclang.Definition;
+    import de.uka.ilkd.key.speclang.AbstractContractDefinition;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
@@ -433,7 +433,7 @@ requiresabsclause returns [Term result = null] throws SLTranslationException
 :	
 	req:REQUIRES_ABS id:IDENT
 		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
-				result = translator.translate(req.getText(), Term.class, id.getText(), paramVars, services);
+				result = translator.translate(req.getText(), Term.class, id.getText(), paramVars, selfVar, services);
 			
 			} else{
 				raiseError("The name " + id.getText() + " already exists in this namespace");
@@ -452,14 +452,14 @@ ensuresabsclause returns [Term result = null] throws SLTranslationException
 	req:ENSURES_ABS id:IDENT
 		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
 				result = translator.translate(req.getText(), Term.class, id.getText(), 
-													paramVars, resultVar, services);
+													paramVars, selfVar, resultVar, services);
 			} else{
 				raiseError("The name " + id.getText() + " already exists in this namespace");
 			}
 		}
 	;
 	
-defclause returns [Definition result = null] throws SLTranslationException
+defclause returns [AbstractContractDefinition result = null] throws SLTranslationException
 {
     Term pr = null;
 }
@@ -471,9 +471,9 @@ defclause returns [Definition result = null] throws SLTranslationException
 				raiseError("Undeclared " + id.getText() + " appeared in def clause");
 			} else
 			//result = new Definition(TB.func(f), TB.convertToFormula(pr, services));
-			result = translator.translate(def.getText(), Definition.class, 
+			result = translator.translate(def.getText(), AbstractContractDefinition.class, 
 												f, pr,
-												paramVars, resultVar, services);
+												paramVars, selfVar, resultVar, services);
 		} 
 	;
 

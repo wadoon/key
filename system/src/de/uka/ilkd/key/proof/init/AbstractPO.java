@@ -176,33 +176,20 @@ public abstract class AbstractPO implements IPersistablePO {
     }
     
     protected void collectAbstractContractDefinitions(KeYJavaType selfKJT) {
-        final ImmutableSet<AbstractContractDefinition> defs =
-                specRepos.getAbstractContractDefinitions(selfKJT);
-        
-        for (AbstractContractDefinition def : defs) {
-        	Taclet defTaclet = def.toTaclet();
-        	// TODO only include if choices are applicable
-        	taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(defTaclet));
-        	// TODO what kind of justification to use?
-        	initConfig.getProofEnv().registerRule(defTaclet, AxiomJustification.INSTANCE);
-        }
-
-        /*     for (ClassAxiom axiom : axioms) {
-            final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
-                    getSCC(axiom, axioms);
-            for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
-                assert axiomTaclet != null : "class axiom returned null taclet: "
-                        + axiom.getName();
-
-                // only include if choices are appropriate
-                if (choicesApply(axiomTaclet, initConfig.getActivatedChoices())) {
-                    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-                            axiomTaclet));
-                    initConfig.getProofEnv().registerRule(axiomTaclet,
-                            AxiomJustification.INSTANCE);
-                }
-            }
-        }*/
+    	
+    	for (KeYJavaType type : services.getJavaInfo().getAllKeYJavaTypes()) {
+    		System.out.println(type);
+	    	final ImmutableSet<AbstractContractDefinition> defs =
+	                specRepos.getAbstractContractDefinitions(type);
+	        if (defs != null && defs.isEmpty() == false){
+	        	for (AbstractContractDefinition def : defs) {
+	        		Taclet defTaclet = def.toTaclet();
+	        		// TODO only include if choices are applicable
+	        		taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(defTaclet));
+	        		initConfig.getProofEnv().registerRule(defTaclet, AxiomJustification.INSTANCE);
+	        	}
+	        }
+    	}
     }
     
     /** Check whether a taclet conforms with the currently active choices.
