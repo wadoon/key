@@ -774,15 +774,19 @@ ensures_keyword
 ;
 
 ensures_abs_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
 	ENSURES_ABS result=expression {result = flipHeaps("ensures_abs", result); }
 ;
 
 def_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
 	DEF result=expression {result = flipHeaps("def", result); }
 ;

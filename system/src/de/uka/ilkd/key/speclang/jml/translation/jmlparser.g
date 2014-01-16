@@ -454,7 +454,7 @@ ensuresabsclause returns [Term result = null] throws SLTranslationException
 	req:ENSURES_ABS id:IDENT
 		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
 				result = translator.translate(req.getText(), Term.class, id.getText(), 
-													paramVars, selfVar, resultVar, services);
+													paramVars, selfVar, resultVar, services, atPres);
 			} else{
 				raiseError("The name " + id.getText() + " already exists in this namespace");
 			}
@@ -475,7 +475,7 @@ defclause returns [AbstractContractDefinition result = null] throws SLTranslatio
 			//result = new Definition(TB.func(f), TB.convertToFormula(pr, services));
 			result = translator.translate(def.getText(), AbstractContractDefinition.class, 
 												f, pr,
-												paramVars, selfVar, resultVar, services);
+												paramVars, selfVar, resultVar, services, atPres);
 		} 
 	;
 

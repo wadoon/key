@@ -223,7 +223,6 @@ public abstract class AbstractPO implements IPersistablePO {
     protected void collectAbstractContractDefinitions(KeYJavaType selfKJT) {
     	
     	for (KeYJavaType type : services.getJavaInfo().getAllKeYJavaTypes()) {
-    		System.out.println(type);
 	    	final ImmutableSet<AbstractContractDefinition> defs =
 	                specRepos.getAbstractContractDefinitions(type);
 	        if (defs != null && defs.isEmpty() == false){

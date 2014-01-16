@@ -287,25 +287,33 @@ final class JMLTranslator {
             public Term translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, String.class, ImmutableList.class, ProgramVariable.class, ProgramVariable.class, Services.class);
+                checkParameters(params, String.class, ImmutableList.class, ProgramVariable.class, ProgramVariable.class, Services.class, Map.class);
                 String name = (String) params[0];
                 ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
                 ProgramVariable selfVar = (ProgramVariable) params[2];
                 ProgramVariable resultVar = (ProgramVariable) params[3];
                 Services services = (Services) params[4];
+                Map<LocationVariable, Term> atPres = (Map) params[5];
+                
                 
                 HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
                 JavaInfo javaInfo = services.getJavaInfo();
                 
+               
+                //creating a function
                 List<Sort> sorts = new ArrayList<Sort>();
+                // twice the heap sort (for heap and atPreHeap)
 				sorts.add(heapLDT.targetSort());
+				sorts.add(heapLDT.targetSort());
+				//sort of selfVar
 				if (selfVar != null) {
 					sorts.add(selfVar.getKeYJavaType().getSort());
 				}
-				// resultVar is null when method returns void
+				// sort of resultVar
 				if (resultVar != null) {
 					sorts.add(resultVar.getKeYJavaType().getSort());
 				}
+				// sorts of all method parameters
 				for (ProgramVariable param: paramVars) {
 					sorts.add(param.getKeYJavaType().getSort());
 				}
@@ -313,9 +321,18 @@ final class JMLTranslator {
 				Function f = new Function(new Name(name), Sort.FORMULA, 
 								sorts.toArray(new Sort[sorts.size()]));									
 				javaInfo.getServices().getNamespaces().functions().add(f);	
-				
+
+             
+                //Creating a term
 				List<Term> subterms = new ArrayList<Term>();
+				
+				// add heap
 				subterms.add(TB.var(heapLDT.getHeap()));
+				// add corresponding atPreHeap
+				if (atPres != null) {
+					subterms.add(atPres.get(heapLDT.getHeap()));
+				}
+				// add selfVar, resultVar, parameters
 				if (selfVar != null) {
 					subterms.add(TB.var(selfVar));
 				}
@@ -335,34 +352,44 @@ final class JMLTranslator {
             public AbstractContractDefinition translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Function.class, Term.class, ImmutableList.class, ProgramVariable.class, ProgramVariable.class, Services.class);
+                checkParameters(params, Function.class, Term.class, ImmutableList.class, ProgramVariable.class, ProgramVariable.class, Services.class, Map.class);
                 Function function = (Function) params[0];
                 Term value = (Term) params[1];
                 ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[2];
                 ProgramVariable selfVar = (ProgramVariable) params[3];
                 ProgramVariable resultVar = (ProgramVariable) params[4];
                 Services services = (Services) params[5];
+                Map<LocationVariable, Term> atPres = (Map) params[6];
+                
                 
                 HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-                
-                //TODO That is a very naive way to distinguish between a "requires" placeholder
-                // and an "ensures" placeholder, based on a number of its argument sorts.
-                //Think of a better way, that would also suit an "assignable" placeholder
-                // Also, shouldn't it be checked that the placeholder and its value have matching sorts and arguments?
+       
+                // Build term for a function
                 List<Term> subterms = new ArrayList<Term>();
                 
+                // heap goes for requires and ensures
                 subterms.add(TB.var(heapLDT.getHeap()));
-				//both ensures and requires depend on selfVar when it exists
+                
+                // heapAtPre only for ensures 
+                int hasHeapAtPre = 0;
+                if (function.argSort(1) == heapLDT.targetSort() && atPres != null) {
+                	subterms.add(atPres.get(heapLDT.getHeap()));
+                	hasHeapAtPre = 1;
+                }
+                
+				// both ensures and requires depend on selfVar when it exists
                 int hasSelf = 0;
                 if (selfVar != null) {
                 	subterms.add(TB.var(selfVar));
                 	hasSelf = 1;
                 }
-               //depending on the number of sorts in the function decide, whether to add resultVar
-                if (function.argSorts().size() == paramVars.size() + 2 + hasSelf) {
-                	//metavariable represents ensures
+                
+                // resultVar only for ensures (ensures has 1 more sort than result)
+                if (function.argSorts().size() == paramVars.size() + 2 + hasSelf + hasHeapAtPre) {
                 	subterms.add(TB.var(resultVar));
                 } 
+                
+                // parameters for ensures and requires
 				for (ProgramVariable param: paramVars) {
 					subterms.add(TB.var(param));
 				}
