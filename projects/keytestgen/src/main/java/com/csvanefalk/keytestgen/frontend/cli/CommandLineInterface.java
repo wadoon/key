@@ -167,6 +167,7 @@ public final class CommandLineInterface {
                 generateTestCases(parser);
 
             } catch (final Exception e) {
+e.printStackTrace();               
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);
             }
@@ -245,12 +246,14 @@ public final class CommandLineInterface {
          */
         private File getTestFolder(File rootFolder, ITestSuite testSuite) {
 
-            String javaPackage = testSuite.getPackage();
-            String[] packageElements = javaPackage.split("[.]");
             String path = testSuite.getClassName() + File.separator;
             path += "src" + File.separator;
-            for (int i = 0; i < packageElements.length; i++) {
-                path += packageElements[i] + File.separator;
+            String javaPackage = testSuite.getPackage();
+            if (javaPackage != null) {
+               String[] packageElements = javaPackage.split("[.]");
+               for (int i = 0; i < packageElements.length; i++) {
+                   path += packageElements[i] + File.separator;
+               }
             }
             return new File(rootFolder, path);
         }

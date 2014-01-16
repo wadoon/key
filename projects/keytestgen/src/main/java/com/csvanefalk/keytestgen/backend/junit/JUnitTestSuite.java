@@ -52,6 +52,6 @@ public class JUnitTestSuite implements ITestSuite {
 
     @Override
     public String getPackage() {
-        return testSuite.getJavaClass().getPackageDeclaration().toString();
+        return testSuite.getJavaClass().getPackageDeclaration();
     }
 }
