@@ -11,8 +11,11 @@ import com.csvanefalk.keytestgen.core.oracle.abstraction.Oracle;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestCase;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestSuite;
 import com.csvanefalk.keytestgen.util.Benchmark;
+
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -101,6 +104,10 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
             Benchmark.startBenchmarking("2. [KeY] Create symbolic execution tree");
             final IExecutionStart root = keYInterface.getSymbolicExecutionTree(targetMethod);
 
+            
+            //IExecutionStatement s;
+            //SourceElement se = s.getActiveStatement();
+            
             final List<IExecutionNode> nodes = codeCoverageParser.retrieveNodes(root);
 
             Benchmark.finishBenchmarking("2. [KeY] Create symbolic execution tree");
