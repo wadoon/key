@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -117,7 +118,7 @@ public class KeYJavaClassFactory {
 
         final String fileName = getFileName(javaFile);
         final String packageName = getPackage(javaFile);
-        final String qualifiedName = packageName.equals("") ? fileName : packageName + "." + fileName;
+        final String qualifiedName = JavaUtil.isTrimmedEmpty(packageName) ? fileName : packageName + "." + fileName;
         final KeYJavaType mainClass = javaInfo.getKeYJavaType(qualifiedName);
 
         if (mainClass == null) {
