@@ -148,7 +148,7 @@ public class KeYInterface {
             //Prettyprinting can be left on for debugging. Probably not appropriate for production environments.
             SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(method,
                                                                                                               false,
-                                                                                                              true,
+                                                                                                             true,
                                                                                                               true,
                                                                                                               false,
                                                                                                               false);

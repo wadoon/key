@@ -107,7 +107,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
             
             //IExecutionStatement s;
             //SourceElement se = s.getActiveStatement();
-            
+            System.out.println("number of children:" + root.getChildren().length);
             final List<IExecutionNode> nodes = codeCoverageParser.retrieveNodes(root);
 
             Benchmark.finishBenchmarking("2. [KeY] Create symbolic execution tree");
