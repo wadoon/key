@@ -6,7 +6,18 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="56178314-d8da-4be1-b105-b411ca0889c3" name="Default" comment="Updating project settings." />
+    <list default="true" id="56178314-d8da-4be1-b105-b411ca0889c3" name="Default" comment="Fixed an issue where new Expression transformers were improperly applied, leading to corrupt simplifications.">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/TermSimplificationTransformer.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/tools/ModelGenerationTools.java" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/util/transformer/RemoveAxiomaticExpressionsTransformer.java" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveAxiomaticExpressionsTransformer.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/util/transformer/RemoveDisjunctionsTransformer.java" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveDisjunctionsTransformer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/smt/SMT/ModelGenerator_SMT.java" afterPath="$PROJECT_DIR$/smt/SMT/ModelGenerator_SMT.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java" afterPath="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="keytestgen.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -123,7 +134,22 @@
     </breakpoint_any>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java" line="309" class="com.csvanefalk.keytestgen.core.model.implementation.ModelBuilderVisitor" package="com.csvanefalk.keytestgen.core.model.implementation">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" line="68" class="com.csvanefalk.keytestgen.core.model.implementation.ModelAssignmentResolvingVisitor" package="com.csvanefalk.keytestgen.core.model.implementation">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" line="103" class="com.csvanefalk.keytestgen.core.model.implementation.ModelAssignmentResolvingVisitor" package="com.csvanefalk.keytestgen.core.model.implementation">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -167,20 +193,75 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ModelBuilderVisitor.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ModelBuilderVisitor.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="229" column="14" selection-start="8394" selection-end="8394" vertical-scroll-proportion="6.8627453" vertical-offset="0" max-vertical-offset="6885">
+            <state line="268" column="41" selection-start="10029" selection-end="10034" vertical-scroll-proportion="-47.73077" vertical-offset="2494" max-vertical-offset="6885">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Model.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/Model.java">
+      <file leaf-file-name="ModelGenerator.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="71" column="10" selection-start="2443" selection-end="2443" vertical-scroll-proportion="0.0" vertical-offset="1065" max-vertical-offset="3180">
+            <state line="142" column="76" selection-start="5272" selection-end="5272" vertical-scroll-proportion="0.0" vertical-offset="2001" max-vertical-offset="3075">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ModelGenerator_SMT.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/smt/SMT/ModelGenerator_SMT.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="225" column="92" selection-start="9229" selection-end="9229" vertical-scroll-proportion="0.0" vertical-offset="1873" max-vertical-offset="4470">
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RemoveObserverFunctionsTransformer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveObserverFunctionsTransformer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="10" column="0" selection-start="396" selection-end="837" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2685">
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TermSimplificationTransformer.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/TermSimplificationTransformer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="145" column="38" selection-start="5575" selection-end="5575" vertical-scroll-proportion="0.90654206" vertical-offset="1884" max-vertical-offset="3885">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="StringConstants.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="46" column="47" selection-start="2066" selection-end="2066" vertical-scroll-proportion="-10.5" vertical-offset="417" max-vertical-offset="795">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="KeYStone.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/KeYStone.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="29" column="0" selection-start="736" selection-end="736" vertical-scroll-proportion="0.0" vertical-offset="226" max-vertical-offset="615">
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -188,70 +269,25 @@
       <file leaf-file-name="ModelAssignmentResolvingVisitor.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="135" column="67" selection-start="5721" selection-end="5721" vertical-scroll-proportion="0.0" vertical-offset="2025" max-vertical-offset="2550">
+            <state line="164" column="0" selection-start="6637" selection-end="6637" vertical-scroll-proportion="0.0" vertical-offset="2167" max-vertical-offset="2520">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelArrayVariable.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelArrayVariable.java">
+      <file leaf-file-name="EquationUtils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/EquationUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="330">
+            <state line="121" column="0" selection-start="4104" selection-end="4104" vertical-scroll-proportion="0.0" vertical-offset="745" max-vertical-offset="6930">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelInstanceFactory.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstanceFactory.java">
+      <file leaf-file-name="TermParserTools.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/parsers/TermParserTools.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="360" max-vertical-offset="480">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="0" selection-start="1237" selection-end="1237" vertical-scroll-proportion="0.0" vertical-offset="570" max-vertical-offset="1260">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="KeYJavaMethod.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="105" column="0" selection-start="3431" selection-end="3431" vertical-scroll-proportion="0.0" vertical-offset="1575" max-vertical-offset="2610">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="KeYInterface.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="270" column="87" selection-start="13365" selection-end="13365" vertical-scroll-proportion="0.0" vertical-offset="4050" max-vertical-offset="4755">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ContractWrapper.class" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/speclang/ContractWrapper.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="13" selection-start="167" selection-end="167" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="300">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ModelInstance.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="690" max-vertical-offset="1875">
+            <state line="695" column="37" selection-start="22321" selection-end="22321" vertical-scroll-proportion="0.0" vertical-offset="10093" max-vertical-offset="11175">
               <folding />
             </state>
           </provider>
@@ -275,25 +311,12 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/symbolic/SymbolicDebuggerTests.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/util/transformer/RemoveDisjunctionsTransformer.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/SMT/PaperTest.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/util/TermEquivalenceChecker.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/SMT/Model_SMTTest.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/TestJUnitTestCaseGenerator.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/frontend/cli/CLITest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/META-INF/MANIFEST.MF" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/CoreInterface.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/frontend/cli/CommandLineInterface.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/backend/AbstractJavaSourceGenerator.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/frontend/cli/commandlineinterfacetest/ExecuteTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaClassFactory.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/Preprocessor.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/NormalizeArithmeticComparatorsTransformer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/KeYStone.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/EquationUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/EquationSystem.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveObserverFunctionsTransformer.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/testutils/FileEnvironment.java" />
@@ -303,11 +326,9 @@
         <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/testutils/TestEnvironment.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelIntegerTest.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/SMT/ArrayIndexReadAccessTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java" />
         <option value="$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/logic/TermImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilder.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/SystemControl.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveSDPsTransformer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveSortDependingFunctionsTransformer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/NormalizeArrayTermsTransformer.java" />
@@ -320,12 +341,27 @@
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelArrayVariable.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelArrayInstance.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelInstanceFactory.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelInstance.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/frontend/cli/CommandLineInterface.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/targetmodels/own/Simple.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelOldTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/expression/ExpressionUtils.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/simplex/Simplex.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/EquationUtils.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/util/transformer/RemoveAxiomaticExpressionsTransformer.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/util/transformers/RemoveAxiomaticExpressionsTransformer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveDisjunctionsTransformer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/tools/ModelGenerationTools.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/TermSimplificationTransformer.java" />
+        <option value="$PROJECT_DIR$/smt/SMT/ModelGenerator_SMT.java" />
       </list>
     </option>
   </component>
@@ -385,7 +421,7 @@
     <option name="STATE" value="0" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1" splitterProportion="0.5">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -396,7 +432,368 @@
       <autoscrollFromSource />
       <sortByType />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="util" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="util" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="transformer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="util" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="util" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="transformers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="oracle" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="keytestgen" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="project.structure.last.edited" value="Libraries" />
@@ -434,15 +831,24 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
     <property name="FullScreen" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="SearchEverywhereHistory" value="mode&#10;S&#10;POM&#10;pom" />
+    <property name="SearchEverywhereHistory" value="Cons&#10;mode&#10;S&#10;POM&#10;pom" />
     <property name="LayoutCode.rearrangeEntries" value="false" />
     <property name="LayoutCode.rearrangeEntriesJava" value="true" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="OverrideImplement.overriding.sorted" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/util" />
   </component>
-  <component name="RunManager" selected="JUnit.ModelIntegerTest">
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.csvanefalk.keytestgen.core.model" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.csvanefalk.keytestgen.util.transformers" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JUnit.ArrayIndexReadAccessTest">
     <configuration default="false" name="ModelIntegerTest.testSolveCompoundConstraintMid2" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="keytestgen" />
@@ -469,29 +875,6 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="com.csvanefalk.keytestgen.frontend.cli.commandlineinterfacetest in keytestgen" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="keytestgen" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="com.csvanefalk.keytestgen.frontend.cli.commandlineinterfacetest" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="package" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -548,7 +931,13 @@
       </option>
       <envs />
       <patterns />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -564,6 +953,40 @@
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="com.csvanefalk.keytestgen.core.model.SMT" />
       <option name="MAIN_CLASS_NAME" value="com.csvanefalk.keytestgen.core.model.SMT.ArrayIndexReadAccessTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ModelOldTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="com.csvanefalk.keytestgen.core.model.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="keytestgen" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="com.csvanefalk.keytestgen.core.model" />
+      <option name="MAIN_CLASS_NAME" value="com.csvanefalk.keytestgen.core.model.ModelOldTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -809,18 +1232,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest.testSolveCompoundConstraintMid2" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.com.csvanefalk.keytestgen.frontend.cli.commandlineinterfacetest in keytestgen" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.ExecuteTest" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.ArrayIndexReadAccessTest" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.ExecuteTest" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.ArrayIndexReadAccessTest" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.ModelOldTest" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.ArrayIndexReadAccessTest" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest.testSolveCompoundConstraintMid2" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.ExecuteTest" />
-        <item index="4" class="java.lang.String" itemvalue="JUnit.com.csvanefalk.keytestgen.frontend.cli.commandlineinterfacetest in keytestgen" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.ArrayIndexReadAccessTest" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.ModelOldTest" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.ModelIntegerTest.testSolveCompoundConstraintMid2" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.ExecuteTest" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
@@ -881,7 +1304,11 @@
       <workItem from="1389372781011" duration="990000" />
       <workItem from="1389374287103" duration="411000" />
       <workItem from="1389375094045" duration="1037000" />
-      <workItem from="1389876667285" duration="659000" />
+      <workItem from="1389876667285" duration="914000" />
+      <workItem from="1389887959448" duration="1574000" />
+      <workItem from="1389965272833" duration="1101000" />
+      <workItem from="1389967732861" duration="7425000" />
+      <workItem from="1390151547038" duration="11213000" />
     </task>
     <task id="LOCAL-00001" summary="Fixing project setup. Should build cleanly now.">
       <created>1385056912112</created>
@@ -967,11 +1394,19 @@
       <created>1389877441240</created>
       <updated>1389877441240</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Fixed an issue causing the equation abstraction to incorrectly simplify integer values.">
+      <created>1390158039983</created>
+      <updated>1390158039983</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Fixed an issue where new Expression transformers were improperly applied, leading to corrupt simplifications.">
+      <created>1390162926302</created>
+      <updated>1390162926302</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="74464000" />
+    <option name="totallyTimeSpent" value="96032000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -983,9 +1418,10 @@
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32907802" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3178082" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36653388" sideWeight="0.70436186" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3657534" sideWeight="0.70436186" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36712328" sideWeight="0.2956381" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -995,15 +1431,14 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2296875" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="1410" y="97" width="510" height="943" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21171875" sideWeight="0.672949" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1875" sideWeight="0.672949" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29140624" sideWeight="0.672949" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32270917" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28756058" sideWeight="0.672949" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3328767" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3187251" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -1044,7 +1479,9 @@
     <MESSAGE value="Array accessors now rendering correctly in the ModelGenerator." />
     <MESSAGE value="Cleaning redundant dependencies." />
     <MESSAGE value="Updating project settings." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating project settings." />
+    <MESSAGE value="Fixed an issue causing the equation abstraction to incorrectly simplify integer values." />
+    <MESSAGE value="Fixed an issue where new Expression transformers were improperly applied, leading to corrupt simplifications." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed an issue where new Expression transformers were improperly applied, leading to corrupt simplifications." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -1060,137 +1497,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/speclang/ContractWrapper.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="13" selection-start="167" selection-end="167" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="300">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="690" max-vertical-offset="1875">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="690" max-vertical-offset="1875">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/src.zip!/java/lang/ClassLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="436" column="0" selection-start="16714" selection-end="16714" vertical-scroll-proportion="0.0" vertical-offset="5533" max-vertical-offset="32730" />
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/src.zip!/java/net/URLClassLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="16" selection-start="225" selection-end="233" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10905" />
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/jre/lib/rt.jar!/sun/misc/URLClassPath.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="16" selection-start="119" selection-end="135" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1920" />
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/src.zip!/java/util/zip/ZipFile.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="759" column="31" selection-start="25570" selection-end="25570" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="11145" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/concurrency/capsules/MethodCapsule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="168" column="0" selection-start="5856" selection-end="5856" vertical-scroll-proportion="0.0" vertical-offset="1788" max-vertical-offset="2490" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/Preprocessor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="98" column="0" selection-start="3164" selection-end="3164" vertical-scroll-proportion="0.0" vertical-offset="1193" max-vertical-offset="2160" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveObserverFunctionsTransformer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="23" selection-start="8" selection-end="23" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2745" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/CoreTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="0" selection-start="657" selection-end="657" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="0" selection-start="747" selection-end="747" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="420" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/copyright/profiles_settings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="412" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/targetmodels/arrays/ObjectArrayIndexWriteAccess.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="13" selection-start="69" selection-end="69" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="435" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/testutils/FileEnvironment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="0" selection-start="1887" selection-end="1887" vertical-scroll-proportion="0.0" vertical-offset="578" max-vertical-offset="2010" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/testutils/TestEnvironment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="0" selection-start="2119" selection-end="2119" vertical-scroll-proportion="0.0" vertical-offset="478" max-vertical-offset="1995" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/KeYTestGenTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="0" selection-start="2250" selection-end="2250" vertical-scroll-proportion="0.0" vertical-offset="358" max-vertical-offset="5835" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelIntegerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="0" selection-start="601" selection-end="727" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4935" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/SMT/ArrayIndexReadAccessTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="24" selection-start="914" selection-end="914" vertical-scroll-proportion="0.0" vertical-offset="54" max-vertical-offset="480" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/java/JavaInfo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="997" column="0" selection-start="34265" selection-end="34265" vertical-scroll-proportion="0.0" vertical-offset="13873" max-vertical-offset="20055" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/SystemControl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="10" selection-start="415" selection-end="415" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="315" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/targetmodels/arrays/ArrayIndexReadAccess.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="30" selection-start="268" selection-end="278" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="390" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/AbstractTermTransformer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="503" column="24" selection-start="15460" selection-end="15460" vertical-scroll-proportion="1.5980148" vertical-offset="6751" max-vertical-offset="8010" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/tools/ModelGenerationTools.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="213" column="23" selection-start="8366" selection-end="8366" vertical-scroll-proportion="0.0" vertical-offset="2968" max-vertical-offset="4365" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveSortDependingFunctionsTransformer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="91" column="98" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.5422535" vertical-offset="1044" max-vertical-offset="1485" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/collection/ImmutableArray.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="63" column="0" selection-start="1869" selection-end="1869" vertical-scroll-proportion="0.0" vertical-offset="578" max-vertical-offset="2655" />
@@ -1199,11 +1505,6 @@
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/logic/op/AbstractOperator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="69" column="0" selection-start="2043" selection-end="2043" vertical-scroll-proportion="0.0" vertical-offset="653" max-vertical-offset="1890" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="53" selection-start="776" selection-end="776" vertical-scroll-proportion="0.014084507" vertical-offset="294" max-vertical-offset="780" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../system/src/de/uka/ilkd/key/logic/Name.java">
@@ -1219,16 +1520,6 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/NormalizeArrayTermsTransformer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="10" column="13" selection-start="321" selection-end="321" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="345" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/EquationUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="121" column="0" selection-start="4104" selection-end="4104" vertical-scroll-proportion="0.0" vertical-offset="1168" max-vertical-offset="6915" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/parsers/TermParserTools.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="619" column="52" selection-start="19294" selection-end="19294" vertical-scroll-proportion="0.33171913" vertical-offset="9013" max-vertical-offset="11175" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/PathconditionPrerocessor.java">
@@ -1256,21 +1547,6 @@
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="27300" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="124" column="31" selection-start="4664" selection-end="4664" vertical-scroll-proportion="0.0" vertical-offset="1455" max-vertical-offset="2790" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="14" selection-start="1974" selection-end="1974" vertical-scroll-proportion="0.0" vertical-offset="249" max-vertical-offset="765" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="100" selection-start="1118" selection-end="1122" vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="1290" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/Model.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="71" column="10" selection-start="2443" selection-end="2443" vertical-scroll-proportion="0.0" vertical-offset="1070" max-vertical-offset="3045">
@@ -1278,53 +1554,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="135" column="67" selection-start="5721" selection-end="5721" vertical-scroll-proportion="0.0" vertical-offset="1798" max-vertical-offset="2445">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/variable/ModelArrayVariable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
-          <folding />
-        </state>
+        <state line="15" column="2" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstanceFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="46" max-vertical-offset="480">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/speclang/ContractWrapper.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="13" selection-start="167" selection-end="167" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="300">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="531" max-vertical-offset="1755">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="105" column="0" selection-start="3431" selection-end="3431" vertical-scroll-proportion="0.0" vertical-offset="1245" max-vertical-offset="2520">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="270" column="87" selection-start="13365" selection-end="13365" vertical-scroll-proportion="0.0" vertical-offset="2719" max-vertical-offset="4275">
-          <folding />
-        </state>
+        <state line="24" column="5" selection-start="809" selection-end="809" vertical-scroll-proportion="0.0" vertical-offset="46" max-vertical-offset="480" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
@@ -1334,10 +1571,266 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/classabstraction/KeYJavaMethod.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="105" column="0" selection-start="3431" selection-end="3431" vertical-scroll-proportion="0.0" vertical-offset="1245" max-vertical-offset="2520" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/keyinterface/KeYInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="270" column="87" selection-start="13365" selection-end="13365" vertical-scroll-proportion="0.0" vertical-offset="2719" max-vertical-offset="4275">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/speclang/ContractWrapper.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="13" selection-start="167" selection-end="167" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="300" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelInstance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="4" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.0" vertical-offset="531" max-vertical-offset="1755" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/frontend/cli/CommandParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="13" selection-start="362" selection-end="362" vertical-scroll-proportion="0.0" vertical-offset="654" max-vertical-offset="1890" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/frontend/cli/CommandLineInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="284" column="38" selection-start="10682" selection-end="10682" vertical-scroll-proportion="0.0" vertical-offset="2445" max-vertical-offset="5265">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="0" selection-start="747" selection-end="747" vertical-scroll-proportion="0.0" vertical-offset="40" max-vertical-offset="420">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/KeYTestGenTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="407" column="0" selection-start="13565" selection-end="13565" vertical-scroll-proportion="0.0" vertical-offset="5468" max-vertical-offset="5835">
+          <folding>
+            <element signature="e#13328#13344#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/rule/NoPosTacletApp.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="53" column="19" selection-start="4528" selection-end="4528" vertical-scroll-proportion="-10.2" vertical-offset="525" max-vertical-offset="915" />
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/de/uka/ilkd/key/2.0/key-2.0.jar!/de/uka/ilkd/key/logic/TermImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="57" column="16" selection-start="3034" selection-end="3034" vertical-scroll-proportion="0.0" vertical-offset="855" max-vertical-offset="1590">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/expression/NumericConstant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="13" selection-start="190" selection-end="190" vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="630">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelOldTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="35" selection-start="1381" selection-end="1381" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/targetmodels/own/Simple.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="48" selection-start="301" selection-end="301" vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="315">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/simplex/Simplex.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="177" column="55" selection-start="6085" selection-end="6085" vertical-scroll-proportion="0.0" vertical-offset="2584" max-vertical-offset="4050">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/Equation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="78" column="0" selection-start="2675" selection-end="2675" vertical-scroll-proportion="0.0" vertical-offset="904" max-vertical-offset="4125">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/EquationSystem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="59" column="0" selection-start="2016" selection-end="2016" vertical-scroll-proportion="0.0" vertical-offset="604" max-vertical-offset="3480">
+          <folding>
+            <element signature="e#1873#1891#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelIntegerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="263" column="63" selection-start="10482" selection-end="10482" vertical-scroll-proportion="0.0" vertical-offset="2954" max-vertical-offset="4935">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/expression/ExpressionUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="53" column="0" selection-start="1836" selection-end="1836" vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="4485">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/csvanefalk/keytestgen/core/model/ModelArrayTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="19" selection-start="902" selection-end="902" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="1290">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/tools/EliminateConjunctionsTransformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="0" selection-start="695" selection-end="695" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="675">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runners/model/FrameworkMethod.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="795">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="40" selection-start="388" selection-end="388" vertical-scroll-proportion="-6.0" vertical-offset="0" max-vertical-offset="255">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runners/ParentRunner.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="44" column="25" selection-start="2400" selection-end="2400" vertical-scroll-proportion="-4.96" vertical-offset="521" max-vertical-offset="1080">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.11/junit-4.11.jar!/org/junit/runners/BlockJUnit4ClassRunner.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="1425">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveAxiomaticExpressionsTransformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="0" selection-start="202" selection-end="202" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1485">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveDisjunctionsTransformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="22" selection-start="745" selection-end="745" vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="2295">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="0" selection-start="2069" selection-end="2069" vertical-scroll-proportion="0.0" vertical-offset="376" max-vertical-offset="765">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelAssignmentResolvingVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="164" column="0" selection-start="6637" selection-end="6637" vertical-scroll-proportion="0.0" vertical-offset="2167" max-vertical-offset="2520">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/KeYStone.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="0" selection-start="736" selection-end="736" vertical-scroll-proportion="0.0" vertical-offset="226" max-vertical-offset="615">
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/StringConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="47" selection-start="2066" selection-end="2066" vertical-scroll-proportion="-10.5" vertical-offset="417" max-vertical-offset="795">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="229" column="14" selection-start="8394" selection-end="8394" vertical-scroll-proportion="6.8627453" vertical-offset="0" max-vertical-offset="6885">
+        <state line="268" column="41" selection-start="10029" selection-end="10034" vertical-scroll-proportion="-47.73077" vertical-offset="2494" max-vertical-offset="6885">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/parsers/TermParserTools.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="695" column="37" selection-start="22321" selection-end="22321" vertical-scroll-proportion="0.0" vertical-offset="10093" max-vertical-offset="11175">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveObserverFunctionsTransformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="0" selection-start="396" selection-end="837" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2685">
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="142" column="76" selection-start="5272" selection-end="5272" vertical-scroll-proportion="0.0" vertical-offset="2001" max-vertical-offset="3075">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/smt/SMT/ModelGenerator_SMT.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="225" column="92" selection-start="9229" selection-end="9229" vertical-scroll-proportion="0.0" vertical-offset="1873" max-vertical-offset="4470">
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/keystone/equations/EquationUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="121" column="0" selection-start="4104" selection-end="4104" vertical-scroll-proportion="0.0" vertical-offset="1533" max-vertical-offset="6930">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/csvanefalk/keytestgen/util/transformers/TermSimplificationTransformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="145" column="38" selection-start="5575" selection-end="5575" vertical-scroll-proportion="0.90654206" vertical-offset="1884" max-vertical-offset="3885">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

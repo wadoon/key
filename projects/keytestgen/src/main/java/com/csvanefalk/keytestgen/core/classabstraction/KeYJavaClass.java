@@ -1,13 +1,13 @@
 package com.csvanefalk.keytestgen.core.classabstraction;
 
-import java.util.HashMap;
-import java.util.Set;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Instances of this class represent an abstract view of a Java class,

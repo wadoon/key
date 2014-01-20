@@ -77,13 +77,15 @@ class ModelAssignmentResolvingVisitor extends KeYTestGenTermVisitor {
              */
             if (TermParserTools.isPrimitiveType(leftOperand)) {
 
+                leftOperandIdentifier = TermParserTools.resolveIdentifierString(leftOperand,
+                                                                                ModelAssignmentResolvingVisitor.SEPARATOR);
+
+                final ModelVariable modelVariable = model.getVariable(leftOperandIdentifier);
+
                 /*
                  * If the left-hand hand is a boolean, configure it accordingly.
                  */
                 if (TermParserTools.isBoolean(leftOperand)) {
-
-                    leftOperandIdentifier = TermParserTools.resolveIdentifierString(leftOperand,
-                                                                                    ModelAssignmentResolvingVisitor.SEPARATOR);
 
                     /*
                      * If the right-hand operator is a boolean constant (TRUE or
@@ -91,13 +93,16 @@ class ModelAssignmentResolvingVisitor extends KeYTestGenTermVisitor {
                      * to the variable.
                      */
                     if (TermParserTools.isBooleanConstant(rightOperand)) {
-
-                        final ModelVariable modelVariable = model.getVariable(leftOperandIdentifier);
-
                         boolean value = TermParserTools.isBooleanTrue(rightOperand);
                         value = sawNot ? !value : value;
                         model.add(modelVariable, value);
                     }
+                }
+
+                //Variable is an integer. Isolate bound value and assign to model.
+                else {
+                    int boundVal = Integer.parseInt(TermParserTools.resolveNumber(rightOperand));
+                    model.add(modelVariable, boundVal);
                 }
             }
 

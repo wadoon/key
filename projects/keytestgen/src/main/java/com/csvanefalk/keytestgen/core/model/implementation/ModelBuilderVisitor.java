@@ -32,7 +32,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
      * Constant for separating fields in {@link SortDependingFunction}
      * instances.
      */
-    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR.toString();
+    private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR;
 
     /**
      * Returns a wrapper representation of the primitive type of a variable

@@ -12,7 +12,7 @@ import java.io.IOException;
 public class ModelArrayTest extends ModelTest {
 
     public ModelArrayTest() throws KeYInterfaceException, IOException {
-        super("arrays");
+        super("arrays", false, "ObjectArrayIndexWriteAccess.java");
     }
 
     @Test
