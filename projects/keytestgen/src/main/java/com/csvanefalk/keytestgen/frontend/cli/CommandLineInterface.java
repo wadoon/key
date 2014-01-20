@@ -167,7 +167,7 @@ public final class CommandLineInterface {
                 generateTestCases(parser);
 
             } catch (final Exception e) {
-e.printStackTrace();               
+                e.printStackTrace();
                 System.out.println("Error: " + e.getMessage());
                 System.exit(1);
             }
@@ -250,10 +250,10 @@ e.printStackTrace();
             path += "src" + File.separator;
             String javaPackage = testSuite.getPackage();
             if (javaPackage != null) {
-               String[] packageElements = javaPackage.split("[.]");
-               for (int i = 0; i < packageElements.length; i++) {
-                   path += packageElements[i] + File.separator;
-               }
+                String[] packageElements = javaPackage.split("[.]");
+                for (int i = 0; i < packageElements.length; i++) {
+                    path += packageElements[i] + File.separator;
+                }
             }
             return new File(rootFolder, path);
         }

@@ -1,9 +1,7 @@
-package com.csvanefalk.keytestgen.util.transformer;
+package com.csvanefalk.keytestgen.util.transformers;
 
 import com.csvanefalk.keytestgen.keystone.util.Tuple;
 import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
-import com.csvanefalk.keytestgen.util.transformers.AbstractTermTransformer;
-import com.csvanefalk.keytestgen.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;

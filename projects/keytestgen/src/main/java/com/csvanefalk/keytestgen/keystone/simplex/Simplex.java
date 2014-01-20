@@ -167,7 +167,13 @@ public strictfp class Simplex {
 
     private static int indexOfLargestColumnValue(final Fraction[][] table, final int rowIndex) {
         int resultIndex = -1;
+
         Fraction largest = Fraction.ZERO;
+        if (table.length > rowIndex) {
+            resultIndex = 0;
+            largest = table[rowIndex][0];
+        }
+
         for (int i = 0; i < (table[rowIndex].length - 1); i++) {
             if (table[rowIndex][i].compareTo(largest) > 0) {
                 largest = table[0][i];
@@ -177,6 +183,13 @@ public strictfp class Simplex {
         return resultIndex;
     }
 
+    /**
+     * Finds the index of the largest row-value in a tableaux.
+     *
+     * @param table       the table.
+     * @param columnIndex the column to search.
+     * @return
+     */
     private static int indexOfLargestRowValue(final Fraction[][] table, final int columnIndex) {
         int resultIndex = -1;
         Fraction largest = Fraction.ZERO;

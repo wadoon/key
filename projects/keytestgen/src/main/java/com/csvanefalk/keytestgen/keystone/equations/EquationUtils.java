@@ -229,6 +229,7 @@ public class EquationUtils {
                 simplifiedRightHand = ExpressionUtils.simplifyExpression(simplifiedRightHand);
 
                 simplifiedLeftHand = new NumericConstant(Fraction.ZERO);
+
             } else if (ExpressionUtils.isAddition(simplifiedLeftHand)) {
                 Addition addition = (Addition) simplifiedLeftHand;
 
@@ -237,18 +238,19 @@ public class EquationUtils {
                  * constant, and which one represents the rest of the
                  * expression.
                  */
-                IExpression target = null;
-                IExpression other = null;
+                IExpression constantPart;
+                IExpression nonConstantPart;
                 if (ExpressionUtils.isConstant(addition.getLeftOperand())) {
-                    target = addition.getLeftOperand();
-                    other = addition.getRightOperand();
+                    constantPart = addition.getLeftOperand();
+                    nonConstantPart = addition.getRightOperand();
                 } else {
-                    target = addition.getRightOperand();
-                    other = addition.getLeftOperand();
+                    constantPart = addition.getRightOperand();
+                    nonConstantPart = addition.getLeftOperand();
                 }
 
-                simplifiedLeftHand = other;
-                simplifiedRightHand = new Addition(target, simplifiedRightHand);
+                // Move the non-constant part to the other side of the equation
+                simplifiedLeftHand = nonConstantPart;
+                simplifiedRightHand = new Addition(ExpressionUtils.negate(constantPart), simplifiedRightHand);
                 simplifiedRightHand = ExpressionUtils.simplifyExpression(simplifiedRightHand);
             }
         }
@@ -259,7 +261,6 @@ public class EquationUtils {
         equation.setLeftOperand(simplifiedLeftHand);
         equation.setRightOperand(simplifiedRightHand);
         isolateConstantPart(equation);
-        int x = 1;
         return equation;
     }
 
@@ -279,8 +280,8 @@ public class EquationUtils {
     }
 
     public static Equation negateEquation(Equation equation) {
-        ExpressionUtils.negate(equation.getLeftOperand());
-        ExpressionUtils.negate(equation.getRightOperand());
+        equation.setLeftOperand(ExpressionUtils.negate(equation.getLeftOperand()));
+        equation.setRightOperand(ExpressionUtils.negate(equation.getRightOperand()));
         return equation;
     }
 

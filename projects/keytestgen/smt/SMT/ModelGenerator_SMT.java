@@ -6,7 +6,7 @@ import com.csvanefalk.keytestgen.core.model.SMT.PaperTest;
 import com.csvanefalk.keytestgen.core.model.implementation.Model;
 import com.csvanefalk.keytestgen.core.model.implementation.ModelBuilder;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
-import com.csvanefalk.keytestgen.core.model.tools.ModelGenerationTools;
+import com.csvanefalk.keytestgen.util.transformers.TermSimplificationTransformer;
 import com.csvanefalk.keytestgen.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -92,7 +92,7 @@ public enum ModelGenerator_SMT implements IModelGenerator {
              * primitive integer values in it.
              */
             final Model model = new ModelBuilder().createModel(node,
-                    pathCondition);
+                                                               pathCondition);
 
             /*
              * Get concrete values for any primitive types represented in the
@@ -155,7 +155,7 @@ public enum ModelGenerator_SMT implements IModelGenerator {
                  * Extract the variable name
                  */
                 final String varName = definition.substring(0,
-                        definition.lastIndexOf('_'));
+                                                            definition.lastIndexOf('_'));
 
                 /*
                  * Extract the value
@@ -223,7 +223,8 @@ public enum ModelGenerator_SMT implements IModelGenerator {
              * There is hence nothing useful we can do with it, and we just
              * return it as null.
              */
-            final Term simplifiedPathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
+            final Term simplifiedPathCondition = TermSimplificationTransformer.getInstance()
+                                                                              .simplifyTerm(pathCondition);
 
             if (simplifiedPathCondition == null) {
 
@@ -258,7 +259,7 @@ public enum ModelGenerator_SMT implements IModelGenerator {
                         && (attempts < ModelSettings.getNUMBER_OF_TRIES()));
 
                 PaperTest.addResult(pathCondition + "_KEYNTERPOL",
-                        Calendar.getInstance().getTimeInMillis() - time);
+                                    Calendar.getInstance().getTimeInMillis() - time);
                 return result;
             }
 
@@ -301,10 +302,10 @@ public enum ModelGenerator_SMT implements IModelGenerator {
          * Set up the translator for this term.
          */
         final SmtLib2Translator translator = new SmtLib2Translator(services,
-                this.configuration);
+                                                                   this.configuration);
 
         final StringBuffer result = translator.translateProblem(term, services,
-                this.settings);
+                                                                this.settings);
 
         result.append("\n(get-model)");
 

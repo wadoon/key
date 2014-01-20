@@ -4,7 +4,6 @@ import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.core.model.IModelGenerator;
 import com.csvanefalk.keytestgen.core.model.ModelGeneratorException;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
-import com.csvanefalk.keytestgen.core.model.tools.ModelGenerationTools;
 import com.csvanefalk.keytestgen.keystone.KeYStone;
 import com.csvanefalk.keytestgen.keystone.KeYStoneException;
 import com.csvanefalk.keytestgen.util.transformers.*;
@@ -115,6 +114,11 @@ public class ModelGenerator implements IModelGenerator {
     private Term configurePathConditionForModelGeneration(Term pathCondition) throws TermTransformerException {
 
         /*
+         * Remove all axiomatic expressions
+         */
+        pathCondition = RemoveAxiomaticExpressionsTransformer.getInstance().transform(pathCondition);
+
+        /*
          * Remove all implications from the path condition.
          */
         pathCondition = RemoveImplicationsTransformer.getInstance().transform(pathCondition);
@@ -138,7 +142,7 @@ public class ModelGenerator implements IModelGenerator {
 
         pathCondition = RemoveObserverFunctionsTransformer.getInstance().transform(pathCondition);
 
-        pathCondition = ModelGenerationTools.simplifyTerm(pathCondition);
+        pathCondition = TermSimplificationTransformer.getInstance().transform(pathCondition);
 
         pathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(services)
                                                                  .transform(pathCondition);
