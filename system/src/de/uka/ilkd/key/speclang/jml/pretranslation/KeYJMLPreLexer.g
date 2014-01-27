@@ -42,6 +42,7 @@ lexer grammar KeYJMLPreLexer;
     ASSUME_REDUNDANTLY          : 'assume_redundantly';
     ASSIGNABLE 			: 'assignable';
     ASSIGNABLE_RED 		: 'assignable_redundantly';
+    ASSIGNABLE_ABS		: 'assignable_abs';
     AXIOM                       : 'axiom';
     BEHAVIOR 			: 'behavior';
     BEHAVIOUR 			: 'behaviour';

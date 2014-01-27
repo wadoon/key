@@ -44,6 +44,7 @@ tokens {
 
     ACCESSIBLE      = "accessible";
     ASSIGNABLE      = "assignable";
+    ASSIGNABLE_ABS  = "assignable_abs";
     ENSURES         = "ensures";
     ENSURES_ABS		= "ensures_abs";
     DECLASSIFY      = "declassify";

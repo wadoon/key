@@ -86,6 +86,7 @@ final class JMLTranslator {
         // clauses
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
+        ASSIGNABLE_ABS ("assignable_abs"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         ENSURES_ABS ("ensures_abs"),
@@ -241,6 +242,63 @@ final class JMLTranslator {
                 }
             }
         });
+        
+        translationMethods.put(JMLKeyWord.ASSIGNABLE_ABS,
+                new JMLTranslationMethod() {
+
+			@Override
+			public Term translate(SLTranslationExceptionManager excManager,
+						 			Object... params) 
+						 					throws SLTranslationException {
+				checkParameters(params, String.class, ImmutableList.class, 
+				ProgramVariable.class, Services.class);
+				String name = (String) params[0];
+		        ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
+                ProgramVariable selfVar = (ProgramVariable) params[2];
+		        Services services = (Services) params[3];
+		                
+		        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+		        JavaInfo javaInfo = services.getJavaInfo();
+		        
+		        //creating a function
+		        List<Sort> sorts = new ArrayList<Sort>();
+		        
+		        //depends on heap
+		        sorts.add(heapLDT.targetSort());
+		        //selfVar
+				if (selfVar != null) {
+					sorts.add(selfVar.getKeYJavaType().getSort());
+				}
+				// sorts of all method parameters
+				for (ProgramVariable param: paramVars) {
+					sorts.add(param.getKeYJavaType().getSort());
+				}
+				
+				// create function of sort LocSetLDT
+				Function f = new Function(new Name(name), services.getTypeConverter().getLocSetLDT().targetSort(), 
+						sorts.toArray(new Sort[sorts.size()]));
+				
+				javaInfo.getServices().getNamespaces().functions().add(f);
+				
+				// Creating a Term
+				List<Term> subterms = new ArrayList<Term>();
+				
+				// add heap
+				subterms.add(TB.var(heapLDT.getHeap()));
+				
+				// add selfVar, resultVar, parameters
+				if (selfVar != null) {
+					subterms.add(TB.var(selfVar));
+				}
+				
+				// add parameters
+				for (ProgramVariable param: paramVars) {
+					subterms.add(TB.var(param));
+				} 
+				
+				return TB.func(f, subterms.toArray(new Term[subterms.size()]), null);
+			}
+		});
         translationMethods.put(JMLKeyWord.DEPENDS,
                                new JMLTranslationMethod() {
 
@@ -363,39 +421,62 @@ final class JMLTranslator {
                 
                 
                 HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-       
+                
                 // Build term for a function
-                List<Term> subterms = new ArrayList<Term>();
+                List<Term> subterms = new ArrayList<Term>(); 
                 
-                // heap goes for requires and ensures
-                subterms.add(TB.var(heapLDT.getHeap()));
-                
-                // heapAtPre only for ensures 
-                int hasHeapAtPre = 0;
-                if (function.argSort(1) == heapLDT.targetSort() && atPres != null) {
-                	subterms.add(atPres.get(heapLDT.getHeap()));
-                	hasHeapAtPre = 1;
+                if (function.sort() == Sort.FORMULA) {
+	                // heap goes for requires and ensures
+	                subterms.add(TB.var(heapLDT.getHeap()));
+	                
+	                // heapAtPre only for ensures 
+	                int hasHeapAtPre = 0;
+	                if (function.argSort(1) == heapLDT.targetSort() && atPres != null) {
+	                	subterms.add(atPres.get(heapLDT.getHeap()));
+	                	hasHeapAtPre = 1;
+	                }
+	                
+					// both ensures and requires depend on selfVar when it exists
+	                int hasSelf = 0;
+	                if (selfVar != null) {
+	                	subterms.add(TB.var(selfVar));
+	                	hasSelf = 1;
+	                }
+	                
+	                // resultVar only for ensures (ensures has 1 more sort than result)
+	                if (function.argSorts().size() == paramVars.size() + 2 + hasSelf + hasHeapAtPre) {
+	                	subterms.add(TB.var(resultVar));
+	                } 
+	                
+	                // parameters for ensures and requires
+					for (ProgramVariable param: paramVars) {
+						subterms.add(TB.var(param));
+					}
+					return new AbstractContractDefinition(TB.func(function, subterms.toArray(new Term[subterms.size()]), null), 
+	                		TB.convertToFormula(value, services));
                 }
-                
-				// both ensures and requires depend on selfVar when it exists
-                int hasSelf = 0;
-                if (selfVar != null) {
-                	subterms.add(TB.var(selfVar));
-                	hasSelf = 1;
+                else if (function.sort() == services.getTypeConverter().getLocSetLDT().targetSort()) {
+                	// Build term for a function
+	                
+	                // add heap
+	                subterms.add(TB.var(heapLDT.getHeap()));
+	                
+	                // self
+	                if (selfVar != null) {
+	                	subterms.add(TB.var(selfVar));
+	                }
+	                
+	                // parameters 
+					for (ProgramVariable param: paramVars) {
+						subterms.add(TB.var(param));
+					}
+	                
+					return new AbstractContractDefinition(TB.func(function, subterms.toArray(new Term[subterms.size()]), null), 
+	                		value);
                 }
-                
-                // resultVar only for ensures (ensures has 1 more sort than result)
-                if (function.argSorts().size() == paramVars.size() + 2 + hasSelf + hasHeapAtPre) {
-                	subterms.add(TB.var(resultVar));
-                } 
-                
-                // parameters for ensures and requires
-				for (ProgramVariable param: paramVars) {
-					subterms.add(TB.var(param));
-				}
+                else throw excManager.createException("Placeholder "+ function.name() + "doesn't match its definition");
 				
-                return new AbstractContractDefinition(TB.func(function, subterms.toArray(new Term[subterms.size()]), null), 
-                		TB.convertToFormula(value, services));
+                
                 	
 			
             }

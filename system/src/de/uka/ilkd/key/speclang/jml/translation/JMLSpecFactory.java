@@ -632,17 +632,20 @@ public class JMLSpecFactory {
                     throws SLTranslationException {
 
         for (PositionedString expr : assignableClauses) {
-            Term translated =
-                    JMLTranslator.translate(expr, pm.getContainerType(),
-                                            selfVar,
-                                            paramVars, null, null, null,
-                                            Term.class,
-                                            services);
-
-            // less than nothing is marked by some special term;
-            if(translated == TB.strictlyNothing()) {
-                return true;
-            }
+        	// abstract assignable allows no strictlyNothing
+        	if (!expr.text.startsWith("assignable_abs")) {
+	            Term translated =
+	                    JMLTranslator.translate(expr, pm.getContainerType(),
+	                                            selfVar,
+	                                            paramVars, null, null, null,
+	                                            Term.class,
+	                                            services);
+	
+	            // less than nothing is marked by some special term;
+	            if(translated == TB.strictlyNothing()) {
+	                return true;
+	            }
+        	}
         }
 
         return false;

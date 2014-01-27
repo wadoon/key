@@ -345,6 +345,7 @@ top returns [Object result = null] throws  SLTranslationException
 :
     (   result = accessibleclause
     |   result = assignableclause
+    |	result = assignableabsclause
     |   result = breaksclause
     |   result = continuesclause
     |   result = dependsclause
@@ -385,6 +386,19 @@ assignableclause returns [Term result = null] throws SLTranslationException
         { result = TB.strictlyNothing(); }
     )
     ;
+
+assignableabsclause returns [Term result = null] throws SLTranslationException
+:	
+	ass:ASSIGNABLE_ABS id:IDENT
+		{	Named n = javaInfo.getServices().getNamespaces().functions().lookup(id.getText());
+			if (n == null){
+				result = translator.translate(ass.getText(), Term.class, id.getText(), 
+													paramVars, selfVar, services);
+			} else{
+				raiseError("The name " + id.getText() + " already exists in this namespace");
+			}
+		}
+	;
 
 
 declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
@@ -464,20 +478,43 @@ ensuresabsclause returns [Term result = null] throws SLTranslationException
 defclause returns [AbstractContractDefinition result = null] throws SLTranslationException
 {
     Term pr = null;
+    Term un = null;
+    Function f = null;
 }
 :
-	def:DEF id:IDENT EQUAL_SINGLE pr=predornot
-		{	
-			Function f = (Function)javaInfo.getServices().getNamespaces().functions().lookup(id.getText());
+	def:DEF id:IDENT 
+	{
+			f = (Function)javaInfo.getServices().getNamespaces().functions().lookup(id.getText());
 			if (f == null) {
 				raiseError("Undeclared " + id.getText() + " appeared in def clause");
-			} else
-			//result = new Definition(TB.func(f), TB.convertToFormula(pr, services));
-			result = translator.translate(def.getText(), AbstractContractDefinition.class, 
+			}
+	}
+	( 
+		{ // TODO: move code out of the parser!	
+          f.sort() == Sort.FORMULA}? 
+          (
+          	EQUAL_SINGLE pr = predornot {
+          		result = translator.translate(def.getText(), AbstractContractDefinition.class, 
 												f, pr,
 												paramVars, selfVar, resultVar, services, atPres);
-		} 
+          	}
+          )
+          |
+        { // TODO: move code out of the parser!
+          f.sort() == services.getTypeConverter().getLocSetLDT().targetSort()}? 
+          (
+          	EQUAL_SINGLE un = storeRefUnion {
+          		result = translator.translate(def.getText(), AbstractContractDefinition.class, 
+												f, un,
+												paramVars, selfVar, resultVar, services, atPres);
+          	}
+          ) 
+	)
+
 	;
+	
+
+	
 
 axiomsclause returns [Term result = null] throws SLTranslationException
 :

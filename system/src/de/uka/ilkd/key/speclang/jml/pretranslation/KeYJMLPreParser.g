@@ -656,6 +656,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 :
     (
 	    ps=assignable_clause     { sc.addAssignable(ps); }
+	|   ps=assignable_abs_clause { sc.addAssignable(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|	ps=ensures_abs_clause	 { sc.addEnsures(ps); }
@@ -720,6 +721,16 @@ assignable_keyword
     |   MODIFIABLE_RED
     |   MODIFIES
     |   MODIFIES_RED
+;
+
+
+assignable_abs_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    ASSIGNABLE_ABS result=expression { result = flipHeaps("assignable_abs", result); }
 ;
 
 
