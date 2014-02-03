@@ -635,6 +635,14 @@ public final class TermParserTools {
     }
 
     /**
+     * @param term the term to check
+     * @return true if the term represents an array-length check, or false otherwise.
+     */
+    public static boolean isArrayLengthCheck(Term term) {
+        return term.op().toString().equalsIgnoreCase(StringConstants.LENGTH) && term.op().arity() == 1;
+    }
+
+    /**
      * Generate an identifier String for a variable. Such an identifier is used
      * in order to uniquely distinguish an instance of a {@link ModelVariable}.
      * <p/>

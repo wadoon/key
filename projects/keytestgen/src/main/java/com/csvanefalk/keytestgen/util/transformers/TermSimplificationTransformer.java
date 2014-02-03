@@ -25,9 +25,10 @@ public class TermSimplificationTransformer extends AbstractTermTransformer {
     }
 
     /**
-     * Given an initial {@link de.uka.ilkd.key.logic.Term}, constructs a simpler Term which
-     * "localizes" all occurences of primitive datatypes, by transforming
-     * the instances of {@link de.uka.ilkd.key.logic.op.SortDependingFunction} which contain them.
+     * Given an initial {@link de.uka.ilkd.key.logic.Term}, this method
+     * constructs a simpler Term which "localizes" all occurences of
+     * primitive datatypes, by transforming the instances of
+     * {@link de.uka.ilkd.key.logic.op.SortDependingFunction} which contain them.
      * <p/>
      * As an example of how this works, consider the case where we have an
      * instace of some class <code>Base</code> named "base", which as a
@@ -48,7 +49,7 @@ public class TermSimplificationTransformer extends AbstractTermTransformer {
      * This process will also remove all implied properties of internal
      * objects, such as not-null requirements, since these are not needed in
      * the simplified formula, and would only further pollute the SMT-LIB
-     * expression. Further, it will simplify the formula by removing
+     * expression. Finally, it will simplify the formula by removing
      * unnecessary conjuntions.
      *
      * @param term the term to process
@@ -215,12 +216,12 @@ public class TermSimplificationTransformer extends AbstractTermTransformer {
     @Override
     protected Term transformSortDependentFunction(final Term term) {
 
-            /*
-             * Check if the base type of the selection statement is a primitive
-             * type (we do not handle anything else). If so, create an alias for
-             * the nested variable, and return everything else as a new
-             * LocationVariable.
-             */
+        /*
+         * Check if the base type of the selection statement is a primitive
+         * type (we do not handle anything else). If so, create an alias for
+         * the nested variable, and return everything else as a new
+         * LocationVariable.
+         */
         if (TermParserTools.isPrimitiveType(term)) {
 
             final ProgramElementName resolvedVariableName = new ProgramElementName(TermParserTools.resolveIdentifierString(
@@ -249,5 +250,23 @@ public class TermSimplificationTransformer extends AbstractTermTransformer {
             return null;
         }
         return super.transformTerm(term);
+    }
+
+    @Override
+    protected Term transformFunction(final Term term) throws TermTransformerException {
+        if (TermParserTools.isArrayLengthCheck(term)) {
+
+            final String variableNameString = TermParserTools.resolveIdentifierString(term.sub(0),
+                                                                                      StringConstants.SEPARATOR)
+                    + StringConstants.SEPARATOR
+                    + StringConstants.LENGTH;
+
+            final ProgramElementName resolvedVariableName = new ProgramElementName(variableNameString);
+            final LocationVariable resolvedVariable = new LocationVariable(resolvedVariableName, term.sort());
+
+            return termFactory.createTerm(resolvedVariable);
+        } else {
+            return super.transformFunction(term);
+        }
     }
 }

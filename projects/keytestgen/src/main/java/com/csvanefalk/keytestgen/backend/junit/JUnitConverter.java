@@ -184,10 +184,8 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements IFram
         }
 
         /**
-         * Services invocations of
+         * Services invocations of the convert method of this class.
          *
-         * @param klass     the class for which we are generating test cases
-         * @param testCases the test cases to generate
          * @return a JUnit source file in String format
          * @throws JUnitConverterException
          */
@@ -220,7 +218,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements IFram
             /*
              * Print the new class header
              */
-            String name = "";
+            String name;
             String className = testSuite.getJavaClass().getName();
             // make the first letter of the method name capital
             char firstLetter = Character.toUpperCase(methodName.charAt(0));
@@ -598,7 +596,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements IFram
     /**
      * Convert an abstract test suite into a JUnit test suite.
      *
-     * @param the test suite to convert
+     * @param testSuite the test suite to convert
      * @return the resulting JUnit test suite
      */
     @Override
