@@ -11,7 +11,7 @@ import com.csvanefalk.keytestgen.core.oracle.abstraction.Oracle;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestCase;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestSuite;
 import com.csvanefalk.keytestgen.util.Benchmark;
-import com.huydo.exploitgen.INodeProcessor;
+import com.huydo.exploitgen.NINodeProcessor;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -81,7 +81,10 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
     /**
      * Executes the test generation procedure.
      */
-    @Override
+    /* (non-Javadoc)
+    * @see com.csvanefalk.keytestgen.core.concurrency.capsules.ICapsule#doWork()
+    */
+   @Override
     public void doWork() {
 
         /*
@@ -110,9 +113,13 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
             //SourceElement se = s.getActiveStatement();
             //System.out.println("number of children:" + root.getChildren().length);
             
-            //try to use INodeProcessor:
-            INodeProcessor hNodes=new INodeProcessor(root);
-            System.out.println("Number of terminating nodes:"+hNodes.getLeafNodes().size());
+            //try to use NINodeProcessor:
+            NINodeProcessor nodeProcessor=new NINodeProcessor(root);
+            
+            //System.out.println("Number of terminating nodes:"+nodeProcessor.getLeafNodes().size());
+            //nodeProcessor.printLeafInfo();
+            nodeProcessor.printInterferenceTerm(0, 1);
+            
             
             final List<IExecutionNode> nodes = codeCoverageParser.retrieveNodes(root);
             

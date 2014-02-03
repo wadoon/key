@@ -15,6 +15,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Given that a client does not specify anything else, KeYTestGen2 will default
@@ -35,6 +36,7 @@ public class ModelGenerator implements IModelGenerator {
     private static ModelGenerator instance = null;
 
     public static ModelGenerator getInstance() {
+       
         if (ModelGenerator.instance == null) {
             ModelGenerator.instance = new ModelGenerator();
         }
@@ -158,7 +160,7 @@ public class ModelGenerator implements IModelGenerator {
      * @return a map of variable names to their concrete values
      * @throws ModelGeneratorException
      */
-    private Map<String, Integer> getConcreteValues(final Term pathCondition,
+    public Map<String, Integer> getConcreteValues(final Term pathCondition,
                                                    final Services services) throws ModelGeneratorException {
 
         try {
