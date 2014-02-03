@@ -2,19 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d79ce890-165e-42ad-ac52-7a11ece4868a" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../projects/keytestgen/.idea/libraries/key.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../projects/keytestgen/.idea/symfony2.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../key-ext-jars/antlr.jar" afterPath="$PROJECT_DIR$/../key-ext-jars/antlr.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/lib/antlr.jar" afterPath="$PROJECT_DIR$/../projects/keytestgen/lib/antlr.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/repo/antlr_custom/antlr_custom/2.7.2/antlr_custom-2.7.2.jar" afterPath="$PROJECT_DIR$/../projects/keytestgen/repo/antlr_custom/antlr_custom/2.7.2/antlr_custom-2.7.2.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/repo/de/uka/ilkd/key/2.0/key-2.0.jar" afterPath="$PROJECT_DIR$/../projects/keytestgen/repo/de/uka/ilkd/key/2.0/key-2.0.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/lib/key.jar" afterPath="$PROJECT_DIR$/../projects/keytestgen/lib/key.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../system/src/de/uka/ilkd/key/speclang/ContractWrapper.java" afterPath="$PROJECT_DIR$/../system/src/de/uka/ilkd/key/speclang/ContractWrapper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/.idea/libraries/Maven__de_uka_ilkd_key_2_0.xml" afterPath="$PROJECT_DIR$/../projects/keytestgen/.idea/libraries/Maven__de_uka_ilkd_key_2_0.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/key-devel.iml" afterPath="$PROJECT_DIR$/key-devel.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/backend/junit/JUnitConverter.java" afterPath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/backend/junit/JUnitConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/repo/de/uka/ilkd/key/2.0/key-2.0/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/../projects/keytestgen/repo/de/uka/ilkd/key/2.0/key-2.0/META-INF/MANIFEST.MF" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java" afterPath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/instance/ModelArrayInstance.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java" afterPath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelBuilderVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java" afterPath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/core/model/implementation/ModelGenerator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveAxiomaticExpressionsTransformer.java" afterPath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/util/transformers/RemoveAxiomaticExpressionsTransformer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/util/parsers/TermParserTools.java" afterPath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/util/parsers/TermParserTools.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/util/transformers/TermSimplificationTransformer.java" afterPath="$PROJECT_DIR$/../projects/keytestgen/src/main/java/com/csvanefalk/keytestgen/util/transformers/TermSimplificationTransformer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/.idea/codeStyleSettings.xml" afterPath="$PROJECT_DIR$/../projects/keytestgen/.idea/codeStyleSettings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/keytestgen.iml" afterPath="$PROJECT_DIR$/../projects/keytestgen/keytestgen.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/.idea/misc.xml" afterPath="$PROJECT_DIR$/../projects/keytestgen/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/repo/de/uka/ilkd/key/2.0/key-2.0/de/uka/ilkd/key/util/install/startProver_win" afterPath="$PROJECT_DIR$/../projects/keytestgen/repo/de/uka/ilkd/key/2.0/key-2.0/de/uka/ilkd/key/util/install/startProver_win" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../projects/keytestgen/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../projects/keytestgen/.idea/workspace.xml" />
     </list>
@@ -92,7 +91,7 @@
       <file leaf-file-name="AbstractSymbolicExecutionTestCase.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/AbstractSymbolicExecutionTestCase.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="959" column="49" selection-start="53901" selection-end="53901" vertical-scroll-proportion="0.19812793" vertical-offset="12653" max-vertical-offset="23655">
+            <state line="959" column="49" selection-start="53901" selection-end="53901" vertical-scroll-proportion="-3.6727688" vertical-offset="14385" max-vertical-offset="23655">
               <folding />
             </state>
           </provider>
@@ -101,7 +100,7 @@
       <file leaf-file-name="TestSymbolicExecutionTreeBuilder.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/TestSymbolicExecutionTreeBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="77" column="21" selection-start="3088" selection-end="3088" vertical-scroll-proportion="0.0" vertical-offset="570" max-vertical-offset="43140">
+            <state line="77" column="21" selection-start="3088" selection-end="3088" vertical-scroll-proportion="0.0" vertical-offset="1155" max-vertical-offset="43440">
               <folding />
             </state>
           </provider>
@@ -110,7 +109,7 @@
       <file leaf-file-name="ContractWrapper.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/speclang/ContractWrapper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="56" column="31" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.0" vertical-offset="411" max-vertical-offset="1125">
+            <state line="56" column="31" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.0" vertical-offset="840" max-vertical-offset="1320">
               <folding />
             </state>
           </provider>
@@ -137,9 +136,10 @@
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds">
-    <option name="y" value="22" />
-    <option name="width" value="1280" />
-    <option name="height" value="774" />
+    <option name="x" value="489" />
+    <option name="y" value="115" />
+    <option name="width" value="1253" />
+    <option name="height" value="860" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -167,6 +167,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -268,7 +269,6 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -313,9 +313,6 @@
       <option name="SHMEM_ADDRESS" value="javadebug" />
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
-      <method />
-    </configuration>
-    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
       <method />
     </configuration>
     <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
@@ -383,9 +380,6 @@
       <patterns />
       <method />
     </configuration>
-    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
-      <method />
-    </configuration>
     <configuration default="true" type="FlashRunConfigurationType" factoryName="Flash App">
       <option name="BCName" value="" />
       <option name="IOSSimulatorSdkPath" value="" />
@@ -439,10 +433,6 @@
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <method />
-    </configuration>
-    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
-      <TestRunner />
       <method />
     </configuration>
     <configuration default="true" type="FlexUnitRunConfigurationType" factoryName="FlexUnit" appDescriptorForEmulator="Android" class_name="" emulatorAdlOptions="" method_name="" output_log_level="null" package_name="" scope="Class">
@@ -542,14 +532,18 @@
       <workItem from="1389357424722" duration="561000" />
       <workItem from="1389368080993" duration="941000" />
       <workItem from="1389373931119" duration="325000" />
+      <workItem from="1390224332535" duration="241000" />
+      <workItem from="1390788786883" duration="202000" />
+      <workItem from="1390788995814" duration="78000" />
+      <workItem from="1390789083731" duration="12000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="9991000" />
+    <option name="totallyTimeSpent" value="10524000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1280" height="774" extended-state="0" />
+    <frame x="489" y="115" width="1253" height="860" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -562,17 +556,17 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30319148" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33997345" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2171875" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22062351" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2203125" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22382094" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -598,6 +592,90 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/collection/DefaultImmutableMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="21" selection-start="1999" selection-end="1999" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7080">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/AbstractSymbolicExecutionTestCase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="959" column="49" selection-start="53901" selection-end="53901" vertical-scroll-proportion="0.0" vertical-offset="14385" max-vertical-offset="23880">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/TestSymbolicExecutionTreeBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="77" column="21" selection-start="3088" selection-end="3088" vertical-scroll-proportion="0.0" vertical-offset="1155" max-vertical-offset="43440">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/speclang/ContractWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="31" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.0" vertical-offset="840" max-vertical-offset="1320">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/collection/DefaultImmutableMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="21" selection-start="1999" selection-end="1999" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7080">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/AbstractSymbolicExecutionTestCase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="959" column="49" selection-start="53901" selection-end="53901" vertical-scroll-proportion="0.0" vertical-offset="14385" max-vertical-offset="23880">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/TestSymbolicExecutionTreeBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="77" column="21" selection-start="3088" selection-end="3088" vertical-scroll-proportion="0.0" vertical-offset="1155" max-vertical-offset="43440">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/speclang/ContractWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="31" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.0" vertical-offset="840" max-vertical-offset="1320">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/collection/DefaultImmutableMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="21" selection-start="1999" selection-end="1999" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7080">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/AbstractSymbolicExecutionTestCase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="959" column="49" selection-start="53901" selection-end="53901" vertical-scroll-proportion="0.0" vertical-offset="14385" max-vertical-offset="23880">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/TestSymbolicExecutionTreeBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="77" column="21" selection-start="3088" selection-end="3088" vertical-scroll-proportion="0.0" vertical-offset="1155" max-vertical-offset="43440">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/speclang/ContractWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="31" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.0" vertical-offset="840" max-vertical-offset="1320">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/collection/DefaultImmutableMap.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="66" column="21" selection-start="1999" selection-end="1999" vertical-scroll-proportion="0.0" vertical-offset="540" max-vertical-offset="7080">
@@ -710,13 +788,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/speclang/ContractWrapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="31" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.0" vertical-offset="411" max-vertical-offset="1125">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/TestSymbolicExecutionTreeBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="77" column="21" selection-start="3088" selection-end="3088" vertical-scroll-proportion="0.0" vertical-offset="570" max-vertical-offset="43140">
@@ -724,9 +795,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/system/src/de/uka/ilkd/key/speclang/ContractWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="31" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.0" vertical-offset="411" max-vertical-offset="1125">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/system/test/de/uka/ilkd/key/symbolic_execution/AbstractSymbolicExecutionTestCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="959" column="49" selection-start="53901" selection-end="53901" vertical-scroll-proportion="0.19812793" vertical-offset="12653" max-vertical-offset="23655">
+        <state line="959" column="49" selection-start="53901" selection-end="53901" vertical-scroll-proportion="-3.6727688" vertical-offset="14385" max-vertical-offset="23655">
           <folding />
         </state>
       </provider>

@@ -144,6 +144,8 @@ public class ModelGenerator implements IModelGenerator {
 
         pathCondition = RemoveObserverFunctionsTransformer.getInstance().transform(pathCondition);
 
+        pathCondition = RemoveAxiomaticExpressionsTransformer.getInstance().transform(pathCondition);
+
         pathCondition = TermSimplificationTransformer.getInstance().transform(pathCondition);
 
         pathCondition = NormalizeArithmeticComparatorsTransformer.getInstance(services)
@@ -188,6 +190,12 @@ public class ModelGenerator implements IModelGenerator {
         }
     }
 
+    /**
+     * Binds a set of concerete values to the variables in th model.
+     *
+     * @param model
+     * @param concreteValues
+     */
     private void instantiateModel(final Model model, final Map<String, Integer> concreteValues) {
 
         for (final String variableName : concreteValues.keySet()) {

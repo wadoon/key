@@ -252,11 +252,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          * for it).
          */
         if (operator.getClass() == Function.class) {
-
-            // The operator is the "self" declaration
-            if (operator.toString().equalsIgnoreCase("self")) {
-                return default_self;
-            }
+            return getFunctionVariable(term);
         }
 
         /*
@@ -269,19 +265,32 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          * It may also represent an array access operation.
          */
         if (operator.getClass() == SortDependingFunction.class) {
-
-            // Check if the operator is an array access operation
-            if (term.subs().size() >= 3 && term.sub(2).toString().startsWith(StringConstants.ARRAY)) {
-                return getArrayAccessVariable(term);
-            }
-
-            // Otherwise, treat it as a nested variable
-            else {
-                return getProgramVariableForField(term.sub(2));
-            }
+            return getSortDependentFunctionVariable(term);
         }
 
         return null;
+    }
+
+    private ProgramVariable getFunctionVariable(Term term) {
+
+        // The operator is the "self" declaration
+        if (term.op().toString().equalsIgnoreCase("self")) {
+            return default_self;
+        } else {
+            return null;
+        }
+    }
+
+    private ProgramVariable getSortDependentFunctionVariable(Term term) {
+        // Check if the operator is an array access operation
+        if (term.subs().size() >= 3 && term.sub(2).toString().startsWith(StringConstants.ARRAY)) {
+            return getArrayAccessVariable(term);
+        }
+
+        // Otherwise, treat it as a nested variable
+        else {
+            return getProgramVariableForField(term.sub(2));
+        }
     }
 
     private ProgramVariable getArrayAccessVariable(final Term term) {
@@ -307,7 +316,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          * Check if the the term is the array-length function. Associate it as a normal constant
          * of the array it is applied to.
          */
-        if (term.op().toString().equalsIgnoreCase(StringConstants.LENGTH) && term.op().arity() == 1) {
+        if (TermParserTools.isArrayLengthCheck(term)) {
 
             /*
              * First parse the array variable itself, in order to ensure that it
@@ -342,7 +351,6 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          * instead? What other variables (if any) may have nulled sorts?
          */
         final ProgramVariable programVariable = getVariable(term);
-
         if ((programVariable == null) || programVariable.toString().equals("self")) {
             return;
         }
@@ -360,7 +368,6 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
          * Check that the variable we found is not already present in the model.
          */
         final ModelVariable currentVariable = model.getVariable(identifier);
-
         if ((currentVariable != null) && currentVariable.isParameter()) {
             return;
         }
@@ -443,7 +450,9 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
      */
     private ProgramVariable createLengthConstant(Term term) {
         KeYJavaType type = javaInfo.getKeYJavaType(term.sort());
-        ProgramElementName name = new ProgramElementName(StringConstants.LENGTH);
+        String arrayName = TermParserTools.resolveIdentifierString(term.sub(0), SEPARATOR);
+
+        ProgramElementName name = new ProgramElementName(arrayName + SEPARATOR + StringConstants.LENGTH);
         ProgramVariable lengthConstant = new LocationVariable(name, type);
         return lengthConstant;
     }
