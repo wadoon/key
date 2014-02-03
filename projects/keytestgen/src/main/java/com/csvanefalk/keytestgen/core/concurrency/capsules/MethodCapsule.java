@@ -116,7 +116,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
             //try to use NonInterferenceChecker
             NonInterferenceChecker nic=new NonInterferenceChecker(root);  
             nic.checkProgram();
-            
+            //nic.printConcreteModel(0, 1);
             
             final List<IExecutionNode> nodes = codeCoverageParser.retrieveNodes(root);
             
