@@ -47,7 +47,7 @@ public class KeYJavaMethod {
      */
     private final IProgramMethod programMethod;
 
-    KeYJavaMethod(final KeYJavaClass declaringClass,
+    public KeYJavaMethod(final KeYJavaClass declaringClass,
                   final IProgramMethod programMethod,
                   final KeYEnvironment<CustomConsoleUserInterface> environment,
                   final FunctionalOperationContract functionalContract) {

@@ -254,7 +254,8 @@ public final class TermParserTools {
      */
     public static boolean isBooleanFalse(final Term term) throws TermParserException {
         if (TermParserTools.isBoolean(term)) {
-            return term.op().name().toString().equals(StringConstants.FALSE);
+            return term.op().name().toString().equals(StringConstants.FALSE)?true:false;
+                  
         } else {
             throw new TermTransformerException("Attempted to apply boolean operation to non-boolean literal");
         }
@@ -267,7 +268,7 @@ public final class TermParserTools {
      */
     public static boolean isBooleanTrue(final Term term) throws TermTransformerException {
         if (TermParserTools.isBoolean(term)) {
-            return term.op().name().toString().equals(StringConstants.TRUE);
+           return term.op().name().toString().equals(StringConstants.TRUE)?true:false;
         } else {
             throw new TermTransformerException("Attempted to apply boolean operation to non-boolean literal");
         }

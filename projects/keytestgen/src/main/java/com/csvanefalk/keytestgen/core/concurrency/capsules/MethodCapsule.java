@@ -11,7 +11,7 @@ import com.csvanefalk.keytestgen.core.oracle.abstraction.Oracle;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestCase;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestSuite;
 import com.csvanefalk.keytestgen.util.Benchmark;
-import com.huydo.exploitgen.NonInterferenceChecker;
+
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -113,11 +113,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
             //SourceElement se = s.getActiveStatement();
             //System.out.println("number of children:" + root.getChildren().length);
             
-            //try to use NonInterferenceChecker
-            NonInterferenceChecker nic=new NonInterferenceChecker(root);  
-            nic.checkProgram();
-            //nic.printConcreteModel(0, 1);
-            
+                       
             final List<IExecutionNode> nodes = codeCoverageParser.retrieveNodes(root);
             
             Benchmark.finishBenchmarking("2. [KeY] Create symbolic execution tree");

@@ -14,4 +14,8 @@ public class KeYInterfaceException extends KeYTestGenException {
     public KeYInterfaceException(final String message) {
         super(message);
     }
+
+    public KeYInterfaceException(String message, Throwable cause) {
+      super(message, cause);
+   }
 }

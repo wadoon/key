@@ -2,16 +2,19 @@ package com.csvanefalk.keytestgen.core.keyinterface;
 
 import com.csvanefalk.keytestgen.core.classabstraction.KeYJavaMethod;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
@@ -214,7 +217,7 @@ public class KeYInterface {
             return KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null);
 
         } catch (final ProblemLoaderException e) {
-            throw new KeYInterfaceException(e.getMessage());
+            throw new KeYInterfaceException(e.getMessage(), e);
         } finally {
             KeYInterface.lock.unlock();
         }
@@ -245,6 +248,11 @@ public class KeYInterface {
 
         KeYEnvironment<CustomConsoleUserInterface> environment = method.getEnvironment();
 
+        /*IProgramMethod pm = method.getProgramMethod();
+        ImmutableSet<Contract> contracts = environment.getServices().getSpecificationRepository().getContracts(pm.getContainerType(), pm);
+        Contract contract = contracts.iterator().next(); // TODO; In case of also you have multiple contracts. Select the one you need
+        ProofOblInput input = contract.createProofObl(environment.getInitConfig(), contract);*/
+        
         // Start proof
         ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(),
                                                   method.getProgramMethod().getFullName(),

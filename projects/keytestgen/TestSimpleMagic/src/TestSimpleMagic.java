@@ -15,19 +15,15 @@ public  class TestSimpleMagic {
          * Create the values needed for this test case.
          */
         Simple self = new Simple();        
-        int self_h = 0;        
         
         /*
          * Create the parameter instances to be passed to the method under test.
          *
          */
+        int h1 = 1;        
+        int l1 = 0;        
         
-        /*
-         * Configuring variable: self
-         */
-        setFieldValue(self,"h",0);        
-        
-        self.magic();        
+        self.magic(h1,l1);        
         
         /*
          * Test oracle
@@ -42,19 +38,15 @@ public  class TestSimpleMagic {
          * Create the values needed for this test case.
          */
         Simple self = new Simple();        
-        int self_h = 2;        
         
         /*
          * Create the parameter instances to be passed to the method under test.
          *
          */
+        int h1 = 0;        
+        int l1 = 0;        
         
-        /*
-         * Configuring variable: self
-         */
-        setFieldValue(self,"h",2);        
-        
-        self.magic();        
+        self.magic(h1,l1);        
         
         /*
          * Test oracle

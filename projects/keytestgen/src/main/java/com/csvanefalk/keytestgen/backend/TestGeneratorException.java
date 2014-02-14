@@ -8,6 +8,9 @@ public class TestGeneratorException extends KeYTestGenException {
 
     public TestGeneratorException(final String message) {
         super(message);
-        // TODO Auto-generated constructor stub
     }
+
+   public TestGeneratorException(String message, Throwable cause) {
+      super(message, cause);
+   }
 }

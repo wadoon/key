@@ -169,9 +169,9 @@ public class TestGenerator {
             return convertedTestSuites;
 
         } catch (final CoreException e) {
-            throw new TestGeneratorException(e.getMessage());
+            throw new TestGeneratorException(e.getMessage(), e);
         } catch (final FrameworkConverterException e) {
-            throw new TestGeneratorException(e.getMessage());
+            throw new TestGeneratorException(e.getMessage(), e);
         }
     }
 

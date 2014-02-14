@@ -283,9 +283,9 @@ public class CoreInterface implements ICapsuleMonitor {
             return keYJavaClass;
 
         } catch (final KeYInterfaceException e) {
-            throw new CoreException(e.getMessage());
+            throw new CoreException(e.getMessage(), e);
         } catch (final IOException e) {
-            throw new CoreException(e.getMessage());
+            throw new CoreException(e.getMessage(), e);
         }
     }
 

@@ -8,6 +8,9 @@ public class CoreException extends KeYTestGenException {
 
     public CoreException(final String message) {
         super(message);
-        // TODO Auto-generated constructor stub
     }
+
+   public CoreException(String message, Throwable cause) {
+      super(message, cause);
+   }
 }
