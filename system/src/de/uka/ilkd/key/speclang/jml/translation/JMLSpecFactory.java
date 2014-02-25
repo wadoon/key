@@ -757,7 +757,8 @@ public class JMLSpecFactory {
                                                    ProgramVariableCollection progVars,
                                                    ContractClauses clauses,
                                                    Map<LocationVariable,Term> posts,
-                                                   Map<LocationVariable,Term> axioms) {
+                                                   Map<LocationVariable,Term> axioms,
+                                                   boolean isAbstract) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
 
         Term abbrvLhs = null;
@@ -783,14 +784,14 @@ public class JMLSpecFactory {
             // create diamond modality contract
             FunctionalOperationContract contract =
                     cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars, isAbstract);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             // create box modality contract
             FunctionalOperationContract contract =
                     cf.func(name, pm, false, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars, isAbstract);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
@@ -804,11 +805,11 @@ public class JMLSpecFactory {
             }
             FunctionalOperationContract contract1 =
                     cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars, isAbstract);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 =
                     cf.func(name, pm, false, clauses.requires, clauses.measuredBy, posts, axioms,
-                        clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                        clauses.assignables, clauses.accessibles, clauses.hasMod, progVars, isAbstract);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
@@ -1150,7 +1151,7 @@ public class JMLSpecFactory {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         result = result.union(createFunctionalOperationContracts(name, pm,
                                                                  progVars,
-                                                                 clauses, posts, axioms));
+                                                                 clauses, posts, axioms, textualSpecCase.isAbstract()));
         result = result.union(createDependencyOperationContract(pm, progVars,
                                                                 clauses));
 

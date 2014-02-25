@@ -37,7 +37,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
  */
 public class ContractRuleApp extends AbstractContractRuleApp {
 
-    private List<LocationVariable> heapContext;
+    protected List<LocationVariable> heapContext;
 
     ContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
     	this(rule,	pio, null);

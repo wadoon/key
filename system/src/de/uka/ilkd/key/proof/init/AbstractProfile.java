@@ -39,7 +39,7 @@ public abstract class AbstractProfile implements Profile {
     /**
      * The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
      */
-    private static Profile defaultProfile = JavaProfile.getDefaultInstance();
+    private static Profile defaultProfile = JavaAbstractOperationProfile.getDefaultInstance();
 
     private final RuleCollection       standardRules;
 

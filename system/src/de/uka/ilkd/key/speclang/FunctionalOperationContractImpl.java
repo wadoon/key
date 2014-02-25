@@ -87,6 +87,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final int id;
     final boolean transaction;
     final boolean toBeSaved;
+    final boolean isAbstract;
 
     /**
      * If a method is strictly pure, it has no modifies clause which could
@@ -118,6 +119,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param excVar the variable used for the thrown exception
      * @param heapAtPreVar the variable used for the pre-heap
      * @param globalDefs definitions for the whole contract
+     * @param isAbstract abstractly defined contract
      */
     FunctionalOperationContractImpl(String baseName,
                                     String name,
@@ -140,7 +142,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Term globalDefs,
                                     int id,
                                     boolean toBeSaved,
-                                    boolean transaction) {
+                                    boolean transaction,
+                                    boolean isAbstract) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;
@@ -183,6 +186,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.id                     = id;
         this.transaction            = transaction;
         this.toBeSaved	            = toBeSaved;
+        this.isAbstract             = isAbstract;
     }
 
 
@@ -1230,6 +1234,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return or.replace(globalDefs);
     }
 
+    
     @Override
     public String toString() {
         return
@@ -1248,7 +1253,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 + "; termination: "
                 + getModality()
                 + "; transaction: "
-                + transactionApplicableContract();
+                + transactionApplicableContract()
+                + "; isAbstract: "
+                + isAbstract;
     }
 
 
@@ -1298,7 +1305,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    globalDefs,
                                                    newId,
                                                    toBeSaved,
-                                                   transaction);
+                                                   transaction,
+                                                   isAbstract);
     }
 
 
@@ -1327,7 +1335,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    globalDefs,
                                                    id,
                                                    toBeSaved && newKJT.equals(kjt),
-                                                   transaction);
+                                                   transaction,
+                                                   isAbstract);
     }
 
 
@@ -1365,4 +1374,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return new OriginalVariables(originalSelfVar, originalResultVar,
                                      originalExcVar, atPreVars, originalParamVars);
     }
+
+
+	@Override
+	//A contract is abstract, if its requires, ensures and assignables were declared abstractly
+	// (using requires_abs, ensures_abs and assignable_abs)
+	public boolean isAbstract() {
+		return isAbstract;
+	}
 }

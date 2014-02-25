@@ -113,7 +113,7 @@ public class JavaProfile extends AbstractProfile {
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound
         			   .prepend(QueryExpand.INSTANCE);
   
-        //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
+        //contract insertion rule,ÿ ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!
         builtInRules = builtInRules.prepend(UseOperationContractRule.INSTANCE);
 

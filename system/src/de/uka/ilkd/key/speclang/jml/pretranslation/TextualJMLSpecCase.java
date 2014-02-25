@@ -68,6 +68,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private Map<String, ImmutableList<PositionedString>>
       defs = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
+    //tells, whether all requires, ensures, assignable are declared abstractly
+    //determined while adding requires, ensures, assignable
+    private boolean isAbstract = true;
+    
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
         super(mods);
@@ -103,6 +107,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addRequires(PositionedString ps) {
+    	if (!ps.text.startsWith("requires_abs")) {
+    		isAbstract = false;
+    	}
         addGeneric(requires, ps);
     }
 
@@ -135,6 +142,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addAssignable(PositionedString ps) {
+    	if (!ps.text.startsWith("assignable_abs")) {
+    		isAbstract = false;
+    	}
         addGeneric(assignables, ps);
     }
 
@@ -150,6 +160,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addEnsures(PositionedString ps) {
+    	if (!ps.text.startsWith("ensures_abs")) {
+    		isAbstract = false;
+    	}
         addGeneric(ensures, ps);
     }
 
@@ -482,4 +495,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + continues.hashCode()
                + returns.hashCode();
     }
+    
+    
+    // contract is considered abstract, if only requires_abs, ensures_abs and assignable_abs are used
+	public boolean isAbstract() {
+		return isAbstract;
+	}
+
+	public void setIsAbstract(boolean isAbstract) {
+		this.isAbstract = isAbstract;
+		
+	}
 }

@@ -105,4 +105,5 @@ public interface FunctionalOperationContract extends OperationContract {
     public KeYJavaType getSpecifiedIn();
 
     public boolean hasResultVar();
+    public boolean isAbstract();
 }

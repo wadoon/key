@@ -107,7 +107,8 @@ public class ContractFactory {
             foci.globalDefs,
             foci.id,
             foci.toBeSaved,
-            foci.transaction);
+            foci.transaction,
+            foci.isAbstract);
     }
 
     /** Add the specification contained in InitiallyClause as a postcondition. */
@@ -166,7 +167,8 @@ public class ContractFactory {
                                                    foci.originalMods.get(
                                                            services.getTypeConverter().getHeapLDT()
                                                            .getSavedHeap())
-                                                           != null
+                                                           != null,
+                                                   foci.isAbstract
                                                    );
     }
 
@@ -187,7 +189,7 @@ public class ContractFactory {
                                                    foci.originalSelfVar, foci.originalParamVars,
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
-                                                   foci.toBeSaved,foci.transaction);
+                                                   foci.toBeSaved,foci.transaction, foci.isAbstract);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -286,7 +288,7 @@ public class ContractFactory {
                                                    hasMod, selfVar, paramVars, resultVar, excVar,
                                                    atPreVars, null, Contract.INVALID_ID, toBeSaved,
                                                    mods.get(services.getTypeConverter().getHeapLDT()
-                                                           .getSavedHeap()) != null);
+                                                           .getSavedHeap()) != null, false);
     }
 
     public FunctionalOperationContract func (String baseName,
@@ -299,10 +301,10 @@ public class ContractFactory {
                                              Map<LocationVariable, Term> mods,
                                              Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
-                                             ProgramVariableCollection pv) {
+                                             ProgramVariableCollection pv, boolean isAbstract) {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, axioms,
                     mods, accessibles, hasMod, pv, false, mods.get(
-                            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+                            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null, isAbstract);
     }
 
 
@@ -317,14 +319,14 @@ public class ContractFactory {
                                              Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
                                              ProgramVariableCollection progVars,
-                                             boolean toBeSaved, boolean transaction) {
+                                             boolean toBeSaved, boolean transaction, boolean isAbstract) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
                                                    pm.getContainerType(), modality, pres, mby,
                                                    posts, axioms, mods, accessibles, hasMod,
                                                    progVars.selfVar, progVars.paramVars,
                                                    progVars.resultVar, progVars.excVar,
                                                    progVars.atPreVars, null,
-                                                   Contract.INVALID_ID, toBeSaved, transaction);
+                                                   Contract.INVALID_ID, toBeSaved, transaction, isAbstract);
     }
 
     /**
@@ -386,8 +388,10 @@ public class ContractFactory {
         Map<LocationVariable,Term> mods = t.originalMods;
         Map<ProgramVariable,Term> deps = t.originalDeps;
         Modality moda = t.modality;
+        boolean isAbstract = t.isAbstract;
         for(FunctionalOperationContract other : others) {
             Modality otherModality = other.getModality();
+            isAbstract = isAbstract && other.isAbstract();
             if (moda != otherModality) {
                 // TODO are there other modalities to appear in contracts?
                 // I know that this is extremely ugly, but I don't know how to combine other kinds of modalities.
@@ -529,7 +533,7 @@ public class ContractFactory {
                                                    t.globalDefs,
                                                    Contract.INVALID_ID,
                                                    t.toBeSaved,
-                                                   t.transaction);
+                                                   t.transaction, isAbstract);
     }
 
 

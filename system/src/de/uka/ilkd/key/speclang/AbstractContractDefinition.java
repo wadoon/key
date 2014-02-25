@@ -28,7 +28,6 @@ public class AbstractContractDefinition implements SpecificationElement{
 		this.definition = definition;
 		this.kjt = null;
 		this.name = "expand_def_" + definedSymbol.op().name();
-		//System.out.println("Def" + name + " created!");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -46,7 +45,7 @@ public class AbstractContractDefinition implements SpecificationElement{
 				definedSymbol,
 				definition,
 				listVars.reverse(),
-                new RuleSet(new Name("userTaclets1")), // what here?
+                new RuleSet(new Name("expand_def")), 
                 null); //services not needed
 	}
 	
@@ -59,7 +58,6 @@ public class AbstractContractDefinition implements SpecificationElement{
 		return this.name;
 	}
 	@Override
-	// is it ok?
 	public VisibilityModifier getVisibility() {
 		assert false;
 		return null;

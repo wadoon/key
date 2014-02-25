@@ -420,6 +420,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
         i--) {
             TextualJMLSpecCase specCase
             = (TextualJMLSpecCase) constructsArray[i];
+            
+            // save it here, because here it represents how contract was defined by the user (in JML comments)
+            // later prepended "ensures" and "requires" do not change the fact, that a contract is abstract
+            boolean oldIsAbstract = specCase.isAbstract();
+            
+            
             if(modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
                specCase.addAxioms(modelMethodDecl.getMethodDefinition());
             }
@@ -490,7 +496,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     && !pm.isModel()) {
                 specCase.addSignalsOnly(new PositionedString(getDefaultSignalsOnly(pm)));
             }
-
+            
+            //return old value
+            specCase.setIsAbstract(oldIsAbstract);
             //translate contract
             try {
                 ImmutableSet<Contract> contracts

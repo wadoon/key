@@ -81,7 +81,7 @@ import de.uka.ilkd.key.util.Triple;
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
-public final class UseOperationContractRule implements BuiltInRule {
+public class UseOperationContractRule implements BuiltInRule {
 
     public static final UseOperationContractRule INSTANCE
                                             = new UseOperationContractRule();
@@ -97,7 +97,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     //constructors
     //-------------------------------------------------------------------------
 
-    private UseOperationContractRule() {
+    protected UseOperationContractRule() {
     }
 
 
@@ -281,6 +281,18 @@ public final class UseOperationContractRule implements BuiltInRule {
         ImmutableSet<FunctionalOperationContract> result
                 = services.getSpecificationRepository()
                           .getOperationContracts(kjt, pm, modality);
+        
+//		ImmutableSet<FunctionalOperationContract> allContracts = services
+//				.getSpecificationRepository().getOperationContracts(kjt, pm,
+//						modality);
+//		ImmutableSet<FunctionalOperationContract> result = DefaultImmutableSet
+//				.<FunctionalOperationContract> nil();
+//
+//		for (FunctionalOperationContract contract : allContracts) {
+//			if (contract.isAbstract()) {
+//				result = result.add(contract);
+//			}
+//		}
 
         //in box modalities, diamond contracts may be applied as well
         if(modality == Modality.BOX) {
@@ -540,10 +552,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts
-                = getApplicableContracts(goal.proof().getServices(),
-                	                 inst.pm,
-                	                 inst.staticType,
-                	                 inst.mod);
+                = getApplicableContracts(inst, goal.proof().getServices());
         if(contracts.isEmpty()) {
             return false;
         }
