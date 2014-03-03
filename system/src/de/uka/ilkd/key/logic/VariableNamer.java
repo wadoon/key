@@ -382,7 +382,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 		    					  .getJavaType());
             result += "_arr";
         } else {
-            String name = type.getName().toString();
+            String name = type.getName();
             name = MiscTools.filterAlphabetic(name);
             if (name.length() > 0) {
                 result = name.substring(0, 1).toLowerCase();
@@ -656,13 +656,12 @@ public abstract class VariableNamer implements InstantiationProposer {
 	}
 
         String proposal;
-	boolean found = false;
 	try {
 	    Iterator<TacletGoalTemplate> templs =
 	        app.taclet().goalTemplates().iterator();
             RewriteTacletGoalTemplate rwgt =null;
 	    String name = "";
-	    while (templs.hasNext() && !found) {
+	    while (templs.hasNext()) {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
 	        Term t = findProgramInTerm(rwgt.replaceWith());
 	        ContextStatementBlock c =
@@ -675,7 +674,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 	            if (v.hasInitializer()) {
 			ProgramElement rhs = instantiateExpression(
 			    v.getInitializer(), app.instantiations(), services);
-			name = ProofSaver.printProgramElement(rhs);
+			name = ProofSaver.printProgramElement(rhs).toString();
 			break;
 		    } else if (c.getStatementAt(1) instanceof CopyAssignment) {
 	        	CopyAssignment p2 = (CopyAssignment) c.getStatementAt(1);
