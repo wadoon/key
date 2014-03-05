@@ -92,6 +92,7 @@ public final class ProofManagementDialog extends JDialog {
     private JButton startButton;
     private JButton cancelButton;
     private KeYMediator mediator;
+    
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
