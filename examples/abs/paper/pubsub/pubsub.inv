@@ -1,0 +1,21 @@
+\invariants(Seq historySV, Heap heapSV, ABSAnyInterface self) {
+  subscribeInv : Pubsub.Service {
+	true
+    };
+
+  produceInv : Pubsub.Service {
+	true
+    };
+
+  addInv : Pubsub.Proxy {
+	true
+    };
+
+  signalInv : Pubsub.Proxy {
+	true
+    };
+
+  publishInv : Pubsub.Proxy {
+	true
+    };	
+}

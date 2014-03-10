@@ -1,0 +1,22 @@
+\invariants(Seq historySV, Heap heapSV, ABSAnyInterface self) {
+
+/*      writerInv : RW.RWController {
+      	  containsWriter(historySV, self, any::select(heapSV, self, RW.RWController::writer))
+      };*/
+
+
+
+     writerInv : RW.RWController {
+      	  seqLen(getWriters(historySV)) <= 1 & 
+	      RW.CallerI::select(heapSV, self, RW.RWController::writer) = 
+	  	          \if (seqLen(getWriters(historySV)) = 0) \then (null) \else (RW.CallerI::seqGet(getWriters(historySV), 0)) &
+          \forall int i;(i>=0 & i<seqLen(getWriters(historySV)) -> any::seqGet(getWriters(historySV), i) != null) &
+	  
+	  \forall int i;\forall HistoryLabel ev;(i>=0 & i<seqLen(historySV) & ev=HistoryLabel::seqGet(historySV, i) 
+	  	      			     	      & getMethod(ev) = RW.RWinterface::openW#RW.CallerI
+						      & (isInvocationEv(ev) | isInvocationREv(ev)) -> 
+	  	  getArguments(ev) = seqSingleton(getCaller(ev)) ) 
+     };
+
+}
+
