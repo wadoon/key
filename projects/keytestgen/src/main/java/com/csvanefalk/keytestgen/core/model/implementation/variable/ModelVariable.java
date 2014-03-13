@@ -61,7 +61,7 @@ public class ModelVariable {
      */
     private final IProgramVariable variable;
 
-    ModelVariable(final IProgramVariable programVariable, final String identifier) {
+    public ModelVariable(final IProgramVariable programVariable, final String identifier) {
 
         variable = programVariable;
         this.identifier = identifier;

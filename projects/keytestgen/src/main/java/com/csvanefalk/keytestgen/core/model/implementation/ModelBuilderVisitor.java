@@ -26,7 +26,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  *
  * @author christopher
  */
-class ModelBuilderVisitor extends KeYTestGenTermVisitor {
+public class ModelBuilderVisitor extends KeYTestGenTermVisitor {
 
     /**
      * Constant for separating fields in {@link SortDependingFunction}
@@ -40,7 +40,7 @@ class ModelBuilderVisitor extends KeYTestGenTermVisitor {
      * @param variable the variable
      * @return the primitive type of the variable
      */
-    private static Object resolvePrimitiveType(final IProgramVariable variable) {
+    public static Object resolvePrimitiveType(final IProgramVariable variable) {
 
         /*
          * FIXME: Horrible. Do not do String comparison here, find a convenient
