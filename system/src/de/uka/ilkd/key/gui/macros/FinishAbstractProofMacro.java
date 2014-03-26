@@ -8,7 +8,12 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -39,7 +44,38 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
     public KeyStroke getKeyStroke () {
 	return KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK);
     }
+    
+    /*
+     * find a modality term in a node
+     */
+    private static boolean hasModality(Node node) {
+        Sequent sequent = node.sequent();
+        for (SequentFormula sequentFormula : sequent) {
+            if(hasModality(sequentFormula.formula())) {
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    /*
+     * recursively descent into the term to detect a modality.
+     */
+    private static boolean hasModality(Term term) {
+        if(term.op() instanceof Modality) {
+            return true;
+        }
+
+        for (Term sub : term.subs()) {
+            if(hasModality(sub)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     private static class FinishAbstractProofStrategy implements Strategy {
     	
     	private final Strategy delegate;
@@ -59,7 +95,15 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
         	if (ruleApp instanceof TacletApp &&
         		(	((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("expand_def"))) ||
         			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("classAxiom")))   ||
-        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("partialInvAxiom")))
+        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("partialInvAxiom")))// ||
+        			// !hasModality(goal.node())//||
+        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut"))) ||
+        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut_direct"))) ||
+        			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnonEQ") ||
+        			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnon")
+        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split"))) ||
+        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split_if"))) ||
+        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split_cond")))
         		)) {
         			return TopRuleAppCost.INSTANCE;
 	        	}

@@ -40,7 +40,19 @@ public abstract class AbstractUserInterface implements UserInterface {
 		pl.addTaskListener(this);
 		pl.run();
 	}
-
+	
+	// (M) load cached Proof (reuse its rules on the selected proof)
+	public void reuseProof(File file, KeYMediator mediator) {
+		// problem: we load proof file for some other problem, but want to apply it on the current problem
+		// their source pathes may be different. 
+		// trick: load .proof file using \javaSource of the current proof, not the one from .proof file
+		boolean useCurrentJavaPath = true;
+		final ProblemLoader pl = new ProblemLoader(file, null,
+		        null, AbstractProfile.getDefaultProfile(), mediator, useCurrentJavaPath);
+		pl.addTaskListener(this);
+		pl.run();
+	}
+	
     @Override
 	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
 	app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);

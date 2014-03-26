@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.speclang;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -11,6 +7,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -31,7 +28,7 @@ public class AbstractContractDefinition implements SpecificationElement{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Taclet toTaclet(){
+	public Taclet toTaclet(TermServices services){
 		TacletGenerator TG = TacletGenerator.getInstance();
 		
 		//get variables of definedSymbol (reversed)
@@ -46,7 +43,7 @@ public class AbstractContractDefinition implements SpecificationElement{
 				definition,
 				listVars.reverse(),
                 new RuleSet(new Name("expand_def")), 
-                null); //services not needed
+                services); //services not needed
 	}
 	
 	@Override

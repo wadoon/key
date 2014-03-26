@@ -43,6 +43,11 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
       super(file, classPath, bootClassPath, profileOfNewProofs, mediator);
    }
 
+   // (M) alternative loader, for when the .proof is loaded to be reused 
+   public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator, boolean useCurrentJavaSource) {
+	      super(file, classPath, bootClassPath, profileOfNewProofs, mediator, useCurrentJavaSource);
+	   }
+   
    public void addTaskListener(ProverTaskListener ptl) {
       this.ptl = ptl;
    }

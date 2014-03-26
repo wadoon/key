@@ -81,7 +81,16 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param bootClassPath the boot class path to use. 
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
-
+    
+    /**
+     * reuses the cached proof from the given file and applies it on 
+     * the currently selected proof in the mediator
+     * @param file the File .proof with the proof to be reused (M)
+     * @param mediator mediator from the main window
+     */
+ // (M) 
+ 	public void reuseProof(File file, KeYMediator mediator);
+    
     /** 
      * called to open the build in examples 
      */

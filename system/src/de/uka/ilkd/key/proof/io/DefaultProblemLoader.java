@@ -99,6 +99,11 @@ public class DefaultProblemLoader {
     * The instantiate proof or {@code null} if no proof was instantiated during loading process.
     */
    private Proof proof;
+   
+   /**
+    * Flag to say, that the .proof is loaded to be reused 
+    */
+   private boolean useCurrentJavaSource;
 
    /**
     * Constructor.
@@ -119,8 +124,24 @@ public class DefaultProblemLoader {
       if (this.profileOfNewProofs == null) {
          this.profileOfNewProofs = AbstractProfile.getDefaultProfile();
       }
+      this.useCurrentJavaSource = false;
    }
-
+   
+   // (M) alternative loader, for when the .proof is loaded to be reused 
+   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath,
+           Profile profileOfNewProofs, KeYMediator mediator, boolean useCurrentJavaSource) {
+	  assert mediator != null;
+	  this.file = file;
+	  this.classPath = classPath;
+	  this.bootClassPath = bootClassPath;
+	  this.mediator = mediator;
+	  this.profileOfNewProofs = profileOfNewProofs;
+	  if (this.profileOfNewProofs == null) {
+		  this.profileOfNewProofs = AbstractProfile.getDefaultProfile();
+	  }
+	  this.useCurrentJavaSource = useCurrentJavaSource;
+   }
+   
    /**
     * Executes the loading process and tries to instantiate a proof
     * and to re-apply rules on it if possible.
@@ -136,6 +157,10 @@ public class DefaultProblemLoader {
            ProofIndependentSettings.DEFAULT_INSTANCE
                            .getGeneralSettings().setOneStepSimplification(true);
            envInput = createEnvInput();
+           // (M)
+           if (this.useCurrentJavaSource) {
+        	   changeJavaSource();
+           }
            problemInitializer = createProblemInitializer();
            initConfig = createInitConfig();
            // Read proof obligation settings
@@ -162,7 +187,8 @@ public class DefaultProblemLoader {
          }
       }
       catch (ProblemLoaderException e) {
-          throw(e);
+          e.printStackTrace();
+    	  throw(e);
       }
       catch (Exception e) { // TODO give more specific exception message
           throw new ProblemLoaderException(this, e);
@@ -212,6 +238,14 @@ public class DefaultProblemLoader {
          }
       }
    }
+   
+   protected void changeJavaSource() throws ProofInputException {
+	   if (envInput != null) {
+		   String modelDir = mediator.getSelectedProof().getJavaModel().getModelDir();
+		   envInput.setJavaPath(modelDir);
+	   }
+   }
+   
 
    /**
     * Instantiates the {@link ProblemInitializer} to use.

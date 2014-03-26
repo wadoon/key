@@ -374,4 +374,10 @@ public final class SLEnvInput extends AbstractEnvInput {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }
     }
+
+
+	@Override
+	public void setJavaPath(String path) throws ProofInputException {
+		//(M)
+	}
 }

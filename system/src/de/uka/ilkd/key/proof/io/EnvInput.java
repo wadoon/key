@@ -55,6 +55,11 @@ public interface EnvInput {
      * Reads the Java path.
      */
     String readJavaPath() throws ProofInputException;
+    
+    /** 
+     * Sets the Java path.
+     */
+    void setJavaPath(String path) throws ProofInputException;
 
     /**
      * gets the classpath elements to be considered here.

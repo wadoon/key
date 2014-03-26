@@ -109,6 +109,11 @@ public class LDTInput implements EnvInput {
     public String readJavaPath() throws ProofInputException {
 	return "";
     }
+    
+    //(M)
+    @Override
+    public void setJavaPath(String path) throws ProofInputException {
+    }
 
 
     // no class path elements here

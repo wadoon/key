@@ -436,6 +436,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // save it here, because here it represents how contract was defined by the user (in JML comments)
             // later prepended "ensures" and "requires" do not change the fact, that a contract is abstract
             boolean oldIsAbstract = specCase.isAbstract();
+            // TODO sugaring for absent requires, ensures and assignable clauses 
+//            if (oldIsAbstract) {
+//            	if (specCase.getRequires().isEmpty()){
+//            		specCase.addRequires(new PositionedString("requires_abs " + pm.getName() + ""));
+//            	}
+//            }
             
             
             if(modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {

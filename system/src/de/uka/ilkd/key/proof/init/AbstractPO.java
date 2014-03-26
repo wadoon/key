@@ -226,7 +226,7 @@ public abstract class AbstractPO implements IPersistablePO {
 	                specRepos.getAbstractContractDefinitions(type);
 	        if (defs != null && defs.isEmpty() == false){
 	        	for (AbstractContractDefinition def : defs) {
-	        		Taclet defTaclet = def.toTaclet();
+	        		Taclet defTaclet = def.toTaclet(services);
 	        		// TODO only include if choices are applicable
 	        		taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(defTaclet));
 	        		initConfig.getProofEnv().registerRule(defTaclet, AxiomJustification.INSTANCE);

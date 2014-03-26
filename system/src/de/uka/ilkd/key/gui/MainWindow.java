@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -78,6 +79,7 @@ import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.LoadCachedProofAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
@@ -240,6 +242,9 @@ public final class MainWindow extends JFrame  {
 
     /** action for saving a proof (attempt) */
     private SaveFileAction saveFileAction;
+    
+    /** action for loading an abstract cached part of the proof (M)*/
+    private LoadCachedProofAction loadCachedProofAction;
 
     private QuickSaveAction quickSaveAction;
     private QuickLoadAction quickLoadAction;
@@ -422,6 +427,7 @@ public final class MainWindow extends JFrame  {
         openMostRecentFileAction  = new OpenMostRecentFileAction(this);
         editMostRecentFileAction  = new EditMostRecentFileAction(this);
         saveFileAction            = new SaveFileAction(this);
+        loadCachedProofAction 	  = new LoadCachedProofAction(this); //(M)
         quickSaveAction           = new QuickSaveAction(this);
         quickLoadAction           = new QuickLoadAction(this);
         proofManagementAction     = new ProofManagementAction(this);
@@ -735,6 +741,7 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(saveFileAction);
         fileMenu.add(quickSaveAction);
         fileMenu.add(quickLoadAction);
+        fileMenu.add(loadCachedProofAction); //(M)
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
 
@@ -1585,6 +1592,11 @@ public final class MainWindow extends JFrame  {
 
     public void loadProblem(File file) {
         getUserInterface().loadProblem(file);
+    }
+    
+    // (M) load cached Proof (reuse its rules on the selected proof)
+    public void reuseProof(File file) {
+    	getUserInterface().reuseProof(file, getMediator());
     }
 
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {

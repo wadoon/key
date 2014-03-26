@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
@@ -300,6 +301,32 @@ public class KeYFile implements EnvInput {
             System.out.println(ehe.getCause().getMessage());
             throw new ProofInputException(ehe.getCause().getMessage());
         }
+    }
+    
+    // (M)
+    @Override
+    public void setJavaPath(String path) throws ProofInputException {
+    	javaPath = path;
+    	
+        if(javaPath != null) {
+            File cfile = new File(javaPath);
+            if (!cfile.isAbsolute()) { // test relative pathname
+                File parent=file.file().getParentFile();
+                try {
+					cfile = new File(parent,javaPath).
+					getCanonicalFile().getAbsoluteFile();
+				} catch (IOException e) {
+					throw new ProofInputException(e);
+				}
+                javaPath = cfile.getAbsolutePath();
+            }
+            if (!cfile.exists()) {
+                throw new ProofInputException("Declared Java source " 
+                        + javaPath + " not found.");
+            }                      
+        }
+        classPaths = ImmutableSLList.<String>nil();
+    	javaPathAlreadyParsed = true;
     }
     
     
