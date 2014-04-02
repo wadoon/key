@@ -337,6 +337,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
            
         bindRuleSet ( d, "semantics_blasting", inftyConst () );
         
+        
+        //(M)
+        bindRuleSet ( d, "expand_def", -5700);
+        
         bindRuleSet ( d, "closure", -15000 );
         bindRuleSet ( d, "alpha", -7000 );
         bindRuleSet ( d, "delta", -6000 );

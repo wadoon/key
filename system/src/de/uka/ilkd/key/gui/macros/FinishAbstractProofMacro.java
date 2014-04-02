@@ -16,7 +16,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -92,20 +94,31 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        	
+        	
+        	
         	if (ruleApp instanceof TacletApp &&
         		(	((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("expand_def"))) ||
         			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("classAxiom")))   ||
-        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("partialInvAxiom")))// ||
-        			// !hasModality(goal.node())//||
-        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut"))) ||
-        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut_direct"))) ||
+        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("partialInvAxiom")))  ||
+        			
+        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut"))) ||
+        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut_direct"))) ||
+        			
+        			ruleApp.rule().name().toString().equalsIgnoreCase("ifthenelse_split") 
+        			
         			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnonEQ") ||
-        			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnon")
+        			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnon")||
+        			//((TacletApp)ruleApp).taclet().goalTemplates().size() > 1
+        			 //!hasModality(goal.node())//||
         			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split"))) ||
         			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split_if"))) ||
         			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split_cond")))
         		)) {
-        			return TopRuleAppCost.INSTANCE;
+        		//Taclet t = (Taclet) ruleApp.rule();
+        		//if (t.goalTemplates().size() > 1) infinity
+        		
+        		return TopRuleAppCost.INSTANCE;
 	        	}
         	else return delegate.computeCost(ruleApp, pio, goal);
         	
