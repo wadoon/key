@@ -6,6 +6,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseAbstractOperationContractRule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 /*
@@ -41,12 +42,6 @@ public class JavaAbstractOperationProfile extends JavaProfile {
 	public ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
         
-        builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
-                                   .prepend(BlockContractRule.INSTANCE)
-                                   .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(getOneStepSimpilifier())
-        			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound
-        			   .prepend(QueryExpand.INSTANCE);
   
         //contract insertion rule,ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!
