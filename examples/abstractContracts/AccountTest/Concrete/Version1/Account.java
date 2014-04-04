@@ -14,7 +14,8 @@ public class Account {
 	Account() {
 	}
 	
-	/*@ public normal_behavior
+	/*@ 
+	 @ public normal_behavior
 	 @ ensures (!\result ==> balance == \old(balance)) 
 	 @   && (\result ==> balance == \old(balance) + x); 
 	 @ assignable balance;
@@ -27,10 +28,11 @@ public class Account {
 		return true;
 	}
 
-	/*@ public normal_behavior
-	 @  ensures (!\result ==> balance == \old(balance)) 
+	/*@ 
+	 @ public normal_behavior
+	 @ ensures (!\result ==> balance == \old(balance)) 
 	 @   && (\result ==> balance == \old(balance) - x);
-	 @  assignable balance;
+	 @ assignable balance;
 	 @*/
 	boolean undoUpdate(int x) {
 		int newBalance = balance - x;
@@ -41,26 +43,25 @@ public class Account {
 	}
 	
 	/*@
-	 @ ensures_abs lockE;
-	 @ def lockE = this.lock;
-	 @ assignable_abs lockA;
-	 @ def lockA = this.lock;
+	 @ public normal_behavior
+	 @ ensures this.lock;
+	 @ assignable this.lock;
 	 @*/
 	void lock() {
 		lock = true;
 	}
 	
 	/*@
-	 @ ensures_abs unLockE;
-	 @ def unLockE = !this.lock;
-	 @ assignable_abs unLockA;
-	 @ def unLockA = this.lock;
+	 @ public normal_behavior
+	 @ ensures !this.lock;
+	 @ assignable this.lock;
 	 @*/
 	void unLock() {
 		lock = false;
 	}
 	
 	/*@
+	 @ public normal_behavior
 	 @ ensures \result == this.lock;
 	 @*/
 	boolean /*@ pure @*/ isLocked() {

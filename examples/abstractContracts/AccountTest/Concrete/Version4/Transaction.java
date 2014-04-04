@@ -5,8 +5,9 @@ public class Transaction {
 	  requires destination != null && source != null && \invariant_for(source) 
 	  		&& \invariant_for(destination);
 	  requires source != destination;
-	  ensures \result ==> (\old(destination.balance) + amount >= destination.balance);
-	  ensures \result ==> (\old(source.balance) - amount >= source.balance);
+	  ensures true;
+	  ensures (amount <= 0) ==> !\result;
+	  assignable \everything;
 	 @*/
 	public boolean transfer(Account source, Account destination, int amount) {
 		if (source.balance < 0) amount = -1;

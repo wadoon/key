@@ -1,9 +1,6 @@
 public class Account {
-	final int OVERDRAFT_LIMIT = 0;
-	
+
 	/*@ accessible \inv:this.*; @*/
-	
-	//@ public invariant balance >= OVERDRAFT_LIMIT;
 	
 	int balance = 0;
 	public boolean lock = false;
@@ -19,15 +16,12 @@ public class Account {
 	 @ requires_abs updateR;
 	 @ def updateR = true;
 	 @ ensures_abs updateE;
-	 @ def updateE =  (!\result ==> balance == \old(balance)) 
-	 @   && (\result ==> balance == \old(balance) + x); 
-	 @ assignable balance;
+	 @ def updateE = \result; 
+	 @ assignable_abs updateA;
+	 @ def updateA = balance;
 	 @*/
 	boolean update(int x) {
-		int newBalance = balance + x;
-		if (newBalance < OVERDRAFT_LIMIT)
-			return false;
-		balance = newBalance;
+		balance = balance + x;
 		return true;
 	}
 
@@ -36,15 +30,12 @@ public class Account {
 	 @ requires_abs undoUpdateR;
 	 @ def undoUpdateR = true;
 	 @ ensures_abs undoUpdateE;
-	 @ def undoUpdateE =  (!\result ==> balance == \old(balance)) 
-	 @   && (\result ==> balance == \old(balance) - x);
-	 @ assignable balance;
+	 @ def undoUpdateE = \result;
+	 @ assignable_abs undoUpdateA;
+	 @ def undoUpdateA = balance;
 	 @*/
 	boolean undoUpdate(int x) {
-		int newBalance = balance - x;
-		if (newBalance < OVERDRAFT_LIMIT)
-			return false;
-		balance = newBalance;
+		balance = balance - x;
 		return true;
 	}
 	
@@ -76,5 +67,4 @@ public class Account {
 	boolean /*@ pure @*/ isLocked() {
 		return lock;
 	}
-	
 }

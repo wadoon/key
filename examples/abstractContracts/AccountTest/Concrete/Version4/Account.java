@@ -13,7 +13,7 @@ public class Account {
 	
 	/*
 	 @ public normal_behavior
-	 @ ensures (balance == \old(balance) + x) && \result; 
+	 @ ensures \result; 
 	 @ assignable balance;
 	 @*/
 	boolean update(int x) {
@@ -23,7 +23,7 @@ public class Account {
 
 	/*@ 
 	 @ public normal_behavior
-	 @ ensures (balance == \old(balance) - x) && \result;
+	 @ ensures \result;
 	 @ assignable balance;
 	 @*/
 	boolean undoUpdate(int x) {

@@ -110,7 +110,7 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
         			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnonEQ") ||
         			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnon")||
         			//((TacletApp)ruleApp).taclet().goalTemplates().size() > 1
-        			 //!hasModality(goal.node())//||
+        			//!hasModality(goal.node())//||
         			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split"))) ||
         			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split_if"))) ||
         			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("split_cond")))

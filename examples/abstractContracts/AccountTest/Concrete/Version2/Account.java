@@ -80,6 +80,7 @@ public class Account {
 	}
 	
 	/*@
+	 @ public normal_behavior
 	 @ ensures \result == this.lock;
 	 @*/
 	boolean /*@ pure @*/ isLocked() {

@@ -15,17 +15,25 @@ public class Transaction {
 	  def transferA = \everything;
 	 @*/
 	public boolean transfer(Account source, Account destination, int amount) {
+		if (source.balance < 0) amount = -1;
+		if (destination.isLocked()) amount = -1;
+		if (source.isLocked()) amount = -1;
+		
+		int take;
+		int give;
+		if (amount != -1) { take = amount * -1; give = amount;} 
+	
 		if (amount <= 0) {
 			return false;
 		}
-		if (!source.update(amount * -1)) {
+		if (!source.update(take)) {
 			return false;
 		}
-		if (!destination.update(amount)) {
-			source.undoUpdate(amount * -1);
+		if (!destination.update(give)) {
+			source.undoUpdate(take);
 			return false;
 		}
-		return true;
+		return true;	
 	}
 
 	/*@

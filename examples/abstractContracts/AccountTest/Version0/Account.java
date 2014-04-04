@@ -11,7 +11,8 @@ public class Account {
 	Account() {
 	}
 	
-	/*@ public normal_behavior
+	/*@ 
+	 @ public normal_behavior
 	 @ requires_abs updateR;
 	 @ def updateR = true;
 	 @ ensures_abs updateE;
@@ -24,13 +25,14 @@ public class Account {
 		return true;
 	}
 
-	/*@ public normal_behavior
-	 @  requires_abs undoUpdateR;
-	 @  def undoUpdateR = true;
-	 @  ensures_abs undoUpdateE;
-	 @  def undoUpdateE = (balance == \old(balance) - x) && \result;
-	 @  assignable_abs undoUpdateA;
-	 @  def undoUpdateA = balance;
+	/*@ 
+	 @ public normal_behavior
+	 @ requires_abs undoUpdateR;
+	 @ def undoUpdateR = true;
+	 @ ensures_abs undoUpdateE;
+	 @ def undoUpdateE = (balance == \old(balance) - x) && \result;
+	 @ assignable_abs undoUpdateA;
+	 @ def undoUpdateA = balance;
 	 @*/
 	boolean undoUpdate(int x) {
 		balance = balance - x;
@@ -58,10 +60,11 @@ public class Account {
 	}
 	
 	/*@
-	 @ ensures \result == this.lock;
+	 @ public normal_behavior
+	 @ ensures_abs isLockedE;
+	 @ def isLockedE = \result == this.lock;
 	 @*/
 	boolean /*@ pure @*/ isLocked() {
 		return lock;
 	}
-	
 }

@@ -2,11 +2,17 @@ public class Transaction {
 	/*@ accessible \inv:this.*; @*/
 
 	/*@ public normal_behavior
-	  requires destination != null && source != null && \invariant_for(source) 
+	  requires_abs transferR1;
+	  requires_abs transferR2;
+	  def transferR1 = destination != null && source != null && \invariant_for(source) 
 	  		&& \invariant_for(destination);
-	  requires source != destination;
-	  ensures \result ==> (\old(destination.balance) + amount >= destination.balance);
-	  ensures \result ==> (\old(source.balance) - amount >= source.balance);
+	  def transferR2 = source != destination;
+	  ensures_abs transferE1;
+	  ensures_abs transferE2;
+	  def transferE1 = true;
+	  def transferE2 = (amount <= 0) ==> !\result;
+	  assignable_abs transferA;
+	  def transferA = \everything;
 	 @*/
 	public boolean transfer(Account source, Account destination, int amount) {
 		if (source.balance < 0) amount = -1;
