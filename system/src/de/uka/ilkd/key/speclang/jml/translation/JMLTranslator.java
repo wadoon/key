@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Placeholder;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -284,7 +285,8 @@ final class JMLTranslator {
 				}
 				
 				// create function of sort LocSetLDT
-				Function f = new Function(new Name(name), services.getTypeConverter().getLocSetLDT().targetSort(), 
+				Placeholder p = new Placeholder(name, Placeholder.ASSIGNABLE);
+				Function f = new Function(p, services.getTypeConverter().getLocSetLDT().targetSort(), 
 						sorts.toArray(new Sort[sorts.size()]));
 				
 				javaInfo.getServices().getNamespaces().functions().add(f);
@@ -385,7 +387,8 @@ final class JMLTranslator {
 					sorts.add(param.getKeYJavaType().getSort());
 				}
 				
-				Function f = new Function(new Name(name), Sort.FORMULA, 
+				Placeholder p = new Placeholder(name, Placeholder.ENSURES);
+				Function f = new Function(p, Sort.FORMULA, 
 								sorts.toArray(new Sort[sorts.size()]));									
 				javaInfo.getServices().getNamespaces().functions().add(f);	
 
@@ -434,26 +437,26 @@ final class JMLTranslator {
                 // Build term for a function
                 List<Term> subterms = new ArrayList<Term>(); 
                 
-                if (function.sort() == Sort.FORMULA) {
+                assert function.name() instanceof Placeholder;
+                Placeholder p = (Placeholder)function.name();
+                if(p.getType() == Placeholder.ENSURES || p.getType() == Placeholder.REQUIRES) {
 	                // heap goes for requires and ensures
 	                subterms.add(tb.var(heapLDT.getHeap()));
 	                
 	                // heapAtPre only for ensures 
-	                int hasHeapAtPre = 0;
-	                if (function.argSort(1) == heapLDT.targetSort() && atPres != null) {
+	               
+	                if(p.getType() == Placeholder.ENSURES && atPres != null) {
 	                	subterms.add(atPres.get(heapLDT.getHeap()));
-	                	hasHeapAtPre = 1;
 	                }
 	                
 					// both ensures and requires depend on selfVar when it exists
-	                int hasSelf = 0;
+	                
 	                if (selfVar != null) {
 	                	subterms.add(tb.var(selfVar));
-	                	hasSelf = 1;
 	                }
 	                
 	                // resultVar only for ensures (ensures has 1 more sort than result)
-	                if (function.argSorts().size() == paramVars.size() + 2 + hasSelf + hasHeapAtPre) {
+	                if(p.getType() == Placeholder.ENSURES && resultVar != null) {
 	                	subterms.add(tb.var(resultVar));
 	                } 
 	                
@@ -464,7 +467,7 @@ final class JMLTranslator {
 	                return new AbstractContractDefinition(tb.func(function, subterms.toArray(new Term[subterms.size()]), null), 
 	                        tb.convertToFormula(value));
                 }
-                else if (function.sort() == services.getTypeConverter().getLocSetLDT().targetSort()) {
+                else if (p.getType() == Placeholder.ASSIGNABLE) {
                 	// Build term for a function
 	                
 	                // add heap
@@ -555,7 +558,8 @@ final class JMLTranslator {
 					sorts.add(param.getKeYJavaType().getSort());
 				}
 				
-				Function f = new Function(new Name(name), Sort.FORMULA, 
+				Placeholder p = new Placeholder(name, Placeholder.REQUIRES);
+				Function f = new Function(p, Sort.FORMULA, 
 								sorts.toArray(new Sort[sorts.size()]));									
 				javaInfo.getServices().getNamespaces().functions().add(f);	
 				
