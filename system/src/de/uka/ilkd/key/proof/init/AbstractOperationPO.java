@@ -331,13 +331,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
       assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
 
       // add axioms
-      collectClassAxioms(getCalleeKeYJavaType());
+      //if (!(services.getProfile() instanceof JavaAbstractOperationProfile)) {
+    	  collectClassAxioms(getCalleeKeYJavaType());
       
       // 
-      collectAbstractContractDefinitions(getCalleeKeYJavaType());
-
+          collectAbstractContractDefinitions(getCalleeKeYJavaType());
+      //}
       // for JML annotation statements
       generateWdTaclets();
+   }
+   
+   public void collect(){
+	   collectClassAxioms(getCalleeKeYJavaType());
+	      
+	      // 
+	   collectAbstractContractDefinitions(getCalleeKeYJavaType());
    }
 
    /**

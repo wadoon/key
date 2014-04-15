@@ -25,11 +25,14 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TacletToProofLoader;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaAbstractOperationProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -171,8 +174,13 @@ public class DefaultProblemLoader {
                }
                // Create proof and apply rules again if possible
                proof = createProof(poContainer);
+               // (M) add taclets giving concrete values to class inv and placeholders
+               //if (mediator.getServices().getProfile() instanceof JavaAbstractOperationProfile) {
+               //   TacletToProofLoader tl = new TacletToProofLoader(proof);
+               //	             	   tl.collectAxiomsAndDefs();
+               //}
                if (proof != null) {
-                   replayProof(proof);
+            	   replayProof(proof);
                }
                // this message is propagated to the top level in console mode
                return null; // Everything fine

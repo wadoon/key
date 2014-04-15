@@ -7,11 +7,15 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Placeholder;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -78,6 +82,34 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
         return false;
     }
     
+//    private static boolean hasAbstractPlaceholder(Node node) {
+//        Sequent sequent = node.sequent();
+//        for (SequentFormula sequentFormula : sequent) {
+//            if(hasModality(sequentFormula.formula())) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
+
+    /*
+     * recursively descent into the term to detect a modality.
+     */
+    private static boolean hasAbstractPlaceholder(Term term) {
+        if (term.op() instanceof Function) {
+        	if (term.op().name() instanceof Placeholder)
+            return true;
+        }
+
+        for (Term sub : term.subs()) {
+            if(hasAbstractPlaceholder(sub)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private static class FinishAbstractProofStrategy implements Strategy {
     	
     	private final Strategy delegate;
@@ -94,18 +126,15 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
-        	
-        	
-        	
-        	if (ruleApp instanceof TacletApp &&
+        if (ruleApp instanceof TacletApp &&
         		(	((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("expand_def"))) ||
         			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("classAxiom")))   ||
-        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("partialInvAxiom")))  ||
+        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("partialInvAxiom"))) // ||
         			
-        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut"))) ||
-        			((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut_direct"))) ||
+        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut"))) ||
+        			//((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("cut_direct"))) ||
         			
-        			ruleApp.rule().name().toString().equalsIgnoreCase("ifthenelse_split") 
+        			//ruleApp.rule().name().toString().equalsIgnoreCase("ifthenelse_split") 
         			
         			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnonEQ") ||
         			//ruleApp.rule().name().toString().equalsIgnoreCase("simplifySelectOfAnon")||
@@ -120,7 +149,28 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
         		
         		return TopRuleAppCost.INSTANCE;
 	        	}
-        	else return delegate.computeCost(ruleApp, pio, goal);
+    	else {
+//    		if (ruleApp instanceof TacletApp && ((TacletApp)ruleApp).taclet().goalTemplates().size() > 1 &&
+//    				!hasModality(goal.node()))
+//    			return TopRuleAppCost.INSTANCE;
+//    		if (ruleApp instanceof TacletApp &&
+//        			ruleApp.rule().name().toString().equalsIgnoreCase("ifthenelse_split") ) {
+//    			
+//        		TacletApp t = (TacletApp) ruleApp;
+//        		SchemaVariable sv = t.instantiations().lookupVar(new Name("phi"));
+//        		Object inst = t.instantiations().getInstantiation(sv);
+//
+//        		boolean b;
+//        		if (inst instanceof Term) {
+//        			b = hasAbstractPlaceholder((Term)inst);
+//        			System.out.println("has placeholder:" + b);
+//        			System.out.println(t);
+//        			if (b) { return TopRuleAppCost.INSTANCE;}
+//        		}
+//        		
+//    		}
+    		return delegate.computeCost(ruleApp, pio, goal);
+    	}
         	
 //            String name = ruleApp.rule().name().toString();
 //            if(admittedRuleNames.contains(name)) {

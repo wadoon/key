@@ -46,6 +46,8 @@ public class JavaAbstractOperationProfile extends JavaProfile {
         //contract insertion rule,ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!
         //builtInRules = builtInRules.prepend(UseAbstractOperationContractRule.INSTANCE);
+        
+        //use operation contract rule is in the set
         builtInRules = builtInRules.prepend(UseAbstractOperationContractRule.INSTANCE);
         return builtInRules;
 	}

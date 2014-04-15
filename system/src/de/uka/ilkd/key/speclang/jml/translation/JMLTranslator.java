@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -412,7 +413,6 @@ final class JMLTranslator {
 				for (ProgramVariable param: paramVars) {
 					subterms.add(tb.var(param));
 				}
-				
 				return tb.func(f, subterms.toArray(new Term[subterms.size()]), null);
             }
         });

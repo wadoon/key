@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 
@@ -14,9 +11,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
