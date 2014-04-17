@@ -17,7 +17,7 @@ public class Log {
       @ ensures_abs rotateLogE;
       @ assignable_abs rotateLogA;
       @ def rotateLogR = true;
-      @ def rotateLogE = \result == (\old(last) == logRecord.length  - 1 ? 0 : last + 1);
+      @ def rotateLogE = (\result == (last == logRecord.length - 1 ? 0 : last + 1));
       @ def rotateLogA = \nothing;
       @*/
     protected /*@ pure @*/ int rotateLog() {
@@ -29,8 +29,8 @@ public class Log {
       @ ensures_abs    Log_addE;
       @ assignable_abs Log_addA;
       @ def Log_addR = true;
-      @ def Log_addE = last == (\old(last) == logRecord.length  - 1 ? 0 : last + 1) && 
-      @                logRecord[(last + 1) % logRecord.length] == bal;
+      @ def Log_addE = (last == (\old(last) == logRecord.length - 1 ? 0 : \old(last) + 1)) && 
+      @             (logRecord[last] == bal);
       @ def Log_addA = logRecord[(last + 1) % logRecord.length], last;
       @*/
     public void add(int bal) {
