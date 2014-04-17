@@ -24,6 +24,12 @@ public class Log {
     public int rotateLog() {
 	if (last == logRecord.length - 1) {
 	    // empty array
+	    /*@ loop_invariant
+	      @   i>=0 && i<=logRecord.length &&
+	      @   (\forall int j; j>=0 && j<logRecord.length; logRecord[j] == 0);
+	      @ decreases logRecord.length - i;
+	      @ assignable logRecord[*];
+	      @*/
 	    for (int i = 0; i<logRecord.length; i++) {
 		logRecord[i] = 0;		
 	    }
