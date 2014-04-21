@@ -1,0 +1,40 @@
+\documentclass{report}
+
+\usepackage{keyjavadl}
+\usepackage{multirow,booktabs} % for result tables
+\usepackage{xspace}
+\begin{document}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l@{\quad}c@{\quad}c@{\quad}c@{\quad}ccc}
+\toprule
+Version & \multicolumn{3}{c}{Completely abstract} & Concrete\\ \midrule
+ 	 		 & Partial 		& Full 			& Savings 	& Full \\ 
+   			 & proof 		& proof 			&   				& proof \\ \midrule
+v1	 		 & 124 (7) 		& 1523 (24)  	& 8\%     		& 1217 (20)		\\ \midrule
+v2			 & 124 (7)     & 854 (15) 	& 15\%   		& 715 (14) 		\\ \midrule
+v3    		 & 124 (7)     & 1328 (20)  	& 9\%    		& 1046 (17)		\\ \bottomrule
+\end{tabular}
+\end{center}
+\caption{Results for {Log} example}\label{tbl:account-savings}
+
+\label{tbl:student-se-ratio}
+\end{table}
+
+
+\begin{table}\centering
+\begin{center}
+\begin{tabular}{c@{\quad}c@{\quad}c@{\quad}c@{\quad}c@{\quad}cc}
+\toprule
+Version	& Symbolic execution	& Full proof 	& Ratio 		\\ \midrule
+v1			& 183 (9) 						& 1130 (20)  	& 16\%    		\\ \midrule
+v2			& 246 (9)     				     & 702 (14)  	& 35\%    		\\ \midrule
+v3    		& 294 (9)                  	     & 1048 (17)  & 28\%    		\\ \bottomrule 
+\end{tabular}
+\end{center}
+\caption{Analysis of the {Log} example (specified with concrete contracts)}
+\label{tbl:account-se-ratio}
+\end{table}
+
+\end{document}
