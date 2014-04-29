@@ -1,15 +1,22 @@
 public class Transaction {
 	/*@ accessible \inv:this.*; @*/
-
+	
+	Log log = new Log(10);
+	
 	/*@ public normal_behavior
 	  requires destination != null && source != null && \invariant_for(source) 
-	  		&& \invariant_for(destination);
+	  		&& \invariant_for(destination) && \invariant_for(log);
 	  requires source != destination;
 	  ensures \result ==> (\old(destination.balance) + amount == destination.balance);
 	  ensures \result ==> (\old(source.balance) - amount == source.balance);
-	  assignable source.balance, destination.balance;
+	  ensures log.last == (\old(log.last) == log.logRecord.length  - 1 ? 0 : \old(log.last) + 1) && 
+               log.logRecord[log.last] == refNum;
+	  assignable log.logRecord[*], log.last, source.balance, destination.balance;
 	 @*/
-	public boolean transfer(Account source, Account destination, int amount) {
+	public boolean transfer(Account source, Account destination, int amount, int refNum) {
+		
+		log.add(refNum);
+		
 		if (source.balance < 0) amount = -1;
 		if (destination.isLocked()) amount = -1;
 		if (source.isLocked()) amount = -1;
@@ -17,7 +24,8 @@ public class Transaction {
 		int take;
 		int give;
 		if (amount != -1) { take = amount * -1; give = amount;} 
-	
+		
+		
 		if (amount <= 0) {
 			return false;
 		}
@@ -29,5 +37,6 @@ public class Transaction {
 			return false;
 		}
 		return true;	
+		
 	}
 }
