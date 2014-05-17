@@ -68,6 +68,7 @@ import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
@@ -98,6 +99,14 @@ public final class SpecificationRepository {
                       ImmutableSet<FunctionalOperationContract>> operationContracts =
             new LinkedHashMap<Pair<KeYJavaType, IProgramMethod>,
                               ImmutableSet<FunctionalOperationContract>>();
+    
+    //added by Huy, supplement container for information flow contracts
+    private final Map<Pair<KeYJavaType, IProgramMethod>,
+                      ImmutableSet<InformationFlowContract>> infFlowContracts =
+            new LinkedHashMap<Pair<KeYJavaType, IProgramMethod>,
+            ImmutableSet<InformationFlowContract>>();
+    
+    //----
     private final Map<Pair<KeYJavaType, IObserverFunction>,
                       ImmutableSet<WellDefinednessCheck>> wdChecks =
             new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>,
@@ -447,7 +456,23 @@ public final class SpecificationRepository {
             final MethodWellDefinedness mwd =
                     new MethodWellDefinedness((FunctionalOperationContract) contract, services);
             registerContract(mwd);
-        } else if (contract instanceof DependencyContract
+            
+        }
+        //add data to infFlowContracts
+        else if(contract instanceof InformationFlowContract){
+           infFlowContracts.put(
+                 new Pair<KeYJavaType, IProgramMethod>(targetKJT,
+                         (IProgramMethod) targetMethod),
+                 getInformationFlowContracts(targetKJT,
+                         (IProgramMethod) targetMethod).add(
+                         (InformationFlowContract) contract));
+           // Create new well-definedness check
+           final MethodWellDefinedness mwd =
+                 new MethodWellDefinedness((InformationFlowContract)contract, services);
+           registerContract(mwd);
+           
+        }         
+        else if (contract instanceof DependencyContract
                 && ((DependencyContract) contract).getOrigVars().atPres.isEmpty()
                 && targetMethod.getContainerType().equals(
                         services.getJavaInfo().getJavaLangObject())) {
@@ -748,6 +773,21 @@ public final class SpecificationRepository {
                 .<FunctionalOperationContract> nil() : result;
     }
 
+    /**
+     * Returns all information flow contracts for the passed operation.
+     * added by Huy
+     */
+    public ImmutableSet<InformationFlowContract> getInformationFlowContracts(
+            KeYJavaType kjt, IProgramMethod pm) {
+        pm = (IProgramMethod) getCanonicalFormForKJT(pm, kjt);
+        final Pair<KeYJavaType, IProgramMethod> pair = new Pair<KeYJavaType, IProgramMethod>(
+                kjt, pm);
+        final ImmutableSet<InformationFlowContract> result = infFlowContracts
+                .get(pair);
+        return result == null ? DefaultImmutableSet
+                .<InformationFlowContract> nil() : result;
+    }
+    
     /**
      * Returns all registered (atomic) operation contracts for the passed
      * operation which refer to the passed modality.

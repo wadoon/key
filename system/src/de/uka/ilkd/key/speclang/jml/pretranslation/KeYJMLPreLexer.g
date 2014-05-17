@@ -70,6 +70,7 @@ lexer grammar KeYJMLPreLexer;
     DURATION_RED 		: 'duration_redundantly';
     ENSURES 			: 'ensures';
     ENSURES_RED 		: 'ensures_redundantly';
+    ESCAPES				: 'escapes';
     EXCEPTIONAL_BEHAVIOR 	: 'exceptional_behavior';
     EXCEPTIONAL_BEHAVIOUR 	: 'exceptional_behaviour';
     EXSURES                     : 'exsures';

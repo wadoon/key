@@ -62,6 +62,8 @@ tokens {
     BREAKS          = "breaks";
     CONTINUES       = "continues";
     RETURNS         = "returns";
+    
+    ESCAPES			  = "escapes";
 }
 
 AND : "&";

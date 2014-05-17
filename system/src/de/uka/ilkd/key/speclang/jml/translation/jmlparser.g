@@ -38,12 +38,14 @@ header {
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
+    import de.uka.ilkd.key.util.Declassifier;
 
     import java.math.BigInteger;
     import java.util.List;
     import java.util.Map;
     import java.util.LinkedHashMap;
     import java.util.ArrayList;
+    
 }
 
 class KeYJMLParser extends Parser;
@@ -356,6 +358,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = signalsclause
     |   result = signalsonlyclause
     |   result = termexpression
+    |   result = escapesclause  // declassification syntax
     )
     (SEMI)? EOF
     ;
@@ -498,6 +501,25 @@ respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil(
     term = storeref { result = result.append(term); }
     (COMMA term = storeref { result = result.append(term); })*
         { result = translator.translate(resp.getText(), ImmutableList.class, result, services); }
+    ;
+
+
+escapesclause returns  [Declassifier result = Declassifier.EMPTY_DECLASSIFIER] throws SLTranslationException {
+    ImmutableList<Term> declassifications = ImmutableSLList.<Term>nil();    
+}
+:
+    ESCAPES (NOTHING | declassifications = infflowspeclist)   
+    {declassifications = declassifications.append(declassifications);     
+     result = new Declassifier(declassifications);}
+    ;
+
+infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+    Term term = null;
+}
+:
+    term = termexpression { result = result.append(term); }
+    (COMMA term = termexpression { result = result.append(term); })*
+        { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
 
 

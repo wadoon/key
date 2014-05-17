@@ -64,7 +64,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private Map<String, ImmutableList<PositionedString>>
       axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
-
+    
+    //declassification
+    private ImmutableList<PositionedString> declassifications =
+          ImmutableSLList.<PositionedString>nil();
+    
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
         super(mods);
@@ -225,11 +229,26 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 	           addAxioms(ps);
         }
     }
+    
+    // --------- added by Huy -----------
+    public void addDeclassification(PositionedString ps) {
+       declassifications = declassifications.append(ps);
+   }
 
+
+   public void addDeclassification(ImmutableList<PositionedString> l) {
+      declassifications = declassifications.append(l);
+   }
+    
+   public ImmutableList<PositionedString> getDeclassifications(){
+      return declassifications;
+   } 
+   
     public Behavior getBehavior() {
         return behavior;
     }
-
+    
+    //------------------------------------
 
     public ImmutableList<PositionedString> getRequires() {
         return requires.get(HeapLDT.BASE_HEAP_NAME.toString());

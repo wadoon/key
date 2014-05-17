@@ -68,7 +68,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
         super(contract.getTypeName(), contract.id(), contract.getTarget(), contract.getOrigVars(),
               Type.OPERATION_CONTRACT, services);
-        assert contract != null;
+        //assert contract != null;
         this.contract = contract;
         this.modelField = false;
         final OriginalVariables origVars = contract.getOrigVars();
@@ -89,13 +89,23 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.globalDefs = contract.getGlobalDefs();
     }
 
+    
+    //added by Huy
+    public MethodWellDefinedness(InformationFlowContract contract, Services services) {
+       super(contract.getTypeName(), contract.id(), contract.getTarget(), contract.getOrigVars(),
+             Type.OPERATION_CONTRACT, services);
+       this.contract = contract;
+       this.modelField = true;
+   }
+    
+    
     public MethodWellDefinedness(DependencyContract contract, Services services) {
         super(ContractFactory.generateContractTypeName("JML model field", contract.getKJT(),
                                                        contract.getTarget(),
                                                        contract.getTarget().getContainerType()),
               contract.id(), contract.getTarget(), contract.getOrigVars(),
               Type.OPERATION_CONTRACT, services);
-        assert contract != null;
+        //assert contract != null;
         this.contract = contract;
         this.modelField = true;
         final LocationVariable h = getHeap();
