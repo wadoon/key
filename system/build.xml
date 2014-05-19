@@ -10,12 +10,12 @@
   <property name="gen.dir"  value="${basedir}/genSrc" />
   <property name="docs.dir"  value="${basedir}/doc"   />
 
-<!--
+
   <condition property="ext.dir" value="${env.KEY_LIB}">
   	<isset property="env.KEY_LIB"/>
   </condition>
-	-->
-  <property name="ext.dir" value="${basedir}/../key-ext-jars"   />
+	
+  <!--<property name="ext.dir" value="${basedir}/../key-ext-jars"   /> -->
 	
   <property name="instrument.dir" value="${basedir}/instrumented/" />
   <property name="junit.jar"  value="${ext.dir}/junit.jar"  />
