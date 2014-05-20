@@ -19,7 +19,7 @@ public class TransformerTest extends UtilTest {
 
     private final TermEquivalenceChecker termEquivalenceChecker = TermEquivalenceChecker.getInstance();
     protected ITermTransformer transformer;
-    TermFactory termFactory = TermFactory.DEFAULT;
+    TermFactory termFactory = new TermFactory();
 
     public TransformerTest() throws KeYInterfaceException, IOException {
         super("own");

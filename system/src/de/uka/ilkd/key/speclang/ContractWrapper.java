@@ -46,7 +46,9 @@ public class ContractWrapper
                 contract.globalDefs,
                 contract.id,
                 contract.toBeSaved,
-                contract.transaction);
+                contract.transaction,
+                contract.services
+                );
     }
     
 

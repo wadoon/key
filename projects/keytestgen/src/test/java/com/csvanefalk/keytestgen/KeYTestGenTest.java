@@ -180,6 +180,42 @@ public abstract class KeYTestGenTest {
 
             return false;
         }
+
+		@Override
+		public long getIntBound() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public long getHeapBound() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public long getSeqBound() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public long getObjectBound() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public long getLocSetBound() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public boolean invarianForall() {
+			// TODO Auto-generated method stub
+			return false;
+		}
     }
 
     protected IExecutionMethodCall getMethodCallNode(final IExecutionStart root) {

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -637,10 +636,9 @@ public class TermTacletAppIndex {
                                    NewRuleListener listener ) {
         fireRulesAdded ( listener, localTacletApps, pos );
         
-        final Iterator<TermTacletAppIndex> it = subtermIndices.iterator ();
         int subterm = 0;
-        while ( it.hasNext () ) {
-            it.next ().reportTacletApps ( pos.down ( subterm ),
+        for (final TermTacletAppIndex appIndex : subtermIndices) {
+            appIndex.reportTacletApps ( pos.down ( subterm ),
                                           listener );
             ++subterm;
         }
@@ -680,7 +678,9 @@ public class TermTacletAppIndex {
                                        ImmutableList<NoPosTacletApp> taclets,
                                        PosInOccurrence pos) {
 
-        for (NoPosTacletApp taclet : taclets) listener.ruleAdded(taclet, pos);
+        for (NoPosTacletApp taclet : taclets) {
+            listener.ruleAdded(taclet, pos);
+        }
     }
 
 
@@ -691,11 +691,10 @@ public class TermTacletAppIndex {
                                                ImmutableList<NoPosTacletApp> taclets) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 
-        while ( !taclets.isEmpty() ) {
-            final NoPosTacletApp app = taclets.head ();
-            taclets = taclets.tail ();
-            if ( p_filter.filter ( app.taclet () ) )
-            result = result.prepend ( app );
+        for (final NoPosTacletApp app :  taclets) {
+            if ( p_filter.filter ( app.taclet () ) ) {
+                result = result.prepend ( app );
+            }
         }
 
         return result;

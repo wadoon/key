@@ -16,6 +16,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -36,7 +38,9 @@ import java.util.Map;
  */
 public final class InformationFlowContractImpl implements InformationFlowContract {
 
-    protected static final TermBuilder TB = TermBuilder.DF;
+	protected final TermBuilder TB;
+	private final TermServices services;
+	
     private final int id;
     private final KeYJavaType forClass;
     private final IProgramMethod pm;
@@ -55,7 +59,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final boolean toBeSaved;
     private final Term origDep;
     private final ImmutableList<Declassifier> origInfFlowSpecs;
-
+    
+    
+    
     /**
      * If a method is strictly pure, it has no modifies clause which could
      * anonymised.
@@ -86,7 +92,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           Term dep,
                                           ImmutableList<Declassifier> declassificationSpecs,
                                           boolean toBeSaved,
-                                          int id) {
+                                          int id,TermServices services
+                                          ) {
         assert baseName != null;
         assert forClass != null;
         assert pm != null;
@@ -130,6 +137,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
         this.origInfFlowSpecs = declassificationSpecs;
+        this.services=services;
+        TB=services.getTermBuilder();
     }
 
 
@@ -149,10 +158,10 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        Term heapAtPre,
                                        Term dep,
                                        ImmutableList<Declassifier> declassificationSpecs,
-                                       boolean toBeSaved) {
+                                       boolean toBeSaved,TermServices services) {
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
              hasRealMod, self, params, result, exc, heapAtPre, dep, declassificationSpecs,
-             toBeSaved, INVALID_ID);
+             toBeSaved, INVALID_ID,services);
     }
 
 
@@ -442,7 +451,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, newId);
+                                               toBeSaved, newId,services);
     }
 
 
@@ -457,7 +466,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, id);
+                                               toBeSaved, id,services);
     }
 
 
@@ -469,7 +478,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, id);
+                                               toBeSaved, id,services);
     }
 
 
@@ -481,7 +490,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, id);
+                                               toBeSaved, id,services);
     }
 
 
@@ -493,7 +502,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, id);
+                                               toBeSaved, id,services);
     }
 
 

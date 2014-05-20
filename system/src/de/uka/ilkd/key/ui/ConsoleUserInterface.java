@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,18 +20,19 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -49,7 +50,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     private final BatchMode batchMode;
     private final byte verbosity;
-	private ProofStarter ps;
 	private KeYMediator mediator;
 	private boolean autoMode;
 
@@ -60,14 +60,14 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         return autoMode;
     }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, byte verbosity) {
+   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
     	this.batchMode = batchMode;
     	this.verbosity = verbosity;
-        this.mediator  = new KeYMediator(this, useAutoSaver);
+        this.mediator  = new KeYMediator(this);
    }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, boolean verbose) {
-       this(batchMode, useAutoSaver, verbose? DEBUG: NORMAL);
+   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+       this(batchMode, verbose? DEBUG: NORMAL);
    }
 
     public void taskFinished(TaskFinishedInfo info) {
@@ -75,7 +75,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         final Proof proof = info.getProof();
         if (proof==null) {
             if (verbosity > SILENT) System.out.println("Proof loading failed");
-            return;
+            System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
@@ -107,7 +107,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 }
                 System.exit(-1);
             }
-            if(batchMode.isLoadOnly() ||  openGoals==0) {
+            if(batchMode.isLoadOnly() || openGoals==0) {
                 if (verbosity > SILENT)
                 System.out.println("Number of open goals after loading: " +
                         openGoals);
@@ -118,9 +118,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             // has to be notified that we work in auto mode (CS)
             mediator.setInteractive(false);
 
-            final Object result = ps.start();
-            if (verbosity >= HIGH) {
-            	System.out.println(result);
+            startAndWaitForAutoMode(proof);
+            if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+            	System.out.println(proof.statistics());
             }
         }
     }
@@ -145,8 +145,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
-    	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
-        ps.init(proofAggregate);
         mediator.setProof(proofAggregate.getFirstProof());
     }
 
@@ -272,7 +270,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    public ProblemInitializer createProblemInitializer(Profile profile) {
       ProblemInitializer pi = new ProblemInitializer(this,
             new Services(profile, mediator.getExceptionHandler()),
-            false,
             this);
       return pi;
    }
@@ -424,11 +421,4 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        pcs.firePropertyChange(propertyName, oldValue, newValue);
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected boolean isRegisterProofs() {
-      return false;
-   }
 }

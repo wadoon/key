@@ -1,16 +1,16 @@
 
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+
 
 package de.uka.ilkd.key.smt;
 
@@ -31,8 +31,9 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 public interface SMTSolver {
 
     public enum ReasonOfInterruption {
-        User, Timeout, Exception, NoInterruption
-    };
+
+	User, Timeout, Exception, NoInterruption
+    }
 
     /**
      * A solver process can have differnt states. When a solver is created, it is in state
@@ -40,18 +41,12 @@ public interface SMTSolver {
      * execution has stopped the solver is in state <code>Stopped</code>.
      */
     public enum SolverState {
-        Waiting, Running, Stopped
-    };
 
-    /**
-     * Starts a concurrent session of the solver. Parameter timeout should be choosen carefully
-     * in order to avoid lockups.
-     * 
-     * @param timeout timeout for this solver session
-     * @param settings {@link SMTSettings} for this solver session.
-     */
-    public void startConcurrently(SolverTimeout timeout, SMTSettings settings);
-    
+	Waiting, Running, Stopped
+    }
+
+
+        
     /**
      * Starts the solver as part of the current thread. To execute the solver concurrently with the 
      * current thread, please see {@link SMTSolver#startConcurrently(SolverTimeout, SMTSettings)}.
@@ -162,5 +157,10 @@ public interface SMTSolver {
      * Returns the exceptions that has been thrown while translating taclets into assumptions.
      */
     public Collection<Throwable> getExceptionsOfTacletTranslation();
+    
+    
+    public AbstractSolverSocket getSocket();    
+    
+    
 
 }

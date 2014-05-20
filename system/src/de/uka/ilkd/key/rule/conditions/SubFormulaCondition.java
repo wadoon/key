@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -44,10 +44,10 @@ public class SubFormulaCondition extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
                          SVInstantiations instMap, Services services) {        
-        if (!(var instanceof FormulaSV) || (FormulaSV)var != this.a) {
+        if (!(var instanceof FormulaSV) || var != this.a) {
             return false;
         }
-        Term tInst = (Term) instMap.getInstantiation((FormulaSV)a);
+        Term tInst = (Term) instMap.getInstantiation(a);
         if (tInst.arity() == 0) {
             return negated;
         } else {

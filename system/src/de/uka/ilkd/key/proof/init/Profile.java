@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -47,7 +46,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * </p>
  * <p>
  * Each {@link Profile} has a unique name {@link #name()}.
- * </p>
+ * </p> 
  * <p>
  * It is recommended
  * to have only one instance of each {@link Profile}. The default instances
@@ -122,19 +121,18 @@ public interface Profile {
     /** returns the (default) justification for the given rule */
     RuleJustification getJustification(Rule r);
 
-
+    
     /**
      * returns the file name of the internal class directory relative to JavaRedux
      * @return the file name of the internal class directory relative to JavaRedux
      */
     String getInternalClassDirectory();
-
+	
     /**
      * returns the file name of the internal class list
      * @return the file name of the internal class list
      */
     String getInternalClasslistFilename();
-
-
+    
     TermLabelManager getTermLabelManager();
 }

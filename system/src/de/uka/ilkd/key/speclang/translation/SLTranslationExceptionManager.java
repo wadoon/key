@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang.translation;    
 
@@ -82,6 +81,10 @@ public class SLTranslationExceptionManager {
         return new Position(absoluteLine, absoluteColumn); 
     }
     
+    private Position createAbsolutePosition(final Position pos) {
+	return this.createAbsolutePosition(pos.getLine(), pos.getColumn());
+    }
+
     
     //-------------------------------------------------------------------------
     //public interface
@@ -101,6 +104,22 @@ public class SLTranslationExceptionManager {
 	    org.antlr.runtime.Token t) {
 	return new PositionedString(text, fileName, createAbsolutePosition(
 		t.getLine(), t.getCharPositionInLine()));
+    }
+
+    /**
+     * Creates a string with position information from the given relative
+     * position.
+     * 
+     * @param text
+     *            the {@link String}
+     * @param pos
+     *            the {@link Position}
+     * @return <code>text</code> as {@link PositionedString} with absolute
+     *         position in the current file
+     */
+    public PositionedString createPositionedString(final String text,
+	    final Position pos) {
+	return new PositionedString(text, fileName, createAbsolutePosition(pos));
     }
     
     /**

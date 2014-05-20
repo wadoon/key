@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -45,9 +45,9 @@ public class ConstantCondition extends VariableConditionAdapter {
                          SVInstantiations instMap,
                          Services services) {
         if ((!(var instanceof TermSV)
-                    || (TermSV)var != this.t)
+                    || var != this.t)
                 && (!(var instanceof FormulaSV)
-                        || (FormulaSV)var != this.t)) {
+                        || var != this.t)) {
             return true;
         }
         if (var instanceof TermSV) {

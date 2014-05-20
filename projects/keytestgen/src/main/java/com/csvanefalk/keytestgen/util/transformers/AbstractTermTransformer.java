@@ -28,7 +28,7 @@ public abstract class AbstractTermTransformer implements ITermTransformer {
     /**
      * Used for constructing new {@link Term} instances.
      */
-    protected final TermFactory termFactory = TermFactory.DEFAULT;
+    protected final TermFactory termFactory = new TermFactory();
 
     /**
      * @return a {@link Term} representation of the boolean constant FALSE.

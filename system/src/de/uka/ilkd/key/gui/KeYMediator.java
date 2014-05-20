@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui;
 
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -37,7 +37,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -58,8 +57,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
-import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
@@ -114,11 +111,9 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
      */
-    public KeYMediator(UserInterface ui, boolean useAutoSaver) {
+    public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
-	if (useAutoSaver) {
-		autoSaver = new AutoSaver();
-	}
+	this.autoSaver = AutoSaver.getDefaultInstance();
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
@@ -290,10 +285,11 @@ public class KeYMediator {
                                 }
                         });
         if (!proof.isDisposed()) {
-           proof.getServices().getCaches().getTermTacletAppIndexCache().clear();
+           ServiceCaches caches = proof.getServices().getCaches();
+           caches.getTermTacletAppIndexCache().clear();
+           caches.getBetaCandidates().clear(); // TODO: Is this required since the strategy is instantiated everytime again?
+           caches.getIfThenElseMalusCache().clear(); // TODO: Is this required since the strategy is instantiated everytime again?
         }
-        AbstractBetaFeature.clearCache();
-        IfThenElseMalusFeature.clearCache();
     }
 
 
@@ -442,7 +438,6 @@ public class KeYMediator {
                 TacletApp tmpApp =
                     firstApp.tryToInstantiate(getServices());
                 if (tmpApp != null) firstApp = tmpApp;
-
 
             }
 	    if (ifSeqInteraction || !firstApp.complete()) {

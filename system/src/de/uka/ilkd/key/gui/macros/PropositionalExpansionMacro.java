@@ -1,23 +1,23 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.Set;
 
 import javax.swing.KeyStroke;
+
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 
 /**
  * The macro PropositionalExpansionMacro apply rules to decompose propositional
@@ -54,6 +54,6 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
 
     @Override
     public KeyStroke getKeyStroke () {
-	return KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.SHIFT_DOWN_MASK);
+	return KeyStrokeManager.get(this);
     }
 }

@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
@@ -12,7 +13,7 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
 
     private static Sort INT_SORT = new SortImpl(new Name("int"));
 
-    private static final TermBuilder termBuilder = TermBuilder.DF;
+   
 
     public static NormalizeArithmeticComparatorsTransformer getInstance(final Services services) {
         return new NormalizeArithmeticComparatorsTransformer(services);
@@ -21,9 +22,10 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
     private boolean sawNegation = false;
 
     private final Services services;
-
+    private final TermBuilder termBuilder;
     private NormalizeArithmeticComparatorsTransformer(final Services services) {
         this.services = services;
+        termBuilder = new TermBuilder(new TermFactory(),services);
     }
 
     private Term addToZValue(final Term term, final int toAdd) {
@@ -37,12 +39,11 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
             }
 
             final int newValue = currentValue + toAdd;
-            return NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(services, Integer.toString(newValue));
+            return termBuilder.zTerm(Integer.toString(newValue));
 
         } else {
-            final Term val = NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                      .zTerm(services, Integer.toString(toAdd));
-            return NormalizeArithmeticComparatorsTransformer.termBuilder.add(services, term, val);
+            final Term val = termBuilder.zTerm(Integer.toString(toAdd));
+            return termBuilder.add(term, val);
         }
     }
 
@@ -66,7 +67,7 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
             final Term rightChild = transform(term.sub(1));
 
             // Represents the value 1
-            final Term one = NormalizeArithmeticComparatorsTransformer.termBuilder.zTerm(services, "1");
+            final Term one = termBuilder.zTerm( "1");
 
             if (sawNegation) {
                 sawNegation = false;
@@ -76,13 +77,9 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
                  */
                 if (TermParserTools.isGreaterOrEquals(term)) {
 
-                    final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                                           .add(services,
-                                                                                                leftChild,
-                                                                                                one);
+                    final Term incrementedChild = termBuilder.add(leftChild,one);
 
-                    return NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                    .leq(incrementedChild, rightChild, services);
+                    return termBuilder.leq(incrementedChild, rightChild);
                 }
 
                 /*
@@ -90,27 +87,23 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
                  */
                 if (TermParserTools.isLessOrEquals(term)) {
 
-                    final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                                           .add(services,
-                                                                                                rightChild,
-                                                                                                one);
+                    final Term incrementedChild = termBuilder.add(rightChild,one);
 
-                    return NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                    .geq(leftChild, incrementedChild, services);
+                    return termBuilder.geq(leftChild, incrementedChild);
                 }
 
                 /*
                  * The negation of a x < y is x >= y.
                  */
                 if (TermParserTools.isLessThan(term)) {
-                    return NormalizeArithmeticComparatorsTransformer.termBuilder.geq(leftChild, rightChild, services);
+                    return termBuilder.geq(leftChild, rightChild);
                 }
 
                 /*
                  * The negation of a x > y is x <= y.
                  */
                 if (TermParserTools.isGreaterThan(term)) {
-                    return NormalizeArithmeticComparatorsTransformer.termBuilder.leq(leftChild, rightChild, services);
+                    return termBuilder.leq(leftChild, rightChild);
                 }
 
                 /*
@@ -122,18 +115,11 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
                     final Term lhandPlusOne = addToZValue(leftChild, 1);
                     final Term rhandPlusOne = addToZValue(rightChild, 1);
 
-                    final Term lessThanConstraint = NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                                             .leq(lhandPlusOne,
-                                                                                                  rightChild,
-                                                                                                  services);
+                    final Term lessThanConstraint = termBuilder.leq(lhandPlusOne,rightChild);
 
-                    final Term greaterThanConstraint = NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                                                .geq(leftChild,
-                                                                                                     rhandPlusOne,
-                                                                                                     services);
+                    final Term greaterThanConstraint = termBuilder.geq(leftChild,rhandPlusOne);
 
-                    return NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                    .or(lessThanConstraint, greaterThanConstraint);
+                    return termBuilder.or(lessThanConstraint, greaterThanConstraint);
                 }
             }
 
@@ -148,13 +134,9 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
                  */
                 if (TermParserTools.isLessThan(term)) {
 
-                    final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                                           .add(services,
-                                                                                                leftChild,
-                                                                                                one);
+                    final Term incrementedChild = termBuilder.add(leftChild,one);
 
-                    return NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                    .leq(incrementedChild, rightChild, services);
+                    return termBuilder.leq(incrementedChild, rightChild);
                 }
 
                 /*
@@ -162,13 +144,9 @@ public class NormalizeArithmeticComparatorsTransformer extends AbstractTermTrans
                  */
                 if (TermParserTools.isGreaterThan(term)) {
 
-                    final Term incrementedChild = NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                                           .add(services,
-                                                                                                rightChild,
-                                                                                                one);
+                    final Term incrementedChild = termBuilder.add(rightChild, one);
 
-                    return NormalizeArithmeticComparatorsTransformer.termBuilder
-                                                                    .geq(leftChild, incrementedChild, services);
+                    return termBuilder.geq(leftChild, incrementedChild);
                 }
             }
         }

@@ -176,23 +176,7 @@ public abstract class AbstractSMTSolver
         return result;
     }
 
-    /**
-     * Starts a solver process. This method should be accessed only by an instance of
-     * <code>SolverLauncher</code>. If you want to start a solver please have a look at
-     * <code>SolverLauncher</code>.
-     * 
-     * @param timeout
-     * @param settings
-     */
-    @Override
-    public void startConcurrently(SolverTimeout timeout, SMTSettings settings) {
-
-        thread = new Thread(this);
-        solverTimeout = timeout;
-        smtSettings = settings;
-        thread.start();
-    }
-
+    
     /**
      * Starts the solver as part of the current thread.
      */

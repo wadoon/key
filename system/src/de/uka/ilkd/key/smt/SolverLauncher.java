@@ -1,23 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -237,9 +233,7 @@ public class SolverLauncher implements SolverListener {
          * Create dynamic arrays to hold solvertypes and problems.
          */
 	LinkedList<SolverType> types = new LinkedList<SolverType>();
-	for (SolverType type : solverTypes) {
-	    types.add(type);
-	}
+	Collections.addAll(types, solverTypes);
 	LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
 	problems.add(problem);
 	
@@ -315,7 +309,7 @@ public class SolverLauncher implements SolverListener {
 	    timer.schedule(solverTimeout, settings.getTimeout(),PERIOD);
 	    session.addCurrentlyRunning(solver);
 	    
-	    solver.startConcurrently(solverTimeout, settings);
+
 	    i++;
 	}
     }
@@ -340,7 +334,7 @@ public class SolverLauncher implements SolverListener {
     private void launchSolvers(LinkedList<SMTSolver> solvers,
 	    Collection<SMTProblem> problems, Collection<SolverType> solverTypes)
     {
-
+    //Show progress dialog
 	notifyListenersOfStart(problems, solverTypes);
 
 	// Launch all solvers until the queue is empty or the launcher is
@@ -420,13 +414,15 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void notifyListenersOfStop()  {
-	Collection<SMTSolver> solvers = session.getProblemSolvers();
+	Collection<SMTSolver> problemSolvers = session.getProblemSolvers();
+	Collection<SMTSolver> finishedSolvers = session.getFinishedSolvers();
+	finishedSolvers.addAll(problemSolvers);
 	for (SolverLauncherListener listener : listeners) {
-	    listener.launcherStopped(this, solvers);
+	    listener.launcherStopped(this, finishedSolvers);
 	}
 
-	if (!solvers.isEmpty() && listeners.isEmpty()) {
-	    throw new SolverException(solvers);
+	if (!problemSolvers.isEmpty() && listeners.isEmpty()) {
+	    throw new SolverException(problemSolvers);
 	}
     }
 
@@ -437,7 +433,7 @@ public class SolverLauncher implements SolverListener {
      */
     private void notifySolverHasFinished(SMTSolver solver) {
 	lock.lock();
-	try {
+	try {		
 		session.removeCurrentlyRunning(solver);
 		wait.signal();
 	} finally {
@@ -459,6 +455,7 @@ public class SolverLauncher implements SolverListener {
 
     @Override
     public void processStopped(SMTSolver solver, SMTProblem problem) {
+    session.addFinishedSolver(solver);
 	notifySolverHasFinished(solver);
     }
 
@@ -490,6 +487,8 @@ class Session {
     private ReentrantLock lock = new ReentrantLock();
     /** Locks the collection of the problem solvers. */
     private ReentrantLock problemSolverLock = new ReentrantLock();
+    private ReentrantLock finishedSolverLock = new ReentrantLock();
+    private Collection<SMTSolver> finishedSolvers = new LinkedList<SMTSolver>();
     private Collection<SMTSolver> problemSolvers = new LinkedList<SMTSolver>();
     private LinkedList<SMTSolver> currentlyRunning = new LinkedList<SMTSolver>();
 
@@ -561,6 +560,15 @@ class Session {
 	    problemSolverLock.unlock();
 	}
     }
+    
+    public void addFinishedSolver(SMTSolver solver) {
+    	try {
+    		finishedSolverLock.lock();
+    		finishedSolvers.add(solver);
+    	} finally {
+    		finishedSolverLock.unlock();
+    	}
+    }
 
     public Collection<SMTSolver> getProblemSolvers() {
 	try {
@@ -571,6 +579,18 @@ class Session {
 	} finally {
 	    problemSolverLock.unlock();
 	}
+
+    }
+    
+    public Collection<SMTSolver> getFinishedSolvers() {
+    	try {
+    		finishedSolverLock.lock();
+    		Collection<SMTSolver> copy = new LinkedList<SMTSolver>(
+    				finishedSolvers);
+    		return copy; // finally trumps return
+    	} finally {
+    		finishedSolverLock.unlock();
+    	}
 
     }
 

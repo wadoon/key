@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -160,6 +160,7 @@ public class KeYProgModelInfo{
     }
 
 
+    @SuppressWarnings("unchecked")
     public KeYJavaType resolveType(String shortName, KeYJavaType context) {
         recoder.abstraction.ClassType result = null;
 
@@ -234,7 +235,7 @@ public class KeYProgModelInfo{
         recoder.abstraction.Type result;
         if (tr instanceof TypeRef) {
             result = (recoder.abstraction.Type)
-            rec2key().toRecoder(((TypeRef)tr).getKeYJavaType());
+            rec2key().toRecoder(tr.getKeYJavaType());
             return result;
         }
         result=getServConf().getSourceInfo().getType
@@ -352,13 +353,13 @@ public class KeYProgModelInfo{
 	if (bt1 instanceof recoder.abstraction.ArrayType &&
 	    bt2 instanceof recoder.abstraction.ClassType) {
 	    if (((recoder.abstraction.ClassType)bt2).isInterface()) {
-		return ((recoder.abstraction.ClassType)bt2).
+		return bt2.
                     getFullName().equals("java.lang.Cloneable") ||
-                    ((recoder.abstraction.ClassType)bt2).
+                    bt2.
                     getFullName().equals("java.lang.Serializable")
                     ;
 	    } else {
-		return ((recoder.abstraction.ClassType)bt2).
+		return bt2.
 		    getFullName().equals("java.lang.Object");
 	    }
 	}

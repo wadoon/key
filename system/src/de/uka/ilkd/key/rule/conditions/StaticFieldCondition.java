@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -54,7 +54,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
         final Term f = (Term)o;
         final Operator op = f.op();
         if (op instanceof Function) {
-            final String name = ((Function) op).name().toString();
+            final String name = op.name().toString();
 
             // check for normal attribute
             int endOfClassName = name.indexOf("::$");

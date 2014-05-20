@@ -1,27 +1,25 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.logic;
 
-import java.util.*;
-
+import java.util.Map;
+import java.util.Collections;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.LRUCache;
-
 /** 
  * The TermFactory is the <em>only</em> way to create terms using constructors 
  * of class Term or any of its subclasses. It is the only class that implements 
@@ -36,25 +34,23 @@ import de.uka.ilkd.key.util.LRUCache;
  */
 public final class TermFactory {
     
-    /** 
-     * The only instance of TermFactory. 
-     */
-    public static final TermFactory DEFAULT = new TermFactory();    
-
-    private static final Map<Term, Term> cache 
-    	= Collections.synchronizedMap(new LRUCache<Term, Term>(20000));
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
+    private final Map<Term, Term> cache;
     
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     
-    private TermFactory() {
+    public TermFactory(Map<Term, Term> cache) {
+        this.cache = cache;
     }
     
-    
+    //added by Huy
+    public TermFactory(){
+    	cache  = Collections.synchronizedMap(new LRUCache<Term, Term>(20000));
+    }
     
     //-------------------------------------------------------------------------
     //public interface
