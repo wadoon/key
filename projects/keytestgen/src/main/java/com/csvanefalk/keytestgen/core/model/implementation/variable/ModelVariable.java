@@ -2,6 +2,7 @@ package com.csvanefalk.keytestgen.core.model.implementation.variable;
 
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -67,6 +68,9 @@ public class ModelVariable {
         this.identifier = identifier;
     }
 
+    //added by Huy, used to store symbolic value of variable
+    private Term symbolicValue;
+    
     /**
      * Since we are working with unique Java assertions, two
      * {@link ModelVariable} instances are equal iff. their paths are identical.
@@ -183,4 +187,20 @@ public class ModelVariable {
     public boolean isPrimitive() {
         return boundValue instanceof Number || boundValue instanceof Boolean;
     }
+
+   /**
+    * @return the symbolicValue
+    */
+   public Term getSymbolicValue() {
+      return symbolicValue;
+   }
+
+   /**
+    * @param symbolicValue the symbolicValue to set
+    */
+   public void setSymbolicValue(Term symbolicValue) {
+      this.symbolicValue = symbolicValue;
+   }
+    
+   
 }
