@@ -98,6 +98,7 @@ final class JMLTranslator {
         REQUIRES ("requires"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
+        ESCAPEHATCH ("escapes"),
 
         // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
@@ -324,6 +325,19 @@ final class JMLTranslator {
                 return tb.convertToFormula(requiresTerm);
             }
         });
+        
+        translationMethods.put(JMLKeyWord.ESCAPEHATCH, new JMLTranslationMethod() {
+
+           @Override
+           public Term translate(SLTranslationExceptionManager excManager,
+                                 Object... params)
+                   throws SLTranslationException {
+               checkParameters(params, Term.class, Services.class);
+               Term escapehatch = (Term) params[0];
+               return escapehatch;
+           }
+       });
+        
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
 
             @Override
@@ -1716,6 +1730,8 @@ final class JMLTranslator {
             throws SLTranslationException {
         try {
             JMLKeyWord jmlKeyWord = JMLKeyWord.jmlValueOf(jmlKeyWordName);
+            
+           
             JMLTranslationMethod m = translationMethods.get(jmlKeyWord);
             if (m == null) {
                 throw excManager.createException(

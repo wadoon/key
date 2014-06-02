@@ -90,6 +90,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final boolean transaction;
     final boolean toBeSaved;
 
+    //serves for KEG
+    Map<LocationVariable,Term> escapeHatches;
+    
     /**
      * If a method is strictly pure, it has no modifies clause which could
      * be anonymised.
@@ -189,8 +192,102 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.id                     = id;
         this.transaction            = transaction;
         this.toBeSaved	            = toBeSaved;
+        //default escapeHatches clause
+        this.escapeHatches          =null;
     }
 
+    
+    /**
+     * Creates an operation contract.
+     * Using this constructor is discouraged: it may change in the future.
+     * Please use the factory methods in {@link de.uka.ilkd.key.speclang.ContractFactory}.
+     * @param baseName base name of the contract (does not have to be unique)
+    * @param pm the IProgramMethod to which the contract belongs
+    * @param modality the modality of the contract
+    * @param mby the measured_by clause of the contract
+    * @param selfVar the variable used for the receiver object
+    * @param paramVars the variables used for the operation parameters
+    * @param resultVar the variables used for the operation result
+    * @param excVar the variable used for the thrown exception
+    * @param globalDefs definitions for the whole contract
+    * @param services TODO
+    * @param pre the precondition of the contract
+    * @param post the postcondition of the contract
+    * @param mod the modifies clause of the contract
+    * @param heapAtPreVar the variable used for the pre-heap
+    * @param escapeHatches the escapes expressions of the contract (served for KEG)
+     */
+    FunctionalOperationContractImpl(String baseName,
+                                    String name,
+                                    KeYJavaType kjt,
+                                    IProgramMethod pm,
+                                    KeYJavaType specifiedIn,
+                                    Modality modality,
+                                    Map<LocationVariable,Term> pres,
+                                    Term mby,
+                                    Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> axioms,
+                                    Map<LocationVariable,Term> mods,
+                                    Map<ProgramVariable, Term> accessibles,
+                                    Map<LocationVariable,Boolean> hasRealMod,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable excVar,
+                                    Map<LocationVariable, LocationVariable> atPreVars,
+                                    Term globalDefs,
+                                    int id,
+                                    boolean toBeSaved,
+                                    boolean transaction, TermServices services,
+                                    Map<LocationVariable, Term> escapeHatches) {
+        assert !(name == null && baseName == null);
+        assert kjt != null;
+        assert pm != null;
+        assert pres != null;
+        assert posts != null;
+        assert modality != null;
+        assert (selfVar == null) == pm.isStatic();
+        assert globalDefs == null || globalDefs.sort() == Sort.UPDATE;
+        assert paramVars != null;
+        assert paramVars.size() >= pm.getParameterDeclarationCount();
+        // may be more parameters in specifications (ghost parameters)
+        if (resultVar == null){
+            assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
+        } else {
+            assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "+pm+" with return type "+pm.getReturnType();
+        }
+        assert pm.isModel() || excVar != null;
+        assert atPreVars.size() != 0;
+        assert services != null;
+        this.services = services;
+        this.TB = services.getTermBuilder();
+        this.baseName               = baseName;
+        this.name = name != null
+                ? name
+                        : ContractFactory.generateContractName(baseName, kjt, pm, specifiedIn, id);
+        this.pm                = pm;
+        this.kjt                    = kjt;
+        this.specifiedIn            = specifiedIn;
+        this.modality               = modality;
+        this.originalPres           = pres;
+        this.originalMby            = mby;
+        this.originalPosts          = posts;
+        this.originalAxioms         = axioms;
+        this.originalMods           = mods;
+        this.originalDeps           = accessibles;
+        this.hasRealModifiesClause  = hasRealMod;
+        this.originalSelfVar        = selfVar;
+        this.originalParamVars      = paramVars;
+        this.originalResultVar      = resultVar;
+        this.originalExcVar         = excVar;
+        this.originalAtPreVars      = atPreVars;
+        this.globalDefs             = globalDefs;
+        this.id                     = id;
+        this.transaction            = transaction;
+        this.toBeSaved              = toBeSaved;
+        //default escapeHatches clause
+        this.escapeHatches          = escapeHatches;
+    }
 
     //-------------------------------------------------------------------------
     //internal methods
@@ -1308,7 +1405,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    newId,
                                                    toBeSaved,
                                                    transaction, 
-                                                   services);
+                                                   services,escapeHatches);
     }
 
 
@@ -1337,7 +1434,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    globalDefs,
                                                    id,
                                                    toBeSaved && newKJT.equals(kjt),
-                                                   transaction, services);
+                                                   transaction, services,escapeHatches);
     }
 
 
@@ -1374,5 +1471,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
         return new OriginalVariables(originalSelfVar, originalResultVar,
                                      originalExcVar, atPreVars, originalParamVars);
+    }
+    
+    //serves KEG
+        
+    public Map<LocationVariable, Term> getEscapeHatches(){
+       return escapeHatches;
     }
 }

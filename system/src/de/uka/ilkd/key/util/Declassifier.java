@@ -30,4 +30,8 @@ public class Declassifier {
    private Declassifier() {
       this.declassifications=ImmutableSLList.<Term>nil();
    }
+
+   public String toString() {
+      return declassifications + "";
+   }
 }

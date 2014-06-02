@@ -294,7 +294,8 @@ public final class SLEnvInput extends AbstractEnvInput {
         	final ImmutableSet<SpecificationElement> methodSpecs
         	    = specExtractor.extractMethodSpecs(pm,staticInvPresent);
         	specRepos.addSpecs(methodSpecs);
-
+        	
+              	
                 //loop invariants
                 final JavaASTCollector collector 
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);

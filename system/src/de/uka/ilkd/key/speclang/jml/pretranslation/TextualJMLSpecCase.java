@@ -66,8 +66,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
       axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     //declassification
-    private ImmutableList<PositionedString> declassifications =
-          ImmutableSLList.<PositionedString>nil();
+    private Map<String, ImmutableList<PositionedString>>
+       escapeHatches =  new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
@@ -81,6 +81,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           accessibles.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           accessibles.put(hName.toString()+"AtPre", ImmutableSLList.<PositionedString>nil());
           axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          escapeHatches.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
 
@@ -231,19 +232,19 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     // --------- added by Huy -----------
-    public void addDeclassification(PositionedString ps) {
-       declassifications = declassifications.append(ps);
+    public void addEscapeHatches(PositionedString ps) {
+       addGeneric(escapeHatches, ps);
+
    }
 
 
-   public void addDeclassification(ImmutableList<PositionedString> l) {
-      declassifications = declassifications.append(l);
+   public void addEscapeHatches(ImmutableList<PositionedString> l) {
+      for (PositionedString ps : l) {
+         addEscapeHatches(ps);
+      }
    }
     
-   public ImmutableList<PositionedString> getDeclassifications(){
-      return declassifications;
-   } 
-   
+ 
     public Behavior getBehavior() {
         return behavior;
     }
@@ -294,7 +295,17 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getAxioms(String hName) {
       return axioms.get(hName);
     }
-
+   
+    
+    //serve KEG
+    public ImmutableList<PositionedString> getEscapeHatches(){
+       return escapeHatches.get(HeapLDT.BASE_HEAP_NAME.toString());
+    } 
+    
+    public ImmutableList<PositionedString> getEscapeHatches(String hName){
+       return escapeHatches.get(hName);
+    } 
+    
     public String getName() {
         return name;
     }

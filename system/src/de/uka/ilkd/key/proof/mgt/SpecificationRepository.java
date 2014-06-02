@@ -6,7 +6,7 @@
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
-//
+//F
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
@@ -66,8 +66,10 @@ import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
@@ -398,16 +400,19 @@ public final class SpecificationRepository {
 
     private Contract prepareContract(Contract contract) {
         // sanity check
+       
         assert getCanonicalFormForKJT(contract.getTarget(), contract.getKJT())
                 .equals(contract.getTarget());
-
+        
         // set id
         Integer nextId = contractCounters.get(contract.getTypeName());
         if (nextId == null) {
             nextId = 0;
         }
+        
         contract = contract.setID(nextId);
         contractCounters.put(contract.getTypeName(), nextId + 1);
+        
         return contract;
     }
 
@@ -420,6 +425,8 @@ public final class SpecificationRepository {
     private void registerContract(Contract contract,
                                   final ImmutableSet<Pair<KeYJavaType, IObserverFunction>>
                                                                                    targets) {
+       
+      
         for (Pair<KeYJavaType, IObserverFunction> impl : targets) {
             registerContract(contract, impl);
         }
@@ -428,11 +435,13 @@ public final class SpecificationRepository {
     private void registerContract(Contract contract,
                                   Pair<KeYJavaType, IObserverFunction> targetPair) {
         if (!WellDefinednessCheck.isOn() && contract instanceof WellDefinednessCheck) {
+           //System.out.println("quit!!!!!!!!!");
             return;
         }
         final KeYJavaType targetKJT = targetPair.first;
         final IObserverFunction targetMethod = targetPair.second;
         contract = contract.setTarget(targetKJT, targetMethod);
+        
         final String name = contract.getName();
         assert contractsByName.get(name) == null : "Tried to add a contract with a non-unique name: "
                 + name;
@@ -445,8 +454,9 @@ public final class SpecificationRepository {
         assert contract.id() != Contract.INVALID_ID : "Tried to add a contract with an invalid id!";
         contracts.put(targetPair,
                 getContracts(targetKJT, targetMethod).add(contract));
-
-        if (contract instanceof FunctionalOperationContract) {
+        
+        if (contract instanceof FunctionalOperationContract) {  
+           //System.out.println("huyL: " + (new ContractWrapper((FunctionalOperationContractImpl)contract)).getEscapeHatches());
             operationContracts.put(
                     new Pair<KeYJavaType, IProgramMethod>(targetKJT,
                             (IProgramMethod) targetMethod),
@@ -462,6 +472,7 @@ public final class SpecificationRepository {
         }
         //add data to infFlowContracts
         else if(contract instanceof InformationFlowContract){
+           System.out.println("information flow contract detected!");
            infFlowContracts.put(
                  new Pair<KeYJavaType, IProgramMethod>(targetKJT,
                          (IProgramMethod) targetMethod),
@@ -890,8 +901,9 @@ public final class SpecificationRepository {
      * methods.
      */
     public void addContract(Contract contract) {
+       
         contract = prepareContract(contract);
-
+        
         // register and inherit
         final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> impls = getOverridingTargets(
                 contract.getKJT(), contract.getTarget()).add(
@@ -1488,7 +1500,7 @@ public final class SpecificationRepository {
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
-                addContract((Contract) spec);
+                addContract((Contract) spec);                
             } else if (spec instanceof ClassInvariant) {
                 addClassInvariant((ClassInvariant) spec);
             } else if (spec instanceof InitiallyClause) {

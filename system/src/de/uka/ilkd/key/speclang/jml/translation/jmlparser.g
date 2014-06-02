@@ -505,22 +505,26 @@ respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil(
     ;
 
 
-escapesclause returns  [Declassifier result = Declassifier.EMPTY_DECLASSIFIER] throws SLTranslationException {
-    ImmutableList<Term> declassifications = ImmutableSLList.<Term>nil();    
+escapesclause returns 
+ [ImmutableList<Term> escapeHatches = ImmutableSLList.<Term>nil()] throws SLTranslationException 
+{
 }
 :
-    ESCAPES (NOTHING | declassifications = infflowspeclist)   
-    {declassifications = declassifications.append(declassifications);     
-     result = new Declassifier(declassifications);}
+    ESCAPES (NOTHING | escapeHatches = infflowspeclist)   
+ 
     ;
 
 infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
     Term term = null;
 }
 :
-    term = termexpression { result = result.append(term); }
-    (COMMA term = termexpression { result = result.append(term); })*
-        { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
+    term = termexpression {
+       term = translator.translate("escapes", Term.class, term, services);
+       result = result.append(term); 
+     }
+    (COMMA term = termexpression { 
+       term = translator.translate("escapes", Term.class, term, services);
+       result = result.append(term);  })*
     ;
 
 

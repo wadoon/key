@@ -672,7 +672,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=breaks_clause         { sc.addBreaks(ps); }
 	|   ps=continues_clause      { sc.addContinues(ps); }
 	|   ps=returns_clause        { sc.addReturns(ps); }	
-		|   ps=escapes_clause      { sc.addDeclassification(ps); }
+	|   ps=escapes_clause      { sc.addEscapeHatches(ps); }
     )
     {
 	if(b == Behavior.EXCEPTIONAL_BEHAVIOR

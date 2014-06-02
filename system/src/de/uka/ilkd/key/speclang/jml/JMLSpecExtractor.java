@@ -506,8 +506,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
             try {
                 ImmutableSet<Contract> contracts
                 = jsf.createJMLOperationContracts(pm, specCase);
-                for(Contract contract : contracts) {
+                for(Contract contract : contracts) {                    
                     result = result.add(contract);
+                    //check escape hatches clauses
+                    
                 }
             } catch (SLWarningException e) {
                 warnings = warnings.add(e.getWarning());

@@ -188,7 +188,7 @@ public class ContractFactory {
                                                    foci.originalSelfVar, foci.originalParamVars,
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
-                                                   foci.toBeSaved,foci.transaction, services);
+                                                   foci.toBeSaved,foci.transaction, services,foci.escapeHatches);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -306,7 +306,24 @@ public class ContractFactory {
                             services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
 
-
+    //serves KEG
+    public FunctionalOperationContract func (String baseName,
+          IProgramMethod pm,
+          boolean terminates,
+          Map<LocationVariable, Term> pres,
+          Term mby,
+          Map<LocationVariable, Term> posts,
+          Map<LocationVariable, Term> axioms,
+          Map<LocationVariable, Term> mods,
+          Map<ProgramVariable, Term> accessibles,
+          Map<LocationVariable, Boolean> hasMod,
+          ProgramVariableCollection pv,
+          Map<LocationVariable, Term> escapeHatches) {
+            return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, axioms,
+            mods, accessibles, hasMod, pv, false, mods.get(
+            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,escapeHatches);
+            }
+    
     public FunctionalOperationContract func (String baseName,
                                              IProgramMethod pm,
                                              Modality modality,
@@ -327,6 +344,29 @@ public class ContractFactory {
                                                    progVars.atPreVars, null,
                                                    Contract.INVALID_ID, toBeSaved, transaction, services);
     }
+    
+    //serves KEG
+    public FunctionalOperationContract func (String baseName,
+          IProgramMethod pm,
+          Modality modality,
+          Map<LocationVariable, Term> pres,
+          Term mby,
+          Map<LocationVariable, Term> posts,
+          Map<LocationVariable, Term> axioms,
+          Map<LocationVariable, Term> mods,
+          Map<ProgramVariable, Term> accessibles,
+          Map<LocationVariable, Boolean> hasMod,
+          ProgramVariableCollection progVars,
+          boolean toBeSaved, boolean transaction,
+          Map<LocationVariable, Term> escapeHatches) {
+       return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
+                pm.getContainerType(), modality, pres, mby,
+                posts, axioms, mods, accessibles, hasMod,
+                progVars.selfVar, progVars.paramVars,
+                progVars.resultVar, progVars.excVar,
+                progVars.atPreVars, null,
+                Contract.INVALID_ID, toBeSaved, transaction, services,escapeHatches);
+}
 
     /**
      * Returns the union of the passed contracts.

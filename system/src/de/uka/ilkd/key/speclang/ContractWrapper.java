@@ -47,7 +47,8 @@ public class ContractWrapper
                 contract.id,
                 contract.toBeSaved,
                 contract.transaction,
-                contract.services
+                contract.services,
+                contract.escapeHatches
                 );
     }
     
@@ -80,5 +81,22 @@ public class ContractWrapper
         }
 
         return parameters;
+    }
+    
+    //added by Huy, serves KEG
+    public List<Term> getEscapeHatchTerms(){
+       List<Term> escapeHatcheTerms = new LinkedList<Term>();
+       if(escapeHatches !=null){
+          for (Term term : escapeHatches.values()) {
+             escapeHatcheTerms.add(term);
+          }
+       }   
+       return escapeHatcheTerms;
+    }
+    
+    public boolean hasNotNullEscapeHatchTerms(){
+       if(getEscapeHatchTerms().get(0)!=null)
+          return true;
+       return false;
     }
 }

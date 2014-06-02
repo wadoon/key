@@ -56,6 +56,7 @@ import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
@@ -120,6 +121,8 @@ public class JMLSpecFactory {
 
         public ImmutableList<Term> abbreviations = ImmutableSLList.<Term>nil();
         public Map<LocationVariable,Term> requires = new LinkedHashMap<LocationVariable,Term>();
+        public Map<LocationVariable,Term> escapeHatches = new LinkedHashMap<LocationVariable,Term>();
+
         public Term measuredBy;
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
         public Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable,Term>();
@@ -306,6 +309,17 @@ public class JMLSpecFactory {
                                            originalBehavior,
                                            textualSpecCase.getEnsures(heap.name().toString())));
           }
+           
+           if(heap == savedHeap && textualSpecCase.getEscapeHatches(heap.name().toString()).isEmpty()) {
+              clauses.escapeHatches.put(heap, null);
+            }else{
+              clauses.escapeHatches.put(heap, translateEscapes(pm, progVars.selfVar,
+                                            progVars.paramVars,
+                                            progVars.resultVar, progVars.excVar,
+                                            progVars.atPres,
+                                            originalBehavior,
+                                            textualSpecCase.getEscapeHatches(heap.name().toString())));
+           }
           if(textualSpecCase.getAxioms(heap.name().toString()).isEmpty()) {
         	  clauses.axioms.put(heap, null);
           }else{
@@ -596,6 +610,37 @@ public class JMLSpecFactory {
         }
     }
 
+    private Term translateEscapes(IProgramMethod pm,
+          ProgramVariable selfVar,
+          ImmutableList<ProgramVariable> paramVars,
+          ProgramVariable resultVar,
+          ProgramVariable excVar,
+          Map<LocationVariable,Term> atPres,
+          Behavior originalBehavior,
+          ImmutableList<PositionedString> escapesHatches)
+                throws SLTranslationException {
+       
+       Term result = null;
+       
+       for (PositionedString expr : escapesHatches) {
+          ImmutableList<Term> translated = JMLTranslator.translate(expr,
+                                                    pm.getContainerType(),
+                                                    selfVar, paramVars,
+                                                    null, null, null,
+                                                    ImmutableList.class,
+                                                    services);
+         
+          for (Term t : translated) {
+             if (result == null) {
+                result = t;
+             } else {
+                result = TB.pair(result, t);
+             }
+          }
+       } 
+       
+       return result;
+    }
 
     @SuppressWarnings("unused")
     private Term translateAccessible(IProgramMethod pm,
@@ -774,23 +819,36 @@ public class JMLSpecFactory {
              }
            }
         }
-
+        //System.out.println("escape hatch terms: " + clauses.escapeHatches.values().toArray()[0]);
         // diverges
         if (clauses.diverges.equals(TB.ff())) {
+           
             // create diamond modality contract
-            FunctionalOperationContract contract =
+           /* FunctionalOperationContract contract =
                     cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);*/
+                  
+              
+           FunctionalOperationContract contract =
+                 cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
+                         clauses.assignables, clauses.accessibles, clauses.hasMod, progVars,clauses.escapeHatches);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
+            //System.out.println("escape hatch terms: " + ((FunctionalOperationContractImpl)contract).getEscapeHatches());
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             // create box modality contract
-            FunctionalOperationContract contract =
+            /*FunctionalOperationContract contract =
                     cf.func(name, pm, false, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);*/
+           //System.out.println("HHHHHHHH-2");
+           FunctionalOperationContract contract =
+                  cf.func(name, pm, false, pres, clauses.measuredBy, posts, axioms,
+                          clauses.assignables, clauses.accessibles, clauses.hasMod, progVars,clauses.escapeHatches);
+           
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
+           //System.out.println("HHHHHHHH-3");
             // create two contracts for each diamond and box modality
             for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
               if(clauses.requires.get(heap) != null) {
@@ -1142,6 +1200,7 @@ public class JMLSpecFactory {
 
         // create contracts
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        
         result = result.union(createFunctionalOperationContracts(name, pm,
                                                                  progVars,
                                                                  clauses, posts, axioms));
