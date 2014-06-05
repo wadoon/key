@@ -78,6 +78,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+import de.uka.ilkd.key.util.Declassifier;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -121,8 +122,10 @@ public class JMLSpecFactory {
 
         public ImmutableList<Term> abbreviations = ImmutableSLList.<Term>nil();
         public Map<LocationVariable,Term> requires = new LinkedHashMap<LocationVariable,Term>();
+        //serve KEG
         public Map<LocationVariable,Term> escapeHatches = new LinkedHashMap<LocationVariable,Term>();
-
+        public ImmutableList<Declassifier> declassifies = ImmutableSLList.<Declassifier>nil();
+        
         public Term measuredBy;
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
         public Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable,Term>();
@@ -135,6 +138,8 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
+        
+        
     }
 
     //-------------------------------------------------------------------------
@@ -372,6 +377,11 @@ public class JMLSpecFactory {
                 progVars.atPres,
                 originalBehavior,
                 textualSpecCase.getReturns());
+        clauses.declassifies = translateDeclassifyClauses(pm, progVars.selfVar, 
+                 progVars.paramVars, 
+                 progVars.resultVar, 
+                 textualSpecCase.getDeclassify());
+        
         return clauses;
     }
 
@@ -641,6 +651,30 @@ public class JMLSpecFactory {
        
        return result;
     }
+    
+    private ImmutableList<Declassifier>
+    translateDeclassifyClauses(IProgramMethod pm,
+                                ProgramVariable selfVar,
+                                ImmutableList<ProgramVariable> paramVars,
+                                ProgramVariable resultVar,
+                                ImmutableList<PositionedString> originalClauses)
+        throws SLTranslationException {
+    if (originalClauses.isEmpty()) {
+        return ImmutableSLList.<Declassifier>nil();
+    } else {
+        ImmutableList<Declassifier> result =
+                                 ImmutableSLList.<Declassifier>nil();
+        for (PositionedString expr : originalClauses) {
+            Declassifier translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                                selfVar, paramVars, resultVar,
+                                                null, null, Declassifier.class, services);
+            result = result.append(translated);
+        }
+        return result;
+    }
+}
+    
 
     @SuppressWarnings("unused")
     private Term translateAccessible(IProgramMethod pm,
@@ -831,7 +865,8 @@ public class JMLSpecFactory {
               
            FunctionalOperationContract contract =
                  cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
-                         clauses.assignables, clauses.accessibles, clauses.hasMod, progVars,clauses.escapeHatches);
+                         clauses.assignables, clauses.accessibles, clauses.hasMod, progVars,
+                         clauses.escapeHatches, clauses.declassifies);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             //System.out.println("escape hatch terms: " + ((FunctionalOperationContractImpl)contract).getEscapeHatches());
             result = result.add(contract);
@@ -843,7 +878,8 @@ public class JMLSpecFactory {
            //System.out.println("HHHHHHHH-2");
            FunctionalOperationContract contract =
                   cf.func(name, pm, false, pres, clauses.measuredBy, posts, axioms,
-                          clauses.assignables, clauses.accessibles, clauses.hasMod, progVars,clauses.escapeHatches);
+                          clauses.assignables, clauses.accessibles, clauses.hasMod, progVars,
+                          clauses.escapeHatches, clauses.declassifies);
            
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
@@ -1194,6 +1230,10 @@ public class JMLSpecFactory {
         ContractClauses clauses =
                 translateJMLClauses(pm, textualSpecCase,
                                     progVars, originalBehavior);
+        
+        //System.out.println("declassifier: *** : " + clauses.declassifies.toString());
+        //System.out.println("number of declassifiers: " + clauses.declassifies.size());
+        //System.out.println("program method: " + pm.getName());
         Map<LocationVariable,Term> posts = generatePostCondition(progVars, clauses, originalBehavior);
         Map<LocationVariable,Term> axioms =
                 generateRepresentsAxioms(progVars, clauses, originalBehavior);

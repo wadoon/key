@@ -595,7 +595,6 @@ requires_keyword
     REQUIRES_RED
 ;
 
-
 generic_spec_body[ImmutableList<String> mods, Behavior b]
 	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
@@ -673,6 +672,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=continues_clause      { sc.addContinues(ps); }
 	|   ps=returns_clause        { sc.addReturns(ps); }	
 	|   ps=escapes_clause      { sc.addEscapeHatches(ps); }
+	|   ps=declassify_clause      { sc.addDeclassify(ps); }
     )
     {
 	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
@@ -712,6 +712,18 @@ escapes_clause
 :
    ESCAPES result=expression { result = result.prepend("escapes "); }
 ;
+
+
+// new annotation for decalssification of information flow
+declassify_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+   DECLASSIFY result=expression { result = result.prepend("declassify "); }
+;
+
 
 assignable_clause
 	returns [PositionedString r = null]

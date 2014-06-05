@@ -69,6 +69,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private Map<String, ImmutableList<PositionedString>>
        escapeHatches =  new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
+    private ImmutableList<PositionedString> declassify =
+          ImmutableSLList.<PositionedString>nil();
+    
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
         super(mods);
@@ -306,6 +309,20 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
        return escapeHatches.get(hName);
     } 
     
+    public ImmutableList<PositionedString> getDeclassify() {
+       return declassify;
+   }
+
+    
+    public void addDeclassify(PositionedString ps) {
+       declassify = declassify.append(ps);
+   }
+
+
+   public void addDeclassify(ImmutableList<PositionedString> l) {
+      declassify = declassify.append(l);
+   }
+    
     public String getName() {
         return name;
     }
@@ -434,6 +451,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("returns: ").append(it.next()).append("\n");
         }
+        //KEG
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+           it = escapeHatches.get(h.toString()).iterator();
+           while(it.hasNext()) {
+             sb.append("escapeHatches<"+h+">: " + it.next() + "\n");
+           }
+         }
+        it = declassify.iterator();
+        while (it.hasNext()) {
+            sb.append("declassify: ").append(it.next()).append("\n");
+        }
+        
         return sb.toString();
     }
 
@@ -458,7 +487,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && depends.equals(sc.depends)
                && breaks.equals(sc.breaks)
                && continues.equals(sc.continues)
-               && returns.equals(sc.returns);
+               && returns.equals(sc.returns)
+               //KEG
+               && escapeHatches.equals(sc.escapeHatches)
+               && declassify.equals(sc.declassify);
     }
 
 
@@ -478,6 +510,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + depends.hashCode()
                + breaks.hashCode()
                + continues.hashCode()
-               + returns.hashCode();
+               + returns.hashCode()
+               + declassify.hashCode()
+               + escapeHatches.hashCode();
     }
 }

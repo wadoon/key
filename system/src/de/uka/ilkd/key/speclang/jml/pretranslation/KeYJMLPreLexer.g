@@ -164,7 +164,10 @@ lexer grammar KeYJMLPreLexer;
     WORKING_SPACE_CALLER 		: 'working_space_caller';
     WORKING_SPACE_REENTRANT 		: 'working_space_reentrant';
     WRITABLE			: 'writable';
-
+    
+    DECLASSIFY		: 'declassify' ;
+    IF				: '\\if' ;
+    LEAK				: '\\leak';
 fragment SL_COMMENT
 @init {
     paraphrase.push("a single-line non-specification comment");

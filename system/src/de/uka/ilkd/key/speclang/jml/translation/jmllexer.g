@@ -184,6 +184,7 @@ SEQDEF : "\\seq_def";
 FROM : "\\from";
 TO : "\\to";
 IF : "\\if";
+LEAK: "\\leak";
 
 DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;
 

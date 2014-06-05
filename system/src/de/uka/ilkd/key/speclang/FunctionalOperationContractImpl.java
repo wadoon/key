@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -58,6 +59,7 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.util.Declassifier;
 import static de.uka.ilkd.key.util.Assert.*;
 
 /**
@@ -92,6 +94,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     //serves for KEG
     Map<LocationVariable,Term> escapeHatches;
+    ImmutableList<Declassifier> declassifies;
     
     /**
      * If a method is strictly pure, it has no modifies clause which could
@@ -193,7 +196,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.transaction            = transaction;
         this.toBeSaved	            = toBeSaved;
         //default escapeHatches clause
-        this.escapeHatches          =null;
+        this.escapeHatches          = new HashMap<LocationVariable, Term>();
+        this.declassifies           = ImmutableSLList.<Declassifier>nil();
     }
 
     
@@ -239,7 +243,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     int id,
                                     boolean toBeSaved,
                                     boolean transaction, TermServices services,
-                                    Map<LocationVariable, Term> escapeHatches) {
+                                    Map<LocationVariable, Term> escapeHatches,
+                                    ImmutableList<Declassifier> declassifies) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;
@@ -286,7 +291,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.transaction            = transaction;
         this.toBeSaved              = toBeSaved;
         //default escapeHatches clause
-        this.escapeHatches          = escapeHatches;
+        this.escapeHatches          = escapeHatches;   
+        this.declassifies           = declassifies;
     }
 
     //-------------------------------------------------------------------------
@@ -1405,7 +1411,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    newId,
                                                    toBeSaved,
                                                    transaction, 
-                                                   services,escapeHatches);
+                                                   services,
+                                                   escapeHatches,
+                                                   declassifies);
     }
 
 
@@ -1434,7 +1442,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    globalDefs,
                                                    id,
                                                    toBeSaved && newKJT.equals(kjt),
-                                                   transaction, services,escapeHatches);
+                                                   transaction, services,
+                                                   escapeHatches,
+                                                   declassifies);
     }
 
 
@@ -1473,9 +1483,18 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                      originalExcVar, atPreVars, originalParamVars);
     }
     
-    //serves KEG
-        
+    //serves KEG        
     public Map<LocationVariable, Term> getEscapeHatches(){
        return escapeHatches;
+    }
+    
+    public ImmutableList<Declassifier> getDeclassifies(){
+       return declassifies;
+    }
+    
+    public boolean hasDeclassifies(){
+       if(declassifies.size()>0)
+          return true;
+       return false;
     }
 }

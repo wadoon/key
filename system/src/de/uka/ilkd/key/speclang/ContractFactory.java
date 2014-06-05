@@ -16,6 +16,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.Declassifier;
 
 /**
  * Contracts should only be created through methods of this class
@@ -188,7 +190,8 @@ public class ContractFactory {
                                                    foci.originalSelfVar, foci.originalParamVars,
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
-                                                   foci.toBeSaved,foci.transaction, services,foci.escapeHatches);
+                                                   foci.toBeSaved,foci.transaction, services,
+                                                   foci.escapeHatches,foci.declassifies);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -318,10 +321,12 @@ public class ContractFactory {
           Map<ProgramVariable, Term> accessibles,
           Map<LocationVariable, Boolean> hasMod,
           ProgramVariableCollection pv,
-          Map<LocationVariable, Term> escapeHatches) {
+          Map<LocationVariable, Term> escapeHatches,
+          ImmutableList<Declassifier> declassifies) {
             return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, axioms,
             mods, accessibles, hasMod, pv, false, mods.get(
-            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,escapeHatches);
+            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
+            escapeHatches, declassifies);
             }
     
     public FunctionalOperationContract func (String baseName,
@@ -358,14 +363,16 @@ public class ContractFactory {
           Map<LocationVariable, Boolean> hasMod,
           ProgramVariableCollection progVars,
           boolean toBeSaved, boolean transaction,
-          Map<LocationVariable, Term> escapeHatches) {
+          Map<LocationVariable, Term> escapeHatches,
+          ImmutableList<Declassifier> declassifies) {
        return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
                 pm.getContainerType(), modality, pres, mby,
                 posts, axioms, mods, accessibles, hasMod,
                 progVars.selfVar, progVars.paramVars,
                 progVars.resultVar, progVars.excVar,
                 progVars.atPreVars, null,
-                Contract.INVALID_ID, toBeSaved, transaction, services,escapeHatches);
+                Contract.INVALID_ID, toBeSaved, transaction, services,
+                escapeHatches,declassifies);
 }
 
     /**

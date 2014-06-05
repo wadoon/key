@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+import de.uka.ilkd.key.util.Declassifier;
 
 /**
  * Wrapper for extracting raw preconditions and postconditions from
@@ -48,7 +49,8 @@ public class ContractWrapper
                 contract.toBeSaved,
                 contract.transaction,
                 contract.services,
-                contract.escapeHatches
+                contract.escapeHatches,
+                contract.declassifies
                 );
     }
     
@@ -98,5 +100,10 @@ public class ContractWrapper
        if(getEscapeHatchTerms().get(0)!=null)
           return true;
        return false;
+    }
+    
+    //added by Huy, serve for conditional delimited release
+    public ImmutableList<Declassifier> getDeclassify(){
+       return declassifies;
     }
 }

@@ -359,7 +359,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = signalsclause
     |   result = signalsonlyclause
     |   result = termexpression
-    |   result = escapesclause  // declassification syntax
+    |   result = escapesclause  // declassification syntax     	
     )
     (SEMI)? EOF
     ;
@@ -385,20 +385,50 @@ assignableclause returns [Term result = null] throws SLTranslationException
     ;
 
 
-declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-{
-    Term declass = null;
-    Term frompart = null;
-    Term topart = null;
-    Term ifpart = null;
+//KEG
+declassifyclause returns  [Declassifier result = Declassifier.EMPTY_DECLASSIFIER] throws SLTranslationException {
+
+    ImmutableList<Term> conds = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> leaks = ImmutableSLList.<Term>nil();  
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();      
+    ImmutableList<Term> tmp ;
 }
 :
-    del:DECLASSIFY declass = predicate
-    (FROM frompart = storeRefUnion)?
-    (TO topart = storeRefUnion)?
-    (IF ifpart = predicate)?
-    { result = translator.translate(del.getText(), ImmutableList.class, declass, frompart, topart, ifpart, services); }
+    DECLASSIFY (NOTHING | decl = leaklist)
+    (   (IF (NOTHING | tmp = ifesclist {conds = conds.append(tmp);}))              
+    )*
+    {//conds = decl.append(conds);
+     //leaks = sep.append(leaks);
+     result = new Declassifier(conds, decl);}
     ;
+
+ifesclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+    Term term = null;
+}
+:
+    term = termexpression {
+       term = translator.translate("\\if", Term.class, term, services);
+       result = result.append(term); 
+     }
+    (COMMA term = termexpression { 
+       term = translator.translate("\\if", Term.class, term, services);
+       result = result.append(term);  })*
+    ;
+
+leaklist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+    Term term = null;
+}
+:
+    term = termexpression {
+       term = translator.translate("\\leak", Term.class, term, services);
+       result = result.append(term); 
+     }
+    (COMMA term = termexpression { 
+       term = translator.translate("\\leak", Term.class, term, services);
+       result = result.append(term);  })*
+    ;
+
+
 
 
 dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SLTranslationException
@@ -510,11 +540,11 @@ escapesclause returns
 {
 }
 :
-    ESCAPES (NOTHING | escapeHatches = infflowspeclist)   
+    ESCAPES (NOTHING | escapeHatches = escapehatchlist)   
  
     ;
 
-infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+escapehatchlist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
     Term term = null;
 }
 :
@@ -526,6 +556,8 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
        term = translator.translate("escapes", Term.class, term, services);
        result = result.append(term);  })*
     ;
+
+
 
 
 signalsclause returns [Term result=null] throws SLTranslationException
