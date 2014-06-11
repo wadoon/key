@@ -25,7 +25,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.util.Declassifier;
+import de.uka.ilkd.key.util.DelimitedRelease;
 
 import java.util.Iterator;
 import java.util.List;
@@ -58,7 +58,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final Term origAtPre;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final ImmutableList<Declassifier> origInfFlowSpecs;
+    private final ImmutableList<DelimitedRelease> origInfFlowSpecs;
     
     
     
@@ -90,7 +90,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           Term exc,
                                           Term heapAtPre,
                                           Term dep,
-                                          ImmutableList<Declassifier> declassificationSpecs,
+                                          ImmutableList<DelimitedRelease> declassificationSpecs,
                                           boolean toBeSaved,
                                           int id,TermServices services
                                           ) {
@@ -157,7 +157,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        Term exc,
                                        Term heapAtPre,
                                        Term dep,
-                                       ImmutableList<Declassifier> declassificationSpecs,
+                                       ImmutableList<DelimitedRelease> declassificationSpecs,
                                        boolean toBeSaved,TermServices services) {
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
              hasRealMod, self, params, result, exc, heapAtPre, dep, declassificationSpecs,
@@ -376,13 +376,13 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     
-    private String getHTMLFor(ImmutableList<Declassifier> originalInfFlowSpecs,
+    private String getHTMLFor(ImmutableList<DelimitedRelease> originalInfFlowSpecs,
                               String htmlName,
                               Services services) {
         String infFlowSpecString = "";
         if (hasDeclassificationSpec()) {
             infFlowSpecString = "<br><b>" + htmlName + "</b> ";
-            for (Declassifier infFlowSpec : originalInfFlowSpecs) {
+            for (DelimitedRelease infFlowSpec : originalInfFlowSpecs) {
                 infFlowSpecString += "(" + getHTMLFor(infFlowSpec.leaks, services) + ")";               
             }
         }
@@ -513,7 +513,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public ImmutableList<Declassifier> getInformationFlowSecurity() {
+    public ImmutableList<DelimitedRelease> getInformationFlowSecurity() {
         return origInfFlowSpecs;
     }
 

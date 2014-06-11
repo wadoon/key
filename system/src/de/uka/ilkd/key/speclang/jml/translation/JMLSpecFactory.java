@@ -78,7 +78,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
-import de.uka.ilkd.key.util.Declassifier;
+import de.uka.ilkd.key.util.DelimitedRelease;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -123,8 +123,9 @@ public class JMLSpecFactory {
         public ImmutableList<Term> abbreviations = ImmutableSLList.<Term>nil();
         public Map<LocationVariable,Term> requires = new LinkedHashMap<LocationVariable,Term>();
         //serve KEG
-        public Map<LocationVariable,Term> escapeHatches = new LinkedHashMap<LocationVariable,Term>();
-        public ImmutableList<Declassifier> declassifies = ImmutableSLList.<Declassifier>nil();
+        //public Map<LocationVariable,Term> escapeHatches = new LinkedHashMap<LocationVariable,Term>();
+        public ImmutableList<DelimitedRelease> escapeHatches = ImmutableSLList.<DelimitedRelease>nil();
+        public ImmutableList<DelimitedRelease> declassifies = ImmutableSLList.<DelimitedRelease>nil();
         
         public Term measuredBy;
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
@@ -314,7 +315,7 @@ public class JMLSpecFactory {
                                            originalBehavior,
                                            textualSpecCase.getEnsures(heap.name().toString())));
           }
-           
+           /* old escape hatches handler
            if(heap == savedHeap && textualSpecCase.getEscapeHatches(heap.name().toString()).isEmpty()) {
               clauses.escapeHatches.put(heap, null);
             }else{
@@ -324,7 +325,12 @@ public class JMLSpecFactory {
                                             progVars.atPres,
                                             originalBehavior,
                                             textualSpecCase.getEscapeHatches(heap.name().toString())));
-           }
+           }*/
+           clauses.escapeHatches = translateDeclassifyClauses(pm, progVars.selfVar, 
+                 progVars.paramVars, 
+                 progVars.resultVar, 
+                 textualSpecCase.getEscapeHatches());
+           
           if(textualSpecCase.getAxioms(heap.name().toString()).isEmpty()) {
         	  clauses.axioms.put(heap, null);
           }else{
@@ -619,7 +625,8 @@ public class JMLSpecFactory {
                                        originalClauses);
         }
     }
-
+    /* 
+     old escape hatches clause translate
     private Term translateEscapes(IProgramMethod pm,
           ProgramVariable selfVar,
           ImmutableList<ProgramVariable> paramVars,
@@ -650,9 +657,32 @@ public class JMLSpecFactory {
        } 
        
        return result;
+    }  */
+    
+    private ImmutableList<DelimitedRelease>
+    translateEscapes(IProgramMethod pm,
+                                ProgramVariable selfVar,
+                                ImmutableList<ProgramVariable> paramVars,
+                                ProgramVariable resultVar,
+                                ImmutableList<PositionedString> originalClauses)
+        throws SLTranslationException {
+    if (originalClauses.isEmpty()) {
+        return ImmutableSLList.<DelimitedRelease>nil();
+    } else {
+        ImmutableList<DelimitedRelease> result =
+                                 ImmutableSLList.<DelimitedRelease>nil();
+        for (PositionedString expr : originalClauses) {
+            DelimitedRelease translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                                selfVar, paramVars, resultVar,
+                                                null, null, DelimitedRelease.class, services);
+            result = result.append(translated);
+        }
+        return result;
+    }
     }
     
-    private ImmutableList<Declassifier>
+    private ImmutableList<DelimitedRelease>
     translateDeclassifyClauses(IProgramMethod pm,
                                 ProgramVariable selfVar,
                                 ImmutableList<ProgramVariable> paramVars,
@@ -660,15 +690,15 @@ public class JMLSpecFactory {
                                 ImmutableList<PositionedString> originalClauses)
         throws SLTranslationException {
     if (originalClauses.isEmpty()) {
-        return ImmutableSLList.<Declassifier>nil();
+        return ImmutableSLList.<DelimitedRelease>nil();
     } else {
-        ImmutableList<Declassifier> result =
-                                 ImmutableSLList.<Declassifier>nil();
+        ImmutableList<DelimitedRelease> result =
+                                 ImmutableSLList.<DelimitedRelease>nil();
         for (PositionedString expr : originalClauses) {
-            Declassifier translated =
+            DelimitedRelease translated =
                         JMLTranslator.translate(expr, pm.getContainerType(),
                                                 selfVar, paramVars, resultVar,
-                                                null, null, Declassifier.class, services);
+                                                null, null, DelimitedRelease.class, services);
             result = result.append(translated);
         }
         return result;

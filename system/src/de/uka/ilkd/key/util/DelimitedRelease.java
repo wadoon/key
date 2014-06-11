@@ -16,8 +16,8 @@ import de.uka.ilkd.key.logic.Term;
  * @author Huy Do
  *
  */
-public class Declassifier {
-   public static final Declassifier EMPTY_DECLASSIFIER = new Declassifier();
+public class DelimitedRelease {
+   public static final DelimitedRelease EMPTY_DECLASSIFIER = new DelimitedRelease();
    
    //represent conditional delimited release. Map(A,B) represents: if formula A holds then expression B is allowed to be leaked
    //private final Map<Term, Term> declassifications;
@@ -27,13 +27,13 @@ public class Declassifier {
    /**
     * @param declassification
     */
-   public Declassifier(ImmutableList<Term> conditions, ImmutableList<Term> leaks) {
+   public DelimitedRelease(ImmutableList<Term> conditions, ImmutableList<Term> leaks) {
       super();
       this.conditions = conditions;
       this.leaks = leaks;
    }
       
-   private Declassifier() {
+   private DelimitedRelease() {
       this.conditions = ImmutableSLList.<Term>nil();
       this.leaks = ImmutableSLList.<Term>nil();
    }   

@@ -66,8 +66,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
       axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     //declassification
-    private Map<String, ImmutableList<PositionedString>>
-       escapeHatches =  new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    //private Map<String, ImmutableList<PositionedString>>
+      // escapeHatches =  new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private ImmutableList<PositionedString> escapeHatches =
+          ImmutableSLList.<PositionedString>nil();
     
     private ImmutableList<PositionedString> declassify =
           ImmutableSLList.<PositionedString>nil();
@@ -84,7 +86,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           accessibles.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           accessibles.put(hName.toString()+"AtPre", ImmutableSLList.<PositionedString>nil());
           axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          escapeHatches.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          //escapeHatches.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
 
@@ -236,8 +238,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     
     // --------- added by Huy -----------
     public void addEscapeHatches(PositionedString ps) {
-       addGeneric(escapeHatches, ps);
-
+       //addGeneric(escapeHatches, ps);
+       escapeHatches = escapeHatches.append(ps);
    }
 
 
@@ -302,12 +304,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     
     //serve KEG
     public ImmutableList<PositionedString> getEscapeHatches(){
-       return escapeHatches.get(HeapLDT.BASE_HEAP_NAME.toString());
+       //return escapeHatches.get(HeapLDT.BASE_HEAP_NAME.toString());
+       return escapeHatches;
     } 
-    
+    /*
     public ImmutableList<PositionedString> getEscapeHatches(String hName){
        return escapeHatches.get(hName);
-    } 
+    } */
     
     public ImmutableList<PositionedString> getDeclassify() {
        return declassify;
@@ -452,12 +455,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             sb.append("returns: ").append(it.next()).append("\n");
         }
         //KEG
+        /*
         for(Name h : HeapLDT.VALID_HEAP_NAMES) {
            it = escapeHatches.get(h.toString()).iterator();
            while(it.hasNext()) {
              sb.append("escapeHatches<"+h+">: " + it.next() + "\n");
            }
-         }
+         }*/
+        it = escapeHatches.iterator();
+        while (it.hasNext()) {
+            sb.append("escapeHatches: ").append(it.next()).append("\n");
+        }
+        
         it = declassify.iterator();
         while (it.hasNext()) {
             sb.append("declassify: ").append(it.next()).append("\n");

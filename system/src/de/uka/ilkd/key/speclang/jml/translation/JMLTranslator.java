@@ -330,6 +330,7 @@ final class JMLTranslator {
         });
         
         /*KEG*/
+        /*
         translationMethods.put(JMLKeyWord.ESCAPEHATCH, new JMLTranslationMethod() {
 
            @Override
@@ -340,7 +341,7 @@ final class JMLTranslator {
                Term escapehatch = (Term) params[0];
                return escapehatch;
            }
-       });
+       });*/
         
         translationMethods.put(JMLKeyWord.IF_ESC, new JMLTranslationMethod() {
 

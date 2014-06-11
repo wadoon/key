@@ -37,7 +37,7 @@ import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
-import de.uka.ilkd.key.util.Declassifier;
+import de.uka.ilkd.key.util.DelimitedRelease;
 
 /**
  * Contracts should only be created through methods of this class
@@ -191,7 +191,7 @@ public class ContractFactory {
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
                                                    foci.toBeSaved,foci.transaction, services,
-                                                   foci.escapeHatches,foci.declassifies);
+                                                   foci.escapeHatches);//,foci.declassifies);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -321,8 +321,8 @@ public class ContractFactory {
           Map<ProgramVariable, Term> accessibles,
           Map<LocationVariable, Boolean> hasMod,
           ProgramVariableCollection pv,
-          Map<LocationVariable, Term> escapeHatches,
-          ImmutableList<Declassifier> declassifies) {
+          ImmutableList<DelimitedRelease> escapeHatches,
+          ImmutableList<DelimitedRelease> declassifies) {
             return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, axioms,
             mods, accessibles, hasMod, pv, false, mods.get(
             services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
@@ -363,8 +363,8 @@ public class ContractFactory {
           Map<LocationVariable, Boolean> hasMod,
           ProgramVariableCollection progVars,
           boolean toBeSaved, boolean transaction,
-          Map<LocationVariable, Term> escapeHatches,
-          ImmutableList<Declassifier> declassifies) {
+          ImmutableList<DelimitedRelease> escapeHatches,
+          ImmutableList<DelimitedRelease> declassifies) {
        return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
                 pm.getContainerType(), modality, pres, mby,
                 posts, axioms, mods, accessibles, hasMod,
@@ -372,7 +372,7 @@ public class ContractFactory {
                 progVars.resultVar, progVars.excVar,
                 progVars.atPreVars, null,
                 Contract.INVALID_ID, toBeSaved, transaction, services,
-                escapeHatches,declassifies);
+                escapeHatches);//,declassifies);
 }
 
     /**

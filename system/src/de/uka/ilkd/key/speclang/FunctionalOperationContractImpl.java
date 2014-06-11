@@ -59,7 +59,7 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.util.Declassifier;
+import de.uka.ilkd.key.util.DelimitedRelease;
 import static de.uka.ilkd.key.util.Assert.*;
 
 /**
@@ -93,8 +93,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final boolean toBeSaved;
 
     //serves for KEG
-    Map<LocationVariable,Term> escapeHatches;
-    ImmutableList<Declassifier> declassifies;
+    //Map<LocationVariable,Term> escapeHatches;
+    ImmutableList<DelimitedRelease> escapeHatches;
+    //ImmutableList<DelimitedRelease> declassifies;
     
     /**
      * If a method is strictly pure, it has no modifies clause which could
@@ -196,8 +197,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.transaction            = transaction;
         this.toBeSaved	            = toBeSaved;
         //default escapeHatches clause
-        this.escapeHatches          = new HashMap<LocationVariable, Term>();
-        this.declassifies           = ImmutableSLList.<Declassifier>nil();
+        //this.escapeHatches          = new HashMap<LocationVariable, Term>();
+        this.escapeHatches           = ImmutableSLList.<DelimitedRelease>nil();
+        //this.declassifies           = ImmutableSLList.<DelimitedRelease>nil();
     }
 
     
@@ -243,8 +245,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     int id,
                                     boolean toBeSaved,
                                     boolean transaction, TermServices services,
-                                    Map<LocationVariable, Term> escapeHatches,
-                                    ImmutableList<Declassifier> declassifies) {
+                                    //Map<LocationVariable, Term> escapeHatches,
+                                    ImmutableList<DelimitedRelease> escapeHatches){
+                                    //ImmutableList<DelimitedRelease> declassifies) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;
@@ -292,7 +295,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.toBeSaved              = toBeSaved;
         //default escapeHatches clause
         this.escapeHatches          = escapeHatches;   
-        this.declassifies           = declassifies;
+        //this.declassifies           = declassifies;
     }
 
     //-------------------------------------------------------------------------
@@ -1412,8 +1415,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    toBeSaved,
                                                    transaction, 
                                                    services,
-                                                   escapeHatches,
-                                                   declassifies);
+                                                   escapeHatches);
+                                                   /*,declassifies);*/
     }
 
 
@@ -1443,8 +1446,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    id,
                                                    toBeSaved && newKJT.equals(kjt),
                                                    transaction, services,
-                                                   escapeHatches,
-                                                   declassifies);
+                                                   escapeHatches);
+                                                   //declassifies);
     }
 
 
@@ -1484,17 +1487,29 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
     
     //serves KEG        
+    /*
     public Map<LocationVariable, Term> getEscapeHatches(){
+       return escapeHatches;
+    }*/
+    public ImmutableList<DelimitedRelease> getEscapeHatches(){
        return escapeHatches;
     }
     
-    public ImmutableList<Declassifier> getDeclassifies(){
-       return declassifies;
+    public boolean hasEscapeHatches(){
+       if(escapeHatches.size()>0)
+          return true;
+       return false;
     }
     
+    /*
+    public ImmutableList<DelimitedRelease> getDeclassifies(){
+       return declassifies;
+    }*/
+    
+    /*
     public boolean hasDeclassifies(){
        if(declassifies.size()>0)
           return true;
        return false;
-    }
+    }*/
 }
