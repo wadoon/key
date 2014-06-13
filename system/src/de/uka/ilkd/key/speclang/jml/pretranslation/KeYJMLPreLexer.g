@@ -168,6 +168,7 @@ lexer grammar KeYJMLPreLexer;
     DECLASSIFY		: 'declassify' ;
     IF				: '\\if' ;
     LEAK				: '\\leak';
+    TO				: '\\to';
 fragment SL_COMMENT
 @init {
     paraphrase.push("a single-line non-specification comment");

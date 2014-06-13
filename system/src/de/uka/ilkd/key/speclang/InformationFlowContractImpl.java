@@ -383,7 +383,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         if (hasDeclassificationSpec()) {
             infFlowSpecString = "<br><b>" + htmlName + "</b> ";
             for (DelimitedRelease infFlowSpec : originalInfFlowSpecs) {
-                infFlowSpecString += "(" + getHTMLFor(infFlowSpec.leaks, services) + ")";               
+                infFlowSpecString += "(" + getHTMLFor(infFlowSpec.escapeHatches, services) + ")";               
             }
         }
         return infFlowSpecString;

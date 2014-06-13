@@ -38,7 +38,7 @@ header {
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
-    import de.uka.ilkd.key.util.Declassifier;
+    import de.uka.ilkd.key.util.DelimitedRelease;
 
     import java.math.BigInteger;
     import java.util.List;
@@ -386,24 +386,25 @@ assignableclause returns [Term result = null] throws SLTranslationException
 
 
 //KEG
-escapesclause returns  [Declassifier result = Declassifier.EMPTY_DECLASSIFIER] throws SLTranslationException {
+escapesclause returns  [DelimitedRelease result = DelimitedRelease.EMPTY_DelimitedRelease] throws SLTranslationException {
 
+    ImmutableList<Term> esc = ImmutableSLList.<Term>nil();  
     ImmutableList<Term> conds = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> leaks = ImmutableSLList.<Term>nil();  
-    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();      
+    ImmutableList<Term> to = ImmutableSLList.<Term>nil(); 
+        
     ImmutableList<Term> tmp ;
 }
 :
-    ESCAPES (NOTHING | decl = leaklist)
-    (   (IF (NOTHING | tmp = ifesclist {conds = conds.append(tmp);}))              
+    ESCAPES (NOTHING | esc = leaklist)
+    (   (IF (NOTHING | tmp = ifesclist {conds = conds.append(tmp);})) |  
+        (TO (NOTHING | to = leaklist))       
     )*
-    {//conds = decl.append(conds);
-     //leaks = sep.append(leaks);
-     result = new Declassifier(conds, decl);}
+    {
+     result = new DelimitedRelease(conds, esc, to);}
     ;
 
 
-declassifyclause returns  [Declassifier result = Declassifier.EMPTY_DECLASSIFIER] throws SLTranslationException {
+declassifyclause returns  [DelimitedRelease result = DelimitedRelease.EMPTY_DelimitedRelease] throws SLTranslationException {
 
     ImmutableList<Term> conds = ImmutableSLList.<Term>nil();
     ImmutableList<Term> leaks = ImmutableSLList.<Term>nil();  
@@ -412,11 +413,11 @@ declassifyclause returns  [Declassifier result = Declassifier.EMPTY_DECLASSIFIER
 }
 :
     DECLASSIFY (NOTHING | decl = leaklist)
-    (   (IF (NOTHING | tmp = ifesclist {conds = conds.append(tmp);}))              
+    (   (IF (NOTHING | tmp = ifesclist {conds = conds.append(tmp);}))          
     )*
     {//conds = decl.append(conds);
      //leaks = sep.append(leaks);
-     result = new Declassifier(conds, decl);}
+     result = new DelimitedRelease(conds, decl);}
     ;
 
 ifesclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
