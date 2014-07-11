@@ -17,4 +17,4 @@ included in these files.
 The following command line arguments where used:
    -hide -list JAVALANG.TXT -hideType float -hideType double rt.jar
 
-Some files were edited by hand afterwards (Object, Class, and all exception types) to remove method stubs, to add bodies to method or constructors (being empty or calling super()), or to add JML specifications. TODO: This is very inconsistent and undocumented.
+Some files were edited by hand afterwards (Object, Class, Thread, and all exception types) to remove method stubs, to add bodies to method or constructors (being empty or calling super()), or to add JML specifications. TODO: This is very inconsistent and undocumented.
