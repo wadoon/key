@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.List;
@@ -27,6 +25,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -36,11 +35,12 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
-   private boolean autoMode;
 
    /**
     * The used {@link PropertyChangeSupport}.
@@ -80,7 +80,16 @@ public abstract class AbstractUserInterface implements UserInterface {
         return !(getMacro() instanceof SkipMacro);
     }
 
-    public boolean applyMacro() {
+    @Override
+    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, 
+          ProofAggregate proofList, InitConfig initConfig) {
+       final ProofEnvironment env = new ProofEnvironment(initConfig); 
+       env.addProofEnvironmentListener(this);
+       env.registerProof(proofOblInput, proofList);
+       return env;
+    }
+
+   public boolean applyMacro() {
         assert macroChosen();
         if (getMacro().canApplyTo(getMediator(), null)) {
             System.out.println(getMacroConsoleOutput());
@@ -139,7 +148,9 @@ public abstract class AbstractUserInterface implements UserInterface {
     @Override
     public Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException {
        ProblemInitializer init = createProblemInitializer(initConfig.getProfile());
-       return init.startProver(initConfig, input, 0);
+       ProofAggregate proofList = init.startProver(initConfig, input);
+       createProofEnvironmentAndRegisterProof(input, proofList, initConfig);
+       return proofList.getFirstProof();
     }
     
     /**
@@ -193,125 +204,24 @@ public abstract class AbstractUserInterface implements UserInterface {
        }
     }
 
-    @Override
-    public boolean isAutoMode() {
-        return autoMode;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyAutoModeBeingStarted() {
-       boolean oldValue = isAutoMode();
-       autoMode = true;
-       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyAutomodeStopped() {
-       boolean oldValue = isAutoMode();
-       autoMode = false;
-       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        pcs.addPropertyChangeListener(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        pcs.addPropertyChangeListener(propertyName, listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        pcs.removePropertyChangeListener(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        pcs.removePropertyChangeListener(propertyName, listener);
-    }
-
-    /**
-     * Fires the event to all available listeners.
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-
-    /**
-     * Fires the event to all available listeners.
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-
-    /**
-     * Fires the event to all available listeners.
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-
-    /**
-     * Fires the event to all listeners.
-     * @param evt The event to fire.
-     */
-    protected void firePropertyChange(PropertyChangeEvent evt) {
-        pcs.firePropertyChange(evt);
-    }
-
-    /**
-     * Fires the event to all listeners.
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
-    }
-
-    /**
-     * Fires the event to all listeners.
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
-    }
-
-    /**
-     * Fires the event to all listeners.
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
+    public void proofUnregistered(ProofEnvironmentEvent event) {
+       if (event.getSource().getProofs().isEmpty()) {
+          event.getSource().removeProofEnvironmentListener(this);
+       }
     }
 }
