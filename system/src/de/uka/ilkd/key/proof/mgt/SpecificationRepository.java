@@ -29,7 +29,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -75,6 +74,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
+import de.uka.ilkd.key.speclang.RelyGuaranteeSpecification;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.StatementWellDefinedness;
@@ -119,6 +119,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<LoopStatement, LoopInvariant>();
     private final Map<StatementBlock, ImmutableSet<BlockContract>> blockContracts =
             new LinkedHashMap<StatementBlock, ImmutableSet<BlockContract>>();
+    private final Map<KeYJavaType, RelyGuaranteeSpecification> threadSpecs = // TODO currently only one thread spec
+                    new LinkedHashMap<KeYJavaType, RelyGuaranteeSpecification>();
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited =
@@ -845,6 +847,24 @@ public final class SpecificationRepository {
         }
         return result;
     }
+    
+    public RelyGuaranteeSpecification getThreadSpecification (KeYJavaType kjt) {
+        return threadSpecs.get(kjt);
+    }
+    
+    public void addThreadSpecification (RelyGuaranteeSpecification rgs) {
+        KeYJavaType kjt = rgs.getKJT();
+        if (threadSpecs.get(kjt) != null)
+            // TODO: allow more?
+            throw new IllegalStateException("Thread specification for thread type "+kjt
+                +" already registered.");
+        threadSpecs.put(kjt, rgs);
+    }
+    
+    public void addThreadSpecifications (Iterable<RelyGuaranteeSpecification> specs) {
+        for (RelyGuaranteeSpecification rgs: specs)
+            addThreadSpecification(rgs);
+    }
 
     /**
      * Returns all functions for which contracts are registered in the passed
@@ -1488,6 +1508,8 @@ public final class SpecificationRepository {
                 addLoopInvariant((LoopInvariant) spec);
             } else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
+            } else if (spec instanceof RelyGuaranteeSpecification) {
+                addThreadSpecification((RelyGuaranteeSpecification)spec);
             } else {
                 assert false : "unexpected spec: " + spec + "\n("
                         + spec.getClass() + ")";
