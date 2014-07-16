@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 
-public class RelyGuaranteeSpecification implements SpecificationElement {
+public class ThreadSpecification implements SpecificationElement {
     
     private final static VisibilityModifier VM = new Public();
     private final String name;
@@ -25,7 +25,7 @@ public class RelyGuaranteeSpecification implements SpecificationElement {
     private final LocationVariable prevHeapVar, currHeapVar;
     private final ProgramVariable threadVar;
     
-    public RelyGuaranteeSpecification (String name, String displayName, 
+    public ThreadSpecification (String name, String displayName, 
                     KeYJavaType threadType,
                     Term rely, Term guarantee, Term assignable, Term notChanged,
                     LocationVariable prevHeapVar, LocationVariable currHeapVar,

@@ -74,7 +74,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
-import de.uka.ilkd.key.speclang.RelyGuaranteeSpecification;
+import de.uka.ilkd.key.speclang.ThreadSpecification;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.StatementWellDefinedness;
@@ -119,8 +119,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<LoopStatement, LoopInvariant>();
     private final Map<StatementBlock, ImmutableSet<BlockContract>> blockContracts =
             new LinkedHashMap<StatementBlock, ImmutableSet<BlockContract>>();
-    private final Map<KeYJavaType, RelyGuaranteeSpecification> threadSpecs = // TODO currently only one thread spec
-                    new LinkedHashMap<KeYJavaType, RelyGuaranteeSpecification>();
+    private final Map<KeYJavaType, ThreadSpecification> threadSpecs = // TODO currently only one thread spec
+                    new LinkedHashMap<KeYJavaType, ThreadSpecification>();
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited =
@@ -848,11 +848,11 @@ public final class SpecificationRepository {
         return result;
     }
     
-    public RelyGuaranteeSpecification getThreadSpecification (KeYJavaType kjt) {
+    public ThreadSpecification getThreadSpecification (KeYJavaType kjt) {
         return threadSpecs.get(kjt);
     }
     
-    public void addThreadSpecification (RelyGuaranteeSpecification rgs) {
+    public void addThreadSpecification (ThreadSpecification rgs) {
         KeYJavaType kjt = rgs.getKJT();
         if (threadSpecs.get(kjt) != null)
             // TODO: allow more?
@@ -861,8 +861,8 @@ public final class SpecificationRepository {
         threadSpecs.put(kjt, rgs);
     }
     
-    public void addThreadSpecifications (Iterable<RelyGuaranteeSpecification> specs) {
-        for (RelyGuaranteeSpecification rgs: specs)
+    public void addThreadSpecifications (Iterable<ThreadSpecification> specs) {
+        for (ThreadSpecification rgs: specs)
             addThreadSpecification(rgs);
     }
 
@@ -1508,8 +1508,8 @@ public final class SpecificationRepository {
                 addLoopInvariant((LoopInvariant) spec);
             } else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
-            } else if (spec instanceof RelyGuaranteeSpecification) {
-                addThreadSpecification((RelyGuaranteeSpecification)spec);
+            } else if (spec instanceof ThreadSpecification) {
+                addThreadSpecification((ThreadSpecification)spec);
             } else {
                 assert false : "unexpected spec: " + spec + "\n("
                         + spec.getClass() + ")";
