@@ -377,6 +377,10 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
+    /**
+     * Store formulas to be proven.
+     * @param poTerms formulas to be proven
+     */
     protected void assignPOTerms(Term... poTerms) {
         this.poTerms = poTerms;
     }

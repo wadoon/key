@@ -1248,6 +1248,14 @@ public class TermBuilder {
             return func(integerLDT.getAdd(), t1, t2);
         }
     }
+    
+    public Term sub(Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Term zero = integerLDT.zero();
+        if (t2.equals(zero))
+            return t1;
+        else return func(integerLDT.getSub(), t1, t2);
+    }
 
     public Term inByte(Term var) {
         Function f =

@@ -106,5 +106,12 @@ public class ThreadSpecification implements SpecificationElement {
         res.put(tb.var(threadVar), threadVar2);
         return res;
     }
+    
+    @Override
+    public String toString() {
+        return "rely: "+rely+"; guarantee: "+guarantee
+                        +"; assignable: "+assignable
+                        +"; notChanged: "+notChanged;
+    }
 
 }
