@@ -75,7 +75,8 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term guard = tb.and(tb.lt(tb.zero(), idx), tb.lt(idx, tb.seqLen(heaps)));
         final Term traceProp = tb.all(iVar, tb.imp(guard, tb.and(frame,guar)));
         
-        final Term prog = tb.prog(Modality.BOX, jb, traceProp);
+        final Modality modality = Modality.DIA; // XXX: only diamond for uniform translation
+        final Term prog = tb.prog(modality, jb, traceProp);
         final Term upd = tb.elementary(tb.var(heapsVar), tb.seqSingleton(tb.getBaseHeap()));
         final Term result = tb.apply(upd, prog);
         assignPOTerms(result);
