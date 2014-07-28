@@ -53,6 +53,7 @@ implements IExecutionContext, Reference {
      */
     public ExecutionContext(TypeReference classContext, 
                     IProgramMethod methodContext, ReferencePrefix runtimeInstance, TypeReference threadContext, ReferencePrefix runtimeThread) {
+        assert (threadContext==null)==(runtimeThread==null);
         this.classContext = classContext;
         this.methodContext = methodContext;
         this.runtimeInstance = runtimeInstance;

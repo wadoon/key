@@ -271,13 +271,17 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     }
 
     /**
-     * translate exection contexts
+     * translate execution contexts
      */
     public ExecutionContext convert(
             de.uka.ilkd.key.java.recoderext.ExecutionContext ec) {
+        final boolean threaded = ec.getThreadTypeReference() != null;
         return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()), 
                                     (IProgramMethod) callConvert(ec.getMethodContext()),
-				                        ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null);
+				                        ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null,
+				                        threaded? (TypeReference) callConvert(ec.getThreadTypeReference()): null,
+				                        threaded? (ReferencePrefix) callConvert(ec.getRuntimeThreadInstance()): null
+				                    );
     }
 
     // ----- Schema Variables

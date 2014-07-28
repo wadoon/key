@@ -256,6 +256,14 @@ ExpressionContainer {
     public ReferencePrefix getRuntimeInstance() {
         return runtimeInstance;
     }
+    
+    public TypeReference getThreadTypeReference() {
+        return threadContext;
+    }
+    
+    public ReferencePrefix getRuntimeThreadInstance() {
+        return runtimeThread;
+    }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
     }

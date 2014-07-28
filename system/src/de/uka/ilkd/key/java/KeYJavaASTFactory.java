@@ -925,7 +925,7 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
-     * Create an execution context.
+     * Create an execution context without thread context.
      * 
      * @param classType
      *            the enclosing class {@link KeYJavaType}
@@ -946,6 +946,31 @@ public abstract class KeYJavaASTFactory {
 		reference);
 
 	return context;
+    }
+
+    /**
+     * Create a full execution context, including thread context.
+     * 
+     * @param classType
+     *            the enclosing class {@link KeYJavaType}
+     * @param method
+     *            the enclosing {@link IProgramMethod} defined in
+     *            <code>classType</code>
+     * @param reference
+     *            the {@link ReferencePrefix} <code>method</code> is called on
+     * @return a new {@link ExecutionContext} for calls on
+     *         <code>reference</code> to <code>method</code> from
+     *         <code>classType</code>
+     */
+    public static ExecutionContext executionContext(
+                    final KeYJavaType classType, final IProgramMethod method,
+                    final ReferencePrefix reference,
+                    final KeYJavaType threadType, final ReferencePrefix thread) {
+        final TypeRef type = new TypeRef(classType);
+        final TypeRef type2 = new TypeRef(threadType);
+        final ExecutionContext context = new ExecutionContext(type, method,
+                        reference, type2, thread);
+        return context;
     }
 
     /**

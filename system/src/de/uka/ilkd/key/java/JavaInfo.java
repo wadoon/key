@@ -40,6 +40,7 @@ import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -71,6 +72,7 @@ import de.uka.ilkd.key.util.Pair;
 public final class JavaInfo {
 
 
+    private static final String THREAD = "java.lang.Thread";
     protected Services services;
     private KeYProgModelInfo kpmi;
 
@@ -82,10 +84,10 @@ public final class JavaInfo {
     /**
      * as accessed very often caches:
      * KeYJavaType of
-     *    java.lang.Object, java.lang.Clonable, java.io.Serializable
+     *    java.lang.Object, java.lang.Clonable, java.io.Serializable, java.lang.Thread
      * in </em>in this order</em>
      */
-    protected KeYJavaType[] commonTypes = new KeYJavaType[3];
+    protected KeYJavaType[] commonTypes = new KeYJavaType[4];
 
     //some caches for the getKeYJavaType methods.
     private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
@@ -876,7 +878,7 @@ public final class JavaInfo {
     }
 
     /**
-     * returns the programvariable for the specified attribute. The attribute
+     * returns the program variable for the specified attribute. The attribute
      * has to be fully qualified, i.e. <tt>declarationType::attributeName</tt>
      * @param fullyQualifiedName the String with the fully qualified attribute
      * name
@@ -898,7 +900,7 @@ public final class JavaInfo {
 
 
     /**
-     * returns the programvariable for the specified attribute declared in
+     * returns the program variable for the specified attribute declared in
      * the specified class
      * @param programName the String with the name of the attribute
      * @param qualifiedClassName the String with the full (inclusive package) qualified
@@ -1074,6 +1076,16 @@ public final class JavaInfo {
     }
 
     /**
+     * returns the KeYJavaType for class <tt>java.lang.Thread</tt>
+     */
+    public KeYJavaType getJavaLangThread() {
+        if (commonTypes[3] == null) {
+            commonTypes[3] = getTypeByClassName(THREAD);
+        }
+        return commonTypes[3];
+    }
+
+    /**
      * returns the KeYJavaType for class java.lang.Object
      */
     public Sort objectSort() {
@@ -1144,8 +1156,10 @@ public final class JavaInfo {
             }
             final KeYJavaType kjt =
                 getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            final TypeReference threadClass = new TypeRef(getJavaLangThread());
+            final ReferencePrefix runtimeThread = null; // TODO
             defaultExecutionContext =
-                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
+                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null, threadClass, runtimeThread);
         }
         return defaultExecutionContext;
     }

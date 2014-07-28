@@ -2818,15 +2818,21 @@ public class PrettyPrinter {
     }
 
     public void printExecutionContext(ExecutionContext x) 
-	throws java.io.IOException {
-	write("source=");
-	writeFullMethodSignature(x.getMethodContext());
-	write("@");
-	writeElement(x.getTypeReference());
-	if (x.getRuntimeInstance() != null) {
-	    write(",this=");
-	    writeElement(x.getRuntimeInstance());
-	}
+                    throws java.io.IOException {
+        write("source=");
+        writeFullMethodSignature(x.getMethodContext());
+        write("@");
+        writeElement(x.getTypeReference());
+        if (x.getRuntimeInstance() != null) {
+            write(",this=");
+            writeElement(x.getRuntimeInstance());
+        }
+        if (x.getThreadTypeReference() != null) {
+            write(",threadClass=");
+            writeElement(x.getThreadTypeReference());
+            write(",thread=");
+            writeElement(x.getRuntimeThreadInstance());
+        }
     }
 
     public void printSuperConstructorReference(SuperConstructorReference x) 
