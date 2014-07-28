@@ -1157,7 +1157,7 @@ public final class JavaInfo {
             final KeYJavaType kjt =
                 getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             final TypeReference threadClass = new TypeRef(getJavaLangThread());
-            final ReferencePrefix runtimeThread = null; // TODO
+            final ReferencePrefix runtimeThread = new LocationVariable(new ProgramElementName("thread"),getJavaLangThread());
             defaultExecutionContext =
                 new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null, threadClass, runtimeThread);
         }
