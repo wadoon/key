@@ -39,6 +39,9 @@ implements IExecutionContext, Reference {
      * the currently active method
      */
     private IProgramMethod methodContext;
+    
+    private final TypeReference threadContext;
+    private final ReferencePrefix runtimeThread;
 
     /**
      * creates an execution context reference
@@ -49,12 +52,21 @@ implements IExecutionContext, Reference {
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-                    IProgramMethod methodContext, ReferencePrefix runtimeInstance) {
+                    IProgramMethod methodContext, ReferencePrefix runtimeInstance, TypeReference threadContext, ReferencePrefix runtimeThread) {
         this.classContext = classContext;
         this.methodContext = methodContext;
         this.runtimeInstance = runtimeInstance;
+        this.threadContext = threadContext;
+        this.runtimeThread = runtimeThread;
     }
-
+    
+    // TODO: temporary compatability hack
+    @Deprecated
+    public ExecutionContext(TypeReference classContext, 
+                    IProgramMethod methodContext, ReferencePrefix runtimeInstance) {
+        this(classContext, methodContext, runtimeInstance, null, null);
+    }
+    
     /**
      * creates an execution context reference
      * @param children an ExtList with the required children of the execution
@@ -65,6 +77,9 @@ implements IExecutionContext, Reference {
         children.remove(this.classContext);
         this.methodContext = children.get(IProgramMethod.class);
         this.runtimeInstance = children.get(ReferencePrefix.class);
+        children.remove(runtimeInstance);
+        this.threadContext = children.get(TypeReference.class);
+        this.runtimeThread = children.get(ReferencePrefix.class);
     }
 
 
@@ -102,6 +117,14 @@ implements IExecutionContext, Reference {
         }
         if (runtimeInstance != null) {
             if (index == 0) return runtimeInstance;
+            index--;
+        }
+        if (threadContext != null) {
+            if (index == 0) return threadContext;
+            index--;
+        }
+        if (runtimeThread != null) {
+            if (index == 0) return runtimeThread;
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -147,7 +170,18 @@ implements IExecutionContext, Reference {
 
     @Override
     public String toString() {
-        return "Context: "+classContext+ "#" + methodContext + " Instance: "+runtimeInstance;
+        return "Context: "+classContext+ "#" + methodContext + " Instance: "+runtimeInstance
+                        +" Thread context: "+threadContext+ " Instance: "+runtimeThread;
+    }
+
+    @Override
+    public TypeReference getThreadTypeReference() {
+        return threadContext;
+    }
+
+    @Override
+    public ReferencePrefix getRuntimeThreadInstance() {
+        return runtimeThread;
     }
 
 }

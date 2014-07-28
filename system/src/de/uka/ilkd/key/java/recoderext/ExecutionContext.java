@@ -31,10 +31,9 @@ public class ExecutionContext
     implements Reference, TypeReferenceContainer, 
 	       ExpressionContainer {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2460904042433100490L;
+    // what else TODO
+    
+    private static final long serialVersionUID = 8575487220451641767L;
 
     /**
      * the ast parent
@@ -56,6 +55,9 @@ public class ExecutionContext
      */
     private ReferencePrefix runtimeInstance;
     
+    private TypeReference threadContext;
+    private ReferencePrefix runtimeThread;
+    
     protected ExecutionContext() {}
 
     /**
@@ -68,10 +70,12 @@ public class ExecutionContext
      */
     public ExecutionContext(TypeReference classContext,
              MethodSignature methodContext,
-			    ReferencePrefix runtimeInstance) {
+			    ReferencePrefix runtimeInstance, TypeReference threadContext, ReferencePrefix runtimeThread) {
 	this.classContext = classContext;
 	this.methodContext = methodContext;
 	this.runtimeInstance  = runtimeInstance;
+	this.threadContext = threadContext;
+	this.runtimeThread = runtimeThread;
 	makeParentRoleValid();
     }
     
@@ -96,19 +100,27 @@ public class ExecutionContext
      *    of bounds
      */
     public ProgramElement getChildAt(int index) {
-	if (classContext != null) {
-	   if (index == 0) return classContext;
-	   index--;
-	}
-   if (methodContext != null) {
-      if (index == 0) return methodContext;
-      index--;
-   }
-	if (runtimeInstance != null) {
-	   if (index == 0) return runtimeInstance;
-	   index--;
-	}
-	throw new ArrayIndexOutOfBoundsException();
+        if (classContext != null) {
+            if (index == 0) return classContext;
+            index--;
+        }
+        if (methodContext != null) {
+            if (index == 0) return methodContext;
+            index--;
+        }
+        if (runtimeInstance != null) {
+            if (index == 0) return runtimeInstance;
+            index--;
+        }
+        if (threadContext != null) {
+            if (index == 0) return threadContext;
+            index--;
+        }
+        if (runtimeThread != null) {
+            if (index == 0) return runtimeThread;
+            index--;
+        }
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -128,7 +140,16 @@ public class ExecutionContext
        }
        if (runtimeInstance != null) {
           if (child == runtimeInstance) return idx;
+          idx ++;
        }
+       if (threadContext != null) {
+           if (child == threadContext) return idx;
+           idx ++;
+        }
+       if (runtimeThread != null) {
+           if (child == runtimeThread) return idx;
+           idx ++;
+        }
        return -1;
     }
 
@@ -136,7 +157,7 @@ public class ExecutionContext
     }
 
     public ExecutionContext deepClone() {
-	return new ExecutionContext(classContext, methodContext, runtimeInstance);
+	return new ExecutionContext(classContext, methodContext, runtimeInstance, threadContext, runtimeThread);
     }
 
     public NonTerminalProgramElement getASTParent() {

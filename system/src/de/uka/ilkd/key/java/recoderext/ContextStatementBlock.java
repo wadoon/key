@@ -42,8 +42,9 @@ public class ContextStatementBlock
     /**
      Statement block.
      */
-    public ContextStatementBlock(TypeSVWrapper tr, MethodSignatureSVWrapper pm, ExpressionSVWrapper runtime) {
-	this(tr != null ? new ExecutionContext(tr, pm, runtime) : null);
+    public ContextStatementBlock(TypeSVWrapper tr, MethodSignatureSVWrapper pm, ExpressionSVWrapper runtime,
+                    TypeSVWrapper threadType, ExpressionSVWrapper thread) {
+	this(tr != null ? new ExecutionContext(tr, pm, runtime, threadType, thread) : null);
     }
 
     /**

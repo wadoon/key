@@ -3789,16 +3789,21 @@ ExecutionContext ExecutionContext() :
   TypeReference classContext;
   Expression runtimeInstance = null;
   MethodSignature methodSignature;
+  TypeReference threadContext;
+  Expression runtimeThread;
 }
 {
 
   "source="
   methodSignature = MethodSignature() "@" classContext = Type()
   [ ",this=" runtimeInstance = Expression() ]
+  ",threadClass=" threadContext = Type()
+  ",thread=" runtimeThread = Expression()
 
   { return new ExecutionContext
         (classContext, methodSignature,
-        (ReferencePrefix)runtimeInstance);
+        (ReferencePrefix)runtimeInstance, 
+        threadContext, (ReferencePrefix)runtimeThread);
   }
 }
 

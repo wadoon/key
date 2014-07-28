@@ -663,4 +663,16 @@ public final class ProgramSV extends AbstractSV
    public ReferencePrefix getRuntimeInstance() {
       return null;
    }
+
+
+   @Override
+   public TypeReference getThreadTypeReference() {
+       return null;
+   }
+
+
+   @Override
+   public ReferencePrefix getRuntimeThreadInstance() {
+       return null;
+   }
 }

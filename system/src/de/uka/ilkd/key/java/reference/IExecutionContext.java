@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 /**
- * extracted interface to allow schema variabes to stand for an
+ * extracted interface to allow schema variables to stand for an
  * execution context
  */
 public interface IExecutionContext extends Reference {
@@ -38,4 +38,8 @@ public interface IExecutionContext extends Reference {
     * @return the runtime instance object
     */
    public ReferencePrefix getRuntimeInstance();
+   
+   public TypeReference getThreadTypeReference();
+   
+   public ReferencePrefix getRuntimeThreadInstance();
 }

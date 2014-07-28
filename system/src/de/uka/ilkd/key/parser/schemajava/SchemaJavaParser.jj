@@ -2030,7 +2030,8 @@ ExecutionContext ExecutionContext() :
 {
     pm = MethodSignatureSV() "@" tr = TypeSV() "(" (instance = ExpressionSV())? ")"
     {
-	return new ExecutionContext(tr, pm, instance);
+    // TODO
+	return new ExecutionContext(tr, pm, instance, null, null);
     }
 }
 
@@ -3705,7 +3706,8 @@ StatementBlock StartBlock() :
               if (tr == null) {
                  result = factory.createContextStatementBlock(ec);
 	      } else {
-                 result = factory.createContextStatementBlock(tr, pm, sv);
+	      // TODO
+                 result = factory.createContextStatementBlock(tr, pm, sv, null, null);
 	      }
               setPrefixInfo(result);
             }

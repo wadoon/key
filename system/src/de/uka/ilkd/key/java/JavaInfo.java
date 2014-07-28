@@ -1132,7 +1132,7 @@ public final class JavaInfo {
 
 
     /**
-     * returns the default execution context. This is equiavlent to executing the program
+     * returns the default execution context. This is equivalent to executing the program
      * in a static method of a class placed in the default package
      * @return the default execution context
      */
