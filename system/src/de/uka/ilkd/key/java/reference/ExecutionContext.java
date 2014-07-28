@@ -94,6 +94,8 @@ implements IExecutionContext, Reference {
         if (classContext != null) count++;
         if (methodContext != null) count++;
         if (runtimeInstance != null) count++;
+        if (threadContext != null) count++;
+        if (runtimeThread != null) count++;
         return count;
     }
 
@@ -171,7 +173,7 @@ implements IExecutionContext, Reference {
     @Override
     public String toString() {
         return "Context: "+classContext+ "#" + methodContext + " Instance: "+runtimeInstance
-                        +" Thread context: "+threadContext+ " Instance: "+runtimeThread;
+                        +(threadContext==null? "":" Thread context: "+threadContext+ " Instance: "+runtimeThread);
     }
 
     @Override
