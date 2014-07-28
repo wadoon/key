@@ -390,10 +390,8 @@ public class InitConfig {
     }
 
     
-    public void setSettings(ProofSettings settings) {
-	  this.settings = settings;
-	  // replace the <inv> symbol as it may have changed arity
-	  namespaces().functions().add(services.getJavaInfo().getInv());
+    public void setSettings(ProofSettings newSettings) {
+      this.settings = newSettings;	  
 	}
     
     
