@@ -24,6 +24,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -64,6 +65,7 @@ import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
+import de.uka.ilkd.key.speclang.ThreadSpecification;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -75,6 +77,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLThreadSpecification;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.Pair;
@@ -1113,6 +1116,38 @@ public class JMLSpecFactory {
     	assert dep != null;
     	assert targetHeap != null;
         return createJMLDependencyContract(kjt, targetHeap, dep);
+    }
+    
+    // TODO WIP
+    public ThreadSpecification createJMLThreadSpecification
+                    (KeYJavaType threadClass, TextualJMLThreadSpecification spec) 
+                    throws SLTranslationException {
+        final JavaInfo ji = services.getJavaInfo();
+        if (! ji.isSubtype(threadClass, ji.getJavaLangThread()))
+            throw new SLTranslationException("Thread specification can only be given in subtypes of java.lang.Thread", 
+                            null, 0, invCounter);
+        final String name = "JML Thread Specification for "+threadClass.getName();
+        Term rely = TB.tt(); // default
+        Term guar = TB.tt(); // default
+        for (PositionedString ps: spec.getRelies()) {
+            final Term relyTrans = JMLTranslator.translate(ps, threadClass, null, null, null, null, null, null, services); 
+            rely = TB.and(rely, relyTrans);
+        }
+        for (PositionedString ps: spec.getGuarantees()) {
+            final Term guarTrans = JMLTranslator.translate(ps, threadClass, null, null, null, null, null, null, services);
+            guar = TB.and(guar, guarTrans);
+        }
+        final Term notAssigned = spec.getNotAssigned()==null?
+                        TB.empty() : // default
+                        JMLTranslator.<Term>translate(spec.getNotAssigned(), threadClass, null, null, null, null, null, null, services);
+        final Term assignable = spec.getAssignable()==null?
+                        TB.allLocs() : // default
+                        JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, null, null, null, null, null, null, services);
+        final KeYJavaType heapKJT = new KeYJavaType(services.getTypeConverter().getHeapLDT().targetSort());
+        final LocationVariable prevHeapVar = new LocationVariable(new ProgramElementName("heap'"),heapKJT);
+        final LocationVariable currHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
+        final LocationVariable threadVar = TB.selfVar(threadClass, false); // TODO
+        return new ThreadSpecification(name, null, threadClass, rely, guar, notAssigned, assignable, prevHeapVar, currHeapVar, threadVar);
     }
 
 
