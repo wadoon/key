@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
+import java.util.Properties;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -81,5 +83,17 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term result = tb.apply(upd, prog);
         assignPOTerms(result);
     }
-
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * @param initConfig The already load {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     * @throws IOException Occurred Exception.
+     */
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
+          throws IOException {
+        // TODO
+        throw new Error("not implemented");
+    }
+    
 }

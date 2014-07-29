@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -51,4 +53,17 @@ public final class TransitivityPO extends AbstractRelyGuaranteePO {
         assignPOTerms(result);
     }
 
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * @param initConfig The already load {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     * @throws IOException Occurred Exception.
+     */
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
+          throws IOException {
+        // TODO
+        throw new Error("not implemented");
+    }
+    
 }
