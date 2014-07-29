@@ -826,7 +826,7 @@ public final class SpecificationRepository {
         final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> subs = getOverridingTargets(
                 contract.getKJT(), contract.getTarget());
         for (Pair<KeYJavaType, IObserverFunction> sub : subs) {
-            for (DisplayableSpecificationElement subContract : getContracts(sub.first, sub.second)) {
+            for (DisplayableSpecificationElement<?> subContract : getContracts(sub.first, sub.second)) {
                 // TODO: no inheritance for ThreadSpecification (yet)
                 if (! (subContract instanceof Contract)) continue;
                 if (subContract.id() == contract.id()) {
@@ -861,6 +861,7 @@ public final class SpecificationRepository {
             throw new IllegalStateException("Thread specification for thread type "+kjt
                 +" already registered.");
         threadSpecs.put(kjt, rgs);
+        contracts.put(new Pair<KeYJavaType, IObserverFunction>(kjt, null), DefaultImmutableSet.<DisplayableSpecificationElement<?>>nil().add(rgs));
     }
     
     public void addThreadSpecifications (Iterable<ThreadSpecification> specs) {

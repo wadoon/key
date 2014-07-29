@@ -118,8 +118,9 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
     @Override
     public String getHTMLText(Services serv) {
-        // todo Auto-generated method stub
-        return null;
+        return "<b>rely: </b>"+rely +"<br><b>guarantee: </b>"+guarantee
+                        +"<br><b>notChanged: </b>"+notChanged
+                        +"<br><b>assignable: </b>"+assignable;
     }
 
     @Override
