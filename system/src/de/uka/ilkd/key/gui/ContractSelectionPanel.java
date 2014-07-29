@@ -57,7 +57,7 @@ class ContractSelectionPanel extends JPanel {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public ContractSelectionPanel(Services services,
-	                          boolean multipleSelection) {
+                    boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
 
@@ -73,15 +73,15 @@ class ContractSelectionPanel extends JPanel {
         //create contract list
         contractList = new JList();
         contractList.setSelectionMode(
-                multipleSelection
-                ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
-                : ListSelectionModel.SINGLE_SELECTION);
+                        multipleSelection
+                        ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
+                                        : ListSelectionModel.SINGLE_SELECTION);
         contractList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-		if(contractList.isSelectionEmpty()) {
-		    contractList.setSelectedIndex(e.getFirstIndex());
-		}
-	    }
+                if(contractList.isSelectionEmpty()) {
+                    contractList.setSelectedIndex(e.getFirstIndex());
+                }
+            }
         });
         final Services serv = services;
         contractList.setCellRenderer(new DefaultListCellRenderer() {
@@ -91,36 +91,36 @@ class ContractSelectionPanel extends JPanel {
             private static final long serialVersionUID = 9066658130231994408L;
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
 
-	    public Component getListCellRendererComponent(JList list,
-	                                                  Object value,
-	                                                  int index,
-	                                                  boolean isSelected,
-	                                                  boolean cellHasFocus) {
-	        assert value != null;
-		Contract contract = (Contract) value;
-		Component supComp
-		        = super.getListCellRendererComponent(list,
-		                                             value,
-		                                             index,
-		                                             isSelected,
-		                                             cellHasFocus);
+            public Component getListCellRendererComponent(JList list,
+                            Object value,
+                            int index,
+                            boolean isSelected,
+                            boolean cellHasFocus) {
+                assert value != null;
+                Contract contract = (Contract) value;
+                Component supComp
+                = super.getListCellRendererComponent(list,
+                                value,
+                                index,
+                                isSelected,
+                                cellHasFocus);
 
-		//create label and enclosing panel
-		JLabel label = new JLabel();
-		label.setText(contract.getHTMLText(serv));
-		label.setFont(PLAINFONT);
-		FlowLayout lay = new FlowLayout();
-		lay.setAlignment(FlowLayout.LEFT);
-		JPanel result = new JPanel(lay);
-		result.add(label);
-		label.setVerticalAlignment(SwingConstants.TOP);
+                //create label and enclosing panel
+                JLabel label = new JLabel();
+                label.setText(contract.getHTMLText(serv));
+                label.setFont(PLAINFONT);
+                FlowLayout lay = new FlowLayout();
+                lay.setAlignment(FlowLayout.LEFT);
+                JPanel result = new JPanel(lay);
+                result.add(label);
+                label.setVerticalAlignment(SwingConstants.TOP);
 
-		//set background color
-		result.setBackground(supComp.getBackground());
+                //set background color
+                result.setBackground(supComp.getBackground());
 
-		//set border
-		TitledBorder border = new TitledBorder(
-				BorderFactory.createEtchedBorder(),
+                //set border
+                TitledBorder border = new TitledBorder(
+                                BorderFactory.createEtchedBorder(),
                                 contract.getDisplayName());
 
                 Font borderFont = border.getTitleFont();
@@ -130,11 +130,11 @@ class ContractSelectionPanel extends JPanel {
                         borderFont = PLAINFONT;
                     }
                 }
-		border.setTitleFont(borderFont.deriveFont(Font.BOLD));
-		result.setBorder(border);
+                border.setTitleFont(borderFont.deriveFont(Font.BOLD));
+                result.setBorder(border);
 
-		return result;
-	    }
+                return result;
+            }
         });
         scrollPane.setViewportView(contractList);
     }
@@ -156,7 +156,7 @@ class ContractSelectionPanel extends JPanel {
 
 
     public void addListSelectionListener(ListSelectionListener lsl) {
-	contractList.addListSelectionListener(lsl);
+        contractList.addListSelectionListener(lsl);
     }
 
 
@@ -189,7 +189,7 @@ class ContractSelectionPanel extends JPanel {
 
 
     public void setContracts(ImmutableSet<Contract> contracts, String title) {
-	setContracts(contracts.toArray(new Contract[contracts.size()]), title);
+        setContracts(contracts.toArray(new Contract[contracts.size()]), title);
     }
 
 
@@ -201,12 +201,12 @@ class ContractSelectionPanel extends JPanel {
             return (Contract) selection[0];
         } else {
             ImmutableSet<FunctionalOperationContract> contracts
-            	= DefaultImmutableSet.<FunctionalOperationContract>nil();
+            = DefaultImmutableSet.<FunctionalOperationContract>nil();
             for(Object contract : selection) {
-        	contracts = contracts.add((FunctionalOperationContract) contract);
+                contracts = contracts.add((FunctionalOperationContract) contract);
             }
             return services.getSpecificationRepository()
-                           .combineOperationContracts(contracts);
+                            .combineOperationContracts(contracts);
         }
     }
 }
