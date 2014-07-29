@@ -83,6 +83,7 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term result = tb.apply(upd, prog);
         assignPOTerms(result);
     }
+    
     /**
      * Instantiates a new proof obligation with the given settings.
      * @param initConfig The already load {@link InitConfig}.

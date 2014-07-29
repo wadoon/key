@@ -7,6 +7,9 @@ import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -118,9 +121,11 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
     @Override
     public String getHTMLText(Services serv) {
-        return "<b>rely: </b>"+rely +"<br><b>guarantee: </b>"+guarantee
-                        +"<br><b>notChanged: </b>"+notChanged
-                        +"<br><b>assignable: </b>"+assignable;
+        return "<html><b>rely: </b>"+LogicPrinter.quickPrintTerm(rely, serv) 
+                        +"<br><b>guarantee: </b>"+LogicPrinter.quickPrintTerm(guarantee, serv)
+                        +"<br><b>notChanged: </b>"+LogicPrinter.quickPrintTerm(notChanged, serv)
+                        +"<br><b>assignable: </b>"+LogicPrinter.quickPrintTerm(assignable, serv)
+                        +"</html>";
     }
 
     @Override

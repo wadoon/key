@@ -741,8 +741,9 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<DisplayableSpecificationElement<?>> getContracts(KeYJavaType kjt, IObserverFunction target) {
         assert kjt != null;
-        assert target != null;
-        target = getCanonicalFormForKJT(target, kjt);
+//        assert target != null;
+        if (target != null)
+            target = getCanonicalFormForKJT(target, kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, target);
         final ImmutableSet<DisplayableSpecificationElement<?>> result = WellDefinednessCheck.isOn() ?

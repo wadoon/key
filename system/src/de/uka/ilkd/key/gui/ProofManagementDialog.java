@@ -520,7 +520,7 @@ public final class ProofManagementDialog extends JDialog {
         ContractSelectionPanel pan = getActiveContractPanel();
         if (pan == contractPanelByMethod) {
             final ClassTree.Entry entry = classTree.getSelectedEntry();
-            if(entry != null && entry.target != null && 
+            if(entry != null && //entry.target != null && // XXX relaxed for thread spec 
                             !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
                 final ImmutableSet<DisplayableSpecificationElement<?>> contracts 
                 = initConfig.getServices().getSpecificationRepository().getContracts(entry.kjt, entry.target);
