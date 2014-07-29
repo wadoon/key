@@ -62,7 +62,7 @@ public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer();
-        sb.append("thread_behavior\n");
+        sb.append("concurrent_behavior\n");
         for (PositionedString rely: relies) {
             sb.append("relies_on ");
             sb.append(rely.toString());

@@ -204,6 +204,7 @@ classlevel_element[ImmutableList<String> mods]
 @after { r = result; }
 :
         result=class_invariant[mods]
+    |   result=thread_spec[mods]
     |   (accessible_keyword expression) => result=depends_clause[mods]
     |   result=method_specification[mods]
     |   result=field_or_method_declaration[mods]
@@ -335,6 +336,23 @@ invariant_keyword
     |   INVARIANT_RED
 ;
 
+thread_spec[ImmutableList<String> mods]
+  returns [ImmutableList<TextualJMLConstruct> result = null]
+  throws SLTranslationException
+@init {
+    TextualJMLThreadSpecification spec = new TextualJMLThreadSpecification(mods);
+    // TODO allow unordered specification
+}
+:
+  thread_spec_keyword
+  (RELIES_ON ps=expression { spec.addRely(ps); } )*
+  (GUARANTEES ps=expression { spec.addGuarantee(ps); })*
+  (NOT_ASSIGNED ps=expression { spec.setNotAssigned(ps); })?
+  (ASSIGNABLE ps=expression { spec.setAssignable(ps); })?
+  { result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(spec); }
+;
+
+thread_spec_keyword: CONCURRENT_BEHAVIOR | CONCURRENT_BEHAVIOUR; 
 
 class_axiom[ImmutableList<String> mods]
             returns [ImmutableList<TextualJMLConstruct> result = null]

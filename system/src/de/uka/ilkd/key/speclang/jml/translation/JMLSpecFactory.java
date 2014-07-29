@@ -1124,8 +1124,8 @@ public class JMLSpecFactory {
                     throws SLTranslationException {
         final JavaInfo ji = services.getJavaInfo();
         if (! ji.isSubtype(threadClass, ji.getJavaLangThread()))
-            throw new SLTranslationException("Thread specification can only be given in subtypes of java.lang.Thread", 
-                            null, spec.getApproxPosition(), null);
+            throw new SLTranslationException("Class " + threadClass +" cannot have a thread specification", 
+                            spec.getSourceFileName(), spec.getApproxPosition(), null);
         final String name = "JML Thread Specification for "+threadClass.getName();
         Term rely = TB.tt(); // default
         Term guar = TB.tt(); // default

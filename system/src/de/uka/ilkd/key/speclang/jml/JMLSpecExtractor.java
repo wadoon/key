@@ -51,6 +51,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLThreadSpecification;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
@@ -341,6 +342,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    } else if (c instanceof TextualJMLClassAxiom){
         		ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom)c);
         		result = result.add(ax);
+        	    } else if (c instanceof TextualJMLThreadSpecification) {
+        	        final ThreadSpecification ts = jsf.createJMLThreadSpecification(kjt, (TextualJMLThreadSpecification) c);
+        	        result = result.add(ts);
         	    } else {
         	        // DO NOTHING
                         // There may be other kinds of JML constructs which are not specifications.
