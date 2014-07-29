@@ -1127,26 +1127,26 @@ public class JMLSpecFactory {
             throw new SLTranslationException("Class " + threadClass +" cannot have a thread specification", 
                             spec.getSourceFileName(), spec.getApproxPosition(), null);
         final String name = "JML Thread Specification for "+threadClass.getName();
+        final LocationVariable threadVar = TB.selfVar(threadClass, false); // TODO
         Term rely = TB.tt(); // default
         Term guar = TB.tt(); // default
         for (PositionedString ps: spec.getRelies()) {
-            final Term relyTrans = JMLTranslator.translate(ps, threadClass, null, null, null, null, null, null, services); 
+            final Term relyTrans = JMLTranslator.translate(ps, threadClass, threadVar, null, null, null, null, Term.class, services); 
             rely = TB.and(rely, relyTrans);
         }
         for (PositionedString ps: spec.getGuarantees()) {
-            final Term guarTrans = JMLTranslator.translate(ps, threadClass, null, null, null, null, null, null, services);
+            final Term guarTrans = JMLTranslator.translate(ps, threadClass, threadVar, null, null, null, null, Term.class, services);
             guar = TB.and(guar, guarTrans);
         }
         final Term notAssigned = spec.getNotAssigned()==null?
                         TB.empty() : // default
-                        JMLTranslator.<Term>translate(spec.getNotAssigned(), threadClass, null, null, null, null, null, null, services);
+                        JMLTranslator.<Term>translate(spec.getNotAssigned(), threadClass, threadVar, null, null, null, null, Term.class, services);
         final Term assignable = spec.getAssignable()==null?
                         TB.allLocs() : // default
-                        JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, null, null, null, null, null, null, services);
+                        JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, threadVar, null, null, null, null, Term.class, services);
         final KeYJavaType heapKJT = new KeYJavaType(services.getTypeConverter().getHeapLDT().targetSort());
         final LocationVariable prevHeapVar = new LocationVariable(new ProgramElementName("heap'"),heapKJT);
         final LocationVariable currHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
-        final LocationVariable threadVar = TB.selfVar(threadClass, false); // TODO
         return new ThreadSpecification(name, null, threadClass, rely, guar, notAssigned, assignable, prevHeapVar, currHeapVar, threadVar);
     }
 
