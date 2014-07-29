@@ -86,6 +86,7 @@ public final class ProofManagementDialog extends JDialog {
     private JTabbedPane tabbedPane;
     private Map<Pair<KeYJavaType, IObserverFunction>, Icon> targetIcons;
     private ClassTree classTree;
+    @SuppressWarnings("rawtypes")
     private JList proofList;
     private ContractSelectionPanel contractPanelByMethod;
     private ContractSelectionPanel contractPanelByProof;
@@ -98,6 +99,7 @@ public final class ProofManagementDialog extends JDialog {
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private ProofManagementDialog(MainWindow mainWindow, InitConfig initConfig) {
         super(mainWindow, "Proof Management", true);
         this.mediator = mainWindow.getMediator();
@@ -539,6 +541,7 @@ public final class ProofManagementDialog extends JDialog {
         updateStartButton();
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void updateGlobalStatus() {
         //target icons
        

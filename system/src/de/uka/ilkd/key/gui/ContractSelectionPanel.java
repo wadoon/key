@@ -43,6 +43,7 @@ class ContractSelectionPanel extends JPanel {
      */
     private static final long serialVersionUID = 1681223715264203991L;
     private final Services services;
+    @SuppressWarnings("rawtypes")
     private final JList contractList;
     private final TitledBorder border;
 
@@ -54,6 +55,7 @@ class ContractSelectionPanel extends JPanel {
     /**
      * Creates a contract selection panel containing the specified contracts.
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public ContractSelectionPanel(Services services,
 	                          boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -158,6 +160,7 @@ class ContractSelectionPanel extends JPanel {
     }
 
 
+    @SuppressWarnings("unchecked")
     public void setContracts(Contract[] contracts, String title) {
         if (contracts == null || contracts.length == 0) {
             contractList.setListData(new Contract[0]);
