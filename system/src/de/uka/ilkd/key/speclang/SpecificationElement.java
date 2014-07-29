@@ -44,4 +44,5 @@ public interface SpecificationElement {
      * specification element belongs.
      */
     public KeYJavaType getKJT();
+
 }

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 
-public class ThreadSpecification implements SpecificationElement {
+public class ThreadSpecification implements DisplayableSpecificationElement {
     
     private final static VisibilityModifier VM = new Public();
     private final String name;
@@ -112,6 +112,18 @@ public class ThreadSpecification implements SpecificationElement {
         return "rely: "+rely+"; guarantee: "+guarantee
                         +"; assignable: "+assignable
                         +"; notChanged: "+notChanged;
+    }
+
+    @Override
+    public String getHTMLText(Services serv) {
+        // todo Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int id() {
+        // todo Auto-generated method stub
+        return 0;
     }
 
 }
