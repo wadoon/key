@@ -8,8 +8,6 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -32,7 +30,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     
     public ThreadSpecification (String name, String displayName, 
                     KeYJavaType threadType,
-                    Term rely, Term guarantee, Term assignable, Term notChanged,
+                    Term rely, Term guarantee, Term notChanged, Term assignable,
                     LocationVariable prevHeapVar, LocationVariable currHeapVar,
                     ProgramVariable threadVar) {
         assert name != null;

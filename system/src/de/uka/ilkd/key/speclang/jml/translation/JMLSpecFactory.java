@@ -1118,7 +1118,6 @@ public class JMLSpecFactory {
         return createJMLDependencyContract(kjt, targetHeap, dep);
     }
     
-    // TODO WIP
     public ThreadSpecification createJMLThreadSpecification
                     (KeYJavaType threadClass, TextualJMLThreadSpecification spec) 
                     throws SLTranslationException {
