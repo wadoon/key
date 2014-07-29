@@ -522,11 +522,11 @@ public final class ProofManagementDialog extends JDialog {
             final ClassTree.Entry entry = classTree.getSelectedEntry();
             if(entry != null && entry.target != null && 
                             !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
-                final ImmutableSet<DisplayableSpecificationElement> contracts 
+                final ImmutableSet<DisplayableSpecificationElement<?>> contracts 
                 = initConfig.getServices().getSpecificationRepository().getContracts(entry.kjt, entry.target);
                 pan.setContracts(contracts, "Contracts");
             } else {
-                pan.setContracts(DefaultImmutableSet.<DisplayableSpecificationElement>nil(), "Contracts");	        
+                pan.setContracts(DefaultImmutableSet.<DisplayableSpecificationElement<?>>nil(), "Contracts");	        
             }	    	    
         } else if (pan == contractPanelByProof) {
             if(proofList.getSelectedValue() != null) {
@@ -537,7 +537,7 @@ public final class ProofManagementDialog extends JDialog {
                 pan.setContracts(usedContracts,
                                 "Contracts used in proof \"" + p.name() + "\"");
             } else {
-                pan.setContracts(DefaultImmutableSet.<DisplayableSpecificationElement>nil(), "Contracts");
+                pan.setContracts(DefaultImmutableSet.<DisplayableSpecificationElement<?>>nil(), "Contracts");
             }
         }
         updateStartButton();
@@ -556,7 +556,7 @@ public final class ProofManagementDialog extends JDialog {
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
             for (IObserverFunction target : targets) {
                 if (!isInstanceMethodOfAbstractClass(kjt, target)) {                
-                    ImmutableSet<DisplayableSpecificationElement> contracts = specRepos.getContracts(kjt, target);
+                    ImmutableSet<DisplayableSpecificationElement<?>> contracts = specRepos.getContracts(kjt, target);
                     boolean startedProving = false;
                     boolean allClosed = true;
                     boolean lemmasLeft = false;

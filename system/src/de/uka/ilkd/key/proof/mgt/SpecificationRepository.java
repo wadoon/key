@@ -94,8 +94,8 @@ public final class SpecificationRepository {
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private final ContractFactory cf;
 
-    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<DisplayableSpecificationElement>> contracts =
-            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<DisplayableSpecificationElement>>();
+    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<DisplayableSpecificationElement<?>>> contracts =
+            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<DisplayableSpecificationElement<?>>>();
     private final Map<Pair<KeYJavaType, IProgramMethod>,
                       ImmutableSet<FunctionalOperationContract>> operationContracts =
             new LinkedHashMap<Pair<KeYJavaType, IProgramMethod>,
@@ -554,10 +554,10 @@ public final class SpecificationRepository {
             inv = inv.setKJT(kjt);
         for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
             if (!JMLInfoExtractor.isHelper(pm)) {
-                final ImmutableSet<DisplayableSpecificationElement> oldContracts = getContracts(kjt,pm);
+                final ImmutableSet<DisplayableSpecificationElement<?>> oldContracts = getContracts(kjt,pm);
                 ImmutableSet<FunctionalOperationContract> oldFuncContracts = DefaultImmutableSet
                         .nil();
-                for (DisplayableSpecificationElement old : oldContracts) {
+                for (DisplayableSpecificationElement<?> old : oldContracts) {
                     if (old instanceof FunctionalOperationContract)
                         oldFuncContracts = oldFuncContracts
                                 .add((FunctionalOperationContract) old);
@@ -728,9 +728,9 @@ public final class SpecificationRepository {
     /**
      * Returns all registered contracts.
      */
-    public ImmutableSet<DisplayableSpecificationElement> getAllContracts() {
-        ImmutableSet<DisplayableSpecificationElement> result = DefaultImmutableSet.<DisplayableSpecificationElement> nil();
-        for (ImmutableSet<DisplayableSpecificationElement> s : contracts.values()) {
+    public ImmutableSet<DisplayableSpecificationElement<?>> getAllContracts() {
+        ImmutableSet<DisplayableSpecificationElement<?>> result = DefaultImmutableSet.<DisplayableSpecificationElement<?>> nil();
+        for (ImmutableSet<DisplayableSpecificationElement<?>> s : contracts.values()) {
             result = result.union(s);
         }
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
@@ -739,15 +739,15 @@ public final class SpecificationRepository {
     /**
      * Returns all registered (atomic) contracts for the passed target.
      */
-    public ImmutableSet<DisplayableSpecificationElement> getContracts(KeYJavaType kjt, IObserverFunction target) {
+    public ImmutableSet<DisplayableSpecificationElement<?>> getContracts(KeYJavaType kjt, IObserverFunction target) {
         assert kjt != null;
         assert target != null;
         target = getCanonicalFormForKJT(target, kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, target);
-        final ImmutableSet<DisplayableSpecificationElement> result = WellDefinednessCheck.isOn() ?
+        final ImmutableSet<DisplayableSpecificationElement<?>> result = WellDefinednessCheck.isOn() ?
                 contracts.get(pair) : removeWdChecks(contracts.get(pair));
-        return result == null ? DefaultImmutableSet.<DisplayableSpecificationElement> nil() : result;
+        return result == null ? DefaultImmutableSet.<DisplayableSpecificationElement<?>> nil() : result;
     }
 
     /**

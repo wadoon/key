@@ -362,11 +362,11 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    					Services services,
                                                 KeYJavaType kjt,
                                                 IObserverFunction target) {
-        ImmutableSet<DisplayableSpecificationElement> old
+        ImmutableSet<DisplayableSpecificationElement<?>> old
         	= services.getSpecificationRepository().getContracts(kjt,
         							     target);
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
-        for(DisplayableSpecificationElement contract : old) {
+        for(DisplayableSpecificationElement<?> contract : old) {
             if(!(contract instanceof DependencyContract)) {
                 result = result.add((Contract)contract);
             }

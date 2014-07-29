@@ -302,8 +302,8 @@ public abstract class AbstractPO implements IPersistablePO {
         sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
 
         //contracts
-        ImmutableSet<DisplayableSpecificationElement> contractsToSave = specRepos.getAllContracts();
-        for (DisplayableSpecificationElement c : contractsToSave) {
+        ImmutableSet<DisplayableSpecificationElement<?>> contractsToSave = specRepos.getAllContracts();
+        for (DisplayableSpecificationElement<?> c : contractsToSave) {
             if (!(c instanceof Contract && ((Contract) c).toBeSaved())) {
                 // TODO: thread spec not saved yet
                 contractsToSave = contractsToSave.remove(c);
@@ -311,7 +311,8 @@ public abstract class AbstractPO implements IPersistablePO {
         }
         if (!contractsToSave.isEmpty()) {
             sb.append("\\contracts {\n");
-            for (DisplayableSpecificationElement c : contractsToSave) {
+            for (DisplayableSpecificationElement<?> c : contractsToSave) {
+                assert c instanceof Contract;
                 sb.append(((Contract)c).proofToString(services));
             }
             sb.append("}\n\n");
