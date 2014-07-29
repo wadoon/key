@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -46,6 +47,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
@@ -360,12 +362,13 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    					Services services,
                                                 KeYJavaType kjt,
                                                 IObserverFunction target) {
-        ImmutableSet<Contract> result
+        ImmutableSet<DisplayableSpecificationElement> old
         	= services.getSpecificationRepository().getContracts(kjt,
         							     target);
-        for(Contract contract : result) {
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        for(DisplayableSpecificationElement contract : old) {
             if(!(contract instanceof DependencyContract)) {
-        	result = result.remove(contract);
+                result = result.add((Contract)contract);
             }
         }
         return result;

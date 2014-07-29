@@ -190,21 +190,21 @@ class ContractSelectionPanel extends JPanel {
     }
 
 
-    public void setContracts(ImmutableSet<Contract> contracts, String title) {
-        setContracts(contracts.toArray(new Contract[contracts.size()]), title);
+    public void setContracts(ImmutableSet<? extends DisplayableSpecificationElement> contracts, String title) {
+        setContracts(contracts.toArray(new DisplayableSpecificationElement[contracts.size()]), title);
     }
 
-
-    public Contract getContract() {
+    public DisplayableSpecificationElement getContract() {
         final Object[] selection = contractList.getSelectedValues();
         if(selection.length == 0) {
             return null;
         } else if(selection.length == 1) {
-            return (Contract) selection[0];
+            return (DisplayableSpecificationElement) selection[0];
         } else {
             ImmutableSet<FunctionalOperationContract> contracts
             = DefaultImmutableSet.<FunctionalOperationContract>nil();
             for(Object contract : selection) {
+                // TODO: why is this type safe?
                 contracts = contracts.add((FunctionalOperationContract) contract);
             }
             return services.getSpecificationRepository()

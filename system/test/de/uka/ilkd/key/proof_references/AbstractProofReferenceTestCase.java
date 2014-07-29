@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
@@ -323,7 +325,12 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          });
          assertNotNull(target);
          // Find first contract.
-         ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(containerKJT, target);
+         ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
+         // the implementation guarantees that a non-null target gets a Contract
+         for (DisplayableSpecificationElement<?> dse: environment.getSpecificationRepository().getContracts(containerKJT, target)) {
+             if (dse instanceof Contract)
+                         contracts.add((Contract)dse);
+         }
          assertFalse(contracts.isEmpty());
          Contract contract = contracts.iterator().next();
          // Start proof

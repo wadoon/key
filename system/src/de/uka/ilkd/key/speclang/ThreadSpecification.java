@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 
@@ -124,6 +126,13 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     public int id() {
         // todo Auto-generated method stub
         return 0;
+    }
+
+    @Override
+    public ProofOblInput createProofObl(InitConfig copyWithServices,
+                    DisplayableSpecificationElement contract) {
+        // todo Auto-generated method stub
+        return null;
     }
 
 }

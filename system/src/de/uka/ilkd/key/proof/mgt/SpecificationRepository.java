@@ -67,6 +67,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyContract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
@@ -93,8 +94,8 @@ public final class SpecificationRepository {
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private final ContractFactory cf;
 
-    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<Contract>> contracts =
-            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<Contract>>();
+    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<DisplayableSpecificationElement>> contracts =
+            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<DisplayableSpecificationElement>>();
     private final Map<Pair<KeYJavaType, IProgramMethod>,
                       ImmutableSet<FunctionalOperationContract>> operationContracts =
             new LinkedHashMap<Pair<KeYJavaType, IProgramMethod>,
@@ -553,11 +554,10 @@ public final class SpecificationRepository {
             inv = inv.setKJT(kjt);
         for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
             if (!JMLInfoExtractor.isHelper(pm)) {
-                final ImmutableSet<Contract> oldContracts = getContracts(kjt,
-                        pm);
+                final ImmutableSet<DisplayableSpecificationElement> oldContracts = getContracts(kjt,pm);
                 ImmutableSet<FunctionalOperationContract> oldFuncContracts = DefaultImmutableSet
                         .nil();
-                for (Contract old : oldContracts) {
+                for (DisplayableSpecificationElement old : oldContracts) {
                     if (old instanceof FunctionalOperationContract)
                         oldFuncContracts = oldFuncContracts
                                 .add((FunctionalOperationContract) old);
@@ -587,12 +587,12 @@ public final class SpecificationRepository {
      * @param contracts A set of contracts
      * @return contracts without well-definedness checks
      */
-    private static ImmutableSet<Contract> removeWdChecks(ImmutableSet<Contract> contracts) {
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+    private static <T extends DisplayableSpecificationElement<?>> ImmutableSet<T> removeWdChecks (ImmutableSet<T> contracts) {
+        ImmutableSet<T> result = DefaultImmutableSet.<T>nil();
         if (contracts == null) {
-            return contracts;
+            return (ImmutableSet<T>) contracts;
         }
-        for (Contract c: contracts) {
+        for (T c: contracts) {
             if (!(c instanceof WellDefinednessCheck)) {
                 result = result.add(c);
             }
@@ -728,9 +728,9 @@ public final class SpecificationRepository {
     /**
      * Returns all registered contracts.
      */
-    public ImmutableSet<Contract> getAllContracts() {
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract> nil();
-        for (ImmutableSet<Contract> s : contracts.values()) {
+    public ImmutableSet<DisplayableSpecificationElement> getAllContracts() {
+        ImmutableSet<DisplayableSpecificationElement> result = DefaultImmutableSet.<DisplayableSpecificationElement> nil();
+        for (ImmutableSet<DisplayableSpecificationElement> s : contracts.values()) {
             result = result.union(s);
         }
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
@@ -739,15 +739,15 @@ public final class SpecificationRepository {
     /**
      * Returns all registered (atomic) contracts for the passed target.
      */
-    public ImmutableSet<Contract> getContracts(KeYJavaType kjt, IObserverFunction target) {
+    public ImmutableSet<DisplayableSpecificationElement> getContracts(KeYJavaType kjt, IObserverFunction target) {
         assert kjt != null;
         assert target != null;
         target = getCanonicalFormForKJT(target, kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, target);
-        final ImmutableSet<Contract> result = WellDefinednessCheck.isOn() ?
+        final ImmutableSet<DisplayableSpecificationElement> result = WellDefinednessCheck.isOn() ?
                 contracts.get(pair) : removeWdChecks(contracts.get(pair));
-        return result == null ? DefaultImmutableSet.<Contract> nil() : result;
+        return result == null ? DefaultImmutableSet.<DisplayableSpecificationElement> nil() : result;
     }
 
     /**
@@ -826,9 +826,11 @@ public final class SpecificationRepository {
         final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> subs = getOverridingTargets(
                 contract.getKJT(), contract.getTarget());
         for (Pair<KeYJavaType, IObserverFunction> sub : subs) {
-            for (Contract subContract : getContracts(sub.first, sub.second)) {
+            for (DisplayableSpecificationElement subContract : getContracts(sub.first, sub.second)) {
+                // TODO: no inheritance for ThreadSpecification (yet)
+                if (! (subContract instanceof Contract)) continue;
                 if (subContract.id() == contract.id()) {
-                    result = result.add(subContract);
+                    result = result.add((Contract) subContract);
                     break;
                 }
             }

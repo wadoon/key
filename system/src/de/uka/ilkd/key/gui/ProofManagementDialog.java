@@ -69,10 +69,12 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Pair;
 
 public final class ProofManagementDialog extends JDialog {
+    // TODO disentangle GUI and proof management code
 
     /**
      * 
@@ -426,12 +428,12 @@ public final class ProofManagementDialog extends JDialog {
         }
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private ProofOblInput createPOForSelectedContract() {
-        final Contract contract = getActiveContractPanel().getContract();
+        final DisplayableSpecificationElement contract = getActiveContractPanel().getContract();
 
-        return contract == null
-                        ? null
-                                        : contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()), contract);
+        return contract == null? null
+                        : contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()), contract);
     }
 
     private Proof findPreferablyClosedProof(ProofOblInput po) {
@@ -520,22 +522,22 @@ public final class ProofManagementDialog extends JDialog {
             final ClassTree.Entry entry = classTree.getSelectedEntry();
             if(entry != null && entry.target != null && 
                             !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
-                final ImmutableSet<Contract> contracts 
+                final ImmutableSet<DisplayableSpecificationElement> contracts 
                 = initConfig.getServices().getSpecificationRepository().getContracts(entry.kjt, entry.target);
                 pan.setContracts(contracts, "Contracts");
             } else {
-                pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");	        
+                pan.setContracts(DefaultImmutableSet.<DisplayableSpecificationElement>nil(), "Contracts");	        
             }	    	    
         } else if (pan == contractPanelByProof) {
             if(proofList.getSelectedValue() != null) {
                 final Proof p 
                 = ((ProofWrapper)proofList.getSelectedValue()).proof;
                 final ImmutableSet<Contract> usedContracts 
-                = p.mgt().getUsedContracts();
+                    = p.mgt().getUsedContracts();
                 pan.setContracts(usedContracts,
                                 "Contracts used in proof \"" + p.name() + "\"");
             } else {
-                pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
+                pan.setContracts(DefaultImmutableSet.<DisplayableSpecificationElement>nil(), "Contracts");
             }
         }
         updateStartButton();
@@ -554,11 +556,11 @@ public final class ProofManagementDialog extends JDialog {
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
             for (IObserverFunction target : targets) {
                 if (!isInstanceMethodOfAbstractClass(kjt, target)) {                
-                    ImmutableSet<Contract> contracts = specRepos.getContracts(kjt, target);
+                    ImmutableSet<DisplayableSpecificationElement> contracts = specRepos.getContracts(kjt, target);
                     boolean startedProving = false;
                     boolean allClosed = true;
                     boolean lemmasLeft = false;
-                    for (Contract contract : contracts) {
+                    for (DisplayableSpecificationElement contract : contracts) {
                         // TODO: why do we create a PO to check if all proofs have been closed?
                         final ProofOblInput po = contract.createProofObl(initConfig, contract);
                         Proof proof = findPreferablyClosedProof(po);

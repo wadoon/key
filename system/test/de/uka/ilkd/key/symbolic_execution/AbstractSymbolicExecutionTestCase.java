@@ -35,6 +35,7 @@ import junit.framework.TestCase;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -69,6 +70,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -1662,7 +1664,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             });
             assertNotNull(target);
             // Find first contract.
-            ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(containerKJT, target);
+            ImmutableSet<Contract> contracts = DefaultImmutableSet.nil();
+            for (DisplayableSpecificationElement<?> dse:
+                            environment.getSpecificationRepository().getContracts(containerKJT, target)) {
+                if (dse instanceof Contract)
+                    contracts.add((Contract)dse);
+            }
             assertFalse(contracts.isEmpty());
             Contract contract = contracts.iterator().next();
             // Start proof

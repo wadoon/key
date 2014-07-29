@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 /**
  * Interface for all specification elements to be displayed
@@ -8,7 +10,8 @@ import de.uka.ilkd.key.java.Services;
  * @author bruns
  *
  */
-public interface DisplayableSpecificationElement extends SpecificationElement {
+public interface DisplayableSpecificationElement<T extends DisplayableSpecificationElement<?>> 
+extends SpecificationElement {
 
     /**
      * For display (e.g., in ProofManagementDialog).
@@ -17,5 +20,7 @@ public interface DisplayableSpecificationElement extends SpecificationElement {
     public String getHTMLText(Services serv);
 
     public int id();
+
+    public ProofOblInput createProofObl(InitConfig copyWithServices, T contract);
     
 }

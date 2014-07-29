@@ -167,6 +167,6 @@ public class ContractConfigurator extends JDialog {
      * Returns the selected contract.
      */
     public Contract getContract() {
-	return contractPanel.getContract();
+        return (Contract) contractPanel.getContract();
     }
 }

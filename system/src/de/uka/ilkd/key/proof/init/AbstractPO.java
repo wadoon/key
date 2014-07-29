@@ -42,6 +42,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
@@ -301,16 +302,17 @@ public abstract class AbstractPO implements IPersistablePO {
         sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
 
         //contracts
-        ImmutableSet<Contract> contractsToSave = specRepos.getAllContracts();
-        for (Contract c : contractsToSave) {
-            if (!c.toBeSaved()) {
+        ImmutableSet<DisplayableSpecificationElement> contractsToSave = specRepos.getAllContracts();
+        for (DisplayableSpecificationElement c : contractsToSave) {
+            if (!(c instanceof Contract && ((Contract) c).toBeSaved())) {
+                // TODO: thread spec not saved yet
                 contractsToSave = contractsToSave.remove(c);
             }
         }
         if (!contractsToSave.isEmpty()) {
             sb.append("\\contracts {\n");
-            for (Contract c : contractsToSave) {
-                sb.append(c.proofToString(services));
+            for (DisplayableSpecificationElement c : contractsToSave) {
+                sb.append(((Contract)c).proofToString(services));
             }
             sb.append("}\n\n");
         }
