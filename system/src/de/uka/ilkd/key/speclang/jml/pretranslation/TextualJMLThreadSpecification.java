@@ -2,7 +2,6 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
@@ -13,7 +12,6 @@ public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
     private ImmutableList<PositionedString> guarantees = ImmutableSLList.nil();
     private PositionedString notAssigned;
     private PositionedString assignable;
-    private Position pos = Position.UNDEFINED;
 
     public TextualJMLThreadSpecification(ImmutableList<String> mods) {
         super(ImmutableSLList.<String>nil()); // modifiers are currently ignored
@@ -59,16 +57,6 @@ public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
     
     public PositionedString getAssignable() {
         return assignable;
-    }
-    
-    private void setPosition(PositionedString ps) {
-        if (pos == Position.UNDEFINED)
-            pos = ps.pos;
-    }
-    
-    // TODO: move to interface
-    public Position getApproxPosition() {
-        return pos;
     }
     
     @Override
