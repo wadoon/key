@@ -1076,7 +1076,8 @@ public final class JavaInfo {
     }
 
     /**
-     * returns the KeYJavaType for class <tt>java.lang.Thread</tt>
+     * returns the KeYJavaType for class <tt>java.lang.Thread</tt>.
+     * In JavaCard, there is no Thread, the result will be <code>null</code>.
      */
     public KeYJavaType getJavaLangThread() {
         if (commonTypes[3] == null) {
@@ -1156,8 +1157,10 @@ public final class JavaInfo {
             }
             final KeYJavaType kjt =
                 getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
-            final TypeReference threadClass = new TypeRef(getJavaLangThread());
-            final ReferencePrefix runtimeThread = new LocationVariable(new ProgramElementName("thread"),getJavaLangThread());
+            // when doing JavaCard proofs instead of Java, there is no Thread
+            final KeYJavaType threadType = getJavaLangThread();
+            final TypeReference threadClass = threadType==null? null: new TypeRef(getJavaLangThread());
+            final ReferencePrefix runtimeThread = threadType==null? null: new LocationVariable(new ProgramElementName("thread"),getJavaLangThread());
             defaultExecutionContext =
                 new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null, threadClass, runtimeThread);
         }
