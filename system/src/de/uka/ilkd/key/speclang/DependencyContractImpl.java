@@ -504,10 +504,8 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig,
-            Contract contract) {
-        return new DependencyContractPO(initConfig,
-                (DependencyContract) contract);
+    public ProofOblInput createProofObl(InitConfig initConfig) {
+        return new DependencyContractPO(initConfig,this);
     }
 
 

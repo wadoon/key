@@ -165,12 +165,6 @@ public interface Contract extends DisplayableSpecificationElement<Contract> {
     public String proofToString(Services services);
 
 
-    /**
-     * Returns a proof obligation to the passed contract and initConfig.
-     */
-    @Override
-    public ProofOblInput createProofObl(InitConfig initConfig,
-	    Contract contract);
 
     /**
      * Returns a contract which is identical this contract except that

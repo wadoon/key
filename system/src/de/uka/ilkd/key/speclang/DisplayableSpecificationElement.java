@@ -21,6 +21,9 @@ extends SpecificationElement {
 
     public int id();
 
-    public ProofOblInput createProofObl(InitConfig copyWithServices, T contract);
+    /**
+     * Create a new PO from this specification element.
+     */
+    public ProofOblInput createProofObl(InitConfig copyWithServices);
     
 }

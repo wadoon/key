@@ -1265,7 +1265,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
+    public ProofOblInput createProofObl(InitConfig initConfig) {
+        return new FunctionalOperationContractPO(initConfig,this);
+    }
+
+
+    public static ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
         return new FunctionalOperationContractPO(initConfig,
                 (FunctionalOperationContract) contract);
     }

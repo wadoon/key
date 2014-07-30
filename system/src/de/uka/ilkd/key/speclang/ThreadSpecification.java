@@ -133,8 +133,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     }
 
     @Override
-    public ProofOblInput createProofObl(InitConfig copyWithServices,
-                    DisplayableSpecificationElement contract) {
+    public ProofOblInput createProofObl(InitConfig copyWithServices) {
         // todo Auto-generated method stub
         return null;
     }

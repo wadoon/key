@@ -399,7 +399,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                        initConfig, (FunctionalOperationContract)contract, true, true);
            }
            else {
-               po = contract.createProofObl(initConfig, contract);
+               po = contract.createProofObl(initConfig);
            }
            return new LoadedPOContainer(po, proofNum);
        }

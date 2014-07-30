@@ -1199,9 +1199,8 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Override
-    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-        assert contract instanceof WellDefinednessCheck;
-        return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
+    public final ProofOblInput createProofObl(InitConfig initConfig) {
+        return new WellDefinednessPO(initConfig, this);
     }
 
     @Override

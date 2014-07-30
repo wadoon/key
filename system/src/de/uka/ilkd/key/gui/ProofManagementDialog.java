@@ -433,7 +433,7 @@ public final class ProofManagementDialog extends JDialog {
         final DisplayableSpecificationElement contract = getActiveContractPanel().getContract();
 
         return contract == null? null
-                        : contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()), contract);
+                        : contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()));
     }
 
     private Proof findPreferablyClosedProof(ProofOblInput po) {
@@ -562,7 +562,7 @@ public final class ProofManagementDialog extends JDialog {
                     boolean lemmasLeft = false;
                     for (DisplayableSpecificationElement contract : contracts) {
                         // TODO: why do we create a PO to check if all proofs have been closed?
-                        final ProofOblInput po = contract.createProofObl(initConfig, contract);
+                        final ProofOblInput po = contract.createProofObl(initConfig);
                         Proof proof = findPreferablyClosedProof(po);
                         if (proof == null) {
                             allClosed = false;
