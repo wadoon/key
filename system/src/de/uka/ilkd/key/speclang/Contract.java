@@ -31,7 +31,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 /**
  * A contractual agreement about an ObserverFunction.
  */
-public interface Contract extends DisplayableSpecificationElement<Contract> {
+public interface Contract extends DisplayableSpecificationElement {
 
     public static final int INVALID_ID = Integer.MIN_VALUE;
 

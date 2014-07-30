@@ -162,7 +162,7 @@ class ContractSelectionPanel extends JPanel {
 
 
     @SuppressWarnings("unchecked")
-    public void setContracts(DisplayableSpecificationElement<?>[] contracts, String title) {
+    public void setContracts(DisplayableSpecificationElement[] contracts, String title) {
         if (contracts == null || contracts.length == 0) {
             contractList.setListData(new DisplayableSpecificationElement[0]);
             updateUI();
@@ -170,8 +170,8 @@ class ContractSelectionPanel extends JPanel {
         }
 
         //sort contracts by id (for the user's convenience)
-        Arrays.sort(contracts, new Comparator<DisplayableSpecificationElement<?>> () {
-            public int compare(DisplayableSpecificationElement<?> c1, DisplayableSpecificationElement<?> c2) {
+        Arrays.sort(contracts, new Comparator<DisplayableSpecificationElement> () {
+            public int compare(DisplayableSpecificationElement c1, DisplayableSpecificationElement c2) {
                 int res = c1.id() - c2.id();
                 if (res == 0) {
                     return c2.getName().compareTo(c1.getName());

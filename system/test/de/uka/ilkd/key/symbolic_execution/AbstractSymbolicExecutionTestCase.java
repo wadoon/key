@@ -1665,7 +1665,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertNotNull(target);
             // Find first contract.
             ImmutableSet<Contract> contracts = DefaultImmutableSet.nil();
-            for (DisplayableSpecificationElement<?> dse:
+            for (DisplayableSpecificationElement dse:
                             environment.getSpecificationRepository().getContracts(containerKJT, target)) {
                 if (dse instanceof Contract)
                     contracts.add((Contract)dse);

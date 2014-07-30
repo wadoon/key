@@ -327,7 +327,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          // Find first contract.
          ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
          // the implementation guarantees that a non-null target gets a Contract
-         for (DisplayableSpecificationElement<?> dse: environment.getSpecificationRepository().getContracts(containerKJT, target)) {
+         for (DisplayableSpecificationElement dse: environment.getSpecificationRepository().getContracts(containerKJT, target)) {
              if (dse instanceof Contract)
                          contracts.add((Contract)dse);
          }

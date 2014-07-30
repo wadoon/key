@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  * @author bruns
  *
  */
-public interface DisplayableSpecificationElement<T extends DisplayableSpecificationElement<?>> 
+public interface DisplayableSpecificationElement 
 extends SpecificationElement {
 
     /**
