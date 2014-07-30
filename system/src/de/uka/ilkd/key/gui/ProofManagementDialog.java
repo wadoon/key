@@ -428,7 +428,6 @@ public final class ProofManagementDialog extends JDialog {
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     private ProofOblInput createPOForSelectedContract() {
         final DisplayableSpecificationElement contract = getActiveContractPanel().getContract();
 

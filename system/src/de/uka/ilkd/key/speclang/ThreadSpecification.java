@@ -11,6 +11,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.TransitivityPO;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 
@@ -134,8 +135,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
     @Override
     public ProofOblInput createProofObl(InitConfig copyWithServices) {
-        // todo Auto-generated method stub
-        return null;
+        return new TransitivityPO(copyWithServices, this);
     }
 
 }
