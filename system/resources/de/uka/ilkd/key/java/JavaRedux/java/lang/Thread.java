@@ -10,7 +10,7 @@ public class Thread extends java.lang.Object implements java.lang.Runnable
    public final static int NORM_PRIORITY = 5;
    public final static int MAX_PRIORITY = 10;
 
-   private /*@ spec_public @*/ final Runnable target;
+   protected /*@ spec_public @*/ final Runnable target;
 
    public static java.lang.Thread currentThread();
    public static void yield();

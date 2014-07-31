@@ -6,6 +6,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -41,17 +42,17 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Sort heapSort = heapLDT.targetSort();
         final Sort fieldSort = heapLDT.getFieldSort();
         final Sort objectSort = javaInfo.objectSort();
-        final IntegerLDT integerLDT = environmentServices.getTypeConverter().getIntegerLDT();
+        final TypeConverter typeConverter = environmentServices.getTypeConverter();
+        final IntegerLDT integerLDT = typeConverter.getIntegerLDT();
         final Sort intSort = integerLDT.targetSort();
         
         final ProgramVariable threadVar = tb.selfVar(tspec.getKJT(), true);
         register(threadVar, environmentServices);
         final Term thread = tb.var(threadVar);
-        final ProgramVariable heapsVar = environmentServices.getTypeConverter().getSeqLDT().getHeapSeq();
+        final ProgramVariable heapsVar = typeConverter.getSeqLDT().getHeapSeq();
         final Term heaps = tb.var(heapsVar);
         
-        final KeYJavaType runnableType = javaInfo.getKeYJavaType(RUNNABLE);
-        final ProgramVariable target = new LocationVariable(TARGET, runnableType, true);
+        final ProgramVariable target = javaInfo.getAttributeSuper("target", tspec.getKJT());
         final ReferencePrefix reference = KeYJavaASTFactory.fieldReference(threadVar, target);
         final MethodReference runMethod = KeYJavaASTFactory.methodCall(reference, RUN, new ImmutableArray<Expression>());
         // TODO: further technical setup
@@ -85,7 +86,15 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Modality modality = Modality.DIA; // XXX: only diamond for uniform translation
         final Term prog = tb.prog(modality, jb, traceProp);
         final Term upd = tb.elementary(tb.var(heapsVar), tb.seqSingleton(tb.getBaseHeap()));
-        final Term guaranteeTerm = tb.apply(upd, prog);
+        
+        final Sort runnableSort = target.sort();
+        final Term targetField =  tb.func(new Function(new Name("java.lang.Thread::$target"), fieldSort));
+        // TODO how to get a field????
+        final Term selectTarget = tb.select(runnableSort, tb.getBaseHeap(), thread, targetField);
+        final LogicVariable t = new LogicVariable(new Name("run"), runnableSort);
+        // TODO this somehow prevents rule application!
+        final Term targetDef = tb.tt();// tb.equals(selectTarget, tb.var(t));
+        final Term guaranteeTerm = tb.imp(targetDef, tb.apply(upd, prog));
     
     
         // reflexivity / transitivity

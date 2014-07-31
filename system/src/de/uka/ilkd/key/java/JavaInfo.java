@@ -974,6 +974,15 @@ public final class JavaInfo {
         return getAttribute(attributeName, getKeYJavaType(s));
     }
 
+    public ProgramVariable getAttributeSuper(String attributeName, KeYJavaType classType) {
+        ProgramVariable res = null;
+        while (res == null && classType != null) {
+            res = getAttribute(attributeName, classType);
+            classType = getSuperclass(classType);
+        }
+        return res;
+    }
+    
     /**
      * returns a list of all attributes with the given program name
      * declared in one of <tt>type</tt>'s sub- or supertype including
@@ -1036,7 +1045,7 @@ public final class JavaInfo {
 	if (commonTypesCacheValid) return;
 
 	final String[] fullNames = new String[] {"java.lang.Object",
-		"java.lang.Cloneable", "java.io.Serializable"};
+		"java.lang.Cloneable", "java.io.Serializable", "java.lang.Thread"};
 
 	for (int i = 0; i<fullNames.length; i++) {
 	    commonTypes[i] = getTypeByClassName(fullNames[i]);
