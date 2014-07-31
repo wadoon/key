@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
@@ -26,23 +27,27 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
     private final static String NAME = "guarantee";
     private final static String RUN = "run";
     
+    private final TermBuilder tb; 
+    
     public GuaranteePO (InitConfig initConfig, ThreadSpecification tspec) {
         super(initConfig, NAME, tspec);
+        tb = environmentServices.getTermBuilder();
     }
 
     @Override
     public void readProblem() throws ProofInputException {
+
+        // guarantee term
         final Sort heapSort = heapLDT.targetSort();
         final Sort fieldSort = heapLDT.getFieldSort();
         final Sort objectSort = javaInfo.objectSort();
-        IntegerLDT integerLDT = environmentServices.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = environmentServices.getTypeConverter().getIntegerLDT();
         final Sort intSort = integerLDT.targetSort();
-        final TermBuilder tb = environmentServices.getTermBuilder();
         
         final ProgramVariable threadVar = tb.selfVar(tspec.getKJT(), true);
         register(threadVar, environmentServices);
         final Term thread = tb.var(threadVar);
-        final ProgramVariable heapsVar = environmentServices.getTypeConverter().getHeapLDT().getHeapSeq();
+        final ProgramVariable heapsVar = environmentServices.getTypeConverter().getSeqLDT().getHeapSeq();
         final Term heaps = tb.var(heapsVar);
         
         final KeYJavaType runnableType = javaInfo.getKeYJavaType(RUNNABLE);
@@ -80,7 +85,31 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Modality modality = Modality.DIA; // XXX: only diamond for uniform translation
         final Term prog = tb.prog(modality, jb, traceProp);
         final Term upd = tb.elementary(tb.var(heapsVar), tb.seqSingleton(tb.getBaseHeap()));
-        final Term result = tb.apply(upd, prog);
+        final Term guaranteeTerm = tb.apply(upd, prog);
+    
+    
+        // reflexivity / transitivity
+        final QuantifiableVariable heap0Var = new LogicVariable(new Name("heap_0"),heapSort);
+        final QuantifiableVariable heap1Var = new LogicVariable(new Name("heap_1"),heapSort);
+        final QuantifiableVariable heap2Var = new LogicVariable(new Name("heap_2"),heapSort);
+        final ArrayList<QuantifiableVariable> vars = new ArrayList<QuantifiableVariable>(3);
+        vars.add(heap0Var); vars.add(heap1Var); vars.add(heap2Var);
+        
+        final Term heap0 = tb.var(heap0Var);
+        final Term heap1 = tb.var(heap1Var);
+        final Term heap2 = tb.var(heap2Var);
+
+        final Term relyTrans0 = tspec.getRely(heap0, heap1, thread, environmentServices);
+        final Term relyTrans1 = tspec.getRely(heap1, heap2, thread, environmentServices);
+        final Term relyTrans2 = tspec.getRely(heap0, heap2, thread, environmentServices);
+        final Term trans = tb.imp(tb.and(relyTrans0,relyTrans1), relyTrans2);
+        
+        final Term reflex = tspec.getRely(heap0, heap0, thread, environmentServices);
+        
+        final Term transitivityTerm = tb.all(vars, tb.and(reflex, trans));
+        
+
+        final Term result = tb.and(guaranteeTerm, transitivityTerm);
         assignPOTerms(result);
     }
     

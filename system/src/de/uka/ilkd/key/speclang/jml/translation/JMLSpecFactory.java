@@ -969,7 +969,6 @@ public class JMLSpecFactory {
     }
 
 
-    @SuppressWarnings("unchecked")
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           VisibilityModifier visibility,
                                           PositionedString originalRep,
@@ -1010,7 +1009,6 @@ public class JMLSpecFactory {
     }
 
 
-    @SuppressWarnings("unchecked")
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           TextualJMLRepresents textualRep)
             throws SLTranslationException {
@@ -1082,7 +1080,6 @@ public class JMLSpecFactory {
     }
 
 
-    @SuppressWarnings("unchecked")
     public Contract createJMLDependencyContract(KeYJavaType kjt,
     											LocationVariable targetHeap,
                                                 PositionedString originalDep)

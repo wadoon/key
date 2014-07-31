@@ -27,9 +27,11 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
@@ -53,6 +55,8 @@ public final class SeqLDT extends LDT {
     private final Function seqDef;
     private final Function values;
     
+    // special
+    private LocationVariable heapSeq;
     
     public SeqLDT(TermServices services) {
 	super(NAME, services);
@@ -66,6 +70,9 @@ public final class SeqLDT extends LDT {
         seqIndexOf    = addFunction(services, "seqIndexOf");
         seqDef         = addFunction(services, "seqDef");
         values			= addFunction(services, "values");
+        
+        final Namespace progVars = services.getNamespaces().programVariables();
+        heapSeq = (LocationVariable) progVars.lookup("heaps");
     }
     
     
@@ -108,6 +115,7 @@ public final class SeqLDT extends LDT {
 	return seqDef;
     }
     
+    
     /** Placeholder for the sequence of values observed through the execution of an enhanced for loop.
      * Follows David Cok's proposal to adapt JML to Java5.
      * @return
@@ -116,6 +124,15 @@ public final class SeqLDT extends LDT {
     	return values;
     }
 
+
+    /**
+     * Sequence of heaps.
+     * Use to express trace properties.
+     * @return
+     */
+    public LocationVariable getHeapSeq() {
+        return heapSeq;
+    }
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 

@@ -94,7 +94,6 @@ public final class HeapLDT extends LDT {
     
     //heap pv
     private ImmutableList<LocationVariable> heaps;
-    private LocationVariable heapSeq;
     
     
     
@@ -129,7 +128,6 @@ public final class HeapLDT extends LDT {
         heaps = ImmutableSLList.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
-        heapSeq = (LocationVariable) progVars.lookup("heaps");
         wellFormed = new LinkedHashMap<Sort,Function>();
         wellFormed.put((Sort)sorts.lookup(new Name("Heap")), addFunction(services, "wellFormed"));
     }
@@ -334,9 +332,6 @@ public final class HeapLDT extends LDT {
         return null;
     }
     
-    public LocationVariable getHeapSeq() {
-        return heapSeq;
-    }
 
     /**
      * Given a "program variable" representing a field or a model field, 

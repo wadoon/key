@@ -9,9 +9,9 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.GuaranteePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.TransitivityPO;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 
@@ -135,7 +135,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
     @Override
     public ProofOblInput createProofObl(InitConfig copyWithServices) {
-        return new TransitivityPO(copyWithServices, this);
+        return new GuaranteePO(copyWithServices, this);
     }
 
 }
