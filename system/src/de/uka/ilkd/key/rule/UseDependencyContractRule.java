@@ -367,7 +367,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         							     target);
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         for(DisplayableSpecificationElement contract : old) {
-            if(!(contract instanceof DependencyContract)) {
+            if(contract instanceof DependencyContract) {
                 result = result.add((Contract)contract);
             }
         }
