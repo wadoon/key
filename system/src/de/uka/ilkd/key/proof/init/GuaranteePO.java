@@ -3,7 +3,6 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
-import recoder.java.statement.Try;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -24,13 +23,13 @@ import de.uka.ilkd.key.speclang.ThreadSpecification;
 
 public class GuaranteePO extends AbstractRelyGuaranteePO {
     
-    private final static String NAME = "guarantee";
+    private final static String NAME = ".Thread Specification";
     private final static String RUN = "run";
     
     private final TermBuilder tb; 
     
     public GuaranteePO (InitConfig initConfig, ThreadSpecification tspec) {
-        super(initConfig, NAME, tspec);
+        super(initConfig, tspec.getKJT()+NAME, tspec);
         tb = environmentServices.getTermBuilder();
     }
 
@@ -54,7 +53,7 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final LocationVariable target = (LocationVariable) javaInfo.getAttributeSuper("target", tspec.getKJT());
         final ReferencePrefix reference = KeYJavaASTFactory.fieldReference(threadVar, target);
         final MethodReference runMethod = KeYJavaASTFactory.methodCall(reference, RUN, new ImmutableArray<Expression>());
-        // TODO: further technical setup (exceptions)
+        // TODO: further technical setup
         final de.uka.ilkd.key.java.statement.Try tryCatch = KeYJavaASTFactory.tryBlock(KeYJavaASTFactory.block(runMethod), 
                         new Branch[]{KeYJavaASTFactory.catchClause(javaInfo, "e", "Throwable", KeYJavaASTFactory.block())});
         final JavaBlock jb = JavaBlock.createJavaBlock(KeYJavaASTFactory.block(tryCatch));
