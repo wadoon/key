@@ -121,8 +121,11 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term selectTarget = tb.select(runnableSort, tb.getBaseHeap(), thread, tb.func(targetField));
         final Term t = tb.func(new Function(new Name("runner"), runnableSort));
         final Term targetDef = tb.equals(selectTarget, t);
+        final Term tNonNull = tb.not(tb.equals(t, tb.NULL()));
+        final Term tCreated = tb.created(t);
+        // TODO: exact instance?
         
-        final Term freePre = tb.and(wellFormed, nonNull, created, exactInstance, targetDef);
+        final Term freePre = tb.and(wellFormed, nonNull, created, exactInstance, targetDef, tNonNull, tCreated);
         
         final Term result = tb.imp(freePre, tb.and(guaranteeTerm, transitivityTerm));
        
