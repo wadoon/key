@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
+import recoder.java.statement.Try;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -53,7 +55,9 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final ReferencePrefix reference = KeYJavaASTFactory.fieldReference(threadVar, target);
         final MethodReference runMethod = KeYJavaASTFactory.methodCall(reference, RUN, new ImmutableArray<Expression>());
         // TODO: further technical setup (exceptions)
-        final JavaBlock jb = JavaBlock.createJavaBlock(KeYJavaASTFactory.block(runMethod));
+        final de.uka.ilkd.key.java.statement.Try tryCatch = KeYJavaASTFactory.tryBlock(KeYJavaASTFactory.block(runMethod), 
+                        new Branch[]{KeYJavaASTFactory.catchClause(javaInfo, "e", "Throwable", KeYJavaASTFactory.block())});
+        final JavaBlock jb = JavaBlock.createJavaBlock(KeYJavaASTFactory.block(tryCatch));
         
         final QuantifiableVariable iVar = new LogicVariable(new Name("i"), intSort);
         final Term idx = tb.var(iVar);
