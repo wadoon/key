@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -23,8 +22,6 @@ import de.uka.ilkd.key.speclang.ThreadSpecification;
 
 public class GuaranteePO extends AbstractRelyGuaranteePO {
     
-    private static final String RUNNABLE = "java.lang.Runnable";
-    private static final ProgramElementName TARGET = new ProgramElementName("target");
     private final static String NAME = "guarantee";
     private final static String RUN = "run";
     
@@ -52,10 +49,10 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final ProgramVariable heapsVar = typeConverter.getSeqLDT().getHeapSeq();
         final Term heaps = tb.var(heapsVar);
         
-        final ProgramVariable target = javaInfo.getAttributeSuper("target", tspec.getKJT());
+        final LocationVariable target = (LocationVariable) javaInfo.getAttributeSuper("target", tspec.getKJT());
         final ReferencePrefix reference = KeYJavaASTFactory.fieldReference(threadVar, target);
         final MethodReference runMethod = KeYJavaASTFactory.methodCall(reference, RUN, new ImmutableArray<Expression>());
-        // TODO: further technical setup
+        // TODO: further technical setup (exceptions)
         final JavaBlock jb = JavaBlock.createJavaBlock(KeYJavaASTFactory.block(runMethod));
         
         final QuantifiableVariable iVar = new LogicVariable(new Name("i"), intSort);
@@ -87,14 +84,7 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term prog = tb.prog(modality, jb, traceProp);
         final Term upd = tb.elementary(tb.var(heapsVar), tb.seqSingleton(tb.getBaseHeap()));
         
-        final Sort runnableSort = target.sort();
-        final Term targetField =  tb.func(new Function(new Name("java.lang.Thread::$target"), fieldSort));
-        // TODO how to get a field????
-        final Term selectTarget = tb.select(runnableSort, tb.getBaseHeap(), thread, targetField);
-        final LogicVariable t = new LogicVariable(new Name("run"), runnableSort);
-        // TODO this somehow prevents rule application!
-        final Term targetDef = tb.tt();// tb.equals(selectTarget, tb.var(t));
-        final Term guaranteeTerm = tb.imp(targetDef, tb.apply(upd, prog));
+        final Term guaranteeTerm = tb.apply(upd, prog);
     
     
         // reflexivity / transitivity
@@ -118,7 +108,21 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term transitivityTerm = tb.all(vars, tb.and(reflex, trans));
         
 
-        final Term result = tb.and(guaranteeTerm, transitivityTerm);
+        // construct free preconditions
+        final Term wellFormed = tb.wellFormed(tb.getBaseHeap());
+        final Term nonNull = tb.not(tb.equals(thread, tb.NULL()));
+        final Term created = tb.created(thread);
+        final Term exactInstance = tb.exactInstance(tspec.getKJT().getSort(), thread);
+        final Sort runnableSort = target.sort();
+        final Function targetField =  typeConverter.getHeapLDT().getFieldSymbolForPV(target, environmentServices);
+        final Term selectTarget = tb.select(runnableSort, tb.getBaseHeap(), thread, tb.func(targetField));
+        final Term t = tb.func(new Function(new Name("runner"), runnableSort));
+        final Term targetDef = tb.equals(selectTarget, t);
+        
+        final Term freePre = tb.and(wellFormed, nonNull, created, exactInstance, targetDef);
+        
+        final Term result = tb.imp(freePre, tb.and(guaranteeTerm, transitivityTerm));
+       
         assignPOTerms(result);
     }
     
