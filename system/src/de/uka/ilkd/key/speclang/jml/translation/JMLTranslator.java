@@ -138,6 +138,9 @@ final class JMLTranslator {
         REACH_LOCS ("reachLocs"),
         COMMENTARY ("(* *)"),
         DL ("\\dl_"),
+        
+        // concurrency extension
+        PREV ("\\prev"),
 
         // arithmetic
         ADD ("+"),
@@ -427,6 +430,21 @@ final class JMLTranslator {
                 TermServices services = (TermServices) params[1];
                 return term == null ? tb.tt() : tb.convertToFormula(term);
             }
+        });
+        
+        translationMethods.put(JMLKeyWord.PREV, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                            Object... params) throws SLTranslationException {
+                checkParameters(params, SLExpression.class);
+                Term t = ((SLExpression) params[0]).getTerm();
+                final Map<Term, Term> map = new LinkedHashMap<Term, Term>();
+                map.put(tb.getBaseHeap(), tb.getPrevHeap());
+                OpReplacer or = new OpReplacer(map, tb.tf());
+                return or.replace(t);
+            }
+            
         });
 
         // quantifiers

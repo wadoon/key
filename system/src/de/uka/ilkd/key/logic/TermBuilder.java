@@ -1622,6 +1622,10 @@ public class TermBuilder {
         return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
+    public Term getPrevHeap() {
+        return var(services.getTypeConverter().getHeapLDT().getPrevHeap());
+    }
+    
     public Term dot(Sort asSort, Term o, Function f) {
     final Sort fieldSort
         = services.getTypeConverter().getHeapLDT().getFieldSort();

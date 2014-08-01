@@ -44,6 +44,8 @@ header {
     import java.util.Map;
     import java.util.LinkedHashMap;
     import java.util.ArrayList;
+    
+    import static de.uka.ilkd.key.speclang.jml.translation.JMLTranslator.JMLKeyWord.*;
 }
 
 class KeYJMLParser extends Parser;
@@ -1532,6 +1534,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |
 	(OLD | PRE) => result=oldexpression
 
+    |  PREV LPAREN result=expression RPAREN
+        { result = new SLExpression(translator.translate("\\prev", Term.class, result)); }
     |   result = transactionUpdated
     |
 	BACKUP LPAREN result=expression RPAREN

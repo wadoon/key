@@ -633,6 +633,7 @@ public class JMLSpecFactory {
             ImmutableList<ProgramVariable> paramVars,
             ImmutableList<PositionedString> assignableClauses)
                     throws SLTranslationException {
+        if (assignableClauses == null) return false;
 
         for (PositionedString expr : assignableClauses) {
             Term translated =
@@ -1140,8 +1141,7 @@ public class JMLSpecFactory {
         final Term assignable = spec.getAssignable()==null?
                         TB.allLocs() : // default
                         JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, threadVar, null, null, null, null, Term.class, services);
-        final KeYJavaType heapKJT = new KeYJavaType(services.getTypeConverter().getHeapLDT().targetSort());
-        final LocationVariable prevHeapVar = new LocationVariable(new ProgramElementName("heap'"),heapKJT);
+        final LocationVariable prevHeapVar = services.getTypeConverter().getHeapLDT().getPrevHeap();
         final LocationVariable currHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
         return new ThreadSpecification(name, null, threadClass, rely, guar, notAssigned, assignable, prevHeapVar, currHeapVar, threadVar);
     }

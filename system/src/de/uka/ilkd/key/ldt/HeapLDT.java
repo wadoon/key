@@ -56,8 +56,9 @@ public final class HeapLDT extends LDT {
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
     public static final Name BASE_HEAP_NAME = new Name("heap");
+    public static final Name PREV_HEAP_NAME = new Name("prevHeap");
     public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
-    public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME, SAVED_HEAP_NAME };
+    public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME, PREV_HEAP_NAME, SAVED_HEAP_NAME };
 
 
     
@@ -127,6 +128,7 @@ public final class HeapLDT extends LDT {
         prec		  = addFunction(services, "prec");
         heaps = ImmutableSLList.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
+                 .append((LocationVariable) progVars.lookup(PREV_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
         wellFormed = new LinkedHashMap<Sort,Function>();
         wellFormed.put((Sort)sorts.lookup(new Name("Heap")), addFunction(services, "wellFormed"));
@@ -315,6 +317,10 @@ public final class HeapLDT extends LDT {
     }
     
     public LocationVariable getSavedHeap() {
+        return heaps.tail().tail().head();
+    }
+    
+    public LocationVariable getPrevHeap() {
         return heaps.tail().head();
     }
 

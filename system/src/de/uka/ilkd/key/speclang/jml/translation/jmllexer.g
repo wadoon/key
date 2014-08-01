@@ -126,6 +126,7 @@ OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
 PLUS : "+";
 PRE : "\\pre";
+PREV : "\\prev";
 PRIVATEDATA : "\\private_data";
 QUESTIONMARK : "?";
 RBRACE : "}";
