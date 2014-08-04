@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -27,6 +26,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * ensures that the given instantiation for the schema variable denotes a
  * final field
+ * @author bruns
+ * @since 2.3.7249
  */
 public final class FinalReferenceCondition extends VariableConditionAdapter {
 
@@ -34,10 +35,10 @@ public final class FinalReferenceCondition extends VariableConditionAdapter {
     private final boolean negation;
 
     /**
-     * the static reference condition checks if a suggested
-     * instantiation for a schema variable denotes a static
+     * the final reference condition checks if a suggested
+     * instantiation for a schema variable denotes a final
      * reference. The flag negation allows to reuse this condition for
-     * ensuring non static references.
+     * ensuring nonfinal references.
      */
     public FinalReferenceCondition (SchemaVariable reference, 
                     boolean negation) {
@@ -61,8 +62,7 @@ public final class FinalReferenceCondition extends VariableConditionAdapter {
             } else{
                 return !negation;
             }
-            return (negation ^ attribute.isFinal()) && 
-                            !(attribute instanceof ProgramConstant);
+            return (negation ^ attribute.isFinal());
         }
         return true;
     }

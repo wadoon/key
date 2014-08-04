@@ -14,7 +14,14 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
-
+/**
+ * Thread specification for rely/gurantee as described in Daniel Bruns' thesis.
+ * The specification consists of two formulas rely and guarantee
+ * and two terms of type locSet assignable and notChanged.
+ * The formulas are parametric in two heaps.
+ * @author bruns
+ * @since 2.3.7349
+ */
 public class ThreadSpecification implements DisplayableSpecificationElement {
     
     private final static VisibilityModifier VM = new Public();

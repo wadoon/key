@@ -7,7 +7,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.Branch;
@@ -20,7 +19,13 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.ThreadSpecification;
 
-
+/**
+ * Proof obligation for rely/guarantee.
+ * It includes the trace property for guarantee (including framing)
+ * and reflexivity/transitivity for the rely condition.
+ * @author bruns
+ * @since 2.3.7349
+ */
 public class GuaranteePO extends AbstractRelyGuaranteePO {
     
     private final static String NAME = ".Thread Specification";

@@ -341,7 +341,6 @@ public class QueryExpand implements BuiltInRule {
      * @param qeps The resulting collection of query evaluation positions.
      * @author gladisch
      */
-    @SuppressWarnings("unchecked")
     private void findQueriesAndEvaluationPositions(Term t, int level, Vector<Integer> pathInTerm,
     		               ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive,
     		               int qepLevel, boolean qepIsPositive, List<QueryEvalPos> qeps){
