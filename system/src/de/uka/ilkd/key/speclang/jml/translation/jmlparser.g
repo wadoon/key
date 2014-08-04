@@ -45,7 +45,6 @@ header {
     import java.util.LinkedHashMap;
     import java.util.ArrayList;
     
-    import static de.uka.ilkd.key.speclang.jml.translation.JMLTranslator.JMLKeyWord.*;
 }
 
 class KeYJMLParser extends Parser;

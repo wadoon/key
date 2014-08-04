@@ -95,6 +95,7 @@ public final class HeapLDT extends LDT {
     
     //heap pv
     private ImmutableList<LocationVariable> heaps;
+    private final LocationVariable prevHeap;
     
     
     
@@ -128,8 +129,8 @@ public final class HeapLDT extends LDT {
         prec		  = addFunction(services, "prec");
         heaps = ImmutableSLList.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
-                 .append((LocationVariable) progVars.lookup(PREV_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
+        prevHeap = (LocationVariable) progVars.lookup(PREV_HEAP_NAME);
         wellFormed = new LinkedHashMap<Sort,Function>();
         wellFormed.put((Sort)sorts.lookup(new Name("Heap")), addFunction(services, "wellFormed"));
     }
@@ -317,11 +318,11 @@ public final class HeapLDT extends LDT {
     }
     
     public LocationVariable getSavedHeap() {
-        return heaps.tail().tail().head();
+        return heaps.tail().head();
     }
     
     public LocationVariable getPrevHeap() {
-        return heaps.tail().head();
+        return prevHeap;
     }
 
     
