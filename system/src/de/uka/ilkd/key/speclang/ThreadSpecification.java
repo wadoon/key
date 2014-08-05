@@ -29,6 +29,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     private final String displayName;
     
     private final KeYJavaType threadType;
+    private final Term pre;
     private final Term rely;
     private final Term guarantee;
     private final Term assignable;
@@ -37,12 +38,13 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     private final ProgramVariable threadVar;
     
     public ThreadSpecification (String name, String displayName, 
-                    KeYJavaType threadType,
+                    KeYJavaType threadType, Term pre,
                     Term rely, Term guarantee, Term notChanged, Term assignable,
                     LocationVariable prevHeapVar, LocationVariable currHeapVar,
                     ProgramVariable threadVar) {
         assert name != null;
         assert threadType != null;
+        assert pre != null;
         assert rely != null;
         assert guarantee != null;
         assert assignable != null;
@@ -53,6 +55,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         this.name = name;
         this.displayName = displayName==null? name: displayName;
         this.threadType = threadType;
+        this.pre = pre;
         this.rely = rely;
         this.guarantee = guarantee;
         this.assignable = assignable;
@@ -61,13 +64,20 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         this.currHeapVar = currHeapVar;
         this.threadVar = threadVar;
     }
-                  
+    
+    public Term getPre (Term currHeap, Term threadVar, Services services) {
+        final Map<Term,Term> replaceMap = getReplaceMap(null, currHeap, threadVar, services);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
+        return or.replace(pre);
+    }
+        
     public Term getRely (Term prevHeap, Term currHeap, 
                     Term threadVar, Services services) {
         final Map<Term,Term> replaceMap = getReplaceMap(prevHeap, currHeap, threadVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(rely);
     }
+    
     public Term getGuarantee (Term prevHeap, Term currHeap, 
                     Term threadVar, Services services) {
         final Map<Term,Term> replaceMap = getReplaceMap(prevHeap, currHeap, threadVar, services);
@@ -112,7 +122,8 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                     Term threadVar2, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         Map<Term, Term> res = new LinkedHashMap<Term, Term>();
-        res.put(tb.var(prevHeapVar), prevHeap);
+        if (prevHeap != null)
+            res.put(tb.var(prevHeapVar), prevHeap);
         res.put(tb.var(currHeapVar), currHeap);
         res.put(tb.var(threadVar), threadVar2);
         return res;
@@ -120,14 +131,15 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     
     @Override
     public String toString() {
-        return "rely: "+rely+"; guarantee: "+guarantee
+        return "pre: "+pre+"; rely: "+rely+"; guarantee: "+guarantee
                         +"; assignable: "+assignable
                         +"; notChanged: "+notChanged;
     }
 
     @Override
     public String getHTMLText(Services serv) {
-        return "<html><b>rely: </b>"+LogicPrinter.quickPrintTerm(rely, serv) 
+        return "<html><b>pre: </b>"+LogicPrinter.quickPrintTerm(pre, serv)
+                        +"<br><b>rely: </b>"+LogicPrinter.quickPrintTerm(rely, serv) 
                         +"<br><b>guarantee: </b>"+LogicPrinter.quickPrintTerm(guarantee, serv)
                         +"<br><b>notChanged: </b>"+LogicPrinter.quickPrintTerm(notChanged, serv)
                         +"<br><b>assignable: </b>"+LogicPrinter.quickPrintTerm(assignable, serv)
@@ -143,6 +155,26 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     @Override
     public ProofOblInput createProofObl(InitConfig copyWithServices) {
         return new GuaranteePO(copyWithServices, this);
+    }
+    
+    @Override
+    public boolean equals (Object o) {
+        if (o instanceof ThreadSpecification) {
+            final ThreadSpecification t = (ThreadSpecification) o;
+            return t.threadType.equals(threadType)
+                            && t.pre.equals(pre)
+                            && t.rely.equals(rely)
+                            && t.guarantee.equals(guarantee)
+                            && t.notChanged.equals(notChanged)
+                            && t.assignable.equals(assignable);
+        } else return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        return 2*pre.hashCode() + 3*rely.hashCode() + 7*guarantee.hashCode()
+                        + 11*notChanged.hashCode() + 13*assignable.hashCode()
+                        + 17*threadType.hashCode();
     }
 
 }

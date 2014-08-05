@@ -1127,6 +1127,11 @@ public class JMLSpecFactory {
         final LocationVariable threadVar = TB.selfVar(threadClass, false); // TODO
         Term rely = TB.tt(); // default
         Term guar = TB.tt(); // default
+        Term pre = TB.tt(); // default
+        for (PositionedString ps: spec.getPres()) {
+            final Term preTrans = JMLTranslator.translate(ps, threadClass, threadVar, null, null, null, null, Term.class, services); 
+            pre = TB.and(pre, preTrans);
+        }
         for (PositionedString ps: spec.getRelies()) {
             final Term relyTrans = JMLTranslator.translate(ps, threadClass, threadVar, null, null, null, null, Term.class, services); 
             rely = TB.and(rely, relyTrans);
@@ -1143,7 +1148,7 @@ public class JMLSpecFactory {
                         JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, threadVar, null, null, null, null, Term.class, services);
         final LocationVariable prevHeapVar = services.getTypeConverter().getHeapLDT().getPrevHeap();
         final LocationVariable currHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
-        return new ThreadSpecification(name, null, threadClass, rely, guar, notAssigned, assignable, prevHeapVar, currHeapVar, threadVar);
+        return new ThreadSpecification(name, null, threadClass, pre, rely, guar, notAssigned, assignable, prevHeapVar, currHeapVar, threadVar);
     }
 
 

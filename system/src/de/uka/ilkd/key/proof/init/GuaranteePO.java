@@ -78,6 +78,7 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term select1 = tb.select(Sort.ANY, currHeap, o, f);
         final Term equalSelect = tb.equals(select0, select1);
         
+        final Term pre = tspec.getPre(currHeap, thread, environmentServices);
         final Term notChanged = tspec.getNotChanged(thread, environmentServices);
         final Term changeLocal = tspec.getAssignable(thread, environmentServices);
         final Term changeRemote = tb.setMinus(tb.allLocs(), notChanged);
@@ -92,7 +93,7 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term prog = tb.prog(modality, jb, traceProp);
         final Term upd = tb.elementary(tb.var(heapsVar), tb.seqSingleton(tb.getBaseHeap()));
         
-        final Term guaranteeTerm = tb.apply(upd, prog);
+        final Term guaranteeTerm = tb.imp(pre, tb.apply(upd, prog));
     
     
         // reflexivity / transitivity

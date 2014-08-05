@@ -345,6 +345,7 @@ thread_spec[ImmutableList<String> mods]
 }
 :
   thread_spec_keyword
+  (REQUIRES ps=expression { spec.addPre(ps); } )*
   (RELIES_ON ps=expression { spec.addRely(ps); } )*
   (GUARANTEES ps=expression { spec.addGuarantee(ps); })*
   (NOT_ASSIGNED ps=expression { spec.setNotAssigned(ps); })?

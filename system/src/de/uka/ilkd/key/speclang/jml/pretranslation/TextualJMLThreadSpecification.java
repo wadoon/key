@@ -7,7 +7,8 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
 
 public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
-    
+
+    private ImmutableList<PositionedString> pres = ImmutableSLList.nil();
     private ImmutableList<PositionedString> relies = ImmutableSLList.nil();
     private ImmutableList<PositionedString> guarantees = ImmutableSLList.nil();
     private PositionedString notAssigned;
@@ -19,6 +20,11 @@ public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
     
     // Implementation note: append() more expensive than prepend(), but preserves original order
 
+    void addPre (PositionedString newPre) {
+        pres = relies.append(newPre);
+        setPosition(newPre);
+    }
+    
     void addRely (PositionedString newRely) {
         relies = relies.append(newRely);
         setPosition(newRely);
@@ -37,6 +43,10 @@ public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
     void setAssignable(PositionedString newAssignable) {
         assignable = newAssignable;
         setPosition(newAssignable);
+    }
+    
+    public ImmutableList<PositionedString> getPres() {
+        return pres;
     }
 
     
@@ -63,24 +73,34 @@ public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
     public String toString() {
         final StringBuffer sb = new StringBuffer();
         sb.append("concurrent_behavior\n");
+        for (PositionedString pre: pres) {
+            sb.append("requires ");
+            sb.append(pre.toString());
+            sb.append(';');
+            sb.append('\n');
+        }
         for (PositionedString rely: relies) {
             sb.append("relies_on ");
             sb.append(rely.toString());
+            sb.append(';');
             sb.append('\n');
         }
         for (PositionedString guar: guarantees) {
             sb.append("guarantees ");
             sb.append(guar.toString());
+            sb.append(';');
             sb.append('\n');
         }
         if (notAssigned != null) {
             sb.append("not_assigned ");
             sb.append(notAssigned);
+            sb.append(';');
             sb.append('\n');
         }
         if (assignable != null) {
             sb.append("assignable ");
             sb.append(assignable);
+            sb.append(';');
             sb.append('\n');
         }
         return sb.toString();
@@ -90,7 +110,7 @@ public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
     public boolean equals (Object o) {
         if (o instanceof TextualJMLThreadSpecification) {
             final TextualJMLThreadSpecification t = (TextualJMLThreadSpecification) o;
-            return t.relies.equals(this.relies)
+            return t.pres.equals(this.pres) && t.relies.equals(this.relies)
                             && t.guarantees.equals(guarantees)
                             && equalsOrNull(t.notAssigned,notAssigned)
                             && equalsOrNull(t.assignable,assignable);
