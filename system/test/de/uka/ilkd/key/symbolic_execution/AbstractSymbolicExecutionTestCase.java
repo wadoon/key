@@ -1770,7 +1770,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             for (DisplayableSpecificationElement dse:
                             environment.getSpecificationRepository().getContracts(containerKJT, target)) {
                 if (dse instanceof Contract)
-                    contracts.add((Contract)dse);
+                    contracts = contracts.add((Contract)dse);
             }
             assertFalse(contracts.isEmpty());
             Contract contract = contracts.iterator().next();

@@ -329,7 +329,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          // the implementation guarantees that a non-null target gets a Contract
          for (DisplayableSpecificationElement dse: environment.getSpecificationRepository().getContracts(containerKJT, target)) {
              if (dse instanceof Contract)
-                         contracts.add((Contract)dse);
+                 contracts = contracts.add((Contract)dse);
          }
          assertFalse(contracts.isEmpty());
          Contract contract = contracts.iterator().next();
