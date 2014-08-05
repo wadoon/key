@@ -21,7 +21,7 @@ public final class TextualJMLThreadSpecification extends TextualJMLConstruct {
     // Implementation note: append() more expensive than prepend(), but preserves original order
 
     void addPre (PositionedString newPre) {
-        pres = relies.append(newPre);
+        pres = pres.append(newPre);
         setPosition(newPre);
     }
     

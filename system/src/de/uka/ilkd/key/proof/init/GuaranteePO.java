@@ -78,7 +78,7 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         final Term select1 = tb.select(Sort.ANY, currHeap, o, f);
         final Term equalSelect = tb.equals(select0, select1);
         
-        final Term pre = tspec.getPre(currHeap, thread, environmentServices);
+        final Term pre = tspec.getPre(tb.getBaseHeap(), thread, environmentServices);
         final Term notChanged = tspec.getNotChanged(thread, environmentServices);
         final Term changeLocal = tspec.getAssignable(thread, environmentServices);
         final Term changeRemote = tb.setMinus(tb.allLocs(), notChanged);
