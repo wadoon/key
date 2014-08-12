@@ -520,9 +520,11 @@ public final class UseOperationContractRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal,
                                 PosInOccurrence pio) {
-	//focus must be top level succedent
-	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-	    return false;
+        // do not apply rule for concurrent Java
+        final boolean sequential = goal.proof().getSettings().getChoiceSettings().getDefaultChoices().get("concurrency").equals("off");
+        //focus must be top level succedent
+        if(pio == null || !pio.isTopLevel() || pio.isInAntec() || !sequential) {
+            return false;
 	}
 
 	//instantiation must succeed
