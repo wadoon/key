@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -21,12 +20,12 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.ProofStarter;
 
 public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
@@ -75,15 +74,14 @@ public final class StaRVOOrSUtil {
          SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(env.getMediator(), proof, false, false, true);
          builder.analyse();
          // Run auto mode
-         ProofStarter ps = new ProofStarter(false);
-         ps.init(new SingleProof(proof, proofObligation.name()));
-         ps.start();
+         env.getUi().startAndWaitForAutoMode(proof);
          // Update symbolic execution tree
          builder.analyse();
          // Analyze discovered symbolic execution tree
          analyzeSymbolicExecutionTree(builder, contract);
       }
       finally {
+         env.getMediator().setProof(null);
          proof.dispose();
       }
    }
@@ -91,25 +89,28 @@ public final class StaRVOOrSUtil {
    protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract) throws ProofInputException {
       System.out.println();
       System.out.println(contract.getName());
-      System.out.println("==========================");
+      String line = "";
+      for (int i = 0; i < contract.getName().length();i++)
+         line = line.concat("=");
+      System.out.println(line);
+           
       IExecutionStart symRoot = builder.getStartNode();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(symRoot);
       while (iter.hasNext()) {
          IExecutionNode next = iter.next();
+         // Check applied contracts
+//         if (next instanceof ExecutionOperationContract) {
+//            ExecutionOperationContract ec = (ExecutionOperationContract)next;
+//            ec.getName()
+//         }
          // Check if node is a leaf node
          if (next.getChildren().length == 0) {
             // Check if verified
-            if (next instanceof IExecutionTermination && 
-                ((IExecutionTermination)next).isBranchVerified()) {
-               // Nothing to do
-            }
-            else {
-               // Get path condition
-               Term pathCondition = next.getPathCondition();
-               // Pretty print path condition
-               String pathConditionPP = next.getFormatedPathCondition();
-               System.out.println(next.getName() + " is " + next.getElementType() + " with path condition: " + pathConditionPP);
-            }
+            boolean verified = next instanceof IExecutionTermination && ((IExecutionTermination)next).isBranchVerified();
+            // Get path condition
+            String pathConditionPP = next.getFormatedPathCondition();
+            System.out.println(next.getName() + " is " + next.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified);
+            System.out.println();
          }
       }
    }
