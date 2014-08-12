@@ -59,8 +59,7 @@ public final class RelyRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio.isInAntec()) return false;
-        if (!pio.isTopLevel()) return false;
+        if (pio == null || pio.isInAntec() || !pio.isTopLevel()) return false;
         final Services services = goal.proof().getServices();
         // check whether rely/guarantee option is set
         if (!relyGuaranteeEnabled(goal)) return false;
@@ -72,7 +71,8 @@ public final class RelyRule implements BuiltInRule {
     }
 
     private boolean relyGuaranteeEnabled(Goal goal) {
-        return goal.proof().getSettings().getChoiceSettings().getChoices().get("concurrency").equals("RG");
+        final String concurrenyChoice = goal.proof().getSettings().getChoiceSettings().getDefaultChoice("concurrency");
+        return "concurrency:RG".equals(concurrenyChoice);
     }
     
     private Instantiation getInstantiation(Term target, Goal goal, Services services) {
@@ -90,7 +90,7 @@ public final class RelyRule implements BuiltInRule {
         }
         if (!(activeStm instanceof Assignment)) return null;
         final Expression lhs = ((Assignment) activeStm).getLhs();
-        assert lhs instanceof VariableReference;
+//        assert lhs instanceof ProgramVariable;
         
         // investigate RHS
         final Expression rhs = ((Assignment) activeStm).getRhs();
@@ -101,9 +101,9 @@ public final class RelyRule implements BuiltInRule {
             if (field.isFinal()) return null;
 
             // prefix may still be this, static access (w/ variable prefix)
-            return new Instantiation(target, (VariableReference) lhs, (FieldReference) rhs); // TODO
+            return new Instantiation(target, (ProgramVariable) lhs, (FieldReference) rhs); // TODO
         } else if (rhs instanceof ArrayReference) {
-          return new Instantiation(target, (VariableReference) lhs, (ArrayReference) rhs);
+          return new Instantiation(target, (ProgramVariable) lhs, (ArrayReference) rhs);
         } else
             return null;
     }
@@ -118,7 +118,7 @@ public final class RelyRule implements BuiltInRule {
         
         final Term target;
         final boolean emptyMod;
-        final VariableReference lhs;
+        final ProgramVariable lhs;
         final FieldReference fieldAccess;
         final ArrayReference arrayAccess;
         
@@ -130,7 +130,7 @@ public final class RelyRule implements BuiltInRule {
             arrayAccess = null;
         }
         
-        Instantiation (Term target, VariableReference lhs, FieldReference fr) {
+        Instantiation (Term target, ProgramVariable lhs, FieldReference fr) {
             this.target = target;
             emptyMod = false;
             this.lhs = lhs;
@@ -138,7 +138,7 @@ public final class RelyRule implements BuiltInRule {
             arrayAccess = null;
         }
         
-        Instantiation (Term target, VariableReference lhs, ArrayReference ar) {
+        Instantiation (Term target, ProgramVariable lhs, ArrayReference ar) {
             this.target = target;
             emptyMod = false;
             this.lhs = lhs;

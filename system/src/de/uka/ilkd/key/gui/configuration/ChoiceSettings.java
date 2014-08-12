@@ -70,6 +70,9 @@ public class ChoiceSettings implements Settings, Cloneable {
 	return (HashMap<String,String>) category2Default.clone();
     }
     
+    public String getDefaultChoice (String category) {
+        return category2Default.get(category);
+    }
     
     /** 
      * returns the current selected choices as set    

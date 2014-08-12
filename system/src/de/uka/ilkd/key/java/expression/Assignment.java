@@ -46,9 +46,10 @@ public abstract class Assignment extends Operator
      */
     public Assignment(ExtList children) {
         super(children);
+        // try to resolve lhs, rhs
         final Expression[] ex = children.collect(Expression.class);
-        lhs = ex[0];
-        rhs = ex[1];
+        lhs = ex.length >= 1 ? ex[0]: null;
+        rhs = ex.length >= 2 ? ex[1]: null;
     }
 
 
