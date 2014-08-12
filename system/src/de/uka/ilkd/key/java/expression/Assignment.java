@@ -27,9 +27,12 @@ import de.uka.ilkd.key.util.ExtList;
 
 public abstract class Assignment extends Operator 
     implements ExpressionStatement {
+    
+    private final Expression lhs, rhs;
 
     public Assignment() {
-
+        lhs = null;
+        rhs = null;
     }
 
     /**
@@ -42,7 +45,10 @@ public abstract class Assignment extends Operator
      * 		Comments
      */
     public Assignment(ExtList children) {
-	super(children);
+        super(children);
+        final Expression[] ex = children.collect(Expression.class);
+        lhs = ex[0];
+        rhs = ex[1];
     }
 
 
@@ -52,6 +58,8 @@ public abstract class Assignment extends Operator
     */
     public Assignment(Expression lhs) {
         super(lhs);
+        this.lhs = lhs;
+        rhs = null;
     }
 
     /**
@@ -61,8 +69,17 @@ public abstract class Assignment extends Operator
     */
     public Assignment(Expression lhs, Expression rhs) {
         super(lhs, rhs);
+        this.lhs = lhs;
+        this.rhs = rhs;
     }
 
+    public Expression getLhs() {
+        return lhs;
+    }
+    
+    public Expression getRhs() {
+        return rhs;
+    }
 
     /**
      *        Checks if this operator is left or right associative. Assignments
