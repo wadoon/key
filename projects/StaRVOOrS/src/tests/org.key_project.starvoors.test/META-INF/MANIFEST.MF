@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
+Bundle-Name: StaRVOOrS Tests
 Bundle-SymbolicName: org.key_project.starvoors.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.starvoors.test.Activator
@@ -11,3 +11,4 @@ Require-Bundle: org.eclipse.ui,
  org.key_project.starvoors;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project
