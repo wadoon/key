@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Starvoors
+Bundle-SymbolicName: org.key_project.starvoors
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.starvoors.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.key_project.key4eclipse;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.key_project.starvoors.util
