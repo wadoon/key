@@ -6,9 +6,11 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ArrayReference;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.speclang.ThreadSpecification;
 
 /**
  * Rule to handle heap read access in concurrent programs
@@ -30,7 +33,7 @@ import de.uka.ilkd.key.proof.Goal;
 public final class RelyRule implements BuiltInRule {
     
     public final static RelyRule INSTANCE = new RelyRule();
-    private static final Name NAME = new Name("Concurrent Read");
+    private static final Name NAME = new Name("Rely");
     
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;
@@ -67,7 +70,8 @@ public final class RelyRule implements BuiltInRule {
         final Instantiation inst = getInstantiation(target, goal, services);
         lastFocusTerm = target;
         lastInstantiation = inst;
-        return inst != null;
+        if (inst == null) return false;
+        return getApplicableThreadSpec(inst.target.javaBlock(), services) != null;
     }
 
     private boolean relyGuaranteeEnabled(Goal goal) {
@@ -90,12 +94,12 @@ public final class RelyRule implements BuiltInRule {
         }
         if (!(activeStm instanceof Assignment)) return null;
         final Expression lhs = ((Assignment) activeStm).getLhs();
-//        assert lhs instanceof ProgramVariable;
         
         // investigate RHS
         final Expression rhs = ((Assignment) activeStm).getRhs();
         // must be field access (excludes array length)
         if (rhs instanceof FieldReference) {
+            assert lhs instanceof ProgramVariable: "unexpected: "+lhs;
             final ProgramVariable field = ((FieldReference) rhs).getProgramVariable();
             // must not be final
             if (field.isFinal()) return null;
@@ -103,9 +107,16 @@ public final class RelyRule implements BuiltInRule {
             // prefix may still be this, static access (w/ variable prefix)
             return new Instantiation(target, (ProgramVariable) lhs, (FieldReference) rhs); // TODO
         } else if (rhs instanceof ArrayReference) {
-          return new Instantiation(target, (ProgramVariable) lhs, (ArrayReference) rhs);
+            assert lhs instanceof ProgramVariable: "unexpected: "+lhs;
+            return new Instantiation(target, (ProgramVariable) lhs, (ArrayReference) rhs);
         } else
             return null;
+    }
+    
+    private ThreadSpecification getApplicableThreadSpec(JavaBlock jb, Services services) {
+        final ExecutionContext ec = JavaTools.getInnermostExecutionContext(jb, services);
+        final KeYJavaType threadType = ec.getThreadTypeReference().getKeYJavaType();
+        return services.getSpecificationRepository().getThreadSpecification(threadType);
     }
 
     @Override
@@ -124,6 +135,7 @@ public final class RelyRule implements BuiltInRule {
         
         Instantiation (Term target) {
             this.target = target;
+            assert target.javaBlock() != null;
             emptyMod = true;
             lhs = null;
             fieldAccess = null;
@@ -132,6 +144,7 @@ public final class RelyRule implements BuiltInRule {
         
         Instantiation (Term target, ProgramVariable lhs, FieldReference fr) {
             this.target = target;
+            assert target.javaBlock() != null;
             emptyMod = false;
             this.lhs = lhs;
             fieldAccess = fr;
@@ -140,6 +153,7 @@ public final class RelyRule implements BuiltInRule {
         
         Instantiation (Term target, ProgramVariable lhs, ArrayReference ar) {
             this.target = target;
+            assert target.javaBlock() != null;
             emptyMod = false;
             this.lhs = lhs;
             fieldAccess = null;
