@@ -116,7 +116,7 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  * </li>
  * </ul>
  */
-public final class NotationInfo {
+public class NotationInfo {
     
 
 
@@ -183,7 +183,9 @@ public final class NotationInfo {
     	createDefaultNotationTable();
     }
     
-    
+    protected void setNotation(Object key, Notation notation) {
+       notationTable.put(key, notation);
+    }
     
     //-------------------------------------------------------------------------
     //internal methods

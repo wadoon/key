@@ -1,12 +1,21 @@
 package org.key_project.starvoors.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.Notation;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -18,6 +27,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
@@ -25,13 +35,12 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
    
-   public static void start(File location) throws ProofInputException {
+   public static void start(File location) throws ProofInputException, IOException {
       // Load source code and rules
       KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null);
       try {
@@ -54,7 +63,7 @@ public final class StaRVOOrSUtil {
       }
    }
 
-   protected static void verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException {
+   protected static void verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException, IOException {
       InitConfig proofInitConfig = env.getInitConfig().deepCopy();
       ProofOblInput proofObligation = new FunctionalOperationContractPO(proofInitConfig, (FunctionalOperationContract)contract, true, true);
       Proof proof = env.getUi().createProof(proofInitConfig, proofObligation);
@@ -86,7 +95,7 @@ public final class StaRVOOrSUtil {
       }
    }
    
-   protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract) throws ProofInputException {
+   protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract) throws ProofInputException, IOException {
       System.out.println();
       System.out.println(contract.getName());
       String line = "";
@@ -96,26 +105,67 @@ public final class StaRVOOrSUtil {
            
       IExecutionStart symRoot = builder.getStartNode();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(symRoot);
+      Map<Term, ExecutionOperationContract> contractResults = new HashMap<Term, ExecutionOperationContract>();
       while (iter.hasNext()) {
          IExecutionNode next = iter.next();
          // Check applied contracts
-//         if (next instanceof ExecutionOperationContract) {
-//            ExecutionOperationContract ec = (ExecutionOperationContract)next;
-//            ec.getName()
-//         }
+         if (next instanceof ExecutionOperationContract) {
+            ExecutionOperationContract ec = (ExecutionOperationContract)next;
+            contractResults.put(ec.getResultTerm(), ec);
+         }
          // Check if node is a leaf node
          if (next.getChildren().length == 0) {
-            // Check if verified
-            boolean verified = next instanceof IExecutionTermination && ((IExecutionTermination)next).isBranchVerified();
-            // Get path condition
-            String pathConditionPP = next.getFormatedPathCondition();
-            System.out.println(next.getName() + " is " + next.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified);
-            System.out.println();
+            workWithLeafNode(next, contractResults);
          }
       }
    }
    
-   public static String prettyPrint(SymbolicExecutionTreeBuilder builder, Term term) {
-      return SymbolicExecutionUtil.formatTerm(term, builder.getProof().getServices(), false, true);
+   protected static void workWithLeafNode(IExecutionNode leaf, final Map<Term, ExecutionOperationContract> contractResults) throws ProofInputException, IOException {
+      // Check if verified
+      boolean verified = leaf instanceof IExecutionTermination && ((IExecutionTermination)leaf).isBranchVerified();
+      // Get path condition
+      Term pathCondition = leaf.getPathCondition();
+      StringBuffer sb = transformTermPP(pathCondition, contractResults, leaf.getServices());
+      String pathConditionPP = sb.toString();
+      System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified);
+      System.out.println();
+   }
+   
+   protected static StringBuffer transformTermPP(Term term, Map<Term, ExecutionOperationContract> contractResults, Services services) throws IOException {
+      NotationInfo ni = new TransformationNotationInfo(contractResults);
+      LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), ni, services, true);
+      logicPrinter.getNotationInfo().refresh(services, true, false);
+      logicPrinter.printTerm(term);
+      return logicPrinter.result();      
+   }
+   
+   protected static class TransformationNotationInfo extends NotationInfo {
+      public TransformationNotationInfo(Map<Term, ExecutionOperationContract> contractResults) {
+         setNotation(LocationVariable.class, new LocationVariableTransformationNotation(contractResults));
+      }
+   }
+      
+   protected static class LocationVariableTransformationNotation extends Notation.VariableNotation {
+      private final Map<Term, ExecutionOperationContract> contractResults;
+
+      protected LocationVariableTransformationNotation(Map<Term, ExecutionOperationContract> contractResults) {
+         this.contractResults = contractResults;
+      }
+
+      @Override
+      public void print(Term t, LogicPrinter sp) throws IOException {
+         try {
+            IExecutionOperationContract contract = contractResults.get(t);
+            if (contract != null) {
+               sp.printConstant(contract.getName());
+            }
+            else {
+               super.print(t, sp);
+            }
+         }
+         catch (ProofInputException e) {
+            throw new IOException(e);
+         }
+      }
    }
 }
