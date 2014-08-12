@@ -1717,7 +1717,7 @@ public final class SymbolicExecutionUtil {
       while (exceptionDefinition.op() == Junctor.AND) {
          exceptionDefinitionParent = exceptionDefinition;
          Term firstSub = exceptionDefinition.sub(0);
-         if (firstSub.op() == node.proof().env().getInitialServices().getJavaInfo().getInv()) { // TODO: Replace "node.proof().env().getInitialServices().getJavaInfo().getInv()" with "node.proof().getServices().getJavaInfo().getInv()" when bug item http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1386 is solved.
+         if (firstSub.op() == node.proof().getServices().getJavaInfo().getInv()) { 
             exceptionDefinition = exceptionDefinition.sub(1);
          }
          else {
@@ -3091,7 +3091,7 @@ public final class SymbolicExecutionUtil {
                                    Services services, 
                                    boolean useUnicode,
                                    boolean usePrettyPrinting) {
-      if (useUnicode || usePrettyPrinting) {
+      if ((useUnicode || usePrettyPrinting) && services != null) {
          StringBuffer result;
          NotationInfo ni = new NotationInfo();
          LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), ni, services, true);

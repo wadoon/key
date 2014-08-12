@@ -39,6 +39,109 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyNumber
+    */
+   public void testVerifyNumberNormal() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyNumber/test/VerifyNumberNormal.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyNumber/oracle/VerifyNumberNormal.xml",
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyMin
+    */
+   public void testVerifyMinTrueBranch() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyMin/test/VerifyMinTrueBranch.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyMin/oracle/VerifyMinTrueBranch.xml",
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyMin
+    */
+   public void testVerifyMin() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyMin/test/VerifyMin.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyMin/oracle/VerifyMin.xml",
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/simpleMethodCallStackTest
+    */
+   public void testSimpleMethodCallStack() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/simpleMethodCallStackTest/test/SimpleMethodCallStackTest.java",
+                "SimpleMethodCallStackTest",
+                "magic",
+                null,
+                "examples/_testcase/set/simpleMethodCallStackTest/oracle/SimpleMethodCallStackTest.xml",
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/methodCallStackTest
+    */
+   public void testMethodCallStack() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/methodCallStackTest/test/MethodCallStackTest.java",
+                "MethodCallStackTest",
+                "magic",
+                null,
+                "examples/_testcase/set/methodCallStackTest/oracle/MethodCallStackTest.xml",
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/unicodeTest
     */
    public void testUnicode_Disabled() throws Exception {

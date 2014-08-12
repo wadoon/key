@@ -13,9 +13,13 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
@@ -38,6 +42,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -88,6 +93,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
          handleAutoModeStopped(e);
       }
    };
+   
+   /**
+    * The up to know discovered {@link ISEDTermination} nodes.
+    */
+   private final Map<IExecutionTermination, ISEDTermination> knownTerminations = new HashMap<IExecutionTermination, ISEDTermination>();
 
    /**
     * Constructor.
@@ -99,6 +109,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       getMediator().addAutoModeListener(autoModeListener);
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 
@@ -223,7 +234,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (e.getSource() == getProof() && getMediator().autoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
+      if (e.getSource() == getProof() && getMediator().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
          try {
             // Inform UI that the process is resumed
             super.resume();
@@ -240,7 +251,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (e.getSource() == getProof() && !getMediator().autoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
+      if (e.getSource() == getProof() && !getMediator().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
          try {
             updateExecutionTree(getBuilder());
          }
@@ -298,7 +309,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public boolean canResume() {
       return super.canResume() && 
-             !getMediator().getInteractiveProver().isAutoMode() && // Only one proof completion per time is possible
+             !getMediator().isInAutoMode() && // Only one proof completion per time is possible
              getUi().isAutoModeSupported(getProof()); // Otherwise Auto Mode is not available.
    }
    
@@ -394,7 +405,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public boolean canSuspend() {
       return super.canSuspend() && 
-             getMediator().getInteractiveProver().isAutoMode() && // Only if the auto mode is in progress
+             getMediator().isInAutoMode() && // Only if the auto mode is in progress
              getMediator().getSelectedProof() == getProof(); // And the auto mode handles this proof
    }
    
@@ -458,12 +469,14 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step into.
     */
    public void stepInto(IKeYSEDDebugNode<?> keyNode) throws DebugException {
-      runAutoMode(keyNode,
-                  ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP, 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  false,
-                  false);
-      super.stepInto();
+      if (canStepInto()) {
+         runAutoMode(keyNode,
+                     ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP, 
+                     SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
+                     false,
+                     false);
+         super.stepInto();
+      }
    }
 
    /**
@@ -496,12 +509,14 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step over.
     */
    public void stepOver(IKeYSEDDebugNode<?> keyNode) throws DebugException {
-      runAutoMode(keyNode,
-                  KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  true,
-                  false);
-      super.stepOver();
+      if (canStepOver()) {
+         runAutoMode(keyNode,
+                     KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
+                     SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
+                     true,
+                     false);
+         super.stepOver();
+      }
    }
 
    /**
@@ -534,12 +549,14 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step return.
     */
    public void stepReturn(IKeYSEDDebugNode<?> keyNode) throws DebugException {
-      runAutoMode(keyNode,
-                  KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  false,
-                  true);
-      super.stepReturn();
+      if (canStepReturn()) {
+         runAutoMode(keyNode,
+                     KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
+                     SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
+                     false,
+                     true);
+         super.stepReturn();
+      }
    }
    
    /**
@@ -548,5 +565,49 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public ISEDDebugNode[] getLeafsToSelect() throws DebugException {
       return collectLeafs(lastResumedKeyNode != null ? lastResumedKeyNode : this);
+   }
+   
+   /**
+    * Registers the given {@link ISEDTermination} on this node.
+    * @param termination The {@link ISEDTermination} to register.
+    */
+   public void addTermination(ISEDTermination termination) {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         Assert.isNotNull(termination);
+         @SuppressWarnings("unchecked")
+         ISEDTermination oldTermination = knownTerminations.put(((IKeYSEDDebugNode<IExecutionTermination>)termination).getExecutionNode(), termination);
+         Assert.isTrue(oldTermination == null);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDTermination[] getTerminations() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         ImmutableList<IExecutionTermination> executionTerminations = executionNode.getTerminations();
+         ISEDTermination[] result = new ISEDTermination[executionTerminations.size()];
+         int i = 0;
+         for (IExecutionTermination executionTermination : executionTerminations) {
+            ISEDTermination keyTermination = getTermination(executionTermination);
+            if (keyTermination == null) {
+               // Create new method return, its parent will be set later when the full child hierarchy is explored.
+               keyTermination = (ISEDTermination)KeYModelUtil.createTermination(getDebugTarget(), this, null, executionTermination);
+            }
+            result[i] = keyTermination;
+            i++;
+         }
+         return result;
+      }
+   }
+   
+   /**
+    * Returns the {@link ISEDTermination} with the given {@link IExecutionTermination} if available.
+    * @param executionTermination The {@link IExecutionTermination} to search its {@link ISEDTermination}.
+    * @return The found {@link ISEDTermination} or {@code null} if not available.
+    */
+   public ISEDTermination getTermination(final IExecutionTermination executionTermination) {
+      return knownTerminations.get(executionTermination);
    }
 }
