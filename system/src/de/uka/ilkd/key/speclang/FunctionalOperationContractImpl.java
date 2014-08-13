@@ -700,36 +700,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
         final StringBuffer sig = new StringBuffer();
-        if (originalResultVar != null) {
-            sig.append(originalResultVar);
-            sig.append(" = ");
-        }
-        else if (pm.isConstructor()) {
-            sig.append(originalSelfVar);
-            sig.append(" = new ");
-        }
-        if (!pm.isStatic() && !pm.isConstructor()) {
-            sig.append(originalSelfVar);
-            sig.append(".");
-        }
-        sig.append(pm.getName());
-        sig.append("(");
-        for (SVSubstitute subst : originalParamVars) {
-           if (subst instanceof Named) {
-              Named named = (Named)subst;
-              sig.append(named.name()).append(", ");
-           }
-           else if (subst instanceof Term) {
-              sig.append(LogicPrinter.quickPrintTerm((Term)subst, services, usePrettyPrinting, useUnicodeSymbols).trim()).append(", ");
-           }
-           else {
-              sig.append(subst).append(", ");
-           }
-        }
-        if (!originalParamVars.isEmpty()) {
-            sig.setLength(sig.length() - 2);
-        }
-        sig.append(")");
+        appendMethodCallText(pm, originalResultVar, originalSelfVar, originalParamVars, services, usePrettyPrinting, useUnicodeSymbols,sig);
         if(!pm.isModel()) {
             sig.append(" catch(");
             sig.append(originalExcVar);
@@ -836,6 +807,47 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                     + (transaction ? "\ntransaction applicable:" : "");
         }
     }
+
+
+   public static void appendMethodCallText(IProgramMethod pm,
+                                           ProgramVariable originalResultVar, 
+                                           ProgramVariable originalSelfVar,
+                                           ImmutableList<? extends SVSubstitute> originalParamVars,
+                                           Services services, 
+                                           boolean usePrettyPrinting,
+                                           boolean useUnicodeSymbols, 
+                                           final StringBuffer sig) {
+      if (originalResultVar != null) {
+            sig.append(originalResultVar);
+            sig.append(" = ");
+        }
+        else if (pm.isConstructor()) {
+            sig.append(originalSelfVar);
+            sig.append(" = new ");
+        }
+        if (!pm.isStatic() && !pm.isConstructor()) {
+            sig.append(originalSelfVar);
+            sig.append(".");
+        }
+        sig.append(pm.getName());
+        sig.append("(");
+        for (SVSubstitute subst : originalParamVars) {
+           if (subst instanceof Named) {
+              Named named = (Named)subst;
+              sig.append(named.name()).append(", ");
+           }
+           else if (subst instanceof Term) {
+              sig.append(LogicPrinter.quickPrintTerm((Term)subst, services, usePrettyPrinting, useUnicodeSymbols).trim()).append(", ");
+           }
+           else {
+              sig.append(subst).append(", ");
+           }
+        }
+        if (!originalParamVars.isEmpty()) {
+            sig.setLength(sig.length() - 2);
+        }
+        sig.append(")");
+   }
 
 
     @Override

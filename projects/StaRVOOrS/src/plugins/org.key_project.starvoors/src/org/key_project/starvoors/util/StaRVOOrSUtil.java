@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -132,7 +133,7 @@ public final class StaRVOOrSUtil {
    }
    
    protected static StringBuffer transformTermPP(Term term, Map<Term, ExecutionOperationContract> contractResults, Services services) throws IOException {
-      NotationInfo ni = new TransformationNotationInfo(contractResults);
+      NotationInfo ni = new TransformationNotationInfo(services, contractResults);
       LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), ni, services, true);
       logicPrinter.getNotationInfo().refresh(services, true, false);
       logicPrinter.printTerm(term);
@@ -140,16 +141,19 @@ public final class StaRVOOrSUtil {
    }
    
    protected static class TransformationNotationInfo extends NotationInfo {
-      public TransformationNotationInfo(Map<Term, ExecutionOperationContract> contractResults) {
-         setNotation(LocationVariable.class, new LocationVariableTransformationNotation(contractResults));
+      public TransformationNotationInfo(Services services, Map<Term, ExecutionOperationContract> contractResults) {
+         setNotation(LocationVariable.class, new LocationVariableTransformationNotation(services, contractResults));
       }
    }
       
    protected static class LocationVariableTransformationNotation extends Notation.VariableNotation {
       private final Map<Term, ExecutionOperationContract> contractResults;
+      
+      private final Services services;
 
-      protected LocationVariableTransformationNotation(Map<Term, ExecutionOperationContract> contractResults) {
+      protected LocationVariableTransformationNotation(Services services, Map<Term, ExecutionOperationContract> contractResults) {
          this.contractResults = contractResults;
+         this.services = services;
       }
 
       @Override
@@ -157,7 +161,16 @@ public final class StaRVOOrSUtil {
          try {
             IExecutionOperationContract contract = contractResults.get(t);
             if (contract != null) {
-               sp.printConstant(contract.getName());
+               StringBuffer sb = new StringBuffer();
+               FunctionalOperationContractImpl.appendMethodCallText(contract.getContractProgramMethod(), 
+                                                                    contract.getResultTerm(), 
+                                                                    contract.getResultTerm(), 
+                                                                    originalParamVars, 
+                                                                    services, 
+                                                                    true, 
+                                                                    false, 
+                                                                    sb);
+               sp.printConstant(sb.toString());
             }
             else {
                super.print(t, sp);
