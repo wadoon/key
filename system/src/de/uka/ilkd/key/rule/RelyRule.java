@@ -41,6 +41,13 @@ public final class RelyRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
                     RuleApp ruleApp) throws RuleAbortException {
+        if (!( ruleApp instanceof RelyBuiltInRuleApp))
+                        throw new RuleAbortException();
+        final RelyBuiltInRuleApp app = (RelyBuiltInRuleApp) ruleApp;
+        final Instantiation inst = app.inst;
+        if (inst == null) throw new RuleAbortException();
+        final ThreadSpecification ts = getApplicableThreadSpec(inst.target.javaBlock(), services);
+        if (ts == null) throw new RuleAbortException();
         // todo Auto-generated method stub
         return null;
     }
@@ -67,7 +74,7 @@ public final class RelyRule implements BuiltInRule {
         // check whether rely/guarantee option is set
         if (!relyGuaranteeEnabled(goal)) return false;
         final Term target = pio.constrainedFormula().formula();
-        final Instantiation inst = getInstantiation(target, goal, services);
+        final Instantiation inst = getInstantiation(target, goal);
         lastFocusTerm = target;
         lastInstantiation = inst;
         if (inst == null) return false;
@@ -79,7 +86,7 @@ public final class RelyRule implements BuiltInRule {
         return "concurrency:RG".equals(concurrenyChoice);
     }
     
-    private Instantiation getInstantiation(Term target, Goal goal, Services services) {
+    Instantiation getInstantiation(Term target, Goal goal) {
         if (target == lastFocusTerm) return lastInstantiation;
         
         while (target.op() instanceof UpdateApplication) {
@@ -113,7 +120,7 @@ public final class RelyRule implements BuiltInRule {
             return null;
     }
     
-    private ThreadSpecification getApplicableThreadSpec(JavaBlock jb, Services services) {
+    private static ThreadSpecification getApplicableThreadSpec(JavaBlock jb, Services services) {
         final ExecutionContext ec = JavaTools.getInnermostExecutionContext(jb, services);
         final KeYJavaType threadType = ec.getThreadTypeReference().getKeYJavaType();
         return services.getSpecificationRepository().getThreadSpecification(threadType);
@@ -121,11 +128,10 @@ public final class RelyRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        // todo Auto-generated method stub
-        return null;
+        return new RelyBuiltInRuleApp(this, pos);
     }
     
-    private static class Instantiation {
+    static class Instantiation {
         
         final Term target;
         final boolean emptyMod;
@@ -133,7 +139,7 @@ public final class RelyRule implements BuiltInRule {
         final FieldReference fieldAccess;
         final ArrayReference arrayAccess;
         
-        Instantiation (Term target) {
+        private Instantiation (Term target) {
             this.target = target;
             assert target.javaBlock() != null;
             emptyMod = true;
@@ -142,7 +148,7 @@ public final class RelyRule implements BuiltInRule {
             arrayAccess = null;
         }
         
-        Instantiation (Term target, ProgramVariable lhs, FieldReference fr) {
+        private Instantiation (Term target, ProgramVariable lhs, FieldReference fr) {
             this.target = target;
             assert target.javaBlock() != null;
             emptyMod = false;
@@ -151,7 +157,7 @@ public final class RelyRule implements BuiltInRule {
             arrayAccess = null;
         }
         
-        Instantiation (Term target, ProgramVariable lhs, ArrayReference ar) {
+        private Instantiation (Term target, ProgramVariable lhs, ArrayReference ar) {
             this.target = target;
             assert target.javaBlock() != null;
             emptyMod = false;
