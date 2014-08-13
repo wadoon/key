@@ -6,12 +6,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.Notation;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -24,7 +29,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -37,6 +41,8 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
+// TODO: Rename locations according to source code
+// TODO: Find solution for temporary proof locations used in path condition
 public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
@@ -162,14 +168,14 @@ public final class StaRVOOrSUtil {
             IExecutionOperationContract contract = contractResults.get(t);
             if (contract != null) {
                StringBuffer sb = new StringBuffer();
-               FunctionalOperationContractImpl.appendMethodCallText(contract.getContractProgramMethod(), 
-                                                                    contract.getResultTerm(), 
-                                                                    contract.getResultTerm(), 
-                                                                    originalParamVars, 
-                                                                    services, 
-                                                                    true, 
-                                                                    false, 
-                                                                    sb);
+               ProgramVariable originalSelfVar = contract.getSelfTerm() != null ? (ProgramVariable)contract.getSelfTerm().op() : null;
+               appendMethodCallText(contract.getContractProgramMethod(), 
+                                    originalSelfVar, 
+                                    contract.getContractParams(), 
+                                    services, 
+                                    true, 
+                                    false, 
+                                    sb);
                sp.printConstant(sb.toString());
             }
             else {
@@ -179,6 +185,38 @@ public final class StaRVOOrSUtil {
          catch (ProofInputException e) {
             throw new IOException(e);
          }
+      }
+      
+      protected void appendMethodCallText(IProgramMethod pm,
+                                          ProgramVariable originalSelfVar,
+                                          ImmutableList<? extends SVSubstitute> originalParamVars,
+                                          Services services, 
+                                          boolean usePrettyPrinting,
+                                          boolean useUnicodeSymbols, 
+                                          final StringBuffer sig) throws IOException {
+           if (!pm.isStatic() && !pm.isConstructor()) {
+               sig.append(originalSelfVar);
+               sig.append(".");
+           }
+           sig.append(pm.getName());
+           sig.append("(");
+           for (SVSubstitute subst : originalParamVars) {
+              if (subst instanceof Named) {
+                 Named named = (Named)subst;
+                 sig.append(named.name()).append(", ");
+              }
+              else if (subst instanceof Term) {
+                 StringBuffer paramText = transformTermPP((Term)subst, contractResults, services);
+                 sig.append(paramText.toString().trim()).append(", ");
+              }
+              else {
+                 sig.append(subst).append(", ");
+              }
+           }
+           if (!originalParamVars.isEmpty()) {
+               sig.setLength(sig.length() - 2);
+           }
+           sig.append(")");
       }
    }
 }
