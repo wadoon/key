@@ -1037,6 +1037,7 @@ public class TermBuilder {
     }
 
     public Term apply(Term update, Term target) {
+        if (update == null) return target;
         return apply(update,target,null);
     }
 

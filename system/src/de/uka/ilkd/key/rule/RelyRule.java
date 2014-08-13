@@ -12,15 +12,20 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.ThreadSpecification;
 
@@ -46,10 +51,90 @@ public final class RelyRule implements BuiltInRule {
         final RelyBuiltInRuleApp app = (RelyBuiltInRuleApp) ruleApp;
         final Instantiation inst = app.inst;
         if (inst == null) throw new RuleAbortException();
-        final ThreadSpecification ts = getApplicableThreadSpec(inst.target.javaBlock(), services);
+        final JavaBlock javaBlock = inst.target.javaBlock();
+        final ExecutionContext ec = JavaTools.getInnermostExecutionContext(javaBlock, services);
+        final KeYJavaType threadType = ec.getThreadTypeReference().getKeYJavaType();
+        final ReferencePrefix thread = ec.getRuntimeThreadInstance();
+        final ThreadSpecification ts = services.getSpecificationRepository().getThreadSpecification(threadType);
         if (ts == null) throw new RuleAbortException();
-        // todo Auto-generated method stub
-        return null;
+        final TermBuilder tb = services.getTermBuilder();
+        
+        final String excChoice = goal.proof().getSettings().getChoiceSettings().getDefaultChoice("runtimeExceptions");
+        final boolean ignoreRTE = "runtimeExceptions:ignore".equals(excChoice);
+        final boolean allowRTE = "runtimeExceptions:allow".equals(excChoice);
+        assert ignoreRTE || allowRTE || "runtimeExceptions:ban".equals(excChoice);
+        
+        final Term threadVar = null; // TODO
+        final Term heap = tb.getBaseHeap();
+        final Term prevHeap = tb.getPrevHeap();
+        final Term rely = ts.getRely(prevHeap, heap, threadVar, services);
+        final Term notAssigned = ts.getNotChanged(threadVar, services);
+        
+        // PIO is possibly an update applied to a modality
+        final Term leadingUpd = (app.pio.subTerm().op() instanceof UpdateApplication)?
+                        app.pio.subTerm().sub(0): null;
+        final Term target = leadingUpd == null? app.pio.subTerm(): app.pio.subTerm().sub(1);
+        assert target == app.inst.target;
+        
+        final Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        final Term assigned = tb.setMinus(tb.allLocs(), notAssigned);
+        final Term anonHeap = tb.func(new Function(new Name("anonHeap"), heapSort));
+        final Term anonUpd = tb.elementary(heap, tb.anon(heap, assigned, anonHeap));
+        final Term prevUpd = tb.parallel(tb.elementary(prevHeap, heap), anonUpd);
+        final Term addRely = tb.apply(leadingUpd, tb.apply(prevUpd, rely));
+
+        final Term post = target.sub(0);
+
+        if (inst.emptyMod) { // empty modality rule
+            final ImmutableList<Goal> res = goal.split(1);
+            final Goal g = res.head();
+            g.addFormula(new SequentFormula(addRely), true, false);
+            final Term newPost = tb.apply(leadingUpd, tb.apply(anonUpd, post));
+            g.changeFormula(new SequentFormula(newPost), app.pio);
+
+            return res;
+        } else { // read access
+            ImmutableList<Goal> res;
+            final JavaBlock newBlock = JavaTools.removeActiveStatement(javaBlock, services);
+            final Term newProg = tb.prog((Modality)target.op(), newBlock, post);
+            final Term assignUpd; // the particular assignment effect
+            
+            if (inst.fieldAccess != null) {
+                // field (attribute) access
+                
+                if (ignoreRTE) res = goal.split(1);
+                else {
+                    // ban or allow RTE
+                    res = goal.split(2);
+                    assert false : "TODO";
+                }
+
+                assignUpd = null;
+                // TODO
+
+            } else {
+                assert (inst.arrayAccess != null);
+                // array access
+                
+                if (ignoreRTE) res = goal.split(1);
+                else { // ban or allow RTE
+                    res = goal.split(3);
+                    assert false : "TODO";
+                }
+
+                assignUpd = null;
+                // TODO
+            }
+            
+            // add rely in any case
+            final Goal aGoal = res.head();
+            aGoal.addFormula(new SequentFormula(addRely), true, false);
+            // assignment effect in any case
+            final Term assignRes = tb.apply(leadingUpd, tb.apply(anonUpd, tb.apply(assignUpd, newProg)));
+            aGoal.changeFormula(new SequentFormula(assignRes), app.pio);
+            
+            return res;
+        }
     }
 
     @Override
@@ -88,10 +173,11 @@ public final class RelyRule implements BuiltInRule {
     
     Instantiation getInstantiation(Term target, Goal goal) {
         if (target == lastFocusTerm) return lastInstantiation;
+
+        // must be applied on modality possibly with one update
+        if (target.op() instanceof UpdateApplication)
+            target = target.sub(1);
         
-        while (target.op() instanceof UpdateApplication) {
-            target = UpdateApplication.getTarget(target);
-        }
         if (!(target.op() instanceof Modality)) return null;
         final JavaBlock prog = target.javaBlock();
         final SourceElement activeStm = JavaTools.getActiveStatement(prog);
