@@ -15,12 +15,10 @@
                name="appName"
                value="StaRVOOrS Casesgenerator">
          </property>
-<!--
          <property
                name="welcomePerspective"
-               value="org.eclipse.jdt.ui.JavaPerspective">
+               value="org.eclipse.ui.resourcePerspective">
          </property>
--->
          <property
                name="introTitle"
                value="StaRVOOrS Casesgenerator">
