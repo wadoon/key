@@ -67,7 +67,7 @@
             thread="main"
             visible="true">
          <run
-               class="org.key_project.starvoors.casesgenerator.application.CasesGenerator">
+               class="org.key_project.starvoors.casesgenerator.application.CasesGeneratorApplication">
          </run>
       </application>
    </extension>

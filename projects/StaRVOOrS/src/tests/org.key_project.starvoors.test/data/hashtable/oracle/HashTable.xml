@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+   <proof contractId="HashTable[HashTable::HashTable(int)].JML normal_behavior operation contract.0" contractText="self = new HashTable(capacity) catch(exc)
+pre: capacity &gt;= 1
+post: self.capacity = capacity
+&amp; (self.size = 0 &amp; self.&lt;inv&gt;)
+&amp; exc = null
+mod: self.h.* \cup {(self, size)}
+termination: diamond">
+      <executionPath pathCondition="true" verified="true"/>
+   </proof>
+   <proof contractId="HashTable[HashTable::add(java.lang.Object,int)].JML normal_behavior operation contract.0" contractText="self.add(u, key) catch(exc)
+pre: self.size &lt; self.capacity &amp; (self.&lt;inv&gt; &amp; !u = null)
+post: self.size = javaAddInt(self.size@heapAtPre, 1)
+&amp; (  \exists int i;
+       (  i &gt;= 0
+        &amp; i &lt; self.capacity
+        &amp; inInt(i)
+        &amp; self.h[i] = u)
+   &amp; self.&lt;inv&gt;)
+&amp; exc = null
+mod: {(self, size)} \cup self.h.*
+termination: diamond">
+      <executionPath pathCondition="self.h[self.hash_function(key)] = null" verified="true"/>
+      <executionPath pathCondition="!self.h[self.hash_function(key)] = null" verified="false"/>
+   </proof>
+   <proof contractId="HashTable[HashTable::add(java.lang.Object,int)].JML normal_behavior operation contract.1" contractText="self.add(u, key) catch(exc)
+pre: self.size &gt;= self.capacity &amp; (self.&lt;inv&gt; &amp; !u = null)
+post: \forall int j;
+    (   j &gt;= 0 &amp; j &lt; self.capacity &amp; inInt(j)
+     -&gt; self.h[j] = (self.h@heapAtPre)[j])
+&amp; self.&lt;inv&gt;
+&amp; exc = null
+mod: empty
+termination: diamond">
+      <executionPath pathCondition="true" verified="true"/>
+   </proof>
+   <proof contractId="HashTable[HashTable::hash_function(int)].JML normal_behavior operation contract.0" contractText="result = self.hash_function(val) catch(exc)
+pre: self.&lt;inv&gt;
+post: result &gt;= 0
+&amp; result &lt; self.capacity
+&amp; self.&lt;inv&gt;
+&amp; exc = null
+mod: empty
+termination: diamond">
+      <executionPath pathCondition="val &gt;  -1" verified="true"/>
+      <executionPath pathCondition="val &lt; 0" verified="true"/>
+   </proof>
+</result>

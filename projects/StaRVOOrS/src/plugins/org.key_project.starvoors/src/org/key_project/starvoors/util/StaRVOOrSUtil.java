@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.starvoors.model.StaRVOOrSExecutionPath;
+import org.key_project.starvoors.model.StaRVOOrSProof;
+import org.key_project.starvoors.model.StaRVOOrSResult;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -48,10 +52,11 @@ public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
    
-   public static void start(File location) throws ProofInputException, IOException {
+   public static StaRVOOrSResult start(File location) throws ProofInputException, IOException {
       // Load source code and rules
       KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null);
       try {
+         StaRVOOrSResult result = new StaRVOOrSResult();
          // Iterate over available types to list proof obligations
          Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
          for (KeYJavaType type : kjts) {
@@ -60,18 +65,22 @@ public final class StaRVOOrSUtil {
                for (IObserverFunction target : targets) {
                   ImmutableSet<Contract> contracts = env.getSpecificationRepository().getContracts(type, target);
                   for (Contract contract : contracts) {
-                     verify(env, contract);
+                     StaRVOOrSProof proofResult = verify(env, contract);
+                     if (proofResult != null) {
+                        result.addProof(proofResult);
+                     }
                   }
                }
             }
          }
+         return result;
       }
       finally {
          env.dispose();
       }
    }
 
-   protected static void verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException, IOException {
+   protected static StaRVOOrSProof verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException, IOException {
       InitConfig proofInitConfig = env.getInitConfig().deepCopy();
       ProofOblInput proofObligation = new FunctionalOperationContractPO(proofInitConfig, (FunctionalOperationContract)contract, true, true);
       Proof proof = env.getUi().createProof(proofInitConfig, proofObligation);
@@ -95,7 +104,9 @@ public final class StaRVOOrSUtil {
          // Update symbolic execution tree
          builder.analyse();
          // Analyze discovered symbolic execution tree
-         analyzeSymbolicExecutionTree(builder, contract);
+         StaRVOOrSProof proofResult = new StaRVOOrSProof(contract.getName(), contract.getPlainText(builder.getProof().getServices()));
+         analyzeSymbolicExecutionTree(builder, contract, proofResult);
+         return proofResult;
       }
       finally {
          env.getMediator().setProof(null);
@@ -103,12 +114,14 @@ public final class StaRVOOrSUtil {
       }
    }
 
-   protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract) throws ProofInputException, IOException {
+   protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract, StaRVOOrSProof proofResult) throws ProofInputException, IOException {
       System.out.println();
       System.out.println(contract.getName());
       String line = "";
       for (int i = 0; i < contract.getName().length();i++)
          line = line.concat("=");
+      System.out.println(line);
+      System.out.println(contract.getPlainText(builder.getProof().getServices()));
       System.out.println(line);
 
       Map<LocationVariable, ProgramVariable> preStateMapping = getPreStateMapping(builder.getProof());
@@ -125,7 +138,10 @@ public final class StaRVOOrSUtil {
          }
          // Check if node is a leaf node
          if (next.getChildren().length == 0) {
-            workWithLeafNode(next, contractResults, preStateMapping);
+            StaRVOOrSExecutionPath path = workWithLeafNode(next, contractResults, preStateMapping);
+            if (path != null) {
+               proofResult.addPath(path);
+            }
          }
       }
    }
@@ -140,7 +156,7 @@ public final class StaRVOOrSUtil {
       }
    }
    
-   protected static void workWithLeafNode(IExecutionNode leaf, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
+   protected static StaRVOOrSExecutionPath workWithLeafNode(IExecutionNode leaf, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
       // Check if verified
       boolean verified = leaf instanceof IExecutionTermination && ((IExecutionTermination)leaf).isBranchVerified();
       // Get path condition
@@ -149,6 +165,7 @@ public final class StaRVOOrSUtil {
       String pathConditionPP = sb.toString();
       System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified);
       System.out.println();
+      return new StaRVOOrSExecutionPath(pathConditionPP.trim(), verified);
    }
    
    protected static StringBuffer transformTermPP(Term term, Map<Term, ExecutionOperationContract> contractResults, Map<LocationVariable, ProgramVariable> preStateMapping, Services services) throws IOException {
