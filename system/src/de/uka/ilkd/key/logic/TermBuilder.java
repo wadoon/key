@@ -345,6 +345,7 @@ public class TermBuilder {
     return new LocationVariable(new ProgramElementName(baseName),
                             new KeYJavaType(sort));
     }
+    
 
     //-------------------------------------------------------------------------
     //constructors for special classes of term operators

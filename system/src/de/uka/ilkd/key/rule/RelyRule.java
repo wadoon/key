@@ -2,18 +2,18 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.VariableReference;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -22,10 +22,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.ThreadSpecification;
 
@@ -76,9 +78,10 @@ public final class RelyRule implements BuiltInRule {
         final Term target = leadingUpd == null? app.pio.subTerm(): app.pio.subTerm().sub(1);
         assert target == app.inst.target;
         
-        final Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final Sort heapSort = heapLDT.targetSort();
         final Term assigned = tb.setMinus(tb.allLocs(), notAssigned);
-        final Term anonHeap = tb.func(new Function(new Name("anonHeap"), heapSort));
+        final Term anonHeap = tb.func(new Function(new Name("anonHeapRely"), heapSort));
         final Term anonUpd = tb.elementary(heap, tb.anon(heap, assigned, anonHeap));
         final Term prevUpd = tb.parallel(tb.elementary(prevHeap, heap), anonUpd);
         final Term addRely = tb.apply(leadingUpd, tb.apply(prevUpd, rely));
@@ -97,6 +100,7 @@ public final class RelyRule implements BuiltInRule {
             ImmutableList<Goal> res;
             final JavaBlock newBlock = JavaTools.removeActiveStatement(javaBlock, services);
             final Term newProg = tb.prog((Modality)target.op(), newBlock, post);
+            final Term lhs = tb.var(inst.lhs);
             final Term assignUpd; // the particular assignment effect
             
             if (inst.fieldAccess != null) {
@@ -109,8 +113,15 @@ public final class RelyRule implements BuiltInRule {
                     assert false : "TODO";
                 }
 
-                assignUpd = null;
-                // TODO
+                Term receiver = null;
+                try {
+                    receiver = tb.parseTerm(""+inst.fieldAccess.getReferencePrefix());
+                } catch (ParserException e) {
+                    throw new RuleAbortException(e);
+                }
+                final Term field = tb.func(heapLDT.getFieldSymbolForPV((LocationVariable)inst.fieldAccess.getProgramVariable(), services));
+                final Sort targetSort = inst.fieldAccess.getProgramVariable().sort();
+                assignUpd = tb.elementary(lhs, tb.select(targetSort, heap, receiver, field));
 
             } else {
                 assert (inst.arrayAccess != null);
@@ -122,8 +133,18 @@ public final class RelyRule implements BuiltInRule {
                     assert false : "TODO";
                 }
 
-                assignUpd = null;
-                // TODO
+                Term receiver = null;
+                Term idx = null;
+                try {
+                    receiver = tb.parseTerm(""+inst.arrayAccess.getReferencePrefix());
+                    idx = tb.parseTerm(""+inst.arrayAccess.getDimensionExpressions().get(0));
+                } catch (ParserException e) {
+                    throw new RuleAbortException(e);
+                }
+                final Type arrayType = inst.arrayAccess.getKeYJavaType(services, ec).getJavaType();
+                assert arrayType instanceof ArrayType;
+                final Sort targetSort = ((ArrayType) arrayType).getBaseType().getKeYJavaType().getSort();
+                assignUpd = tb.elementary(lhs, tb.select(targetSort, heap, receiver, tb.arr(idx)));
             }
             
             // add rely in any case

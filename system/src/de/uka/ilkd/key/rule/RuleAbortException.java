@@ -34,4 +34,12 @@ public class RuleAbortException extends Exception {
         super(msg);
     }
     
+    public RuleAbortException(Throwable cause) {
+        super(cause);
+    }
+    
+    public RuleAbortException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+    
 }
