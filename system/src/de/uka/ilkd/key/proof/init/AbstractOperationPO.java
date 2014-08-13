@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -114,6 +115,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
    private Term uninterpretedPredicate;
 
    private InitConfig proofConfig;
+   
+   private final Map<LocationVariable, ProgramVariable> currentLocationToPreStateMapping = new HashMap<LocationVariable, ProgramVariable>();
 
    /**
     * Constructor.
@@ -269,7 +272,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
          final List<LocationVariable> modHeaps =
                  HeapContext.getModHeaps(proofServices, transactionFlag);
-         final Map<LocationVariable, LocationVariable> atPreVars =
+         final Map<LocationVariable,LocationVariable> atPreVars =
                  HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
 
 //         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
@@ -305,6 +308,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
                formalParamVars = formalParamVars.append(formalParamVar);
                register(formalParamVar, proofServices);
+               currentLocationToPreStateMapping.put(formalParamVar, paramVar);
             }
             else {
                formalParamVars = formalParamVars.append((LocationVariable)paramVar); // The cast is ugly but legal. It is a bigger task to refactor TB.paramVars to return a list of LocationVariabe instead of ProgramVariable.
@@ -634,6 +638,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
    }
 
    /**
+    * Returns the mapping of previous to their original location.
+    * @return The mapping of previous to their original location.
+    */
+   public Map<LocationVariable, ProgramVariable> getCurrentLocationToPreStateMapping() {
+      return currentLocationToPreStateMapping;
+   }
+
+   /**
     * Builds the frame clause including the modifies clause.
     * @param modHeaps The heaps.
     * @param heapToAtPre The previous heap before execution.
@@ -797,7 +809,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                               ImmutableList<LocationVariable> formalParamVars,
-                              Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+                              Map<LocationVariable, LocationVariable> atPreVars, 
+                              Services services) {
       Term update = null;
       for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
          final Term u = tb.elementary(atPreEntry.getValue(), tb.getBaseHeap());
@@ -811,7 +824,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
           Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
           Iterator<ProgramVariable> paramIt = paramVars.iterator();
           while (formalParamIt.hasNext()) {
-              Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
+              LocationVariable nextFormalParam = formalParamIt.next();
+              ProgramVariable nextParam = paramIt.next();
+              Term paramUpdate = tb.elementary(nextFormalParam, tb.var(nextParam));
               update = tb.parallel(update, paramUpdate);
           }
        }

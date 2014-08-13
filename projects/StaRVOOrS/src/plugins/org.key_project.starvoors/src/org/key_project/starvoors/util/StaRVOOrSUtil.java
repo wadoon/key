@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -22,6 +23,8 @@ import de.uka.ilkd.key.pp.Notation;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -41,8 +44,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
-// TODO: Rename locations according to source code
-// TODO: Find solution for temporary proof locations used in path condition
 public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
@@ -101,7 +102,7 @@ public final class StaRVOOrSUtil {
          proof.dispose();
       }
    }
-   
+
    protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract) throws ProofInputException, IOException {
       System.out.println();
       System.out.println(contract.getName());
@@ -109,7 +110,9 @@ public final class StaRVOOrSUtil {
       for (int i = 0; i < contract.getName().length();i++)
          line = line.concat("=");
       System.out.println(line);
-           
+
+      Map<LocationVariable, ProgramVariable> preStateMapping = getPreStateMapping(builder.getProof());
+      
       IExecutionStart symRoot = builder.getStartNode();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(symRoot);
       Map<Term, ExecutionOperationContract> contractResults = new HashMap<Term, ExecutionOperationContract>();
@@ -122,24 +125,34 @@ public final class StaRVOOrSUtil {
          }
          // Check if node is a leaf node
          if (next.getChildren().length == 0) {
-            workWithLeafNode(next, contractResults);
+            workWithLeafNode(next, contractResults, preStateMapping);
          }
       }
    }
    
-   protected static void workWithLeafNode(IExecutionNode leaf, final Map<Term, ExecutionOperationContract> contractResults) throws ProofInputException, IOException {
+   protected static Map<LocationVariable, ProgramVariable> getPreStateMapping(Proof proof) {
+      ContractPO po = proof.getServices().getSpecificationRepository().getPOForProof(proof);
+      if (po instanceof AbstractOperationPO) {
+         return ((AbstractOperationPO) po).getCurrentLocationToPreStateMapping();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   protected static void workWithLeafNode(IExecutionNode leaf, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
       // Check if verified
       boolean verified = leaf instanceof IExecutionTermination && ((IExecutionTermination)leaf).isBranchVerified();
       // Get path condition
       Term pathCondition = leaf.getPathCondition();
-      StringBuffer sb = transformTermPP(pathCondition, contractResults, leaf.getServices());
+      StringBuffer sb = transformTermPP(pathCondition, contractResults, preStateMapping, leaf.getServices());
       String pathConditionPP = sb.toString();
       System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified);
       System.out.println();
    }
    
-   protected static StringBuffer transformTermPP(Term term, Map<Term, ExecutionOperationContract> contractResults, Services services) throws IOException {
-      NotationInfo ni = new TransformationNotationInfo(services, contractResults);
+   protected static StringBuffer transformTermPP(Term term, Map<Term, ExecutionOperationContract> contractResults, Map<LocationVariable, ProgramVariable> preStateMapping, Services services) throws IOException {
+      NotationInfo ni = new TransformationNotationInfo(services, contractResults, preStateMapping);
       LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), ni, services, true);
       logicPrinter.getNotationInfo().refresh(services, true, false);
       logicPrinter.printTerm(term);
@@ -147,18 +160,21 @@ public final class StaRVOOrSUtil {
    }
    
    protected static class TransformationNotationInfo extends NotationInfo {
-      public TransformationNotationInfo(Services services, Map<Term, ExecutionOperationContract> contractResults) {
-         setNotation(LocationVariable.class, new LocationVariableTransformationNotation(services, contractResults));
+      public TransformationNotationInfo(Services services, Map<Term, ExecutionOperationContract> contractResults, Map<LocationVariable, ProgramVariable> preStateMapping) {
+         setNotation(LocationVariable.class, new LocationVariableTransformationNotation(services, contractResults, preStateMapping));
       }
    }
       
    protected static class LocationVariableTransformationNotation extends Notation.VariableNotation {
       private final Map<Term, ExecutionOperationContract> contractResults;
       
+      private final Map<LocationVariable, ProgramVariable> preStateMapping;
+      
       private final Services services;
 
-      protected LocationVariableTransformationNotation(Services services, Map<Term, ExecutionOperationContract> contractResults) {
+      protected LocationVariableTransformationNotation(Services services, Map<Term, ExecutionOperationContract> contractResults, Map<LocationVariable, ProgramVariable> preStateMapping) {
          this.contractResults = contractResults;
+         this.preStateMapping = preStateMapping;
          this.services = services;
       }
 
@@ -179,7 +195,13 @@ public final class StaRVOOrSUtil {
                sp.printConstant(sb.toString());
             }
             else {
-               super.print(t, sp);
+               IProgramVariable programVariable = preStateMapping.get(t.op());
+               if (programVariable != null) {
+                  sp.printConstant(programVariable.name().toString());
+               }
+               else {
+                  super.print(t, sp);
+               }
             }
          }
          catch (ProofInputException e) {
@@ -206,7 +228,7 @@ public final class StaRVOOrSUtil {
                  sig.append(named.name()).append(", ");
               }
               else if (subst instanceof Term) {
-                 StringBuffer paramText = transformTermPP((Term)subst, contractResults, services);
+                 StringBuffer paramText = transformTermPP((Term)subst, contractResults, preStateMapping, services);
                  sig.append(paramText.toString().trim()).append(", ");
               }
               else {
