@@ -6,10 +6,13 @@ import java.util.Properties;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -61,7 +64,10 @@ public class GuaranteePO extends AbstractRelyGuaranteePO {
         // TODO: further technical setup
         final de.uka.ilkd.key.java.statement.Try tryCatch = KeYJavaASTFactory.tryBlock(KeYJavaASTFactory.block(runMethod), 
                         new Branch[]{KeYJavaASTFactory.catchClause(javaInfo, "e", "Throwable", KeYJavaASTFactory.block())});
-        final JavaBlock jb = JavaBlock.createJavaBlock(KeYJavaASTFactory.block(tryCatch));
+        final StatementBlock block = KeYJavaASTFactory.block(tryCatch);
+        final ExecutionContext ec = KeYJavaASTFactory.executionContext(tspec.getKJT(), null, threadVar, tspec.getKJT(), threadVar);
+        final MethodFrame mf = KeYJavaASTFactory.methodFrame(ec, block);
+        final JavaBlock jb = JavaBlock.createJavaBlock(mf);
         
         final QuantifiableVariable iVar = new LogicVariable(new Name("i"), intSort);
         final Term idx = tb.var(iVar);

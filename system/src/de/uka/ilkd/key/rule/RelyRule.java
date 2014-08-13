@@ -66,7 +66,12 @@ public final class RelyRule implements BuiltInRule {
         final boolean allowRTE = "runtimeExceptions:allow".equals(excChoice);
         assert ignoreRTE || allowRTE || "runtimeExceptions:ban".equals(excChoice);
         
-        final Term threadVar = null; // TODO
+        Term threadVar = null;
+        try {
+            threadVar = tb.parseTerm(""+thread);
+        } catch (ParserException e1) {
+            throw new RuleAbortException(e1);
+        }
         final Term heap = tb.getBaseHeap();
         final Term prevHeap = tb.getPrevHeap();
         final Term rely = ts.getRely(prevHeap, heap, threadVar, services);
@@ -230,6 +235,7 @@ public final class RelyRule implements BuiltInRule {
     private static ThreadSpecification getApplicableThreadSpec(JavaBlock jb, Services services) {
         final ExecutionContext ec = JavaTools.getInnermostExecutionContext(jb, services);
         final KeYJavaType threadType = ec.getThreadTypeReference().getKeYJavaType();
+        if (threadType == null) return null;
         return services.getSpecificationRepository().getThreadSpecification(threadType);
     }
 

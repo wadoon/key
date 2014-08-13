@@ -19,6 +19,7 @@ import java.io.StringWriter;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 
 public class JavaBlock {
@@ -45,6 +46,11 @@ public class JavaBlock {
 	    return EMPTY_JAVABLOCK;	   
 	} */
 	return new JavaBlock(prg);
+    }
+    
+    public static JavaBlock createJavaBlock(Statement s) {
+        final StatementBlock b = new StatementBlock(s);
+        return createJavaBlock(b);
     }
     
 
