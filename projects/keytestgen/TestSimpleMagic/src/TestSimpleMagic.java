@@ -20,7 +20,7 @@ public  class TestSimpleMagic {
          * Create the parameter instances to be passed to the method under test.
          *
          */
-        int h1 = 1;        
+        int h1 = 0;        
         int l1 = 0;        
         
         self.magic(h1,l1);        
@@ -43,7 +43,7 @@ public  class TestSimpleMagic {
          * Create the parameter instances to be passed to the method under test.
          *
          */
-        int h1 = 0;        
+        int h1 = 1;        
         int l1 = 0;        
         
         self.magic(h1,l1);        

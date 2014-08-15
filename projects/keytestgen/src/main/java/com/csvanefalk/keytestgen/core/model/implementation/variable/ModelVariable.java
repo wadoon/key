@@ -68,8 +68,15 @@ public class ModelVariable {
         this.identifier = identifier;
     }
 
-    //added by Huy, used to store symbolic value of variable
+    /**
+     * added by Huy, used to store symbolic value of variable
+     */
     private Term symbolicValue;
+    
+    /**
+     * added by Huy, used to indicate the variable is static or nonstatic
+     */
+    private boolean isStatic;
     
     /**
      * Since we are working with unique Java assertions, two
@@ -202,5 +209,11 @@ public class ModelVariable {
       this.symbolicValue = symbolicValue;
    }
     
+   public boolean isStatic(){
+      return isStatic;
+   }
    
+   public void setStatic(boolean is){
+      isStatic = is;
+   }
 }
