@@ -67,6 +67,8 @@ public class ModelVariable {
         variable = programVariable;
         this.identifier = identifier;
     }
+    
+    
 
     /**
      * added by Huy, used to store symbolic value of variable
@@ -77,6 +79,12 @@ public class ModelVariable {
      * added by Huy, used to indicate the variable is static or nonstatic
      */
     private boolean isStatic;
+    
+    /**
+     * added by Huy, used to store the name of the class in which variable is declared
+     * used mostly for accessing static variables
+     */
+    private String declareClassName;
     
     /**
      * Since we are working with unique Java assertions, two
@@ -216,4 +224,24 @@ public class ModelVariable {
    public void setStatic(boolean is){
       isStatic = is;
    }
+   
+   public IProgramVariable getProgramVariable(){
+      return variable;
+   }
+
+   /**
+    * @return the declareClassName
+    */
+   public String getDeclareClassName() {
+      return declareClassName;
+   }
+
+   /**
+    * @param declareClassName the declareClassName to set
+    */
+   public void setDeclareClassName(String declareClassName) {
+      this.declareClassName = declareClassName;
+   }
+   
+   
 }
