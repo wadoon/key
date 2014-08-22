@@ -170,6 +170,20 @@ public final class SpecificationRepository {
     // internal methods
     // -------------------------------------------------------------------------
 
+    private static String getUniqueNameForObserver(IObserverFunction obs) {
+       StringBuffer sb = new StringBuffer(obs.name().toString());
+       
+       if (obs.isStatic()) {
+          sb.append("_static_");
+       }
+       
+       for (KeYJavaType pType : obs.getParamTypes()) {
+          sb.append(pType.getFullName());
+       }
+       
+       return sb.toString();
+    }
+    
     private static Taclet getLimitedToUnlimitedTaclet(IObserverFunction limited,
                                                       IObserverFunction unlimited, 
                                                       TermServices services) {
@@ -193,8 +207,7 @@ public final class SpecificationRepository {
                 Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet> nil(),
                 unlimitedTerm));
         tacletBuilder.setName(MiscTools.toValidTacletName("unlimit "
-                + unlimited.name()));
-
+                + getUniqueNameForObserver(unlimited)));
         return tacletBuilder.getTaclet();
     }
 
@@ -226,7 +239,7 @@ public final class SpecificationRepository {
                         subs)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
         tacletBuilder.setName(MiscTools.toValidTacletName("limit "
-                + unlimited.name()));
+                + getUniqueNameForObserver(unlimited)));
         tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 
         return tacletBuilder.getTaclet();
@@ -376,7 +389,7 @@ public final class SpecificationRepository {
             }
             for (ClassAxiom ax : e.getValue()) {
                 if (JavaInfo.isVisibleTo(ax, visibleTo)) {
-                    result = result.add(ax);
+                   result = result.add(ax);
                 }
             }
         }
@@ -819,8 +832,7 @@ public final class SpecificationRepository {
         for (FunctionalOperationContract contract : result) {
             if (!contract.getModality().equals(matchModality)
                     || (transactionModality
-                            && !contract.transactionApplicableContract() && !contract
-                                .isReadOnlyContract(services))) {
+                            && !contract.transactionApplicableContract())) {
                 result = result.remove(contract);
             }
         }
@@ -1089,6 +1101,7 @@ public final class SpecificationRepository {
         }
     }
 
+    
     /**
      * Returns all class axioms visible in the passed class, including the
      * axioms induced by invariant declarations.
@@ -1098,7 +1111,6 @@ public final class SpecificationRepository {
         if (result == null) {
             // get visible registered axioms of other classes
             result = getVisibleAxiomsOfOtherClasses(selfKjt);
-
             // add registered axioms of own class
             ImmutableSet<ClassAxiom> ownAxioms = axioms.get(selfKjt);
             if (ownAxioms != null) {
@@ -1106,6 +1118,7 @@ public final class SpecificationRepository {
                     result = result.add(ax);
                 }
             }
+
             final JavaInfo ji = services.getJavaInfo();
 
             // add invariant axiom for own class and other final classes
@@ -1121,6 +1134,7 @@ public final class SpecificationRepository {
                 invDef = tb.tf().createTerm(Equality.EQV,
                         tb.inv(tb.var(selfVar)), invDef);
                 final IObserverFunction invSymbol = services.getJavaInfo().getInv();
+                
                 final ClassAxiom invRepresentsAxiom
                 = new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(),
                                       invSymbol,
@@ -1133,14 +1147,21 @@ public final class SpecificationRepository {
                                       null);
                 result = result.add(invRepresentsAxiom);
             }
-
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo()
                     .getAllProgramMethods(selfKjt)) {
                 if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
+
+                    StringBuffer sb = new StringBuffer();
+                    for (KeYJavaType pd : pm.getParamTypes()) {
+                       sb.append(pd.getJavaType().getFullName());
+                       sb.append("_");
+                    }
+                
+                    
                     final ClassAxiom queryAxiom
-                    = new QueryAxiom("Query axiom for " + pm.getName() +
+                    = new QueryAxiom("Query axiom for " + pm.getName() + "_" + sb +
                                          " in " + selfKjt.getFullName(),
                                      pm,
                                      selfKjt);
@@ -1163,8 +1184,8 @@ public final class SpecificationRepository {
     private ImmutableSet<ClassAxiom> getModelMethodAxioms() {
         ImmutableSet<ClassAxiom> result  = DefaultImmutableSet.<ClassAxiom>nil();
         for(KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
-            final ProgramVariable selfVar = tb.selfVar(kjt, false);
             for(IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
+                final ProgramVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
                 if(!pm.isVoid() && pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(kjt, pm);
                     ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, false);
@@ -1202,7 +1223,6 @@ public final class SpecificationRepository {
                             // TODO Wojtek: I do not understand the visibility issues of model fields/methods.
                             // VisibilityModifier visibility = pm.isPrivate() ? new Private() :
                             //    (pm.isProtected() ? new Protected() : (pm.isPublic() ? new Public() : null));
-
                             final ClassAxiom modelMethodRepresentsAxiom
                                 = new RepresentsAxiom("Definition axiom for " + pm.getName() +
                                                         " in " + kjt.getFullName(),
@@ -1215,6 +1235,7 @@ public final class SpecificationRepository {
                         }
                     }
                     for(FunctionalOperationContract fop : getOperationContracts(kjt,pm)) {
+                    	if(!fop.getSpecifiedIn().equals(kjt)) continue;
                     	Term preFromContract =
                     	        fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                     	Term postFromContract =
@@ -1400,6 +1421,15 @@ public final class SpecificationRepository {
             }
         }
         return null;
+    }
+
+    public ContractPO getContractPOForProof(Proof proof) {
+        ProofOblInput po = getProofOblInput(proof);
+        if (po != null && po instanceof ContractPO) {
+            return (ContractPO)po;
+        } else {
+            return null;
+        }
     }
 
     /**

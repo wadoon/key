@@ -100,12 +100,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.addName(new PositionedString("assert "+assertStm.text, assertStm.fileName, assertStm.pos));
         res.addEnsures(assertStm);
         res.addAssignable(new PositionedString("assignable \\strictly_nothing;",assertStm.fileName,assertStm.pos));
+        res.setPosition(assertStm);
         return res;
     }
 
 
     public void addName(PositionedString n) {
         this.name = n.text;
+        setPosition(n);
     }
 
     public void addRequires(PositionedString ps) {
@@ -121,6 +123,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addMeasuredBy(PositionedString ps) {
         measuredBy = measuredBy.append(ps);
+        setPosition(ps);
     }
 
 
@@ -158,6 +161,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addSignals(PositionedString ps) {
         signals = signals.append(ps);
+        setPosition(ps);
     }
 
 
@@ -168,6 +172,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addSignalsOnly(PositionedString ps) {
         signalsOnly = signalsOnly.append(ps);
+        setPosition(ps);
     }
 
 
@@ -178,21 +183,25 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void setWorkingSpace(PositionedString ps) {
         workingSpace = ps;
+        setPosition(ps);
     }
 
 
     public void addDiverges(PositionedString ps) {
         diverges = diverges.append(ps);
+        setPosition(ps);
     }
 
 
     public void addDepends(PositionedString ps) {
         depends = depends.append(ps);
+        setPosition(ps);
     }
 
 
     public void addBreaks(PositionedString ps) {
         breaks = breaks.append(ps);
+        setPosition(ps);
     }
 
 
@@ -203,6 +212,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addContinues(PositionedString ps) {
         continues = continues.append(ps);
+        setPosition(ps);
     }
 
 
@@ -213,6 +223,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addReturns(PositionedString ps) {
         returns = returns.append(ps);
+        setPosition(ps);
     }
 
 
@@ -228,6 +239,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addAxioms(PositionedString ps) {
         addGeneric(axioms, ps);
+        setPosition(ps);
     }
 
     public void addAxioms(ImmutableList<PositionedString> l) {

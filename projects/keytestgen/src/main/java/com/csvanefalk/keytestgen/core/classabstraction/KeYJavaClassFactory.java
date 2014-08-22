@@ -12,7 +12,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,7 +47,7 @@ public class KeYJavaClassFactory {
     }
 
     private KeYJavaClass constructClass(final KeYJavaType parent,
-                                        final KeYEnvironment<CustomConsoleUserInterface> environment) {
+                                        final KeYEnvironment<CustomUserInterface> environment) {
 
         final Services services = environment.getServices();
         final JavaInfo javaInfo = services.getJavaInfo();
@@ -108,7 +108,7 @@ public class KeYJavaClassFactory {
         /*
          * Load the file into KeY and get the InitConfig instance for it.
          */
-        final KeYEnvironment<CustomConsoleUserInterface> environment = keyInterface.loadJavaFile(javaFile);
+        final KeYEnvironment<CustomUserInterface> environment = keyInterface.loadJavaFile(javaFile);
         final JavaInfo javaInfo = environment.getServices().getJavaInfo();
 
         /*
@@ -130,7 +130,7 @@ public class KeYJavaClassFactory {
 
     public KeYJavaClass createKeYJavaClass(final IExecutionMethodCall methodCall) {
 
-        methodCall.getMediator().getSelectedProof().env().getInitConfig();
+        methodCall.getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment();
 
         /*
          * Get and process the method call node

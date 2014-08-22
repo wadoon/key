@@ -19,7 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import org.junit.Assert;
 
 import java.io.File;
@@ -310,7 +310,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printNamespaceProgramVariables(final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
+    protected void printNamespaceProgramVariables(final SymbolicExecutionEnvironment<CustomUserInterface> environment) {
 
         final int i = 0;
         Namespace namespace = environment.getInitConfig().progVarNS();
@@ -326,7 +326,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printNamespaceVariables(final SymbolicExecutionEnvironment<CustomConsoleUserInterface> environment) {
+    protected void printNamespaceVariables(final SymbolicExecutionEnvironment<CustomUserInterface> environment) {
 
         final int i = 0;
         Namespace namespace = environment.getInitConfig().varNS();

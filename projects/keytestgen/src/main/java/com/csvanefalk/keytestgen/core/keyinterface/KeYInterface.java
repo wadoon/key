@@ -24,7 +24,7 @@ import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,7 +100,7 @@ public class KeYInterface {
      * @return the proof
      * @throws ProofInputException in the event that the proof cannot be created
      */
-    private Proof getProof(final KeYEnvironment<CustomConsoleUserInterface> environment,
+    private Proof getProof(final KeYEnvironment<CustomUserInterface> environment,
                            final IProgramMethod method,
                            final String precondition) throws ProofInputException {
 
@@ -149,7 +149,7 @@ public class KeYInterface {
             KeYInterface.lock.lock();
 
             //Prettyprinting can be left on for debugging. Probably not appropriate for production environments.
-            SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(method,
+            SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(method,
                                                                                                               false,
                                                                                                              true,
                                                                                                               true,
@@ -198,7 +198,7 @@ public class KeYInterface {
      * @throws ProofInputException   in case the proof could not be initiated
      * @throws IOException           in case the File could not be found, or is not accessible
      */
-    public KeYEnvironment<CustomConsoleUserInterface> loadJavaFile(final File javaFile) throws KeYInterfaceException {
+    public KeYEnvironment<CustomUserInterface> loadJavaFile(final File javaFile) throws KeYInterfaceException {
 
         try {
 
@@ -239,14 +239,14 @@ public class KeYInterface {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException    Occurred Exception.
      */
-    private SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(KeYJavaMethod method,
+    private SymbolicExecutionEnvironment<CustomUserInterface> createSymbolicExecutionEnvironment(KeYJavaMethod method,
                                                                                                         boolean mergeBranchConditions,
                                                                                                         boolean useOperationContracts,
                                                                                                         boolean useLoopInvarints,
                                                                                                         boolean nonExecutionBranchHidingSideProofs,
                                                                                                         boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
 
-        KeYEnvironment<CustomConsoleUserInterface> environment = method.getEnvironment();
+        KeYEnvironment<CustomUserInterface> environment = method.getEnvironment();
 
         /*IProgramMethod pm = method.getProgramMethod();
         ImmutableSet<Contract> contracts = environment.getServices().getSpecificationRepository().getContracts(pm.getContainerType(), pm);
@@ -276,10 +276,10 @@ public class KeYInterface {
         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(),
                                                                                 proof,
                                                                                 mergeBranchConditions,
-                                                                                false);
+                                                                                false,false);
         //builder.analyse();
         //assert (builder.getStartNode() != null);
-        return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(environment, builder);
+        return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
     }
 
     /**

@@ -374,4 +374,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }
     }
+    
+    @Override
+    public File getInitialFile() {
+       return null;
+    }
 }
