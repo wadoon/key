@@ -237,7 +237,7 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           File location,
                                                           List<File> classPaths,
                                                           File bootClassPath) throws ProblemLoaderException {
-      return load(profile, location, classPaths, bootClassPath, null, null);
+      return load(profile, location, classPaths, bootClassPath, null, null);      
    }
    
    /**
@@ -258,10 +258,10 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           File bootClassPath,
                                                           Properties poPropertiesToForce,
                                                           IUserInterfaceCustomization customization) throws ProblemLoaderException {
-      CustomUserInterface ui = new CustomUserInterface(false, customization);
+      CustomUserInterface ui = new CustomUserInterface(false, customization);      
       DefaultProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce); 
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<CustomUserInterface>(ui, initConfig, loader.getProof());
+      return new KeYEnvironment<CustomUserInterface>(ui, initConfig, loader.getProof());      
    }
 
    /**

@@ -31,12 +31,24 @@ public class CasesGeneratorApplication implements IApplication {
       if (arguments.length == 2) {
          File file = new File(arguments[0]);
          if (file.exists()) {
+            System.out.println("Setting the taclet options...");
             setYDefaultTacletOptions();
+            System.out.println("Analizing the contracts...");
             StaRVOOrSResult result = StaRVOOrSUtil.start(file);
-            if (result != null) {
-               File resultFile = new File(arguments[1]);
+            
+            if (result != null) {       
+               System.out.println("Generating out.xml file...");
+               String arg = arguments[1];
+               File resultFile;
+               if (arg.charAt(arg.length()-1) == '/') {               
+                  resultFile = new File(arg + "out.xml");                  
+               } else {
+                  resultFile = new File(arg + "/out.xml");                  
+               }
                StaRVOOrSWriter.write(result, resultFile);
-            }
+               System.out.println("\nProcess done.");
+            } else {System.out.println("\nProcess Aborted.");}
+            
          }
          else {
             System.out.println("The file \"" + file + "\" does not exist.");

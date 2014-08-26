@@ -53,8 +53,10 @@ public final class StaRVOOrSUtil {
    }
    
    public static StaRVOOrSResult start(File location) throws ProofInputException, IOException {
+     try {
       // Load source code and rules
       KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null);
+      
       try {
          StaRVOOrSResult result = new StaRVOOrSResult();
          // Iterate over available types to list proof obligations
@@ -78,6 +80,7 @@ public final class StaRVOOrSUtil {
       finally {
          env.dispose();
       }
+    } catch (Exception e) {System.out.println("KeY has failed loading the files."); return null;} 
    }
 
    protected static StaRVOOrSProof verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException, IOException {
