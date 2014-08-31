@@ -603,25 +603,24 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Creates for the given {@link IExecutionStateNode} the contained
+    * Creates for the given {@link IExecutionNode} the contained
     * {@link IExecutionConstraint}s.
-    * @param node The {@link IExecutionStateNode} to create constraints for.
+    * @param node The {@link IExecutionNode} to create constraints for.
     * @return The created {@link IExecutionConstraint}s.
     */
-   public static IExecutionConstraint[] createExecutionConstraints(IExecutionStateNode<?> node) {
+   public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode node) {
       if (node != null && !node.isDisposed()) {
          TermBuilder tb = node.getServices().getTermBuilder();
          List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
          Node proofNode = node.getProofNode();
          Sequent sequent = proofNode.sequent();
-         SequentFormula currentSF = proofNode.getAppliedRuleApp().posInOccurrence().constrainedFormula();
          for (SequentFormula sf : sequent.antecedent()) {
-            if (currentSF != sf) {
+            if (!containsSymbolicExecutionLabel(sf.formula())) {
                constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, sf.formula()));
             }
          }
          for (SequentFormula sf : sequent.succedent()) {
-            if (currentSF != sf) {
+            if (!containsSymbolicExecutionLabel(sf.formula())) {
                constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, tb.not(sf.formula())));
             }
          }
@@ -632,6 +631,28 @@ public final class SymbolicExecutionUtil {
       }
    }
    
+   /**
+    * Checks if the {@link Term} or one of its sub terms contains
+    * a symbolic execution label.
+    * @param term The {@link Term} to check.
+    * @return {@code true} SE label is somewhere contained, {@code false} SE label is not contained at all.
+    */
+   public static boolean containsSymbolicExecutionLabel(Term term) {
+      term = TermBuilder.goBelowUpdates(term);
+      if (term.op() instanceof Modality) {
+         return hasSymbolicExecutionLabel(term);
+      }
+      else {
+         boolean hasModality = false;
+         int i = 0;
+         while (!hasModality && i < term.arity()) {
+            hasModality = containsSymbolicExecutionLabel(term.sub(i));
+            i++;
+         }
+         return hasModality;
+      }
+   }
+
    /**
     * Creates for the given {@link IExecutionStateNode} the contained
     * root {@link IExecutionVariable}s.
@@ -2401,7 +2422,9 @@ public final class SymbolicExecutionUtil {
          originalSequentWithoutMethodFrame = labelSkolemConstants(originalSequentWithoutMethodFrame, skolemInNewTerm, factory);
          newSuccedentToProve = addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, ParameterlessTermLabel.RESULT_LABEL);
       }
-      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      Sequent sequentToProve = newSuccedentToProve != null ?
+                               originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent() :
+                               originalSequentWithoutMethodFrame;
       if (additionalAntecedent != null) {
          sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
       }
@@ -2509,23 +2532,28 @@ public final class SymbolicExecutionUtil {
     * @return The found skolem {@link Term}s.
     */
    private static Set<Term> collectSkolemConstants(Sequent sequent, Term term) {
-      // Collect skolem constants in term
-      Set<Term> result = collectSkolemConstantsNonRecursive(term);
-      // Collect all skolem constants used in skolem constants
-      List<Term> toCheck = new LinkedList<Term>(result);
-      while (!toCheck.isEmpty()) {
-         Term skolemConstant = toCheck.remove(0);
-         List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
-         for (Term replacement : replacements) {
-            Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
-            for (Term checkConstant : checkResult) {
-               if (result.add(checkConstant)) {
-                  toCheck.add(checkConstant);
+      if (term != null) {
+         // Collect skolem constants in term
+         Set<Term> result = collectSkolemConstantsNonRecursive(term);
+         // Collect all skolem constants used in skolem constants
+         List<Term> toCheck = new LinkedList<Term>(result);
+         while (!toCheck.isEmpty()) {
+            Term skolemConstant = toCheck.remove(0);
+            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
+            for (Term replacement : replacements) {
+               Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
+               for (Term checkConstant : checkResult) {
+                  if (result.add(checkConstant)) {
+                     toCheck.add(checkConstant);
+                  }
                }
             }
          }
+         return result;
       }
-      return result;
+      else {
+         return new HashSet<Term>();
+      }
    }
 
    /**
