@@ -39,6 +39,7 @@ public final class StringConstants {
     public static final String SUBTRACTION = "sub";
     public static final String TAB = "    ";
     public static final String TRUE = "true"; //fixed by Huy (TRUE-> true)
+    public static final String True = "TRUE"; //fixed by Huy (TRUE-> true)
     public static final String Z = "Z";
     public static final String LENGTH = "length";
     public static final String ARRAYSTOREVALID = "arrayStoreValid";

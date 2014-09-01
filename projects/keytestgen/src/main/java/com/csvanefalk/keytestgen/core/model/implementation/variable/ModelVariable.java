@@ -1,10 +1,14 @@
 package com.csvanefalk.keytestgen.core.model.implementation.variable;
 
+import java.util.List;
+
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 
 /**
  * Instances of this class represent Java program variables during runtime. It's
@@ -83,8 +87,11 @@ public class ModelVariable {
     /**
      * added by Huy, used to store the name of the class in which variable is declared
      * used mostly for accessing static variables
-     */
+     */       
     private String declareClassName;
+    
+    private List<Term> constraints; //contain all constraints of variable (added by Huy)
+    
     
     /**
      * Since we are working with unique Java assertions, two
@@ -241,6 +248,20 @@ public class ModelVariable {
     */
    public void setDeclareClassName(String declareClassName) {
       this.declareClassName = declareClassName;
+   }
+
+   /**
+    * @return the constraints
+    */
+   public List<Term> getConstraints() {
+      return constraints;
+   }
+
+   /**
+    * @param constraints the constraints to set
+    */
+   public void setConstraints(List<Term> constraints) {
+      this.constraints = constraints;
    }
    
    
