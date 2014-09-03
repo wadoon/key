@@ -121,7 +121,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
@@ -499,6 +498,7 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param pio The {@link PosInOccurrence} of the modality or its updates.
     * @param additionalConditions Additional conditions to add to the antecedent.
     * @param term The new succedent term.
     * @param keepUpdates {@code true} keep updates, {@code false} throw updates away.
@@ -506,6 +506,7 @@ public final class SymbolicExecutionUtil {
     */
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
+                                                                      PosInOccurrence pio,
                                                                       Term additionalConditions,
                                                                       Term term,
                                                                       boolean keepUpdates) {
@@ -518,8 +519,8 @@ public final class SymbolicExecutionUtil {
       Term newTerm = services.getTermBuilder().func(newPredicate, term);
       // Create Sequent to prove with new succedent.
       Sequent sequentToProve = keepUpdates ? 
-                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, false) :
-                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, null, false);
+                               createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, false) :
+                               createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, null, false);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -592,14 +593,14 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if it is right now possible to compute the variables of the given {@link IExecutionStateNode}
-    * via {@link IExecutionStateNode#getVariables()}. 
-    * @param node The {@link IExecutionStateNode} to check.
+    * Checks if it is right now possible to compute the variables of the given {@link IExecutionNode}
+    * via {@link IExecutionNode#getVariables()}. 
+    * @param node The {@link IExecutionNode} to check.
     * @param services The {@link Services} to use.
     * @return {@code true} right now it is possible to compute variables, {@code false} it is not possible to compute variables.
     * @throws ProofInputException Occurred Exception.
     */
-   public static boolean canComputeVariables(IExecutionStateNode<?> node, Services services) throws ProofInputException {
+   public static boolean canComputeVariables(IExecutionNode<?> node, Services services) throws ProofInputException {
       return node != null && 
              !node.isDisposed() &&
              !services.getTermBuilder().ff().equals(node.getPathCondition());
@@ -611,7 +612,7 @@ public final class SymbolicExecutionUtil {
     * @param node The {@link IExecutionNode} to create constraints for.
     * @return The created {@link IExecutionConstraint}s.
     */
-   public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode node) {
+   public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode<?> node) {
       if (node != null && !node.isDisposed()) {
          TermBuilder tb = node.getServices().getTermBuilder();
          List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
@@ -657,12 +658,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Creates for the given {@link IExecutionStateNode} the contained
+    * Creates for the given {@link IExecutionNode} the contained
     * root {@link IExecutionVariable}s.
-    * @param node The {@link IExecutionStateNode} to create variables for.
+    * @param node The {@link IExecutionNode} to create variables for.
     * @return The created {@link IExecutionVariable}s.
     */
-   public static IExecutionVariable[] createExecutionVariables(IExecutionStateNode<?> node) {
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) {
       if (node != null) {
          Node proofNode = node.getProofNode();
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
@@ -672,7 +673,7 @@ public final class SymbolicExecutionUtil {
             variables.add(selfVar);
          }
          // Add method parameters
-         Node callNode = findMethodCallNode(node.getProofNode());
+         Node callNode = findMethodCallNode(node.getProofNode(), node.getModalityPIO());
          if (callNode != null
                  && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
             MethodBodyStatement mbs =
@@ -1615,12 +1616,13 @@ public final class SymbolicExecutionUtil {
     * which also represents a symbolic execution tree node
     * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
     * @param node The {@link Node} to start search in.
+    * @param pio The {@link PosInOccurrence} of the modality.
     * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
     */
-   public static Node findMethodCallNode(Node node) {
-      if (node != null && node.getAppliedRuleApp() != null) {
+   public static Node findMethodCallNode(Node node, PosInOccurrence pio) {
+      if (node != null && pio != null) {
          // Get current program method
-         Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
+         Term term = pio.subTerm();
          term = TermBuilder.goBelowUpdates(term);
          Services services = node.proof().getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
@@ -1631,8 +1633,7 @@ public final class SymbolicExecutionUtil {
             while (parent != null && result == null) {
                SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
                if (activeStatement instanceof MethodBodyStatement && 
-                   ((MethodBodyStatement)activeStatement).getProgramMethod(services)
-                       == mf.getProgramMethod()) {
+                   ((MethodBodyStatement)activeStatement).getProgramMethod(services) == mf.getProgramMethod()) {
                   result = parent;
                }
                else {
@@ -2981,7 +2982,7 @@ public final class SymbolicExecutionUtil {
     * @param executionNode The {@link IExecutionNode} to get the root of its symbolic execution tree.
     * @return The root of the given {@link IExecutionNode}.
     */
-   public static IExecutionNode getRoot(IExecutionNode executionNode) {
+   public static IExecutionNode<?> getRoot(IExecutionNode<?> executionNode) {
       if (executionNode != null) {
          while (executionNode.getParent() != null) {
             executionNode = executionNode.getParent();

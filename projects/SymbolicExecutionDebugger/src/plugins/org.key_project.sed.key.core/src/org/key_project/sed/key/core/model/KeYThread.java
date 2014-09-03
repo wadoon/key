@@ -156,7 +156,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
@@ -642,6 +642,22 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
             constraints = KeYModelUtil.createConstraints(this, executionNode);
          }
          return constraints;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasVariables() throws DebugException {
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
       }
    }
 

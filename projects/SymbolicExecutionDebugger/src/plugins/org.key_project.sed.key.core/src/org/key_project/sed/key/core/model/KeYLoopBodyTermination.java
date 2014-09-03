@@ -69,9 +69,9 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
     * @param executionNode The {@link IExecutionTermination} to represent by this debug node.
     */
    public KeYLoopBodyTermination(KeYDebugTarget target, 
-                                    IKeYSEDDebugNode<?> parent, 
-                                    KeYThread thread, 
-                                    IExecutionTermination executionNode) throws DebugException {
+                                 IKeYSEDDebugNode<?> parent, 
+                                 KeYThread thread, 
+                                 IExecutionTermination executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
@@ -118,7 +118,7 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
