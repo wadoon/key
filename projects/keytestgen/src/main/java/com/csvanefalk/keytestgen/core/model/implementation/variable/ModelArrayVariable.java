@@ -1,5 +1,6 @@
 package com.csvanefalk.keytestgen.core.model.implementation.variable;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
@@ -10,8 +11,16 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  */
 public class ModelArrayVariable extends ModelVariable {
 
-    ModelArrayVariable(final IProgramVariable programVariable,
+    public ModelArrayVariable(final IProgramVariable programVariable,
                        final String identifier) {
         super(programVariable, identifier);
     }
+    
+    /**
+     * @override
+     */
+    public String getTypeName() {
+        return variable.getKeYJavaType().getSort().toString();
+    }
+
 }

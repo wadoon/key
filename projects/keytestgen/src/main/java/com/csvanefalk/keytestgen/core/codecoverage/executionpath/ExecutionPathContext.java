@@ -3,7 +3,8 @@ package com.csvanefalk.keytestgen.core.codecoverage.executionpath;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.model.*;
-import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionStateNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
+
 
 import java.util.*;
 
@@ -296,8 +297,8 @@ public class ExecutionPathContext {
         private SourceElement findParentExecutionBranch(IExecutionNode node) {
 
             while (true) {
-                if (node.getParent() instanceof AbstractExecutionStateNode) {
-                    return ((AbstractExecutionStateNode) node.getParent()).getActiveStatement();
+                if (node.getParent() instanceof AbstractExecutionNode) {
+                    return ((AbstractExecutionNode) node.getParent()).getActiveStatement();
                 } else {
                     node = node.getParent();
                 }
@@ -305,7 +306,7 @@ public class ExecutionPathContext {
         }
 
         private SourceElement getActiveStatement(final IExecutionNode node) {
-            final AbstractExecutionStateNode abstractExecutionStateNode = (AbstractExecutionStateNode) node;
+            final AbstractExecutionNode abstractExecutionStateNode = (AbstractExecutionNode) node;
             return abstractExecutionStateNode.getActiveStatement();
         }
 
@@ -333,7 +334,7 @@ public class ExecutionPathContext {
          * otherwise
          */
         private boolean isProgramStatementNode(final IExecutionNode node) {
-            return node instanceof AbstractExecutionStateNode;
+            return node instanceof AbstractExecutionNode;
         }
 
         private boolean isTerminatingNode(final IExecutionNode node) {

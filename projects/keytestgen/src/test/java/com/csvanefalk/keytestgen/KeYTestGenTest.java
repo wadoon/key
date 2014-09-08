@@ -285,9 +285,9 @@ public abstract class KeYTestGenTest {
 
             final IExecutionNode next = iterator.next();
 
-            if (next instanceof IExecutionStateNode<?>) {
+            if (next instanceof IExecutionNode<?>) {
                 printSingleNode(next);
-                final IExecutionStateNode<SourceElement> stuff = (IExecutionStateNode<SourceElement>) next;
+                final IExecutionNode<SourceElement> stuff = (IExecutionNode<SourceElement>) next;
                 for (final IExecutionVariable var : SymbolicExecutionUtil.createExecutionVariables(stuff)) {
                     System.out.println("\n" + var.getProgramVariable());
                     for (final IExecutionValue val : var.getValues()) {
@@ -377,9 +377,9 @@ public abstract class KeYTestGenTest {
 
             final IExecutionNode next = iterator.next();
 
-            if (next instanceof IExecutionStateNode<?>) {
+            if (next instanceof IExecutionNode<?>) {
 
-                final IExecutionStateNode<?> stateNode = (IExecutionStateNode<?>) next;
+                final IExecutionNode<?> stateNode = (IExecutionNode<?>) next;
                 System.out
                       .println("Node " + stateNode.getName() + "\nPath condition " + stateNode.getPathCondition() + "\nHuman readable: " + stateNode
                               .getFormatedPathCondition()

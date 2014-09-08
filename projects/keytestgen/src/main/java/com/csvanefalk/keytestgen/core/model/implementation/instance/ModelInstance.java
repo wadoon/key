@@ -102,8 +102,11 @@ public class ModelInstance {
      * @return the type
      */
     public String getType() {
-
+       try{
         return type.getJavaType().getFullName();
+       }catch(Exception e){
+          return null;
+       }
     }
 
     public String getTypeName() {

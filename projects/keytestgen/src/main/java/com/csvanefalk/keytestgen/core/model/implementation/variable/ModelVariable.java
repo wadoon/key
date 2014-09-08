@@ -2,13 +2,14 @@ package com.csvanefalk.keytestgen.core.model.implementation.variable;
 
 import java.util.List;
 
+import com.csvanefalk.keytestgen.StringConstants;
+import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelArrayInstance;
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Instances of this class represent Java program variables during runtime. It's
@@ -64,12 +65,14 @@ public class ModelVariable {
     /**
      * The wrapped {@link ProgramVariable} instance.
      */
-    private final IProgramVariable variable;
+    protected final IProgramVariable variable;
 
     public ModelVariable(final IProgramVariable programVariable, final String identifier) {
 
         variable = programVariable;
         this.identifier = identifier;
+        
+        arrayIdx = -1; //default that this model variable is not an array's element
     }
     
     
@@ -92,6 +95,7 @@ public class ModelVariable {
     
     private List<Term> constraints; //contain all constraints of variable (added by Huy)
     
+    private int arrayIdx; //=-1 if this is not an element of array, otherwise is the index number (added by Huy) 
     
     /**
      * Since we are working with unique Java assertions, two
@@ -135,13 +139,19 @@ public class ModelVariable {
         return variable.getKeYJavaType();
     }
 
+    public Sort getSort(){
+       return variable.sort();
+    }
     /**
      * Returns a String representation of the {@link KeYJavaType} of this
      * variable.
      */
     public String getTypeName() {
-
-        return variable.getKeYJavaType().getName();
+       try{
+          return variable.getKeYJavaType().getName();
+       }catch(Exception e){
+          return variable.sort().toString();
+       }
     }
 
     /**
@@ -263,6 +273,28 @@ public class ModelVariable {
    public void setConstraints(List<Term> constraints) {
       this.constraints = constraints;
    }
+
+   /**
+    * @return the arrayIdx
+    */
+   public int getArrayIdx() {
+      return arrayIdx;
+   }
+
+   /**
+    * @param arrayIdx the arrayIdx to set
+    */
+   public void setArrayIdx(int arrayIdx) {
+      this.arrayIdx = arrayIdx;
+   }
    
+   public boolean isArrayElement(){
+      return (arrayIdx >= 0);
+   }
    
+   public boolean isArrayLength(){
+      return ((getParentModelInstance() instanceof ModelArrayInstance) && (arrayIdx < 0)
+            && identifier.endsWith(StringConstants.LENGTH));
+      
+   }
 }

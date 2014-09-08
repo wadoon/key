@@ -1,6 +1,8 @@
 package com.csvanefalk.keytestgen.core.model.implementation;
 
+import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelArrayInstance;
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
+import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelArrayVariable;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import de.uka.ilkd.key.logic.Term;
 
@@ -202,5 +204,84 @@ public class Model {
 
         final int index = variables.indexOf(variable);
         return index >= 0 ? variables.get(index) : null;
+    }
+    
+    
+    /**
+     * for printing purpose
+     * */
+    public String toString(){   
+       String result = "";
+       for(ModelVariable mv : getVariables()){      
+          
+          if(mv.isPrimitive()){
+             result += mv.getIdentifier()+": " + mv.getSymbolicValue() + " :: " + mv.getTypeName()+ " : " + mv.getValue() + "\n" ;             
+          }else if(mv instanceof ModelArrayVariable){
+             result += mv.getIdentifier() + ": " + mv.getTypeName() + "; length: " +
+                        ((ModelArrayInstance)mv.getValue()).length() + "; includes: \n";
+             for(ModelVariable mvv : ((ModelArrayInstance)mv.getValue()).getArrayElements()){
+                result += "     " + mvv.getIdentifier()+" : " + mvv.getVariableName()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
+             }
+             result += "-----\n";
+          }else{
+             result += mv.getIdentifier()+": " + mv.getSymbolicValue() + " :: " ;
+             ModelInstance mi=(ModelInstance)mv.getValue();
+             result += mi.toString() + " ; " + " includes: \n";
+             for(ModelVariable mvv : mi.getFields()){
+                result += "     " + mvv.getIdentifier()+" : " + mvv.getVariableName()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
+             }
+             result += "-----\n";
+          }
+       }       
+       return result;      
+    }
+    
+   /**
+   * check if a ModelVariable is added into Model or not, use the identifier of var
+   * @param identifier
+   * @return true if there exists an ModelVariable mv that mv.identifier = identifier
+   */
+    public boolean inModel(String identifier){           
+       if (getVariable(identifier) != null) 
+          return true;
+       else
+          return false;
+    }
+    
+    /** merge this model with another Model     
+     * @param dModel
+     * if there exists a ModelVariable of Model dModel that is not in this model
+     * then add it into this model
+     */
+    public void mergeModel(Model dModel){
+       List<ModelVariable> dMVs = dModel.getVariables(); 
+       for(ModelVariable mv: dMVs){
+          if(!inModel(mv.getIdentifier())){
+             add(mv);
+             //look up the referee
+             List<ModelVariable> referees;
+             try{
+                referees = mv.getParentModelInstance().getReferees();
+             }catch(Exception e){
+                referees = null;
+             }
+             
+             if(referees!=null){
+                for(ModelVariable rmv: referees){
+                   if(inModel(rmv.getIdentifier()))
+                      assignField(mv, getVariable(rmv.getIdentifier()));                      
+
+                }
+             }
+          }
+       }
+    }
+    
+    public void resetPrimitiveValue(){
+       for(ModelVariable mv: getVariables()){
+          if(mv.isPrimitive()){
+             mv.setValue(ModelBuilderVisitor.resolvePrimitiveType(mv.getProgramVariable()));
+          }
+       }       
     }
 }

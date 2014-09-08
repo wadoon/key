@@ -4,6 +4,7 @@ import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public class ModelArrayInstance extends ModelInstance {
      */
     public int length() {
         for (ModelVariable field : getFields()) {
-            if (field.getVariableName().endsWith(StringConstants.LENGTH)) {
+            if (field.isArrayLength()) {
                 return field.getValue();
             }
         }
@@ -33,9 +34,20 @@ public class ModelArrayInstance extends ModelInstance {
 
     /**
      * @return all elements of this array.
+     * implemented by Huy
      */
     public List<ModelVariable> getArrayElements() {
-        return null;
+       List<ModelVariable> result = new LinkedList<ModelVariable>();
+       for (ModelVariable field : getFields()) {
+          if (!field.getVariableName().endsWith(StringConstants.LENGTH)) {
+              result.add(field);
+          }
+      }
+       return result;
+       /*if(result.size()>0)
+          return result;
+       else
+          return null;*/
     }
 
     /**
@@ -43,8 +55,13 @@ public class ModelArrayInstance extends ModelInstance {
      *
      * @param index index of the elements.
      * @return the elements, or null if no element exists for the provided index.
+     * implemented by Huy
      */
     public ModelVariable getElement(int index) {
+       for (ModelVariable field : getFields()) {
+          if(field.getArrayIdx() == index)
+             return field;
+       }
         return null;
     }
 }
