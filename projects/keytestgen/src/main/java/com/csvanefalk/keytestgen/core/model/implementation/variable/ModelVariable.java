@@ -77,17 +77,17 @@ public class ModelVariable {
     
     
 
-    /**
+    /*
      * added by Huy, used to store symbolic value of variable
      */
     private Term symbolicValue;
     
-    /**
+    /*
      * added by Huy, used to indicate the variable is static or nonstatic
      */
     private boolean isStatic;
     
-    /**
+    /*
      * added by Huy, used to store the name of the class in which variable is declared
      * used mostly for accessing static variables
      */       
@@ -96,6 +96,12 @@ public class ModelVariable {
     private List<Term> constraints; //contain all constraints of variable (added by Huy)
     
     private int arrayIdx; //=-1 if this is not an element of array, otherwise is the index number (added by Huy) 
+    
+    /*
+     *added by Huy, store the value of position in the array if this ModelVariable object is an array element
+     *otherwise, arrayIdxValue =  null 
+     * */
+    private Object arrayIdxValue; 
     
     /**
      * Since we are working with unique Java assertions, two
@@ -210,7 +216,9 @@ public class ModelVariable {
         boundValue = value;
     }
 
-    @Override
+   
+
+   @Override
     public String toString() {
 
         return getTypeName() + " : " + identifier;
@@ -289,12 +297,29 @@ public class ModelVariable {
    }
    
    public boolean isArrayElement(){
-      return (arrayIdx >= 0);
+      //return (arrayIdx >= 0);
+      return (arrayIdxValue != null);
    }
    
    public boolean isArrayLength(){
-      return ((getParentModelInstance() instanceof ModelArrayInstance) && (arrayIdx < 0)
+      /*return ((getParentModelInstance() instanceof ModelArrayInstance) && (arrayIdx < 0)
+            && identifier.endsWith(StringConstants.LENGTH));  */  
+      return ((getParentModelInstance() instanceof ModelArrayInstance)
+            && !isArrayElement()
             && identifier.endsWith(StringConstants.LENGTH));
-      
+   }
+   
+   /**
+    * @return the arrayIdxValue
+    */
+   public <T> T getArrayIdxValue() {
+      return (T) arrayIdxValue;
+   }
+
+   /**
+    * @param arrayIdxValue the arrayIdxValue to set
+    */
+   public void setArrayIdxValue(Object arrayIdxValue) {
+      this.arrayIdxValue = arrayIdxValue;
    }
 }

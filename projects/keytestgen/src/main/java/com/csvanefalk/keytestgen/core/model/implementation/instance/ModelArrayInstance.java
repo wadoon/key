@@ -39,7 +39,7 @@ public class ModelArrayInstance extends ModelInstance {
     public List<ModelVariable> getArrayElements() {
        List<ModelVariable> result = new LinkedList<ModelVariable>();
        for (ModelVariable field : getFields()) {
-          if (!field.getVariableName().endsWith(StringConstants.LENGTH)) {
+          if (!field.isArrayLength()) {
               result.add(field);
           }
       }
