@@ -75,7 +75,11 @@ public class ModelVariable {
         arrayIdx = -1; //default that this model variable is not an array's element
     }
     
-    
+    public ModelVariable(final String identifier){
+       this.identifier = identifier;
+       this.variable = null;
+       arrayIdx = -1;
+    }
 
     /*
      * added by Huy, used to store symbolic value of variable
