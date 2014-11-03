@@ -18,6 +18,9 @@ public class ModelArrayVariable extends ModelVariable {
         super(programVariable, identifier);
     }
     
+    public ModelArrayVariable(ModelArrayVariable mvA){
+       super(mvA);
+    }
     /**
      * @override
      */
@@ -46,4 +49,6 @@ public class ModelArrayVariable extends ModelVariable {
        }
        return dimension;
     }
+    
+    
 }

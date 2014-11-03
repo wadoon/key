@@ -2,8 +2,13 @@ package com.csvanefalk.keytestgen.core.model.implementation;
 
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelArrayInstance;
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
+import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstanceFactory;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelArrayVariable;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
+import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
+
+
+
 import de.uka.ilkd.key.logic.Term;
 
 import java.util.HashMap;
@@ -30,9 +35,41 @@ public class Model {
      *
      * @return the new instance.
      */
-    public static Model constructModel() {
+    public static Model constructModel(){
 
         return new Model();
+    }
+    
+    //clone method. added by Huy
+    public static Model constructModel(Model modelCopy){
+       Model model = constructModel();      
+       /*we reconstruct model based on modelCopy*/
+       for(ModelVariable mv: modelCopy.variables){
+          if(mv instanceof ModelArrayVariable){
+             ModelArrayVariable mvNew = new ModelArrayVariable((ModelArrayVariable)mv);
+             //TODO need be refined: to solve ModelVariable created manually (no have appropriate type, only sort) 
+             Object instance = ModelInstanceFactory.constructModelInstance(mv.getType());
+             model.add(mvNew, instance);
+          }else{
+             ModelVariable mvNew = new ModelVariable(mv);
+             Object instance;
+             if(TermParserTools.isPrimitiveType(mv.getSort().toString()))
+                instance = ModelBuilderVisitor.resolvePrimitiveType(mv.getProgramVariable());
+             else
+                instance = ModelInstanceFactory.constructModelInstance(mv.getType());             
+             model.add(mvNew, instance);
+          }                    
+       }
+       
+       for(ModelVariable mv: model.variables){
+          if(mv.getParentIdentifier()!=null){
+             model.assignField(mv, model.getVariable(mv.getParentIdentifier()));
+          }
+       }
+       
+       return model;
+       
+       
     }
 
     /**
@@ -50,9 +87,9 @@ public class Model {
     private final LinkedList<ModelVariable> variables = new LinkedList<ModelVariable>();
 
     private Model() {
-
     }
 
+    
     /**
      * Adds a variable to the heap, causing it to point to a given object
      * instance. If the variable already exists on the heap, this method will
@@ -190,11 +227,16 @@ public class Model {
      * @return
      */
     public final List<ModelVariable> getVariables() {
-
         return variables;
     }
+    
+    
 
-    /**
+    public HashMap<ModelVariable, ModelVariable> getBuffer() {
+      return buffer;
+   }
+
+   /**
      * Retrieves the actual in-memory reference to a variable, as represented on
      * the heap.
      *
@@ -249,16 +291,18 @@ public class Model {
     }
     
     /** merge this model with another Model     
-     * @param dModel
+     * @param dModel     * 
      * if there exists a ModelVariable of Model dModel that is not in this model
      * then add it into this model
+     * added by Huy
      */
-    public void mergeModel(Model dModel){
+    public Model mergeModel(Model dModel){
+       Model result = constructModel(this);
        List<ModelVariable> dMVs = dModel.getVariables(); 
        for(ModelVariable mv: dMVs){
-          if(!inModel(mv.getIdentifier())){
-             add(mv);
-             //look up the referee
+          if(!result.inModel(mv.getIdentifier())){
+             result.add(mv);
+             /*//look up the referee
              List<ModelVariable> referees;
              try{
                 referees = mv.getParentModelInstance().getReferees();
@@ -269,12 +313,16 @@ public class Model {
              if(referees!=null){
                 for(ModelVariable rmv: referees){
                    if(inModel(rmv.getIdentifier()))
-                      assignField(mv, getVariable(rmv.getIdentifier()));                      
+                      result.assignField(mv, result.getVariable(rmv.getIdentifier()));                      
 
                 }
-             }
+             }*/
+             if(mv.getParentIdentifier()!=null)
+                result.assignField(mv, result.getVariable(mv.getParentIdentifier()));
           }
        }
+       return result;
+       
     }
     
     public void resetPrimitiveValue(){

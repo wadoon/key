@@ -82,6 +82,28 @@ public class ModelVariable {
     }
 
     /*
+     * clone constructor (just create fresh boundValue)
+     * */
+    public ModelVariable(final ModelVariable mv){
+       if(mv.isPrimitive())
+          this.boundValue = new Object(); //fresh boundValue
+       else
+          this.boundValue = mv.boundValue;
+       
+       this.identifier = mv.identifier;
+       this.isParameter = mv.isParameter;
+       //this.parentModelInstance = mv.parentModelInstance;
+       this.variable = mv.variable;
+       this.symbolicValue = mv.symbolicValue;
+       this.isStatic = mv.isStatic;
+       this.declareClassName = mv.declareClassName;
+       this.constraints = mv.constraints;
+       this.arrayIdx = mv.arrayIdx;
+       this.arrayIdxValue = mv.arrayIdxValue;
+       this.parentIdentifier = mv.parentIdentifier;
+    }
+    
+    /*
      * added by Huy, used to store symbolic value of variable
      */
     private Term symbolicValue;
@@ -107,6 +129,7 @@ public class ModelVariable {
      * */
     private Object arrayIdxValue; 
     
+    private String parentIdentifier; //used to store the name of parent object
     /**
      * Since we are working with unique Java assertions, two
      * {@link ModelVariable} instances are equal iff. their paths are identical.
@@ -326,4 +349,14 @@ public class ModelVariable {
    public void setArrayIdxValue(Object arrayIdxValue) {
       this.arrayIdxValue = arrayIdxValue;
    }
+
+   public String getParentIdentifier() {
+      return parentIdentifier;
+   }
+
+   public void setParentIdentifier(String parentIdentifier) {
+      this.parentIdentifier = parentIdentifier;
+   }
+   
+   
 }
