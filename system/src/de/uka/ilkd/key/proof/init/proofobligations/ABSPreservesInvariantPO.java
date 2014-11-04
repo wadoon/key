@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.init.proofobligations;
 
+import abs.frontend.ast.ClassDecl;
 import abs.frontend.ast.MethodImpl;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -32,6 +33,7 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
     public static final String PRESERVES_INV_PO = "Preserves Invariant";
 
     private final ABSTermBuilder tb;
+    private final String thisType;
     private ImmutableSet<ABSClassInvariant> classInvariants;
 
     private final Name className;
@@ -43,6 +45,7 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
         super(initConfig);
         this.tb = services.getTermBuilder();
         this.className = className;
+        this.thisType = method.getMethodSig().getContextDecl().getDirectSuperTypes().iterator().next().qualifiedName();
         this.method = method;
         this.classInvariants = repository.getClassInvariants(className.toString());
     }
@@ -63,6 +66,9 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         Term wellFormedHistory = tb.wellFormedHistory(history, services);
         Term wellFormedHeap = tb.wellFormed(heap, services);
+
+        services.getNamespaces().functions().add(new Function(new Name("this"),
+                services.getProgramInfo().getKeYJavaType(thisType).getSort()));
 
         Function _this = services.getTypeConverter().getThisConstant();
         

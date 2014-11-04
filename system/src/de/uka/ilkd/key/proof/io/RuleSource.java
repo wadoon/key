@@ -71,6 +71,7 @@ public class RuleSource {
             getResourceFile(relative, PATH_TO_RULES + filename);
         if (u == null) {
             // a more specific exception type would probably be better
+            System.out.println(relative.getName());
             throw new RuntimeException("Could not find rule file "+PATH_TO_RULES+filename);
         }
         return new RuleSource(u);

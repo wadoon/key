@@ -266,7 +266,6 @@ public abstract class AbstractABS2KeYABSConverter {
         return new ABSFnApp(fctName, arguments);
     }
 
-    
     public IABSPureExpression convert(MinusExp x) {
         if (x.getChild(0) instanceof IntLiteral) {
             return new ABSIntLiteral(new BigInteger("-"

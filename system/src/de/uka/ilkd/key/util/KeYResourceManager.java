@@ -224,7 +224,7 @@ public class KeYResourceManager {
      * @return the URL of the resource
      */
     public URL getResourceFile(Class<?> cl, String resourcename) {
-        URL resourceURL = cl.getResource(resourcename);
+        final URL resourceURL = cl.getResource(resourcename);
 	if (resourceURL == null && cl.getSuperclass() != null) {
 	    return getResourceFile(cl.getSuperclass(), resourcename);
 	} else if (resourceURL == null && cl.getSuperclass() == null) {

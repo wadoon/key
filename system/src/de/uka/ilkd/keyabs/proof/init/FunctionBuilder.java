@@ -107,6 +107,7 @@ public class FunctionBuilder {
         for (ClassDescriptor classDescriptor : info.getABSParserInfo().getClasses().values()) {
             for (FieldDecl  field : classDescriptor.getFields()) {
                 registerField(services, heapLDT, funcNS, progVarNS, classDescriptor, field);
+
             }
             for (ParamDecl field : classDescriptor.getParams()) {
                 registerField(services, heapLDT, funcNS, progVarNS, classDescriptor, field);
@@ -143,6 +144,8 @@ public class FunctionBuilder {
                 services.getJavaInfo().getKeYJavaType(field.getType().getQualifiedName()),
                 new KeYJavaType(),
                 false, false));
+        System.out.println("Register Fields "+fieldFct);
+
         funcNS.add(fieldFct);
     }
 

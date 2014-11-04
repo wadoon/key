@@ -45,9 +45,14 @@ public class MethodInvoc2MethodLabel extends AbstractTermTransformer {
 
         ProgramElement pe = (ProgramElement) svInst.lookupValue(new Name("m"));
         String methName = pe.toString();
+
+        System.out.println("Looking for " + callee.sort().name());
+
         InterfaceDecl itf = serv.getJavaInfo().getABSParserInfo().getInterfaces().get(callee.sort().name());
+        System.out.println("Returned itf name " + itf);
         Function mlabel = null;
         for (MethodSig msig : itf.getBodys()) {
+            System.out.println(msig.getName() + " == " + methName);
             if (methName.equals(msig.getName())) {
                 mlabel = (Function) serv.getNamespaces().functions().
                         lookup(FunctionBuilder.createNameFor(msig, itf));

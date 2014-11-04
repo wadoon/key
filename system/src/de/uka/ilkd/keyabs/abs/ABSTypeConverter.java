@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -18,7 +17,22 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.keyabs.abs.abstraction.ABSInterfaceType;
-import de.uka.ilkd.keyabs.abs.expression.*;
+import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
+import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
@@ -77,7 +91,7 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
         } else if (pe instanceof ABSMethodLabel) {
             return TB.func(((ABSMethodLabel)pe).getMethodLabel());
         } else {
-		final TermBuilder tb = services.getTermBuilder();
+		final TermBuilder<ABSServices> tb = services.getTermBuilder();
 		if (pe instanceof ABSBinaryOperatorPureExp) {
 		    Term left = convertToLogicElement(
 			    ((ABSBinaryOperatorPureExp) pe).getChildAt(0), ec);
@@ -115,6 +129,10 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 		    for (int i = 0; i < dtCons.getArgumentCount(); i++) {
 			subs[i] = convertToLogicElement(
 				dtCons.getArgumentAt(i), ec);
+	                if (!subs[i].sort().extendsTrans(cons.argSort(i))) {
+	                    subs[i] = TB.cast(services, cons.argSort(i), subs[i]);
+	                }
+
 		    }
 		    return tb.func(cons, subs);
 		} else if (pe instanceof ABSIntLiteral) {
@@ -135,6 +153,9 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
             for (int i = 0; i<fnApp.getArgumentCount(); i++) {
                 IABSPureExpression arg = fnApp.getArgumentAt(i);
                 args[i] = convertToLogicElement(arg);
+                if (!args[i].sort().extendsTrans(fn.argSort(i))) {
+                    args[i] = TB.cast(services, fn.argSort(i), args[i]);
+                }
             }
             return tb.func(fn, args);
         } else {
@@ -150,7 +171,7 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
     }
 
     private Term convertBool2Fml(Junctor op, Term left, Term right) {
-	TermBuilder tb = services.getTermBuilder();
+	TermBuilder<ABSServices> tb = services.getTermBuilder();
 	Term leftFml = left.sort() == Sort.FORMULA ? left : tb.equals(left,
 		tb.TRUE(services));
 	Term rightFml = right.sort() == Sort.FORMULA ? right : tb.equals(right,
