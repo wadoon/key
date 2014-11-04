@@ -1925,7 +1925,7 @@ public final class LogicPrinter implements ILogicPrinter {
         }
         layouter.print(" ");
         for (int i = 0; i < x.getStatementCount(); i++) {
-            boolean fstStmnt = markFirstStatement &&
+            final boolean fstStmnt = markFirstStatement &&
             		(!(x.getChildAt(i) instanceof ProgramPrefix) ||
                        (!(x.getChildAt(i) instanceof NonTerminalProgramElement) || 
                     		   ((NonTerminalProgramElement)x).getChildCount() == 0));
@@ -2080,12 +2080,22 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSMethodFrame(ABSMethodFrame x) throws IOException {
-    	layouter.print("methodframe");
+        final boolean fstStmnt = markFirstStatement && x.getStatementCount() == 0;
+
+	if (fstStmnt) {
+	    markFirstStatement = false;
+	    mark(MARK_START_FIRST_STMT);
+	}
+	layouter.print("methodframe");
         x.getExecutionContext().visit(programPrettyPrinter);
         layouter.print(":{");
         layouter.beginC(2).ind();
         printStatementList(x);
         layouter.brk(0,-2).end().print("}");
+	if (fstStmnt) {
+	    markFirstStatement = false;
+	    mark(MARK_END_FIRST_STMT);
+	}
     }
 
     public void printABSExecutionContext(ABSExecutionContext x) throws IOException {
