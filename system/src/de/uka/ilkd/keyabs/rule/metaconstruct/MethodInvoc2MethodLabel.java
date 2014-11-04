@@ -19,7 +19,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.keyabs.abs.ABSProgramElement;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.proof.init.FunctionBuilder;
-import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 
 public class MethodInvoc2MethodLabel extends AbstractTermTransformer {
 
@@ -38,29 +37,26 @@ public class MethodInvoc2MethodLabel extends AbstractTermTransformer {
         Iterable<ABSProgramElement> args = (Iterable<ABSProgramElement>) svInst.getInstantiation(argsSV);
 
         Debug.assertTrue(args instanceof Iterable);
-        TermBuilder TB = services.getTermBuilder();
-        Term seq = TB.seqEmpty(services);
-
-
+        TermBuilder<ABSServices> TB = serv.getTermBuilder();
 
         ProgramElement pe = (ProgramElement) svInst.lookupValue(new Name("m"));
         String methName = pe.toString();
-
-        System.out.println("Looking for " + callee.sort().name());
-
+        
         InterfaceDecl itf = serv.getJavaInfo().getABSParserInfo().getInterfaces().get(callee.sort().name());
-        System.out.println("Returned itf name " + itf);
         Function mlabel = null;
-        for (MethodSig msig : itf.getBodys()) {
-            System.out.println(msig.getName() + " == " + methName);
+        for ( MethodSig msig : itf.getBodys() ) {
             if (methName.equals(msig.getName())) {
                 mlabel = (Function) serv.getNamespaces().functions().
                         lookup(FunctionBuilder.createNameFor(msig, itf));
                 break;
             }
         }
+        
+        if (mlabel == null) {
+            throw new RuntimeException("Method with name " + methName + " not found.");
+        }
 
-        return ABSTermBuilder.TB.func(mlabel);
+        return TB.func(mlabel);
     }
 
     private boolean compatibleArgs(MethodSig msig, Iterable<ABSProgramElement> args,
