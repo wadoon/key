@@ -247,7 +247,6 @@ public class ModelVariable {
 
    @Override
     public String toString() {
-
         return getTypeName() + " : " + identifier;
     }
 

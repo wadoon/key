@@ -259,7 +259,7 @@ public class Model {
           if(mv.isPrimitive()){
              result += mv.getIdentifier()+": " + mv.getSymbolicValue() + " :: " + mv.getTypeName()+ " : " + mv.getValue() + "\n" ;             
           }else if(mv instanceof ModelArrayVariable){
-             result += mv.getIdentifier() + ": " + mv.getTypeName() + "; length: " +
+             result += mv.getIdentifier() + ": " + mv.getSymbolicValue() + " :: " + mv.getTypeName() +  "; length: " +
                         ((ModelArrayInstance)mv.getValue()).length() + "; includes: \n";
              for(ModelVariable mvv : ((ModelArrayInstance)mv.getValue()).getArrayElements()){
                 result += "     " + mvv.getIdentifier()+" : " + mvv.getVariableName()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
@@ -267,10 +267,12 @@ public class Model {
              result += "-----\n";
           }else{
              result += mv.getIdentifier()+": " + mv.getSymbolicValue() + " :: " ;
-             ModelInstance mi=(ModelInstance)mv.getValue();
-             result += mi.toString() + " ; " + " includes: \n";
-             for(ModelVariable mvv : mi.getFields()){
-                result += "     " + mvv.getIdentifier()+" : " + mvv.getVariableName()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
+             if(mv.getValue() instanceof ModelInstance ){
+                ModelInstance mi=(ModelInstance)mv.getValue();
+                result += mi.toString() + " ; " + " includes: \n";
+                for(ModelVariable mvv : mi.getFields()){
+                   result += "     " + mvv.getIdentifier()+" : " + mvv.getVariableName()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
+                }
              }
              result += "-----\n";
           }
@@ -296,29 +298,16 @@ public class Model {
      * then add it into this model
      * added by Huy
      */
-    public Model mergeModel(Model dModel){
+    public Model merge(Model dModel){
        Model result = constructModel(this);
        List<ModelVariable> dMVs = dModel.getVariables(); 
        for(ModelVariable mv: dMVs){
-          if(!result.inModel(mv.getIdentifier())){
-             result.add(mv);
-             /*//look up the referee
-             List<ModelVariable> referees;
-             try{
-                referees = mv.getParentModelInstance().getReferees();
-             }catch(Exception e){
-                referees = null;
-             }
-             
-             if(referees!=null){
-                for(ModelVariable rmv: referees){
-                   if(inModel(rmv.getIdentifier()))
-                      result.assignField(mv, result.getVariable(rmv.getIdentifier()));                      
-
-                }
-             }*/
-             if(mv.getParentIdentifier()!=null)
-                result.assignField(mv, result.getVariable(mv.getParentIdentifier()));
+          if(!result.inModel(mv.getIdentifier())){             
+             ModelVariable newMv = new ModelVariable(mv);
+             newMv.setSymbolicValue(null); //because this model variable does not exist in current Model
+             result.add(newMv);
+             if(newMv.getParentIdentifier()!=null)
+                result.assignField(newMv, result.getVariable(newMv.getParentIdentifier()));
           }
        }
        return result;
