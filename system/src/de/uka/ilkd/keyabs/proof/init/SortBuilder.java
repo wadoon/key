@@ -93,7 +93,7 @@ public class SortBuilder {
 
         assert topSort != null;
 
-        initializeDatatypeSorts(info, services, topSort);
+        initializeDatatypeSorts(info, initConfig, services, topSort);
         initializeInterfaceSorts(initConfig, absModelInfo, services, anyInterfaceSort);
         initializeGenericDatatypes(initConfig, info, services, topSort);
     }
