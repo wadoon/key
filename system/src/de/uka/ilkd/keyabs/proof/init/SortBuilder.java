@@ -172,7 +172,7 @@ public class SortBuilder {
         return interfaceSort;
     }
 
-    private void initializeDatatypeSorts(ABSInfo info, ABSServices services, Sort topSort) {
+    private void initializeDatatypeSorts(ABSInfo info, ABSInitConfig initConfig, ABSServices services, Sort topSort) {
         for (Entry<Name, DataTypeDecl> dataType : info.getABSParserInfo()
                 .getDatatypes().getDatatypes().entrySet()) {
             final ABSDatatype absType = new ABSDatatype(dataType.getKey());
@@ -181,8 +181,9 @@ public class SortBuilder {
                 dataTypeSort = services.getNamespaces().sorts().lookup(dataType.getKey());
                 if (dataTypeSort == null) {
                     dataTypeSort = new SortImpl(dataType.getKey(), topSort);
+                    initConfig.sortNS().addSafely(dataTypeSort);
                 }
-            }
+            }                        
             final KeYJavaType abs2sort = new KeYJavaType(absType, dataTypeSort);
             services.getProgramInfo().rec2key().put(absType, abs2sort);
         }
