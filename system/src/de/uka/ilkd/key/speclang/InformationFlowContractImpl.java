@@ -10,22 +10,28 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+
 import de.uka.ilkd.key.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
+
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.util.DelimitedRelease;
+
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ContractPO;
-
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.util.DelimitedRelease;
+import de.uka.ilkd.key.util.InfFlowSpec;
+
 
 import java.util.Iterator;
 import java.util.List;
@@ -38,10 +44,8 @@ import java.util.Map;
  */
 public final class InformationFlowContractImpl implements InformationFlowContract {
 
-	protected final TermBuilder TB;
-	private final TermServices services;
-	
-    private final int id;
+
+	 private final int id;
     private final KeYJavaType forClass;
     private final IProgramMethod pm;
     private final KeYJavaType specifiedIn;
@@ -58,10 +62,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final Term origAtPre;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final ImmutableList<DelimitedRelease> origInfFlowSpecs;
-    
-    
-    
+    private final ImmutableList<InfFlowSpec> origInfFlowSpecs;
+
     /**
      * If a method is strictly pure, it has no modifies clause which could
      * anonymised.
@@ -90,10 +92,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           Term exc,
                                           Term heapAtPre,
                                           Term dep,
-                                          ImmutableList<DelimitedRelease> declassificationSpecs,
+                                          ImmutableList<InfFlowSpec> infFlowSpecs,
                                           boolean toBeSaved,
-                                          int id,TermServices services
-                                          ) {
+                                          int id) {
         assert baseName != null;
         assert forClass != null;
         assert pm != null;
@@ -114,7 +115,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         }
         assert exc != null;
 //        assert dep != null;
-        assert declassificationSpecs != null;
+        assert infFlowSpecs != null;
 
         this.baseName = baseName;
         this.name = name != null
@@ -136,9 +137,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         this.hasRealModifiesClause  = hasRealMod;
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
-        this.origInfFlowSpecs = declassificationSpecs;
-        this.services=services;
-        TB=services.getTermBuilder();
+        this.origInfFlowSpecs = infFlowSpecs;
+
     }
 
 
@@ -157,12 +157,12 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        Term exc,
                                        Term heapAtPre,
                                        Term dep,
-                                       ImmutableList<DelimitedRelease> declassificationSpecs,
-                                       boolean toBeSaved,TermServices services) {
+                                       ImmutableList<InfFlowSpec> infFlowSpecs,
+                                       boolean toBeSaved) {
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
-             hasRealMod, self, params, result, exc, heapAtPre, dep, declassificationSpecs,
-             toBeSaved, INVALID_ID,services);
-    }
+             hasRealMod, self, params, result, exc, heapAtPre, dep, infFlowSpecs,
+             toBeSaved, INVALID_ID);
+   }
 
 
     //-------------------------------------------------------------------------
@@ -283,8 +283,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     
     
     @Override
-    public boolean hasDeclassificationSpec() {
-        return !(origInfFlowSpecs.isEmpty());
+    public boolean hasInfFlowSpec() {
+        return !(origInfFlowSpecs == InfFlowSpec.EMPTY_INF_FLOW_SPEC);
+
     }
 
 
@@ -376,14 +377,18 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     
-    private String getHTMLFor(ImmutableList<DelimitedRelease> originalInfFlowSpecs,
+    private String getHTMLFor(ImmutableList<InfFlowSpec> originalInfFlowSpecs,
                               String htmlName,
                               Services services) {
         String infFlowSpecString = "";
-        if (hasDeclassificationSpec()) {
+        if (hasInfFlowSpec()) {
             infFlowSpecString = "<br><b>" + htmlName + "</b> ";
-            for (DelimitedRelease infFlowSpec : originalInfFlowSpecs) {
-                infFlowSpecString += "(" + getHTMLFor(infFlowSpec.escapeHatches, services) + ")";               
+            for (InfFlowSpec infFlowSpec : originalInfFlowSpecs) {
+                infFlowSpecString += "(" + getHTMLFor(infFlowSpec.preExpressions, services) + ")";
+                infFlowSpecString += " by (" + getHTMLFor(infFlowSpec.postExpressions, services) + ")";
+                if (!infFlowSpec.newObjects.isEmpty()) {
+                    infFlowSpecString += ", new objects (" + getHTMLFor(infFlowSpec.newObjects, services) + ")";
+                }
             }
         }
         return infFlowSpecString;
@@ -399,18 +404,23 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                + "; paramVars: " + origParams + "; id:" + id;
     }
 
-/*
+
+
     @Override
-    public ContractPO createProofObl(InitConfig initConfig) {
-        return null;
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
     }
-*/
-/*
+
+
     @Override
     public ProofOblInput getProofObl(Services services) {
         return services.getSpecificationRepository().getPO(this);
     }
-*/
+
+    @Override
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
+        return new InfFlowContractPO(initConfig, (InformationFlowContract) contract);
+    }
 
     @Override
     public String getDisplayName() {
@@ -451,7 +461,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, newId,services);
+                                               toBeSaved, newId);
     }
 
 
@@ -466,7 +476,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, id,services);
+                                               toBeSaved, id);
     }
 
 
@@ -478,7 +488,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, id,services);
+                                               toBeSaved, id);
     }
 
 
@@ -490,7 +500,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, id,services);
+                                               toBeSaved, id);
     }
 
 
@@ -502,7 +512,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origAtPre, origDep, origInfFlowSpecs,
-                                               toBeSaved, id,services);
+                                               toBeSaved, id);
     }
 
 
@@ -513,7 +523,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public ImmutableList<DelimitedRelease> getInformationFlowSecurity() {
+
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs() {
         return origInfFlowSpecs;
     }
 
@@ -554,7 +565,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                && id == ifc.id()
                && toBeSaved == ifc.toBeSaved()
                && origDep.equals(ifc.getDep())
-               && origInfFlowSpecs.equals(ifc.getInformationFlowSecurity());
+               && origInfFlowSpecs.equals(ifc.getInfFlowSpecs());
     }
     
     
@@ -594,12 +605,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
    }
 
 
-   @Override
-   public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-       return new FunctionalOperationContractPO(initConfig,
-               (FunctionalOperationContract) contract);
-   }
-
    // the following code is legacy code
     
     @Override
@@ -637,7 +642,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                 + "Please use the POSnippetFactory instead.");
 
     }
-    
 
     @Override
     @Deprecated
@@ -674,78 +678,51 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                 + "Please use the POSnippetFactory instead.");
     }
 
-
-   /* (non-Javadoc)
-    * @see de.uka.ilkd.key.speclang.Contract#getOrigVars()
-    */
-   @Override
-   public OriginalVariables getOrigVars() {
-      // TODO Auto-generated method stub
-      return null;
-   }
+    @Override
+    public OriginalVariables getOrigVars() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 
-   /* (non-Javadoc)
-    * @see de.uka.ilkd.key.speclang.Contract#getDep(de.uka.ilkd.key.logic.op.LocationVariable, boolean, de.uka.ilkd.key.logic.op.ProgramVariable, de.uka.ilkd.key.collection.ImmutableList, java.util.Map, de.uka.ilkd.key.java.Services)
-    */
-   @Override
-   public Term getDep(LocationVariable heap, boolean atPre,
-         ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
-         Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-         Services services) {
-      // TODO Auto-generated method stub
-      return null;
-   }
+    @Override
+    public Term getDep(LocationVariable heap, boolean atPre,
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services) {
+        return null;
+    }
 
 
-   /* (non-Javadoc)
-    * @see de.uka.ilkd.key.speclang.Contract#getDep(de.uka.ilkd.key.logic.op.LocationVariable, boolean, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.collection.ImmutableList, java.util.Map, de.uka.ilkd.key.java.Services)
-    */
-   @Override
-   public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
-         Term selfTerm, ImmutableList<Term> paramTerms,
-         Map<LocationVariable, Term> atPres, Services services) {
-      // TODO Auto-generated method stub
-      return null;
-   }
+    @Override
+    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms,
+            Map<LocationVariable, Term> atPres, Services services) {
+        return null;
+    }
 
 
-   /* (non-Javadoc)
-    * @see de.uka.ilkd.key.speclang.Contract#getRequires(de.uka.ilkd.key.logic.op.LocationVariable)
-    */
-   @Override
-   public Term getRequires(LocationVariable heap) {
-      // TODO Auto-generated method stub
-      return null;
-   }
+    @Override
+    public Term getRequires(LocationVariable heap) {
+        return null;
+    }
 
 
-   /* (non-Javadoc)
-    * @see de.uka.ilkd.key.speclang.Contract#getAssignable(de.uka.ilkd.key.logic.op.LocationVariable)
-    */
-   @Override
-   public Term getAssignable(LocationVariable heap) {
-      // TODO Auto-generated method stub
-      return null;
-   }
+    @Override
+    public Term getAssignable(LocationVariable heap) {
+        return null;
+    }
 
 
-   /* (non-Javadoc)
-    * @see de.uka.ilkd.key.speclang.Contract#getAccessible(de.uka.ilkd.key.logic.op.ProgramVariable)
-    */
-   @Override
-   public Term getAccessible(ProgramVariable heap) {
-      // TODO Auto-generated method stub
-      return null;
-   }
+    @Override
+    public Term getAccessible(ProgramVariable heap) {
+        return null;
+    }
 
 
-   /* (non-Javadoc)
-    * @see de.uka.ilkd.key.speclang.Contract#getGlobalDefs()
-    */
-   @Override
-   public Term getGlobalDefs() {
-      // TODO Auto-generated method stub
-      return null;
-   }
+    @Override
+    public Term getGlobalDefs() {
+        // information flow contracts do not have global defs (yet?)
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

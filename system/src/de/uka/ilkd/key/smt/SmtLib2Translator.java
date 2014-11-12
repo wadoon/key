@@ -20,12 +20,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
-<<<<<<< HEAD
- * The translation for the SMT2-format. It nearly the same as for the
- * SMT1-format.
-=======
  * The translation for the SMT2-format. It nearly the same as for the SMT1-format.
->>>>>>> origin/master
  */
 public class SmtLib2Translator extends AbstractSMTTranslator {
 
@@ -80,16 +75,6 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     private static StringBuffer DISTINCT = new StringBuffer("distinct");
 
     /**
-<<<<<<< HEAD
-     * Just a constructor which starts the conversion to Simplify syntax. The
-     * result can be fetched with
-     * 
-     * @param sequent
-     *            The sequent which shall be translated.
-     * 
-     * @param services
-     *            The Services Object belonging to the sequent.
-=======
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
      *
@@ -97,7 +82,6 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
      *                The sequent which shall be translated.
      *
      * @param services The Services Object belonging to the sequent.
->>>>>>> origin/master
      */
     public SmtLib2Translator(Sequent sequent, Services services,
             Configuration config) {

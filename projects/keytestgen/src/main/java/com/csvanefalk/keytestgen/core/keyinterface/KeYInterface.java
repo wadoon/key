@@ -179,7 +179,7 @@ public class KeYInterface {
 
             return env.getBuilder().getStartNode();
 
-        } catch (final ProofInputException e) {
+        } catch (final ProofInputException | ProblemLoaderException e) {
 
             throw new KeYInterfaceException("FATAL: could not create proof: " + e.getMessage());
 
@@ -276,7 +276,7 @@ public class KeYInterface {
         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(),
                                                                                 proof,
                                                                                 mergeBranchConditions,
-                                                                                false,false);
+                                                                                false,false,false);
         //builder.analyse();
         //assert (builder.getStartNode() != null);
         return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);

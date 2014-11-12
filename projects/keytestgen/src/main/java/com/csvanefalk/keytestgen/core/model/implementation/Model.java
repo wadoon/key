@@ -302,8 +302,12 @@ public class Model {
        Model result = constructModel(this);
        List<ModelVariable> dMVs = dModel.getVariables(); 
        for(ModelVariable mv: dMVs){
-          if(!result.inModel(mv.getIdentifier())){             
-             ModelVariable newMv = new ModelVariable(mv);
+          if(!result.inModel(mv.getIdentifier())){
+             ModelVariable newMv;
+             if(mv instanceof ModelArrayVariable)
+                newMv = new ModelArrayVariable((ModelArrayVariable)mv);
+             else
+                newMv = new ModelVariable(mv);
              newMv.setSymbolicValue(null); //because this model variable does not exist in current Model
              result.add(newMv);
              if(newMv.getParentIdentifier()!=null)

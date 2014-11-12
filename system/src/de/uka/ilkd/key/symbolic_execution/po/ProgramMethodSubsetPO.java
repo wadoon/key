@@ -53,15 +53,9 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * ]{@code startPosition}, {@code endPosition}] are executed.
  * </p>
  * <p>
-<<<<<<< HEAD
- * To select assertions by its end position is required, because KeY's recorder
- * includes also leading space and leading comments into a assertions position. 
- * Another drawback is that the end position of the previous statement is 
-=======
  * To select statements by its end position is required, because KeY's recorder
  * includes also leading space and leading comments into a statements position.
  * Another drawback is that the end position of the previous statement is
->>>>>>> origin/master
  * exactly the start position of the following statement.
  * </p>
  * <p>

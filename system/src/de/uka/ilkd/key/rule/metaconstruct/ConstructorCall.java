@@ -116,11 +116,7 @@ public class ConstructorCall extends ProgramTransformer {
     }
 
     /**
-<<<<<<< HEAD
-     * returns a sequence of assertions modelling the Java constructor call semantics explicitly 
-=======
      * returns a sequence of statements modelling the Java constructor call semantics explicitly
->>>>>>> origin/master
      */
     protected List<Statement> constructorCallSequence(
             final New constructorReference, final KeYJavaType classType,

@@ -14,18 +14,18 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -206,7 +206,9 @@ public class ProofStarter {
            final Profile profile = proof.getInitConfig().getProfile();
            final StrategyFactory factory = profile.getDefaultStrategyFactory();
            if (strategyProperties == null) {
-              strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
+              strategyProperties =
+                      factory.getSettingsDefinition().getDefaultPropertiesFactory()
+                      .createDefaultStrategyProperties();
            }
 
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {

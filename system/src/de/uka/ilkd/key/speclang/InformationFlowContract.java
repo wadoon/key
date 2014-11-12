@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.util.DelimitedRelease;
+import de.uka.ilkd.key.util.InfFlowSpec;
+
 
 
 
@@ -146,8 +148,11 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the set of views.
      */
-    ImmutableList<DelimitedRelease> getInformationFlowSecurity();
+
+    
+    ImmutableList<InfFlowSpec> getInfFlowSpecs();
 
 
-    public boolean hasDeclassificationSpec();
+    public boolean hasInfFlowSpec();
+
 }

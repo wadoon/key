@@ -5,6 +5,8 @@ import java.util.List;
 import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelArrayInstance;
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
+import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -85,9 +87,12 @@ public class ModelVariable {
      * clone constructor (just create fresh boundValue)
      * */
     public ModelVariable(final ModelVariable mv){
-       if(mv.isPrimitive())
-          this.boundValue = new Object(); //fresh boundValue
-       else
+       if(mv.isPrimitive()){
+          if(mv.boundValue instanceof Number)
+             this.boundValue = 0; //number type
+          else
+             this.boundValue = false; //boolean type
+       }else
           this.boundValue = mv.boundValue;
        
        this.identifier = mv.identifier;
@@ -125,11 +130,12 @@ public class ModelVariable {
     
     /*
      *added by Huy, store the value of position in the array if this ModelVariable object is an array element
-     *otherwise, arrayIdxValue =  null 
+     *otherwise, arrayIdxValue =  null
      * */
     private Object arrayIdxValue; 
     
-    private String parentIdentifier; //used to store the name of parent object
+    private String parentIdentifier; //used to store the name of parent object    
+   
     /**
      * Since we are working with unique Java assertions, two
      * {@link ModelVariable} instances are equal iff. their paths are identical.
@@ -324,7 +330,10 @@ public class ModelVariable {
    
    public boolean isArrayElement(){
       //return (arrayIdx >= 0);
-      return (arrayIdxValue != null);
+      if(arrayIdx>=0)
+         return true;
+      else         
+         return (arrayIdxValue != null);
    }
    
    public boolean isArrayLength(){
@@ -357,5 +366,21 @@ public class ModelVariable {
       this.parentIdentifier = parentIdentifier;
    }
    
-   
+   /*
+    * return runtime type of variable
+    * added by Huy
+    */   
+   public String getRuntimeType(){
+      String runtimeType;
+      if(symbolicValue!=null){
+         if(!TermParserTools.isNullSort(symbolicValue)){
+            runtimeType = symbolicValue.sort().toString();            
+         }else{
+            runtimeType = getTypeName();
+         }
+      }else{
+         runtimeType = getTypeName();
+      }
+      return runtimeType;
+   }
 }
