@@ -28,7 +28,6 @@ public class FunctionBuilder {
         if (t.isTypeParameter()) {
             return Sort.ANY;
         } else {        	
-        	System.out.println("====" + t);
             return info.getTypeByName(t.getQualifiedName()).getSort();
         }
     }
@@ -56,17 +55,18 @@ public class FunctionBuilder {
 
         System.out.println("Register Global Functions");
         for (Map.Entry<Name, FunctionDecl> func : info.getABSParserInfo().getFunctions().entrySet()) {
-        	System.out.println(func.getKey());
-            final Sort[] argSorts = new Sort[func.getValue().getNumParam()];
+            final FunctionDecl absFuncDecl = func.getValue();
+	    final Sort[] argSorts = new Sort[absFuncDecl.getNumParam()];
             int count = 0;
-            for (ParamDecl arg : func.getValue().getParamList()) {
+            for (ParamDecl arg : absFuncDecl.getParamList()) {
                 argSorts[count++] = getType(arg.getType(), info);
             }
 
             Function function = new Function(func.getKey(),
-                    getType(func.getValue().getType(), info),
+                    getType(absFuncDecl.getType(), info),
                     argSorts, null, false);
 
+          
             funcNS.add(function);
         }
 
@@ -144,8 +144,6 @@ public class FunctionBuilder {
                 services.getJavaInfo().getKeYJavaType(field.getType().getQualifiedName()),
                 new KeYJavaType(),
                 false, false));
-        System.out.println("Register Fields "+fieldFct);
-
         funcNS.add(fieldFct);
     }
 

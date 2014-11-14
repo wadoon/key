@@ -148,7 +148,8 @@ public abstract class AbstractABS2KeYABSConverter {
 
     public CopyAssignment convert(AssignStmt x) {
         IABSLocationReference lhs = (IABSLocationReference) convert(x.getVar());
-        IABSPureExpression rhs = (IABSPureExpression) convert(x.getValue());
+        
+        IABSExpression rhs = (IABSExpression) convert(x.getValue());
         return new CopyAssignment(lhs, rhs);
     }
 

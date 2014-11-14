@@ -2066,7 +2066,7 @@ public final class LogicPrinter implements ILogicPrinter {
 
     public void printABSGetExp(ABSGetExp x) throws IOException {
         x.getChildAt(0).visit(programPrettyPrinter);
-        layouter.print(".get()");
+        layouter.print(".get");
     }
 
     public void printABSReturnStatement(ABSReturnStatement x) throws IOException{

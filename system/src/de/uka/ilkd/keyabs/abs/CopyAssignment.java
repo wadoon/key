@@ -8,19 +8,19 @@ import de.uka.ilkd.key.java.ProgramElement;
 public class CopyAssignment extends ABSNonTerminalProgramElement implements
         IABSStatement, ExpressionContainer {
 
-    public CopyAssignment(IABSLocationReference lhs, IABSPureExpression rhs,
+    public CopyAssignment(IABSLocationReference lhs, IABSExpression rhs,
             PositionInfo pos) {
         super(pos);
         this.lhs = lhs;
         this.rhs = rhs;
     }
 
-    public CopyAssignment(IABSLocationReference lhs, IABSPureExpression rhs) {
+    public CopyAssignment(IABSLocationReference lhs, IABSExpression rhs) {
         this(lhs, rhs, null);
     }
 
     private final IABSLocationReference lhs;
-    private final IABSPureExpression rhs;
+    private final IABSExpression rhs;
 
     @Override
     public int getChildCount() {
