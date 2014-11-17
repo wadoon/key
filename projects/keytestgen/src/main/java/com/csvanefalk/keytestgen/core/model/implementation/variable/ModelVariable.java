@@ -75,12 +75,14 @@ public class ModelVariable {
         this.identifier = identifier;
         
         arrayIdx = -1; //default that this model variable is not an array's element
+        arrayIdxTerm = null;
     }
     
     public ModelVariable(final String identifier){
        this.identifier = identifier;
        this.variable = null;
        arrayIdx = -1;
+       arrayIdxTerm = null;
     }
 
     /*
@@ -106,6 +108,7 @@ public class ModelVariable {
        this.arrayIdx = mv.arrayIdx;
        this.arrayIdxValue = mv.arrayIdxValue;
        this.parentIdentifier = mv.parentIdentifier;
+       this.arrayIdxTerm = mv.arrayIdxTerm;
     }
     
     /*
@@ -132,7 +135,8 @@ public class ModelVariable {
      *added by Huy, store the value of position in the array if this ModelVariable object is an array element
      *otherwise, arrayIdxValue =  null
      * */
-    private Object arrayIdxValue; 
+    private Object arrayIdxValue;
+    private Term arrayIdxTerm;
     
     private String parentIdentifier; //used to store the name of parent object    
    
@@ -383,4 +387,15 @@ public class ModelVariable {
       }
       return runtimeType;
    }
+
+   public Term getArrayIdxTerm() {
+      return arrayIdxTerm;
+   }
+
+   public void setArrayIdxTerm(Term arrayIdxTerm) {
+      this.arrayIdxTerm = arrayIdxTerm;
+   }
+   
+   
+   
 }
