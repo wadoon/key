@@ -359,7 +359,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         if(atPreVars != null) {
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-            for(LocationVariable h : heapLDT.getAllHeaps()) {
+            for(LocationVariable h : heapLDT.getAllHeaps(services)) {
                 if(atPreVars.get(h) != null) {
                     assertEqualSort(originalAtPreVars.get(h), atPreVars.get(h));
                     result.put(originalAtPreVars.get(h), atPreVars.get(h));
@@ -441,7 +441,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         if(atPres != null) {
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-            for(LocationVariable h : heapLDT.getAllHeaps()) {
+            for(LocationVariable h : heapLDT.getAllHeaps(services)) {
                 if(atPres.get(h) != null) {
                     assertEqualSort(originalAtPreVars.get(h), atPres.get(h));
                     result.put(TB.var(originalAtPreVars.get(h)), atPres.get(h));
@@ -850,7 +850,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final String mby = hasMby ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting, useUnicodeSymbols) : null;
 
         String mods = "";
-        for (LocationVariable h : heapLDT.getAllHeaps()) {
+        for (LocationVariable h : heapLDT.getAllHeaps(services)) {
             if (originalMods.get(h) != null) {
                 String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 mods = mods
@@ -877,7 +877,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
 
         String pres = "";
-        for (LocationVariable h : heapLDT.getAllHeaps()) {
+        for (LocationVariable h : heapLDT.getAllHeaps(services)) {
             if (originalPres.get(h) != null) {
                 String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 pres = pres
@@ -890,7 +890,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
 
         String posts = "";
-        for (LocationVariable h : heapLDT.getAllHeaps()) {
+        for (LocationVariable h : heapLDT.getAllHeaps(services)) {
             if (originalPosts.get(h) != null) {
                 String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 posts = posts
@@ -904,7 +904,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         String axioms = "";
         if (originalAxioms != null) {
-            for(LocationVariable h : heapLDT.getAllHeaps()) {
+            for(LocationVariable h : heapLDT.getAllHeaps(services)) {
                 if(originalAxioms.get(h) != null) {
                     String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                     posts = posts
@@ -1295,7 +1295,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             paramVars = paramVars.tail();
         }
         if(atPreVars != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
                     map.put(TB.var(atPre ? h : originalAtPreVar), TB.var(atPreVars.get(h)));
@@ -1328,7 +1328,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             paramTerms = paramTerms.tail();
         }
         if(atPres != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(originalAtPreVar != null && atPres.get(h) != null) {
                     map.put(TB.var(originalAtPreVar), atPres.get(h));

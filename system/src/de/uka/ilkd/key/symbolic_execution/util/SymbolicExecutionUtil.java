@@ -2616,7 +2616,7 @@ public final class SymbolicExecutionUtil {
          List<Term> toCheck = new LinkedList<Term>(result);
          while (!toCheck.isEmpty()) {
             Term skolemConstant = toCheck.remove(0);
-            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
+            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant, null);
             for (Term replacement : replacements) {
                Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
                for (Term checkConstant : checkResult) {
@@ -2750,7 +2750,7 @@ public final class SymbolicExecutionUtil {
       int skolemCheck = checkSkolemEquality(term);
       if (skolemCheck == -1) {
          TermBuilder tb = services.getTermBuilder();
-         List<Term> replacements = findSkolemReplacements(sequent, term);
+         List<Term> replacements = findSkolemReplacements(sequent, term.sub(0), term);
          if (!replacements.isEmpty()) {
             Term other = term.sub(1);
             List<Term> newTerms = new LinkedList<Term>();
@@ -2766,7 +2766,7 @@ public final class SymbolicExecutionUtil {
       }
       else if (skolemCheck == 1) {
          TermBuilder tb = services.getTermBuilder();
-         List<Term> replacements = findSkolemReplacements(sequent, term);
+         List<Term> replacements = findSkolemReplacements(sequent, term.sub(1), term);
          if (!replacements.isEmpty()) {
             Term other = term.sub(0);
             List<Term> newTerms = new LinkedList<Term>();
@@ -2783,7 +2783,7 @@ public final class SymbolicExecutionUtil {
       else {
          if (isSkolemConstant(term)) {
             // Skolem term
-            List<Term> replacements = findSkolemReplacements(sequent, term);
+            List<Term> replacements = findSkolemReplacements(sequent, term, null);
             return !replacements.isEmpty() ? 
                    replacements.get(0) : // Any of the replacements can be used, for simplicity use the first one. Alternatively may the one with the lowest depth or with least symbols might be used.
                    term;
@@ -2859,20 +2859,25 @@ public final class SymbolicExecutionUtil {
     * Utility method of {@link #replaceSkolemConstants(Sequent, Term, Services)} to
     * find all equality parts of the given skolem constant.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
-    * @param skolemEquality The skolem equality to solve.
+    * @param skolemConstant The skolem constant to solve.
+    * @param skolemEquality The optional skolem equality to ignore.
     * @return The equality parts of the given skolem equality.
     */
-   private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemEquality) {
+   private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemConstant, Term skolemEquality) {
       List<Term> result = new LinkedList<Term>();
       for (SequentFormula sf : sequent) {
          Term term = sf.formula();
          if (term != skolemEquality) {
             int skolemCheck = checkSkolemEquality(term);
             if (skolemCheck == -1) {
-               result.add(term.sub(1));
+               if (term.sub(0).equals(skolemConstant)) {
+                  result.add(term.sub(1));
+               }
             }
             else if (skolemCheck == 1) {
-               result.add(term.sub(0));
+               if (term.sub(1).equals(skolemConstant)) {
+                  result.add(term.sub(0));
+               }
             }
          }
       }
@@ -3485,6 +3490,46 @@ public final class SymbolicExecutionUtil {
        */
       public boolean isContained() {
          return contained;
+      }
+   }
+   
+   /**
+    * Creates recursive a term which can be used to determine the value
+    * of {@link #getProgramVariable()}.
+    * @param services The {@link Services} to use.
+    * @return The created term.
+    */
+   public static Term createSelectTerm(IExecutionVariable variable) {
+      final Services services = variable.getServices();
+      if (SymbolicExecutionUtil.isStaticVariable(variable.getProgramVariable())) {
+         // Static field access
+         Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)variable.getProgramVariable(), services);
+         return services.getTermBuilder().staticDot(variable.getProgramVariable().sort(), function);
+      }
+      else {
+         if (variable.getParentValue() == null) {
+            // Direct access to a variable, so return it as term
+            return services.getTermBuilder().var((ProgramVariable)variable.getProgramVariable());
+         }
+         else {
+            Term parentTerm = variable.getParentValue().getVariable().createSelectTerm();
+            if (variable.getProgramVariable() != null) {
+               if (services.getJavaInfo().getArrayLength() == variable.getProgramVariable()) {
+                  // Special handling for length attribute of arrays
+                  Function function = services.getTypeConverter().getHeapLDT().getLength();
+                  return services.getTermBuilder().func(function, parentTerm);
+               }
+               else {
+                  // Field access on the parent variable
+                  Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)variable.getProgramVariable(), services);
+                  return services.getTermBuilder().dot(variable.getProgramVariable().sort(), parentTerm, function);
+               }
+            }
+            else {
+               // Special handling for array indices.
+               return services.getTermBuilder().dotArr(parentTerm, variable.getArrayIndex());
+            }
+         }
       }
    }
 }
