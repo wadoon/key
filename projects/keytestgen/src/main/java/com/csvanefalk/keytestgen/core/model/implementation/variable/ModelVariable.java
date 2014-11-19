@@ -140,6 +140,9 @@ public class ModelVariable {
     
     private String parentIdentifier; //used to store the name of parent object    
    
+    //added by Huy, store the heap form (select ...) of model variable
+    private Term heapForm;
+    
     /**
      * Since we are working with unique Java assertions, two
      * {@link ModelVariable} instances are equal iff. their paths are identical.
@@ -394,6 +397,14 @@ public class ModelVariable {
 
    public void setArrayIdxTerm(Term arrayIdxTerm) {
       this.arrayIdxTerm = arrayIdxTerm;
+   }
+
+   public Term getHeapForm() {
+      return heapForm;
+   }
+
+   public void setHeapForm(Term heapForm) {
+      this.heapForm = heapForm;
    }
    
    
