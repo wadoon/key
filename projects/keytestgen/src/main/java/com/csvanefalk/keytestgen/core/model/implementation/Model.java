@@ -10,6 +10,8 @@ import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
 
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Junctor;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -262,7 +264,7 @@ public class Model {
              result += mv.getIdentifier() + ": " + mv.getSymbolicValue() + " :: " + mv.getTypeName() +  "; length: " +
                         ((ModelArrayInstance)mv.getValue()).length() + "; includes: \n";
              for(ModelVariable mvv : ((ModelArrayInstance)mv.getValue()).getArrayElements()){
-                result += "     " + mvv.getIdentifier()+" : " + mvv.getVariableName()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
+                result += "     " + mvv.getIdentifier()+" : " + mvv.getSymbolicValue()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
              }
              result += "-----\n";
           }else{
@@ -271,7 +273,7 @@ public class Model {
                 ModelInstance mi=(ModelInstance)mv.getValue();
                 result += mi.toString() + " ; " + " includes: \n";
                 for(ModelVariable mvv : mi.getFields()){
-                   result += "     " + mvv.getIdentifier()+" : " + mvv.getVariableName()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
+                   result += "     " + mvv.getIdentifier()+" : " + mvv.getSymbolicValue() + " : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
                 }
              }
              result += "-----\n";
@@ -285,7 +287,7 @@ public class Model {
    * @param identifier
    * @return true if there exists an ModelVariable mv that mv.identifier = identifier
    */
-    public boolean inModel(String identifier){           
+    public boolean hasVar(String identifier){           
        if (getVariable(identifier) != null) 
           return true;
        else
@@ -302,13 +304,14 @@ public class Model {
        Model result = constructModel(this);
        List<ModelVariable> dMVs = dModel.getVariables(); 
        for(ModelVariable mv: dMVs){
-          if(!result.inModel(mv.getIdentifier())){
+          if(!result.hasVar(mv.getIdentifier())){
              ModelVariable newMv;
              if(mv instanceof ModelArrayVariable)
                 newMv = new ModelArrayVariable((ModelArrayVariable)mv);
              else
                 newMv = new ModelVariable(mv);
              newMv.setSymbolicValue(null); //because this model variable does not exist in current Model
+             newMv.setValueCondition(new TermFactory().createTerm(Junctor.TRUE));//clear condition value
              result.add(newMv);
              if(newMv.getParentIdentifier()!=null)
                 result.assignField(newMv, result.getVariable(newMv.getParentIdentifier()));

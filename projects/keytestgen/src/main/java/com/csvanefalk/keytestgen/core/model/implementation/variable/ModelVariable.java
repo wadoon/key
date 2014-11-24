@@ -9,7 +9,9 @@ import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -81,8 +83,10 @@ public class ModelVariable {
     public ModelVariable(final String identifier){
        this.identifier = identifier;
        this.variable = null;
-       arrayIdx = -1;
-       arrayIdxTerm = null;
+       this.arrayIdx = -1;
+       this.arrayIdxTerm = null;
+       this.valueCondition = new TermFactory().createTerm(Junctor.TRUE);
+       
     }
 
     /*
@@ -104,11 +108,12 @@ public class ModelVariable {
        this.symbolicValue = mv.symbolicValue;
        this.isStatic = mv.isStatic;
        this.declareClassName = mv.declareClassName;
-       this.constraints = mv.constraints;
+       this.valueCondition = mv.valueCondition;
        this.arrayIdx = mv.arrayIdx;
        this.arrayIdxValue = mv.arrayIdxValue;
        this.parentIdentifier = mv.parentIdentifier;
        this.arrayIdxTerm = mv.arrayIdxTerm;
+       this.selectForm = mv.selectForm;
     }
     
     /*
@@ -127,7 +132,7 @@ public class ModelVariable {
      */       
     private String declareClassName;
     
-    private List<Term> constraints; //contain all constraints of variable (added by Huy)
+    private Term valueCondition; //valueCondition must be satisfied for the current symbolic value (added by Huy)
     
     private int arrayIdx; //=-1 if this is not an element of array, otherwise is the index number (added by Huy) 
     
@@ -141,7 +146,7 @@ public class ModelVariable {
     private String parentIdentifier; //used to store the name of parent object    
    
     //added by Huy, store the heap form (select ...) of model variable
-    private Term heapForm;
+    private Term selectForm;
     
     /**
      * Since we are working with unique Java assertions, two
@@ -307,18 +312,15 @@ public class ModelVariable {
       this.declareClassName = declareClassName;
    }
 
-   /**
-    * @return the constraints
-    */
-   public List<Term> getConstraints() {
-      return constraints;
+  
+   
+
+   public Term getValueCondition() {
+      return valueCondition;
    }
 
-   /**
-    * @param constraints the constraints to set
-    */
-   public void setConstraints(List<Term> constraints) {
-      this.constraints = constraints;
+   public void setValueCondition(Term valueCondition) {
+      this.valueCondition = valueCondition;
    }
 
    /**
@@ -399,12 +401,12 @@ public class ModelVariable {
       this.arrayIdxTerm = arrayIdxTerm;
    }
 
-   public Term getHeapForm() {
-      return heapForm;
+   public Term getSelectForm() {
+      return selectForm;
    }
 
-   public void setHeapForm(Term heapForm) {
-      this.heapForm = heapForm;
+   public void setSelectForm(Term selectForm) {
+      this.selectForm = selectForm;
    }
    
    
