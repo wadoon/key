@@ -214,7 +214,8 @@ public class KeYInterface {
                 classpath.add(new File(path));
             }
             */
-            return KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null);
+            return KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
+            //return KeYEnvironment.load(javaFile, null, null);
 
         } catch (final ProblemLoaderException e) {
             throw new KeYInterfaceException(e.getMessage(), e);
