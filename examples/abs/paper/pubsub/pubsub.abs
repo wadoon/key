@@ -60,9 +60,9 @@ class Proxy(Int limit, ServiceI s) implements ProxyI{
 	}
 	
 	Unit publish(Fut<News> fut){
-		Int counter = 0; News ns = None;
+		Int counter = 0; //News ns = None;
 		
-		ns = fut.get;	
+		News ns = fut.get;	
 		while(counter < length(myClients)){
 			ClientI client = nth(myClients, counter);
 			client!signal(ns);

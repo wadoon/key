@@ -98,8 +98,26 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
 
         ABSStatementBlock block = new ABSStatementBlock(frame);
         
-        Term pre = tb.func((Function)services.getNamespaces().functions().lookup(new Name("Pre")), 
-        		tb.var(history), tb.var(heap), tb.func(_this));
+        
+        Name preconditionPredicateName = new Name("Precondition_of_"+methodLabel);
+        assert services.getNamespaces().functions().lookup(preconditionPredicateName) == null;
+        
+        Sort[] paramSorts = getParameterSortsForPrecondition(methodAndParams);
+        
+        Term[] args = new Term[methodAndParams.second.size() + 3];
+        args[0] = tb.var(history);
+        args[1] = tb.var(heap);
+        args[2] = tb.func(_this);
+	
+        int i = 3;
+        for (IProgramVariable param : methodAndParams.second) {
+            args[i] = tb.var(param);
+            i++;
+        }
+
+        Function preconditionPred = new Function(preconditionPredicateName, Sort.FORMULA, paramSorts);
+        
+        Term pre = tb.func(preconditionPred, args);
 
         problemTerm = tb.and(problemTerm, pre);
         problemTerm = tb.and(problemTerm, tb.classInvariant(history, heap, _this, services));
@@ -123,6 +141,22 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
         problemTerm = tb.all(caller, tb.imp(tb.not(tb.equals(tb.var(caller),
                 tb.NULL(services))), problemTerm));
 
+    }
+
+    private Sort[] getParameterSortsForPrecondition(
+	    Pair<ABSStatementBlock, ImmutableList<IProgramVariable>> methodAndParams) {
+	final Sort[] paramSorts = new Sort[methodAndParams.second.size() + 3];
+        
+	paramSorts[0] = services.getTypeConverter().getHistoryLDT().targetSort();
+	paramSorts[1] = services.getTypeConverter().getHeapLDT().targetSort();
+	paramSorts[2] = Sort.ANY;
+	
+	int i = 3;
+        for (IProgramVariable param : methodAndParams.second) {
+            paramSorts[i] = param.sort();
+            i++;
+        }
+	return paramSorts;
     }
 
     private Term createInvocationReactionEvent(Function _this,
