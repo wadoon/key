@@ -591,7 +591,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private StringBuffer buildInstantiatedHierarchyPredicate(
                         SortWrapper child, SortWrapper parent,
                         StringBuffer constant) {
-                StringBuffer form = new StringBuffer();
+                //StringBuffer form = new StringBuffer();
 
                 ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
                 varlist.add(constant);
