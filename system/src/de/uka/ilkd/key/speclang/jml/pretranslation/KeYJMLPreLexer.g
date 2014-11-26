@@ -23,8 +23,6 @@ lexer grammar KeYJMLPreLexer;
 @annotateclass{ @SuppressWarnings("all") } 
 
 @members {
-    private final Stack<String> paraphrase = new Stack<String>();
-
     private void newline() {
       Debug.out("newline() was called but ANTLRv3 does not implement it anymore.");
     }
@@ -166,10 +164,6 @@ lexer grammar KeYJMLPreLexer;
     LEAK				: '\\leak';
     TO				: '\\to';
 fragment SL_COMMENT
-@init {
-    paraphrase.push("a single-line non-specification comment");
-}
-@after { paraphrase.pop(); }
 :
     '//'
     (
@@ -186,10 +180,6 @@ fragment SL_COMMENT
 
 
 fragment ML_COMMENT
-@init {
-    paraphrase.push("a multi-line non-specification comment");
-}
-@after { paraphrase.pop(); }
 :
     '/*'
     (
@@ -209,10 +199,6 @@ fragment ML_COMMENT
 ;
 
 fragment LETTER
-@init {
-    paraphrase.push("a letter");
-}
-@after { paraphrase.pop(); }
 :
         'a'..'z'
     |   'A'..'Z'
@@ -223,10 +209,6 @@ fragment LETTER
 
 
 fragment DIGIT
-@init {
-    paraphrase.push("a digit");
-}
-@after { paraphrase.pop(); }
 :
     '0'..'9'
 ;
@@ -234,10 +216,8 @@ fragment DIGIT
 
 WS
 @init {
-    paraphrase.push("white space");
     boolean acceptAt = false;
 }
-@after { paraphrase.pop(); }
 :
     (
 	    ' '
@@ -261,10 +241,6 @@ WS
 
 
 IDENT
-@init {
-    paraphrase.push("an identifier");
-}
-@after { paraphrase.pop(); }
 :
     LETTER
     (	options { greedy = true; }
@@ -276,12 +252,10 @@ IDENT
 
 BODY
 @init {
-    paraphrase.push("a method body");
     int braceCounter = 0;
     boolean ignoreAt = false;
     String s = null;
 }
-@after { paraphrase.pop(); }
 :
    '{'
       (
@@ -300,21 +274,12 @@ BODY
 
 
 SEMICOLON
-@init {
-    paraphrase.push("a semicolon");
-}
-@after { paraphrase.pop(); }
 :
     ';'
 ;
 
 STRING_LITERAL
-@init {
-  paraphrase.push("a string in double quotes");
-}
 @after {
-    paraphrase.pop();
-
     // strip quotation marks
     final String text = getText();
     final int length = text.length();
@@ -341,19 +306,11 @@ ESC
 
 
     AXIOM_NAME_BEGIN
-    @init {
-      paraphrase.push("`['");
-    }
-    @after { paraphrase.pop(); }
         :
         '['
         ;
 
     AXIOM_NAME_END
-    @init {
-      paraphrase.push("`]'");
-    }
-    @after { paraphrase.pop(); }
         :
         ']'
         ;
