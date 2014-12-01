@@ -253,6 +253,13 @@ public final class NotationInfo {
 	tbl.put(integerLDT.getMod(), new Notation.Infix("%", PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
 	tbl.put(integerLDT.getNeg(),new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 	tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+
+	final FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
+	tbl.put(floatLDT.getFloatSymbol(), new Notation.FloatLiteral());
+	tbl.put(floatLDT.getNeg(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+	tbl.put(floatLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+
+
         	
 	//heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();

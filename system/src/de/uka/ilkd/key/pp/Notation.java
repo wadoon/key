@@ -19,6 +19,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -654,7 +655,50 @@ public abstract class Notation {
 	    }
 	}
     }
-    
+
+    /**
+     * The standard concrete syntax for the float literal indicator `FP'.
+     */
+    static final class FloatLiteral extends Notation {
+	public FloatLiteral() {
+	    super(120);
+	}
+
+	public static String printFloatTerm(Term floatTerm) {
+
+	    final StringBuffer number = new StringBuffer();
+
+	    if (floatTerm.op().name().toString().equals(
+		  FloatLDT.NEGATIVE_LITERAL)) {
+		number.append("-");
+		floatTerm = floatTerm.sub(0);
+	    }
+
+	    if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) {
+		return null;
+	    }
+
+	    Term t2 = floatTerm.sub(1);
+	    Term t1 = floatTerm.sub(0);
+
+
+	    number.append(NumLiteral.printNumberTerm(t1));
+	    number.append(".");
+	    number.append(NumLiteral.printNumberTerm(t2));
+	    number.append("f");
+
+	    return number.toString();
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    final String number = printFloatTerm(t);
+	    if (number != null) {
+		sp.printConstant(number);
+	    } else {
+		sp.printFunctionTerm(t);
+	    }
+	}
+    }
 
     /**
      * The standard concrete syntax for the string literal indicator `cat'
