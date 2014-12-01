@@ -203,6 +203,11 @@ public abstract class ProgramSVSort extends AbstractSort {
 	("JavaLongExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_LONG});
 
+    public static final ProgramSVSort SIMPLEJAVAFLOATEXPRESSION
+	= new SimpleExpressionSpecialPrimitiveTypeSort
+	("JavaFloatExpression", new
+	 PrimitiveType[]{PrimitiveType.JAVA_FLOAT});
+
     public static final ProgramSVSort SIMPLEJAVABYTESHORTEXPRESSION
 	= new SimpleExpressionSpecialPrimitiveTypeSort
 	("JavaByteShortExpression", new
