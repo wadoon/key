@@ -90,8 +90,12 @@ options {
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
 
+  import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
+  import de.uka.ilkd.key.ldt.FloatLDT;
+
   
 }
 
@@ -2596,38 +2600,22 @@ equality_term returns [Term _equality_term = null]
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
-relation_op returns [Function op = null]
-@init{
-  String op_name = null;
-}
+relation_op returns [String op_name = null]
 :
  (
     LESS         { op_name = "lt"; }
  |  LESSEQUAL    { op_name = "leq"; }
  |  GREATER      { op_name = "gt"; }
  |  GREATEREQUAL { op_name = "geq"; }
- ) {
-     op = (Function) functions().lookup(new Name(op_name)); 
-     if(op == null) {
-       semanticError("Function symbol '"+op_name+"' not found.");
-     }
-   }
+ )
 ;
 
-weak_arith_op returns [Function op = null]
-@init{
-  String op_name = null;
-}
+weak_arith_op returns [String op_name = null]
 :
  (
     PLUS         { op_name = "add"; }
  |  MINUS        { op_name = "sub"; }
- ) {
-     op = (Function) functions().lookup(new Name(op_name)); 
-     if(op == null) {
-       semanticError("Function symbol '"+op_name+"' not found.");
-     }
-   }
+ )
 ;
 
 strong_arith_op returns [Function op = null]
@@ -2651,7 +2639,21 @@ strong_arith_op returns [Function op = null]
 logicTermReEntry returns [Term _logic_term_re_entry = null]
 @after { _logic_term_re_entry = a; }
 :
-   a = weak_arith_op_term ((relation_op) => op = relation_op a1=weak_arith_op_term {
+   a = weak_arith_op_term ((relation_op) => op_name = relation_op a1=weak_arith_op_term {
+
+      if (a.sort().name().equals(FloatLDT.NAME)) {
+	if (op_name.equals("lt")) {
+	  op_name = "javaLtFloat";
+	} else {
+	  semanticError("No float function symbol: " + op_name);
+	}
+      }
+
+     Function op = (Function) functions().lookup(new Name(op_name));
+     if(op == null) {
+       semanticError("Function symbol '"+op_name+"' not found.");
+     }
+
                  a = getTermFactory().createTerm(op, a, a1);
               })?
 ;
@@ -2664,9 +2666,21 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
 weak_arith_op_term returns [Term _weak_arith_op_term = null]
 @after { _weak_arith_op_term = a; }
 :
-   a = strong_arith_op_term ((weak_arith_op)=> op = weak_arith_op a1=strong_arith_op_term {
-                  a = getTermFactory().createTerm(op, a, a1);
-                })*
+   a = strong_arith_op_term ((weak_arith_op)=> op_name = weak_arith_op a1=strong_arith_op_term {
+      if (a.sort().name().equals(FloatLDT.NAME)) {
+	if (op_name.equals("add")) {
+	  op_name = "javaAddFloat";
+	} else {
+	  semanticError("No float function symbol: " + op_name);
+	}
+      }
+
+       Function op = (Function) functions().lookup(new Name(op_name));
+       if(op == null) {
+	 semanticError("Function symbol '"+op_name+"' not found.");
+       }
+      a = getTermFactory().createTerm(op, a, a1);
+    })*
 ;
         catch [TermCreationException ex] {
               raiseException
@@ -2881,8 +2895,13 @@ accessterm returns [Term _accessterm = null]
       (MINUS ~NUM_LITERAL) => MINUS result = term110
         {
             if (result.sort() != Sort.FORMULA) {
+	      if (result.sort().name().equals(FloatLDT.NAME)) {
+                result = getTermFactory().createTerm
+                ((Function) functions().lookup(new Name("negFloat")), result);
+	      } else {
                 result = getTermFactory().createTerm
                 ((Function) functions().lookup(new Name("neg")), result);
+	      }
             } else {
                 semanticError("Formula cannot be prefixed with '-'");
             }
@@ -3459,6 +3478,10 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
     | 
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number=NUM_LITERAL
         { a = toZNotation(neg+number.getText(), functions());}    
+    |
+        ((MINUS)? FLOAT_LITERAL) => (MINUS {neg = "-";})? fl=FLOAT_LITERAL
+        { a = getServices().getTypeConverter().convertToLogicElement(
+		new FloatLiteral(neg+fl.getText())); }
     | AT a = abbreviation
     | varfuncid = funcpred_name (LIMITED {limited = true;})?
         ( (~LBRACE | LBRACE bound_variables) =>

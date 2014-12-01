@@ -642,6 +642,14 @@ DIGIT_DISPATCH
   | NUM_LITERAL {$type = NUM_LITERAL;}
 ;
 
+FLOAT_LITERAL
+:
+  (DIGIT)+
+  '.'
+  (DIGIT)+
+  'f'
+;
+
 fragment
 HEX_LITERAL
 : '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F')+
