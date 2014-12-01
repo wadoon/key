@@ -49,6 +49,7 @@ public final class TypeConverter {
     
     private HeapLDT heapLDT = null;
     private IntegerLDT integerLDT = null;
+    private FloatLDT floatLDT = null;
     
     TypeConverter(Services s) {
         this.services = s;
@@ -69,6 +70,7 @@ public final class TypeConverter {
         }
         heapLDT = getHeapLDT();
         integerLDT = getIntegerLDT();
+        floatLDT = getFloatLDT();
     }
 
     public ImmutableList<LDT> getModels() {
@@ -95,6 +97,10 @@ public final class TypeConverter {
     
     public IntegerLDT getIntegerLDT() {
         return (IntegerLDT) getLDT(IntegerLDT.NAME);
+    }
+
+    public FloatLDT getFloatLDT() {
+        return (FloatLDT) getLDT(FloatLDT.NAME);
     }
 
     public BooleanLDT getBooleanLDT() {
@@ -469,6 +475,9 @@ public final class TypeConverter {
             return type1;
     	} else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
             return type2;
+    	} else if ((t1 == PrimitiveType.JAVA_FLOAT) &&
+		    (t2 == PrimitiveType.JAVA_FLOAT)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
         } else {
             throw new RuntimeException("Could not determine promoted type "
         	    	               + "of " + t1 + " and " + t2);
@@ -501,7 +510,9 @@ public final class TypeConverter {
 	else if (t1 == PrimitiveType.JAVA_BIGINT)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 	else if (t1 == PrimitiveType.JAVA_REAL)
-        return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+	else if (t1 == PrimitiveType.JAVA_FLOAT)
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
 	else throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }
