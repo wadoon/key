@@ -993,30 +993,41 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
     KeYJavaType type = null;
     SLExpression right = null;
     Token opToken = null;
+    boolean isFloatType = false;
 }
 :
 	result=shiftexpr
 	(
 	    lt:LT right=shiftexpr
 	    {
-		f = intLDT.getLessThan();
+		isFloatType = right.getType().getSort().equals(
+				floatLDT.targetSort());
+		f = isFloatType ? floatLDT.getLessThan() :
+				intLDT.getLessThan();
 		opToken = lt;
 	    }
 	|
 	    gt:GT right=shiftexpr
 	    {
-		f = intLDT.getGreaterThan();
+		isFloatType = right.getType().getSort().equals(
+				floatLDT.targetSort());
+		f = isFloatType ? floatLDT.getGreaterThan() :
+				  intLDT.getGreaterThan();
 		opToken = gt;
 	    }
 	|
 	    leq:LEQ right=shiftexpr
 	    {
+		isFloatType = right.getType().getSort().equals(
+				floatLDT.targetSort());
 		f = intLDT.getLessOrEquals();
 		opToken = leq;
 	    }
 	|
 	    geq:GEQ right=shiftexpr
 	    {
+		isFloatType = right.getType().getSort().equals(
+				floatLDT.targetSort());
 		f = intLDT.getGreaterOrEquals();
 		opToken = geq;
 	    }
