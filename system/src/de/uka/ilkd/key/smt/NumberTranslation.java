@@ -16,8 +16,12 @@ package de.uka.ilkd.key.smt;
 
 import java.math.BigInteger;
 
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -75,6 +79,33 @@ public final class NumberTranslation {
 	for (int i = 0; i < smallInts.length; ++i) {
 	    smallInts[i] = new BigInteger("" + i);
 	}
+    }
+
+    /** Translate a float literal of sort "float" in FP notation to
+     * an SMTLIB fp literal
+     *
+     * @param term term with sort "float"
+     * @return A string containing the translated literal
+     */
+    public static String translateFloatToSMTLIB(Term term, Services services) {
+      FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
+      String asString = ((FloatLiteral)floatLDT.translateTerm(
+			term, new ExtList(), services)).getValue();
+
+      Float f = new Float(asString);
+      int floatBits = Float.floatToIntBits(f);
+
+      String floatString, sign, m, e;
+
+      //Specific to the float32 format, 1sign, 8e, 23m
+      //For double (i.e. float64), the msize is different
+      int msize	  = 8;
+      floatString = Integer.toBinaryString(floatBits);
+      sign	  = "#b0"; //TODO: set to 1 if negative? Is this handled elsewhere?
+      e		  = "#b" + floatString.substring(0, msize);
+      m		  = "#b" + floatString.substring(msize, floatString.length()-1);
+
+      return ("(fp " + sign + " " + e + " " + m + ")");
     }
 
 }
