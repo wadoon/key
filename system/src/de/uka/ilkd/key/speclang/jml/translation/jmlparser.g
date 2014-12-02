@@ -61,6 +61,7 @@ options {
     private JavaInfo javaInfo;
     private KeYJavaType containerType;
     private IntegerLDT intLDT;
+    private FloatLDT floatLDT;
     private HeapLDT heapLDT;
     private LocSetLDT locSetLDT;
     private BooleanLDT booleanLDT;
@@ -98,6 +99,7 @@ options {
 	this.javaInfo       = services.getJavaInfo();
 	containerType  =   specInClass;
 	this.intLDT         = services.getTypeConverter().getIntegerLDT();
+	this.floatLDT       = services.getTypeConverter().getFloatLDT();
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
 	this.locSetLDT      = services.getTypeConverter().getLocSetLDT();
 	this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
