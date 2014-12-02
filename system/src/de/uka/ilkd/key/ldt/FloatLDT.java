@@ -38,22 +38,40 @@ public final class FloatLDT extends LDT {
 
     public static final Name NAME = new Name("float");
     public static final Name FLOATLIT_NAME = new Name("FP");
-    public static final Name NEGATIVE_LITERAL = new Name("negFloat");
+    public static final Name NEGATIVE_LITERAL = new Name("javaUnaryMinusFloat");
 
     private final Function floatLit;
-    private final Function neg;
     private final Function lessThan;
     private final Function greaterThan;
+    private final Function greaterOrEquals;
+    private final Function lessOrEquals;
+
+    private final Function javaUnaryMinusFloat;
     private final Function javaAddFloat;
+    private final Function javaSubFloat;
+    private final Function javaMulFloat;
+    private final Function javaDivFloat;
+    private final Function javaModFloat;
+
+    private final Function javaMinFloat;
+    private final Function javaMaxFloat;
 
     public FloatLDT(TermServices services) {
 	super(NAME, services);
 
-	floatLit =	addFunction(services, FLOATLIT_NAME.toString());
-	neg =		addFunction(services, NEGATIVE_LITERAL.toString());
-	lessThan =	addFunction(services, "javaLtFloat");
-	greaterThan =	addFunction(services, "javaGtFloat");
-	javaAddFloat =	addFunction(services, "javaAddFloat");
+	floatLit	    = addFunction(services, FLOATLIT_NAME.toString());
+	javaUnaryMinusFloat = addFunction(services, NEGATIVE_LITERAL.toString());
+	lessThan	    = addFunction(services, "javaLtFloat");
+	greaterThan	    = addFunction(services, "javaGtFloat");
+	lessOrEquals	    = addFunction(services, "javaLeqFloat");
+	greaterOrEquals	    = addFunction(services, "javaGeqFloat");
+	javaAddFloat	    = addFunction(services, "javaAddFloat");
+	javaSubFloat	    = addFunction(services, "javaSubFloat");
+	javaMulFloat	    = addFunction(services, "javaMulFloat");
+	javaDivFloat	    = addFunction(services, "javaDivFloat");
+	javaModFloat	    = addFunction(services, "javaModFloat");
+	javaMaxFloat	    = addFunction(services, "javaMaxFloat");
+	javaMinFloat	    = addFunction(services, "javaMinFloat");
     }
 
     @Override
@@ -140,10 +158,22 @@ public final class FloatLDT extends LDT {
             return getGreaterThan();
         } else if (op instanceof LessThan) {
             return getLessThan();
+        } else if (op instanceof GreaterOrEquals) {
+            return getGreaterOrEquals();
+        } else if (op instanceof LessOrEquals) {
+            return getLessOrEquals();
+        } else if (op instanceof Negative) {
+            return getJavaUnaryMinusFloat();
         } else if (op instanceof Plus) {
             return getJavaAddFloat();
-        } else if (op instanceof Negative) {
-            return getNeg();
+        } else if (op instanceof Minus) {
+            return getJavaSubFloat();
+        } else if (op instanceof Times) {
+            return getJavaMulFloat();
+        } else if (op instanceof Divide) {
+            return getJavaDivFloat();
+        } else if (op instanceof Modulo) {
+            return getJavaModFloat();
         } else {
             return null;
         }
@@ -198,10 +228,6 @@ public final class FloatLDT extends LDT {
 	return floatLit;
     }
 
-    public Function getNeg() {
-	return neg;
-    }
-
     public Function getLessThan() {
 	return lessThan;
     }
@@ -210,7 +236,43 @@ public final class FloatLDT extends LDT {
 	return greaterThan;
     }
 
+    public Function getLessOrEquals() {
+	return lessOrEquals;
+    }
+
+    public Function getGreaterOrEquals() {
+	return greaterOrEquals;
+    }
+
+    public Function getJavaUnaryMinusFloat() {
+	return javaUnaryMinusFloat;
+    }
+
     public Function getJavaAddFloat() {
 	return javaAddFloat;
+    }
+
+    public Function getJavaSubFloat() {
+	return javaSubFloat;
+    }
+
+    public Function getJavaMulFloat() {
+	return javaMulFloat;
+    }
+
+    public Function getJavaDivFloat() {
+	return javaDivFloat;
+    }
+
+    public Function getJavaModFloat() {
+	return javaModFloat;
+    }
+
+    public Function getJavaMinFloat() {
+	return javaMinFloat;
+    }
+
+    public Function getJavaMaxFloat() {
+	return javaMaxFloat;
     }
 }

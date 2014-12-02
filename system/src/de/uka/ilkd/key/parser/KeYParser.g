@@ -2897,7 +2897,7 @@ accessterm returns [Term _accessterm = null]
             if (result.sort() != Sort.FORMULA) {
 	      if (result.sort().name().equals(FloatLDT.NAME)) {
                 result = getTermFactory().createTerm
-                ((Function) functions().lookup(new Name("negFloat")), result);
+                ((Function) functions().lookup(new Name("javaUnaryMinusFloat")), result);
 	      } else {
                 result = getTermFactory().createTerm
                 ((Function) functions().lookup(new Name("neg")), result);

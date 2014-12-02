@@ -256,7 +256,7 @@ public final class NotationInfo {
 
 	final FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
 	tbl.put(floatLDT.getFloatSymbol(), new Notation.FloatLiteral());
-	tbl.put(floatLDT.getNeg(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+	tbl.put(floatLDT.getJavaUnaryMinusFloat(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 	tbl.put(floatLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 
 
