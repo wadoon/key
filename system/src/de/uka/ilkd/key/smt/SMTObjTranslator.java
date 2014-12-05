@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -50,6 +51,9 @@ import de.uka.ilkd.key.smt.lang.SMTTermITE;
 import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
 import de.uka.ilkd.key.smt.lang.SMTTermVariable;
+import de.uka.ilkd.key.smt.lang.SMTTermFloatLiteral;
+import de.uka.ilkd.key.smt.lang.SMTTermUnaryOp;
+
 import de.uka.ilkd.key.smt.lang.Util;
 import de.uka.ilkd.key.testgen.ProofInfo;
 import de.uka.ilkd.key.util.Debug;
@@ -59,6 +63,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	public static final String LENGTH = "length";
 	private static final String WELL_FORMED_NAME = "wellFormed";
 	public static final String BINT_SORT = "IntB";
+	public static final String FLOAT_SORT = "Float32";
 	public static final String HEAP_SORT = "Heap";
 	public static final String FIELD_SORT = "Field";
 	public static final String LOCSET_SORT = "LocSet";
@@ -196,6 +201,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	private ModelExtractor query = new ModelExtractor();
 	// some special KeY sorts
 	private Sort integerSort;
+	private Sort floatSort;
 	private Sort heapSort;
 	private Sort fieldSort;
 	private Sort locsetSort;
@@ -375,6 +381,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * Fills the operator table.
 	 */
 	private void initOpTable() {
+		FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
 		opTable = new HashMap<Operator, SMTTermMultOp.Op>();
 		opTable.put(Junctor.AND, SMTTermMultOp.Op.AND);
 		opTable.put(Junctor.OR, SMTTermMultOp.Op.OR);
@@ -397,6 +404,8 @@ public class SMTObjTranslator implements SMTTranslator {
 		        SMTTermMultOp.Op.MUL);
 		opTable.put(services.getTypeConverter().getIntegerLDT().getDiv(),
 		        SMTTermMultOp.Op.BVSDIV);
+		opTable.put(floatLDT.getLessThan(), SMTTermMultOp.Op.FPLT);
+		opTable.put(floatLDT.getAddFloatIEEE(), SMTTermMultOp.Op.FPADD_RNE);
 	}
 
 	/**
@@ -406,6 +415,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		// KeY Sorts
 		seqSort = services.getTypeConverter().getSeqLDT().targetSort();
 		integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
+		floatSort = services.getTypeConverter().getFloatLDT().targetSort();
 		heapSort = services.getTypeConverter().getHeapLDT().targetSort();
 		fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
 		locsetSort = services.getTypeConverter().getLocSetLDT().targetSort();
@@ -1332,6 +1342,11 @@ public class SMTObjTranslator implements SMTTranslator {
 				return zero.minus(n);
 			}
 			return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
+		} else if (op == services.getTypeConverter().getFloatLDT()
+		        .getFloatSymbol()) {
+			Debug.assertTrue(term.arity() == 2);
+			String fplitstring = NumberTranslation.translateFloatToSMTLIB(term, services);
+			return new SMTTermFloatLiteral(fplitstring);
 		} else if (op instanceof Function) {
 			Function fun = (Function) op;
 			if (isTrueConstant(fun, services)) {
@@ -1344,6 +1359,14 @@ public class SMTObjTranslator implements SMTTranslator {
 				        sorts.get(BINT_SORT));
 				SMTTerm right = translateTerm(term.sub(0));
 				return left.minus(right);
+			} else if (fun == services.getTypeConverter().getFloatLDT()
+			        .getJavaUnaryMinusFloat()) {
+			    SMTTerm subterm = translateTerm(term.sub(0));
+			    return new SMTTermUnaryOp(SMTTermUnaryOp.Op.FPNEG, subterm);
+			} else if (fun == services.getTypeConverter().getFloatLDT()
+			        .getIsNormal()) {
+			    SMTTerm subterm = translateTerm(term.sub(0));
+			    return new SMTTermUnaryOp(SMTTermUnaryOp.Op.FPISNORMAL, subterm);
 			} else {
 				return translateCall(fun, term.subs());
 			}
@@ -1398,6 +1421,8 @@ public class SMTObjTranslator implements SMTTranslator {
 			return SMTSort.BOOL;
 		} else if (s.equals(integerSort)) {
 			return sorts.get(BINT_SORT);
+		} else if (s.equals(floatSort)) {
+			return sorts.get(FLOAT_SORT);
 		} else if (s.equals(heapSort)) {
 			return sorts.get(HEAP_SORT);
 		} else if (s.equals(fieldSort)) {

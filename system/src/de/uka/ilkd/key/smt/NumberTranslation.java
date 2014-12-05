@@ -88,24 +88,29 @@ public final class NumberTranslation {
      * @return A string containing the translated literal
      */
     public static String translateFloatToSMTLIB(Term term, Services services) {
-      FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
-      String asString = ((FloatLiteral)floatLDT.translateTerm(
-			term, new ExtList(), services)).getValue();
+	FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
+	String asString = ((FloatLiteral)floatLDT.translateTerm(
+			  term, new ExtList(), services)).getValue();
 
-      Float f = new Float(asString);
-      int floatBits = Float.floatToIntBits(f);
+	Float f = new Float(asString);
+	int floatBits = Float.floatToIntBits(f);
 
-      String floatString, sign, m, e;
+	String floatString, sign, m, e;
 
-      //Specific to the float32 format, 1sign, 8e, 23m
-      //For double (i.e. float64), the msize is different
-      int msize	  = 8;
-      floatString = Integer.toBinaryString(floatBits);
-      sign	  = "#b0"; //TODO: set to 1 if negative? Is this handled elsewhere?
-      e		  = "#b" + floatString.substring(0, msize);
-      m		  = "#b" + floatString.substring(msize, floatString.length()-1);
+	//Specific to the float32 format right now
+	int msize	  = 8;
+	floatString = Integer.toBinaryString(floatBits);
+	int numLeadingZeroes = 32 - floatString.length();
+	if (numLeadingZeroes > 0) {
+	    String zeroes = "00000000000000000000000000000000";
+	    String padding = zeroes.substring(0, numLeadingZeroes);
+	    floatString = padding + floatString;
+	}
+	sign	  = "#b" + floatString.substring(0, 1);
+	e		  = "#b" + floatString.substring(1, msize+1);
+	m		  = "#b" + floatString.substring(msize+1, floatString.length());
 
-      return ("(fp " + sign + " " + e + " " + m + ")");
+	return ("(fp " + sign + " " + e + " " + m + ")");
     }
 
 }

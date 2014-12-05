@@ -28,6 +28,7 @@ public class SMTSort {
 	
 	public static final SMTSort BOOL = new SMTSort("Bool");
 	public static final SMTSort INT = new SMTSort("Int");
+	public static final SMTSort FLOAT = new SMTSort("Floating32");
 	
 	private String id;
 	private SMTSort topLevel;

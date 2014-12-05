@@ -47,6 +47,9 @@ public class SMTTermMultOp extends SMTTerm {
 	IFF, IMPLIES, EQUALS, MUL, DIV, REM,
 	LT, LTE, GT, GTE, PLUS, MINUS, AND, OR,XOR, DISTINCT,
 
+	// Floating-point operators
+	FPLT, FPADD_RNE,
+
 	// BitVec operators 
 	CONCAT, BVOR, BVAND,  BVNAND, BVNOR, BVXNOR,
 	BVSREM, BVSMOD, BVSHL, BVLSHR, BVASHR,
@@ -139,6 +142,9 @@ public class SMTTermMultOp extends SMTTerm {
 	intSymbols.put(Op.REM, "rem");
 	intSymbols.put(Op.PLUS, "+");
 	intSymbols.put(Op.MINUS, "-");
+	//floating-point
+	bvSymbols.put(Op.FPLT, "fp.lt");
+	bvSymbols.put(Op.FPADD_RNE, "fp.add RNE");
     }
 
 

@@ -28,7 +28,9 @@ public class SMTTermUnaryOp extends SMTTerm{
 	
 	public enum Op {
 		NOT,
-		BVNOT, BVNEG
+		BVNOT, BVNEG,
+		FPNEG,
+		FPISNORMAL
 	};
 
 	private Op operator;
@@ -213,6 +215,10 @@ public class SMTTermUnaryOp extends SMTTerm{
 			return tab + "(bvnot" + "\n" + sub.toString(nestPos+1) + "\n" + tab +")";
 		case BVNEG:
 			return tab + "(bvneg" + "\n" + sub.toString(nestPos+1) + "\n" + tab +")";
+		case FPNEG:
+			return tab + "(fp.neg" + "\n" + sub.toString(nestPos+1) + "\n" + tab +")";
+		case FPISNORMAL:
+			return tab + "(fp.isNormal" + "\n" + sub.toString(nestPos+1) + "\n" + tab +")";
 		default:
 			throw new RuntimeException("Unexpected: supported unaryOp={NOT}");
 		}

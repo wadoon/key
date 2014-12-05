@@ -56,6 +56,10 @@ public final class FloatLDT extends LDT {
     private final Function javaMinFloat;
     private final Function javaMaxFloat;
 
+    private final Function addFloatIEEE;
+
+    private final Function isNormal;
+
     public FloatLDT(TermServices services) {
 	super(NAME, services);
 
@@ -72,6 +76,10 @@ public final class FloatLDT extends LDT {
 	javaModFloat	    = addFunction(services, "javaModFloat");
 	javaMaxFloat	    = addFunction(services, "javaMaxFloat");
 	javaMinFloat	    = addFunction(services, "javaMinFloat");
+
+	addFloatIEEE	    = addFunction(services, "addFloatIEEE");
+
+	isNormal	    = addFunction(services, "floatIsNormal");
     }
 
     @Override
@@ -274,5 +282,13 @@ public final class FloatLDT extends LDT {
 
     public Function getJavaMaxFloat() {
 	return javaMaxFloat;
+    }
+
+    public Function getIsNormal() {
+	return isNormal;
+    }
+
+    public Function getAddFloatIEEE() {
+	return addFloatIEEE;
     }
 }
