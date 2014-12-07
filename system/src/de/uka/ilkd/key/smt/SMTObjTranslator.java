@@ -406,7 +406,13 @@ public class SMTObjTranslator implements SMTTranslator {
 		opTable.put(services.getTypeConverter().getIntegerLDT().getDiv(),
 		        SMTTermMultOp.Op.BVSDIV);
 		opTable.put(floatLDT.getLessThan(), SMTTermMultOp.Op.FPLT);
-		opTable.put(floatLDT.getAddFloatIEEE(), SMTTermMultOp.Op.FPADD_RNE);
+		opTable.put(floatLDT.getGreaterThan(), SMTTermMultOp.Op.FPGT);
+		opTable.put(floatLDT.getLessOrEquals(), SMTTermMultOp.Op.FPLEQ);
+		opTable.put(floatLDT.getGreaterOrEquals(), SMTTermMultOp.Op.FPGEQ);
+		opTable.put(floatLDT.getAddFloatIEEE(), SMTTermMultOp.Op.FPADD);
+		opTable.put(floatLDT.getSubFloatIEEE(), SMTTermMultOp.Op.FPSUB);
+		opTable.put(floatLDT.getMulFloatIEEE(), SMTTermMultOp.Op.FPMUL);
+		opTable.put(floatLDT.getDivFloatIEEE(), SMTTermMultOp.Op.FPDIV);
 	}
 
 	/**

@@ -258,6 +258,9 @@ public final class NotationInfo {
 	tbl.put(floatLDT.getFloatSymbol(), new Notation.FloatLiteral());
 	tbl.put(floatLDT.getJavaUnaryMinusFloat(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 	tbl.put(floatLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+	tbl.put(floatLDT.getGreaterThan(), new Notation.Infix(">", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+	tbl.put(floatLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+	tbl.put(floatLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 
 
         	

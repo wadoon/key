@@ -57,6 +57,9 @@ public final class FloatLDT extends LDT {
     private final Function javaMaxFloat;
 
     private final Function addFloatIEEE;
+    private final Function subFloatIEEE;
+    private final Function mulFloatIEEE;
+    private final Function divFloatIEEE;
 
     private final Function isNormal;
 
@@ -80,6 +83,9 @@ public final class FloatLDT extends LDT {
 	javaMinFloat	    = addFunction(services, "javaMinFloat");
 
 	addFloatIEEE	    = addFunction(services, "addFloatIEEE");
+	subFloatIEEE	    = addFunction(services, "subFloatIEEE");
+	mulFloatIEEE	    = addFunction(services, "mulFloatIEEE");
+	divFloatIEEE	    = addFunction(services, "divFloatIEEE");
 
 	isNormal	    = addFunction(services, "floatIsNormal");
 	roundingModeRNE	    = addFunction(services, "RNE");
@@ -295,6 +301,17 @@ public final class FloatLDT extends LDT {
 	return addFloatIEEE;
     }
 
+    public Function getSubFloatIEEE() {
+	return subFloatIEEE;
+    }
+
+    public Function getMulFloatIEEE() {
+	return mulFloatIEEE;
+    }
+
+    public Function getDivFloatIEEE() {
+	return divFloatIEEE;
+    }
 
     public Function getRoundingModeRNE() {
 	return roundingModeRNE;

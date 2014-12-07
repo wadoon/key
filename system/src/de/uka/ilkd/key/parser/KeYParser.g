@@ -2644,6 +2644,12 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
       if (a.sort().name().equals(FloatLDT.NAME)) {
 	if (op_name.equals("lt")) {
 	  op_name = "javaLtFloat";
+	} else if (op_name.equals("gt")) {
+	  op_name = "javaGtFloat";
+	} else if (op_name.equals("leq")) {
+	  op_name = "javaLeqFloat";
+	} else if (op_name.equals("geq")) {
+	  op_name = "javaGeqFloat";
 	} else {
 	  semanticError("No float function symbol: " + op_name);
 	}
