@@ -144,7 +144,7 @@ public class SMTTermMultOp extends SMTTerm {
 	intSymbols.put(Op.MINUS, "-");
 	//floating-point
 	bvSymbols.put(Op.FPLT, "fp.lt");
-	bvSymbols.put(Op.FPADD_RNE, "fp.add RNE");
+	bvSymbols.put(Op.FPADD_RNE, "fp.add");
     }
 
 

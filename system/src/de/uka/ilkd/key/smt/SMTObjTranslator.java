@@ -47,6 +47,7 @@ import de.uka.ilkd.key.smt.lang.SMTFunctionDef;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTerm;
 import de.uka.ilkd.key.smt.lang.SMTTermCall;
+import de.uka.ilkd.key.smt.lang.SMTTermConst;
 import de.uka.ilkd.key.smt.lang.SMTTermITE;
 import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
@@ -1225,38 +1226,52 @@ public class SMTObjTranslator implements SMTTranslator {
 		// System.err.println("Translate: "+term);
 		Operator op = term.op();
 		if (opTable.containsKey(op)) {
-			SMTTerm left = translateTerm(term.sub(0));
-			SMTTerm right = translateTerm(term.sub(1));
-			// make necessary casts
-			if (!left.sort().getId().equals(right.sort().getId())) {
-				if (left.sort().getId().equals(ANY_SORT)) {
-					if (right instanceof SMTTermCall) {
-						SMTTermCall tc = (SMTTermCall) right;
-						if (tc.getFunc().getId().startsWith(ANY_SORT + "2")) {
-							right = tc.getArgs().get(0);
-						} else {
-							right = castTermIfNecessary(right,
-							        sorts.get(ANY_SORT));
-						}
-					} else {
-						right = castTermIfNecessary(right, sorts.get(ANY_SORT));
-					}
-				} else if (right.sort().getId().equals(ANY_SORT)) {
-					if (left instanceof SMTTermCall) {
-						SMTTermCall tc = (SMTTermCall) left;
-						if (tc.getFunc().getId().startsWith(ANY_SORT + "2")) {
-							left = tc.getArgs().get(0);
-							;
-						} else {
-							left = castTermIfNecessary(left,
-							        sorts.get(ANY_SORT));
-						}
-					} else {
-						left = castTermIfNecessary(left, sorts.get(ANY_SORT));
-					}
-				}
+
+			//Some operations (e.g. addFloatIEEE) may have >=3 args
+			if (term.arity() > 2) {
+			    //No typecasting here, because operations are not
+			    //required to all have the same type
+			    List<SMTTerm> args = new LinkedList<SMTTerm>();
+			    for (Term t : term.subs()) {
+				args.add(translateTerm(t));
+			    }
+			    return new SMTTermMultOp(opTable.get(op), args);
+
+			} else {
+
+			    SMTTerm left = translateTerm(term.sub(0));
+			    SMTTerm right = translateTerm(term.sub(1));
+			    // make necessary casts
+			    if (!left.sort().getId().equals(right.sort().getId())) {
+				    if (left.sort().getId().equals(ANY_SORT)) {
+					    if (right instanceof SMTTermCall) {
+						    SMTTermCall tc = (SMTTermCall) right;
+						    if (tc.getFunc().getId().startsWith(ANY_SORT + "2")) {
+							    right = tc.getArgs().get(0);
+						    } else {
+							    right = castTermIfNecessary(right,
+								    sorts.get(ANY_SORT));
+						    }
+					    } else {
+						    right = castTermIfNecessary(right, sorts.get(ANY_SORT));
+					    }
+				    } else if (right.sort().getId().equals(ANY_SORT)) {
+					    if (left instanceof SMTTermCall) {
+						    SMTTermCall tc = (SMTTermCall) left;
+						    if (tc.getFunc().getId().startsWith(ANY_SORT + "2")) {
+							    left = tc.getArgs().get(0);
+							    ;
+						    } else {
+							    left = castTermIfNecessary(left,
+								    sorts.get(ANY_SORT));
+						    }
+					    } else {
+						    left = castTermIfNecessary(left, sorts.get(ANY_SORT));
+					    }
+				    }
+			    }
+			    return left.multOp(opTable.get(op), right);
 			}
-			return left.multOp(opTable.get(op), right);
 		} else if (op == Junctor.NOT) {
 			SMTTerm sub = translateTerm(term.sub(0));
 			return sub.not();
@@ -1347,6 +1362,9 @@ public class SMTObjTranslator implements SMTTranslator {
 			Debug.assertTrue(term.arity() == 2);
 			String fplitstring = NumberTranslation.translateFloatToSMTLIB(term, services);
 			return new SMTTermFloatLiteral(fplitstring);
+		} else if (op == services.getTypeConverter().getFloatLDT()
+		        .getRoundingModeRNE()) {
+			return SMTTermConst.FP_RNE;
 		} else if (op instanceof Function) {
 			Function fun = (Function) op;
 			if (isTrueConstant(fun, services)) {

@@ -60,6 +60,8 @@ public final class FloatLDT extends LDT {
 
     private final Function isNormal;
 
+    private final Function roundingModeRNE;
+
     public FloatLDT(TermServices services) {
 	super(NAME, services);
 
@@ -80,6 +82,7 @@ public final class FloatLDT extends LDT {
 	addFloatIEEE	    = addFunction(services, "addFloatIEEE");
 
 	isNormal	    = addFunction(services, "floatIsNormal");
+	roundingModeRNE	    = addFunction(services, "RNE");
     }
 
     @Override
@@ -290,5 +293,10 @@ public final class FloatLDT extends LDT {
 
     public Function getAddFloatIEEE() {
 	return addFloatIEEE;
+    }
+
+
+    public Function getRoundingModeRNE() {
+	return roundingModeRNE;
     }
 }
