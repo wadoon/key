@@ -258,6 +258,11 @@ public class SMTTermMultOp extends SMTTerm {
 		}				
 	    }
 	    return subs.get(0).sort();
+	case FPADD:
+	case FPSUB:
+	case FPMUL:
+	case FPDIV:
+	    return SMTSort.FLOAT;
 	default:
 	    return SMTSort.BOOL;
 	}

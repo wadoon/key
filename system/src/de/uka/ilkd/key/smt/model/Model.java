@@ -293,12 +293,23 @@ public class Model {
 			return val;
 		}
 
+		if (s.equals(SMTSort.FLOAT)) {
+		    String floatString;
+		    if (val.startsWith("#b")) {
+		      floatString = "#f" + val;
+		    } else {
+		      floatString = "(Unparsed float) " + val;
+		    }
+		    return floatString;
+		}
+
 		if(val.startsWith("#x")){
 			val = val.replace("#", "");
 			val = val.replace("x", "");
 			int x = Integer.parseInt(val, 16);
 			val = "#b"+Integer.toBinaryString(x);
 		}
+
 
 		val = val.replace("#", "");
 		val = val.replace("b", "");

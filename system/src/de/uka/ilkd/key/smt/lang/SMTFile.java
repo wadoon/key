@@ -127,7 +127,7 @@ public class SMTFile {
 		out.append(";==========OPTIONS==========\n\n");
 		
 		out.append("(set-option :print-success true) \n");
-		out.append("(set-option :produce-unsat-cores true)\n");
+		//out.append("(set-option :produce-unsat-cores true)\n");
 		out.append("(set-option :produce-models true)\n");
 		//out.append("(set-option :produce-proofs true)\n");
 		

@@ -1446,7 +1446,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		} else if (s.equals(integerSort)) {
 			return sorts.get(BINT_SORT);
 		} else if (s.equals(floatSort)) {
-			return sorts.get(FLOAT_SORT);
+			return SMTSort.FLOAT;
 		} else if (s.equals(heapSort)) {
 			return sorts.get(HEAP_SORT);
 		} else if (s.equals(fieldSort)) {
