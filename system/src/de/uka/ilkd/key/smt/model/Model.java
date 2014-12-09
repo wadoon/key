@@ -310,6 +310,10 @@ public class Model {
 			val = "#b"+Integer.toBinaryString(x);
 		}
 
+		if (val.startsWith("Any")) {
+		    return val;
+		}
+
 
 		val = val.replace("#", "");
 		val = val.replace("b", "");

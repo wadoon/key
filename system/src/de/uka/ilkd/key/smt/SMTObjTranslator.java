@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -82,6 +84,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	public static final String SEQ_GET = "seqGet";
 	public static final String SEQ_LEN = "seqLen";
 	private static final String SELF = "self";
+
+	//Temporary constant to switch to unbounded any-type
+	private static final boolean boundedAnySort = true;
 	/**
 	 * Mapps some basic KeY operators to their equivalent built in operators.
 	 * Initialized in initOpTable.
@@ -479,7 +484,9 @@ public class SMTObjTranslator implements SMTTranslator {
 		sortNumbers.put(seq, new SMTTermNumber(7, 3, sorts.get(BINT_SORT)));
 		// Any
 		SMTSort any = new SMTSort(ANY_SORT);
-		any.setBitSize((int) (maxSize + 3));
+		if (boundedAnySort) {
+		  any.setBitSize((int) (maxSize + 3));
+		}
 		sorts.put(ANY_SORT, any);
 		sortNumbers.put(any, new SMTTermNumber(6, 3, sorts.get(BINT_SORT)));
 		// don't forget the bool sort number!!
@@ -583,7 +590,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		axiom2.setComment("Index out of bounds implies seqGetOutside");
 		functionTypeAssertions.add(axiom2);
 		// Assertion 3:extensionality
-		// TermVariable s2 = new TermVariable("s2", sorts.get(SEQ_SORT));
+		// SMTTermVariable s2 = new SMTTermVariable("s2", sorts.get(SEQ_SORT));
 		//
 		// SMTTerm lenS2 = SMTTerm.call(functions.get(SEQ_LEN), s2);
 		// SMTTerm getS2 = SMTTerm.call(functions.get(SEQ_GET),s2,i);
@@ -597,7 +604,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		//
 		// SMTTerm axiom3 = a3left.equal(a3right);
 		//
-		// List<TermVariable> a3vars = new LinkedList<TermVariable>();
+		// List<SMTTermVariable> a3vars = new LinkedList<SMTTermVariable>();
 		// a3vars.add(s);
 		// a3vars.add(s2);
 		//
@@ -890,7 +897,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			right = right.and(typeOfTerm);
 		}
 		SMTTerm assertionSub = right;
-		// List<TermVariable> forallVars = new LinkedList<TermVariable>();
+		// List<SMTTermVariable> forallVars = new LinkedList<SMTTermVariable>();
 		// forallVars.add(h);
 		// forallVars.add(o);
 		// SMTTerm assertion = SMTTerm.forall(forallVars, assertionSub, null);
@@ -945,6 +952,15 @@ public class SMTObjTranslator implements SMTTranslator {
 		return source.getId() + "2" + target.getId();
 	}
 
+
+	private SMTFunction createCastFunction(SMTSort source, SMTSort target) {
+		if (boundedAnySort) {
+			return createCastFunction_bounded(source, target);
+		} else {
+			return createCastFunction_unbounded(source, target);
+		}
+	}
+
 	/**
 	 * Creates a function which casts a term from the source sort tot the target
 	 * sort.
@@ -953,15 +969,78 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param target
 	 * @return
 	 */
-	private SMTFunction createCastFunction(SMTSort source, SMTSort target) {
+	private SMTFunction createCastFunction_bounded(SMTSort source, SMTSort target) {
 		String id = getCastFunctionName(source, target);
 		List<SMTSort> domainSorts = new LinkedList<SMTSort>();
 		domainSorts.add(source);
 		SMTFunction f = new SMTFunction(id, domainSorts, target);
 		functions.put(id, f);
-		addCastAssertions(source, target, id);
+		addCastAssertions_bounded(source, target, id);
 		return f;
 	}
+
+	private SMTFunction createCastFunction_unbounded(SMTSort source, SMTSort target) {
+		String s2t_id = getCastFunctionName(source, target);
+		SMTFunction s2t = new SMTFunction(s2t_id, Collections.singletonList(source), target);
+		functions.put(s2t.getId(), s2t);
+
+		 // create <s2t> and its inverse <t2s> at one
+		 String t2s_id = getCastFunctionName(target, source);
+		SMTFunction t2s = new SMTFunction(t2s_id, Collections.singletonList(target), source);
+		functions.put(t2s.getId(), t2s);
+		 // Add axioms/definitions to axiomatize the cast functions
+		 // We use the a new method for the unbounded case
+		 // <addCastAssertions> will become obsolete
+		addCastAssertions_unbounded(source, target);
+		return s2t;
+	}
+
+
+	private void addCastAssertions_unbounded(SMTSort source, SMTSort target) {
+		String s2t_id = getCastFunctionName(source, target);
+		String t2s_id = getCastFunctionName(target, source);
+		SMTFunction s2t = functions.get(s2t_id);
+		SMTFunction t2s = functions.get(t2s_id);
+		SMTSort any = sorts.get(ANY_SORT);  
+		SMTTerm s2t_axiom = null;
+
+		if (source.equals(any)) {
+			// add the axiom: \forall x: S; Any2S(S2Any(x)) = x
+			SMTTermVariable x = new SMTTermVariable("x", target);
+			s2t_axiom = SMTTerm.equal(Arrays.asList(SMTTerm.call(s2t, SMTTerm.call(t2s, x)), x)).forall(x);
+			castAssertions.add(s2t_axiom);
+		}else if (target.equals(any)) {
+			// add the axiom: \forall x: S; Any2S(S2Any(x)) = x
+			SMTTermVariable x = new SMTTermVariable("x", source);
+			s2t_axiom = SMTTerm.equal(Arrays.asList(SMTTerm.call(t2s, SMTTerm.call(s2t, x)), x)).forall(x);
+			castAssertions.add(s2t_axiom);
+		}else {
+			// For a cast function from a source sort S (!= Any) to a target sort T (!= Any):
+			// (1) Create S2Any and Any2T, if not yet exists 
+			// (2) Define the cast function as S2T(x) := Any2T(S2Any(x))
+			SMTFunction s2any = getCastFunction(source, any);
+			SMTFunction any2t = getCastFunction(any, target);
+
+			if(source.equals(sorts.get(FIELD_SORT)) || 
+			    source.equals(sorts.get(HEAP_SORT)) || 
+			    target.equals(sorts.get(FIELD_SORT)) || 
+			    target.equals(sorts.get(HEAP_SORT))){
+
+				throw new RuntimeException("Error: Attempted cast between "+source.getId()+ " to "+target.getId());
+			}
+
+			SMTTermVariable x = new SMTTermVariable("x", source);
+
+			SMTTerm body = SMTTerm.call(s2any, x);
+			body = SMTTerm.call(any2t, body);
+
+			SMTFunctionDef s2t_funDef = new SMTFunctionDef(s2t, x, body);
+			functions.put(s2t.getId(), s2t_funDef);
+			functionDefinitionOrder.add(s2t.getId());
+		}
+
+	}
+
 
 	/**
 	 * Adds the necessary assertions for a cast function
@@ -973,7 +1052,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param id
 	 *            key where the cast function can be found in the function table
 	 */
-	private void addCastAssertions(SMTSort source, SMTSort target, String id) {
+	private void addCastAssertions_bounded(SMTSort source, SMTSort target, String id) {
 		SMTTermVariable v = new SMTTermVariable("v", source);
 		SMTFunction fun = getCastFunction(source, target);
 		SMTTerm call = SMTTerm.call(fun, v);
@@ -1085,6 +1164,9 @@ public class SMTObjTranslator implements SMTTranslator {
 			castAssertions.add(assertion);
 		}
 	}
+
+
+
 
 	/**
 	 * Recursively finds all sorts in a term
@@ -2026,6 +2108,40 @@ public class SMTObjTranslator implements SMTTranslator {
 		}
 	}
 
+	private SMTFunction getIsFunction(SMTSort sort){
+		if (boundedAnySort) {
+			return getIsFunction_bounded(sort);
+		} else {
+			return getIsFunction_unbounded(sort);
+		}
+	}
+
+	private SMTFunction getIsFunction_unbounded(SMTSort sort){
+	  String id = "is"+sort.getId();
+	  if(functions.containsKey(id)){
+	    return functions.get(id);
+	  }
+
+	  List<SMTSort> domain = new LinkedList<SMTSort>();
+	  domain.add(sorts.get(ANY_SORT));
+	  SMTSort image = SMTSort.BOOL;
+
+	  SMTFunction t2any = getCastFunction(sort, sorts.get(ANY_SORT));
+	  SMTFunction any2t = getCastFunction(sorts.get(ANY_SORT), sort);
+
+	  SMTTermVariable v = new SMTTermVariable("x", sorts.get(ANY_SORT));
+	  SMTTerm defTerm = SMTTerm.equal(Arrays.asList(SMTTerm.call(t2any, SMTTerm.call(any2t, v)), v));
+
+	  // is<Sort>(v) = <Sort>2any(any2<Sort>(v)) == v
+	  SMTFunction def = new SMTFunctionDef(id, v, SMTSort.BOOL, defTerm);
+
+	  functions.put(def.getId(), def);
+	  functionDefinitionOrder.add(def.getId());
+	  return def;
+
+	}
+
+
 	/**
 	 * Creates a function for checking if the given sort is the actual sort of
 	 * an Any value.
@@ -2033,7 +2149,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param sort
 	 * @return
 	 */
-	private SMTFunction getIsFunction(SMTSort sort) {
+	private SMTFunction getIsFunction_bounded(SMTSort sort) {
 		String id = "is" + sort.getId();
 		if (functions.containsKey(id)) {
 			return functions.get(id);
