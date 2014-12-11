@@ -85,7 +85,6 @@ public class ModelInstance {
      * @return the fields
      */
     public List<ModelVariable> getFields() {
-
         return new LinkedList<ModelVariable>(fields);
     }
 

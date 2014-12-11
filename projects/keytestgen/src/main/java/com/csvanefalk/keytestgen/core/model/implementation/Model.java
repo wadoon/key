@@ -259,21 +259,26 @@ public class Model {
        for(ModelVariable mv : getVariables()){      
           
           if(mv.isPrimitive()){
-             result += mv.getIdentifier()+": " + mv.getSymbolicValue() + " :: " + mv.getTypeName()+ " : " + mv.getValue() + "\n" ;             
+             result += mv.toString() + "\n" ;             
           }else if(mv instanceof ModelArrayVariable){
-             result += mv.getIdentifier() + ": " + mv.getSymbolicValue() + " :: " + mv.getTypeName() +  "; length: " +
-                        ((ModelArrayInstance)mv.getValue()).length() + "; includes: \n";
-             for(ModelVariable mvv : ((ModelArrayInstance)mv.getValue()).getArrayElements()){
-                result += "     " + mvv.getIdentifier()+" : " + mvv.getSymbolicValue()+" : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
+             if(mv.getValue() instanceof ModelArrayInstance){
+                result += mv.toString() +  "; length: " +
+                           ((ModelArrayInstance)mv.getValue()).length() + "; includes: \n";
+             
+                for(ModelVariable mvv : ((ModelArrayInstance)mv.getValue()).getFields()){
+                   result += "     " + mvv.toString() + "\n";
+                }                
+             }else{
+                result+= mv.toString() + " the value is not ModelArrayInstance!!! \n";
              }
              result += "-----\n";
           }else{
-             result += mv.getIdentifier()+": " + mv.getSymbolicValue() + " :: " ;
+             result += mv.toString();
              if(mv.getValue() instanceof ModelInstance ){
                 ModelInstance mi=(ModelInstance)mv.getValue();
-                result += mi.toString() + " ; " + " includes: \n";
+                result += "; contains: \n";
                 for(ModelVariable mvv : mi.getFields()){
-                   result += "     " + mvv.getIdentifier()+" : " + mvv.getSymbolicValue() + " : " + mvv.getValue() + "; type: " + mvv.getSort().toString() + "\n";
+                   result += "     " + mvv.toString() + "\n";
                 }
              }
              result += "-----\n";

@@ -78,6 +78,8 @@ public class ModelVariable {
         
         arrayIdx = -1; //default that this model variable is not an array's element
         arrayIdxTerm = null;
+        parentIdentifier = "";
+        isFresh = false;
     }
     
     public ModelVariable(final String identifier){
@@ -86,7 +88,8 @@ public class ModelVariable {
        this.arrayIdx = -1;
        this.arrayIdxTerm = null;
        this.valueCondition = new TermFactory().createTerm(Junctor.TRUE);
-       
+       parentIdentifier = "";
+       isFresh = false;
     }
 
     /*
@@ -114,6 +117,7 @@ public class ModelVariable {
        this.parentIdentifier = mv.parentIdentifier;
        this.arrayIdxTerm = mv.arrayIdxTerm;
        this.selectForm = mv.selectForm;
+       this.isFresh = mv.isFresh;
     }
     
     /*
@@ -147,7 +151,8 @@ public class ModelVariable {
    
     //added by Huy, store the heap form (select ...) of model variable
     private Term selectForm;
-    
+    //added by Huy, this flag decides whether this variable is fresh variable or not. If it is fresh variable, it must be treated as an artificial variable 
+    private boolean isFresh;
     /**
      * Since we are working with unique Java assertions, two
      * {@link ModelVariable} instances are equal iff. their paths are identical.
@@ -265,7 +270,13 @@ public class ModelVariable {
 
    @Override
     public String toString() {
-        return getTypeName() + " : " + identifier;
+      String result = "";      
+      result +=  identifier + "; select form: " + selectForm + "; type: " + getTypeName()+ "; symbolic value: " + symbolicValue + 
+                "; concrete value: " + getValue() + "; parent indentifier: " + parentIdentifier;             
+      if(arrayIdxTerm!=null){
+         result += "; arrayIdxTerm: " + arrayIdxTerm;
+      }
+      return result;
     }
 
     public boolean isPrimitive() {
@@ -342,7 +353,7 @@ public class ModelVariable {
       if(arrayIdx>=0)
          return true;
       else         
-         return (arrayIdxValue != null);
+         return (arrayIdxTerm != null);
    }
    
    public boolean isArrayLength(){
@@ -353,6 +364,7 @@ public class ModelVariable {
             && identifier.endsWith(StringConstants.LENGTH));
    }
    
+      
    /**
     * @return the arrayIdxValue
     */
@@ -407,6 +419,14 @@ public class ModelVariable {
 
    public void setSelectForm(Term selectForm) {
       this.selectForm = selectForm;
+   }
+
+   public boolean isFresh() {
+      return isFresh;
+   }
+
+   public void setFresh(boolean isFresh) {
+      this.isFresh = isFresh;
    }
    
    
