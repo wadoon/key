@@ -51,6 +51,7 @@ public class SMTTermMultOp extends SMTTerm {
 	// Floating-point operators
 	FPLT, FPGT, FPLEQ, FPGEQ,
 	FPADD, FPSUB, FPMUL, FPDIV,
+	FPEQ,
 
 	// BitVec operators 
 	CONCAT, BVOR, BVAND,  BVNAND, BVNOR, BVXNOR,
@@ -154,6 +155,7 @@ public class SMTTermMultOp extends SMTTerm {
 	floatSymbols.put(Op.FPSUB, "fp.sub");
 	floatSymbols.put(Op.FPMUL, "fp.mul");
 	floatSymbols.put(Op.FPDIV, "fp.div");
+	floatSymbols.put(Op.FPEQ, "fp.eq");
     }
 
 

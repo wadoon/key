@@ -46,6 +46,8 @@ public final class FloatLDT extends LDT {
     private final Function greaterOrEquals;
     private final Function lessOrEquals;
 
+    private final Function eqFloat;
+
     private final Function javaUnaryMinusFloat;
     private final Function javaAddFloat;
     private final Function javaSubFloat;
@@ -61,9 +63,13 @@ public final class FloatLDT extends LDT {
     private final Function mulFloatIEEE;
     private final Function divFloatIEEE;
 
+
+    private final Function castIntToFloat;
+
     private final Function isNormal;
 
     private final Function roundingModeRNE;
+
 
     public FloatLDT(TermServices services) {
 	super(NAME, services);
@@ -74,6 +80,7 @@ public final class FloatLDT extends LDT {
 	greaterThan	    = addFunction(services, "javaGtFloat");
 	lessOrEquals	    = addFunction(services, "javaLeqFloat");
 	greaterOrEquals	    = addFunction(services, "javaGeqFloat");
+	eqFloat		    = addFunction(services, "javaEqFloat");
 	javaAddFloat	    = addFunction(services, "javaAddFloat");
 	javaSubFloat	    = addFunction(services, "javaSubFloat");
 	javaMulFloat	    = addFunction(services, "javaMulFloat");
@@ -89,6 +96,8 @@ public final class FloatLDT extends LDT {
 
 	isNormal	    = addFunction(services, "floatIsNormal");
 	roundingModeRNE	    = addFunction(services, "RNE");
+
+	castIntToFloat	    = addFunction(services, "castIntToFloat");
     }
 
     @Override
@@ -261,6 +270,10 @@ public final class FloatLDT extends LDT {
 	return greaterOrEquals;
     }
 
+    public Function getEquals() {
+	return eqFloat;
+    }
+
     public Function getJavaUnaryMinusFloat() {
 	return javaUnaryMinusFloat;
     }
@@ -311,6 +324,10 @@ public final class FloatLDT extends LDT {
 
     public Function getDivFloatIEEE() {
 	return divFloatIEEE;
+    }
+
+    public Function getCastIntToFloat() {
+	return castIntToFloat;
     }
 
     public Function getRoundingModeRNE() {

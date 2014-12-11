@@ -12,6 +12,8 @@
 //
 package de.uka.ilkd.key.smt;
 
+import java.math.BigInteger;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,6 +53,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 	 * Initialized in initOpTable.
 	 */
 	private Map<Operator, SMTTermMultOp.Op> opTable;
+	private Map<Operator, SMTTermUnaryOp.Op> opTableUnary;
 	private int varNr;
 	/**
 	 * The SMT translation settings.
@@ -101,12 +104,14 @@ public class SMTFloatTranslator implements SMTTranslator {
 		opTable.put(floatLDT.getGreaterThan(), SMTTermMultOp.Op.FPGT);
 		opTable.put(floatLDT.getLessOrEquals(), SMTTermMultOp.Op.FPLEQ);
 		opTable.put(floatLDT.getGreaterOrEquals(), SMTTermMultOp.Op.FPGEQ);
+		opTable.put(floatLDT.getEquals(), SMTTermMultOp.Op.FPEQ);
 		opTable.put(floatLDT.getAddFloatIEEE(), SMTTermMultOp.Op.FPADD);
 		opTable.put(floatLDT.getSubFloatIEEE(), SMTTermMultOp.Op.FPSUB);
 		opTable.put(floatLDT.getMulFloatIEEE(), SMTTermMultOp.Op.FPMUL);
 		opTable.put(floatLDT.getDivFloatIEEE(), SMTTermMultOp.Op.FPDIV);
 
-		//TODO: keep table for unary ops?
+		opTableUnary = new HashMap<Operator, SMTTermUnaryOp.Op>();
+		opTableUnary.put(floatLDT.getCastIntToFloat(), SMTTermUnaryOp.Op.FPCASTFROMINT);
 	}
 
 	/**
@@ -231,6 +236,9 @@ public class SMTFloatTranslator implements SMTTranslator {
 			    args.add(translateTerm(t));
 			}
 			return new SMTTermMultOp(opTable.get(op), args);
+		} else if (opTableUnary.containsKey(op)) {
+			SMTTerm sub = translateTerm(term.sub(0));
+			return new SMTTermUnaryOp(opTableUnary.get(op), sub);
 		} else if (op == Junctor.NOT) {
 			SMTTerm sub = translateTerm(term.sub(0));
 			return sub.not();
@@ -249,12 +257,18 @@ public class SMTFloatTranslator implements SMTTranslator {
 			        pv.sort());
 			return SMTTerm.call(constant);
 
-		//TODO: add an "opTable" for the following unary ops?
 		} else if (op == services.getTypeConverter().getFloatLDT()
 		        .getFloatSymbol()) {
 			Debug.assertTrue(term.arity() == 2);
 			String fplitstring = NumberTranslation.translateFloatToSMTLIB(term, services);
 			return new SMTTermFloatLiteral(fplitstring);
+
+		} else if (op == services.getTypeConverter().getIntegerLDT()
+			.getNumberSymbol()) {
+			Term number = term.sub(0);
+
+			BigInteger bi = NumberTranslation.translate(number);
+			return new SMTTermNumber(bi.intValue(), 32, SMTSort.mkBV(32));
 		} else if (op == services.getTypeConverter().getFloatLDT()
 		        .getRoundingModeRNE()) {
 			return SMTTermConst.FP_RNE;
