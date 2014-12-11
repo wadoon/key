@@ -333,6 +333,65 @@ public interface SolverType  {
             }
 	};
 
+	/**
+     * Class for the Z3 solver for FP problems. It makes use of the SMT2-format.
+     */
+    static public final SolverType MATHSAT_FP_SOLVER = new AbstractSolverType() {
+
+            public String getDefaultSolverCommand() {
+                return "mathsat";
+                }
+
+            public String getDefaultSolverParameters() {
+                return "-input=smt2";
+                }
+
+            @Override
+            public SMTSolver createSolver(SMTProblem problem,
+                            SolverListener listener, Services services) {
+                    return new SMTSolverImplementation(problem, listener,
+                                    services, this);
+            }
+
+            @Override
+            public String getName() {
+                    return "mathsat (FP)";
+            }
+
+            public String getVersionParameter() {
+            	return "-version";
+                }
+           
+            @Override
+                public String getRawVersion () {
+                    final String tmp = super.getRawVersion();
+                    if (tmp==null) return null;
+                    return tmp.substring(tmp.indexOf("version"));
+                }
+
+            public String[] getSupportedVersions() {
+            	return new String[] {"version 5.2.12"};
+                }
+
+            public String[] getDelimiters() {
+            	return new String [] {"\n","\r"};
+                }
+
+            public boolean supportsIfThenElse() {
+                    return true;
+                }
+
+            @Override
+            public SMTTranslator createTranslator(Services services) {
+                    return new SMTFloatTranslator(services);
+            }
+
+            @Override
+            public String getInfo() {
+            			return "";
+            }
+	};
+
 
 	/**
 	 * Class for the CVC3 solver. It makes use of the SMT1-format.

@@ -48,6 +48,9 @@ public abstract class AbstractSolverSocket implements PipeListener<SolverCommuni
 		if(type==SolverType.Z3_FP_SOLVER){
 			return new Z3Socket(name, query);
 		}
+		if(type==SolverType.MATHSAT_FP_SOLVER){
+			return new MATHSAT_FPSocket(name, query);
+		}
 		else if(type == SolverType.Z3_CE_SOLVER){
 			return new Z3CESocket(name, query);
 		}
@@ -90,6 +93,68 @@ class Z3Socket extends AbstractSolverSocket{
 				return;
 			}
 			throw new RuntimeException("Error while executing Z3:\n" +message);
+		}
+		if (!message.equals("success")) {
+			sc.addMessage(message);
+		}
+
+		switch (sc.getState()) {
+			case WAIT_FOR_RESULT:
+				if(message.equals("unsat")){
+					sc.setFinalResult(SMTSolverResult.createValidResult(name));
+					// One cannot ask for proofs and models at one time
+					// rather have modesl than proofs (MU, 2013-07-19)
+					// pipe.sendMessage("(get-proof)\n");
+					pipe.sendMessage("(exit)\n");
+					sc.setState(WAIT_FOR_DETAILS);
+				}
+				if(message.equals("sat")){
+					sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
+					pipe.sendMessage("(get-model)");
+					pipe.sendMessage("(exit)\n");
+					sc.setState(WAIT_FOR_DETAILS);
+
+				}
+				if(message.equals("unknown")){
+					sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
+					sc.setState(WAIT_FOR_DETAILS);
+					pipe.sendMessage("(exit)\n");
+				}
+				break;
+
+			case WAIT_FOR_DETAILS:
+				if(message.equals("success")){
+					pipe.close();
+				}
+				break;
+		}
+	}
+
+	@Override
+	public void exceptionOccurred(Pipe<SolverCommunication> pipe,
+			Throwable exception) {
+
+
+	}
+
+}
+
+
+class MATHSAT_FPSocket extends AbstractSolverSocket{
+
+	public MATHSAT_FPSocket(String name, ModelExtractor query) {
+		super(name, query);	    
+	}
+
+	public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+		SolverCommunication sc = pipe.getSession();
+        message = message.trim();
+		if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
+			sc.addMessage(message);
+			if(message.indexOf("WARNING:")>-1){
+				return;
+			}
+			throw new RuntimeException("Error while executing mathsat:\n" +message);
 		}
 		if (!message.equals("success")) {
 			sc.addMessage(message);

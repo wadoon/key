@@ -671,7 +671,7 @@ public final class TypeConverter {
 	// everything except \real and \bigint can be coerced to a double
 	if (to == PrimitiveType.JAVA_DOUBLE) return from != PrimitiveType.JAVA_BIGINT;
 	// but a double cannot be coerced to anything else
-	if (from == PrimitiveType.JAVA_DOUBLE) return from != PrimitiveType.JAVA_BIGINT;
+	if (from == PrimitiveType.JAVA_DOUBLE) return false;
 	// everything except doubles can be coerced to a float
 	if (to == PrimitiveType.JAVA_FLOAT) return true;
 	// but a float cannot be coerced to anything but float or double
