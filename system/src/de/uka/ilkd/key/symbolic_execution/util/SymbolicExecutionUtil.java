@@ -2251,7 +2251,7 @@ public final class SymbolicExecutionUtil {
                                                 Services services) {
       if (term.op() instanceof TermTransformer) {
          // Replace meta constructs
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet());
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet(), null);
          term.execPostOrder(visitor);
          return visitor.getTerm();
       }
