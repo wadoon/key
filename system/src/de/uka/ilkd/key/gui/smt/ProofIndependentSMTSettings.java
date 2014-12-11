@@ -158,11 +158,13 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
 
         private ProofIndependentSMTSettings() {
                 dataOfSolvers.put(SolverType.Z3_SOLVER, new SolverData(SolverType.Z3_SOLVER));
+                dataOfSolvers.put(SolverType.Z3_FP_SOLVER, new SolverData(SolverType.Z3_FP_SOLVER));
                 dataOfSolvers.put(SolverType.YICES_SOLVER, new SolverData(SolverType.YICES_SOLVER));
                 dataOfSolvers.put(SolverType.SIMPLIFY_SOLVER, new SolverData(SolverType.SIMPLIFY_SOLVER));
                 dataOfSolvers.put(SolverType.CVC3_SOLVER, new SolverData(SolverType.CVC3_SOLVER));
                 dataOfSolvers.put(SolverType.CVC4_SOLVER, new SolverData(SolverType.CVC4_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_SOLVER));
+                solverUnions.add(new SolverTypeCollection("Z3 (fp)",1,SolverType.Z3_FP_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Yices",1,SolverType.YICES_SOLVER));
                 solverUnions.add(new SolverTypeCollection("CVC3",1,SolverType.CVC3_SOLVER));
                 solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_SOLVER));

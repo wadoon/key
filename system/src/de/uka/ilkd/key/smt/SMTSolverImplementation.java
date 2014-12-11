@@ -359,7 +359,11 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         		SMTTranslator trans = getType().createTranslator(services);
             	//instantiateTaclets(trans);
             	problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
-            	tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
+		if (trans instanceof AbstractSMTTranslator) {
+			tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
+		} else {
+			tacletTranslation = null;
+		}
             	exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
         	}
         	
@@ -424,7 +428,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         			
         		}
         		
-        		if(getSocket().getQuery()!=null){
+        		if(getSocket() != null && getSocket().getQuery()!=null){
         			ModelExtractor mq = getSocket().getQuery();
         			Model m = mq.getModel();
         			if(m!=null){
