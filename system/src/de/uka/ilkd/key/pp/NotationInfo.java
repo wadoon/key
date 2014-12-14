@@ -261,6 +261,7 @@ public final class NotationInfo {
 	tbl.put(floatLDT.getGreaterThan(), new Notation.Infix(">", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(floatLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(floatLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+	tbl.put(floatLDT.getCastLongToFloat(), new Notation.Prefix("(float)",PRIORITY_BOTTOM, PRIORITY_ATOM));
 
 
         	

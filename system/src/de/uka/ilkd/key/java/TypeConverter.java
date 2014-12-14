@@ -475,8 +475,21 @@ public final class TypeConverter {
             return type1;
     	} else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
             return type2;
+    	} else if ((t2 == PrimitiveType.JAVA_FLOAT) &&
+                (t1 == PrimitiveType.JAVA_BYTE||
+                        t1 == PrimitiveType.JAVA_SHORT||
+                        t1 == PrimitiveType.JAVA_INT||
+                        t1 == PrimitiveType.JAVA_CHAR||
+                        t1 == PrimitiveType.JAVA_LONG||
+			t1 == PrimitiveType.JAVA_FLOAT)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
     	} else if ((t1 == PrimitiveType.JAVA_FLOAT) &&
-		    (t2 == PrimitiveType.JAVA_FLOAT)) {
+                (t2 == PrimitiveType.JAVA_BYTE||
+                        t2 == PrimitiveType.JAVA_SHORT||
+                        t2 == PrimitiveType.JAVA_INT||
+                        t2 == PrimitiveType.JAVA_CHAR||
+                        t2 == PrimitiveType.JAVA_LONG||
+			t2 == PrimitiveType.JAVA_FLOAT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
         } else {
             throw new RuntimeException("Could not determine promoted type "

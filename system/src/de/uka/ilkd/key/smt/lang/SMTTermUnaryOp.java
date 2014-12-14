@@ -31,7 +31,8 @@ public class SMTTermUnaryOp extends SMTTerm{
 		BVNOT, BVNEG,
 		FPNEG,
 		FPISNORMAL,
-		FPCASTFROMINT
+		CASTLONGTOFLOAT,
+		CASTFLOATTOLONG
 	};
 
 	private Op operator;
@@ -220,8 +221,10 @@ public class SMTTermUnaryOp extends SMTTerm{
 			return tab + "(fp.neg" + "\n" + sub.toString(nestPos+1) + "\n" + tab +")";
 		case FPISNORMAL:
 			return tab + "(fp.isNormal" + "\n" + sub.toString(nestPos+1) + "\n" + tab +")";
-		case FPCASTFROMINT:
+		case CASTLONGTOFLOAT:
 			return tab + "((_ to_fp 8 24) RNE" + "\n" + sub.toString(nestPos+1) + "\n" + tab +")";
+		case CASTFLOATTOLONG:
+			return tab + "((_ fp.to_sbv 64) RTZ" + "\n" + sub.toString(nestPos+1) + "\n" + tab +")";
 		default:
 			throw new RuntimeException("Unexpected: supported unaryOp={NOT}");
 		}

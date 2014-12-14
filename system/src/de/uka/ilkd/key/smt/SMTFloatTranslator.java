@@ -48,6 +48,12 @@ public class SMTFloatTranslator implements SMTTranslator {
 	}
 
 
+	//All integral types are stored in long format
+	//Since they are technically unbounded (bounding should happen in KeY).
+	//Long operators are not translated so no overflow can happen.
+	//Only integral variables, literals and conversion to float is translated
+	private static final SMTSort INTSORT = SMTSort.mkBV(64);
+
 	/**
 	 * Mapps some basic KeY operators to their equivalent built in operators.
 	 * Initialized in initOpTable.
@@ -77,6 +83,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 
 	// some special KeY sorts
 	private Sort floatSort;
+	private Sort intSort;
 	private Sort boolSort;
 
 	public SMTFloatTranslator(Services services) {
@@ -99,6 +106,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 		opTable.put(Junctor.AND, SMTTermMultOp.Op.AND);
 		opTable.put(Junctor.OR, SMTTermMultOp.Op.OR);
 		opTable.put(Junctor.IMP, SMTTermMultOp.Op.IMPLIES);
+		opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
 
 		opTable.put(floatLDT.getLessThan(), SMTTermMultOp.Op.FPLT);
 		opTable.put(floatLDT.getGreaterThan(), SMTTermMultOp.Op.FPGT);
@@ -111,7 +119,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 		opTable.put(floatLDT.getDivFloatIEEE(), SMTTermMultOp.Op.FPDIV);
 
 		opTableUnary = new HashMap<Operator, SMTTermUnaryOp.Op>();
-		opTableUnary.put(floatLDT.getCastIntToFloat(), SMTTermUnaryOp.Op.FPCASTFROMINT);
+		opTableUnary.put(floatLDT.getCastLongToFloat(), SMTTermUnaryOp.Op.CASTLONGTOFLOAT);
+		opTableUnary.put(floatLDT.getCastFloatToLong(), SMTTermUnaryOp.Op.CASTFLOATTOLONG);
 	}
 
 	/**
@@ -119,6 +128,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 	 */
 	private void initSorts() {
 		floatSort = services.getTypeConverter().getFloatLDT().targetSort();
+		intSort = services.getTypeConverter().getIntegerLDT().targetSort();
 		boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
 	}
 
@@ -267,8 +277,9 @@ public class SMTFloatTranslator implements SMTTranslator {
 			.getNumberSymbol()) {
 			Term number = term.sub(0);
 
+			//Both int and long literal fit in 64 bits, and both translate the same
 			BigInteger bi = NumberTranslation.translate(number);
-			return new SMTTermNumber(bi.intValue(), 32, SMTSort.mkBV(32));
+			return new SMTTermNumber(bi.intValue(), 64, INTSORT);
 		} else if (op == services.getTypeConverter().getFloatLDT()
 		        .getRoundingModeRNE()) {
 			return SMTTermConst.FP_RNE;
@@ -311,6 +322,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 			return SMTSort.BOOL;
 		} else if (s.equals(floatSort)) {
 			return SMTSort.FLOAT;
+		} else if (s.equals(intSort)) {
+			return INTSORT;
 		} else {
 			String msg = "Translation Failed: Unsupported Sort: " + s.name();
 			System.err.println(msg);
