@@ -80,6 +80,11 @@ public class SMTFloatTranslator implements SMTTranslator {
 	 */
 	private List<String> functionDefinitionOrder;
 
+	/**
+	 * Keep track of which terms were not translated
+	 */
+	private List<String> untranslatedMessages;
+
 
 	// some special KeY sorts
 	private Sort floatSort;
@@ -137,9 +142,22 @@ public class SMTFloatTranslator implements SMTTranslator {
 	        SMTSettings settings) throws IllegalFormulaException {
 		this.settings = settings;
 		this.services = services;
+		untranslatedMessages = new LinkedList<String>();
 		SMTFile file = translateProblem(problem);
 		String s = file.toString();
-		return new StringBuffer(s);
+
+		//Add all comments regarding untranslated terms
+		StringBuffer buffer = new StringBuffer(s);
+		if (!untranslatedMessages.isEmpty()) {
+			buffer.append("==========UNTRANSLATED PARTS==========\n\n");
+
+			for (String comment : untranslatedMessages) {
+				String c2 = comment.replaceAll("\n|\r","\n;");
+				buffer.append(";" + c2 + "\n");
+			}
+		}
+
+		return buffer;
 	}
 
 	/**
@@ -224,6 +242,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 			try {
 				return translateTerm(term);
 			} catch (NoTranslationAvailableException e) {
+				untranslatedMessages.add("*Untranslated term:  " + term);
+				untranslatedMessages.add("    " + e.getMessage());
 				return defaultValue;
 			}
 		}
@@ -303,7 +323,6 @@ public class SMTFloatTranslator implements SMTTranslator {
 		} else {
 			String msg = "Unable to translate " + term + " of type " +
 				term.getClass().getName();
-			System.err.println(msg);
 			throw new NoTranslationAvailableException(msg);
 		}
 	}
@@ -326,7 +345,6 @@ public class SMTFloatTranslator implements SMTTranslator {
 			return INTSORT;
 		} else {
 			String msg = "Translation Failed: Unsupported Sort: " + s.name();
-			System.err.println(msg);
 			throw new NoTranslationAvailableException(msg);
 		}
 	}
@@ -368,7 +386,6 @@ public class SMTFloatTranslator implements SMTTranslator {
 			return call(function, subs);
 		} else {
 			String msg = "No translation for function " + name;
-			System.err.println(msg);
 			throw new NoTranslationAvailableException(msg);
 		}
 	}
