@@ -33,7 +33,6 @@ public class SMTTermMultOp extends SMTTerm {
 
     private static HashMap<Op, String> bvSymbols;
     private static HashMap<Op,String> intSymbols;
-    private static HashMap<Op,String> floatSymbols;
     public static enum OpProperty{
 	NONE,
 	LEFTASSOC,
@@ -47,11 +46,6 @@ public class SMTTermMultOp extends SMTTerm {
 	// Bool/Int operator
 	IFF, IMPLIES, EQUALS, MUL, DIV, REM,
 	LT, LTE, GT, GTE, PLUS, MINUS, AND, OR,XOR, DISTINCT,
-
-	// Floating-point operators
-	FPLT, FPGT, FPLEQ, FPGEQ,
-	FPADD, FPSUB, FPMUL, FPDIV,
-	FPEQ,
 
 	// BitVec operators 
 	CONCAT, BVOR, BVAND,  BVNAND, BVNOR, BVXNOR,
@@ -145,17 +139,6 @@ public class SMTTermMultOp extends SMTTerm {
 	intSymbols.put(Op.REM, "rem");
 	intSymbols.put(Op.PLUS, "+");
 	intSymbols.put(Op.MINUS, "-");
-	//floating-point
-	floatSymbols = new HashMap<Op, String>();
-	floatSymbols.put(Op.FPLT, "fp.lt");
-	floatSymbols.put(Op.FPGT, "fp.gt");
-	floatSymbols.put(Op.FPLEQ, "fp.leq");
-	floatSymbols.put(Op.FPGEQ, "fp.geq");
-	floatSymbols.put(Op.FPADD, "fp.add");
-	floatSymbols.put(Op.FPSUB, "fp.sub");
-	floatSymbols.put(Op.FPMUL, "fp.mul");
-	floatSymbols.put(Op.FPDIV, "fp.div");
-	floatSymbols.put(Op.FPEQ, "fp.eq");
     }
 
 
@@ -171,7 +154,7 @@ public class SMTTermMultOp extends SMTTerm {
 	for (SMTTerm sub : this.subs) {
 	    sub.upp = this;
 	}
-	if(bvSymbols==null || intSymbols==null || floatSymbols==null){
+	if(bvSymbols==null || intSymbols==null){
 	    initMaps();
 	}
     }
@@ -265,11 +248,6 @@ public class SMTTermMultOp extends SMTTerm {
 		}				
 	    }
 	    return subs.get(0).sort();
-	case FPADD:
-	case FPSUB:
-	case FPMUL:
-	case FPDIV:
-	    return SMTSort.FLOAT;
 	default:
 	    return SMTSort.BOOL;
 	}
@@ -479,13 +457,11 @@ public class SMTTermMultOp extends SMTTerm {
 
     private String getSymbol(Op operator, SMTTerm first) {
 	boolean isInt = first.sort().equals(SMTSort.INT)&&first.sort().getBitSize()==-1 ;
-	boolean isFloat = floatSymbols.containsKey(operator);
 	String symbol = null;
 	if(isInt){
 	    symbol = intSymbols.get(operator);
-	}else if(isFloat) {
-	    symbol = floatSymbols.get(operator);
-	}else{
+	}
+	else{
 	    symbol = bvSymbols.get(operator);
 	}
 	if(symbol==null){

@@ -64,6 +64,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 	 */
 	private Map<Operator, SMTTermMultOp.Op> opTable;
 	private Map<Operator, SMTTermUnaryOp.Op> opTableUnary;
+
+	private Map<Operator, SMTTermFloatOp.Op> fopTable;
 	private int varNr;
 	/**
 	 * The SMT translation settings.
@@ -126,19 +128,22 @@ public class SMTFloatTranslator implements SMTTranslator {
 		opTable.put(Junctor.IMP, SMTTermMultOp.Op.IMPLIES);
 		opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
 
-		opTable.put(floatLDT.getLessThan(), SMTTermMultOp.Op.FPLT);
-		opTable.put(floatLDT.getGreaterThan(), SMTTermMultOp.Op.FPGT);
-		opTable.put(floatLDT.getLessOrEquals(), SMTTermMultOp.Op.FPLEQ);
-		opTable.put(floatLDT.getGreaterOrEquals(), SMTTermMultOp.Op.FPGEQ);
-		opTable.put(floatLDT.getEquals(), SMTTermMultOp.Op.FPEQ);
-		opTable.put(floatLDT.getAddFloatIEEE(), SMTTermMultOp.Op.FPADD);
-		opTable.put(floatLDT.getSubFloatIEEE(), SMTTermMultOp.Op.FPSUB);
-		opTable.put(floatLDT.getMulFloatIEEE(), SMTTermMultOp.Op.FPMUL);
-		opTable.put(floatLDT.getDivFloatIEEE(), SMTTermMultOp.Op.FPDIV);
+		fopTable = new HashMap<Operator, SMTTermFloatOp.Op>();
+		fopTable.put(floatLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
+		fopTable.put(floatLDT.getGreaterThan(), SMTTermFloatOp.Op.FPGT);
+		fopTable.put(floatLDT.getLessOrEquals(), SMTTermFloatOp.Op.FPLEQ);
+		fopTable.put(floatLDT.getGreaterOrEquals(), SMTTermFloatOp.Op.FPGEQ);
+		fopTable.put(floatLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
+		fopTable.put(floatLDT.getAddFloatIEEE(), SMTTermFloatOp.Op.FPADD);
+		fopTable.put(floatLDT.getSubFloatIEEE(), SMTTermFloatOp.Op.FPSUB);
+		fopTable.put(floatLDT.getMulFloatIEEE(), SMTTermFloatOp.Op.FPMUL);
+		fopTable.put(floatLDT.getDivFloatIEEE(), SMTTermFloatOp.Op.FPDIV);
 
-		opTableUnary = new HashMap<Operator, SMTTermUnaryOp.Op>();
-		opTableUnary.put(floatLDT.getCastLongToFloat(), SMTTermUnaryOp.Op.CASTLONGTOFLOAT);
-		opTableUnary.put(floatLDT.getCastFloatToLong(), SMTTermUnaryOp.Op.CASTFLOATTOLONG);
+		fopTable.put(floatLDT.getJavaUnaryMinusFloat(), SMTTermFloatOp.Op.FPNEG);
+		fopTable.put(floatLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
+		fopTable.put(floatLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
+		fopTable.put(floatLDT.getCastLongToFloat(), SMTTermFloatOp.Op.CASTLONGTOFLOAT);
+		fopTable.put(floatLDT.getCastFloatToLong(), SMTTermFloatOp.Op.CASTFLOATTOLONG);
 	}
 
 	/**
@@ -311,9 +316,13 @@ public class SMTFloatTranslator implements SMTTranslator {
 			    args.add(translateTerm(t));
 			}
 			return new SMTTermMultOp(opTable.get(op), args);
-		} else if (opTableUnary.containsKey(op)) {
-			SMTTerm sub = translateTerm(term.sub(0));
-			return new SMTTermUnaryOp(opTableUnary.get(op), sub);
+		} else if (fopTable.containsKey(op)) {
+			List<SMTTerm> subs = new LinkedList<SMTTerm>();
+			for (Term t : term.subs()) {
+			    subs.add(translateTerm(t));
+			}
+
+			return new SMTTermFloatOp(fopTable.get(op), subs);
 		} else if (op == Junctor.NOT) {
 			SMTTerm sub = translateTerm(term.sub(0));
 			return sub.not();
@@ -354,14 +363,6 @@ public class SMTFloatTranslator implements SMTTranslator {
 				return SMTTerm.TRUE;
 			} else if (isFalseConstant(fun, services)) {
 				return SMTTerm.FALSE;
-			} else if (fun == services.getTypeConverter().getFloatLDT()
-			        .getJavaUnaryMinusFloat()) {
-			    SMTTerm subterm = translateTerm(term.sub(0));
-			    return new SMTTermUnaryOp(SMTTermUnaryOp.Op.FPNEG, subterm);
-			} else if (fun == services.getTypeConverter().getFloatLDT()
-			        .getIsNormal()) {
-			    SMTTerm subterm = translateTerm(term.sub(0));
-			    return new SMTTermUnaryOp(SMTTermUnaryOp.Op.FPISNORMAL, subterm);
 			} else {
 				return translateCall(fun, term.subs());
 			}

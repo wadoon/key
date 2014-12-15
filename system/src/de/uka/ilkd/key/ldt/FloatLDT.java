@@ -68,6 +68,7 @@ public final class FloatLDT extends LDT {
     private final Function castFloatToLong;
 
     private final Function isNormal;
+    private final Function isNaN;
 
     private final Function roundingModeRNE;
 
@@ -96,6 +97,7 @@ public final class FloatLDT extends LDT {
 	divFloatIEEE	    = addFunction(services, "divFloatIEEE");
 
 	isNormal	    = addFunction(services, "floatIsNormal");
+	isNaN		    = addFunction(services, "floatIsNaN");
 	roundingModeRNE	    = addFunction(services, "RNE");
 
 	castLongToFloat	    = addFunction(services, "castLongToFloat");
@@ -310,6 +312,10 @@ public final class FloatLDT extends LDT {
 
     public Function getIsNormal() {
 	return isNormal;
+    }
+
+    public Function getIsNaN() {
+	return isNaN;
     }
 
     public Function getAddFloatIEEE() {
