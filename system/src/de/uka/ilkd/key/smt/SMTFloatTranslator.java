@@ -54,6 +54,10 @@ public class SMTFloatTranslator implements SMTTranslator {
 	//Only integral variables, literals and conversion to float is translated
 	private static final SMTSort INTSORT = SMTSort.mkBV(64);
 
+	public static final String HEAP_SORT = "Heap";
+	public static final String FIELD_SORT = "Field";
+	public static final String OBJECT_SORT = "Object";
+
 	/**
 	 * Mapps some basic KeY operators to their equivalent built in operators.
 	 * Initialized in initOpTable.
@@ -85,11 +89,19 @@ public class SMTFloatTranslator implements SMTTranslator {
 	 */
 	private List<String> untranslatedMessages;
 
+	/**
+	 * The SMT sorts used in this translation. Use the String constants
+	 * LOCSET_SORT, HEAP_SORT, etc. to get wanted sort.
+	 */
+	private Map<String, SMTSort> sorts;
 
 	// some special KeY sorts
 	private Sort floatSort;
 	private Sort intSort;
 	private Sort boolSort;
+	private Sort heapSort;
+	private Sort fieldSort;
+	private Sort objectSort;
 
 	public SMTFloatTranslator(Services services) {
 		super();
@@ -100,6 +112,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 
 		functions = new HashMap<String, SMTFunction>();
 		functionDefinitionOrder = new LinkedList<String>();
+		untranslatedMessages = new LinkedList<String>();
 	}
 
 	/**
@@ -129,12 +142,40 @@ public class SMTFloatTranslator implements SMTTranslator {
 	}
 
 	/**
+	 * Creates the select function for a certain type.
+	 */
+	private SMTFunction createSelectFunction(String name, SMTSort imageSort) {
+
+		List<SMTSort> domainSorts = new LinkedList<SMTSort>();
+		domainSorts.add(sorts.get(HEAP_SORT));
+		domainSorts.add(sorts.get(OBJECT_SORT));
+		domainSorts.add(sorts.get(FIELD_SORT));
+
+
+		SMTFunction f = new SMTFunction(name, domainSorts, imageSort);
+
+		functions.put(name, f);
+		return f;
+	}
+
+
+	/**
 	 * Get special KeY sorts that we need.
 	 */
 	private void initSorts() {
 		floatSort = services.getTypeConverter().getFloatLDT().targetSort();
 		intSort = services.getTypeConverter().getIntegerLDT().targetSort();
 		boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
+
+		heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+		fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+
+
+		//Init unbounded SMT sorts
+		sorts = new HashMap<String, SMTSort>();
+		sorts.put(HEAP_SORT, new SMTSort(HEAP_SORT));
+		sorts.put(OBJECT_SORT, new SMTSort(OBJECT_SORT));
+		sorts.put(FIELD_SORT, new SMTSort(FIELD_SORT));
 	}
 
 	@Override
@@ -142,14 +183,13 @@ public class SMTFloatTranslator implements SMTTranslator {
 	        SMTSettings settings) throws IllegalFormulaException {
 		this.settings = settings;
 		this.services = services;
-		untranslatedMessages = new LinkedList<String>();
 		SMTFile file = translateProblem(problem);
 		String s = file.toString();
 
 		//Add all comments regarding untranslated terms
 		StringBuffer buffer = new StringBuffer(s);
 		if (!untranslatedMessages.isEmpty()) {
-			buffer.append("==========UNTRANSLATED PARTS==========\n\n");
+			buffer.append(";==========UNTRANSLATED PARTS==========\n\n");
 
 			for (String comment : untranslatedMessages) {
 				String c2 = comment.replaceAll("\n|\r","\n;");
@@ -174,6 +214,11 @@ public class SMTFloatTranslator implements SMTTranslator {
 		SMTTerm po = translateSequent(problem);
 		po = po.not();
 		po.setComment("The negated proof obligation");
+
+		//Add sort declarations
+		for (String s : sorts.keySet()) {
+			file.addSort(sorts.get(s));
+		}
 
 		// Add other function declarations to file.
 		for (String s : functions.keySet()) {
@@ -343,9 +388,19 @@ public class SMTFloatTranslator implements SMTTranslator {
 			return SMTSort.FLOAT;
 		} else if (s.equals(intSort)) {
 			return INTSORT;
+		} else if (s.equals(heapSort)) {
+			return sorts.get(HEAP_SORT);
+		} else if (s.equals(fieldSort)) {
+			return sorts.get(FIELD_SORT);
 		} else {
-			String msg = "Translation Failed: Unsupported Sort: " + s.name();
-			throw new NoTranslationAvailableException(msg);
+			//Translate all object types as Object sort
+			Sort obj = services.getJavaInfo().getJavaLangObject().getSort();
+			if (s.equals(obj) || s.extendsTrans(obj)) {
+				return sorts.get(OBJECT_SORT);
+			} else {
+				String msg = "Translation Failed: Unsupported Sort: " + s.name();
+				throw new NoTranslationAvailableException(msg);
+			}
 		}
 	}
 
@@ -384,10 +439,29 @@ public class SMTFloatTranslator implements SMTTranslator {
 		if (functions.containsKey(name)) {
 			function = functions.get(name);
 			return call(function, subs);
-		} else {
-			String msg = "No translation for function " + name;
-			throw new NoTranslationAvailableException(msg);
+		} else if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
+			//A field name.
+			//Add a smt function declaration for the field name
+			name = name.replace("$", "");
+			SMTSort imageSort = translateSort(fun.sort());
+			function = new SMTFunction(name, new LinkedList<SMTSort>(), imageSort);
+			functions.put(name, function);
+
+			return call(function, subs); 
+		} else if (name.endsWith("::select")) {
+			String selectName = Util.processName(name);
+			
+			SMTSort target = translateSort(fun.sort());
+			SMTFunction f;
+			if (functions.containsKey(selectName)) {
+				f = functions.get(selectName);
+			} else {
+				f = createSelectFunction(selectName, target);
+			}
+			return call(f, subs);
 		}
+		String msg = "No translation for function " + name;
+		throw new NoTranslationAvailableException(msg);
 	}
 
 
