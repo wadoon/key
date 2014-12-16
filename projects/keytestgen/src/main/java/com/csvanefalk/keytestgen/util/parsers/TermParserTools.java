@@ -527,10 +527,12 @@ public final class TermParserTools {
      * otherwise
      */
     public static boolean isPrimitiveType(final Term term) {
-
+       if(term!=null){
         final String sortName = term.sort().name().toString();
-
+        
         return TermParserTools.primitiveTypes.contains(sortName);
+       }else
+          return false; //null term is not primitive type (revised by Huy)
     }
 
     /**

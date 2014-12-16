@@ -144,6 +144,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * @param settings
          */
         public void start(SolverTimeout timeout, SMTSettings settings) {
+                System.out.println("Start solverimpl");
                 thread = new Thread(this,"SMTProcessor");
                 solverTimeout = timeout;
                 smtSettings = settings;

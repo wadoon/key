@@ -305,7 +305,7 @@ public class SolverLauncher implements SolverListener {
 	    SMTSolver solver = solvers.poll();
 	    SolverTimeout solverTimeout = new SolverTimeout(solver,
 		    session, settings.getTimeout() + i * 50);
-	 
+	    System.out.println("Schedule solver");
 	    timer.schedule(solverTimeout, settings.getTimeout(),PERIOD);
 	    session.addCurrentlyRunning(solver);
 	    
@@ -339,8 +339,9 @@ public class SolverLauncher implements SolverListener {
 
 	// Launch all solvers until the queue is empty or the launcher is
 	// interrupted.
+	System.out.println("Launch loop " +solvers.size());
 	launchLoop(solvers);
-
+	System.out.println("Finished loop " +solvers.size());
 	// at this point either there are no solvers left to start or
 	// the whole launching process was interrupted.
 	waitForRunningSolvers();
@@ -365,16 +366,19 @@ public class SolverLauncher implements SolverListener {
     private void launchLoop(LinkedList<SMTSolver> solvers) {
 	// as long as there are jobs to do, start solvers
 	while (!solvers.isEmpty() && !isInterrupted()) {
+	   System.out.println("lock");
 	    lock.lock();
 	    try {
 		// start solvers as many as possible
+	       System.out.println("fill running list");
 		fillRunningList(solvers);
 		if (!startNextSolvers(solvers) && !isInterrupted()) {
 		    try {
 			// if there is nothing to do, wait for the next solver
 			// finishing its task.
+		       System.out.println("wait");
 			wait.await();
-
+			System.out.println("done waiting");
 		    } catch (InterruptedException e) {
 			launcherInterrupted(e);
 		    }

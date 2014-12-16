@@ -42,7 +42,7 @@ public class ExternalProcessLauncher<T> {
     public void launch(final String[] command, String initialMessage,
             PipeListener<T> listener) throws Throwable {
         try {
-
+           System.out.println("Start external process");
             lockProcess.lock();
             try {
                 ProcessBuilder builder = new ProcessBuilder();
