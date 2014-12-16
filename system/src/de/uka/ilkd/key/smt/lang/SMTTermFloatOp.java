@@ -28,21 +28,30 @@ public class SMTTermFloatOp extends SMTTerm{
 
 	public static class Op {
 
-		public static Op FPNEG	    = new Op("fp.neg", SMTSort.FLOAT, SMTSort.FLOAT);
-		public static Op FPISNAN    = new Op("fp.isNaN", SMTSort.FLOAT, SMTSort.BOOL);
-		public static Op FPISNORMAL = new Op("fp.isNormal", SMTSort.FLOAT, SMTSort.BOOL);
-		public static Op FPLT	    = new Op("fp.lt", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
-		public static Op FPGT	    = new Op("fp.gt", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
-		public static Op FPLEQ	    = new Op("fp.leq", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
-		public static Op FPGEQ	    = new Op("fp.geq", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
-		public static Op FPEQ	    = new Op("fp.eq", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
-		public static Op FPADD	    = new Op("fp.add", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
-		public static Op FPSUB	    = new Op("fp.sub", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
-		public static Op FPMUL	    = new Op("fp.mul", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
-		public static Op FPDIV	    = new Op("fp.div", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op FPNEG		= new Op("fp.neg", SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op FPABS		= new Op("fp.abs", SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op FPISNAN	= new Op("fp.isNaN", SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPISZERO	= new Op("fp.isZero", SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPISNORMAL	= new Op("fp.isNormal", SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPISSUBNORMAL	= new Op("fp.isSubnormal", SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPISINFINITE	= new Op("fp.isInfinite", SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPISPOSITIVE	= new Op("fp.isPositive", SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPISNEGATIVE	= new Op("fp.isNegative", SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPLT	= new Op("fp.lt", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPGT	= new Op("fp.gt", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPLEQ	= new Op("fp.leq", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPGEQ	= new Op("fp.geq", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPEQ	= new Op("fp.eq", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.BOOL);
+		public static final Op FPADD	= new Op("fp.add", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op FPSUB	= new Op("fp.sub", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op FPMUL	= new Op("fp.mul", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op FPDIV	= new Op("fp.div", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op CASTLONGTOFLOAT  = new Op("(_ to_fp 8 24) RNE", SMTSort.INT, SMTSort.FLOAT);
+		public static final Op CASTFLOATTOLONG  = new Op("(_ fp.to_sbv 64) RTZ", SMTSort.FLOAT, SMTSort.INT);
 
-		public static Op CASTLONGTOFLOAT  = new Op("(_ to_fp 8 24) RNE", SMTSort.INT, SMTSort.FLOAT);
-		public static Op CASTFLOATTOLONG  = new Op("(_ fp.to_sbv 64) RTZ", SMTSort.FLOAT, SMTSort.INT);
+		private static Op unaryFloatPred(String name) {
+			return new Op("fp." + name, SMTSort.FLOAT, SMTSort.BOOL);
+		}
 
 
 		private final int arity;

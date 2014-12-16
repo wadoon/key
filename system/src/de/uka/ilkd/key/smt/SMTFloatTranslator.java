@@ -50,13 +50,15 @@ public class SMTFloatTranslator implements SMTTranslator {
 
 	//All integral types are stored in long format
 	//Since they are technically unbounded (bounding should happen in KeY).
-	//Long operators are not translated so no overflow can happen.
+	//Arithmetic operators (for int/long) are not translated so no overflow can happen.
 	//Only integral variables, literals and conversion to float is translated
 	private static final SMTSort INTSORT = SMTSort.mkBV(64);
 
 	public static final String HEAP_SORT = "Heap";
 	public static final String FIELD_SORT = "Field";
 	public static final String OBJECT_SORT = "Object";
+
+	public static final String ARR_FUNCTION_NAME = "arr";
 
 	/**
 	 * Mapps some basic KeY operators to their equivalent built in operators.
@@ -140,8 +142,14 @@ public class SMTFloatTranslator implements SMTTranslator {
 		fopTable.put(floatLDT.getDivFloatIEEE(), SMTTermFloatOp.Op.FPDIV);
 
 		fopTable.put(floatLDT.getJavaUnaryMinusFloat(), SMTTermFloatOp.Op.FPNEG);
-		fopTable.put(floatLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
+		fopTable.put(floatLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
 		fopTable.put(floatLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
+		fopTable.put(floatLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
+		fopTable.put(floatLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
+		fopTable.put(floatLDT.getIsSubnormal(), SMTTermFloatOp.Op.FPISSUBNORMAL);
+		fopTable.put(floatLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
+		fopTable.put(floatLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
+		fopTable.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
 		fopTable.put(floatLDT.getCastLongToFloat(), SMTTermFloatOp.Op.CASTLONGTOFLOAT);
 		fopTable.put(floatLDT.getCastFloatToLong(), SMTTermFloatOp.Op.CASTFLOATTOLONG);
 	}
@@ -161,6 +169,18 @@ public class SMTFloatTranslator implements SMTTranslator {
 
 		functions.put(name, f);
 		return f;
+	}
+
+	/**
+	 * Creates the arr function.
+	 */
+	private void createArrFunction() {
+		String id = ARR_FUNCTION_NAME;
+		List<SMTSort> domain = new LinkedList<SMTSort>();
+		domain.add(INTSORT);
+		SMTSort image = sorts.get(FIELD_SORT);
+		SMTFunction f = new SMTFunction(id, domain, image);
+		functions.put(id, f);
 	}
 
 
@@ -215,6 +235,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 	public SMTFile translateProblem(Term problem) {
 		SMTFile file = new SMTFile();
 
+		createArrFunction();
+
 		// Translate the proof obligation
 		SMTTerm po = translateSequent(problem);
 		po = po.not();
@@ -224,6 +246,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 		for (String s : sorts.keySet()) {
 			file.addSort(sorts.get(s));
 		}
+
 
 		// Add other function declarations to file.
 		for (String s : functions.keySet()) {
@@ -270,8 +293,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 		Operator op = term.op();
 
 		//The default value is used to partially translate a sequent
-		//by cutting off parts that can't be translated, but without
-		//violating soundness
+		//by cutting off parts that can't be translated, but
+		//without violating soundness
 		if (op == Junctor.NOT) {
 			SMTTerm sub = translateFormulaWithDefaultValue(
 				term.sub(0), defaultValue.not());

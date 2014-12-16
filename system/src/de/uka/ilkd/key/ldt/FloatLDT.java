@@ -62,13 +62,19 @@ public final class FloatLDT extends LDT {
     private final Function subFloatIEEE;
     private final Function mulFloatIEEE;
     private final Function divFloatIEEE;
+    private final Function floatAbs;
 
 
     private final Function castLongToFloat;
     private final Function castFloatToLong;
 
     private final Function isNormal;
+    private final Function isSubnormal;
     private final Function isNaN;
+    private final Function isZero;
+    private final Function isInfinite;
+    private final Function isNegative;
+    private final Function isPositive;
 
     private final Function roundingModeRNE;
 
@@ -95,9 +101,15 @@ public final class FloatLDT extends LDT {
 	subFloatIEEE	    = addFunction(services, "subFloatIEEE");
 	mulFloatIEEE	    = addFunction(services, "mulFloatIEEE");
 	divFloatIEEE	    = addFunction(services, "divFloatIEEE");
+	floatAbs	    = addFunction(services, "floatAbs");
 
 	isNormal	    = addFunction(services, "floatIsNormal");
+	isSubnormal	    = addFunction(services, "floatIsSubnormal");
 	isNaN		    = addFunction(services, "floatIsNaN");
+	isZero		    = addFunction(services, "floatIsZero");
+	isInfinite	    = addFunction(services, "floatIsInfinite");
+	isPositive	    = addFunction(services, "floatIsPositive");
+	isNegative	    = addFunction(services, "floatIsNegative");
 	roundingModeRNE	    = addFunction(services, "RNE");
 
 	castLongToFloat	    = addFunction(services, "castLongToFloat");
@@ -314,8 +326,28 @@ public final class FloatLDT extends LDT {
 	return isNormal;
     }
 
+    public Function getIsSubnormal() {
+	return isSubnormal;
+    }
+
     public Function getIsNaN() {
 	return isNaN;
+    }
+
+    public Function getIsZero() {
+	return isZero;
+    }
+
+    public Function getIsInfinite() {
+	return isInfinite;
+    }
+
+    public Function getIsPositive() {
+	return isPositive;
+    }
+
+    public Function getIsNegative() {
+	return isNegative;
     }
 
     public Function getAddFloatIEEE() {
@@ -332,6 +364,10 @@ public final class FloatLDT extends LDT {
 
     public Function getDivFloatIEEE() {
 	return divFloatIEEE;
+    }
+
+    public Function getAbs() {
+	return floatAbs;
     }
 
     public Function getCastLongToFloat() {
