@@ -25,17 +25,18 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.testgen.ProofInfo;
 
 interface SolverListener {
-    void processStarted(SMTSolver solver, SMTProblem problem);
+        void processStarted(SMTSolver solver, SMTProblem problem);
 
-    void processInterrupted(SMTSolver solver, SMTProblem problem,
-                    Throwable e);
+        void processInterrupted(SMTSolver solver, SMTProblem problem,
+                        Throwable e);
 
-    void processStopped(SMTSolver solver, SMTProblem problem);
+        void processStopped(SMTSolver solver, SMTProblem problem);
 
-    void processTimeout(SMTSolver solver, SMTProblem problem);
+        void processTimeout(SMTSolver solver, SMTProblem problem);
 
-    void processUser(SMTSolver solver, SMTProblem problem);
+        void processUser(SMTSolver solver, SMTProblem problem);
 }
+
 final class SMTSolverImplementation implements SMTSolver, Runnable{
  
         private static int IDCounter = 0;
@@ -144,7 +145,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * @param settings
          */
         public void start(SolverTimeout timeout, SMTSettings settings) {
-                System.out.println("Start solverimpl");
                 thread = new Thread(this,"SMTProcessor");
                 solverTimeout = timeout;
                 smtSettings = settings;
@@ -444,7 +444,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 
                 return exceptionsForTacletTranslation;
         }
-
 
 		@Override
         public AbstractSolverSocket getSocket() {

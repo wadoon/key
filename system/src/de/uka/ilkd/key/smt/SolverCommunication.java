@@ -18,15 +18,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+
 /**
- * Stores the communication between KeY and an external solver: Contains a list
- * that stores the messages that has been sent from the solver to KeY and vice
- * versa.
+ * Stores the communication between KeY and an external solver: Contains a list that stores the messages 
+ * that has been sent from the solver to KeY and vice versa.
  * 
- * Further, it also contains the final result of the solver.
+ * Further, it also contains the final result of the solver. 
  */
 public class SolverCommunication {
-
 	public static SolverCommunication EMPTY = new SolverCommunication();
 			
 
@@ -131,9 +130,10 @@ public class SolverCommunication {
 	
     void addException(Throwable e){
     	exceptions.add(e);
-
     }
 
+
+    
     
 
 }

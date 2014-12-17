@@ -145,8 +145,6 @@ class Z3CESocket extends AbstractSolverSocket{
 	public void messageIncoming(Pipe<SolverCommunication> pipe, String message,
 			int type) {
 	    message = message.trim();
-	    
-	    System.out.println("Msg: "+message);
 
 		SolverCommunication sc = pipe.getSession();
 		if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){

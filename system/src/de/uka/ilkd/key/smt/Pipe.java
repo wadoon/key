@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.smt;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,23 +24,20 @@ import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-interface PipeListener<T> {
-    /**
-     * Is called when a message from the other side of the pipe is received.
-     * 
-     * @param message
-     */
-    void messageIncoming(Pipe<T> pipe, String message, int type);
-
-    void exceptionOccurred(Pipe<T> pipe, Throwable exception);
+interface PipeListener<T>{
+	/** Is called when a message from the other side of the pipe is received. 
+	 * @param message
+	 */
+	void messageIncoming(Pipe<T> pipe, String message, int type);
+	void exceptionOccurred(Pipe<T> pipe,Throwable exception);
 
 }
 
 /**
- * On each side of the pipe there are sender and receivers: Receiver
- * ====<=Output======= Sender ****************** KeY* Sender ======Input=>======
- * Receiver *External Process* Receiver ====<=Error======== Sender
- * ******************
+ * On each side of the pipe there are sender and receivers:
+ ***** Receiver ====<=Output======= Sender    ******************
+ *KeY* Sender	======Input=>====== Receiver  *External Process*
+ ***** Receiver ====<=Error======== Sender    ******************
  * 
  */
 class Pipe<T>{

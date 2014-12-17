@@ -180,7 +180,7 @@ public abstract class AbstractSMTSolver
     /**
      * Starts the solver as part of the current thread.
      */
-    @Override
+    
     public void start(SolverTimeout timeout, SMTSettings settings) {
 
         solverTimeout = timeout;

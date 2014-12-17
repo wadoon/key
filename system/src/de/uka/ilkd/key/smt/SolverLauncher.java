@@ -229,17 +229,10 @@ public class SolverLauncher implements SolverListener {
     private void launchIntern(SMTProblem problem, Services services,
 	    SolverType[] solverTypes)  {
 
-        /*
-         * Create dynamic arrays to hold solvertypes and problems.
-         */
 	LinkedList<SolverType> types = new LinkedList<SolverType>();
 	Collections.addAll(types, solverTypes);
 	LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
 	problems.add(problem);
-	
-	/*
-	 * Proceed with launch procedure
-	 */
 	launchIntern(types, problems, services);
     }
 
@@ -247,10 +240,7 @@ public class SolverLauncher implements SolverListener {
 	    Collection<SMTProblem> problems, Services services)
 	    {
 
-        /*
-	*consider only installed solvers.
-	*TODO: This can all be done in the previous step.
-	*/
+	// consider only installed solvers.
 	LinkedList<SolverType> installedSolvers = new LinkedList<SolverType>();
 	for (SolverType type : factories) {
 	    if (type.isInstalled(false)) {
@@ -260,10 +250,6 @@ public class SolverLauncher implements SolverListener {
 	    	}
 	    }
 	}
-	
-	/*
-	 * Set up the solvers to deal with the provided set of problems.
-	 */
 	problems = prepareSolvers(installedSolvers, problems, services);
 
 	launchIntern(problems, installedSolvers);
@@ -277,17 +263,9 @@ public class SolverLauncher implements SolverListener {
 	launcherHasBeenUsed = true;
     }
 
-    /**
-     * Launch step 3: start final launch procedure.
-     * @param problems
-     * @param factories
-     */
     private void launchIntern(Collection<SMTProblem> problems,
 	    Collection<SolverType> factories)  {
 
-        /*
-         * Create additional dynamic array for the created solvertype instances
-         */
 	LinkedList<SMTSolver> solvers = new LinkedList<SMTSolver>();
 	for (SMTProblem problem : problems) {
 	    solvers.addAll(problem.getSolvers());
@@ -301,16 +279,20 @@ public class SolverLauncher implements SolverListener {
      */
     private void fillRunningList(LinkedList<SMTSolver> solvers) {
 	int i = 0;
-	while ( startNextSolvers(solvers) && !isInterrupted()) {
+	while (startNextSolvers(solvers) && !isInterrupted()) {
 	    SMTSolver solver = solvers.poll();
+
 	    SolverTimeout solverTimeout = new SolverTimeout(solver,
 		    session, settings.getTimeout() + i * 50);
-	    System.out.println("Schedule solver");
+
+	 
 	    timer.schedule(solverTimeout, settings.getTimeout(),PERIOD);
 	    session.addCurrentlyRunning(solver);
-	    
-
+	    // This cast is okay since there is only the class
+	    // SMTSolverImplementation that implements SMTSolver.
+	    ((SMTSolverImplementation) solver).start(solverTimeout, settings);
 	    i++;
+
 	}
     }
 
@@ -339,9 +321,8 @@ public class SolverLauncher implements SolverListener {
 
 	// Launch all solvers until the queue is empty or the launcher is
 	// interrupted.
-	System.out.println("Launch loop " +solvers.size());
 	launchLoop(solvers);
-	System.out.println("Finished loop " +solvers.size());
+
 	// at this point either there are no solvers left to start or
 	// the whole launching process was interrupted.
 	waitForRunningSolvers();
@@ -366,19 +347,16 @@ public class SolverLauncher implements SolverListener {
     private void launchLoop(LinkedList<SMTSolver> solvers) {
 	// as long as there are jobs to do, start solvers
 	while (!solvers.isEmpty() && !isInterrupted()) {
-	   System.out.println("lock");
 	    lock.lock();
 	    try {
 		// start solvers as many as possible
-	       System.out.println("fill running list");
 		fillRunningList(solvers);
 		if (!startNextSolvers(solvers) && !isInterrupted()) {
 		    try {
 			// if there is nothing to do, wait for the next solver
 			// finishing its task.
-		       System.out.println("wait");
 			wait.await();
-			System.out.println("done waiting");
+
 		    } catch (InterruptedException e) {
 			launcherInterrupted(e);
 		    }

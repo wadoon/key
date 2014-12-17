@@ -80,7 +80,6 @@ public class SMTProblem {
         	this.term = t;
         }
 
-       
         public Goal getGoal() {
                 return goal;
         }
