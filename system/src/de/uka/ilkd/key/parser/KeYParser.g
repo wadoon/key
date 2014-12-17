@@ -3783,6 +3783,7 @@ varexp[TacletBuilder b]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
+	| varcond_strictfp[b, negated]
       )
   )
 ;
@@ -4084,6 +4085,13 @@ varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 :
    IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN {
      b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
+   }
+;
+
+varcond_strictfp [TacletBuilder b, boolean negated]
+:
+   ISINSTRICTFP {
+     b.addVariableCondition(new InStrictFp(negated));
    }
 ;
 
