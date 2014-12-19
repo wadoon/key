@@ -129,6 +129,17 @@ public class SMTFloatTranslator implements SMTTranslator {
 		opTable.put(Junctor.OR, SMTTermMultOp.Op.OR);
 		opTable.put(Junctor.IMP, SMTTermMultOp.Op.IMPLIES);
 		opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
+		
+		//Integer comparison
+		opTable.put(services.getTypeConverter().getIntegerLDT().getLessThan(),
+		        SMTTermMultOp.Op.BVSLT);
+		opTable.put(services.getTypeConverter().getIntegerLDT()
+		        .getLessOrEquals(), SMTTermMultOp.Op.BVSLE);
+		opTable.put(services.getTypeConverter().getIntegerLDT()
+		        .getGreaterThan(), SMTTermMultOp.Op.BVSGT);
+		opTable.put(services.getTypeConverter().getIntegerLDT()
+		        .getGreaterOrEquals(), SMTTermMultOp.Op.BVSGE);
+
 
 		fopTable = new HashMap<Operator, SMTTermFloatOp.Op>();
 		fopTable.put(floatLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);

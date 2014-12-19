@@ -65,6 +65,22 @@ This option controls how integer numbers are modeled.
   incorrect properties.
 </entry>
 
+<entry key="floatRules">
+These rules decide how float computations are treated.
+
+* 'strictfp only' means that only float operations inside methods or
+  classes with the strictfp modifier can be verified. This is sound
+  but incomplete, as non-strictfp operations are left alone.
+
+* 'Verify results are normal' ensures that all results of floating-point
+  operations that are not strictfp, are normalized float values. This
+  means that results can not be infinite, subnormal, zero or NaN.
+  Expressions in strictfp-scope will be treated the same as in the
+  'strictfp' rule. This rule is sound and can verify more properties
+  than just the 'strictfp only' option.
+</entry>
+
+
 <entry key="programRules">
 Rules dealing Java language constructs can be turned off by setting
 this to 'None'.
