@@ -317,7 +317,9 @@ public class Model {
                 newMv = new ModelVariable(mv);
              newMv.setSymbolicValue(null); //because this model variable does not exist in current Model
              newMv.setValueCondition(new TermFactory().createTerm(Junctor.TRUE));//clear condition value
-             result.add(newMv);
+             //set newMv is fresh variable
+             newMv.setFresh(true);
+             result.add(newMv);             
              if(newMv.getParentIdentifier()!=null)
                 result.assignField(newMv, result.getVariable(newMv.getParentIdentifier()));
           }

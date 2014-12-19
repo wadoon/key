@@ -281,7 +281,10 @@ public class ModelVariable {
 
     public boolean isPrimitive() {
         //return boundValue instanceof Number || boundValue instanceof Boolean;
-       return TermParserTools.isPrimitiveType(selectForm);
+       if(selectForm!=null)
+          return TermParserTools.isPrimitiveType(selectForm);
+       else
+          return boundValue instanceof Number || boundValue instanceof Boolean;
     }
 
    /**
