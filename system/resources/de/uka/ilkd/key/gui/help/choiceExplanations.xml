@@ -76,8 +76,15 @@ These rules decide how float computations are treated.
   operations that are not strictfp, are normalized float values. This
   means that results can not be infinite, subnormal, zero or NaN.
   Expressions in strictfp-scope will be treated the same as in the
-  'strictfp' rule. This rule is sound and can verify more properties
+  'strictfp only' rule. This rule is sound and can verify more properties
   than just the 'strictfp only' option.
+
+* 'Assume strictfp' means that all all computations are assumed to be
+  within a strictfp modifier, even if no explicit strictfp modifier exists.
+  This acts the same as putting a strictfp modifier on every function.
+  This rule is not sound, but it is computationally much simpler than
+  'verify results are normal'.
+
 </entry>
 
 
