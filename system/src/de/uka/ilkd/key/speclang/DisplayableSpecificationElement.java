@@ -11,19 +11,18 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  *
  */
 public interface DisplayableSpecificationElement 
-extends SpecificationElement {
+						extends SpecificationElement {
 
-    /**
-     * For display (e.g., in ProofManagementDialog).
-     * Optional operation.
-     */
-    public String getHTMLText(Services serv);
+	/**
+	 * For display (e.g., in ProofManagementDialog).
+	 * Optional operation.
+	 */
+	public String getHTMLText(Services serv);
 
-    public int id();
+	public int id();
 
-    /**
-     * Create a new PO from this specification element.
-     */
-    public ProofOblInput createProofObl(InitConfig copyWithServices);
-    
+	/**
+	 * Create a new PO from this specification element.
+	 */
+	public ProofOblInput createProofObl(InitConfig copyWithServices);
 }

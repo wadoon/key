@@ -39,7 +39,8 @@ import de.uka.ilkd.key.util.ExtList;
 
 public final class SeqLDT extends LDT {
     
-    public static final Name NAME = new Name("Seq");    
+    public static final Name NAME = new Name("Seq");
+    public static final Name SEQGET_NAME = new Name("seqGet");
 
     //getters
     private final SortDependingFunction seqGet;
@@ -57,7 +58,7 @@ public final class SeqLDT extends LDT {
     
     // special
     private LocationVariable heapSeq;
-    
+
     public SeqLDT(TermServices services) {
 	super(NAME, services);
         seqGet        = addSortDependingFunction(services, "seqGet");

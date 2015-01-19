@@ -156,7 +156,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     public ProofOblInput createProofObl(InitConfig copyWithServices) {
         return new GuaranteePO(copyWithServices, this);
     }
-    
+
     @Override
     public boolean equals (Object o) {
         if (o instanceof ThreadSpecification) {
@@ -176,5 +176,4 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                         + 11*notChanged.hashCode() + 13*assignable.hashCode()
                         + 17*threadType.hashCode();
     }
-
 }

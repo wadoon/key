@@ -17,12 +17,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -31,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionBranchCondition}.
  * @author Martin Hentschel
  */
-public class ExecutionBranchCondition extends AbstractExecutionNode implements IExecutionBranchCondition {
+public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElement> implements IExecutionBranchCondition {
    /**
     * The optional additional branch label.
     */
@@ -148,7 +152,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
             }
          }
          else {
-            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
+            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
          }
          // Format branch condition
          formatedBranchCondition = formatTerm(branchCondition, services);
@@ -179,7 +183,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    public String getFormatedPathCondition() throws ProofInputException {
-      if (pathCondition == null) {
+      if (formatedPathCondition == null) {
          lazyComputePathCondition();
       }
       return formatedPathCondition;
@@ -252,7 +256,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true, true);
          }
          return result;
       }
@@ -275,5 +279,31 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    @Override
    public String getAdditionalBranchLabel() {
       return additionalBranchLabel;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected PosInOccurrence lazyComputeModalityPIO() {
+      return SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SourceElement getActiveStatement() {
+      Term modalityTerm = getModalityPIO().subTerm();
+      SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
+      return NodeInfo.computeActiveStatement(firstStatement);
    }
 }

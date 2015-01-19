@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 
@@ -150,6 +149,12 @@ public interface Contract extends DisplayableSpecificationElement {
     public String getPlainText(Services services);
 
     /**
+	 * Lookup the proof obligation belonging to the contract in the
+	 * specification repository.
+	 */
+	public ProofOblInput getProofObl(Services services);
+
+    /**
      * Tells whether, on saving a proof where this contract is available, the
      * contract should be saved too. (this is currently true for contracts
      * specified directly in DL, but not for JML contracts)
@@ -165,7 +170,6 @@ public interface Contract extends DisplayableSpecificationElement {
     public String proofToString(Services services);
 
 
-
     /**
      * Returns a contract which is identical this contract except that
      * the id is set to the new id.
@@ -174,7 +178,7 @@ public interface Contract extends DisplayableSpecificationElement {
 
 
     /**
-     * Returns a contract which is identical this contract except that
+     * Returns a contract which is identical to this contract except that
      * the KeYJavaType and IObserverFunction are set to the new values.
      */
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);

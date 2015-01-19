@@ -122,15 +122,17 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param expectedModelPathInBundle The path in the bundle under that the created oracle file will be later available. It is used to create sub directories in temp directory.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
+    * @param saveConstraints Save constraints?
     * @throws IOException Occurred Exception.
     * @throws DebugException Occurred Exception.
     */
    protected static void createOracleFile(ISEDDebugTarget target, 
                                           String expectedModelPathInBundle, 
                                           boolean saveVariables,
-                                          boolean saveCallStack) throws IOException, DebugException {
+                                          boolean saveCallStack,
+                                          boolean saveConstraints) throws IOException, DebugException {
       if (oracleDirectory != null && oracleDirectory.isDirectory()) {
-         createOracleFile(oracleDirectory, target, expectedModelPathInBundle, saveVariables, saveCallStack);
+         createOracleFile(oracleDirectory, target, expectedModelPathInBundle, saveVariables, saveCallStack, saveConstraints);
       }
    }
 
@@ -142,6 +144,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param expectedModelPathInBundle The path in the bundle under that the created oracle file will be later available. It is used to create sub directories in temp directory.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
+    * @param saveConstraints Save constraints?
     * @throws IOException Occurred Exception.
     * @throws DebugException Occurred Exception.
     */
@@ -149,13 +152,14 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                           ISEDDebugTarget target, 
                                           String expectedModelPathInBundle, 
                                           boolean saveVariables,
-                                          boolean saveCallStack) throws IOException, DebugException {
+                                          boolean saveCallStack,
+                                          boolean saveConstraints) throws IOException, DebugException {
       // Create sub folder structure
       File oracleFile = new File(oracleDirectory, expectedModelPathInBundle);
       oracleFile.getParentFile().mkdirs();
       // Create oracle file
       SEDXMLWriter writer = new SEDXMLWriter();
-      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack, null);
+      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack, saveConstraints, null);
       // Print message to the user.
       printOracleDirectory();
    }
@@ -229,6 +233,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param expectedModelPathInBundle The expected path to the oracle file.
     * @param includeVariables Include variables?
     * @param includeCallStack Include call stack?
+    * @param includeConstraints Include constraints?
     * @throws DebugException Occurred Exception.
     * @throws IOException Occurred Exception.
     * @throws ParserConfigurationException Occurred Exception.
@@ -238,11 +243,12 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                                     String bundleId,
                                                     String expectedModelPathInBundle,
                                                     boolean includeVariables,
-                                                    boolean includeCallStack) throws DebugException, IOException, ParserConfigurationException, SAXException {
-      createOracleFile(target, expectedModelPathInBundle, includeVariables, includeCallStack);
+                                                    boolean includeCallStack,
+                                                    boolean includeConstraints) throws DebugException, IOException, ParserConfigurationException, SAXException {
+      createOracleFile(target, expectedModelPathInBundle, includeVariables, includeCallStack, includeConstraints);
       if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
          ISEDDebugTarget expectedDebugTarget = TestSEDKeyCoreUtil.createExpectedModel(bundleId, expectedModelPathInBundle);
-         TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables, includeCallStack);
+         TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables, includeCallStack, includeConstraints);
       }
    }
    
@@ -264,7 +270,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                     String expectedModelPathInBundle,
                                     int modelIndex,
                                     String expectedModelFileExtension) throws DebugException, IOException, ParserConfigurationException, SAXException {
-      assertDebugTargetViaOracle(target, bundleId, expectedModelPathInBundle + modelIndex + expectedModelFileExtension, false, false);
+      assertDebugTargetViaOracle(target, bundleId, expectedModelPathInBundle + modelIndex + expectedModelFileExtension, false, false, false);
    }
    
    /**
@@ -310,7 +316,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepInto());
          launchTreeItem.select();
          // Click on "Step Into" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Into"); 
@@ -373,7 +379,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepOver());
          launchTreeItem.select();
          // Click on "Step Over" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Over"); 
@@ -427,7 +433,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepReturn());
          launchTreeItem.select();
          // Click on "Step Return" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Return"); 
@@ -481,7 +487,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canResume());
          launchTreeItem.select();
          // Click on "Resume" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Resume"); 
@@ -771,12 +777,12 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                                               final String expectedModelPathInBundle,
                                                               final boolean includeVariables,
                                                               final boolean includeCallstack,
+                                                              final boolean includeConstraints,
                                                               final boolean stepIntoInsteadOfRun,
                                                               final boolean mergeBranchConditions,
                                                               final boolean useMethodContracts,
                                                               final boolean useLoopInvariants,
-                                                              final boolean nonExecutionBranchHidingSideProofs,
-                                                              final boolean aliasChecks) {
+                                                              final boolean nonExecutionBranchHidingSideProofs, final boolean aliasChecks) {
       return new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
@@ -888,7 +894,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                assertFalse(target.isTerminated());
                assertTrue(target.canResume());
                // Test the execution tree
-               assertDebugTargetViaOracle(target, bundleId, expectedModelPathInBundle, includeVariables, includeCallstack);
+               assertDebugTargetViaOracle(target, bundleId, expectedModelPathInBundle, includeVariables, includeCallstack, includeConstraints);
             }
          }
       };
@@ -993,6 +999,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
+    * @param predicateEvaluationEnabled Predicate evaluation enabled?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetProofFileTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -1008,6 +1015,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
                                        Boolean usePrettyPrinting,
+                                       Boolean predicateEvaluationEnabled,
                                        int timeoutFactor,
                                        IKeYDebugTargetProofFileTestExecutor executor) throws Exception {
       // Create bot
@@ -1040,7 +1048,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting);
+         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, predicateEvaluationEnabled);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();

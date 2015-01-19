@@ -52,6 +52,7 @@ import javax.swing.event.TreeSelectionListener;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -77,7 +78,7 @@ public final class ProofManagementDialog extends JDialog {
     // TODO disentangle GUI and proof management code
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3543411893273433386L;
 
@@ -111,6 +112,7 @@ public final class ProofManagementDialog extends JDialog {
         targetIcons = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>();
         classTree = new ClassTree(true, true, initConfig.getServices(), targetIcons);
         classTree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
             public void valueChanged(TreeSelectionEvent e) {
                 updateContractPanel();
             }
@@ -144,6 +146,7 @@ public final class ProofManagementDialog extends JDialog {
             }
         });
         proofList.addListSelectionListener(new ListSelectionListener() {
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 updateContractPanel();
             }
@@ -182,6 +185,7 @@ public final class ProofManagementDialog extends JDialog {
         });
         contractPanelByMethod.addListSelectionListener(
                         new ListSelectionListener() {
+							@Override
                             public void valueChanged(ListSelectionEvent e) {
                                 updateStartButton();
                             }
@@ -200,6 +204,7 @@ public final class ProofManagementDialog extends JDialog {
             }
         });
         contractPanelByProof.addListSelectionListener(new ListSelectionListener() {
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 updateStartButton();
             }
@@ -211,6 +216,7 @@ public final class ProofManagementDialog extends JDialog {
         tabbedPane.addTab("By Target", listPanelByMethod);
         tabbedPane.addTab("By Proof", listPanelByProof);
         tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
                 updateStartButton();
                 if (proofList.getSelectedIndex() == -1
@@ -236,9 +242,10 @@ public final class ProofManagementDialog extends JDialog {
         startButton.setMinimumSize(buttonDim);
         startButton.setEnabled(false);
         startButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ProofOblInput po = createPOForSelectedContract();
-                if (po != null) {
+                if(po != null) {
                     setVisible(false);
                     findOrStartProof(po);
                 }
@@ -252,12 +259,14 @@ public final class ProofManagementDialog extends JDialog {
         cancelButton.setPreferredSize(buttonDim);
         cancelButton.setMinimumSize(buttonDim);
         cancelButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
             }
         });
         buttonPanel.add(cancelButton);
         ActionListener escapeListener = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 if (event.getActionCommand().equals("ESC")) {
                     cancelButton.doClick();
@@ -304,6 +313,7 @@ public final class ProofManagementDialog extends JDialog {
         Set<KeYJavaType> kjts = servicesLocal.getJavaInfo().getAllKeYJavaTypes();
         final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
         Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+                    @Override
             public int compare(KeYJavaType o1, KeYJavaType o2) {
                 return o1.getFullName().compareTo(o2.getFullName());
             }
@@ -431,8 +441,9 @@ public final class ProofManagementDialog extends JDialog {
     private ProofOblInput createPOForSelectedContract() {
         final DisplayableSpecificationElement contract = getActiveContractPanel().getContract();
 
-        return contract == null? null
-                        : contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()));
+        return contract == null
+        		? null
+        		: contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()));
     }
 
     private Proof findPreferablyClosedProof(ProofOblInput po) {
@@ -470,7 +481,6 @@ public final class ProofManagementDialog extends JDialog {
                     env.registerProof(po, pl);
 
                 }
-
             } catch (ProofInputException exc) {
                 ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
             }
@@ -491,22 +501,22 @@ public final class ProofManagementDialog extends JDialog {
             if (proof == null) {
                 startButton.setText("Start Proof");
                 startButton.setIcon(null);
+                startButton.setEnabled(true);
             } else {
                 final ProofStatus status = proof.mgt().getStatus();
-                if (status.getProofOpen()) {
                     startButton.setText("Go to Proof");
+                if (status.getProofOpen()) {
                     startButton.setIcon(keyIcon);
                 } else if (status.getProofClosedButLemmasLeft()) {
-                    startButton.setText("Go to Proof");
                     startButton.setIcon(keyAlmostClosedIcon);
                 } else {
                     assert status.getProofClosed();
-                    startButton.setText("Go to Proof");
                     startButton.setIcon(keyClosedIcon);
                 }
-            }
             startButton.setEnabled(true);
+            }
         }
+        validate();
     }
 
 
@@ -555,7 +565,8 @@ public final class ProofManagementDialog extends JDialog {
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
             for (IObserverFunction target : targets) {
                 if (!isInstanceMethodOfAbstractClass(kjt, target)) {                
-                    ImmutableSet<DisplayableSpecificationElement> contracts = specRepos.getContracts(kjt, target);
+                    ImmutableSet<DisplayableSpecificationElement> contracts =
+                    		specRepos.getContracts(kjt, target);
                     boolean startedProving = false;
                     boolean allClosed = true;
                     boolean lemmasLeft = false;

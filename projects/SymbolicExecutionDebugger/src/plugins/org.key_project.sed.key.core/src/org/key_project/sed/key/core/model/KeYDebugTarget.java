@@ -14,7 +14,9 @@
 package org.key_project.sed.key.core.model;
 
 import java.io.File;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarkerDelta;
@@ -63,7 +65,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -121,7 +123,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    /**
     * Maps an {@link IExecutionNode} to its representation in the debug model.
     */
-   private final Map<IExecutionNode, IKeYSEDDebugNode<?>> executionToDebugMapping = new HashMap<IExecutionNode, IKeYSEDDebugNode<?>>();
+   private final Map<IExecutionNode<?>, IKeYSEDDebugNode<?>> executionToDebugMapping = new HashMap<IExecutionNode<?>, IKeYSEDDebugNode<?>>();
    
    /**
     * Observes the proof.
@@ -200,7 +202,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    @Override
    protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node) {
       if (node instanceof IKeYSEDDebugNode) {
-         return breakpointManager.checkBreakpointHit(breakpoint, ((IKeYSEDDebugNode<IExecutionNode>)node));
+         return breakpointManager.checkBreakpointHit(breakpoint, ((IKeYSEDDebugNode<IExecutionNode<?>>)node));
       }
       else {
          return false;
@@ -266,8 +268,36 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     * @param executionNode The {@link IExecutionNode} for that the debug model representation is needed.
     * @return The found {@link IKeYSEDDebugNode} representation of the given {@link IExecutionNode} or {@code null} if no one is available.
     */
-   public IKeYSEDDebugNode<?> getDebugNode(IExecutionNode executionNode) {
+   public IKeYSEDDebugNode<?> getDebugNode(IExecutionNode<?> executionNode) {
       return executionToDebugMapping.get(executionNode);
+   }
+
+   /**
+    * Ensures that the debug model presentation of the given {@link IExecutionNode} and all its parents are created.
+    * @param executionNode The {@link IExecutionNode}.
+    * @return The {@link IKeYSEDDebugNode} which represents the given {@link IExecutionNode}.
+    * @throws DebugException Occurred Exception.
+    */
+   public IKeYSEDDebugNode<?> ensureDebugNodeIsCreated(IExecutionNode<?> executionNode) throws DebugException {
+      // Collect unknown parents
+      Deque<IExecutionNode<?>> parentStack = new LinkedList<IExecutionNode<?>>();
+      while (executionNode != null) {
+         IKeYSEDDebugNode<?> keyNode = getDebugNode(executionNode);
+         parentStack.addFirst(executionNode);
+         if (keyNode == null) {
+            executionNode = executionNode.getParent();
+         }
+         else {
+            executionNode = null;
+         }
+      }
+      // Ensure that children are loaded
+      IKeYSEDDebugNode<?> keyNode = null;
+      for (IExecutionNode<?> parent : parentStack) {
+         keyNode = getDebugNode(parent);
+         keyNode.getChildren();
+      }
+      return keyNode;
    }
    
    /**

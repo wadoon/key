@@ -65,6 +65,7 @@ public final class TestSEDKeyCoreUtil {
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
+    * @param predicateEvaluationEnabled Predicate evaluation enabled?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IFile file,
@@ -72,7 +73,8 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showVariablesOfSelectedDebugNode,
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
-                                final Boolean usePrettyPrinting) throws Exception {
+                                final Boolean usePrettyPrinting,
+                                final Boolean predicateEvaluationEnabled) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -93,6 +95,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (usePrettyPrinting != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
+               }
+               if (predicateEvaluationEnabled != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PREDICATE_EVALUATION_ENABLED, predicateEvaluationEnabled);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
@@ -121,7 +126,7 @@ public final class TestSEDKeyCoreUtil {
          return configs.get(0);
       }
       else {
-         return KeySEDUtil.createConfiguration(file);
+         return KeySEDUtil.createConfiguration(file, null);
       }
    }
    
@@ -270,7 +275,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void assertDisposedInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, true), target, false, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, true), target, false, false, false, false);
    }
    
    /**
@@ -281,7 +286,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, false), target, false, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, false), target, false, false, false, false);
    }
    
    /**
@@ -294,7 +299,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws ParserConfigurationException Occurred Exception.
     */
    public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedModel(Activator.PLUGIN_ID, "data/statements/oracle/FlatSteps.xml"), target, false, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedModel(Activator.PLUGIN_ID, "data/statements/oracle/FlatSteps.xml"), target, false, false, false, false);
    }
    
    /**

@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.ui.CustomUserInterface;
@@ -109,6 +109,13 @@ public final class SideProofStore {
             fireEntriesRemoved(new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
          }
       }
+   }
+
+   /**
+    * Removes all {@link Entry}s.
+    */
+   public void clearProofs() {
+      removeEntries(new LinkedList<Entry>(entries));
    }
    
    /**

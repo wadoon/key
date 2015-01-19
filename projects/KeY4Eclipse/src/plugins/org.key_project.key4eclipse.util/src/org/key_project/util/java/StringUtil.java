@@ -210,4 +210,52 @@ public final class StringUtil {
          return second == null;
       }
    }
+   
+   /**
+    * Fills the given text with the leading character until it has the defined length.
+    * @param text The text to fill.
+    * @param leadingCharacter The leading character to use.
+    * @param length The length to fill up to.
+    * @return The created text.
+    * @throws IllegalArgumentException If the text is already longer as the given length
+    */
+   public static String fillString(String text, char leadingCharacter, int length) throws IllegalArgumentException {
+      StringBuffer sb = new StringBuffer();
+      if (text != null) {
+         if (text.length() > length) {
+            throw new IllegalArgumentException("Text \"" + text + "\" with length " + text.length() + " is longer as " + length + ".");
+         }
+         else {
+            for (int i = 0; i < length - text.length(); i++) {
+               sb.append(leadingCharacter);
+            }
+            sb.append(text);
+         }
+      }
+      else {
+         for (int i = 0; i < length; i++) {
+            sb.append(leadingCharacter);
+         }
+      }
+      return sb.toString();
+   }
+
+   /**
+    * Performs a trim only on the right side.
+    * @param text The text to trim its right side.
+    * @return The trimmed text.
+    */
+   public static String trimRight(String text) {
+      if (text != null) {
+         char[] content = text.toCharArray();
+         int newLength = content.length;
+         while (newLength >= 1 && Character.isWhitespace(content[newLength - 1])) {
+            newLength--;
+         }
+         return newLength == text.length() ? text : text.substring(0, newLength);
+      }
+      else {
+         return null;
+      }
+   }
 }

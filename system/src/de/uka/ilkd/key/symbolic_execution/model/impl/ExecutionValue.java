@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -40,21 +41,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionValue}.
  * @author Martin Hentschel
  */
-public class ExecutionValue extends AbstractExecutionElement implements IExecutionValue {
-   /**
-    * The parent {@link IExecutionVariable} which provides this {@link IExecutionValue}.
-    */
-   private final ExecutionVariable variable;
-   
+public class ExecutionValue extends AbstractExecutionValue {
    /**
     * Is the value unknown?
     */
    private final boolean valueUnknown;
-   
-   /**
-    * The value.
-    */
-   private final Term value;
    
    /**
     * The value as human readable {@link String}.
@@ -65,11 +56,6 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
     * The type of the value.
     */
    private final String typeString;
-
-   /**
-    * The condition under which the variable has this value.
-    */
-   private final Term condition;
 
    /**
     * The condition under which the variable has this value as human readable {@link String}.
@@ -101,22 +87,11 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                          String typeString,
                          Term condition,
                          String conditionString) {
-      super(variable.getSettings(), mediator, proofNode);
-      this.variable = variable;
+      super(variable.getSettings(), mediator, proofNode, variable, condition, value);
       this.valueUnknown = valueUnknown;
-      this.value = value;
       this.valueString = valueString;
       this.typeString = typeString;
-      this.condition = condition;
       this.conditionString = conditionString;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ExecutionVariable getVariable() {
-      return variable;
    }
 
    /**
@@ -131,30 +106,8 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
     * {@inheritDoc}
     */
    @Override
-   public Term getValue() throws ProofInputException {
-      return value;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    public String getValueString() throws ProofInputException {
       return valueString;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isValueAnObject() throws ProofInputException {
-      if (isValueUnknown()) {
-         return false;
-      }
-      else {
-         Term value = getValue();
-         return SymbolicExecutionUtil.hasReferenceSort(getServices(), value);
-      }
    }
 
    /**
@@ -199,14 +152,17 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                      ArrayDeclaration ad = (ArrayDeclaration)javaType;
                      Set<IProgramVariable> pvs = SymbolicExecutionUtil.getProgramVariables(ad.length());
                      if (pvs.size() == 1) {
-                        ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), this, pvs.iterator().next());
+                        ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, pvs.iterator().next(), getVariable().getAdditionalCondition());
                         children.add(lengthVariable);
                         ExecutionValue[] lengthValues = lengthVariable.getValues();
                         for (ExecutionValue lengthValue : lengthValues) {
                            try {
-                              int length = Integer.valueOf(lengthValue.getValueString());
+                              int length = getSettings().isUsePrettyPrinting() ?
+                                           Integer.valueOf(lengthValue.getValueString()) :
+                                           Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
                               for (int i = 0; i < length; i++) {
-                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), this, i, lengthValue);
+                                 Term indexTerm = services.getTermBuilder().zTerm(i);
+                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, indexTerm, lengthValue, getVariable().getAdditionalCondition());
                                  children.add(childI);
                               }
                            }
@@ -223,7 +179,7 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                         ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), keyType);
                         for (ProgramVariable var : vars) {
                            if (!var.isImplicit() && !var.isStatic()) {
-                              children.add(new ExecutionVariable(getVariable().getParentNode(), this, field.getProgramVariable()));
+                              children.add(new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, field.getProgramVariable(), getVariable().getAdditionalCondition()));
                            }
                         }
                      }
@@ -239,37 +195,23 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
     * {@inheritDoc}
     */
    @Override
-   protected String lazyComputeName() throws ProofInputException {
-      String conditionString = getConditionString();
-      if (conditionString != null) {
-         return getVariable().getName() + " {" + getConditionString() + "}";
-      }
-      else {
-         return getVariable().getName();
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getElementType() {
-      return "Value";
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Term getCondition() throws ProofInputException {
-      return condition;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    public String getConditionString() throws ProofInputException {
       return conditionString;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ExecutionVariable getVariable() {
+      return (ExecutionVariable)super.getVariable();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] getNodeConstraints() {
+      return getVariable().getParentNode().getConstraints();
    }
 }

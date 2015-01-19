@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
@@ -119,6 +119,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
          }
          return name;
       }
+   }
+   
+   /**
+    * Checks if the value of {@link #getName()} is already computed.
+    * @return {@code ture} name is computed, {@code false} name is not computed yet.
+    */
+   protected boolean isNameComputed() {
+      return name != null;
    }
 
    /**

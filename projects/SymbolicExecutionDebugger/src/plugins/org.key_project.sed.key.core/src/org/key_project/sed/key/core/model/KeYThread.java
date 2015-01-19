@@ -13,23 +13,27 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
@@ -40,9 +44,11 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpoin
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -80,6 +86,16 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    private IKeYSEDDebugNode<?> lastResumedKeyNode;
    
    /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
+   
+   /**
     * Listens for auto mode start and stop events.
     */
    private final AutoModeListener autoModeListener = new AutoModeListener() {
@@ -98,6 +114,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * The up to know discovered {@link ISEDTermination} nodes.
     */
    private final Map<IExecutionTermination, ISEDTermination> knownTerminations = new HashMap<IExecutionTermination, ISEDTermination>();
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -143,7 +164,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
@@ -238,7 +259,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
          try {
             // Inform UI that the process is resumed
             super.resume();
-            getDebugTarget().threadResumed(this);
          }
          catch (DebugException exception) {
             LogUtil.getLogger().logError(exception);
@@ -262,7 +282,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
          finally {
             try {
                super.suspend();
-               getDebugTarget().threadSuspended(this);
             }
             catch (DebugException e1) {
                LogUtil.getLogger().logError(e1);
@@ -278,12 +297,40 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * by calling {@link SymbolicExecutionTreeBuilder#analyse()}.
     * </p>
     * @param builder The {@link SymbolicExecutionTreeBuilder} to update.
+    * @throws DebugException Occurred Exception.
     */
-   protected void updateExecutionTree(SymbolicExecutionTreeBuilder builder) {
+   protected void updateExecutionTree(SymbolicExecutionTreeBuilder builder) throws DebugException {
       if (getProof() != null) {
          // Update the symbolic execution tree, debug model is updated lazily via getters
-         getBuilder().analyse();
+         SymbolicExecutionCompletions completions = getBuilder().analyse();
+         handleCompletions(completions);
       }
+   }
+   
+   /**
+    * This methods handles all completions, e.g. by collapsing their debug node representations.
+    * @param completions The detected {@link SymbolicExecutionCompletions}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void handleCompletions(SymbolicExecutionCompletions completions) throws DebugException {
+// TODO: This methods does currently nothing until collapsing is supported by the SED.
+//      // Collapse all completed blocks
+//      for (IExecutionNode<?> blockCompletion : completions.getBlockCompletions()) {
+//         for (IExecutionNode<?> completedBlock : blockCompletion.getCompletedBlocks()) {
+//            IKeYSEDDebugNode<?> keyNode = getDebugTarget().ensureDebugNodeIsCreated(completedBlock);
+//            if (keyNode instanceof ISEDGroupable) {
+//               ((ISEDGroupable) keyNode).setCollapsed(true);
+//            }
+//         }
+//      }
+//      // Collapse all returned methods
+//      for (IExecutionBaseMethodReturn<?> methodReturn : completions.getMethodReturns()) {
+//         IExecutionMethodCall methodCall = methodReturn.getMethodCall();
+//         IKeYSEDDebugNode<?> keyNode = getDebugTarget().ensureDebugNodeIsCreated(methodCall);
+//         if (keyNode instanceof ISEDGroupable) {
+//            ((ISEDGroupable) keyNode).setCollapsed(true);
+//         }
+//      }
    }
 
    /**
@@ -339,7 +386,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       if (canResume()) {
          // Inform UI that the process is resumed
          super.resume();
-         getDebugTarget().threadResumed(this);
          // Run auto mode
          runAutoMode(keyNode,
                      KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
@@ -435,7 +481,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       if (canSuspend()) {
          getUi().stopAutoMode();
          super.suspend();
-         getDebugTarget().threadSuspended(this);
       }
    }
 
@@ -609,5 +654,123 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    public ISEDTermination getTermination(final IExecutionTermination executionTermination) {
       return knownTerminations.get(executionTermination);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasVariables() throws DebugException {
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      synchronized (this) {
+         if (variables == null) {
+            variables = KeYModelUtil.createVariables(this, executionNode);
+         }
+         return variables;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourcePath() {
+      IMethod method = getDebugTarget().getLaunchSettings().getMethod();
+      if (method != null) {
+         File localFile = ResourceUtil.getLocation(method.getResource());
+         return localFile != null ? localFile.getAbsolutePath() : null;
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isPredicateEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(getExecutionNode().getProof());
    }
 }
