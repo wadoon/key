@@ -680,10 +680,13 @@ public abstract class Notation {
 
 	    Term t1 = floatTerm.sub(0);
 
-	    int bits = Integer.parseInt(NumLiteral.printNumberTerm(t1));
-	    Float f = Float.intBitsToFloat(bits);
-
-	    return f.toString();
+	    try {
+	      int bits = Integer.parseInt(NumLiteral.printNumberTerm(t1));
+	      Float f = Float.intBitsToFloat(bits);
+	      return f.toString();
+	    } catch (NumberFormatException e) {
+		return null;
+	    }
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
