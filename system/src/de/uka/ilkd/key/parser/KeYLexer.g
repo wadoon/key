@@ -645,10 +645,8 @@ DIGIT_DISPATCH
 
 FLOAT_LITERAL
 :
-  (DIGIT)+
-  '.'
-  (DIGIT)+
-  'f'
+    (DIGIT)+ '.' (DIGIT)+ 'f'
+  | '0' 'x' (DIGIT)+ 'p' (MINUS)? (DIGIT)+
 ;
 
 fragment

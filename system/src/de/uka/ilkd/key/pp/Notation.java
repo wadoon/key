@@ -678,16 +678,12 @@ public abstract class Notation {
 		return null;
 	    }
 
-	    Term t2 = floatTerm.sub(1);
 	    Term t1 = floatTerm.sub(0);
 
+	    int bits = Integer.parseInt(NumLiteral.printNumberTerm(t1));
+	    Float f = Float.intBitsToFloat(bits);
 
-	    number.append(NumLiteral.printNumberTerm(t1));
-	    number.append(".");
-	    number.append(NumLiteral.printNumberTerm(t2));
-	    number.append("f");
-
-	    return number.toString();
+	    return f.toString();
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {

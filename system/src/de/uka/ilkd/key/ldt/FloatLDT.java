@@ -163,31 +163,26 @@ public final class FloatLDT extends LDT {
     public Term translateLiteral(Literal lit, Services services) {
 	Debug.assertTrue(lit instanceof FloatLiteral,
 	    "Literal '"+lit+"' is not a float literal.");
-
 	String s = ((FloatLiteral)lit).getValue();
-	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-
 	final boolean negative = (s.charAt(0) == '-');
-	if (negative) {
-	    s = s.substring(1);
-	}
+	
 
-	//Remove last character which must be "f" for float literals
-	s = s.substring(0, s.length()-1);
-	String[] sp = s.split("\\.");
+	int floatBits = Float.floatToIntBits(Float.parseFloat(s));
+	String bitString = Integer.toBinaryString(floatBits);
+	int number = Integer.parseInt(bitString, 2);
 
+
+	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 	Term intTerm, fractionTerm;
 
-
-	//Use IntegerLDT to translate to Z notation, then remove the Z
-	//Store the minus sign only in the integer part
 	if (negative) {
-	    intTerm = intLDT.translateLiteral(new IntLiteral("-" + sp[0]), services).sub(0);
+	    intTerm = intLDT.translateLiteral(new IntLiteral("-" + number), services).sub(0);
 	} else {
-	    intTerm = intLDT.translateLiteral(new IntLiteral(sp[0]), services).sub(0);
+	    intTerm = intLDT.translateLiteral(new IntLiteral(number), services).sub(0);
 	}
 
-	fractionTerm = intLDT.translateLiteral(new IntLiteral(sp[1]), services).sub(0);
+	//Set the second number to 0 for now
+	fractionTerm = intLDT.translateLiteral(new IntLiteral(0), services).sub(0);
 
 	return services.getTermFactory().createTerm(floatLit, intTerm, fractionTerm);
     }
@@ -243,15 +238,10 @@ public final class FloatLDT extends LDT {
 	    //Use IntegerLDT to translate the Integer & Fraction to literals
 	    IntLiteral il1 = (IntLiteral)intLDT.translateTerm(t.sub(0),
 		children, services);
-	    IntLiteral il2 = (IntLiteral)intLDT.translateTerm(t.sub(1),
-		children, services);
+	    int bits = Integer.parseInt(il1.getValue());
+	    Float f1 = Float.intBitsToFloat(bits);
 
-	    sb.append(il1.getValue());
-	    sb.append(".");
-	    sb.append(il2.getValue());
-	    sb.append("f");
-
-	    return new FloatLiteral(sb.toString());
+	    return new FloatLiteral(f1.toString());
 	}
 	throw new RuntimeException("FloatLDT: Cannot convert term to program: "+t);
     }
