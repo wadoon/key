@@ -1220,39 +1220,48 @@ public class JMLSpecFactory {
         return createJMLDependencyContract(kjt, targetHeap, dep);
     }
     
-    public ThreadSpecification createJMLThreadSpecification
-                    (KeYJavaType threadClass, TextualJMLThreadSpecification spec) 
+    public ThreadSpecification createJMLThreadSpecification(KeYJavaType threadClass,
+                                                            TextualJMLThreadSpecification spec)
                     throws SLTranslationException {
         final JavaInfo ji = services.getJavaInfo();
         if (! ji.isSubtype(threadClass, ji.getJavaLangThread()))
             throw new SLTranslationException("Class " + threadClass +" cannot have a thread specification", 
                             spec.getSourceFileName(), spec.getApproxPosition(), null);
         final String name = "JML Thread Specification for "+threadClass.getName();
-        final LocationVariable threadVar = TB.selfVar(threadClass, false); // TODO
+        final LocationVariable threadVar = TB.threadVar(threadClass); // TODO
         Term rely = TB.tt(); // default
         Term guar = TB.tt(); // default
         Term pre = TB.tt(); // default
         for (PositionedString ps: spec.getPres()) {
-            final Term preTrans = JMLTranslator.translate(ps, threadClass, threadVar, null, null, null, null, Term.class, services); 
+            final Term preTrans =
+                    JMLTranslator.translate(ps, threadClass, threadVar, null, null,
+                                            null, null, Term.class, services);
             pre = TB.and(pre, preTrans);
         }
         for (PositionedString ps: spec.getRelies()) {
-            final Term relyTrans = JMLTranslator.translate(ps, threadClass, threadVar, null, null, null, null, Term.class, services); 
+            final Term relyTrans =
+                    JMLTranslator.translate(ps, threadClass, threadVar, null, null,
+                                            null, null, Term.class, services);
             rely = TB.and(rely, relyTrans);
         }
         for (PositionedString ps: spec.getGuarantees()) {
-            final Term guarTrans = JMLTranslator.translate(ps, threadClass, threadVar, null, null, null, null, Term.class, services);
+            final Term guarTrans =
+                    JMLTranslator.translate(ps, threadClass, threadVar, null, null,
+                                            null, null, Term.class, services);
             guar = TB.and(guar, guarTrans);
         }
-        final Term notAssigned = spec.getNotAssigned()==null?
+        final Term notAssigned = spec.getNotAssigned()==null ?
                         TB.empty() : // default
-                        JMLTranslator.<Term>translate(spec.getNotAssigned(), threadClass, threadVar, null, null, null, null, Term.class, services);
-        final Term assignable = spec.getAssignable()==null?
+                        JMLTranslator.<Term>translate(spec.getNotAssigned(), threadClass, threadVar, null,
+                                                      null, null, null, Term.class, services);
+        final Term assignable = spec.getAssignable() == null ?
                         TB.allLocs() : // default
-                        JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, threadVar, null, null, null, null, Term.class, services);
+                        JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, threadVar, null,
+                                                      null, null, null, Term.class, services);
         final LocationVariable prevHeapVar = services.getTypeConverter().getHeapLDT().getPrevHeap();
         final LocationVariable currHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
-        return new ThreadSpecification(name, null, threadClass, pre, rely, guar, notAssigned, assignable, prevHeapVar, currHeapVar, threadVar);
+        return new ThreadSpecification(name, null, threadClass, pre, rely, guar, notAssigned,
+                                       assignable, prevHeapVar, currHeapVar, threadVar);
     }
 
 

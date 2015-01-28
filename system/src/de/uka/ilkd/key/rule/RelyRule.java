@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
@@ -41,53 +42,107 @@ public final class RelyRule implements BuiltInRule {
     
     public final static RelyRule INSTANCE = new RelyRule();
     private static final Name NAME = new Name("Rely");
-    
+    public static final String CONCURRENCY_OPTION = "concurrency";
+    public static final String EXC_OPTION = "runtimeExceptions";
+
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;
 
-    @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services,
-                    RuleApp ruleApp) throws RuleAbortException {
-        if (!( ruleApp instanceof RelyBuiltInRuleApp))
-                        throw new RuleAbortException();
-        final RelyBuiltInRuleApp app = (RelyBuiltInRuleApp) ruleApp;
-        final Instantiation inst = app.inst;
-        if (inst == null) throw new RuleAbortException();
-        final JavaBlock javaBlock = inst.target.javaBlock();
-        final ExecutionContext ec = JavaTools.getInnermostExecutionContext(javaBlock, services);
-        final KeYJavaType threadType = ec.getThreadTypeReference().getKeYJavaType();
-        final ReferencePrefix thread = ec.getRuntimeThreadInstance();
-        final ThreadSpecification ts = services.getSpecificationRepository().getThreadSpecification(threadType);
-        if (ts == null) throw new RuleAbortException();
+    private static Term buildAnonUpd(Term heap,
+                                     ThreadSpecification ts,
+                                     Services services) {
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final Sort heapSort = heapLDT.targetSort();
         final TermBuilder tb = services.getTermBuilder();
-        
-        final String excChoice = goal.proof().getSettings().getChoiceSettings().getDefaultChoice("runtimeExceptions");
-        final boolean ignoreRTE = "runtimeExceptions:ignore".equals(excChoice);
-        final boolean allowRTE = "runtimeExceptions:allow".equals(excChoice);
-        assert ignoreRTE || allowRTE || "runtimeExceptions:ban".equals(excChoice);
-        
-        Term threadVar = null;
+
+        Term threadVar = tb.var(ts.getThreadVar());
+        final Term notAssigned = ts.getNotChanged(threadVar, services);
+        final Term assigned = tb.setMinus(tb.allLocs(), notAssigned);
+        final Term anonHeap = tb.func(new Function(new Name("anonHeapRely"), heapSort));
+
+        return tb.elementary(heap, tb.anon(heap, assigned, anonHeap));
+    }
+
+    private static Term buildFieldAccAssignUpd(Term lhs, FieldReference fieldRef,
+                                               Term heap, Services services) throws RuleAbortException {
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final TermBuilder tb = services.getTermBuilder();
+
+        Term receiver = null;
         try {
-            threadVar = tb.parseTerm(""+thread);
-        } catch (ParserException e1) {
-            throw new RuleAbortException(e1);
+            receiver = tb.parseTerm("" + fieldRef.getReferencePrefix());
+        } catch (ParserException e) {
+            throw new RuleAbortException(e);
         }
+
+        final Sort targetSort = fieldRef.getProgramVariable().sort();
+        final Term field =
+                tb.func(heapLDT.getFieldSymbolForPV(
+                            (LocationVariable)fieldRef.getProgramVariable(),
+                            services));
+
+        return tb.elementary(lhs, tb.select(targetSort, heap, receiver, field));
+    }
+
+    private static Term buildArrayAccAssignUpd(Term lhs, ArrayReference arrayRef,
+                                               Term heap, JavaBlock javaBlock,
+                                               Services services) throws RuleAbortException {
+        final TermBuilder tb = services.getTermBuilder();
+
+        Term receiver = null;
+        Term idx = null;
+        try {
+            receiver = tb.parseTerm(""+arrayRef.getReferencePrefix());
+            idx = tb.parseTerm(""+arrayRef.getDimensionExpressions().get(0));
+        } catch (ParserException e) {
+            throw new RuleAbortException(e);
+        }
+
+        final ExecutionContext ec = JavaTools.getInnermostExecutionContext(javaBlock, services);
+        final Type arrayType = arrayRef.getKeYJavaType(services, ec).getJavaType();
+        assert arrayType instanceof ArrayType;
+        final Sort targetSort = ((ArrayType) arrayType).getBaseType().getKeYJavaType().getSort();
+        return tb.elementary(lhs, tb.select(targetSort, heap, receiver, tb.arr(idx)));
+    }
+
+    @Override
+    public ImmutableList<Goal> apply(Goal goal,
+                                     Services services,
+                                     RuleApp ruleApp) throws RuleAbortException {
+        if (!(ruleApp instanceof RelyBuiltInRuleApp)) {
+            throw new RuleAbortException();
+        }
+        final RelyBuiltInRuleApp app = (RelyBuiltInRuleApp) ruleApp;
+
+        final Instantiation inst = app.inst;
+        if (inst == null) {
+            throw new RuleAbortException();
+        }
+        final JavaBlock javaBlock = inst.target.javaBlock();
+        final ThreadSpecification ts = getApplicableThreadSpec(javaBlock, services);
+        if (ts == null) {
+            throw new RuleAbortException();
+        }
+        final TermBuilder tb = services.getTermBuilder();
+
+        final String excChoice = goal.proof().getSettings().getChoiceSettings().getDefaultChoice(EXC_OPTION);
+        final boolean ignoreRTE = (EXC_OPTION + ":ignore").equals(excChoice);
+        final boolean allowRTE = (EXC_OPTION + ":allow").equals(excChoice);
+        final boolean banRTE = (EXC_OPTION + ":ban").equals(excChoice);
+        assert ignoreRTE || allowRTE || banRTE;
+
+        Term threadVar = tb.var(ts.getThreadVar());
         final Term heap = tb.getBaseHeap();
         final Term prevHeap = tb.getPrevHeap();
         final Term rely = ts.getRely(prevHeap, heap, threadVar, services);
-        final Term notAssigned = ts.getNotChanged(threadVar, services);
-        
+
         // PIO is possibly an update applied to a modality
-        final Term leadingUpd = (app.pio.subTerm().op() instanceof UpdateApplication)?
-                        app.pio.subTerm().sub(0): null;
-        final Term target = leadingUpd == null? app.pio.subTerm(): app.pio.subTerm().sub(1);
-        assert target == app.inst.target;
-        
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Sort heapSort = heapLDT.targetSort();
-        final Term assigned = tb.setMinus(tb.allLocs(), notAssigned);
-        final Term anonHeap = tb.func(new Function(new Name("anonHeapRely"), heapSort));
-        final Term anonUpd = tb.elementary(heap, tb.anon(heap, assigned, anonHeap));
+        final Term leadingUpd = (app.pio.subTerm().op() instanceof UpdateApplication) ?
+                        app.pio.subTerm().sub(0) : null;
+        final Term target = leadingUpd == null ? app.pio.subTerm() : app.pio.subTerm().sub(1);
+        assert target == inst.target;
+
+        final Term anonUpd = buildAnonUpd(heap, ts, services);
         final Term prevUpd = tb.parallel(tb.elementary(prevHeap, heap), anonUpd);
         final Term addRely = tb.apply(leadingUpd, tb.apply(prevUpd, rely));
 
@@ -107,58 +162,36 @@ public final class RelyRule implements BuiltInRule {
             final Term newProg = tb.prog((Modality)target.op(), newBlock, post);
             final Term lhs = tb.var(inst.lhs);
             final Term assignUpd; // the particular assignment effect
-            
+
             if (inst.fieldAccess != null) {
                 // field (attribute) access
-                
-                if (ignoreRTE) res = goal.split(1);
-                else {
+                if (ignoreRTE) {
+                    res = goal.split(1);
+                } else {
                     // ban or allow RTE
                     res = goal.split(2);
                     assert false : "TODO";
                 }
-
-                Term receiver = null;
-                try {
-                    receiver = tb.parseTerm(""+inst.fieldAccess.getReferencePrefix());
-                } catch (ParserException e) {
-                    throw new RuleAbortException(e);
-                }
-                final Term field = tb.func(heapLDT.getFieldSymbolForPV((LocationVariable)inst.fieldAccess.getProgramVariable(), services));
-                final Sort targetSort = inst.fieldAccess.getProgramVariable().sort();
-                assignUpd = tb.elementary(lhs, tb.select(targetSort, heap, receiver, field));
-
+                assignUpd = buildFieldAccAssignUpd(lhs, inst.fieldAccess, heap, services);
             } else {
                 assert (inst.arrayAccess != null);
                 // array access
-                
-                if (ignoreRTE) res = goal.split(1);
-                else { // ban or allow RTE
+                if (ignoreRTE) {
+                    res = goal.split(1);
+                } else { // ban or allow RTE
                     res = goal.split(3);
                     assert false : "TODO";
                 }
-
-                Term receiver = null;
-                Term idx = null;
-                try {
-                    receiver = tb.parseTerm(""+inst.arrayAccess.getReferencePrefix());
-                    idx = tb.parseTerm(""+inst.arrayAccess.getDimensionExpressions().get(0));
-                } catch (ParserException e) {
-                    throw new RuleAbortException(e);
-                }
-                final Type arrayType = inst.arrayAccess.getKeYJavaType(services, ec).getJavaType();
-                assert arrayType instanceof ArrayType;
-                final Sort targetSort = ((ArrayType) arrayType).getBaseType().getKeYJavaType().getSort();
-                assignUpd = tb.elementary(lhs, tb.select(targetSort, heap, receiver, tb.arr(idx)));
+                assignUpd = buildArrayAccAssignUpd(lhs, inst.arrayAccess, heap, javaBlock, services);
             }
-            
+
             // add rely in any case
             final Goal aGoal = res.head();
             aGoal.addFormula(new SequentFormula(addRely), true, false);
             // assignment effect in any case
             final Term assignRes = tb.apply(leadingUpd, tb.apply(anonUpd, tb.apply(assignUpd, newProg)));
             aGoal.changeFormula(new SequentFormula(assignRes), app.pio);
-            
+
             return res;
         }
     }
@@ -172,7 +205,7 @@ public final class RelyRule implements BuiltInRule {
     public String displayName() {
         return name().toString();
     }
-    
+
     @Override
     public String toString() {
         return displayName();
@@ -180,30 +213,40 @@ public final class RelyRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null || pio.isInAntec() || !pio.isTopLevel()) return false;
-        final Services services = goal.proof().getServices();
-        // check whether rely/guarantee option is set
-        if (!relyGuaranteeEnabled(goal)) return false;
+        if (pio == null
+                || pio.isInAntec()
+                || !pio.isTopLevel()
+                || Transformer.inTransformer(pio)) {
+            return false;
+        }
+        if (!relyGuaranteeEnabled(goal)) {
+            // check whether rely/guarantee option is set
+            return false;
+        }
         final Term target = pio.constrainedFormula().formula();
         final Instantiation inst = getInstantiation(target, goal);
         lastFocusTerm = target;
         lastInstantiation = inst;
-        if (inst == null) return false;
+        if (inst == null) {
+            return false;
+        }
+        final Services services = goal.proof().getServices();
         return getApplicableThreadSpec(inst.target.javaBlock(), services) != null;
     }
 
-    private boolean relyGuaranteeEnabled(Goal goal) {
-        final String concurrenyChoice = goal.proof().getSettings().getChoiceSettings().getDefaultChoice("concurrency");
-        return "concurrency:RG".equals(concurrenyChoice);
+    private static boolean relyGuaranteeEnabled(Goal goal) {
+        final String concurrencyChoice =
+                goal.proof().getSettings().getChoiceSettings().getDefaultChoice(CONCURRENCY_OPTION);
+        return (CONCURRENCY_OPTION + ":RG").equals(concurrencyChoice);
     }
-    
+
     Instantiation getInstantiation(Term target, Goal goal) {
         if (target == lastFocusTerm) return lastInstantiation;
 
         // must be applied on modality possibly with one update
         if (target.op() instanceof UpdateApplication)
             target = target.sub(1);
-        
+
         if (!(target.op() instanceof Modality)) return null;
         final JavaBlock prog = target.javaBlock();
         final SourceElement activeStm = JavaTools.getActiveStatement(prog);
@@ -213,7 +256,7 @@ public final class RelyRule implements BuiltInRule {
         }
         if (!(activeStm instanceof Assignment)) return null;
         final Expression lhs = ((Assignment) activeStm).getLhs();
-        
+
         // investigate RHS
         final Expression rhs = ((Assignment) activeStm).getRhs();
         // must be field access (excludes array length)
@@ -231,11 +274,17 @@ public final class RelyRule implements BuiltInRule {
         } else
             return null;
     }
-    
+
     private static ThreadSpecification getApplicableThreadSpec(JavaBlock jb, Services services) {
         final ExecutionContext ec = JavaTools.getInnermostExecutionContext(jb, services);
-        final KeYJavaType threadType = ec.getThreadTypeReference().getKeYJavaType();
-        if (threadType == null) return null;
+        final TypeReference typeRef = ec.getThreadTypeReference();
+        if (typeRef == null) {
+            return null;
+        }
+        final KeYJavaType threadType = typeRef.getKeYJavaType();
+        if (threadType == null) {
+            return null;
+        }
         return services.getSpecificationRepository().getThreadSpecification(threadType);
     }
 
@@ -243,15 +292,15 @@ public final class RelyRule implements BuiltInRule {
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new RelyBuiltInRuleApp(this, pos);
     }
-    
+
     static class Instantiation {
-        
+
         final Term target;
         final boolean emptyMod;
         final ProgramVariable lhs;
         final FieldReference fieldAccess;
         final ArrayReference arrayAccess;
-        
+
         private Instantiation (Term target) {
             this.target = target;
             assert target.javaBlock() != null;
@@ -260,7 +309,7 @@ public final class RelyRule implements BuiltInRule {
             fieldAccess = null;
             arrayAccess = null;
         }
-        
+
         private Instantiation (Term target, ProgramVariable lhs, FieldReference fr) {
             this.target = target;
             assert target.javaBlock() != null;
@@ -269,7 +318,7 @@ public final class RelyRule implements BuiltInRule {
             fieldAccess = fr;
             arrayAccess = null;
         }
-        
+
         private Instantiation (Term target, ProgramVariable lhs, ArrayReference ar) {
             this.target = target;
             assert target.javaBlock() != null;
@@ -279,5 +328,4 @@ public final class RelyRule implements BuiltInRule {
             arrayAccess = ar;
         }
     }
-
 }

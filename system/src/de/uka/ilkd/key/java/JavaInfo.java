@@ -40,7 +40,6 @@ import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -1267,10 +1266,13 @@ public final class JavaInfo {
                 getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             // when doing JavaCard proofs instead of Java, there is no Thread
             final KeYJavaType threadType = getJavaLangThread();
-            final TypeReference threadClass = threadType==null? null: new TypeRef(getJavaLangThread());
-            final ReferencePrefix runtimeThread = threadType==null? null: new LocationVariable(new ProgramElementName("thread"),getJavaLangThread());
+            final TypeReference threadClass =
+                    threadType == null ? null : new TypeRef(getJavaLangThread());
             defaultExecutionContext =
-                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null, threadClass, runtimeThread);
+                new ExecutionContext(new TypeRef(kjt),
+                                     getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD,
+                                                   ImmutableSLList.<KeYJavaType>nil()),
+                                                   null, threadClass);
         }
         return defaultExecutionContext;
     }

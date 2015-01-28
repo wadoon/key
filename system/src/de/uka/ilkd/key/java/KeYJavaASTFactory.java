@@ -962,14 +962,13 @@ public abstract class KeYJavaASTFactory {
      *         <code>reference</code> to <code>method</code> from
      *         <code>classType</code>
      */
-    public static ExecutionContext executionContext(
-                    final KeYJavaType classType, final IProgramMethod method,
-                    final ReferencePrefix reference,
-                    final KeYJavaType threadType, final ReferencePrefix thread) {
+    public static ExecutionContext executionContext(final KeYJavaType classType,
+                                                    final IProgramMethod method,
+                                                    final ReferencePrefix reference,
+                                                    final KeYJavaType threadType) {
         final TypeRef type = new TypeRef(classType);
         final TypeRef type2 = new TypeRef(threadType);
-        final ExecutionContext context = new ExecutionContext(type, method,
-                        reference, type2, thread);
+        final ExecutionContext context = new ExecutionContext(type, method, reference, type2);
         return context;
     }
 

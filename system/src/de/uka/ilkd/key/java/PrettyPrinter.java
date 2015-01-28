@@ -2837,8 +2837,6 @@ public class PrettyPrinter {
 		if (x.getThreadTypeReference() != null) {
 			write(",threadClass=");
 			writeElement(x.getThreadTypeReference());
-			write(",thread=");
-			writeElement(x.getRuntimeThreadInstance());
 		}
 	}
 

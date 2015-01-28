@@ -44,7 +44,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
@@ -382,9 +382,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        else {
            baseContractName = contractName.substring(0, ind);
        }
-       final Contract contract =
-               initConfig.getServices().getSpecificationRepository()
-                                .getContractByName(baseContractName);
+       final DisplayableSpecificationElement contract =
+               initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
        if (contract == null) {
            throw new RuntimeException("Contract not found: " + baseContractName);
        }
@@ -397,8 +396,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                    throw new IOException("Found contract \"" + contract +
                                          "\" is no FunctionalOperationContract.");
                }
-               po = new FunctionalOperationContractPO(
-                       initConfig, (FunctionalOperationContract)contract, addUninterpretedPredicate, addSymbolicExecutionLabel);
+               po = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract,
+                                                      addUninterpretedPredicate, addSymbolicExecutionLabel);
            }
            else {
                po = contract.createProofObl(initConfig);

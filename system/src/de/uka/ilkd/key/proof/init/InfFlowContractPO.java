@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 import java.io.IOException;
@@ -190,7 +190,7 @@ public class InfFlowContractPO extends AbstractOperationPO
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
        final String contractName = properties.getProperty("contract");
-       final Contract contract =
+       final DisplayableSpecificationElement contract =
                initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
        if (contract == null) {
           throw new RuntimeException("Contract not found: " + contractName);

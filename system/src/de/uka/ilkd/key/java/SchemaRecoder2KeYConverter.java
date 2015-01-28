@@ -278,10 +278,10 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         final boolean threaded = ec.getThreadTypeReference() != null;
         return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()), 
                                     (IProgramMethod) callConvert(ec.getMethodContext()),
-				                        ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null,
-				                        threaded? (TypeReference) callConvert(ec.getThreadTypeReference()): null,
-				                        threaded? (ReferencePrefix) callConvert(ec.getRuntimeThreadInstance()): null
-				                    );
+                                    ec.getRuntimeInstance() != null ?
+                                            (ReferencePrefix) callConvert(ec.getRuntimeInstance()) : null,
+                                    threaded ?
+                                            (TypeReference) callConvert(ec.getThreadTypeReference()) : null);
     }
 
     // ----- Schema Variables

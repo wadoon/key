@@ -680,10 +680,4 @@ public final class ProgramSV extends AbstractSV
    public TypeReference getThreadTypeReference() {
        return null;
    }
-
-
-   @Override
-   public ReferencePrefix getRuntimeThreadInstance() {
-       return null;
-   }
 }

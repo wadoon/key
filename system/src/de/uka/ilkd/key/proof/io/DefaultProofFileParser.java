@@ -213,7 +213,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            builtinIfInsts = null;
            break;
        case 'c' : //contract
-           currContract = proof.getServices().getSpecificationRepository().getContractByName(s);
+           currContract = (Contract)proof.getServices().getSpecificationRepository().getContractByName(s);
            if(currContract == null) {
                // XXX: changed from throwing this exception
                final ProblemLoaderException e = new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");

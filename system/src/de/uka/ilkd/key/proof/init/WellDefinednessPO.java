@@ -37,8 +37,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
@@ -318,9 +318,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
             throws IOException {
        String contractName = properties.getProperty("wd check");
-       final Contract contract =
-               initConfig.getServices().getSpecificationRepository()
-                                .getContractByName(contractName);
+       final DisplayableSpecificationElement contract =
+               initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
        if (contract == null) {
            throw new RuntimeException("Contract not found: " + contractName);
        }

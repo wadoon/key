@@ -41,7 +41,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -385,7 +385,8 @@ public abstract class AbstractProblemLoader {
             else {
                 baseContractName = chooseContract.substring(0, ind);
             }
-            final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+            final DisplayableSpecificationElement contract =
+                    initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
             if (contract == null) {
                 throw new RuntimeException("Contract not found: " + baseContractName);
             }

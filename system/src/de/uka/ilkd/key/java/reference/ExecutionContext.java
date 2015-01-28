@@ -21,9 +21,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.ExtList;
 
-public class ExecutionContext
-extends JavaNonTerminalProgramElement 
-implements IExecutionContext, Reference {
+public class ExecutionContext extends JavaNonTerminalProgramElement
+                                implements IExecutionContext, Reference {
 
     /**
      * the class context 
@@ -41,7 +40,6 @@ implements IExecutionContext, Reference {
     private IProgramMethod methodContext;
     
     private final TypeReference threadContext;
-    private final ReferencePrefix runtimeThread;
 
     /**
      * creates an execution context reference
@@ -51,21 +49,22 @@ implements IExecutionContext, Reference {
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
      */
-    public ExecutionContext(TypeReference classContext, 
-                    IProgramMethod methodContext, ReferencePrefix runtimeInstance, TypeReference threadContext, ReferencePrefix runtimeThread) {
-        assert (threadContext==null)==(runtimeThread==null);
+    public ExecutionContext(TypeReference classContext,
+                            IProgramMethod methodContext,
+                            ReferencePrefix runtimeInstance,
+                            TypeReference threadContext) {
         this.classContext = classContext;
         this.methodContext = methodContext;
         this.runtimeInstance = runtimeInstance;
         this.threadContext = threadContext;
-        this.runtimeThread = runtimeThread;
     }
     
-    // TODO: temporary compatability hack
+    // TODO: temporary compatibility hack
     @Deprecated
-    public ExecutionContext(TypeReference classContext, 
-                    IProgramMethod methodContext, ReferencePrefix runtimeInstance) {
-        this(classContext, methodContext, runtimeInstance, null, null);
+    public ExecutionContext(TypeReference classContext,
+                            IProgramMethod methodContext,
+                            ReferencePrefix runtimeInstance) {
+        this(classContext, methodContext, runtimeInstance, null);
     }
     
     /**
@@ -80,7 +79,6 @@ implements IExecutionContext, Reference {
         this.runtimeInstance = children.get(ReferencePrefix.class);
         children.remove(runtimeInstance);
         this.threadContext = children.get(TypeReference.class);
-        this.runtimeThread = children.get(ReferencePrefix.class);
     }
 
 
@@ -96,7 +94,6 @@ implements IExecutionContext, Reference {
         if (methodContext != null) count++;
         if (runtimeInstance != null) count++;
         if (threadContext != null) count++;
-        if (runtimeThread != null) count++;
         return count;
     }
 
@@ -124,10 +121,6 @@ implements IExecutionContext, Reference {
         }
         if (threadContext != null) {
             if (index == 0) return threadContext;
-            index--;
-        }
-        if (runtimeThread != null) {
-            if (index == 0) return runtimeThread;
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -173,18 +166,13 @@ implements IExecutionContext, Reference {
 
     @Override
     public String toString() {
-        return "Context: "+classContext+ "#" + methodContext + " Instance: "+runtimeInstance
-                        +(threadContext==null? "":" Thread context: "+threadContext+ " Instance: "+runtimeThread);
+        return "Context: "+classContext+ "#" + methodContext +
+               " Instance: "+runtimeInstance +
+               (threadContext == null ? "" :" Thread context: " + threadContext);
     }
 
     @Override
     public TypeReference getThreadTypeReference() {
         return threadContext;
     }
-
-    @Override
-    public ReferencePrefix getRuntimeThreadInstance() {
-        return runtimeThread;
-    }
-
 }

@@ -95,8 +95,10 @@ public final class SpecificationRepository {
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private final ContractFactory cf;
 
-    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<DisplayableSpecificationElement>> contracts =
-            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<DisplayableSpecificationElement>>();
+    private final Map<Pair<KeYJavaType, IObserverFunction>,
+                      ImmutableSet<DisplayableSpecificationElement>> contracts =
+            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>,
+                              ImmutableSet<DisplayableSpecificationElement>>();
     private final Map<Pair<KeYJavaType, IProgramMethod>,
                       ImmutableSet<FunctionalOperationContract>> operationContracts =
             new LinkedHashMap<Pair<KeYJavaType, IProgramMethod>,
@@ -105,8 +107,8 @@ public final class SpecificationRepository {
                       ImmutableSet<WellDefinednessCheck>> wdChecks =
             new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>,
                               ImmutableSet<WellDefinednessCheck>>();
-    private final Map<String, Contract> contractsByName =
-            new LinkedHashMap<String, Contract>();
+    private final Map<String, DisplayableSpecificationElement> contractsByName =
+            new LinkedHashMap<String, DisplayableSpecificationElement>();
     private final Map<KeYJavaType, ImmutableSet<IObserverFunction>> contractTargets =
             new LinkedHashMap<KeYJavaType, ImmutableSet<IObserverFunction>>();
     private final Map<KeYJavaType, ImmutableSet<ClassInvariant>> invs =
@@ -589,7 +591,8 @@ public final class SpecificationRepository {
      * @param contracts A set of contracts
      * @return contracts without well-definedness checks
      */
-    private static <T extends DisplayableSpecificationElement> ImmutableSet<T> removeWdChecks (ImmutableSet<T> contracts) {
+    private static <T extends DisplayableSpecificationElement> ImmutableSet<T>
+            removeWdChecks (ImmutableSet<T> contracts) {
         ImmutableSet<T> result = DefaultImmutableSet.<T>nil();
         if (contracts == null) {
             return (ImmutableSet<T>) contracts;
@@ -731,7 +734,8 @@ public final class SpecificationRepository {
      * Returns all registered contracts.
      */
     public ImmutableSet<DisplayableSpecificationElement> getAllContracts() {
-        ImmutableSet<DisplayableSpecificationElement> result = DefaultImmutableSet.<DisplayableSpecificationElement> nil();
+        ImmutableSet<DisplayableSpecificationElement> result =
+                DefaultImmutableSet.<DisplayableSpecificationElement> nil();
         for (ImmutableSet<DisplayableSpecificationElement> s : contracts.values()) {
             result = result.union(s);
         }
@@ -795,7 +799,7 @@ public final class SpecificationRepository {
      * Returns the registered (atomic or combined) contract corresponding to the
      * passed name, or null.
      */
-    public Contract getContractByName(String name) {
+    public DisplayableSpecificationElement getContractByName(String name) {
         if (name == null || name.length() == 0) {
             return null;
         }
@@ -852,21 +856,22 @@ public final class SpecificationRepository {
         return result;
     }
     
-    public ThreadSpecification getThreadSpecification (KeYJavaType kjt) {
+    public ThreadSpecification getThreadSpecification(KeYJavaType kjt) {
         return threadSpecs.get(kjt);
     }
     
-    public void addThreadSpecification (ThreadSpecification rgs) {
+    public void addThreadSpecification(ThreadSpecification rgs) {
         KeYJavaType kjt = rgs.getKJT();
         if (threadSpecs.get(kjt) != null)
             // TODO: allow more?
-            throw new IllegalStateException("Thread specification for thread type "+kjt
-                +" already registered.");
+            throw new IllegalStateException("Thread specification for thread type " +
+                                            kjt + " already registered.");
         threadSpecs.put(kjt, rgs);
-        contracts.put(new Pair<KeYJavaType, IObserverFunction>(kjt, null), DefaultImmutableSet.<DisplayableSpecificationElement>nil().add(rgs));
+        contracts.put(new Pair<KeYJavaType, IObserverFunction>(kjt, null),
+                      DefaultImmutableSet.<DisplayableSpecificationElement>nil().add(rgs));
     }
     
-    public void addThreadSpecifications (Iterable<ThreadSpecification> specs) {
+    public void addThreadSpecifications(Iterable<ThreadSpecification> specs) {
         for (ThreadSpecification rgs: specs)
             addThreadSpecification(rgs);
     }
@@ -947,7 +952,7 @@ public final class SpecificationRepository {
         String[] atomicNames = contract.getName().split(
                 CONTRACT_COMBINATION_MARKER);
         for (String atomicName : atomicNames) {
-            Contract atomicContract = contractsByName.get(atomicName);
+            DisplayableSpecificationElement atomicContract = contractsByName.get(atomicName);
             if (atomicContract == null) {
                 // This case happens in the symbolic execution debugger when
                 // a temporary contract is used which is not part of the
@@ -958,8 +963,10 @@ public final class SpecificationRepository {
                                                              // causes many
                                                              // NullPointerExceptions
             }
-            assert atomicContract.getTarget().equals(contract.getTarget());
-            result = result.add(atomicContract);
+            assert atomicContract instanceof Contract;
+            final Contract c = (Contract)atomicContract;
+            assert c.getTarget().equals(contract.getTarget());
+            result = result.add(c);
         }
         return result;
     }

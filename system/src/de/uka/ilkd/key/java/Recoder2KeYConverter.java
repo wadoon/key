@@ -2117,13 +2117,13 @@ public class Recoder2KeYConverter {
        }
        
        TypeReference threadContext = null;
-       ReferencePrefix runtimeThread = null;
+       //ReferencePrefix runtimeThread = null;
        if (arg.getThreadTypeReference() != null) {
           threadContext = convert(arg.getThreadTypeReference());
-          runtimeThread = (ReferencePrefix) callConvert(arg.getRuntimeThreadInstance());
+          //runtimeThread = (ReferencePrefix) callConvert(arg.getRuntimeThreadInstance());
        }
 
-       return new ExecutionContext(classContext, methodContext, runtimeInstance, threadContext, runtimeThread);
+       return new ExecutionContext(classContext, methodContext, runtimeInstance, threadContext);
     }
 
     public ThisConstructorReference convert(recoder.java.reference.ThisConstructorReference arg) {

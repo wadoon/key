@@ -109,9 +109,6 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
       if (x.getRuntimeInstance() instanceof IProgramVariable) {
          declaredVariables.add((IProgramVariable)x.getRuntimeInstance());
       }
-      if (x.getRuntimeThreadInstance() instanceof IProgramVariable) {
-          declaredVariables.add((IProgramVariable)x.getRuntimeThreadInstance());
-       }
    }
 
    /**

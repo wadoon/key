@@ -23,11 +23,11 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  * @since 2.3.7349
  */
 public class ThreadSpecification implements DisplayableSpecificationElement {
-    
+
     private final static VisibilityModifier VM = new Public();
     private final String name;
     private final String displayName;
-    
+
     private final KeYJavaType threadType;
     private final Term pre;
     private final Term rely;
@@ -36,7 +36,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     private final Term notChanged;
     private final LocationVariable prevHeapVar, currHeapVar;
     private final ProgramVariable threadVar;
-    
+
     public ThreadSpecification (String name, String displayName, 
                     KeYJavaType threadType, Term pre,
                     Term rely, Term guarantee, Term notChanged, Term assignable,
@@ -64,33 +64,33 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         this.currHeapVar = currHeapVar;
         this.threadVar = threadVar;
     }
-    
+
     public Term getPre (Term currHeap, Term threadVar, Services services) {
         final Map<Term,Term> replaceMap = getReplaceMap(null, currHeap, threadVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(pre);
     }
-        
+
     public Term getRely (Term prevHeap, Term currHeap, 
                     Term threadVar, Services services) {
         final Map<Term,Term> replaceMap = getReplaceMap(prevHeap, currHeap, threadVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(rely);
     }
-    
+
     public Term getGuarantee (Term prevHeap, Term currHeap, 
                     Term threadVar, Services services) {
         final Map<Term,Term> replaceMap = getReplaceMap(prevHeap, currHeap, threadVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(guarantee);
     }
-    
+
     public Term getAssignable(Term threadVar, Services services) {
         final Map<Term,Term> replaceMap = getReplaceMap(null, null, threadVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(assignable);
     }
-    
+
     public Term getNotChanged(Term threadVar, Services services) {
         final Map<Term,Term> replaceMap = getReplaceMap(null, null, threadVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
@@ -117,9 +117,12 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         return threadType;
     }
 
-    
+    public ProgramVariable getThreadVar() {
+        return threadVar;
+    }
+
     private Map<Term, Term> getReplaceMap(Term prevHeap, Term currHeap,
-                    Term threadVar2, Services services) {
+                                          Term threadVar2, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         Map<Term, Term> res = new LinkedHashMap<Term, Term>();
         if (prevHeap != null)
@@ -128,7 +131,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         res.put(tb.var(threadVar), threadVar2);
         return res;
     }
-    
+
     @Override
     public String toString() {
         return "pre: "+pre+"; rely: "+rely+"; guarantee: "+guarantee
@@ -169,7 +172,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                             && t.assignable.equals(assignable);
         } else return false;
     }
-    
+
     @Override
     public int hashCode() {
         return 2*pre.hashCode() + 3*rely.hashCode() + 7*guarantee.hashCode()

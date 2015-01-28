@@ -38,8 +38,6 @@ public interface IExecutionContext extends Reference {
     * @return the runtime instance object
     */
    public ReferencePrefix getRuntimeInstance();
-   
+
    public TypeReference getThreadTypeReference();
-   
-   public ReferencePrefix getRuntimeThreadInstance();
 }

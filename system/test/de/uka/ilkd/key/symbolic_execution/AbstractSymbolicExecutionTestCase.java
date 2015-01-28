@@ -1225,7 +1225,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Load java file
       KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile, null, null, true);
       // Start proof
-      final Contract contract = environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
+      final Contract contract = (Contract)environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
       ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(), (FunctionalOperationContract)contract, true, true);
       Proof proof = environment.createProof(input);

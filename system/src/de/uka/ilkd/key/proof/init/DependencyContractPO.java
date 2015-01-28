@@ -31,8 +31,8 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
+import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
@@ -335,8 +335,8 @@ public final class DependencyContractPO extends AbstractPO
         else {
             baseContractName = contractName.substring(0, ind);
         }
-        final Contract contract = initConfig.getServices()
-                .getSpecificationRepository().getContractByName(baseContractName);
+        final DisplayableSpecificationElement contract =
+                initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + baseContractName);
         }

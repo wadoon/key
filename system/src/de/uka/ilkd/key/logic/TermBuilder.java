@@ -200,6 +200,24 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     /**
+     * Creates a program variable for "thread". Take care to register it
+     * in the namespaces!
+     */
+    public LocationVariable threadVar(KeYJavaType kjt,
+                                      boolean makeNameUnique,
+                                      String postfix) {
+        String name = "thread" + postfix;
+        if(makeNameUnique) {
+            name = newName(name);
+        }
+        return new LocationVariable(new ProgramElementName(name), kjt);
+    }
+
+    public LocationVariable threadVar(KeYJavaType kjt) {
+        return threadVar(kjt, true, "");
+    }
+
+    /**
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
