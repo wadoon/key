@@ -869,6 +869,10 @@ public final class SpecificationRepository {
         threadSpecs.put(kjt, rgs);
         contracts.put(new Pair<KeYJavaType, IObserverFunction>(kjt, null),
                       DefaultImmutableSet.<DisplayableSpecificationElement>nil().add(rgs));
+        final String name = rgs.getName();
+        assert contractsByName.get(name) == null
+                : "Tried to add a thread specification with a non-unique name: " + name;
+        contractsByName.put(rgs.getName(), rgs);
     }
     
     public void addThreadSpecifications(Iterable<ThreadSpecification> specs) {

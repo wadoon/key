@@ -237,7 +237,7 @@ public class GuaranteePO extends AbstractPO {
         final DisplayableSpecificationElement contract =
                 initConfig.getServices().getSpecificationRepository().getContractByName(tSpecName);
         if (contract == null) {
-            throw new RuntimeException("Contract not found: " + tSpecName);
+            throw new RuntimeException("Thread specification not found: " + tSpecName);
         }
         else {
             final ProofOblInput po = contract.createProofObl(initConfig);
