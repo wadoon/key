@@ -862,10 +862,11 @@ public final class SpecificationRepository {
     
     public void addThreadSpecification(ThreadSpecification rgs) {
         KeYJavaType kjt = rgs.getKJT();
-        if (threadSpecs.get(kjt) != null)
+        if (threadSpecs.get(kjt) != null) {
             // TODO: allow more?
             throw new IllegalStateException("Thread specification for thread type " +
                                             kjt + " already registered.");
+        }
         threadSpecs.put(kjt, rgs);
         contracts.put(new Pair<KeYJavaType, IObserverFunction>(kjt, null),
                       DefaultImmutableSet.<DisplayableSpecificationElement>nil().add(rgs));

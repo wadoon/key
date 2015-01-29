@@ -942,8 +942,8 @@ public abstract class KeYJavaASTFactory {
 	    final KeYJavaType classType, final IProgramMethod method,
 	    final ReferencePrefix reference) {
 	final TypeRef type = new TypeRef(classType);
-	final ExecutionContext context = new ExecutionContext(type, method,
-		reference);
+	final ExecutionContext context =
+			new ExecutionContext(type, method, reference, type);
 
 	return context;
     }

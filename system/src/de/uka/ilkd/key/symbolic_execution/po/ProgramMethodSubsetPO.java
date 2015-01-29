@@ -166,8 +166,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
       collectStatementsToExecute(statementsToExecute, pm.getBody());
       Statement[] statements = statementsToExecute.toArray(new Statement[statementsToExecute.size()]);
       StatementBlock blockToExecute = new StatementBlock(statements);
+      final TypeRef typeRef = new TypeRef(type);
       MethodFrame mf = new MethodFrame(endsWithReturn(statements) ? resultVar : null,
-                                       new ExecutionContext(new TypeRef(type), pm, selfVar),
+                                       new ExecutionContext(typeRef, pm, selfVar, typeRef),
                                        blockToExecute);
       StatementBlock result = new StatementBlock(mf);
       // Collect undeclared variables

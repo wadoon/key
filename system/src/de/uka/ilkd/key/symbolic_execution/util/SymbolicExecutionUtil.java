@@ -428,7 +428,7 @@ public final class SymbolicExecutionUtil {
                                                                                      Node methodCallEmptyNode,
                                                                                      IProgramVariable variable) {
       // Create execution context in that the method was called.
-      IExecutionContext context = new ExecutionContext(contextObjectType, contextMethod, contextObject);
+      IExecutionContext context = new ExecutionContext(contextObjectType, contextMethod, contextObject, contextObjectType);
       // Create sequent
       return createExtractReturnVariableValueSequent(services, context, methodReturnNode, methodCallEmptyNode, variable);
    }
