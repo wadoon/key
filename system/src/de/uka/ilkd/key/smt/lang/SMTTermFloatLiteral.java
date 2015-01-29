@@ -17,24 +17,25 @@
 package de.uka.ilkd.key.smt.lang;
 
 
-/**
- *
- *
- * @author Aboubakr Achraf El Ghazi
- *
- */
 public class SMTTermFloatLiteral extends SMTTerm {
 
-	private String value;
+	private final String value;
+	private final SMTSort sort;
 	
 	public SMTTermFloatLiteral (String fpString){
 		this.value = fpString;
+		this.sort = SMTSort.FLOAT;
+	}
+
+	public SMTTermFloatLiteral (String fpString, SMTSort sort){
+		this.value = fpString;
+		this.sort = sort;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public SMTSort sort () {
-		return SMTSort.FLOAT;
+		return this.sort;
 	}
 
 	/** {@inheritDoc} */
@@ -104,33 +105,7 @@ public class SMTTermFloatLiteral extends SMTTerm {
 			return false;
 		SMTTermFloatLiteral tn = (SMTTermFloatLiteral) term;
 		
-		return this.value == tn.value;
-	}
-
-	public boolean equals (SMTTerm term) {
-		return false;
-	/*	
-		if (term == null)
-			return false;
-		
-		if (this == term)
-			return true;
-		
-		if (! (term instanceof SMTTermFloatLiteral))
-			return false;
-		SMTTermFloatLiteral tn = (SMTTermFloatLiteral) term;
-		
-		return this.intValue == tn.intValue && this.bitSize== tn.bitSize;*/
-	}
-	
-	public boolean equals (SMTTermFloatLiteral tn) {
-		return false;
-	/*	
-		if (this == tn)
-			return true;
-		
-		return this.intValue == tn.intValue && this.bitSize== tn.bitSize;*/
-		
+		return this.sort == tn.sort && this.value == tn.value;
 	}
 	
 	@Override

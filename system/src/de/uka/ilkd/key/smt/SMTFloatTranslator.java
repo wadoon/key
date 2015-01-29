@@ -28,6 +28,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -101,6 +102,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 
 	// some special KeY sorts
 	private Sort floatSort;
+	private Sort doubleSort;
 	private Sort intSort;
 	private Sort boolSort;
 	private Sort heapSort;
@@ -124,6 +126,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 	 */
 	private void initOpTable() {
 		FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
+		DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
 		opTable = new HashMap<Operator, SMTTermMultOp.Op>();
 		opTable.put(Junctor.AND, SMTTermMultOp.Op.AND);
 		opTable.put(Junctor.OR, SMTTermMultOp.Op.OR);
@@ -163,6 +166,27 @@ public class SMTFloatTranslator implements SMTTranslator {
 		fopTable.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
 		fopTable.put(floatLDT.getCastLongToFloat(), SMTTermFloatOp.Op.CASTLONGTOFLOAT);
 		fopTable.put(floatLDT.getCastFloatToLong(), SMTTermFloatOp.Op.CASTFLOATTOLONG);
+
+		//Double predicates and operations, translated identically to float operations
+		fopTable.put(doubleLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
+		fopTable.put(doubleLDT.getGreaterThan(), SMTTermFloatOp.Op.FPGT);
+		fopTable.put(doubleLDT.getLessOrEquals(), SMTTermFloatOp.Op.FPLEQ);
+		fopTable.put(doubleLDT.getGreaterOrEquals(), SMTTermFloatOp.Op.FPGEQ);
+		fopTable.put(doubleLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
+		fopTable.put(doubleLDT.getAddDoubleIEEE(), SMTTermFloatOp.Op.FPADD);
+		fopTable.put(doubleLDT.getSubDoubleIEEE(), SMTTermFloatOp.Op.FPSUB);
+		fopTable.put(doubleLDT.getMulDoubleIEEE(), SMTTermFloatOp.Op.FPMUL);
+		fopTable.put(doubleLDT.getDivDoubleIEEE(), SMTTermFloatOp.Op.FPDIV);
+
+		fopTable.put(doubleLDT.getJavaUnaryMinusDouble(), SMTTermFloatOp.Op.FPNEG);
+		fopTable.put(doubleLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
+		fopTable.put(doubleLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
+		fopTable.put(doubleLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
+		fopTable.put(doubleLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
+		fopTable.put(doubleLDT.getIsSubnormal(), SMTTermFloatOp.Op.FPISSUBNORMAL);
+		fopTable.put(doubleLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
+		fopTable.put(doubleLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
+		fopTable.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
 	}
 
 	/**
@@ -200,6 +224,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 	 */
 	private void initSorts() {
 		floatSort = services.getTypeConverter().getFloatLDT().targetSort();
+		doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
 		intSort = services.getTypeConverter().getIntegerLDT().targetSort();
 		boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
 
@@ -381,6 +406,12 @@ public class SMTFloatTranslator implements SMTTranslator {
 			String fplitstring = NumberTranslation.translateFloatToSMTLIB(term, services);
 			return new SMTTermFloatLiteral(fplitstring);
 
+		} else if (op == services.getTypeConverter().getDoubleLDT()
+		        .getDoubleSymbol()) {
+			Debug.assertTrue(term.arity() == 2);
+			String fplitstring = NumberTranslation.translateDoubleToSMTLIB(term, services);
+			return new SMTTermFloatLiteral(fplitstring, SMTSort.DOUBLE);
+
 		} else if (op == services.getTypeConverter().getIntegerLDT()
 			.getNumberSymbol()) {
 			Term number = term.sub(0);
@@ -421,6 +452,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 			return SMTSort.BOOL;
 		} else if (s.equals(floatSort)) {
 			return SMTSort.FLOAT;
+		} else if (s.equals(doubleSort)) {
+			return SMTSort.DOUBLE;
 		} else if (s.equals(intSort)) {
 			return INTSORT;
 		} else if (s.equals(heapSort)) {

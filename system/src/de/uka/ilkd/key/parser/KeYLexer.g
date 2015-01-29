@@ -643,10 +643,23 @@ DIGIT_DISPATCH
   | NUM_LITERAL {$type = NUM_LITERAL;}
 ;
 
+FLOAT_DISPATCH
+:
+    FLOAT_LITERAL {$type = FLOAT_LITERAL;}
+  | DOUBLE_LITERAL {$type = DOUBLE_LITERAL;}
+;
+
+fragment
 FLOAT_LITERAL
 :
     (DIGIT)+ '.' (DIGIT)+ 'f'
-  | '0' 'x' (DIGIT)+ 'p' (MINUS)? (DIGIT)+
+;
+
+fragment
+DOUBLE_LITERAL
+:
+    (DIGIT)+ '.' (DIGIT)+
+    | '0' 'x' (DIGIT)+ 'p' (MINUS)? (DIGIT)+
 ;
 
 fragment

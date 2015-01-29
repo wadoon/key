@@ -91,6 +91,7 @@ options {
   import de.uka.ilkd.key.pp.LogicPrinter;
 
   import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+  import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -2653,6 +2654,18 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
 	} else {
 	  semanticError("No float function symbol: " + op_name);
 	}
+      } else if (a.sort().name().equals(new Name("double"))) {
+	if (op_name.equals("lt")) {
+	  op_name = "javaLtDouble";
+	} else if (op_name.equals("gt")) {
+	  op_name = "javaGtDouble";
+	} else if (op_name.equals("leq")) {
+	  op_name = "javaLeqDouble";
+	} else if (op_name.equals("geq")) {
+	  op_name = "javaGeqDouble";
+	} else {
+	  semanticError("No float function symbol: " + op_name);
+	}
       }
 
      Function op = (Function) functions().lookup(new Name(op_name));
@@ -3488,6 +3501,10 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         ((MINUS)? FLOAT_LITERAL) => (MINUS {neg = "-";})? fl=FLOAT_LITERAL
         { a = getServices().getTypeConverter().convertToLogicElement(
 		new FloatLiteral(neg+fl.getText())); }
+    |
+        ((MINUS)? DOUBLE_LITERAL) => (MINUS {neg = "-";})? fl=DOUBLE_LITERAL
+        { a = getServices().getTypeConverter().convertToLogicElement(
+		new DoubleLiteral(neg+fl.getText())); }
     | AT a = abbreviation
     | varfuncid = funcpred_name (LIMITED {limited = true;})?
         ( (~LBRACE | LBRACE bound_variables) =>

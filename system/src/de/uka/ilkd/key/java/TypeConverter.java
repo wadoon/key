@@ -50,6 +50,7 @@ public final class TypeConverter {
     private HeapLDT heapLDT = null;
     private IntegerLDT integerLDT = null;
     private FloatLDT floatLDT = null;
+    private DoubleLDT doubleLDT = null;
     
     TypeConverter(Services s) {
         this.services = s;
@@ -71,6 +72,7 @@ public final class TypeConverter {
         heapLDT = getHeapLDT();
         integerLDT = getIntegerLDT();
         floatLDT = getFloatLDT();
+        doubleLDT = getDoubleLDT();
     }
 
     public ImmutableList<LDT> getModels() {
@@ -101,6 +103,10 @@ public final class TypeConverter {
 
     public FloatLDT getFloatLDT() {
         return (FloatLDT) getLDT(FloatLDT.NAME);
+    }
+
+    public DoubleLDT getDoubleLDT() {
+        return (DoubleLDT) getLDT(DoubleLDT.NAME);
     }
 
     public BooleanLDT getBooleanLDT() {
@@ -491,6 +497,24 @@ public final class TypeConverter {
                         t2 == PrimitiveType.JAVA_LONG||
 			t2 == PrimitiveType.JAVA_FLOAT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+    	} else if ((t2 == PrimitiveType.JAVA_DOUBLE) &&
+                (t1 == PrimitiveType.JAVA_BYTE||
+                        t1 == PrimitiveType.JAVA_SHORT||
+                        t1 == PrimitiveType.JAVA_INT||
+                        t1 == PrimitiveType.JAVA_CHAR||
+                        t1 == PrimitiveType.JAVA_LONG||
+                        t1 == PrimitiveType.JAVA_FLOAT||
+			t1 == PrimitiveType.JAVA_DOUBLE)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+    	} else if ((t1 == PrimitiveType.JAVA_DOUBLE) &&
+                (t2 == PrimitiveType.JAVA_BYTE||
+                        t2 == PrimitiveType.JAVA_SHORT||
+                        t2 == PrimitiveType.JAVA_INT||
+                        t2 == PrimitiveType.JAVA_CHAR||
+                        t2 == PrimitiveType.JAVA_LONG||
+                        t2 == PrimitiveType.JAVA_FLOAT||
+			t2 == PrimitiveType.JAVA_DOUBLE)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
         } else {
             throw new RuntimeException("Could not determine promoted type "
         	    	               + "of " + t1 + " and " + t2);
@@ -526,6 +550,8 @@ public final class TypeConverter {
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
 	else if (t1 == PrimitiveType.JAVA_FLOAT)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+	else if (t1 == PrimitiveType.JAVA_DOUBLE)
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
 	else throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }

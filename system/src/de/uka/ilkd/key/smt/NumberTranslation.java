@@ -17,8 +17,10 @@ package de.uka.ilkd.key.smt;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.ExtList;
@@ -109,6 +111,39 @@ public final class NumberTranslation {
 	sign	  = "#b" + floatString.substring(0, 1);
 	e		  = "#b" + floatString.substring(1, msize+1);
 	m		  = "#b" + floatString.substring(msize+1, floatString.length());
+
+	return ("(fp " + sign + " " + e + " " + m + ")");
+    }
+
+    /** Translate a double literal of sort "double" in DFP notation to
+     * an SMTLIB fp literal
+     *
+     * @param term term with sort "double"
+     * @return A string containing the translated literal
+     */
+    public static String translateDoubleToSMTLIB(Term term, Services services) {
+	DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
+	String asString = ((DoubleLiteral)doubleLDT.translateTerm(
+			  term, new ExtList(), services)).getValue();
+
+	Double f = new Double(asString);
+	long doubleBits = Double.doubleToLongBits(f);
+
+	String doubleString, sign, m, e;
+
+	//Specific to the double64 format right now
+	int msize	  = 11;
+	doubleString = Long.toBinaryString(doubleBits);
+	int numLeadingZeroes = 64 - doubleString.length();
+	if (numLeadingZeroes > 0) {
+	    String zeroes = "00000000000000000000000000000000";
+	    zeroes = zeroes + zeroes;
+	    String padding = zeroes.substring(0, numLeadingZeroes);
+	    doubleString = padding + doubleString;
+	}
+	sign	  = "#b" + doubleString.substring(0, 1);
+	e		  = "#b" + doubleString.substring(1, msize+1);
+	m		  = "#b" + doubleString.substring(msize+1, doubleString.length());
 
 	return ("(fp " + sign + " " + e + " " + m + ")");
     }

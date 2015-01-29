@@ -263,6 +263,14 @@ public final class NotationInfo {
 	tbl.put(floatLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(floatLDT.getCastLongToFloat(), new Notation.Prefix("(float)",PRIORITY_BOTTOM, PRIORITY_ATOM));
 
+	final DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
+	tbl.put(doubleLDT.getDoubleSymbol(), new Notation.DoubleLiteral());
+	tbl.put(doubleLDT.getJavaUnaryMinusDouble(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+	tbl.put(doubleLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+	tbl.put(doubleLDT.getGreaterThan(), new Notation.Infix(">", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+	tbl.put(doubleLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+	tbl.put(doubleLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+
 
         	
 	//heap operators

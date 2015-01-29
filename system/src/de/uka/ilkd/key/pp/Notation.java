@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -691,6 +692,49 @@ public abstract class Notation {
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    final String number = printFloatTerm(t);
+	    if (number != null) {
+		sp.printConstant(number);
+	    } else {
+		sp.printFunctionTerm(t);
+	    }
+	}
+    }
+
+    /**
+     * The standard concrete syntax for the double literal indicator `DFP'.
+     */
+    static final class DoubleLiteral extends Notation {
+	public DoubleLiteral() {
+	    super(120);
+	}
+
+	public static String printDoubleTerm(Term doubleTerm) {
+
+	    final StringBuffer number = new StringBuffer();
+
+	    if (doubleTerm.op().name().toString().equals(
+		  DoubleLDT.NEGATIVE_LITERAL)) {
+		number.append("-");
+		doubleTerm = doubleTerm.sub(0);
+	    }
+
+	    if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) {
+		return null;
+	    }
+
+	    Term t1 = doubleTerm.sub(0);
+
+	    try {
+	      long bits = Long.parseLong(NumLiteral.printNumberTerm(t1));
+	      Double f = Double.longBitsToDouble(bits);
+	      return f.toString();
+	    } catch (NumberFormatException e) {
+		return null;
+	    }
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    final String number = printDoubleTerm(t);
 	    if (number != null) {
 		sp.printConstant(number);
 	    } else {
