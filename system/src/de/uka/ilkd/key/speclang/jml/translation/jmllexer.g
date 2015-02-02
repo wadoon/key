@@ -153,6 +153,14 @@ tokens {
     UNIONINF             = "\\infinite_union";  //KeY extension, not official JML
     VALUES               = "\\values";
     WORKINGSPACE         = "\\working_space";
+    FP_NAN               = "\\fp_nan";
+    FP_ZERO              = "\\fp_zero";
+    FP_NORMAL            = "\\fp_normal";
+    FP_SUBNORMAL         = "\\fp_subnormal";
+    FP_INFINITE          = "\\fp_infinite";
+    FP_POSITIVE          = "\\fp_positive";
+    FP_NEGATIVE          = "\\fp_negative";
+    FP_ABS               = "\\fp_abs";
     // ONLY_ACCESSED     = "\\only_accessed"; // too many common lexemes
     // ONLY_ASSIGNED     = "\\only_assigned";
     // ONLY_CALLED       = "\\only_called";
@@ -324,6 +332,16 @@ HEXNUMERAL
 DIGITS
     :
         (DIGIT)+
+;
+
+FLOAT_LITERAL
+    :
+    '_'! 'f'! (DIGIT)+ '_' (DIGIT)+ 'f'
+;
+
+DOUBLE_LITERAL
+    :
+    '_'! 'd'! (DIGIT)+ '_' (DIGIT)+ ('d')?
 ;
 
 CHAR_LITERAL:

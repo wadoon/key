@@ -131,9 +131,10 @@ public class SMTFloatTranslator implements SMTTranslator {
 		opTable.put(Junctor.AND, SMTTermMultOp.Op.AND);
 		opTable.put(Junctor.OR, SMTTermMultOp.Op.OR);
 		opTable.put(Junctor.IMP, SMTTermMultOp.Op.IMPLIES);
-		opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
+		//opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
 		
 		//Integer comparison
+		/*
 		opTable.put(services.getTypeConverter().getIntegerLDT().getLessThan(),
 		        SMTTermMultOp.Op.BVSLT);
 		opTable.put(services.getTypeConverter().getIntegerLDT()
@@ -142,7 +143,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 		        .getGreaterThan(), SMTTermMultOp.Op.BVSGT);
 		opTable.put(services.getTypeConverter().getIntegerLDT()
 		        .getGreaterOrEquals(), SMTTermMultOp.Op.BVSGE);
-
+		*/
 
 		fopTable = new HashMap<Operator, SMTTermFloatOp.Op>();
 		fopTable.put(floatLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
@@ -164,8 +165,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 		fopTable.put(floatLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
 		fopTable.put(floatLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
 		fopTable.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
-		fopTable.put(floatLDT.getCastLongToFloat(), SMTTermFloatOp.Op.CASTLONGTOFLOAT);
-		fopTable.put(floatLDT.getCastFloatToLong(), SMTTermFloatOp.Op.CASTFLOATTOLONG);
+		//fopTable.put(floatLDT.getCastLongToFloat(), SMTTermFloatOp.Op.CASTLONGTOFLOAT);
+		//fopTable.put(floatLDT.getCastFloatToLong(), SMTTermFloatOp.Op.CASTFLOATTOLONG);
 
 		//Double predicates and operations, translated identically to float operations
 		fopTable.put(doubleLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
@@ -422,6 +423,21 @@ public class SMTFloatTranslator implements SMTTranslator {
 		} else if (op == services.getTypeConverter().getFloatLDT()
 		        .getRoundingModeRNE()) {
 			return SMTTermConst.FP_RNE;
+		} else if (op == Equality.EQUALS) {
+
+		//opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
+			SMTTerm term0 = translateTerm(term.sub(0));
+			SMTTerm term1 = translateTerm(term.sub(1));
+			List<SMTTerm> terms = new LinkedList<SMTTerm>();
+			terms.add(term0);
+			terms.add(term1);
+			Sort sort = term.sub(0).sort();
+			if (sort == services.getTypeConverter().getDoubleLDT().targetSort() ||
+			    sort == services.getTypeConverter().getFloatLDT().targetSort()) {
+				return new SMTTermFloatOp(SMTTermFloatOp.Op.FPEQ, terms);
+			} else {
+				return new SMTTermMultOp(SMTTermMultOp.Op.EQUALS, terms);
+			}
 		} else if (op instanceof Function) {
 			Function fun = (Function) op;
 			if (isTrueConstant(fun, services)) {
@@ -454,12 +470,13 @@ public class SMTFloatTranslator implements SMTTranslator {
 			return SMTSort.FLOAT;
 		} else if (s.equals(doubleSort)) {
 			return SMTSort.DOUBLE;
-		} else if (s.equals(intSort)) {
+		/*} else if (s.equals(intSort)) {
 			return INTSORT;
 		} else if (s.equals(heapSort)) {
 			return sorts.get(HEAP_SORT);
 		} else if (s.equals(fieldSort)) {
 			return sorts.get(FIELD_SORT);
+		*/
 		} else {
 			//Translate all object types as Object sort
 			Sort obj = services.getJavaInfo().getJavaLangObject().getSort();
@@ -492,6 +509,18 @@ public class SMTFloatTranslator implements SMTTranslator {
 		return fun;
 	}
 
+
+	private String getSelectConstantName(String funName, ImmutableArray<Term> subs) {
+		StringBuffer sb = new StringBuffer(funName);
+		sb.append("<");
+		for(Term t : subs) {
+			sb.append(t.toString());
+			sb.append(",");
+		} 
+		sb.append(">");
+		return Util.processName(sb.toString());
+	}
+
 	/**
 	 * Translates a function call of function f with argument subs.
 	 * 
@@ -517,16 +546,22 @@ public class SMTFloatTranslator implements SMTTranslator {
 
 			return call(function, subs); 
 		} else if (name.endsWith("::select")) {
+			
 			String selectName = Util.processName(name);
 			
 			SMTSort target = translateSort(fun.sort());
-			SMTFunction f;
+			/*SMTFunction f;
 			if (functions.containsKey(selectName)) {
 				f = functions.get(selectName);
 			} else {
 				f = createSelectFunction(selectName, target);
 			}
-			return call(f, subs);
+			*/
+			String constName = getSelectConstantName(name, subs);
+			//String constName = Util.processName(fun.toString());
+			SMTFunction selectConstant = translateConstant(constName,
+				fun.sort());
+			return SMTTerm.call(selectConstant);
 		}
 		String msg = "No translation for function " + name;
 		throw new NoTranslationAvailableException(msg);
