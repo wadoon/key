@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.init.proofobligations;
 
-import abs.frontend.ast.ClassDecl;
+import abs.frontend.ast.Decl;
+import abs.frontend.ast.InterfaceDecl;
 import abs.frontend.ast.MethodImpl;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -21,7 +22,11 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.keyabs.abs.*;
+import de.uka.ilkd.keyabs.abs.ABSExecutionContext;
+import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
+import de.uka.ilkd.keyabs.abs.ABSMethodFrame;
+import de.uka.ilkd.keyabs.abs.ABSMethodLabel;
+import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.proof.init.ABSInitConfig;
 import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
@@ -45,7 +50,15 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
         super(initConfig);
         this.tb = services.getTermBuilder();
         this.className = className;
-        this.thisType = method.getMethodSig().getContextDecl().getDirectSuperTypes().iterator().next().qualifiedName();
+        Decl decl = method.getMethodSig().getContextDecl();
+        
+        if (decl instanceof InterfaceDecl) {
+            this.thisType = 
+            	((InterfaceDecl)decl).getDirectSuperTypes().iterator().next().qualifiedName();
+
+        } else {
+            throw new IllegalStateException("Method declared solely in a class are not yet supported.");
+        }
         this.method = method;
         this.classInvariants = repository.getClassInvariants(className.toString());
     }
