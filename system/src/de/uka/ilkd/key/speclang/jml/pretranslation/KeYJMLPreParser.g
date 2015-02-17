@@ -343,19 +343,53 @@ thread_spec[ImmutableList<String> mods]
   throws SLTranslationException
 @init {
     TextualJMLThreadSpecification spec = new TextualJMLThreadSpecification(mods);
+    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(spec);
     // TODO allow unordered specification
 }
 :
   thread_spec_keyword
-  (REQUIRES ps=expression { spec.addPre(ps); } )*
-  (RELIES_ON ps=expression { spec.addRely(ps); } )*
-  (GUARANTEES ps=expression { spec.addGuarantee(ps); })*
-  (NOT_ASSIGNED ps=expression { spec.setNotAssigned(ps); })?
-  (ASSIGNABLE ps=expression { spec.setAssignable(ps); })?
-  { result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(spec); }
+  (
+	options { greedy = true; }
+	:
+	thread_spec_body_clause[spec]
+  )+
 ;
 
-thread_spec_keyword: CONCURRENT_BEHAVIOR | CONCURRENT_BEHAVIOUR; 
+thread_spec_body_clause[TextualJMLThreadSpecification spec]
+	throws SLTranslationException
+@init {
+    PositionedString[] pss;
+}
+:
+    (
+         requires_keyword ps=expression { spec.addPre(ps); }
+     |   relies_keyword ps=expression { spec.addRely(ps); }
+     |   guarantees_keyword ps=expression { spec.addGuarantee(ps); }
+     |   not_assigned_keyword ps=expression { spec.setNotAssigned(ps); }
+     |   assignable_keyword ps=expression { spec.setAssignable(ps); }
+    )
+;
+
+thread_spec_keyword
+:
+        CONCURRENT_BEHAVIOR
+    |   CONCURRENT_BEHAVIOUR
+;
+
+relies_keyword
+:
+        RELIES_ON
+;
+
+guarantees_keyword
+:
+        GUARANTEES
+;
+
+not_assigned_keyword
+:
+        NOT_ASSIGNED
+;
 
 class_axiom[ImmutableList<String> mods]
             returns [ImmutableList<TextualJMLConstruct> result = null]
