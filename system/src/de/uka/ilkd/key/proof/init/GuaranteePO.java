@@ -77,13 +77,13 @@ public class GuaranteePO extends AbstractPO {
         final Sort runnableSort = target.sort();
         final Function targetField = tc.getHeapLDT().getFieldSymbolForPV(target, environmentServices);
         final Term selectTarget = tb.select(runnableSort, baseHeap, thread, tb.func(targetField));
-        final Term t = tb.func(new Function(new Name("runner"), runnableSort));
-        final Term targetDef = tb.equals(selectTarget, t);
-        final Term tNonNull = tb.not(tb.equals(t, nullTerm));
-        final Term tCreated = tb.created(t);
+        //final Term t = tb.func(new Function(new Name("runner"), runnableSort));
+        //final Term targetDef = tb.equals(selectTarget, t);
+        final Term tNonNull = tb.not(tb.equals(selectTarget, nullTerm));
+        final Term tCreated = tb.created(selectTarget);
         // TODO: exact instance?
 
-        return tb.and(wellFormed, nonNull, created, exactInstance, targetDef, tNonNull, tCreated);
+        return tb.and(wellFormed, nonNull, created, exactInstance,/* targetDef,*/ tNonNull, tCreated);
     }
 
     private JavaBlock buildJavaBlock(final ProgramVariable threadVar,
