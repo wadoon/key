@@ -41,6 +41,8 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -1224,6 +1226,7 @@ public class JMLSpecFactory {
                                                             TextualJMLThreadSpecification spec)
                     throws SLTranslationException {
         final JavaInfo ji = services.getJavaInfo();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         if (! ji.isSubtype(threadClass, ji.getJavaLangThread()))
             throw new SLTranslationException("Class " + threadClass +" cannot have a thread specification", 
                             spec.getSourceFileName(), spec.getApproxPosition(), null);
@@ -1258,8 +1261,8 @@ public class JMLSpecFactory {
                         TB.allLocs() : // default
                         JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, threadVar, null,
                                                       null, null, null, Term.class, services);
-        final LocationVariable prevHeapVar = services.getTypeConverter().getHeapLDT().getPrevHeap();
-        final LocationVariable currHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
+        final LocationVariable prevHeapVar = heapLDT.getPrevHeap();
+        final LocationVariable currHeapVar = heapLDT.getHeap();
         return new ThreadSpecification(name, null, threadClass, pre, rely, guar, notAssigned,
                                        assignable, prevHeapVar, currHeapVar, threadVar);
     }

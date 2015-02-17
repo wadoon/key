@@ -122,6 +122,7 @@ public final class JMLTranslator {
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         MODEL_METHOD_AXIOM ("model_method_axiom"),
+        NOT_ASSIGNED ("not_assigned"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
         SIGNALS ("signals"),
@@ -332,6 +333,24 @@ public final class JMLTranslator {
         	    return tb.convertToFormula(axiomsTerm);
         	}
        });
+        translationMethods.put(JMLKeyWord.NOT_ASSIGNED, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager, Object... params)
+                            throws SLTranslationException {
+                checkParameters(params, Term.class, Services.class);
+                Term notAssignedTerm = (Term) params[0];
+                Services services = (Services) params[1];
+
+                BooleanLDT booleanLDT =
+                        services.getTypeConverter().getBooleanLDT();
+                if (notAssignedTerm.sort() == booleanLDT.targetSort()) {
+                    return tb.convertToFormula(notAssignedTerm);
+                } else {
+                    return notAssignedTerm;
+                }
+            }
+        });
        translationMethods.put(JMLKeyWord.REPRESENTS,
                                new JMLTranslationMethod() {
 

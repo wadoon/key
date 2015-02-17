@@ -57,6 +57,7 @@ tokens {
     LOOP_SEPARATES  = "loop_separates";  //KeY extension, deprecated
     MODEL_METHOD_AXIOM    = "model_method_axiom";  //KeY extension, not official JML
     NON_NULL        = "non_null";
+    NOT_ASSIGNED_CLAUSE   = "not_assigned";
     NULLABLE        = "nullable";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";

@@ -346,6 +346,7 @@ top returns [Object result = null] throws  SLTranslationException
 :
     (   result = accessibleclause
     |   result = assignableclause
+    |   result = notassignedclause
     |   result = breaksclause
     |   result = continuesclause
     |   result = dependsclause
@@ -377,6 +378,17 @@ accessibleclause returns [Term result = null] throws SLTranslationException
 assignableclause returns [Term result = null] throws SLTranslationException
 :
     ass:ASSIGNABLE
+    ( result=storeRefUnion
+        { result = translator.translate(ass.getText(), Term.class, result, services); }
+    | STRICTLY_NOTHING
+        { result = tb.strictlyNothing(); }
+    )
+    ;
+
+
+notassignedclause returns [Term result = null] throws SLTranslationException
+:
+    ass:NOT_ASSIGNED_CLAUSE
     ( result=storeRefUnion
         { result = translator.translate(ass.getText(), Term.class, result, services); }
     | STRICTLY_NOTHING

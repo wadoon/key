@@ -362,11 +362,11 @@ thread_spec_body_clause[TextualJMLThreadSpecification spec]
 }
 :
     (
-         requires_keyword ps=expression { spec.addPre(ps); }
-     |   relies_keyword ps=expression { spec.addRely(ps); }
-     |   guarantees_keyword ps=expression { spec.addGuarantee(ps); }
-     |   not_assigned_keyword ps=expression { spec.setNotAssigned(ps); }
-     |   assignable_keyword ps=expression { spec.setAssignable(ps); }
+         requires_keyword ps=expression		{ spec.addPre(ps); }
+     |   relies_keyword ps=expression		{ spec.addRely(ps); }
+     |   guarantees_keyword ps=expression	{ spec.addGuarantee(ps); }
+     |   ps=not_assigned_clause			{ spec.setNotAssigned(ps); }
+     |   ps=thread_assignable_clause		{ spec.setAssignable(ps); }
     )
 ;
 
@@ -386,9 +386,27 @@ guarantees_keyword
         GUARANTEES
 ;
 
+not_assigned_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    not_assigned_keyword result=expression { result = result.prepend("not_assigned "); }
+;
+
 not_assigned_keyword
 :
         NOT_ASSIGNED
+;
+
+thread_assignable_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    assignable_keyword result=expression { result = result.prepend("assignable "); }
 ;
 
 class_axiom[ImmutableList<String> mods]
