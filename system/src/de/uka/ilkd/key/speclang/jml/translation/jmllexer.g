@@ -119,6 +119,8 @@ tokens {
     NUM_OF               = "\\num_of";
     OLD                  = "\\old";
     PRE                  = "\\pre";
+    PREV                 = "\\prev";
+    PRIVATEDATA          = "\\private_data";
     PRODUCT              = "\\product";
     REACH                = "\\reach";
     REACHLOCS            = "\\reachLocs";  //KeY extension, not official JML
@@ -186,9 +188,6 @@ MOD : "%";
 MULT : "*";
 NOT : "!";
 PLUS : "+";
-PRE : "\\pre";
-PREV : "\\prev";
-PRIVATEDATA : "\\private_data";
 QUESTIONMARK : "?";
 RBRACE : "}";
 SEMI : ";";
