@@ -999,51 +999,60 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
     KeYJavaType type = null;
     SLExpression right = null;
     Token opToken = null;
-    boolean isFloatType = false;
-    boolean isDoubleType = false;
 }
 :
 	result=shiftexpr
 	(
-	    lt:LT right=shiftexpr
-	    {
-		isFloatType = right.getType().getSort().equals(
-				floatLDT.targetSort());
-		isDoubleType = right.getType().getSort().equals(
-				doubleLDT.targetSort());
-		f = isFloatType ? floatLDT.getLessThan() :
-                    isDoubleType ? doubleLDT.getLessThan() :
-				intLDT.getLessThan();
-		opToken = lt;
-	    }
-	|
-	    gt:GT right=shiftexpr
-	    {
-		isFloatType = right.getType().getSort().equals(
-				floatLDT.targetSort());
-		isDoubleType = right.getType().getSort().equals(
-				doubleLDT.targetSort());
-		f = isFloatType ? floatLDT.getGreaterThan() :
-                    isDoubleType ? doubleLDT.getGreaterThan() :
-				  intLDT.getGreaterThan();
-		opToken = gt;
-	    }
-	|
-	    leq:LEQ right=shiftexpr
-	    {
-		isFloatType = right.getType().getSort().equals(
-				floatLDT.targetSort());
-		f = intLDT.getLessOrEquals();
-		opToken = leq;
-	    }
-	|
-	    geq:GEQ right=shiftexpr
-	    {
-		isFloatType = right.getType().getSort().equals(
-				floatLDT.targetSort());
-		f = intLDT.getGreaterOrEquals();
-		opToken = geq;
-	    }
+            (
+                lt:LT right=shiftexpr
+                {
+                    f = intLDT.getLessThan();
+                    opToken = lt;
+                }
+            |
+                gt:GT right=shiftexpr
+                {
+                    f = intLDT.getGreaterThan();
+                    opToken = gt;
+                }
+            |
+                leq:LEQ right=shiftexpr
+                {
+                    f = intLDT.getLessOrEquals();
+                    opToken = leq;
+                }
+            |
+                geq:GEQ right=shiftexpr
+                {
+                    f = intLDT.getGreaterOrEquals();
+                    opToken = geq;
+                }
+            )
+            {
+                if (right.getType().getSort().equals(
+				floatLDT.targetSort())) {
+                    if (f == intLDT.getLessThan()) {
+                        f = floatLDT.getLessThan();
+                    } else if (f == intLDT.getGreaterThan()) {
+                        f = floatLDT.getGreaterThan();
+                    } else if (f == intLDT.getLessOrEquals()) {
+                        f = floatLDT.getLessOrEquals();
+                    } else if (f == intLDT.getGreaterOrEquals()) {
+                        f = floatLDT.getGreaterOrEquals();
+                    }
+                } else if (right.getType().getSort().equals(
+				doubleLDT.targetSort())) {
+                    if (f == intLDT.getLessThan()) {
+                        f = doubleLDT.getLessThan();
+                    } else if (f == intLDT.getGreaterThan()) {
+                        f = doubleLDT.getGreaterThan();
+                    } else if (f == intLDT.getLessOrEquals()) {
+                        f = doubleLDT.getLessOrEquals();
+                    } else if (f == intLDT.getGreaterOrEquals()) {
+                        f = doubleLDT.getGreaterOrEquals();
+                    }
+                }
+            }
 	|
 	    llt:LOCKSET_LT right=postfixexpr
 	    {
@@ -1889,41 +1898,56 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
           | tk4: INDEXOF{tk=tk4;}))
          => result = sequence    
 
-    |   FP_NAN LPAREN e1=expression RPAREN
-        {
-            result = new SLExpression(tb.func(floatLDT.getIsNaN(), e1.getTerm()));
-        }
-    |   FP_ZERO LPAREN e1=expression RPAREN
-        {
-            result = new SLExpression(tb.func(floatLDT.getIsZero(), e1.getTerm()));
-        }
-    |   FP_NORMAL LPAREN e1=expression RPAREN
-        {
-            result = new SLExpression(tb.func(floatLDT.getIsNormal(), e1.getTerm()));
-        }
-    |   FP_SUBNORMAL LPAREN e1=expression RPAREN
-        {
-            result = new SLExpression(tb.func(floatLDT.getIsSubnormal(), e1.getTerm()));
-        }
-    |   FP_INFINITE LPAREN e1=expression RPAREN
-        {
-            result = new SLExpression(tb.func(floatLDT.getIsInfinite(), e1.getTerm()));
-        }
-    |   FP_POSITIVE LPAREN e1=expression RPAREN
-        {
-            result = new SLExpression(tb.func(floatLDT.getIsPositive(), e1.getTerm()));
-        }
-    |   FP_NEGATIVE LPAREN e1=expression RPAREN
-        {
-            result = new SLExpression(tb.func(floatLDT.getIsNegative(), e1.getTerm()));
-        }
-    |   FP_ABS LPAREN e1=expression RPAREN
-        {
-            result = new SLExpression(tb.func(doubleLDT.getAbs(), e1.getTerm()));
+    |   (   fpnan:FP_NAN        LPAREN e1=expression RPAREN { tk = fpnan; }
+        |   fpzero:FP_ZERO      LPAREN e1=expression RPAREN { tk = fpzero; }
+        |   fpnormal:FP_NORMAL  LPAREN e1=expression RPAREN { tk = fpnormal; }
+        |   fpsubnormal:FP_SUBNORMAL LPAREN e1=expression RPAREN { tk = fpsubnormal; }
+        |   fpinf:FP_INFINITE   LPAREN e1=expression RPAREN { tk = fpinf; }
+        |   fppos:FP_POSITIVE   LPAREN e1=expression RPAREN { tk = fppos; }
+        |   fpneg:FP_NEGATIVE   LPAREN e1=expression RPAREN { tk = fpneg; }
+        |   fpabs:FP_ABS        LPAREN e1=expression RPAREN { tk = fpabs; }
+        |   fpsub:FP_SUB        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpsub; }
+        ) {
+            Function f = null;
+
+            for (int i = 0; i < 2; i++) {
+                boolean isDouble = i == 1;
+                IFloatingPointLDT ldt = isDouble ? doubleLDT : floatLDT;
+                KeYJavaType fptype = isDouble ?
+                  javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_DOUBLE) :
+                  javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_FLOAT);
+                Sort targetSort = isDouble ? doubleLDT.targetSort() :
+                                             floatLDT.targetSort(); 
+
+                if (tk != null && e1.getType().getSort().equals(targetSort)) {
+                    if (tk.getType() == FP_NAN) {
+                        f = ldt.getIsNaN();
+                    } else if (tk.getType() == FP_ZERO) {
+                        f = ldt.getIsZero();
+                    } else if (tk.getType() == FP_NORMAL) {
+                        f = ldt.getIsNormal();
+                    } else if (tk.getType() == FP_SUBNORMAL) {
+                        f = ldt.getIsSubnormal();
+                    } else if (tk.getType() == FP_INFINITE) {
+                        f = ldt.getIsInfinite();
+                    } else if (tk.getType() == FP_POSITIVE) {
+                        f = ldt.getIsPositive();
+                    } else if (tk.getType() == FP_NEGATIVE) {
+                        f = ldt.getIsNegative();
+                    } else if (tk.getType() == FP_ABS) {
+                        result = new SLExpression(tb.func(ldt.getAbs(), e1.getTerm()), fptype);
+                    } else if (tk.getType() == FP_SUB) {
+                        result = new SLExpression(tb.func(ldt.getJavaSub(), e1.getTerm(), e2.getTerm()), fptype);
+                    }
+                }
+            }
+
+            if (f != null) {
+                result = new SLExpression(tb.func(f, e1.getTerm()));
+            }
         }
     |   LPAREN result=expression RPAREN
 ;
-
 
 sequence returns [SLExpression result = null] throws SLTranslationException
 {

@@ -96,6 +96,7 @@ options {
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
   import de.uka.ilkd.key.ldt.FloatLDT;
+  import de.uka.ilkd.key.ldt.DoubleLDT;
 
   
 }
@@ -2619,22 +2620,15 @@ weak_arith_op returns [String op_name = null]
  )
 ;
 
-strong_arith_op returns [Function op = null]
-@init{
-  String op_name = null;
-}
+strong_arith_op returns [String op_name = null]
 :
  (
     STAR         { op_name = "mul"; }
  |  SLASH        { op_name = "div"; }
  |  PERCENT      { op_name = "mod"; }
- ) {
-     op = (Function) functions().lookup(new Name(op_name)); 
-     if(op == null) {
-       semanticError("Function symbol '"+op_name+"' not found.");
-     }
-   }
+ )
 ;
+
 
 // term80
 logicTermReEntry returns [Term _logic_term_re_entry = null]
@@ -2651,10 +2645,8 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
 	  op_name = "javaLeqFloat";
 	} else if (op_name.equals("geq")) {
 	  op_name = "javaGeqFloat";
-	} else {
-	  semanticError("No float function symbol: " + op_name);
 	}
-      } else if (a.sort().name().equals(new Name("double"))) {
+      } else if (a.sort().name().equals(DoubleLDT.NAME)) {
 	if (op_name.equals("lt")) {
 	  op_name = "javaLtDouble";
 	} else if (op_name.equals("gt")) {
@@ -2663,8 +2655,6 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
 	  op_name = "javaLeqDouble";
 	} else if (op_name.equals("geq")) {
 	  op_name = "javaGeqDouble";
-	} else {
-	  semanticError("No float function symbol: " + op_name);
 	}
       }
 
@@ -2689,9 +2679,15 @@ weak_arith_op_term returns [Term _weak_arith_op_term = null]
       if (a.sort().name().equals(FloatLDT.NAME)) {
 	if (op_name.equals("add")) {
 	  op_name = "javaAddFloat";
-	} else {
-	  semanticError("No float function symbol: " + op_name);
-	}
+	} else if (op_name.equals("sub")) {
+	  op_name = "javaSubFloat";
+        }
+      } else if (a.sort().name().equals(DoubleLDT.NAME)) {
+	if (op_name.equals("add")) {
+	  op_name = "javaAddDouble";
+	} else if (op_name.equals("sub")) {
+	  op_name = "javaSubDouble";
+        }
       }
 
        Function op = (Function) functions().lookup(new Name(op_name));
@@ -2709,7 +2705,26 @@ weak_arith_op_term returns [Term _weak_arith_op_term = null]
 strong_arith_op_term returns [Term _strong_arith_op_term = null]
 @after { _strong_arith_op_term = a; }
 :
-   a = term110 ( (strong_arith_op) => op = strong_arith_op a1=term110 {
+   a = term110 ( (strong_arith_op) => op_name = strong_arith_op a1=term110 {
+                  Function op = null;
+
+                  if (a.sort().name().equals(FloatLDT.NAME)) {
+                    if (op_name.equals("mul")) {
+                      op_name = "javaMulFloat";
+                    } else if (op_name.equals("div")) {
+                      op_name = "javaDivFloat";
+                    }
+                  } else if (a.sort().name().equals(DoubleLDT.NAME)) {
+                    if (op_name.equals("mul")) {
+                      op_name = "javaMulDouble";
+                    } else if (op_name.equals("div")) {
+                      op_name = "javaDivDouble";
+                    }
+                  }
+                   op = (Function) functions().lookup(new Name(op_name)); 
+                   if(op == null) {
+                     semanticError("Function symbol '"+op_name+"' not found.");
+                   }
                   a = getTermFactory().createTerm(op, a, a1);
                 })*
 ;

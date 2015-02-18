@@ -256,7 +256,7 @@ public final class NotationInfo {
 
 	final FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
 	tbl.put(floatLDT.getFloatSymbol(), new Notation.FloatLiteral());
-	tbl.put(floatLDT.getJavaUnaryMinusFloat(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+	tbl.put(floatLDT.getJavaUnaryMinus(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 	tbl.put(floatLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(floatLDT.getGreaterThan(), new Notation.Infix(">", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(floatLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
@@ -265,7 +265,7 @@ public final class NotationInfo {
 
 	final DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
 	tbl.put(doubleLDT.getDoubleSymbol(), new Notation.DoubleLiteral());
-	tbl.put(doubleLDT.getJavaUnaryMinusDouble(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+	tbl.put(doubleLDT.getJavaUnaryMinus(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 	tbl.put(doubleLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(doubleLDT.getGreaterThan(), new Notation.Infix(">", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(doubleLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));

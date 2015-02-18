@@ -151,12 +151,12 @@ public class SMTFloatTranslator implements SMTTranslator {
 		fopTable.put(floatLDT.getLessOrEquals(), SMTTermFloatOp.Op.FPLEQ);
 		fopTable.put(floatLDT.getGreaterOrEquals(), SMTTermFloatOp.Op.FPGEQ);
 		fopTable.put(floatLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
-		fopTable.put(floatLDT.getAddFloatIEEE(), SMTTermFloatOp.Op.FPADD);
-		fopTable.put(floatLDT.getSubFloatIEEE(), SMTTermFloatOp.Op.FPSUB);
-		fopTable.put(floatLDT.getMulFloatIEEE(), SMTTermFloatOp.Op.FPMUL);
-		fopTable.put(floatLDT.getDivFloatIEEE(), SMTTermFloatOp.Op.FPDIV);
+		fopTable.put(floatLDT.getAddIEEE(), SMTTermFloatOp.Op.FPADD);
+		fopTable.put(floatLDT.getSubIEEE(), SMTTermFloatOp.Op.FPSUB);
+		fopTable.put(floatLDT.getMulIEEE(), SMTTermFloatOp.Op.FPMUL);
+		fopTable.put(floatLDT.getDivIEEE(), SMTTermFloatOp.Op.FPDIV);
 
-		fopTable.put(floatLDT.getJavaUnaryMinusFloat(), SMTTermFloatOp.Op.FPNEG);
+		fopTable.put(floatLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
 		fopTable.put(floatLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
 		fopTable.put(floatLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
 		fopTable.put(floatLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
@@ -174,12 +174,12 @@ public class SMTFloatTranslator implements SMTTranslator {
 		fopTable.put(doubleLDT.getLessOrEquals(), SMTTermFloatOp.Op.FPLEQ);
 		fopTable.put(doubleLDT.getGreaterOrEquals(), SMTTermFloatOp.Op.FPGEQ);
 		fopTable.put(doubleLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
-		fopTable.put(doubleLDT.getAddDoubleIEEE(), SMTTermFloatOp.Op.FPADD);
-		fopTable.put(doubleLDT.getSubDoubleIEEE(), SMTTermFloatOp.Op.FPSUB);
-		fopTable.put(doubleLDT.getMulDoubleIEEE(), SMTTermFloatOp.Op.FPMUL);
-		fopTable.put(doubleLDT.getDivDoubleIEEE(), SMTTermFloatOp.Op.FPDIV);
+		fopTable.put(doubleLDT.getAddIEEE(), SMTTermFloatOp.Op.FPADD);
+		fopTable.put(doubleLDT.getSubIEEE(), SMTTermFloatOp.Op.FPSUB);
+		fopTable.put(doubleLDT.getMulIEEE(), SMTTermFloatOp.Op.FPMUL);
+		fopTable.put(doubleLDT.getDivIEEE(), SMTTermFloatOp.Op.FPDIV);
 
-		fopTable.put(doubleLDT.getJavaUnaryMinusDouble(), SMTTermFloatOp.Op.FPNEG);
+		fopTable.put(doubleLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
 		fopTable.put(doubleLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
 		fopTable.put(doubleLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
 		fopTable.put(doubleLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
@@ -188,6 +188,12 @@ public class SMTFloatTranslator implements SMTTranslator {
 		fopTable.put(doubleLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
 		fopTable.put(doubleLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
 		fopTable.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
+
+		//Duplicate predicates (as not to be further abstracted by intervals)
+		fopTable.put(doubleLDT.getLessThan2(), SMTTermFloatOp.Op.FPLT);
+		fopTable.put(doubleLDT.getGreaterThan2(), SMTTermFloatOp.Op.FPGT);
+		fopTable.put(doubleLDT.getLessOrEquals2(), SMTTermFloatOp.Op.FPLEQ);
+		fopTable.put(doubleLDT.getGreaterOrEquals2(), SMTTermFloatOp.Op.FPGEQ);
 	}
 
 	/**

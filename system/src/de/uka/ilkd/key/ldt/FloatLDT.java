@@ -29,12 +29,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
-/**
- * Complete this class if you want to add support for the Java float type.
- *
- * At the moment this class contains only stubs.
- */
-public final class FloatLDT extends LDT {
+public final class FloatLDT extends LDT implements IFloatingPointLDT {
 
     public static final Name NAME = new Name("float");
     public static final Name FLOATLIT_NAME = new Name("FP");
@@ -200,17 +195,17 @@ public final class FloatLDT extends LDT {
         } else if (op instanceof LessOrEquals) {
             return getLessOrEquals();
         } else if (op instanceof Negative) {
-            return getJavaUnaryMinusFloat();
+            return getJavaUnaryMinus();
         } else if (op instanceof Plus) {
-            return getJavaAddFloat();
+            return getJavaAdd();
         } else if (op instanceof Minus) {
-            return getJavaSubFloat();
+            return getJavaSub();
         } else if (op instanceof Times) {
-            return getJavaMulFloat();
+            return getJavaMul();
         } else if (op instanceof Divide) {
-            return getJavaDivFloat();
+            return getJavaDiv();
         } else if (op instanceof Modulo) {
-            return getJavaModFloat();
+            return getJavaMod();
         } else {
             return null;
         }
@@ -280,35 +275,35 @@ public final class FloatLDT extends LDT {
 	return eqFloat;
     }
 
-    public Function getJavaUnaryMinusFloat() {
+    public Function getJavaUnaryMinus() {
 	return javaUnaryMinusFloat;
     }
 
-    public Function getJavaAddFloat() {
+    public Function getJavaAdd() {
 	return javaAddFloat;
     }
 
-    public Function getJavaSubFloat() {
+    public Function getJavaSub() {
 	return javaSubFloat;
     }
 
-    public Function getJavaMulFloat() {
+    public Function getJavaMul() {
 	return javaMulFloat;
     }
 
-    public Function getJavaDivFloat() {
+    public Function getJavaDiv() {
 	return javaDivFloat;
     }
 
-    public Function getJavaModFloat() {
+    public Function getJavaMod() {
 	return javaModFloat;
     }
 
-    public Function getJavaMinFloat() {
+    public Function getJavaMin() {
 	return javaMinFloat;
     }
 
-    public Function getJavaMaxFloat() {
+    public Function getJavaMax() {
 	return javaMaxFloat;
     }
 
@@ -340,19 +335,19 @@ public final class FloatLDT extends LDT {
 	return isNegative;
     }
 
-    public Function getAddFloatIEEE() {
+    public Function getAddIEEE() {
 	return addFloatIEEE;
     }
 
-    public Function getSubFloatIEEE() {
+    public Function getSubIEEE() {
 	return subFloatIEEE;
     }
 
-    public Function getMulFloatIEEE() {
+    public Function getMulIEEE() {
 	return mulFloatIEEE;
     }
 
-    public Function getDivFloatIEEE() {
+    public Function getDivIEEE() {
 	return divFloatIEEE;
     }
 

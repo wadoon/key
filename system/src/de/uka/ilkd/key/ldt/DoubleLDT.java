@@ -30,12 +30,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
-/**
- * Complete this class if you want to add support for the Java double type.
- *
- * At the moment this class contains only stubs.
- */
-public final class DoubleLDT extends LDT {
+public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     public static final Name NAME = new Name("double");
     public static final Name DOUBLELIT_NAME = new Name("DFP");
@@ -75,6 +70,12 @@ public final class DoubleLDT extends LDT {
 
     private final Function roundingModeRNE;
 
+    //Predicates that may not be abstracted, but only translated by SMT
+    private final Function lessThan2;
+    private final Function greaterThan2;
+    private final Function greaterOrEquals2;
+    private final Function lessOrEquals2;
+
 
     public DoubleLDT(TermServices services) {
 	super(NAME, services);
@@ -108,6 +109,11 @@ public final class DoubleLDT extends LDT {
 	isPositive	    = addFunction(services, "doubleIsPositive");
 	isNegative	    = addFunction(services, "doubleIsNegative");
 	roundingModeRNE	    = addFunction(services, "RNE");
+
+	lessThan2	    = addFunction(services, "interLt");
+	greaterThan2	    = addFunction(services, "interGt");
+	lessOrEquals2	    = addFunction(services, "interLeq");
+	greaterOrEquals2    = addFunction(services, "interGeq");
 
     }
 
@@ -189,7 +195,7 @@ public final class DoubleLDT extends LDT {
 	    			   Services services,
 	    			   ExecutionContext ec) {
         if (op instanceof Negative) {
-            return getJavaUnaryMinusDouble();
+            return getJavaUnaryMinus();
         } else {
             return null;
         }
@@ -258,35 +264,35 @@ public final class DoubleLDT extends LDT {
 	return eqDouble;
     }
 
-    public Function getJavaUnaryMinusDouble() {
+    public Function getJavaUnaryMinus() {
 	return javaUnaryMinusDouble;
     }
 
-    public Function getJavaAddDouble() {
+    public Function getJavaAdd() {
 	return javaAddDouble;
     }
 
-    public Function getJavaSubDouble() {
+    public Function getJavaSub() {
 	return javaSubDouble;
     }
 
-    public Function getJavaMulDouble() {
+    public Function getJavaMul() {
 	return javaMulDouble;
     }
 
-    public Function getJavaDivDouble() {
+    public Function getJavaDiv() {
 	return javaDivDouble;
     }
 
-    public Function getJavaModDouble() {
+    public Function getJavaMod() {
 	return javaModDouble;
     }
 
-    public Function getJavaMinDouble() {
+    public Function getJavaMin() {
 	return javaMinDouble;
     }
 
-    public Function getJavaMaxDouble() {
+    public Function getJavaMax() {
 	return javaMaxDouble;
     }
 
@@ -318,19 +324,19 @@ public final class DoubleLDT extends LDT {
 	return isNegative;
     }
 
-    public Function getAddDoubleIEEE() {
+    public Function getAddIEEE() {
 	return addDoubleIEEE;
     }
 
-    public Function getSubDoubleIEEE() {
+    public Function getSubIEEE() {
 	return subDoubleIEEE;
     }
 
-    public Function getMulDoubleIEEE() {
+    public Function getMulIEEE() {
 	return mulDoubleIEEE;
     }
 
-    public Function getDivDoubleIEEE() {
+    public Function getDivIEEE() {
 	return divDoubleIEEE;
     }
 
@@ -340,5 +346,22 @@ public final class DoubleLDT extends LDT {
 
     public Function getRoundingModeRNE() {
 	return roundingModeRNE;
+    }
+
+    //Predicates that have been simplified as intervals
+    public Function getLessThan2() {
+	return lessThan2;
+    }
+
+    public Function getGreaterThan2() {
+	return greaterThan2;
+    }
+
+    public Function getLessOrEquals2() {
+	return lessOrEquals2;
+    }
+
+    public Function getGreaterOrEquals2() {
+	return greaterOrEquals2;
     }
 }
