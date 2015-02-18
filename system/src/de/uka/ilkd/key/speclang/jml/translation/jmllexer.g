@@ -119,6 +119,7 @@ tokens {
     NOT_SPECIFIED        = "\\not_specified";
     NUM_OF               = "\\num_of";
     OLD                  = "\\old";
+    PERMISSION           = "\\permission";
     PRE                  = "\\pre";
     PREV                 = "\\prev";
     PRIVATEDATA          = "\\private_data";
@@ -217,6 +218,7 @@ LT_IMPLICIT_GT_DISPATCH
       LT {$setType(LT);}
     |
       GT {$setType(GT);}
+    
     ;
 
 LPAREN

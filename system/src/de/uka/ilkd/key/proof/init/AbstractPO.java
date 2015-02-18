@@ -282,7 +282,8 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     private void createProofHeader(String javaPath,
                                    String classPath,
-                                   String bootClassPath, 
+                                   String bootClassPath,
+                                   String includedFiles,
                                    Services services) {
         if (header != null) {
             return;
@@ -297,11 +298,16 @@ public abstract class AbstractPO implements IPersistablePO {
 
         //classpath
         if (classPath != null && !classPath.equals("")) {
-            sb.append("\\classpath \"").append(classPath).append("\";\n\n");
+            sb.append("\\classpath ").append(classPath).append(";\n\n");
         }
 
         //javaSource
         sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
+
+        //include
+        if (includedFiles != null && !includedFiles.equals("")) {
+            sb.append("\\include ").append(includedFiles).append(";\n\n");
+        }
 
         //contracts
         ImmutableSet<DisplayableSpecificationElement> contractsToSave = specRepos.getAllContracts();
@@ -336,6 +342,7 @@ public abstract class AbstractPO implements IPersistablePO {
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
                           javaModel.getBootClassPath(),
+                          javaModel.getIncludedFiles(),
                           proofConfig.getServices());
         Proof proof = new Proof(proofName,
                                 poTerm,
