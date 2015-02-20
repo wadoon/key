@@ -1938,7 +1938,7 @@ public final class LogicPrinter implements ILogicPrinter {
                 mark(MARK_END_FIRST_STMT);
             }
             if (i < x.getStatementCount() - 1) {
-                layouter.brk(1);
+                layouter.nl();
             }
         }
         layouter.print(" ");
@@ -2088,7 +2088,7 @@ public final class LogicPrinter implements ILogicPrinter {
 	}
 	layouter.print("methodframe");
         x.getExecutionContext().visit(programPrettyPrinter);
-        layouter.print(":{");
+        layouter.print(":{").brk();
         layouter.beginC(2).ind();
         printStatementList(x);
         layouter.brk(0,-2).end().print("}");
