@@ -1,0 +1,33 @@
+module Database;
+export *;
+
+import * from Account;
+
+interface DB {
+	Unit insertAccount(Account a);
+	Maybe<Account>getAccount(Int aid);
+}
+
+class DBImpl implements DB {
+	List<Account> as = Nil;
+	Unit insertAccount(Account a) {
+		as = Cons(a,as);
+	}
+
+	Account getAccount(Int aid) {
+		Account result = null;
+		Int n = length(as);
+		Int cnt = 0;
+		Bool ready = False;
+		while (cnt < n && ~ready) {
+			Account a = nth(as,cnt);
+			Int id = a.getAid();
+			if (aid == id) {
+				result = a; 
+				ready = True;
+			}
+			cnt = cnt+1;
+		}
+		return result;
+	}
+}

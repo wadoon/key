@@ -4,7 +4,12 @@
     };
 
   produceInv : Pubsub.Service {
-	true
+	\exists Pubsub.ProducerI pd; \exists Pubsub.ProxyI px; \forall Future u; (
+  		\forall int idx; \exists Future fr; (
+    			idx>=0 & idx<seqLen(history) & HistoryLabel::seqGet(history, idx) = invocEv(self, px, u, Pubsub.ProxyI::publish, fr) ->
+			\exists int idx_0; (
+                    	idx_0 >= 0 & idx_0<idx & HistoryLabel::seqGet(history, idx_0) = invocEv(self, pd, fr, Pubsub.ProducerI::detectNews, seqEmpty))
+	)
     };
 
   addInv : Pubsub.Proxy {

@@ -1,0 +1,25 @@
+module Driver;
+
+import * from Account;
+import * from Transaction;
+
+class Driver {
+
+
+	Unit run() {
+		Account a = new cog AccountImpl(1,4711);
+		Account b = new cog AccountImpl(2,4223);
+	
+		Transaction t1 = new cog TransactionImpl(150, a, b);
+		Transaction t2 = new cog TransactionImpl(150, a, b);
+
+		t1!doTransaction();
+		t2!doTransaction();
+
+
+	}
+}
+
+{   // Main Block
+	new Driver();
+}

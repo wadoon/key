@@ -1,0 +1,23 @@
+module Transaction;
+
+export *;
+
+import Account from Account;
+
+interface Transaction {
+
+  Unit doTransaction();
+
+}
+
+
+
+class TransactionImpl(Int amount, Account sourceAID, Account target) implements Transaction {
+
+   Bool doTransaction() {
+	Fut<Bool> successFut = source!transfer(amount, target);
+	return successFut.get;	
+   }
+
+}
+
