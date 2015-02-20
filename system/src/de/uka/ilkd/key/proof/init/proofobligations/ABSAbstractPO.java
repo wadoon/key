@@ -15,13 +15,6 @@ import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
 import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
-/**
- * Created with IntelliJ IDEA.
- * User: bubel
- * Date: 07.04.13
- * Time: 04:24
- * To change this template use File | Settings | File Templates.
- */
 public abstract class ABSAbstractPO implements ProofOblInput {
     protected final ABSInitConfig initConfig;
     protected final ABSServices services;
