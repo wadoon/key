@@ -22,8 +22,9 @@ public class SMTTermConst extends SMTTerm {
     private final SMTSort sort;
     private final String translation;
 
-    public static final SMTTermConst FP_RNE =
-	new SMTTermConst(SMTSort.FLOAT, "RNE");
+    public static final SMTTermConst FP_RNE = new SMTTermConst(SMTSort.FPROUNDINGMODE, "RNE");
+    public static final SMTTermConst FP_RTN = new SMTTermConst(SMTSort.FPROUNDINGMODE, "RTN");
+    public static final SMTTermConst FP_RTP = new SMTTermConst(SMTSort.FPROUNDINGMODE, "RTP");
 
     public SMTTermConst(SMTSort sort, String translation) {
 	this.sort = sort;

@@ -69,6 +69,8 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function isPositive;
 
     private final Function roundingModeRNE;
+    private final Function roundingModeRTN;
+    private final Function roundingModeRTP;
 
     //Predicates that may not be abstracted, but only translated by SMT
     private final Function lessThan2;
@@ -76,6 +78,9 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function greaterOrEquals2;
     private final Function lessOrEquals2;
 
+    private final Function intervalMin;
+    private final Function intervalMax;
+    private final Function toInterval;
 
     public DoubleLDT(TermServices services) {
 	super(NAME, services);
@@ -109,11 +114,17 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 	isPositive	    = addFunction(services, "doubleIsPositive");
 	isNegative	    = addFunction(services, "doubleIsNegative");
 	roundingModeRNE	    = addFunction(services, "RNE");
+	roundingModeRTN	    = addFunction(services, "RTN");
+	roundingModeRTP	    = addFunction(services, "RTP");
 
-	lessThan2	    = addFunction(services, "interLt");
-	greaterThan2	    = addFunction(services, "interGt");
-	lessOrEquals2	    = addFunction(services, "interLeq");
-	greaterOrEquals2    = addFunction(services, "interGeq");
+	lessThan2	    = addFunction(services, "interLtD");
+	greaterThan2	    = addFunction(services, "interGtD");
+	lessOrEquals2	    = addFunction(services, "interLeqD");
+	greaterOrEquals2    = addFunction(services, "interGeqD");
+
+	intervalMin	    = addFunction(services, "ivMinD");
+	intervalMax	    = addFunction(services, "ivMaxD");
+	toInterval	    = addFunction(services, "DTI");
 
     }
 
@@ -348,6 +359,14 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 	return roundingModeRNE;
     }
 
+    public Function getRoundingModeRTN() {
+	return roundingModeRTN;
+    }
+
+    public Function getRoundingModeRTP() {
+	return roundingModeRTP;
+    }
+
     //Predicates that have been simplified as intervals
     public Function getLessThan2() {
 	return lessThan2;
@@ -363,5 +382,17 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     public Function getGreaterOrEquals2() {
 	return greaterOrEquals2;
+    }
+
+    public Function getIntervalMin() {
+	return intervalMin;
+    }
+
+    public Function getIntervalMax() {
+	return intervalMax;
+    }
+
+    public Function getToInterval() {
+	return toInterval;
     }
 }

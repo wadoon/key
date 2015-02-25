@@ -194,6 +194,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 		fopTable.put(doubleLDT.getGreaterThan2(), SMTTermFloatOp.Op.FPGT);
 		fopTable.put(doubleLDT.getLessOrEquals2(), SMTTermFloatOp.Op.FPLEQ);
 		fopTable.put(doubleLDT.getGreaterOrEquals2(), SMTTermFloatOp.Op.FPGEQ);
+
 	}
 
 	/**
@@ -235,15 +236,16 @@ public class SMTFloatTranslator implements SMTTranslator {
 		intSort = services.getTypeConverter().getIntegerLDT().targetSort();
 		boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
 
-		heapSort = services.getTypeConverter().getHeapLDT().targetSort();
-		fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+		sorts = new HashMap<String, SMTSort>();
+
+		//heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+		//fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
 
 
 		//Init unbounded SMT sorts
-		sorts = new HashMap<String, SMTSort>();
-		sorts.put(HEAP_SORT, new SMTSort(HEAP_SORT));
-		sorts.put(OBJECT_SORT, new SMTSort(OBJECT_SORT));
-		sorts.put(FIELD_SORT, new SMTSort(FIELD_SORT));
+		//sorts.put(HEAP_SORT, new SMTSort(HEAP_SORT));
+		//sorts.put(OBJECT_SORT, new SMTSort(OBJECT_SORT));
+		//sorts.put(FIELD_SORT, new SMTSort(FIELD_SORT));
 	}
 
 	@Override
@@ -278,7 +280,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 	public SMTFile translateProblem(Term problem) {
 		SMTFile file = new SMTFile();
 
-		createArrFunction();
+		//createArrFunction();
 
 		// Translate the proof obligation
 		SMTTerm po = translateSequent(problem);
@@ -375,6 +377,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 	public SMTTerm translateTerm(Term term)
 	    throws NoTranslationAvailableException {
 		Operator op = term.op();
+		DoubleLDT dLDT = services.getTypeConverter().getDoubleLDT();
+		FloatLDT fLDT = services.getTypeConverter().getFloatLDT();
 		if (opTable.containsKey(op)) {
 
 			List<SMTTerm> args = new LinkedList<SMTTerm>();
@@ -426,9 +430,17 @@ public class SMTFloatTranslator implements SMTTranslator {
 			//Both int and long literal fit in 64 bits, and both translate the same
 			BigInteger bi = NumberTranslation.translate(number);
 			return new SMTTermNumber(bi.intValue(), 64, INTSORT);
-		} else if (op == services.getTypeConverter().getFloatLDT()
-		        .getRoundingModeRNE()) {
+		} else if (op == dLDT.getRoundingModeRNE()) {
 			return SMTTermConst.FP_RNE;
+		} else if (op == dLDT.getRoundingModeRTN()) {
+			return SMTTermConst.FP_RTN;
+		} else if (op == dLDT.getRoundingModeRTP()) {
+			return SMTTermConst.FP_RTP;
+		} else if (op == dLDT.getIntervalMin() 
+			|| op == dLDT.getIntervalMax()
+			|| op == dLDT.getToInterval()
+			) {
+			return translateTerm(term.sub(0)); 
 		} else if (op == Equality.EQUALS) {
 
 		//opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
@@ -485,13 +497,13 @@ public class SMTFloatTranslator implements SMTTranslator {
 		*/
 		} else {
 			//Translate all object types as Object sort
-			Sort obj = services.getJavaInfo().getJavaLangObject().getSort();
-			if (s.equals(obj) || s.extendsTrans(obj)) {
-				return sorts.get(OBJECT_SORT);
-			} else {
+			//Sort obj = services.getJavaInfo().getJavaLangObject().getSort();
+			//if (s.equals(obj) || s.extendsTrans(obj)) {
+			//	return sorts.get(OBJECT_SORT);
+			//} else {
 				String msg = "Translation Failed: Unsupported Sort: " + s.name();
 				throw new NoTranslationAvailableException(msg);
-			}
+			//}
 		}
 	}
 
@@ -568,8 +580,15 @@ public class SMTFloatTranslator implements SMTTranslator {
 			SMTFunction selectConstant = translateConstant(constName,
 				fun.sort());
 			return SMTTerm.call(selectConstant);
+		} else if (fun.arity() == 0) {
+			
+			//if (s.equals(boolSort) || s.equals(floatSort) || s.equals(doubleSort)) {
+			SMTFunction constant = translateConstant("|" + fun.name().toString() + "|",
+				fun.sort());
+			return SMTTerm.call(constant);
+			//}
 		}
-		String msg = "No translation for function " + name;
+		String msg = "No translation for function " + name + "\n(" + fun.arity() + "::" + fun.sort() + ")\n";
 		throw new NoTranslationAvailableException(msg);
 	}
 
