@@ -7,8 +7,8 @@ import de.uka.ilkd.key.rule.RelyRule;
 
 public class RelyRuleCompletion implements InteractiveRuleApplicationCompletion {
 
-	@Override
-	public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    @Override
+    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         if (!app.complete() && ((RelyBuiltInRuleApp) app).cannotComplete(goal)) {
             return app;
         }
@@ -18,19 +18,19 @@ public class RelyRuleCompletion implements InteractiveRuleApplicationCompletion 
                 return app;
             }
         }
-		return null;
-	}
+        return null; // TODO: interactive completion
+    }
 
-	@Override
-	public boolean canComplete(IBuiltInRuleApp app) {
-		return checkCanComplete(app);
-	}
+    @Override
+    public boolean canComplete(IBuiltInRuleApp app) {
+        return checkCanComplete(app);
+    }
 
-	/**
+    /**
      * Checks if the app is supported.
      * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-       return app.rule() instanceof RelyRule;
-   }
+        return app.rule() instanceof RelyRule;
+    }
 }

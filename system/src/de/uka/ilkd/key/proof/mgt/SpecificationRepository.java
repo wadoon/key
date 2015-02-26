@@ -855,11 +855,11 @@ public final class SpecificationRepository {
         }
         return result;
     }
-    
+
     public ThreadSpecification getThreadSpecification(KeYJavaType kjt) {
         return kjt != null ? threadSpecs.get(kjt) : null;
     }
-    
+
     public void addThreadSpecification(ThreadSpecification rgs) {
         KeYJavaType kjt = rgs.getKJT();
         if (threadSpecs.get(kjt) != null) {
@@ -875,7 +875,7 @@ public final class SpecificationRepository {
                 : "Tried to add a thread specification with a non-unique name: " + name;
         contractsByName.put(rgs.getName(), rgs);
     }
-    
+
     public void addThreadSpecifications(Iterable<ThreadSpecification> specs) {
         for (ThreadSpecification rgs: specs)
             addThreadSpecification(rgs);

@@ -31,9 +31,8 @@ public final class RelyBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
-        final RelyRule rule = (RelyRule) rule();
         final Term target = posInOccurrence().subTerm();
-        final RelyRule.Instantiation newInst = rule.getInstantiation(target, goal);
+        final RelyRule.Instantiation newInst = RelyRule.getInstantiation(target, goal);
         return new RelyBuiltInRuleApp(rule(), posInOccurrence(), newInst);
     }
 
