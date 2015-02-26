@@ -857,7 +857,7 @@ public final class SpecificationRepository {
     }
     
     public ThreadSpecification getThreadSpecification(KeYJavaType kjt) {
-        return threadSpecs.get(kjt);
+        return kjt != null ? threadSpecs.get(kjt) : null;
     }
     
     public void addThreadSpecification(ThreadSpecification rgs) {
