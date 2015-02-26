@@ -73,6 +73,7 @@ public class WindowUserInterface extends AbstractUserInterface {
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
+        completions.add(new RelyRuleCompletion());
         this.numOfInvokedMacros = 0;
     }
 

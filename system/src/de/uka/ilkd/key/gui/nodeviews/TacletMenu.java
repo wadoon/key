@@ -62,6 +62,7 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.RelyRule;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -314,6 +315,10 @@ public class TacletMenu extends JMenu {
                     CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
             add(item);
+        } else if (builtInRule == RelyRule.INSTANCE) {
+			item = new DefaultBuiltInRuleMenuItem(builtInRule.displayName(), builtInRule, true);
+			item.addActionListener(control);
+			add(item);
         } else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);
             item.addActionListener(control);

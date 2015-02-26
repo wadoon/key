@@ -223,7 +223,7 @@ public final class RelyRule implements BuiltInRule {
             // check whether rely/guarantee option is set
             return false;
         }
-        final Term target = pio.constrainedFormula().formula();
+        final Term target = extractUpdateTarget(pio.subTerm());
         final Instantiation inst = getInstantiation(target, goal);
         lastFocusTerm = target;
         lastInstantiation = inst;
@@ -240,12 +240,18 @@ public final class RelyRule implements BuiltInRule {
         return (CONCURRENCY_OPTION + ":RG").equals(concurrencyChoice);
     }
 
-    Instantiation getInstantiation(Term target, Goal goal) {
-        if (target == lastFocusTerm) return lastInstantiation;
+    private static Term extractUpdateTarget(Term formula) {
+        if (formula != null && formula.op() instanceof UpdateApplication) {
+            return UpdateApplication.getTarget(formula);
+        } else {
+            return formula;
+        }
+    }
 
-        // must be applied on modality possibly with one update
-        if (target.op() instanceof UpdateApplication)
-            target = target.sub(1);
+	Instantiation getInstantiation(Term target, Goal goal) {
+		// must be applied on modality possibly with one update
+		target = extractUpdateTarget(target);
+        if (target == lastFocusTerm) return lastInstantiation;
 
         if (!(target.op() instanceof Modality)) return null;
         final JavaBlock prog = target.javaBlock();
