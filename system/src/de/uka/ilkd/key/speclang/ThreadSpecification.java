@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
@@ -36,6 +39,15 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     private final Term notChanged;
     private final LocationVariable prevHeapVar, currHeapVar;
     private final ProgramVariable threadVar;
+    private static ImmutableList<ProgramVariable> threads;
+
+    private static void generateThreadSeq(Services services) {
+        ImmutableList<ProgramVariable> vars = ImmutableSLList.<ProgramVariable>nil();
+        for (ThreadSpecification ts : services.getSpecificationRepository().getAllThreadSpecs()) {
+            vars = vars.append(ts.getThreadVar());
+        }
+        threads = vars;
+    }
 
     public ThreadSpecification (String name, String displayName, 
                     KeYJavaType threadType, Term pre,
@@ -119,6 +131,13 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
     public ProgramVariable getThreadVar() {
         return threadVar;
+    }
+
+    public static ImmutableList<ProgramVariable> getThreads(Services services) {
+        if (threads == null) {
+            generateThreadSeq(services);
+        }
+        return threads;
     }
 
     private Map<Term, Term> getReplaceMap(Term prevHeap, Term currHeap,

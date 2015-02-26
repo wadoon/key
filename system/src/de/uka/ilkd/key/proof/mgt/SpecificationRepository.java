@@ -860,6 +860,15 @@ public final class SpecificationRepository {
         return kjt != null ? threadSpecs.get(kjt) : null;
     }
 
+    public ImmutableSet<ThreadSpecification> getAllThreadSpecs() {
+        ImmutableSet<ThreadSpecification> result =
+                DefaultImmutableSet.<ThreadSpecification> nil();
+        for (ThreadSpecification s : threadSpecs.values()) {
+            result = result.add(s);
+        }
+        return result;
+    }
+
     public void addThreadSpecification(ThreadSpecification rgs) {
         KeYJavaType kjt = rgs.getKJT();
         if (threadSpecs.get(kjt) != null) {

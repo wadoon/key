@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -38,7 +39,7 @@ public class GuaranteePO extends AbstractPO {
     private final static String RUN = "run";
     private final static String THROWABLE = "Throwable";
     private final static String TARGET = "target";
-    
+
     protected final ThreadSpecification tspec;
     
     public GuaranteePO (InitConfig initConfig, ThreadSpecification tspec) {
@@ -207,8 +208,11 @@ public class GuaranteePO extends AbstractPO {
     public void readProblem() throws ProofInputException {
         final KeYJavaType threadType = tspec.getKJT();
         final ProgramVariable threadVar = tspec.getThreadVar();
-        register(threadVar, environmentServices);
         final Term thread = tb.var(threadVar);
+        final ImmutableList<ProgramVariable> threadVars =
+                ThreadSpecification.getThreads(environmentServices);
+        register(threadVars, environmentServices);
+        final Term threads = tb.seq(tb.var(threadVars)); // the thread pool, TODO: usage
         final LocationVariable target =
                 (LocationVariable)javaInfo.getAttributeSuper(TARGET, threadType);
 
