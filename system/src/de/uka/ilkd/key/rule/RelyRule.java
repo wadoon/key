@@ -48,6 +48,20 @@ public final class RelyRule implements BuiltInRule {
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;
 
+    private static boolean relyGuaranteeEnabled(Goal goal) {
+        final String concurrencyChoice =
+                goal.proof().getSettings().getChoiceSettings().getDefaultChoice(CONCURRENCY_OPTION);
+        return (CONCURRENCY_OPTION + ":RG").equals(concurrencyChoice);
+    }
+
+    private static Term extractUpdateTarget(Term formula) {
+        if (formula != null && formula.op() instanceof UpdateApplication) {
+            return UpdateApplication.getTarget(formula);
+        } else {
+            return formula;
+        }
+    }
+
     private static Term buildAnonUpd(Term heap,
                                      ThreadSpecification ts,
                                      Services services) {
@@ -103,6 +117,75 @@ public final class RelyRule implements BuiltInRule {
         assert arrayType instanceof ArrayType;
         final Sort targetSort = ((ArrayType) arrayType).getBaseType().getKeYJavaType().getSort();
         return tb.elementary(lhs, tb.select(targetSort, heap, receiver, tb.arr(idx)));
+    }
+
+	Instantiation getInstantiation(Term target, Goal goal) {
+		// must be applied on modality possibly with one update
+		target = extractUpdateTarget(target);
+        if (target == lastFocusTerm) return lastInstantiation;
+
+        if (!(target.op() instanceof Modality)) return null;
+        final JavaBlock prog = target.javaBlock();
+        final SourceElement activeStm = JavaTools.getActiveStatement(prog);
+        if (activeStm == null) {
+            // empty modality
+            return new Instantiation(target);
+        }
+        if (!(activeStm instanceof Assignment)) return null;
+        final Expression lhs = ((Assignment) activeStm).getLhs();
+
+        // investigate RHS
+        final Expression rhs = ((Assignment) activeStm).getRhs();
+        // must be field access (excludes array length)
+        if (rhs instanceof FieldReference) {
+            assert lhs instanceof ProgramVariable: "unexpected: "+lhs;
+            final ProgramVariable field = ((FieldReference) rhs).getProgramVariable();
+            // must not be final
+            if (field.isFinal()) return null;
+
+            // prefix may still be this, static access (w/ variable prefix)
+            return new Instantiation(target, (ProgramVariable) lhs, (FieldReference) rhs); // TODO
+        } else if (rhs instanceof ArrayReference) {
+            assert lhs instanceof ProgramVariable: "unexpected: "+lhs;
+            return new Instantiation(target, (ProgramVariable) lhs, (ArrayReference) rhs);
+        } else
+            return null;
+    }
+
+    private static ThreadSpecification getApplicableThreadSpec(JavaBlock jb, Services services) {
+        final ExecutionContext ec = JavaTools.getInnermostExecutionContext(jb, services);
+        final TypeReference typeRef = ec.getThreadTypeReference();
+        if (typeRef == null) {
+            return null;
+        }
+        final KeYJavaType threadType = typeRef.getKeYJavaType();
+        if (threadType == null) {
+            return null;
+        }
+        return services.getSpecificationRepository().getThreadSpecification(threadType);
+    }
+
+    @Override
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+        if (pio == null
+                || pio.isInAntec()
+                || !pio.isTopLevel()
+                || Transformer.inTransformer(pio)) {
+            return false;
+        }
+        if (!relyGuaranteeEnabled(goal)) {
+            // check whether rely/guarantee option is set
+            return false;
+        }
+        final Term target = extractUpdateTarget(pio.subTerm());
+        final Instantiation inst = getInstantiation(target, goal);
+        lastFocusTerm = target;
+        lastInstantiation = inst;
+        if (inst == null) {
+            return false;
+        }
+        final Services services = goal.proof().getServices();
+        return getApplicableThreadSpec(inst.target.javaBlock(), services) != null;
     }
 
     @Override
@@ -209,89 +292,6 @@ public final class RelyRule implements BuiltInRule {
     @Override
     public String toString() {
         return displayName();
-    }
-
-    @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null
-                || pio.isInAntec()
-                || !pio.isTopLevel()
-                || Transformer.inTransformer(pio)) {
-            return false;
-        }
-        if (!relyGuaranteeEnabled(goal)) {
-            // check whether rely/guarantee option is set
-            return false;
-        }
-        final Term target = extractUpdateTarget(pio.subTerm());
-        final Instantiation inst = getInstantiation(target, goal);
-        lastFocusTerm = target;
-        lastInstantiation = inst;
-        if (inst == null) {
-            return false;
-        }
-        final Services services = goal.proof().getServices();
-        return getApplicableThreadSpec(inst.target.javaBlock(), services) != null;
-    }
-
-    private static boolean relyGuaranteeEnabled(Goal goal) {
-        final String concurrencyChoice =
-                goal.proof().getSettings().getChoiceSettings().getDefaultChoice(CONCURRENCY_OPTION);
-        return (CONCURRENCY_OPTION + ":RG").equals(concurrencyChoice);
-    }
-
-    private static Term extractUpdateTarget(Term formula) {
-        if (formula != null && formula.op() instanceof UpdateApplication) {
-            return UpdateApplication.getTarget(formula);
-        } else {
-            return formula;
-        }
-    }
-
-	Instantiation getInstantiation(Term target, Goal goal) {
-		// must be applied on modality possibly with one update
-		target = extractUpdateTarget(target);
-        if (target == lastFocusTerm) return lastInstantiation;
-
-        if (!(target.op() instanceof Modality)) return null;
-        final JavaBlock prog = target.javaBlock();
-        final SourceElement activeStm = JavaTools.getActiveStatement(prog);
-        if (activeStm == null) {
-            // empty modality
-            return new Instantiation(target);
-        }
-        if (!(activeStm instanceof Assignment)) return null;
-        final Expression lhs = ((Assignment) activeStm).getLhs();
-
-        // investigate RHS
-        final Expression rhs = ((Assignment) activeStm).getRhs();
-        // must be field access (excludes array length)
-        if (rhs instanceof FieldReference) {
-            assert lhs instanceof ProgramVariable: "unexpected: "+lhs;
-            final ProgramVariable field = ((FieldReference) rhs).getProgramVariable();
-            // must not be final
-            if (field.isFinal()) return null;
-
-            // prefix may still be this, static access (w/ variable prefix)
-            return new Instantiation(target, (ProgramVariable) lhs, (FieldReference) rhs); // TODO
-        } else if (rhs instanceof ArrayReference) {
-            assert lhs instanceof ProgramVariable: "unexpected: "+lhs;
-            return new Instantiation(target, (ProgramVariable) lhs, (ArrayReference) rhs);
-        } else
-            return null;
-    }
-
-    private static ThreadSpecification getApplicableThreadSpec(JavaBlock jb, Services services) {
-        final ExecutionContext ec = JavaTools.getInnermostExecutionContext(jb, services);
-        final TypeReference typeRef = ec.getThreadTypeReference();
-        if (typeRef == null) {
-            return null;
-        }
-        final KeYJavaType threadType = typeRef.getKeYJavaType();
-        if (threadType == null) {
-            return null;
-        }
-        return services.getSpecificationRepository().getThreadSpecification(threadType);
     }
 
     @Override
