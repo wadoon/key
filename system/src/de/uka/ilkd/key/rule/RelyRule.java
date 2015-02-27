@@ -196,6 +196,14 @@ public final class RelyRule implements BuiltInRule {
         return getApplicableThreadSpec(inst.target, services) != null;
     }
 
+    private static void nullReferenceGoal(final Goal g, final PosInOccurrence pio,
+                                          FieldReference fieldRef, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final ProgramVariable pv = fieldRef.getProgramVariable();
+        g.addFormula(new SequentFormula(tb.equals(tb.var(pv),tb.NULL())), true, true);
+        g.changeFormula(new SequentFormula(tb.ff()), pio);
+    }
+
     private static ImmutableList<Goal> apply(Goal goal,
                                              final Services services,
                                              final PosInOccurrence pio,
@@ -237,6 +245,14 @@ public final class RelyRule implements BuiltInRule {
                         res = goal.split(1);
                         break;
                     case BAN:
+                        if (inst.fieldAccess.getProgramVariable().isStatic()) {
+                            res = goal.split(1);
+                        } else {
+                            res = goal.split(2);
+                            nullReferenceGoal(res.tail().head(), pio, inst.fieldAccess, services);
+                        }
+                        //assert false : "TODO";
+                        break;
                     case ALLOW:
                         res = goal.split(2);
                         assert false : "TODO";
@@ -248,16 +264,19 @@ public final class RelyRule implements BuiltInRule {
             } else { // array access
                 assert (inst.arrayAccess != null);
                 switch (exc) {
-                case IGNORE:
+                    case IGNORE:
                         res = goal.split(1);
                         break;
-                case BAN:
-                case ALLOW:
-                    res = goal.split(3);
-                    assert false : "TODO";
-                    break;
-                default:
-                    res = null;
+                    case BAN:
+                        res = goal.split(3);
+                        assert false : "TODO";
+                        break;
+                    case ALLOW:
+                        res = goal.split(3);
+                        assert false : "TODO";
+                        break;
+                    default:
+                        res = null;
                 }
                 assignUpd = buildArrayAccAssignUpd(lhs, inst.arrayAccess, heap, target, services);
             }

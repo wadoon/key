@@ -20,7 +20,12 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.ThreadSpecification;
@@ -206,6 +211,7 @@ public class GuaranteePO extends AbstractPO {
 
     @Override
     public void readProblem() throws ProofInputException {
+
         final KeYJavaType threadType = tspec.getKJT();
         final ProgramVariable threadVar = tspec.getThreadVar();
         final Term thread = tb.var(threadVar);
