@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.init.proofobligations;
 
 import abs.frontend.ast.Decl;
 import abs.frontend.ast.InterfaceDecl;
+import abs.frontend.ast.ClassDecl;
 import abs.frontend.ast.MethodImpl;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -55,8 +56,10 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
         if (decl instanceof InterfaceDecl) {
             this.thisType = 
             	((InterfaceDecl)decl).getDirectSuperTypes().iterator().next().qualifiedName();
-
-        } else {
+        } else if (decl instanceof ClassDecl) {
+            this.thisType = 
+            	((ClassDecl)decl).getDirectSuperTypes().iterator().next().qualifiedName();
+	} else {
             throw new IllegalStateException("Method declared solely in a class are not yet supported.");
         }
         this.method = method;
