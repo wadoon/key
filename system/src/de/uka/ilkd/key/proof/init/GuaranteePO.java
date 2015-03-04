@@ -43,17 +43,19 @@ public class GuaranteePO extends AbstractPO {
     private final static String NAME = ".Thread Specification";
     private final static String RUN = "run";
     private final static String THROWABLE = "Throwable";
-    private final static String TARGET = "target";
+    public final static String TARGET = "target";
 
     protected final ThreadSpecification tspec;
+    private LocationVariable target;
     
-    public GuaranteePO (InitConfig initConfig, ThreadSpecification tspec) {
+    public GuaranteePO (final InitConfig initConfig, final ThreadSpecification tspec) {
         super(initConfig, tspec.getKJT() + NAME);
         final KeYJavaType threadType = javaInfo.getTypeByClassName(THREAD);
         if (!javaInfo.isSubtype(tspec.getKJT(), threadType))
             throw new IllegalArgumentException("Thread specification must be associated " +
                                                "to a subtype of java.lang.Thread");
         this.tspec = tspec;
+        this.target = (LocationVariable)javaInfo.getAttributeSuper(TARGET, threadType);
     }
 
     @Override
@@ -69,10 +71,8 @@ public class GuaranteePO extends AbstractPO {
      * @return The {@link Term} containing the general assumptions.
      */
     private Term buildFreePre(final Term thread,
-                              final KeYJavaType threadType,
-                              final LocationVariable target,
-                              final Services services) {
-        final TypeConverter tc = services.getTypeConverter();
+                              final KeYJavaType threadType) {
+        final TypeConverter tc = environmentServices.getTypeConverter();
         final Term baseHeap = tb.getBaseHeap();
         final Term nullTerm = tb.NULL();
 
@@ -82,7 +82,7 @@ public class GuaranteePO extends AbstractPO {
         final Term created = tb.created(thread);
         final Term exactInstance = tb.exactInstance(threadType.getSort(), thread);
         final Sort runnableSort = target.sort();
-        final Function targetField = tc.getHeapLDT().getFieldSymbolForPV(target, services);
+        final Function targetField = tc.getHeapLDT().getFieldSymbolForPV(target, environmentServices);
         final Term selectTarget = tb.select(runnableSort, baseHeap, thread, tb.func(targetField));
         //final Term t = tb.func(new Function(new Name("runner"), runnableSort));
         //final Term targetDef = tb.equals(selectTarget, t);
@@ -93,7 +93,7 @@ public class GuaranteePO extends AbstractPO {
         return tb.and(wellFormed, nonNull, created, exactInstance,/* targetDef,*/ tNonNull, tCreated);
     }
 
-    private JavaBlock buildJavaBlock(final ProgramVariable threadVar,
+    private JavaBlock buildJavaBlock(final LocationVariable threadVar,
                                      final KeYJavaType threadType,
                                      final LocationVariable target) {
         final ReferencePrefix reference = KeYJavaASTFactory.fieldReference(threadVar, target);
@@ -159,11 +159,9 @@ public class GuaranteePO extends AbstractPO {
         return tb.all(iVar, tb.imp(guard, tb.and(frame, guar)));
     }
 
-    private Term buildGuaranteeTerm(final ProgramVariable threadVar,
-                                    final KeYJavaType threadType,
-                                    final LocationVariable target,
-                                    final Services services) {
-        final TypeConverter tc = services.getTypeConverter();
+    private Term buildGuaranteeTerm(final LocationVariable threadVar,
+                                    final KeYJavaType threadType) {
+        final TypeConverter tc = environmentServices.getTypeConverter();
         final Term baseHeap = tb.getBaseHeap();
 
         final Term thread = tb.var(threadVar);
@@ -171,11 +169,11 @@ public class GuaranteePO extends AbstractPO {
 
         final JavaBlock jb = buildJavaBlock(threadVar, threadType, target);
 
-        final Term traceProp = buildTraceProp(thread, heaps, services);
+        final Term traceProp = buildTraceProp(thread, heaps, environmentServices);
 
         final Modality modality = Modality.DIA; // XXX: only diamond for uniform translation
 
-        final Term pre = tspec.getPre(baseHeap, thread, services);
+        final Term pre = tspec.getPre(baseHeap, thread, environmentServices);
         final Term upd = tb.elementary(heaps, tb.seqSingleton(baseHeap));
         final Term prog = tb.prog(modality, jb, traceProp);
 
@@ -213,29 +211,32 @@ public class GuaranteePO extends AbstractPO {
     public void readProblem() throws ProofInputException {
 
         final KeYJavaType threadType = tspec.getKJT();
-        final ProgramVariable threadVar = tspec.getThreadVar();
+        final LocationVariable threadVar = tspec.getThreadVar();
         final Term thread = tb.var(threadVar);
         final ImmutableList<ProgramVariable> threadVars =
                 ThreadSpecification.getThreads(environmentServices);
         register(threadVars, environmentServices);
         final Term threads = tb.seq(tb.var(threadVars)); // the thread pool, TODO: usage
-        final LocationVariable target =
-                (LocationVariable)javaInfo.getAttributeSuper(TARGET, threadType);
 
-        final Term guaranteeTerm = buildGuaranteeTerm(threadVar, threadType, target, environmentServices);
+        final Term guaranteeTerm = buildGuaranteeTerm(threadVar, threadType);
         final Term transitivityTerm = buildReflexivityAndTransitivityTerm(thread);
-        final Term freePre = buildFreePre(thread, threadType, target, environmentServices);
+        final Term freePre = buildFreePre(thread, threadType);
 
         final Term result = tb.imp(freePre, tb.and(guaranteeTerm, transitivityTerm));
 
         assignPOTerms(result);
     }
 
+    public LocationVariable getTarget() {
+        assert this.target != null;
+        return this.target;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
+    public void fillSaveProperties(final Properties properties) throws IOException {
         super.fillSaveProperties(properties);
         properties.setProperty("threadSpec", tspec.getName());
     }
@@ -247,7 +248,8 @@ public class GuaranteePO extends AbstractPO {
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+    public static LoadedPOContainer loadFrom(final InitConfig initConfig,
+                                             final Properties properties) throws IOException {
         String tSpecName = properties.getProperty("threadSpec");
         final DisplayableSpecificationElement contract =
                 initConfig.getServices().getSpecificationRepository().getContractByName(tSpecName);

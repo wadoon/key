@@ -38,7 +38,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     private final Term assignable;
     private final Term notChanged;
     private final LocationVariable prevHeapVar, currHeapVar;
-    private final ProgramVariable threadVar;
+    private final LocationVariable threadVar;
     private static ImmutableList<ProgramVariable> threads;
 
     private static void generateThreadSeq(Services services) {
@@ -53,7 +53,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                     KeYJavaType threadType, Term pre,
                     Term rely, Term guarantee, Term notChanged, Term assignable,
                     LocationVariable prevHeapVar, LocationVariable currHeapVar,
-                    ProgramVariable threadVar) {
+                    LocationVariable threadVar) {
         assert name != null;
         assert threadType != null;
         assert pre != null;
@@ -129,7 +129,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         return threadType;
     }
 
-    public ProgramVariable getThreadVar() {
+    public LocationVariable getThreadVar() {
         return threadVar;
     }
 
