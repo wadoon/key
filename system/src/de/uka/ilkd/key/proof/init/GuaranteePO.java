@@ -192,7 +192,7 @@ public class GuaranteePO extends AbstractPO {
         vars.add(heap0Var);
         vars.add(heap1Var);
         vars.add(heap2Var);
-        
+
         final Term heap0 = tb.var(heap0Var);
         final Term heap1 = tb.var(heap1Var);
         final Term heap2 = tb.var(heap2Var);
@@ -203,8 +203,9 @@ public class GuaranteePO extends AbstractPO {
 
         final Term trans = tb.imp(tb.and(relyTrans0, relyTrans1), relyTrans2);
         final Term reflex = tspec.getRely(heap0, heap0, thread, environmentServices);
-        
-        return tb.all(vars, tb.and(reflex, trans));
+        final Term reflexAndTrans = tb.and(reflex, trans);
+
+        return reflexAndTrans != tb.tt() ? tb.all(vars, reflexAndTrans) : tb.tt();
     }
 
     @Override

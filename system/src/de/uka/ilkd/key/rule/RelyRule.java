@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -49,7 +51,7 @@ public final class RelyRule implements BuiltInRule {
     public static final String CONCURRENCY_OPTION = "concurrency";
     public static final String EXC_OPTION = "runtimeExceptions";
     private static enum ExcOption { IGNORE, ALLOW, BAN; }
-    private static enum RuleType { EMPTY_MOD, FIELD_ACCESS, ARRAY_ACCESS;
+    private static enum RuleType { EMPTY_MODALITY, FIELD_ACCESS, ARRAY_ACCESS;
         @Override
         public String toString() { return super.toString().replace('_', ' ').toLowerCase(); }
     }
@@ -79,6 +81,10 @@ public final class RelyRule implements BuiltInRule {
                                         + excChoice);
         }
         return res;
+    }
+
+    private static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence) {
+        return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
     }
 
     private static Term extractUpdateTarget(final Term formula) {
@@ -181,7 +187,7 @@ public final class RelyRule implements BuiltInRule {
         ExecutionContext ec = JavaTools.getInnermostExecutionContext(target.javaBlock(), services);
         final TypeReference typeRef = ec != null ? ec.getThreadTypeReference() : null;
         final KeYJavaType threadType = typeRef != null ? typeRef.getKeYJavaType() : null;
-        if (ec == null && target.javaBlock().size() == 0 && type == RuleType.EMPTY_MOD) {
+        if (ec == null && target.javaBlock().size() == 0 && type == RuleType.EMPTY_MODALITY) {
             return searchThreadSpec(services);
         } else {
             return services.getSpecificationRepository().getThreadSpecification(threadType);
@@ -189,18 +195,17 @@ public final class RelyRule implements BuiltInRule {
     }
 
     private static void nullReferenceGoal(final ImmutableList<Goal> goals, final PosInOccurrence pio,
-                                          final Term update, FieldReference fieldRef,
+                                          final Term update, final ProgramVariable var,
                                           final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Goal normExecGoal = goals.tail().head();
         final Goal nullRefGoal = goals.head();
-        normExecGoal.setBranchLabel("Normal Execution (" + fieldRef + " != null");
-        nullRefGoal.setBranchLabel("Null Reference (" + fieldRef + " = null)");
-        final ProgramVariable pv = fieldRef.getProgramVariable();
-        final Term eqNull = tb.equals(tb.var(pv), tb.NULL());
 
-        nullRefGoal.addFormula(new SequentFormula(tb.apply(update, eqNull)),
-                               true, true);
+        normExecGoal.setBranchLabel("Normal Execution (" + var + " != null)");
+        nullRefGoal.setBranchLabel("Null Reference (" + var + " = null)");
+
+        final Term eqNull = tb.equals(tb.var(var), tb.NULL());
+        nullRefGoal.addFormula(new SequentFormula(tb.apply(update, eqNull)), true, true);
         nullRefGoal.changeFormula(new SequentFormula(tb.ff()), pio);
     }
 
@@ -210,18 +215,30 @@ public final class RelyRule implements BuiltInRule {
                                                             final FieldReference fieldAcc,
                                                             final Term leadingUpd,
                                                             final Services services) {
+        final ReferencePrefix prefix = fieldAcc.getReferencePrefix();
+        final ProgramVariable pv;
+        if (prefix instanceof FieldReference) {
+            pv = ((FieldReference) prefix).getProgramVariable();
+        } else if (prefix instanceof ThisReference) {
+            pv = null;
+        } else {
+            // TODO: Can this be generally assumed?
+            assert prefix instanceof ProgramVariable;
+            pv = (ProgramVariable)prefix;
+        }
         final ImmutableList<Goal> res;
         switch (exc) {
             case IGNORE:
                 res = goal.split(1);
                 break;
             case BAN:
-                final ProgramVariable fieldAccPV = fieldAcc.getProgramVariable();
-                if (fieldAccPV.isStatic() || fieldAccPV.isFinal()) {
+                if (pv == null
+                    || pv.isStatic()
+                    || pv.isFinal()) {
                     res = goal.split(1);
                 } else {
                     res = goal.split(2);
-                    nullReferenceGoal(res, pio, leadingUpd, fieldAcc, services);
+                    nullReferenceGoal(res, pio, leadingUpd, pv, services);
                 }
                 //assert false : "TODO";
                 break;
@@ -278,8 +295,19 @@ public final class RelyRule implements BuiltInRule {
         goal.changeFormula(new SequentFormula(prog), pio);
     }
 
-    private static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence) {
-        return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
+    private static ProgramVariable getApplicableVariable(final Expression lhs) {
+        final ProgramVariable pv;
+        if (lhs instanceof ThisReference) {
+            return null; // must not be "this"-reference
+        }
+        if (lhs instanceof FieldReference) {
+            pv = ((FieldReference) lhs).getProgramVariable();
+        } else {
+            // TODO: Can this be generally assumed?
+            assert lhs instanceof ProgramVariable: "unexpected: " + lhs;
+            pv = (ProgramVariable)lhs;
+        }
+        return !pv.isStatic() ? pv : null; // must not be static
     }
 
     static Instantiation getInstantiation(Term target, final Goal goal) {
@@ -301,6 +329,10 @@ public final class RelyRule implements BuiltInRule {
             final Assignment stm = (Assignment)activeStm;
             final Expression lhs = stm.getLhs();
             final Expression rhs = stm.getRhs();
+            final ProgramVariable lhsVar = getApplicableVariable(lhs);
+            if (lhsVar == null) {
+                return null;
+            }
 
             // investigate RHS
             if (rhs instanceof FieldReference) {
@@ -311,15 +343,12 @@ public final class RelyRule implements BuiltInRule {
                 if (!fieldRef.getProgramVariable().isFinal() || isTargetVar) {
                     // must not be final and target variable must be treated
                     // prefix may still be this, static access (w/ variable prefix)
-                    return new Instantiation(target, lhs, fieldRef); // TODO
+                    return new Instantiation(target, lhsVar, fieldRef); // TODO
                 }
             } else if (rhs instanceof ArrayReference) {
-                return new Instantiation(target, lhs, (ArrayReference) rhs);
+                return new Instantiation(target, lhsVar, (ArrayReference) rhs);
             }
         }
-        // not the empty modality
-        // not an array reference
-        // not a non-final field reference (except the thread target itself)
         return null;
     }
 
@@ -362,7 +391,7 @@ public final class RelyRule implements BuiltInRule {
         final Term assignUpd; // the particular assignment effect
 
         switch (type) {
-        case EMPTY_MOD: // empty modality rule
+        case EMPTY_MODALITY: // empty modality rule
             res = goal.split(1);
             assignUpd = null;
             break;
@@ -383,7 +412,7 @@ public final class RelyRule implements BuiltInRule {
         final Term newProg;
         final Term post = target.sub(0);
         if (assignUpd != null) {
-            assert type != RuleType.EMPTY_MOD;
+            assert type != RuleType.EMPTY_MODALITY;
             final JavaBlock newBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
             final Term prog = tb.prog((Modality)target.op(), newBlock, post);
             newProg = tb.apply(assignUpd, prog); // assignment effect in any case
@@ -405,6 +434,7 @@ public final class RelyRule implements BuiltInRule {
         if (inst == null) {
             throw new RuleAbortException();
         }
+        assert type != null;
         final ThreadSpecification ts =
                 getApplicableThreadSpec(extractUpdateTarget(inst.target), services);
         if (ts == null) {
@@ -442,31 +472,29 @@ public final class RelyRule implements BuiltInRule {
 
         private Instantiation (final Term target) {
             assert target.javaBlock() != null;
-            type = RuleType.EMPTY_MOD;
+            type = RuleType.EMPTY_MODALITY;
             this.target = target;
-            lhs = null;
-            fieldAccess = null;
-            arrayAccess = null;
+            this.lhs = null;
+            this.fieldAccess = null;
+            this.arrayAccess = null;
         }
 
-        private Instantiation (final Term target, final Expression lhs, final FieldReference fr) {
+        private Instantiation (final Term target, final ProgramVariable lhs, final FieldReference fr) {
             assert target.javaBlock() != null;
-            assert lhs instanceof ProgramVariable: "unexpected: " + lhs;
             type = RuleType.FIELD_ACCESS;
             this.target = target;
-            this.lhs = (ProgramVariable)lhs;
-            fieldAccess = fr;
-            arrayAccess = null;
+            this.lhs = lhs;
+            this.fieldAccess = fr;
+            this.arrayAccess = null;
         }
 
-        private Instantiation (final Term target, final Expression lhs, final ArrayReference ar) {
+        private Instantiation (final Term target, final ProgramVariable lhs, final ArrayReference ar) {
             assert target.javaBlock() != null;
-            assert lhs instanceof ProgramVariable: "unexpected: " + lhs;
-            type = RuleType.FIELD_ACCESS;
+            type = RuleType.ARRAY_ACCESS;
             this.target = target;
-            this.lhs = (ProgramVariable)lhs;
-            fieldAccess = null;
-            arrayAccess = ar;
+            this.lhs = lhs;
+            this.fieldAccess = null;
+            this.arrayAccess = ar;
         }
     }
 }
