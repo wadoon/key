@@ -649,7 +649,6 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 	} else {
 	    toReturn.append("(");
 	    toReturn.append(name+" ");
-
 	    for (int i = 0; i < args.size(); i++) {
 		toReturn.append(args.get(i)+" ");
 	    }

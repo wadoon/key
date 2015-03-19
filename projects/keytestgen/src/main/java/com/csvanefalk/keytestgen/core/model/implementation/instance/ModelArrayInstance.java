@@ -1,6 +1,7 @@
 package com.csvanefalk.keytestgen.core.model.implementation.instance;
 
 import com.csvanefalk.keytestgen.StringConstants;
+import com.csvanefalk.keytestgen.core.model.implementation.variable.ConcreteArrInterp;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
@@ -10,13 +11,14 @@ import java.util.List;
 /**
  * Represents a concrete instance of a Java array.
  */
-public class ModelArrayInstance extends ModelInstance {
-
+public class ModelArrayInstance extends ModelInstance {   
     public ModelArrayInstance(KeYJavaType keYJavaType) {
         super(keYJavaType);
     }
-
-    /**
+    
+    
+   
+   /**
      * Gets the length of this array. If the length is defined explicitly in connection
      * with creating this instance, then this specific value is used. Otherwise, the standard
      * size of the associated elements is used.
@@ -64,4 +66,7 @@ public class ModelArrayInstance extends ModelInstance {
        }
         return null;
     }
+
+    
+    
 }

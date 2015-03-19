@@ -46,4 +46,12 @@ public final class StringConstants {
     public static final String EXCEPTION = "exc";
     public static final String ARRAY = "arr";
     public static final String SEPARATOR = "_";
+    //----added by Huy------
+    public static final String BSUM = "bsum";
+    public static final String SUM = "sum";
+    public static final String MAX = "max";
+    public static final String MIN = "min";
+    public static final String JAVA_CAST_INT = "javaCastInt";
+    public static final String IN_INT = "inInt";
+    //-----------------------
 }

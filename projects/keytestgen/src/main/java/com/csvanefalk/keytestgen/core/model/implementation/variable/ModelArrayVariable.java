@@ -1,8 +1,7 @@
 package com.csvanefalk.keytestgen.core.model.implementation.variable;
 
-import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelArrayInstance;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
@@ -12,14 +11,31 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  * type elements.
  */
 public class ModelArrayVariable extends ModelVariable {
-
+   
+   private ConcreteArrInterp arrInterp; //concrete array interpretation
+   
     public ModelArrayVariable(final IProgramVariable programVariable,
                        final String identifier) {
         super(programVariable, identifier);
+        arrInterp = null;
     }
     
+    
+    //clone constructor
     public ModelArrayVariable(ModelArrayVariable mvA){
        super(mvA);
+       this.arrInterp = mvA.arrInterp;
+    }
+    
+    //added by Huy
+    public ModelArrayVariable(String varName){
+       super(varName);
+       arrInterp = null;
+    }
+    
+    public ModelArrayVariable(String varName, ConcreteArrInterp arrInterp){
+       super(varName);
+       this.arrInterp = arrInterp; 
     }
     /**
      * @override
@@ -31,6 +47,7 @@ public class ModelArrayVariable extends ModelVariable {
     /*
      * return array's dimension 
      * based on analyzing sort string
+     * added by Huy
      **/
     public int dimension(){
        /*ModelVariable mv = ((ModelArrayInstance)getValue()).getArrayElements().get(0);
@@ -49,6 +66,16 @@ public class ModelArrayVariable extends ModelVariable {
        }
        return dimension;
     }
+
+
+   public ConcreteArrInterp getArrInterp() {
+      return arrInterp;
+   }
+
+
+   public void setArrInterp(ConcreteArrInterp arrInterp) {
+      this.arrInterp = arrInterp;
+   }
     
     
 }
