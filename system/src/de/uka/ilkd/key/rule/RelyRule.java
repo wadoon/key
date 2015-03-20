@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
@@ -126,12 +128,14 @@ public final class RelyRule implements BuiltInRule {
         return tb.elementary(heap, tb.anon(heap, assigned, anonHeap));
     }
 
-    private static Term buildFieldAccAssignUpd(final ProgramVariable lhs,
+    private static Term buildFieldAccAssignUpd(final Expression lhs,
                                                final FieldReference fieldRef,
                                                final Term heap,
+                                               final Term target,
                                                final Services services) throws RuleAbortException {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
+        final TypeConverter tc = services.getTypeConverter();
         final ProgramVariable pv = fieldRef.getProgramVariable();
 
         Term receiver = null;
@@ -143,16 +147,33 @@ public final class RelyRule implements BuiltInRule {
 
         final Sort targetSort = pv.sort();
         final Term field = tb.func(heapLDT.getFieldSymbolForPV((LocationVariable)pv, services));
+        final ExecutionContext ec = JavaTools.getInnermostExecutionContext(target.javaBlock(), services);
+        final Sort lhsSort = lhs.getKeYJavaType(services, ec).getSort();
 
-        return tb.elementary(tb.var(lhs), tb.select(targetSort, heap, receiver, field));
+        final Term upd;
+        if (lhsSort instanceof ArraySort) {
+            final Type arrayType = lhs.getKeYJavaType(services, ec).getJavaType();
+            final Sort arrTargetSort = ((ArrayType) arrayType).getBaseType().getKeYJavaType().getSort();
+            final Term pref = tc.convertToLogicElement(((ArrayReference)lhs).getReferencePrefix(), ec);
+            final Term idx =
+                    tc.convertToLogicElement(((ArrayReference)lhs).getDimensionExpressions().get(0), ec);
+            upd = tb.elementary(tb.select(arrTargetSort, heap, pref, tb.arr(idx)),
+                                tb.select(targetSort, heap, receiver, field));
+        } else {
+            assert lhs instanceof ProgramVariable : "unexpected " + lhs;
+            upd = tb.elementary(tb.var((ProgramVariable)lhs),
+                                tb.select(targetSort, heap, receiver, field));
+        }
+        return upd;
     }
 
-    private static Term buildArrayAccAssignUpd(final ProgramVariable lhs,
+    private static Term buildArrayAccAssignUpd(final Expression lhs,
                                                final ArrayReference arrayRef,
                                                final Term heap,
                                                final Term target,
                                                final Services services) throws RuleAbortException {
         final TermBuilder tb = services.getTermBuilder();
+        final TypeConverter tc = services.getTypeConverter();
 
         Term receiver = null;
         Term idx = null;
@@ -164,10 +185,26 @@ public final class RelyRule implements BuiltInRule {
         }
 
         final ExecutionContext ec = JavaTools.getInnermostExecutionContext(target.javaBlock(), services);
+        final Sort lhsSort = lhs.getKeYJavaType(services, ec).getSort();
         final Type arrayType = arrayRef.getKeYJavaType(services, ec).getJavaType();
         assert arrayType instanceof ArrayType;
         final Sort targetSort = ((ArrayType) arrayType).getBaseType().getKeYJavaType().getSort();
-        return tb.elementary(tb.var(lhs), tb.select(targetSort, heap, receiver, tb.arr(idx)));
+
+        final Term upd;
+        if (lhsSort instanceof ArraySort) {
+            final Type lhsArrayType = lhs.getKeYJavaType(services, ec).getJavaType();
+            final Sort arrTargetSort = ((ArrayType) lhsArrayType).getBaseType().getKeYJavaType().getSort();
+            final Term pref = tc.convertToLogicElement(((ArrayReference)lhs).getReferencePrefix(), ec);
+            final Term lhsIdx =
+                    tc.convertToLogicElement(((ArrayReference)lhs).getDimensionExpressions().get(0), ec);
+            upd = tb.elementary(tb.select(arrTargetSort, heap, pref, tb.arr(lhsIdx)),
+                                tb.select(targetSort, heap, receiver, tb.arr(idx)));
+        } else {
+            assert lhs instanceof ProgramVariable : "unexpected " + lhs;
+            upd = tb.elementary(tb.var((ProgramVariable)lhs),
+                                tb.select(targetSort, heap, receiver, tb.arr(idx)));
+        }
+        return upd;
     }
 
     private static ThreadSpecification searchThreadSpec(final Services services) {
@@ -295,19 +332,23 @@ public final class RelyRule implements BuiltInRule {
         goal.changeFormula(new SequentFormula(prog), pio);
     }
 
-    private static ProgramVariable getApplicableVariable(final Expression lhs) {
-        final ProgramVariable pv;
+    private static Expression getApplicableVariable(final Expression lhs) {
+        final Expression var;
         if (lhs instanceof ThisReference) {
             return null; // must not be "this"-reference
         }
         if (lhs instanceof FieldReference) {
-            pv = ((FieldReference) lhs).getProgramVariable();
+            var = ((FieldReference) lhs).getProgramVariable();
+        } else if (lhs instanceof ArrayReference) {
+            // TODO: Is this correct?
+            var = (ArrayReference) lhs;
         } else {
             // TODO: Can this be generally assumed?
             assert lhs instanceof ProgramVariable: "unexpected: " + lhs;
-            pv = (ProgramVariable)lhs;
+            var = (ProgramVariable)lhs;
         }
-        return !pv.isStatic() ? pv : null; // must not be static
+        return !(var instanceof ProgramVariable
+                && ((ProgramVariable)var).isStatic()) ? var : null; // must not be static
     }
 
     static Instantiation getInstantiation(Term target, final Goal goal) {
@@ -329,7 +370,7 @@ public final class RelyRule implements BuiltInRule {
             final Assignment stm = (Assignment)activeStm;
             final Expression lhs = stm.getLhs();
             final Expression rhs = stm.getRhs();
-            final ProgramVariable lhsVar = getApplicableVariable(lhs);
+            final Expression lhsVar = getApplicableVariable(lhs);
             if (lhsVar == null) {
                 return null;
             }
@@ -338,9 +379,9 @@ public final class RelyRule implements BuiltInRule {
             if (rhs instanceof FieldReference) {
                 // must be field access (excludes array length)
                 final FieldReference fieldRef = (FieldReference) rhs;
-                final boolean isTargetVar =
-                        fieldRef.getProgramVariable().equals(getTargetVar(goal.proof()));
-                if (!fieldRef.getProgramVariable().isFinal() || isTargetVar) {
+                /*final boolean isTargetVar =
+                        fieldRef.getProgramVariable().equals(getTargetVar(goal.proof()));*/
+                if (!fieldRef.getProgramVariable().isFinal()/* || isTargetVar*/) {
                     // must not be final and target variable must be treated
                     // prefix may still be this, static access (w/ variable prefix)
                     return new Instantiation(target, lhsVar, fieldRef); // TODO
@@ -398,7 +439,7 @@ public final class RelyRule implements BuiltInRule {
         case FIELD_ACCESS: //  // field (attribute) read access
             assert inst.fieldAccess != null;
             res = setupFieldAccessRule(goal, pio, exc, inst.fieldAccess, leadingUpd, services);
-            assignUpd = buildFieldAccAssignUpd(inst.lhs, inst.fieldAccess, heap, services);
+            assignUpd = buildFieldAccAssignUpd(inst.lhs, inst.fieldAccess, heap, target, services);
             break;
         case ARRAY_ACCESS: // array read access
             assert inst.arrayAccess != null;
@@ -466,7 +507,7 @@ public final class RelyRule implements BuiltInRule {
     static class Instantiation {
 
         final Term target;
-        final ProgramVariable lhs;
+        final Expression lhs;
         final FieldReference fieldAccess;
         final ArrayReference arrayAccess;
 
@@ -479,7 +520,7 @@ public final class RelyRule implements BuiltInRule {
             this.arrayAccess = null;
         }
 
-        private Instantiation (final Term target, final ProgramVariable lhs, final FieldReference fr) {
+        private Instantiation (final Term target, final Expression lhs, final FieldReference fr) {
             assert target.javaBlock() != null;
             type = RuleType.FIELD_ACCESS;
             this.target = target;
@@ -488,7 +529,7 @@ public final class RelyRule implements BuiltInRule {
             this.arrayAccess = null;
         }
 
-        private Instantiation (final Term target, final ProgramVariable lhs, final ArrayReference ar) {
+        private Instantiation (final Term target, final Expression lhs, final ArrayReference ar) {
             assert target.javaBlock() != null;
             type = RuleType.ARRAY_ACCESS;
             this.target = target;
