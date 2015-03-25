@@ -194,9 +194,9 @@ public class KeYFile implements EnvInput {
                 ParserConfig pc = new ParserConfig
                 (new Services(getProfile()), 
                         new NamespaceSet());
-                // FIXME: there is no exception handler here, thus, when parsing errors are ecountered
-                // during collection of includes (it is enough to mispell \include) the error
-                // message is very uninformative - ProofInputException without filename, line and column
+                // FIXME: there is no exception handler here, thus, when parsing errors are encountered
+                // during collection of includes (it is enough to misspell \include) the error
+                // message is very non-informative - ProofInputException without filename, line and column
                 // numbers. Somebody please fix that. /Woj
                 problemParser = new KeYParserF(ParserMode.PROBLEM,
                         new KeYLexerF(getNewStream(),

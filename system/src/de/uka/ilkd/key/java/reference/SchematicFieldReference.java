@@ -87,8 +87,8 @@ public class SchematicFieldReference extends FieldReference
     }
 
     /**
-     * Get reference prefix.
-     * @return the reference prefix.
+     * Get reference suffix.
+     * @return the reference suffix.
      */
     public ReferenceSuffix getReferenceSuffix() {
         return (ProgramSV)schemaVariable;

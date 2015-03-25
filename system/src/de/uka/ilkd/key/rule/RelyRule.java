@@ -105,14 +105,6 @@ public final class RelyRule implements BuiltInRule {
         return threadTarget;
     }
 
-    private static Term buildThreadVarUpd(final LocationVariable threadVar, final Goal g,
-                                          final Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final Term threadTarget =
-                tb.dot(threadVar.sort(), tb.var(threadVar), getTargetVar(g.proof()));
-        return tb.elementary(threadTarget, tb.var(threadVar));
-    }
-
     private static Term buildAnonUpd(final Term heap,
                                      final ThreadSpecification ts,
                                      final Services services) {
@@ -317,7 +309,6 @@ public final class RelyRule implements BuiltInRule {
         final Term prevHeap = tb.getPrevHeap();
 
         final Term anonUpd = buildAnonUpd(heap, ts, services);
-        final Term threadVarUpd = buildThreadVarUpd(ts.getThreadVar(), goal, services);
         final Term prevUpd = tb.parallel(tb.elementary(prevHeap, heap), anonUpd);
 
         final Term rely = ts.getRely(prevHeap, heap, tb.var(ts.getThreadVar()), services);
@@ -328,7 +319,7 @@ public final class RelyRule implements BuiltInRule {
             goal.addFormula(new SequentFormula(addRely), true, false);
         }
         final Term prog = // new post condition
-                tb.applySequential(new Term[] {leadingUpd, anonUpd, threadVarUpd}, newProg);
+                tb.applySequential(new Term[] {leadingUpd, anonUpd}, newProg);
         goal.changeFormula(new SequentFormula(prog), pio);
     }
 

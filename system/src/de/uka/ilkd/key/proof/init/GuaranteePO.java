@@ -3,8 +3,11 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -27,8 +30,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.ThreadSpecification;
+import de.uka.ilkd.key.speclang.ThreadSpecification.ExcOption;
 
 /**
  * Proof obligation for rely/guarantee.
@@ -47,7 +53,8 @@ public class GuaranteePO extends AbstractPO {
 
     protected final ThreadSpecification tspec;
     private LocationVariable target;
-    
+    private InitConfig proofConfig;
+
     public GuaranteePO (final InitConfig initConfig, final ThreadSpecification tspec) {
         super(initConfig, tspec.getKJT() + NAME);
         final KeYJavaType threadType = javaInfo.getTypeByClassName(THREAD);
@@ -60,7 +67,7 @@ public class GuaranteePO extends AbstractPO {
 
     @Override
     protected InitConfig getCreatedInitConfigForSingleProof() {
-        return environmentConfig;
+        return proofConfig;
     }
 
     /**
@@ -71,8 +78,9 @@ public class GuaranteePO extends AbstractPO {
      * @return The {@link Term} containing the general assumptions.
      */
     private Term buildFreePre(final Term thread,
-                              final KeYJavaType threadType) {
-        final TypeConverter tc = environmentServices.getTypeConverter();
+                              final KeYJavaType threadType,
+                              final Services services) {
+        final TypeConverter tc = services.getTypeConverter();
         final Term baseHeap = tb.getBaseHeap();
         final Term nullTerm = tb.NULL();
 
@@ -82,7 +90,7 @@ public class GuaranteePO extends AbstractPO {
         final Term created = tb.created(thread);
         final Term exactInstance = tb.exactInstance(threadType.getSort(), thread);
         final Sort runnableSort = target.sort();
-        final Function targetField = tc.getHeapLDT().getFieldSymbolForPV(target, environmentServices);
+        final Function targetField = tc.getHeapLDT().getFieldSymbolForPV(target, services);
         final Term selectTarget = tb.select(runnableSort, baseHeap, thread, tb.func(targetField));
         //final Term t = tb.func(new Function(new Name("runner"), runnableSort));
         //final Term targetDef = tb.equals(selectTarget, t);
@@ -115,10 +123,9 @@ public class GuaranteePO extends AbstractPO {
         return JavaBlock.createJavaBlock(mf);
     }
 
-    private Term buildFrame(final Term thread,
-                            final Term heaps,
-                            final Term prevHeap,
-                            final Term currHeap) {
+    private Term buildFrame(final Term thread, final Term heaps,
+                            final Term prevHeap, final Term currHeap,
+                            final Services services) {
         final Sort fieldSort = heapLDT.getFieldSort();
         final Sort objectSort = javaInfo.objectSort();
 
@@ -127,8 +134,8 @@ public class GuaranteePO extends AbstractPO {
         final Term f = tb.var(fVar);
         final Term o = tb.var(oVar);
 
-        final Term notChanged = tspec.getNotChanged(thread, environmentServices);
-        final Term changeLocal = tspec.getAssignable(thread, environmentServices);
+        final Term notChanged = tspec.getNotChanged(thread, services);
+        final Term changeLocal = tspec.getAssignable(thread, services);
         final Term changeRemote = tb.setMinus(tb.allLocs(), notChanged);
         final Term inSet = tb.elementOf(o, f, tb.union(changeRemote, changeLocal));
 
@@ -153,15 +160,16 @@ public class GuaranteePO extends AbstractPO {
         final Term currHeap = tb.seqGet(heapSort, heaps, idx);
 
         final Term guard = tb.and(tb.lt(tb.zero(), idx), tb.lt(idx, tb.seqLen(heaps)));
-        final Term frame = buildFrame(thread, heaps, prevHeap, currHeap);
+        final Term frame = buildFrame(thread, heaps, prevHeap, currHeap, services);
         final Term guar = tspec.getGuarantee(prevHeap, currHeap, thread, services);
 
         return tb.all(iVar, tb.imp(guard, tb.and(frame, guar)));
     }
 
     private Term buildGuaranteeTerm(final LocationVariable threadVar,
-                                    final KeYJavaType threadType) {
-        final TypeConverter tc = environmentServices.getTypeConverter();
+                                    final KeYJavaType threadType,
+                                    final Services services) {
+        final TypeConverter tc = services.getTypeConverter();
         final Term baseHeap = tb.getBaseHeap();
 
         final Term thread = tb.var(threadVar);
@@ -169,18 +177,19 @@ public class GuaranteePO extends AbstractPO {
 
         final JavaBlock jb = buildJavaBlock(threadVar, threadType, target);
 
-        final Term traceProp = buildTraceProp(thread, heaps, environmentServices);
+        final Term traceProp = buildTraceProp(thread, heaps, services);
 
         final Modality modality = Modality.DIA; // XXX: only diamond for uniform translation
 
-        final Term pre = tspec.getPre(baseHeap, thread, environmentServices);
+        final Term pre = tspec.getPre(baseHeap, thread, services);
         final Term upd = tb.elementary(heaps, tb.seqSingleton(baseHeap));
         final Term prog = tb.prog(modality, jb, traceProp);
 
         return tb.imp(pre, tb.apply(upd, prog));
     }
 
-    private Term buildReflexivityAndTransitivityTerm(final Term thread) {
+    private Term buildReflexivityAndTransitivityTerm(final Term thread,
+                                                     final Services services) {
         final Sort heapSort = heapLDT.targetSort();
 
         // reflexivity / transitivity
@@ -197,35 +206,54 @@ public class GuaranteePO extends AbstractPO {
         final Term heap1 = tb.var(heap1Var);
         final Term heap2 = tb.var(heap2Var);
 
-        final Term relyTrans0 = tspec.getRely(heap0, heap1, thread, environmentServices);
-        final Term relyTrans1 = tspec.getRely(heap1, heap2, thread, environmentServices);
-        final Term relyTrans2 = tspec.getRely(heap0, heap2, thread, environmentServices);
+        final Term relyTrans0 = tspec.getRely(heap0, heap1, thread, services);
+        final Term relyTrans1 = tspec.getRely(heap1, heap2, thread, services);
+        final Term relyTrans2 = tspec.getRely(heap0, heap2, thread, services);
 
         final Term trans = tb.imp(tb.and(relyTrans0, relyTrans1), relyTrans2);
-        final Term reflex = tspec.getRely(heap0, heap0, thread, environmentServices);
+        final Term reflex = tspec.getRely(heap0, heap0, thread, services);
         final Term reflexAndTrans = tb.and(reflex, trans);
 
         return reflexAndTrans != tb.tt() ? tb.all(vars, reflexAndTrans) : tb.tt();
     }
 
+    private void generateTaclets(final InitConfig proofConfig) {
+        final Services services = proofConfig.getServices();
+        // final Goal goal = services.getProof().getGoal(services.getProof().root());
+        if (!ThreadSpecification.relyGuaranteeEnabled()) {
+            return;
+        }
+        final ExcOption exc = ThreadSpecification.exceptionOption();
+        ImmutableSet<SuccTaclet> res = DefaultImmutableSet.<SuccTaclet>nil();
+        res = res.union(tspec.createTaclets(exc, services));
+        for (SuccTaclet t: res) {
+            register(t, proofConfig);
+        }
+    }
+
     @Override
     public void readProblem() throws ProofInputException {
+        assert proofConfig == null;
+
+        proofConfig = environmentConfig.deepCopy();
+        final Services proofServices = proofConfig.getServices();
 
         final KeYJavaType threadType = tspec.getKJT();
         final LocationVariable threadVar = tspec.getThreadVar();
         final Term thread = tb.var(threadVar);
         final ImmutableList<ProgramVariable> threadVars =
-                ThreadSpecification.getThreads(environmentServices);
-        register(threadVars, environmentServices);
+                ThreadSpecification.getThreads(proofServices);
+        register(threadVars, proofServices);
         final Term threads = tb.seq(tb.var(threadVars)); // the thread pool, TODO: usage
 
-        final Term guaranteeTerm = buildGuaranteeTerm(threadVar, threadType);
-        final Term transitivityTerm = buildReflexivityAndTransitivityTerm(thread);
-        final Term freePre = buildFreePre(thread, threadType);
+        final Term guaranteeTerm = buildGuaranteeTerm(threadVar, threadType, proofServices);
+        final Term transitivityTerm = buildReflexivityAndTransitivityTerm(thread, proofServices);
+        final Term freePre = buildFreePre(thread, threadType, proofServices);
 
         final Term result = tb.imp(freePre, tb.and(guaranteeTerm, transitivityTerm));
 
         assignPOTerms(result);
+        generateTaclets(proofConfig);
     }
 
     public LocationVariable getTarget() {

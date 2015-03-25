@@ -232,7 +232,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    private void register(Taclet t, InitConfig proofConfig) {
+    void register(Taclet t, InitConfig proofConfig) {
         assert t != null;
         taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
         proofConfig.registerRule(t, AxiomJustification.INSTANCE);
