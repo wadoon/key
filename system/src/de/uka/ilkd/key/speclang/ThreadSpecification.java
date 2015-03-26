@@ -166,9 +166,11 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         return new AntecSuccTacletGoalTemplate(addSeq, ImmutableSLList.<Taclet>nil(), replaceSeq);
     }
 
-    private static final ImmutableList<TacletGoalTemplate> goals(final TacletGoalTemplate ... ts) {
-        if (ts.length == 1) {
-            ts[0].setName(null);
+    private static final ImmutableList<TacletGoalTemplate> goals(final AntecSuccTacletGoalTemplate ... ts) {
+        if (ts.length == 1) { // If no branching happens, no name is needed
+            ts[0] = new AntecSuccTacletGoalTemplate(ts[0].sequent(),
+                                                    ImmutableSLList.<Taclet>nil(),
+                                                    ts[0].replaceWith());
         }
         ImmutableList<TacletGoalTemplate> res = ImmutableSLList.<TacletGoalTemplate>nil();
         for (TacletGoalTemplate t : ts) {
@@ -252,10 +254,10 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
         final Term rely = tspec.getRely(prevHeap, heap, tb.var(tspec.getThreadVar()), services);
         final Term addRely;
-        if (rely != tb.tt()) { // add rely in any case
-            addRely = tb.applySequential(new Term[] {update, prevUpd}, rely);
-        } else {
+        if (rely.equalsModRenaming(tb.tt())) {
             addRely = null;
+        } else { // add rely in any case
+            addRely = tb.applySequential(new Term[] {update, prevUpd}, rely);
         }
 
         final Term replaceWith = tb.applySequential(upd, replaceTerm);
