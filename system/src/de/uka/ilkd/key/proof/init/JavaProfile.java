@@ -123,7 +123,6 @@ public class JavaProfile extends AbstractProfile {
         
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(BlockContractRule.INSTANCE)
-                                   //.prepend(RelyRule.INSTANCE) TODO: Remove after transformation
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound

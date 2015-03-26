@@ -314,10 +314,6 @@ public class TacletMenu extends JMenu {
                     CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
             add(item);
-        /*} else if (builtInRule == RelyRule.INSTANCE) { TODO: Remove after transformation
-			item = new DefaultBuiltInRuleMenuItem(builtInRule.displayName(), builtInRule, true);
-			item.addActionListener(control);
-			add(item);*/
         } else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);
             item.addActionListener(control);
