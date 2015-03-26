@@ -78,9 +78,8 @@ public final class RelyRule implements BuiltInRule {
         } else if ((EXC_OPTION + ":ban").equals(excChoice)) {
             res = ExcOption.BAN;
         } else {
-            res = null;
             throw new RuntimeException("The setting for the RuntimeException-option is not valid: "
-                                        + excChoice);
+                                       + excChoice);
         }
         return res;
     }
