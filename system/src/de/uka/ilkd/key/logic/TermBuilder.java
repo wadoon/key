@@ -1908,6 +1908,12 @@ public class TermBuilder {
     }
 
 
+    public Term arrayStoreValid(Term v, Term se0) {
+        return func(services.getTypeConverter().getHeapLDT().getArrayStoreValid(),
+                    v, se0);
+    }
+
+
     public Term create(Term h, Term o) {
         return func(services.getTypeConverter().getHeapLDT().getCreate(),
                  new Term[]{h, o});

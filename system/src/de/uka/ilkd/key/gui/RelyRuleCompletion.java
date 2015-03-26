@@ -5,6 +5,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RelyBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RelyRule;
 
+// TODO: Remove after transformation
 public class RelyRuleCompletion implements InteractiveRuleApplicationCompletion {
 
     @Override

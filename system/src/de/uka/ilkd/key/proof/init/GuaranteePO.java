@@ -30,7 +30,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.ThreadSpecification;

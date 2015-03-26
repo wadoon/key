@@ -300,7 +300,7 @@ public class InitConfig {
      */
     public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
        for (Taclet r : s) {
-          registerRule(r, j);          
+          registerRule(r, j);
        }
     }
 
@@ -311,7 +311,7 @@ public class InitConfig {
      */
     public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
        for (BuiltInRule r : s) {
-          registerRule(r, j);          
+          registerRule(r, j);
        }
     }
 

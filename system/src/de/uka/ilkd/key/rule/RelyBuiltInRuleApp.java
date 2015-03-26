@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 
-
+// TODO: Remove after transformation
 public final class RelyBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     final RelyRule.Instantiation inst;

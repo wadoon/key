@@ -44,7 +44,7 @@ import de.uka.ilkd.key.speclang.ThreadSpecification;
  * Rule to handle heap read access in concurrent programs
  * using rely/guarantee contracts.
  * @author bruns
- *
+ * TODO: Remove after transformation
  */
 public final class RelyRule implements BuiltInRule {
 

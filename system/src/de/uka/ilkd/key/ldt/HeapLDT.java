@@ -95,6 +95,7 @@ public final class HeapLDT extends LDT {
     private final Function acc;
     private final Function reach;
     private final Function prec;
+    private final Function arrayStoreValid;
     
     //heap pv
     private ImmutableList<LocationVariable> heaps;
@@ -130,6 +131,7 @@ public final class HeapLDT extends LDT {
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
         prec		  = addFunction(services, "prec");
+        arrayStoreValid   = addFunction(services, "arrayStoreValid");
         heaps = ImmutableSLList.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
@@ -314,6 +316,9 @@ public final class HeapLDT extends LDT {
 	return acc;
     }
     
+    public Function getArrayStoreValid() {
+        return arrayStoreValid;
+    }
     
     public Function getReach() {
 	return reach;
