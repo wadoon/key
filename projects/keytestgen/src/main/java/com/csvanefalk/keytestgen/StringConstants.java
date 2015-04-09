@@ -53,5 +53,6 @@ public final class StringConstants {
     public static final String MIN = "min";
     public static final String JAVA_CAST_INT = "javaCastInt";
     public static final String IN_INT = "inInt";
+    public static final String ALLFIELDS = "allFields";
     //-----------------------
 }
