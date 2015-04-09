@@ -39,13 +39,16 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
+import de.uka.ilkd.key.speclang.ThreadSpecification;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.ThreadSpecification.ExcOption;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -158,7 +161,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * Generate well-definedness taclets to resolve formulas as
      * WD(pv.<inv>) or WD(pv.m(...)).
      */
-    void generateWdTaclets(InitConfig proofConfig) {
+    private void generateWdTaclets(InitConfig proofConfig) {
         if (!WellDefinednessCheck.isOn()) {
             return;
         }
@@ -197,6 +200,27 @@ public abstract class AbstractPO implements IPersistablePO {
         for (RewriteTaclet t: res) {
             register(t, proofConfig);
         }
+    }
+
+    private void generateRelyTaclets(final InitConfig proofConfig) {
+        // final Goal goal = services.getProof().getGoal(services.getProof().root());
+        if (!ThreadSpecification.relyGuaranteeEnabled()) {
+            return;
+        }
+        final ExcOption exc = ThreadSpecification.exceptionOption();
+        ImmutableSet<SuccTaclet> res = DefaultImmutableSet.<SuccTaclet>nil();
+        for (final ThreadSpecification tspec
+                : proofConfig.getServices().getSpecificationRepository().getAllThreadSpecs()) {
+            res = res.union(tspec.createTaclets(exc, proofConfig.getServices()));
+        }
+        for (SuccTaclet t: res) {
+            register(t, proofConfig);
+        }
+    }
+
+    void generateTaclets(final InitConfig proofConfig) {
+        generateWdTaclets(proofConfig);
+        generateRelyTaclets(proofConfig);
     }
 
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
