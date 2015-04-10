@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -30,10 +28,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.speclang.ThreadSpecification;
-import de.uka.ilkd.key.speclang.ThreadSpecification.ExcOption;
 
 /**
  * Proof obligation for rely/guarantee.
@@ -55,7 +51,7 @@ public class GuaranteePO extends AbstractPO {
     private InitConfig proofConfig;
 
     public GuaranteePO (final InitConfig initConfig, final ThreadSpecification tspec) {
-        super(initConfig, tspec.getKJT() + NAME);
+        super(initConfig, tspec.getKJT().getName() + NAME);
         final KeYJavaType threadType = javaInfo.getTypeByClassName(THREAD);
         if (!javaInfo.isSubtype(tspec.getKJT(), threadType))
             throw new IllegalArgumentException("Thread specification must be associated " +
@@ -214,20 +210,6 @@ public class GuaranteePO extends AbstractPO {
         final Term reflexAndTrans = tb.and(reflex, trans);
 
         return reflexAndTrans != tb.tt() ? tb.all(vars, reflexAndTrans) : tb.tt();
-    }
-
-    private void generateTaclets(final InitConfig proofConfig) {
-        final Services services = proofConfig.getServices();
-        // final Goal goal = services.getProof().getGoal(services.getProof().root());
-        if (!ThreadSpecification.relyGuaranteeEnabled()) {
-            return;
-        }
-        final ExcOption exc = ThreadSpecification.exceptionOption();
-        ImmutableSet<SuccTaclet> res = DefaultImmutableSet.<SuccTaclet>nil();
-        res = res.union(tspec.createTaclets(exc, services));
-        for (SuccTaclet t: res) {
-            register(t, proofConfig);
-        }
     }
 
     @Override

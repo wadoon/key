@@ -277,7 +277,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         // add axioms
         collectClassAxioms(getKJT(), proofConfig);
 
-        generateWdTaclets(proofConfig);
+        generateTaclets(proofConfig);
     }
 
     @Override

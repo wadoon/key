@@ -6,6 +6,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -13,9 +14,11 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.SchematicFieldReference;
+import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -269,19 +272,37 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         return relyGoal;
     }
 
-    private static AntecSuccTacletGoalTemplate nullReferenceGoal(final Term update,
+    private static AntecSuccTacletGoalTemplate nullReferenceGoal(final Term prog, final Term update,
+                                                                 final Operator mod,
                                                                  final ProgramSV v,
+                                                                 final ExcOption exc,
                                                                  final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Term varEqNull = tb.apply(update, tb.equals(tb.var(v), tb.NULL()));
-        final AntecSuccTacletGoalTemplate nullRef = goal(varEqNull, tb.ff());
+        final Term replaceTerm;
+        if (exc == ExcOption.ALLOW) {
+            final New exception = KeYJavaASTFactory
+                    .newOperator(services.getJavaInfo().getKeYJavaType(
+                            "java.lang.NullPointerException"));
+            Throw t = KeYJavaASTFactory.throwClause(exception);
+            final ContextStatementBlock throwExc =
+                    new ContextStatementBlock(new Statement[] {t}, null);
+            final JavaBlock throwExcJb = JavaBlock.createJavaBlock(throwExc);
+            replaceTerm = tb.tf().createTerm(mod, new Term[] {prog}, null, throwExcJb);
+        } else {
+            replaceTerm = tb.ff();
+        }
+        final AntecSuccTacletGoalTemplate nullRef =
+                goal(varEqNull, tb.apply(update, replaceTerm));
         nullRef.setName("Null Reference (" + v.getName() + " = null)");
         return nullRef;
     }
 
-    private static AntecSuccTacletGoalTemplate indexOutOfBoundsGoal(final Term update,
+    private static AntecSuccTacletGoalTemplate indexOutOfBoundsGoal(final Term prog, final Term update,
+                                                                    final Operator mod,
                                                                     final ProgramSV arr,
                                                                     final ProgramSV idx,
+                                                                    final ExcOption exc,
                                                                     final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -292,17 +313,34 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final Term lengthLeqIdx = tb.leq(tb.dotLength(array), index);
         final Term idxLtZero = tb.lt(index, tb.zero());
 
-        final Term indexOutOfBounds = tb.apply(update, tb.and(varNeqNull, tb.or(lengthLeqIdx, idxLtZero)));
-        final AntecSuccTacletGoalTemplate outOfBounds = goal(indexOutOfBounds, tb.ff());
+        final Term indexOutOfBounds =
+                tb.apply(update, tb.and(varNeqNull, tb.or(lengthLeqIdx, idxLtZero)));
+        final Term replaceTerm;
+        if (exc == ExcOption.ALLOW) {
+            final New exception = KeYJavaASTFactory
+                    .newOperator(services.getJavaInfo().getKeYJavaType(
+                            "java.lang.ArrayIndexOutOfBoundsException"));
+            Throw t = KeYJavaASTFactory.throwClause(exception);
+            final ContextStatementBlock throwExc =
+                    new ContextStatementBlock(new Statement[] {t}, null);
+            final JavaBlock throwExcJb = JavaBlock.createJavaBlock(throwExc);
+            replaceTerm = tb.tf().createTerm(mod, new Term[] {prog}, null, throwExcJb);
+        } else {
+            replaceTerm = tb.ff();
+        }
+        final AntecSuccTacletGoalTemplate outOfBounds =
+                goal(indexOutOfBounds, tb.apply(update, replaceTerm));
         outOfBounds.setName("Index Out of Bounds (" + arr.getName() + " != null, but "
                                                     + idx.getName() +" Out of Bounds!)");
         return outOfBounds;
     }
 
-    private static AntecSuccTacletGoalTemplate arrayStoreExceptionGoal(final Term update,
+    private static AntecSuccTacletGoalTemplate arrayStoreExceptionGoal(final Term prog, final Term update,
+                                                                       final Operator mod,
                                                                        final ProgramSV arr,
                                                                        final ProgramSV idx,
                                                                        final ProgramSV rhs,
+                                                                       final ExcOption exc,
                                                                        final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -317,7 +355,21 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
         final Term arrayStoreException =
                 tb.apply(update, tb.and(varNeqNull, idxLtLength, idxGeqZero, arrStorInvalid));
-        final AntecSuccTacletGoalTemplate arrayStoreExc = goal(arrayStoreException, tb.ff());
+        final Term replaceTerm;
+        if (exc == ExcOption.ALLOW) {
+            final New exception = KeYJavaASTFactory
+                    .newOperator(services.getJavaInfo().getKeYJavaType(
+                                    "java.lang.ArrayStoreException"));
+            Throw t = KeYJavaASTFactory.throwClause(exception);
+            final ContextStatementBlock throwExc =
+                    new ContextStatementBlock(new Statement[] {t}, null);
+            final JavaBlock throwExcJb = JavaBlock.createJavaBlock(throwExc);
+            replaceTerm = tb.tf().createTerm(mod, new Term[] {prog}, null, throwExcJb);
+        } else {
+            replaceTerm = tb.ff();
+        }
+        final AntecSuccTacletGoalTemplate arrayStoreExc =
+                goal(arrayStoreException, tb.apply(update, replaceTerm));
         arrayStoreExc.setName("Array Store Exception (incompatible dynamic element type of "
                               + arr.getName() + " and " + idx.getName() +")");
         return arrayStoreExc;
@@ -390,7 +442,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final AntecSuccTacletGoalTemplate goalTemp =
                 relyGoal(update, null, prog, null, tspec, services);
 
-        return taclet("rely " + name + " empty modality",
+        return taclet("rely " + name + " EmptyModality",
                       new String[] {"simplify_prog"},
                       findTerm, goals(goalTemp),
                       new VariableCondition[] {},
@@ -428,7 +480,8 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
         final AntecSuccTacletGoalTemplate normalExec =
                 normalFieldAccGoal(prog, update, mod, lhs, rhs, g, tspec, services);
-        final AntecSuccTacletGoalTemplate nullRef = nullReferenceGoal(update, v, services);
+        final AntecSuccTacletGoalTemplate nullRef =
+                nullReferenceGoal(prog, update, mod, v, exc, services);
 
         final ImmutableList<TacletGoalTemplate> fieldAccGoals;
         final ImmutableList<TacletGoalTemplate> fieldAccThisGoals;
@@ -437,22 +490,17 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                 fieldAccGoals = goals(normalExec);
                 fieldAccThisGoals = goals(normalExec);
                 break;
-            case BAN:
+            case BAN: case ALLOW:
                 fieldAccGoals = goals(normalExec, nullRef);
                 fieldAccThisGoals = goals(normalExec);
-                break;
-            case ALLOW:
-                // TODO
-                fieldAccGoals = null;
-                fieldAccThisGoals = null;
-                assert false : "TODO";
                 break;
             default:
                 throw new RuntimeException("The setting for the RuntimeException-option is not valid: "
                                            + exc);
         }
-
-        res = res.add(taclet("rely " + name + " field access",
+        // TODO: static read assignment:
+        // Taclets assignmentReadStaticAttribute + assignmentReadStaticAttributeWithVariablePrefix
+        res = res.add(taclet("rely " + name + " assignmentReadAttribute",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTerm, fieldAccGoals,
                              new VariableCondition[] { new FinalReferenceCondition(a, true),
@@ -461,7 +509,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                        new IsThisReference(v, true),
                                                        new JavaTypeToSortCondition(a, g, false)},
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " field access_this",
+        res = res.add(taclet("rely " + name + " assignmentReadAttributeThis",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTerm, fieldAccThisGoals,
                              new VariableCondition[] { new FinalReferenceCondition(a, true),
@@ -511,10 +559,12 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final AntecSuccTacletGoalTemplate normalArrAccExec =
                 normalArrayAccGoal(prog, update, mod, arrRef, expr, g, tspec, services);
 
-        final AntecSuccTacletGoalTemplate nullRef = nullReferenceGoal(update, v, services);
-        final AntecSuccTacletGoalTemplate indexOutOfBounds = indexOutOfBoundsGoal(update, v, se, services);
+        final AntecSuccTacletGoalTemplate nullRef =
+                nullReferenceGoal(prog, update, mod, v, exc, services);
+        final AntecSuccTacletGoalTemplate indexOutOfBounds =
+                indexOutOfBoundsGoal(prog, update, mod, v, se, exc, services);
         final AntecSuccTacletGoalTemplate arrayStoreException =
-                arrayStoreExceptionGoal(update, v, se, expr, services);
+                arrayStoreExceptionGoal(prog, update, mod, v, se, expr, exc, services);
 
         final ImmutableList<TacletGoalTemplate> assignToRefArrGoals;
         final ImmutableList<TacletGoalTemplate> assignToPrimArrGoals;
@@ -525,34 +575,27 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                 assignToPrimArrGoals = goals(normalToArrExec);
                 arrAccGoals = goals(normalArrAccExec);
                 break;
-            case BAN:
+            case BAN: case ALLOW:
                 assignToRefArrGoals = goals(normalToArrExec, nullRef, indexOutOfBounds, arrayStoreException);
                 assignToPrimArrGoals = goals(normalToArrExec, nullRef, indexOutOfBounds);
                 arrAccGoals = goals(normalArrAccExec, nullRef, indexOutOfBounds);
-                break;
-            case ALLOW:
-                // TODO
-                assignToRefArrGoals = null;
-                assignToPrimArrGoals = null;
-                arrAccGoals = null;
-                assert false : "TODO";
                 break;
             default:
                 throw new RuntimeException("The setting for the RuntimeException-option is not valid: "
                                            + exc);
         }
 
-        res = res.add(taclet("rely " + name + " assignment to reference array",
+        res = res.add(taclet("rely " + name + " assignmentToReferenceArrayComponent",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermToArr, assignToRefArrGoals,
                              new VariableCondition[] { new ArrayComponentTypeCondition(v, true) },
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " assignment to primitive array",
+        res = res.add(taclet("rely " + name + " assignmentToPrimitiveArrayComponent",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermToArr, assignToPrimArrGoals,
                              new VariableCondition[] { new ArrayComponentTypeCondition(v, false) },
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " array access assignment",
+        res = res.add(taclet("rely " + name + " assignmentArray2",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermArrTo, arrAccGoals,
                              new VariableCondition[] { new JavaTypeToSortCondition(v, g, true) },
@@ -598,7 +641,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final ThreadSpecification tspec = this;
 
         ImmutableSet<SuccTaclet> res;
-        final String name = tspec.getKJT().getName().toLowerCase();
+        final String name = tspec.getKJT().getFullName();
         final Term prog = tb.var(SchemaVariableFactory.createFormulaSV(new Name("post")));
         final Term update = tb.var(SchemaVariableFactory.createUpdateSV(new Name("#update")));
         final ModalOperatorSV mod =
