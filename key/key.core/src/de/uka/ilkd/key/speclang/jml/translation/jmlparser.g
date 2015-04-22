@@ -1873,6 +1873,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         |   fpneg:FP_NEGATIVE   LPAREN e1=expression RPAREN { tk = fpneg; }
         |   fpabs:FP_ABS        LPAREN e1=expression RPAREN { tk = fpabs; }
         |   fpsub:FP_SUB        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpsub; }
+        |   fpeq:FP_EQ         LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpeq; }
         ) {
             Function f = null;
 
@@ -1904,6 +1905,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                         result = new SLExpression(tb.func(ldt.getAbs(), e1.getTerm()), fptype);
                     } else if (tk.getType() == FP_SUB) {
                         result = new SLExpression(tb.func(ldt.getJavaSub(), e1.getTerm(), e2.getTerm()), fptype);
+                    } else if (tk.getType() == FP_EQ) {
+                        result = new SLExpression(tb.func(ldt.getEquals(), e1.getTerm(), e2.getTerm()));
                     }
                 }
             }
