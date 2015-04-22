@@ -736,14 +736,43 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                         +"; notChanged: "+notChanged;
     }
 
+    /**
+     * Return String to display contract in proof management dialog
+     * @param includeHtmlMarkup
+     * @param services
+     * @return String to display
+     */
+    private String getText(boolean includeHtmlMarkup, Services serv) {
+        final String start = includeHtmlMarkup ? "<html>" : "";
+        final String startb = includeHtmlMarkup ? "<b>" : "";
+        final String br = includeHtmlMarkup ? "<br>" : "\n";
+        final String endb = includeHtmlMarkup ? " </b>" : " ";
+        final String end = includeHtmlMarkup ? "</html>" : "";
+        Map<String, Term> terms = new LinkedHashMap<String, Term>();
+        terms.put("pre", pre);
+        terms.put("rely", rely);
+        terms.put("guarantee", guarantee);
+        terms.put("notChanged", notChanged);
+        terms.put("assignable", assignable);
+        String text = start;
+        int i = 0;
+        for (String t: terms.keySet()) {
+            String e = i < terms.size() ? br : end;
+            text = text + startb + t + ":" + endb
+                    + LogicPrinter.quickPrintTerm(terms.get(t), serv) + e;
+            i++;
+        }
+        return text;
+    }
+
     @Override
     public String getHTMLText(Services serv) {
-        return "<html><b>pre: </b>"+LogicPrinter.quickPrintTerm(pre, serv)
-                        +"<br><b>rely: </b>"+LogicPrinter.quickPrintTerm(rely, serv) 
-                        +"<br><b>guarantee: </b>"+LogicPrinter.quickPrintTerm(guarantee, serv)
-                        +"<br><b>notChanged: </b>"+LogicPrinter.quickPrintTerm(notChanged, serv)
-                        +"<br><b>assignable: </b>"+LogicPrinter.quickPrintTerm(assignable, serv)
-                        +"</html>";
+        return getText(true, serv);
+    }
+
+    @Override
+    public final String getPlainText(Services services) {
+        return getText(false, services);
     }
 
     @Override
