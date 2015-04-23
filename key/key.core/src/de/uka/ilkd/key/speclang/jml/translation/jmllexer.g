@@ -162,8 +162,11 @@ tokens {
     FP_POSITIVE          = "\\fp_positive";
     FP_NEGATIVE          = "\\fp_negative";
     FP_ABS               = "\\fp_abs";
-    FP_SUB               = "\\fp_sub";
     FP_EQ                = "\\fp_eq";
+    FP_ADD               = "\\fp_add";
+    FP_SUB               = "\\fp_sub";
+    FP_MUL               = "\\fp_mul";
+    FP_DIV               = "\\fp_div";
     // ONLY_ACCESSED     = "\\only_accessed"; // too many common lexemes
     // ONLY_ASSIGNED     = "\\only_assigned";
     // ONLY_CALLED       = "\\only_called";

@@ -1872,8 +1872,11 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         |   fppos:FP_POSITIVE   LPAREN e1=expression RPAREN { tk = fppos; }
         |   fpneg:FP_NEGATIVE   LPAREN e1=expression RPAREN { tk = fpneg; }
         |   fpabs:FP_ABS        LPAREN e1=expression RPAREN { tk = fpabs; }
-        |   fpsub:FP_SUB        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpsub; }
         |   fpeq:FP_EQ         LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpeq; }
+        |   fpadd:FP_ADD        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpadd; }
+        |   fpsub:FP_SUB        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpsub; }
+        |   fpmul:FP_MUL        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpmul; }
+        |   fpdiv:FP_DIV        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpdiv; }
         ) {
             Function f = null;
 
@@ -1903,10 +1906,16 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                         f = ldt.getIsNegative();
                     } else if (tk.getType() == FP_ABS) {
                         result = new SLExpression(tb.func(ldt.getAbs(), e1.getTerm()), fptype);
-                    } else if (tk.getType() == FP_SUB) {
-                        result = new SLExpression(tb.func(ldt.getJavaSub(), e1.getTerm(), e2.getTerm()), fptype);
                     } else if (tk.getType() == FP_EQ) {
                         result = new SLExpression(tb.func(ldt.getEquals(), e1.getTerm(), e2.getTerm()));
+                    } else if (tk.getType() == FP_ADD) {
+                        result = new SLExpression(tb.func(ldt.getJavaAdd(), e1.getTerm(), e2.getTerm()), fptype);
+                    } else if (tk.getType() == FP_SUB) {
+                        result = new SLExpression(tb.func(ldt.getJavaSub(), e1.getTerm(), e2.getTerm()), fptype);
+                    } else if (tk.getType() == FP_MUL) {
+                        result = new SLExpression(tb.func(ldt.getJavaMul(), e1.getTerm(), e2.getTerm()), fptype);
+                    } else if (tk.getType() == FP_DIV) {
+                        result = new SLExpression(tb.func(ldt.getJavaDiv(), e1.getTerm(), e2.getTerm()), fptype);
                     }
                 }
             }
