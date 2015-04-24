@@ -73,6 +73,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
+import de.uka.ilkd.key.speclang.ThreadSpecification;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -725,8 +726,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
         }
-        // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) {
+        // abort if inside of transformer or concurrency option enabled
+        if (Transformer.inTransformer(pio) || ThreadSpecification.relyGuaranteeEnabled()) {
             return false;
         }
         Pair<Term, Term> up = applyUpdates(pio.subTerm(), g.proof().getServices());

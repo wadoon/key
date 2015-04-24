@@ -633,8 +633,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    return false;
 	}
 
-	// abort if inside of transformer
-        if (Transformer.inTransformer(pio)) {
+	// abort if inside of transformer or concurrency option enabled
+        if (Transformer.inTransformer(pio) || ThreadSpecification.relyGuaranteeEnabled()) {
             return false;
         }
 

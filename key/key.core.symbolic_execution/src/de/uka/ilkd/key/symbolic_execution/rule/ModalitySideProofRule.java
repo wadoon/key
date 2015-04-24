@@ -43,6 +43,7 @@ import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.ThreadSpecification;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
@@ -102,8 +103,8 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
       boolean applicable = false;
       if (pio != null && pio.isTopLevel()) {
-          // abort if inside of transformer
-          if (Transformer.inTransformer(pio)) {
+          // abort if inside of transformer or concurrency option enabled
+          if (Transformer.inTransformer(pio) || ThreadSpecification.relyGuaranteeEnabled()) {
               return false;
           }
           Term term = pio.subTerm();
