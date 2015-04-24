@@ -442,7 +442,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final AntecSuccTacletGoalTemplate goalTemp =
                 relyGoal(update, null, prog, null, tspec, services);
 
-        return taclet("rely " + name + " EmptyModality",
+        return taclet("Rely " + name + " EmptyModality",
                       new String[] {"simplify_prog"},
                       findTerm, goals(goalTemp),
                       new VariableCondition[] {},
@@ -500,7 +500,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         }
         // TODO: static read assignment:
         // Taclets assignmentReadStaticAttribute + assignmentReadStaticAttributeWithVariablePrefix
-        res = res.add(taclet("rely " + name + " assignmentReadAttribute",
+        res = res.add(taclet("Rely " + name + " assignmentReadAttribute",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTerm, fieldAccGoals,
                              new VariableCondition[] { new FinalReferenceCondition(a, true),
@@ -509,7 +509,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                        new IsThisReference(v, true),
                                                        new JavaTypeToSortCondition(a, g, false)},
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " assignmentReadAttributeThis",
+        res = res.add(taclet("Rely " + name + " assignmentReadAttributeThis",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTerm, fieldAccThisGoals,
                              new VariableCondition[] { new FinalReferenceCondition(a, true),
@@ -585,17 +585,17 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                            + exc);
         }
 
-        res = res.add(taclet("rely " + name + " assignmentToReferenceArrayComponent",
+        res = res.add(taclet("Rely " + name + " assignmentToReferenceArrayComponent",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermToArr, assignToRefArrGoals,
                              new VariableCondition[] { new ArrayComponentTypeCondition(v, true) },
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " assignmentToPrimitiveArrayComponent",
+        res = res.add(taclet("Rely " + name + " assignmentToPrimitiveArrayComponent",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermToArr, assignToPrimArrGoals,
                              new VariableCondition[] { new ArrayComponentTypeCondition(v, false) },
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " assignmentArray2",
+        res = res.add(taclet("Rely " + name + " assignmentArray2",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermArrTo, arrAccGoals,
                              new VariableCondition[] { new JavaTypeToSortCondition(v, g, true) },
