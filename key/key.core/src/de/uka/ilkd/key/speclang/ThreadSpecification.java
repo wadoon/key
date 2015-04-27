@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.SchematicFieldReference;
 import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -243,15 +244,20 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                         final ThreadSpecification tspec,
                                                         final Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         final Term heap = tb.getBaseHeap();
         final Term prevHeap = tb.getPrevHeap();
+        final Term heaps = tb.var(seqLDT.getHeapSeq());
+        final Term eStep = tb.var(seqLDT.getEStepSeq());
 
         final Term anonUpd = buildAnonUpd(tspec, services);
+        final Term heapsUpd = tb.elementary(heaps, tb.seqConcat(heaps, tb.seqSingleton(heap)));
+        final Term eStepUpd = tb.elementary(eStep, tb.seqConcat(eStep, tb.seqSingleton(tb.TRUE())));
         final Term prevUpd = tb.parallel(tb.elementary(prevHeap, heap), anonUpd);
 
         final Term[] upd; // update for new post condition
         if (assignUpd != null) {
-            upd = new Term[] {update, anonUpd, assignUpd};
+            upd = new Term[] {update, anonUpd, heapsUpd, eStepUpd, assignUpd};
         } else {
             upd = new Term[] {update, anonUpd};
         }
