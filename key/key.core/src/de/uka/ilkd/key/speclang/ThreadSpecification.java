@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -436,7 +437,8 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                    final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        final Term find = tb.tf().createTerm(mod, new Term[]{prog}, null, JavaBlock.EMPTY_JAVABLOCK);
+        final JavaBlock emptyJb = JavaBlock.createJavaBlock(new StatementBlock());
+        final Term find = tb.tf().createTerm(mod, new Term[]{prog}, null, emptyJb);
         final Term findTerm = tb.apply(update, find);
 
         final AntecSuccTacletGoalTemplate goalTemp =
