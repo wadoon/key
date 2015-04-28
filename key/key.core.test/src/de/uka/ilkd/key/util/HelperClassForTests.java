@@ -172,7 +172,7 @@ public class HelperClassForTests {
           File javaFile = new File(baseDir, javaPathInBaseDir);
           Assert.assertTrue(javaFile.exists());
           // Load java file
-          KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(javaFile, null, null);
+          KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(javaFile, null, null, null);
           try {
              // Start proof
              ImmutableSet<DisplayableSpecificationElement> contracts = environment.getServices().getSpecificationRepository().getAllContracts();
@@ -207,7 +207,7 @@ public class HelperClassForTests {
           Proof proof = null;
           try {
              // Load java file
-             environment = KeYEnvironment.load(javaFile, null, null);
+             environment = KeYEnvironment.load(javaFile, null, null, null);
              // Search type
              KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
              Assert.assertNotNull(containerKJT);

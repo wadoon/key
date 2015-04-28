@@ -609,7 +609,8 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 @after { r = result; }
 :
     (abbrvs=spec_var_decls)?
-    (requires=spec_header
+    ((requires=spec_header
+      (requires_free=free_spec_header)?)
        ( options { greedy = true; }
 	 : result = generic_spec_body[mods, b, result] )?
         {
@@ -620,7 +621,12 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 	        for(Iterator<TextualJMLConstruct> it = result.iterator();
                     it.hasNext(); ) {
                         TextualJMLSpecCase sc = (TextualJMLSpecCase) it.next();
-                        sc.addRequires(requires);
+                        if (requires!=null) {
+				sc.addRequires(requires);
+                        }
+                        if (requires_free!=null) {
+				sc.addRequiresFree(requires_free);
+                        }
 			if (abbrvs!=null) {
 				for (PositionedString[] pz: abbrvs) {
 					sc.addAbbreviation(pz);
@@ -662,6 +668,19 @@ spec_header
 ;
 
 
+free_spec_header
+	returns [ImmutableList<PositionedString> result
+		 = ImmutableSLList.<PositionedString>nil()]
+	throws SLTranslationException
+:
+    (
+	options { greedy = true; }
+	:
+	ps=requires_free_clause  { result = result.append(ps); }
+    )+
+;
+
+
 requires_clause
 	returns [PositionedString r = null]
 	throws SLTranslationException
@@ -676,6 +695,16 @@ requires_keyword
 :
     REQUIRES | REQUIRES_RED | PRE | PRE_RED
     
+;
+
+
+requires_free_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    REQUIRES_FREE result=expression { result = flipHeaps("requires_free", result); }
 ;
 
 
@@ -752,6 +781,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	    ps=assignable_clause     { sc.addAssignable(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
+	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
@@ -900,6 +930,16 @@ ensures_clause
 ensures_keyword
 :
 	ENSURES | ENSURES_RED | POST | POST_RED
+;
+
+
+ensures_free_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    ENSURES_FREE result=expression { result = flipHeaps("ensures_free", result); }
 ;
 
 

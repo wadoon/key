@@ -20,6 +20,7 @@ import java.awt.Font;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -52,8 +53,7 @@ public class ContractSelectionPanel extends JPanel {
      */
     private static final long serialVersionUID = 1681223715264203991L;
     private final Services services;
-    @SuppressWarnings("rawtypes")
-    private final JList contractList;
+    private final JList<DisplayableSpecificationElement> contractList;
     private final TitledBorder border;
 
 
@@ -64,7 +64,6 @@ public class ContractSelectionPanel extends JPanel {
     /**
      * Creates a contract selection panel containing the specified contracts.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public ContractSelectionPanel(Services services,
                     boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -80,7 +79,7 @@ public class ContractSelectionPanel extends JPanel {
         add(scrollPane);
 
         //create contract list
-        contractList = new JList();
+        contractList = new JList<DisplayableSpecificationElement>();
         contractList.setSelectionMode(
                         multipleSelection
                         ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
@@ -100,19 +99,19 @@ public class ContractSelectionPanel extends JPanel {
             private static final long serialVersionUID = 9066658130231994408L;
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
 
-            public Component getListCellRendererComponent(JList list,
-                            Object value,
-                            int index,
-                            boolean isSelected,
-                            boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list,
+	                                                      Object value,
+	                                                      int index,
+	                                                      boolean isSelected,
+	                                                      boolean cellHasFocus) {
                 assert value != null;
                 DisplayableSpecificationElement contract = (DisplayableSpecificationElement) value;
                 Component supComp
                 = super.getListCellRendererComponent(list,
-                                value,
-                                index,
-                                isSelected,
-                                cellHasFocus);
+		                                             value,
+		                                             index,
+		                                             isSelected,
+		                                             cellHasFocus);
 
                 //create label and enclosing panel
                 JLabel label = new JLabel();
@@ -169,7 +168,6 @@ public class ContractSelectionPanel extends JPanel {
     }
 
 
-    @SuppressWarnings("unchecked")
     public void setContracts(DisplayableSpecificationElement[] contracts, String title) {
         if (contracts == null || contracts.length == 0) {
             contractList.setListData(new DisplayableSpecificationElement[0]);
@@ -201,21 +199,45 @@ public class ContractSelectionPanel extends JPanel {
         setContracts(contracts.toArray(new DisplayableSpecificationElement[contracts.size()]), title);
     }
 
+
     public DisplayableSpecificationElement getContract() {
-        final Object[] selection = contractList.getSelectedValues();
-        if(selection.length == 0) {
-            return null;
-        } else if(selection.length == 1) {
-            return (DisplayableSpecificationElement) selection[0];
-        } else {
-            ImmutableSet<FunctionalOperationContract> contracts
-            = DefaultImmutableSet.<FunctionalOperationContract>nil();
-            for(Object contract : selection) {
-                // TODO: why is this type safe?
-                contracts = contracts.add((FunctionalOperationContract) contract);
-            }
-            return services.getSpecificationRepository()
-                            .combineOperationContracts(contracts);
-        }
+        final List<DisplayableSpecificationElement> selection =
+                contractList.getSelectedValuesList();
+        return computeContract(services, selection);
+    }
+    
+    /**
+     * <p>
+     * Computes the selected {@link Contract}.
+     * </p>
+     * <p>
+     * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
+     * </p>
+     * @param services The {@link Services}
+     * @param selection The selected contracts.
+     * @return The selected {@link Contract} or {@code null} if not available.
+     */
+    public static DisplayableSpecificationElement
+            computeContract(Services services,
+                            List<DisplayableSpecificationElement> selection) {
+       if(selection.isEmpty()) {
+          return null;
+      } else if(selection.size() == 1) {
+          return selection.get(0);
+      } else {         
+          ImmutableSet<FunctionalOperationContract> contracts
+             = DefaultImmutableSet.<FunctionalOperationContract>nil();
+          for(DisplayableSpecificationElement contract : selection) {
+              if (contract instanceof FunctionalOperationContract) {
+                  contracts = contracts.add((FunctionalOperationContract) contract);
+              } else {
+                  throw new IllegalStateException("Don't know how to combine contracts of kind " 
+                          + contract.getClass() + "\n" + "Contract:\n"
+                          + contract.getPlainText(services));
+              }
+          }
+          return services.getSpecificationRepository()
+                         .combineOperationContracts(contracts);
+      }
     }
 }

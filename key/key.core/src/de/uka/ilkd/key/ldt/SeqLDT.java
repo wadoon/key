@@ -59,6 +59,7 @@ public final class SeqLDT extends LDT {
     
     // special
     private LocationVariable heapSeq;
+    private LocationVariable eStepSeq;
 
     public SeqLDT(TermServices services) {
 	super(NAME, services);
@@ -75,6 +76,7 @@ public final class SeqLDT extends LDT {
         
         final Namespace progVars = services.getNamespaces().programVariables();
         heapSeq = (LocationVariable) progVars.lookup("heaps");
+        eStepSeq = (LocationVariable) progVars.lookup("eStep");
     }
     
     
@@ -135,7 +137,19 @@ public final class SeqLDT extends LDT {
     public LocationVariable getHeapSeq() {
         return heapSeq;
     }
-    
+
+
+    /**
+     * Sequence of booleans to express whether the entry
+     * in heapSeq represents an environment step.
+     * Use to express trace properties.
+     * @return
+     */
+    public LocationVariable getEStepSeq() {
+        return eStepSeq;
+    }
+
+
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
                                  Term[] subs, 

@@ -118,8 +118,7 @@ public class GuaranteePO extends AbstractPO {
         return JavaBlock.createJavaBlock(mf);
     }
 
-    private Term buildFrame(final Term thread, final Term heaps,
-                            final Term prevHeap, final Term currHeap,
+    private Term buildFrame(final Term thread, final Term prevHeap, final Term currHeap,
                             final Services services) {
         final Sort fieldSort = heapLDT.getFieldSort();
         final Sort objectSort = javaInfo.objectSort();
@@ -141,7 +140,8 @@ public class GuaranteePO extends AbstractPO {
         return tb.all(oVar, tb.all(fVar, tb.or(inSet, equalSelect)));
     }
 
-    private Term buildTraceProp(final Term thread, final Term heaps, final Services services) {
+    private Term buildTraceProp(final Term thread, final Term heap, final Term heaps,
+                                final Term eStep, final Services services) {
         final TypeConverter tc = services.getTypeConverter();
 
         final Sort heapSort = heapLDT.targetSort();
@@ -154,8 +154,10 @@ public class GuaranteePO extends AbstractPO {
         final Term prevHeap = tb.seqGet(heapSort, heaps, tb.sub(idx, tb.one()));
         final Term currHeap = tb.seqGet(heapSort, heaps, idx);
 
-        final Term guard = tb.and(tb.lt(tb.zero(), idx), tb.lt(idx, tb.seqLen(heaps)));
-        final Term frame = buildFrame(thread, heaps, prevHeap, currHeap, services);
+        final Term heapsBounds = tb.and(tb.lt(tb.zero(), idx), tb.lt(idx, tb.seqLen(heaps)));
+        final Term noEStep = tb.equals(tb.seqGet(Sort.ANY, eStep, idx), tb.FALSE());
+        final Term guard = tb.and(heapsBounds, noEStep);
+        final Term frame = buildFrame(thread, prevHeap, currHeap, services);
         final Term guar = tspec.getGuarantee(prevHeap, currHeap, thread, services);
 
         return tb.all(iVar, tb.imp(guard, tb.and(frame, guar)));
@@ -169,15 +171,18 @@ public class GuaranteePO extends AbstractPO {
 
         final Term thread = tb.var(threadVar);
         final Term heaps = tb.var(tc.getSeqLDT().getHeapSeq());
+        final Term eStep = tb.var(tc.getSeqLDT().getEStepSeq());
 
         final JavaBlock jb = buildJavaBlock(threadVar, threadType, target);
 
-        final Term traceProp = buildTraceProp(thread, heaps, services);
+        final Term traceProp = buildTraceProp(thread, baseHeap, heaps, eStep, services);
 
         final Modality modality = Modality.DIA; // XXX: only diamond for uniform translation
 
         final Term pre = tspec.getPre(baseHeap, thread, services);
-        final Term upd = tb.elementary(heaps, tb.seqSingleton(baseHeap));
+        final Term heapsUpd = tb.elementary(heaps, tb.seqSingleton(baseHeap));
+        final Term eStepUpd = tb.elementary(eStep, tb.seqSingleton(tb.TRUE()));
+        final Term upd = tb.parallel(heapsUpd, eStepUpd);
         final Term prog = tb.prog(modality, jb, traceProp);
 
         return tb.imp(pre, tb.apply(upd, prog));

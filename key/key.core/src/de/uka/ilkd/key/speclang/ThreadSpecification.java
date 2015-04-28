@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.SchematicFieldReference;
 import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -242,15 +244,20 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                         final ThreadSpecification tspec,
                                                         final Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         final Term heap = tb.getBaseHeap();
         final Term prevHeap = tb.getPrevHeap();
+        final Term heaps = tb.var(seqLDT.getHeapSeq());
+        final Term eStep = tb.var(seqLDT.getEStepSeq());
 
         final Term anonUpd = buildAnonUpd(tspec, services);
+        final Term heapsUpd = tb.elementary(heaps, tb.seqConcat(heaps, tb.seqSingleton(heap)));
+        final Term eStepUpd = tb.elementary(eStep, tb.seqConcat(eStep, tb.seqSingleton(tb.TRUE())));
         final Term prevUpd = tb.parallel(tb.elementary(prevHeap, heap), anonUpd);
 
         final Term[] upd; // update for new post condition
         if (assignUpd != null) {
-            upd = new Term[] {update, anonUpd, assignUpd};
+            upd = new Term[] {update, anonUpd, heapsUpd, eStepUpd, assignUpd};
         } else {
             upd = new Term[] {update, anonUpd};
         }
@@ -436,13 +443,14 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                    final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        final Term find = tb.tf().createTerm(mod, new Term[]{prog}, null, JavaBlock.EMPTY_JAVABLOCK);
+        final JavaBlock emptyJb = JavaBlock.createJavaBlock(new StatementBlock());
+        final Term find = tb.tf().createTerm(mod, new Term[]{prog}, null, emptyJb);
         final Term findTerm = tb.apply(update, find);
 
         final AntecSuccTacletGoalTemplate goalTemp =
                 relyGoal(update, null, prog, null, tspec, services);
 
-        return taclet("rely " + name + " EmptyModality",
+        return taclet("Rely " + name + " EmptyModality",
                       new String[] {"simplify_prog"},
                       findTerm, goals(goalTemp),
                       new VariableCondition[] {},
@@ -500,7 +508,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         }
         // TODO: static read assignment:
         // Taclets assignmentReadStaticAttribute + assignmentReadStaticAttributeWithVariablePrefix
-        res = res.add(taclet("rely " + name + " assignmentReadAttribute",
+        res = res.add(taclet("Rely " + name + " assignmentReadAttribute",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTerm, fieldAccGoals,
                              new VariableCondition[] { new FinalReferenceCondition(a, true),
@@ -509,7 +517,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                        new IsThisReference(v, true),
                                                        new JavaTypeToSortCondition(a, g, false)},
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " assignmentReadAttributeThis",
+        res = res.add(taclet("Rely " + name + " assignmentReadAttributeThis",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTerm, fieldAccThisGoals,
                              new VariableCondition[] { new FinalReferenceCondition(a, true),
@@ -585,17 +593,17 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                            + exc);
         }
 
-        res = res.add(taclet("rely " + name + " assignmentToReferenceArrayComponent",
+        res = res.add(taclet("Rely " + name + " assignmentToReferenceArrayComponent",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermToArr, assignToRefArrGoals,
                              new VariableCondition[] { new ArrayComponentTypeCondition(v, true) },
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " assignmentToPrimitiveArrayComponent",
+        res = res.add(taclet("Rely " + name + " assignmentToPrimitiveArrayComponent",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermToArr, assignToPrimArrGoals,
                              new VariableCondition[] { new ArrayComponentTypeCondition(v, false) },
                              tspec.getThreadVar(), services));
-        res = res.add(taclet("rely " + name + " assignmentArray2",
+        res = res.add(taclet("Rely " + name + " assignmentArray2",
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermArrTo, arrAccGoals,
                              new VariableCondition[] { new JavaTypeToSortCondition(v, g, true) },
@@ -736,14 +744,43 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                         +"; notChanged: "+notChanged;
     }
 
+    /**
+     * Return String to display contract in proof management dialog
+     * @param includeHtmlMarkup
+     * @param services
+     * @return String to display
+     */
+    private String getText(boolean includeHtmlMarkup, Services serv) {
+        final String start = includeHtmlMarkup ? "<html>" : "";
+        final String startb = includeHtmlMarkup ? "<b>" : "";
+        final String br = includeHtmlMarkup ? "<br>" : "\n";
+        final String endb = includeHtmlMarkup ? " </b>" : " ";
+        final String end = includeHtmlMarkup ? "</html>" : "";
+        Map<String, Term> terms = new LinkedHashMap<String, Term>();
+        terms.put("pre", pre);
+        terms.put("rely", rely);
+        terms.put("guarantee", guarantee);
+        terms.put("notChanged", notChanged);
+        terms.put("assignable", assignable);
+        String text = start;
+        int i = 0;
+        for (String t: terms.keySet()) {
+            String e = i < terms.size() ? br : end;
+            text = text + startb + t + ":" + endb
+                    + LogicPrinter.quickPrintTerm(terms.get(t), serv) + e;
+            i++;
+        }
+        return text;
+    }
+
     @Override
     public String getHTMLText(Services serv) {
-        return "<html><b>pre: </b>"+LogicPrinter.quickPrintTerm(pre, serv)
-                        +"<br><b>rely: </b>"+LogicPrinter.quickPrintTerm(rely, serv) 
-                        +"<br><b>guarantee: </b>"+LogicPrinter.quickPrintTerm(guarantee, serv)
-                        +"<br><b>notChanged: </b>"+LogicPrinter.quickPrintTerm(notChanged, serv)
-                        +"<br><b>assignable: </b>"+LogicPrinter.quickPrintTerm(assignable, serv)
-                        +"</html>";
+        return getText(true, serv);
+    }
+
+    @Override
+    public final String getPlainText(Services services) {
+        return getText(false, services);
     }
 
     @Override

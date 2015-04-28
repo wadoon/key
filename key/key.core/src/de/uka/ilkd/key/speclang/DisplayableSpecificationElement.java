@@ -13,10 +13,15 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 public interface DisplayableSpecificationElement extends SpecificationElement {
 
 	/**
-	 * For display (e.g., in ProofManagementDialog).
+	 * For display (e.g., in ProofManagementDialog) in pretty HTML format.
 	 * Optional operation.
 	 */
 	public String getHTMLText(Services serv);
+
+	/**
+     * Returns the contract in pretty plain text format.
+     */
+    public String getPlainText(Services services);
 
 	public int id();
 

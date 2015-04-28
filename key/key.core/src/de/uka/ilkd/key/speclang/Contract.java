@@ -140,16 +140,6 @@ public interface Contract extends DisplayableSpecificationElement {
 	               Services services);
 
     /**
-     * Returns the contract in pretty HTML format.
-     */
-    public String getHTMLText(Services services);
-
-    /**
-     * Returns the contract in pretty plain text format.
-     */
-    public String getPlainText(Services services);
-
-    /**
 	 * Lookup the proof obligation belonging to the contract in the
 	 * specification repository.
 	 */

@@ -91,6 +91,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
+import de.uka.ilkd.key.speclang.ThreadSpecification;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -280,8 +281,8 @@ public class BlockContractRule implements BuiltInRule {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
-        // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) {
+        // abort if inside of transformer or concurrency option enabled
+        if (Transformer.inTransformer(occurrence) || ThreadSpecification.relyGuaranteeEnabled()) {
             return false;
         }
         final Instantiation instantiation =
