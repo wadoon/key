@@ -130,8 +130,11 @@ public class GuaranteePO extends AbstractPO {
 
         final Term notChanged = tspec.getNotChanged(thread, services);
         final Term changeLocal = tspec.getAssignable(thread, services);
+        // tb.frameStrictlyEmpty(currHeap, new LinkedHashMap<Term, Term>(currHeap, prevHeap)); ?
         final Term changeRemote = tb.setMinus(tb.allLocs(), notChanged);
-        final Term inSet = tb.elementOf(o, f, tb.union(changeRemote, changeLocal));
+        final Term inSet = tb.elementOf(o, f, tb.union(changeRemote,
+                                                       tspec.hasModifiesClause() ?
+                                                               changeLocal : tb.empty()));
 
         final Term select0 = tb.select(Sort.ANY, prevHeap, o, f);
         final Term select1 = tb.select(Sort.ANY, currHeap, o, f);

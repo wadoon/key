@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.GuaranteePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -90,6 +91,13 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     private final LocationVariable threadVar;
     private static ImmutableList<ProgramVariable> threads;
 
+    /**
+     * If a method is strictly pure, it has no modifies clause which could
+     * be anonymised.
+     * @see #hasModifiesClause()
+     */
+    final boolean hasRealModifiesClause;
+
     public static final String CONCURRENCY_OPTION = "concurrency";
     public static final String EXC_OPTION = "runtimeExceptions";
     public static enum ExcOption { IGNORE, ALLOW, BAN; }
@@ -124,6 +132,34 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         }
         return res;
     }
+
+    public ThreadSpecification (String name, String displayName, KeYJavaType threadType,
+                                Term pre, Term rely, Term guarantee, Term notChanged, Term assignable,
+                                boolean hasRealMod, LocationVariable prevHeapVar,
+                                LocationVariable currHeapVar, LocationVariable threadVar) {
+        assert name != null;
+        assert threadType != null;
+        assert pre != null;
+        assert rely != null;
+        assert guarantee != null;
+        assert assignable != null;
+        assert notChanged != null;
+        assert prevHeapVar != null;
+        assert currHeapVar != null;
+        assert threadVar != null;
+        this.name = name;
+        this.displayName = displayName==null? name: displayName;
+        this.threadType = threadType;
+        this.pre = pre;
+        this.rely = rely;
+        this.guarantee = guarantee;
+        this.assignable = assignable;
+        this.hasRealModifiesClause = hasRealMod;
+        this.notChanged = notChanged;
+        this.prevHeapVar = prevHeapVar;
+        this.currHeapVar = currHeapVar;
+        this.threadVar = threadVar;
+}
 
     private static void generateThreadSeq(Services services) {
         ImmutableList<ProgramVariable> vars = ImmutableSLList.<ProgramVariable>nil();
@@ -611,33 +647,6 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         return res;
     }
 
-    public ThreadSpecification (String name, String displayName, KeYJavaType threadType,
-                                Term pre, Term rely, Term guarantee, Term notChanged, Term assignable,
-                                LocationVariable prevHeapVar, LocationVariable currHeapVar,
-                                LocationVariable threadVar) {
-        assert name != null;
-        assert threadType != null;
-        assert pre != null;
-        assert rely != null;
-        assert guarantee != null;
-        assert assignable != null;
-        assert notChanged != null;
-        assert prevHeapVar != null;
-        assert currHeapVar != null;
-        assert threadVar != null;
-        this.name = name;
-        this.displayName = displayName==null? name: displayName;
-        this.threadType = threadType;
-        this.pre = pre;
-        this.rely = rely;
-        this.guarantee = guarantee;
-        this.assignable = assignable;
-        this.notChanged = notChanged;
-        this.prevHeapVar = prevHeapVar;
-        this.currHeapVar = currHeapVar;
-        this.threadVar = threadVar;
-    }
-
     /**
      * Rules to handle heap read access in concurrent programs using rely/guarantee contracts.
      * @param exc The chosen option to handle runtime exceptions.
@@ -687,6 +696,16 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final Map<Term,Term> replaceMap = getReplaceMap(null, null, threadVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(assignable);
+    }
+
+    /**
+     * Returns <code>true</code> iff the thread (according to the contract) does
+     * not modify the heap at all, i.e., iff it is "strictly pure."
+     *
+     * @return whether this contract is strictly pure.
+     */
+    public boolean hasModifiesClause() {
+        return hasRealModifiesClause;
     }
 
     public Term getNotChanged(Term threadVar, Services services) {
@@ -750,7 +769,8 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
      * @param services
      * @return String to display
      */
-    private String getText(boolean includeHtmlMarkup, Services serv) {
+    private String getText(boolean includeHtmlMarkup, Services serv,
+                           boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final String start = includeHtmlMarkup ? "<html>" : "";
         final String startb = includeHtmlMarkup ? "<b>" : "";
         final String br = includeHtmlMarkup ? "<br>" : "\n";
@@ -766,8 +786,19 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         int i = 0;
         for (String t: terms.keySet()) {
             String e = i < terms.size() ? br : end;
+            boolean isMod = (t.equals("assignable"));
             text = text + startb + t + ":" + endb
-                    + LogicPrinter.quickPrintTerm(terms.get(t), serv) + e;
+                    + (!isMod || hasRealModifiesClause ?
+                            LogicPrinter.quickPrintTerm(terms.get(t), serv,
+                                                  usePrettyPrinting,
+                                                  useUnicodeSymbols)
+                       : "")
+                    + (isMod && !hasRealModifiesClause ?
+                            (LogicPrinter.quickPrintTerm(serv.getTermBuilder().empty(), serv,
+                                                         usePrettyPrinting,
+                                                         useUnicodeSymbols)
+                             + ", creates no new objects") : "")
+                    + e;
             i++;
         }
         return text;
@@ -775,12 +806,16 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
     @Override
     public String getHTMLText(Services serv) {
-        return getText(true, serv);
+        return getText(true, serv,
+                       NotationInfo.DEFAULT_PRETTY_SYNTAX,
+                       NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
 
     @Override
     public final String getPlainText(Services services) {
-        return getText(false, services);
+        return getText(false, services,
+                       NotationInfo.DEFAULT_PRETTY_SYNTAX,
+                       NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
 
     @Override

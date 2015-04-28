@@ -1296,10 +1296,11 @@ public class JMLSpecFactory {
                         TB.allLocs() : // default
                         JMLTranslator.<Term>translate(spec.getAssignable(), threadClass, threadVar, null,
                                                       null, null, null, Term.class, services);
+        final boolean hasRealMod = (assignable != TB.strictlyNothing());
         final LocationVariable prevHeapVar = heapLDT.getPrevHeap();
         final LocationVariable currHeapVar = heapLDT.getHeap();
         return new ThreadSpecification(name, null, threadClass, pre, rely, guar, notAssigned,
-                                       assignable, prevHeapVar, currHeapVar, threadVar);
+                                       assignable, hasRealMod, prevHeapVar, currHeapVar, threadVar);
     }
 
 
