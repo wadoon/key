@@ -295,7 +295,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         if (assignUpd != null) {
             upd = new Term[] {update, anonUpd, heapsUpd, eStepUpd, assignUpd};
         } else {
-            upd = new Term[] {update, anonUpd};
+            upd = new Term[] {update, anonUpd, heapsUpd, eStepUpd};
         }
 
         final Term rely = tspec.getRely(prevHeap, heap, tb.var(tspec.getThreadVar()), services);
@@ -786,7 +786,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         int i = 0;
         for (String t: terms.keySet()) {
             String e = i < terms.size() ? br : end;
-            boolean isMod = (t.equals("assignable"));
+            final boolean isMod = t.equals("assignable");
             text = text + startb + t + ":" + endb
                     + (!isMod || hasRealModifiesClause ?
                             LogicPrinter.quickPrintTerm(terms.get(t), serv,
