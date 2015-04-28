@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.SchematicFieldReference;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -173,15 +174,17 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                      final Term find, final ImmutableList<TacletGoalTemplate> goals,
                                      final VariableCondition[] varConds,
                                      final LocationVariable threadVar,
+                                     final String displayName,
                                      final Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final Term exactInstance =
-                tb.exactInstance(threadVar.getKeYJavaType().getSort(), tb.var(threadVar));
+        final Term exactInstance = threadVar == null ?
+                tb.ff() : tb.exactInstance(threadVar.getKeYJavaType().getSort(), tb.var(threadVar));
         final Sequent exactInstanceSeq =
                 Sequent.createAnteSequent(new Semisequent(new SequentFormula(exactInstance)));
 
         final SuccTacletBuilder tab = new SuccTacletBuilder();
         tab.setName(MiscTools.toValidTacletName(name));
+        tab.setDisplayName(MiscTools.toValidTacletName(displayName).toString());
         for (final String s: ruleSet) {
             tab.addRuleSet(new RuleSet(new Name(s)));
         }
@@ -190,7 +193,9 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         for (final VariableCondition varCond: varConds) {
             tab.addVariableCondition(varCond);
         }
-        tab.setIfSequent(exactInstanceSeq);
+        if (threadVar != null) {
+            tab.setIfSequent(exactInstanceSeq);
+        }
         return tab.getSuccTaclet();
     }
 
@@ -237,16 +242,19 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
     private static Term buildFieldAccAssignUpd(final ParsableVariable lhs,
                                                final FieldReference fieldRef,
                                                final GenericSort g,
+                                               final boolean isStatic,
                                                final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Term heap = tb.getBaseHeap();
-        final Term receiver = tb.var((ParsableVariable)fieldRef.getReferencePrefix());
+        final Term receiver = isStatic ? null : tb.var((ParsableVariable)fieldRef.getReferencePrefix());
         final ProgramSV pv = (ProgramSV)((SchematicFieldReference)fieldRef).getReferenceSuffix();
 
         final Term memberPVToField =
                 tb.tf().createTerm(AbstractTermTransformer.MEMBER_PV_TO_FIELD, tb.var(pv));
-        return tb.elementary(tb.var(lhs), tb.select(g, heap, receiver, memberPVToField));
+        return tb.elementary(tb.var(lhs),
+                             tb.select(g, heap, isStatic ? tb.NULL() : receiver,
+                                       memberPVToField));
     }
 
     private static Term buildArrayAccAssignUpd(final ParsableVariable lhs,
@@ -276,11 +284,12 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
     private static AntecSuccTacletGoalTemplate relyGoal(final Term update, final Term assignUpd,
                                                         final Term replaceTerm,
-                                                        final ProgramSV v,
+                                                        final TypeReference v,
                                                         final ThreadSpecification tspec,
                                                         final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+        final boolean hasUpd = update != null;
         final Term heap = tb.getBaseHeap();
         final Term prevHeap = tb.getPrevHeap();
         final Term heaps = tb.var(seqLDT.getHeapSeq());
@@ -293,9 +302,11 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
 
         final Term[] upd; // update for new post condition
         if (assignUpd != null) {
-            upd = new Term[] {update, anonUpd, heapsUpd, eStepUpd, assignUpd};
+            upd = hasUpd ? new Term[] {update, anonUpd, heapsUpd, eStepUpd, assignUpd} :
+                                new Term[] {anonUpd, heapsUpd, eStepUpd, assignUpd};
         } else {
-            upd = new Term[] {update, anonUpd, heapsUpd, eStepUpd};
+            upd = hasUpd ? new Term[] {update, anonUpd, heapsUpd, eStepUpd} :
+                                new Term[] {anonUpd, heapsUpd, eStepUpd};
         }
 
         final Term rely = tspec.getRely(prevHeap, heap, tb.var(tspec.getThreadVar()), services);
@@ -303,7 +314,8 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         if (rely.equalsModRenaming(tb.tt())) {
             addRely = null;
         } else { // add rely in any case
-            addRely = tb.applySequential(new Term[] {update, prevUpd}, rely);
+            final Term[] seqUpd = hasUpd ? new Term[] {update, prevUpd} : new Term[] {prevUpd};
+            addRely = tb.applySequential(seqUpd, rely);
         }
 
         final Term replaceWith = tb.applySequential(upd, replaceTerm);
@@ -321,7 +333,9 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                                  final ExcOption exc,
                                                                  final Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final Term varEqNull = tb.apply(update, tb.equals(tb.var(v), tb.NULL()));
+        final Term varEqNull = update != null ?
+                tb.apply(update, tb.equals(tb.var(v), tb.NULL())) :
+                    tb.equals(tb.var(v), tb.NULL());
         final Term replaceTerm;
         if (exc == ExcOption.ALLOW) {
             final New exception = KeYJavaASTFactory
@@ -336,7 +350,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
             replaceTerm = tb.ff();
         }
         final AntecSuccTacletGoalTemplate nullRef =
-                goal(varEqNull, tb.apply(update, replaceTerm));
+                goal(varEqNull, update != null ? tb.apply(update, replaceTerm) : replaceTerm);
         nullRef.setName("Null Reference (" + v.getName() + " = null)");
         return nullRef;
     }
@@ -356,8 +370,9 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final Term lengthLeqIdx = tb.leq(tb.dotLength(array), index);
         final Term idxLtZero = tb.lt(index, tb.zero());
 
-        final Term indexOutOfBounds =
-                tb.apply(update, tb.and(varNeqNull, tb.or(lengthLeqIdx, idxLtZero)));
+        final Term indexOutOfBounds = update != null ?
+                tb.apply(update, tb.and(varNeqNull, tb.or(lengthLeqIdx, idxLtZero))) :
+                    tb.and(varNeqNull, tb.or(lengthLeqIdx, idxLtZero));
         final Term replaceTerm;
         if (exc == ExcOption.ALLOW) {
             final New exception = KeYJavaASTFactory
@@ -372,7 +387,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
             replaceTerm = tb.ff();
         }
         final AntecSuccTacletGoalTemplate outOfBounds =
-                goal(indexOutOfBounds, tb.apply(update, replaceTerm));
+                goal(indexOutOfBounds, update != null ? tb.apply(update, replaceTerm) : replaceTerm);
         outOfBounds.setName("Index Out of Bounds (" + arr.getName() + " != null, but "
                                                     + idx.getName() +" Out of Bounds!)");
         return outOfBounds;
@@ -396,8 +411,9 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final Term idxGeqZero = tb.geq(tb.zero(), index);
         final Term arrStorInvalid = tb.not(tb.arrayStoreValid(array, var));
 
-        final Term arrayStoreException =
-                tb.apply(update, tb.and(varNeqNull, idxLtLength, idxGeqZero, arrStorInvalid));
+        final Term arrayStoreException = update != null ?
+                tb.apply(update, tb.and(varNeqNull, idxLtLength, idxGeqZero, arrStorInvalid)) :
+                    tb.and(varNeqNull, idxLtLength, idxGeqZero, arrStorInvalid);
         final Term replaceTerm;
         if (exc == ExcOption.ALLOW) {
             final New exception = KeYJavaASTFactory
@@ -412,7 +428,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
             replaceTerm = tb.ff();
         }
         final AntecSuccTacletGoalTemplate arrayStoreExc =
-                goal(arrayStoreException, tb.apply(update, replaceTerm));
+                goal(arrayStoreException, update != null ? tb.apply(update, replaceTerm) : replaceTerm);
         arrayStoreExc.setName("Array Store Exception (incompatible dynamic element type of "
                               + arr.getName() + " and " + idx.getName() +")");
         return arrayStoreExc;
@@ -423,12 +439,13 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                                   final ProgramSV v0,
                                                                   final SchematicFieldReference vDotA,
                                                                   final GenericSort g,
+                                                                  final boolean isStatic,
                                                                   final ThreadSpecification tspec,
                                                                   final Services services) {
         final TermFactory tf = services.getTermFactory();
-        final ProgramSV v = (ProgramSV)vDotA.getReferencePrefix();
+        final TypeReference v = (TypeReference)vDotA.getReferencePrefix();
 
-        final Term fieldAccAssignUpd = buildFieldAccAssignUpd(v0, vDotA, g, services);
+        final Term fieldAccAssignUpd = buildFieldAccAssignUpd(v0, vDotA, g, isStatic, services);
         final ContextStatementBlock emptyBlock = new ContextStatementBlock(new Statement[] {}, null);
         final JavaBlock emptyJb = JavaBlock.createJavaBlock(emptyBlock);
         final Term replaceTerm = tf.createTerm(mod, new Term[] {prog}, null, emptyJb);
@@ -478,19 +495,22 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                    final ThreadSpecification tspec,
                                                    final Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        final boolean hasUpd = update != null;
+        final String tName = "Rely " + name + " EmptyModality";
 
         final JavaBlock emptyJb = JavaBlock.createJavaBlock(new StatementBlock());
         final Term find = tb.tf().createTerm(mod, new Term[]{prog}, null, emptyJb);
-        final Term findTerm = tb.apply(update, find);
+        final Term findTerm = hasUpd ? tb.apply(update, find) : find;
 
         final AntecSuccTacletGoalTemplate goalTemp =
                 relyGoal(update, null, prog, null, tspec, services);
 
-        return taclet("Rely " + name + " EmptyModality",
+        return taclet(tName + (hasUpd ? "Update" : ""),
                       new String[] {"simplify_prog"},
                       findTerm, goals(goalTemp),
                       new VariableCondition[] {},
-                      tspec.getThreadVar(), services);
+                      tspec.getThreadVar(), tName,
+                      services);
     }
 
     private static ImmutableSet<SuccTaclet> createFieldAccTaclets(final String name,
@@ -503,6 +523,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final TermBuilder tb = services.getTermBuilder();
         final TermFactory tf = services.getTermFactory();
         ImmutableSet<SuccTaclet> res = DefaultImmutableSet.<SuccTaclet>nil();
+        final boolean hasUpd = update != null;
 
         final ProgramSV lhs =
                 SchemaVariableFactory.createProgramSV(new ProgramElementName("#v0"),
@@ -510,25 +531,58 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final ProgramSV v =
                 SchemaVariableFactory.createProgramSV(new ProgramElementName("#v"),
                                                       ProgramSVSort.VARIABLE, false);
+        final ProgramSV sv =
+                SchemaVariableFactory.createProgramSV(new ProgramElementName("#sv"),
+                                                      ProgramSVSort.STATICVARIABLE, false);
         final ProgramSV a =
                 SchemaVariableFactory.createProgramSV(new ProgramElementName("#a"),
                                                       ProgramSVSort.VARIABLE, false);
         final GenericSort g = new GenericSort(new Name("G"));
         final SchematicFieldReference rhs = new SchematicFieldReference(a, v);
+        final SchematicFieldReference rhsStatic = new SchematicFieldReference(sv, null);
+        final SchematicFieldReference rhsStaticWithPrefix =
+                new SchematicFieldReference(sv, KeYJavaASTFactory.typeRef(tspec.getKJT()));// v
 
         final ContextStatementBlock fieldAccBlock =
                 new ContextStatementBlock(KeYJavaASTFactory.assign(lhs, rhs), null);
+        final ContextStatementBlock staticFieldAccBlock =
+                new ContextStatementBlock(
+                        KeYJavaASTFactory.assign(lhs,
+                                                 KeYJavaASTFactory.passiveExpression(rhsStatic)),
+                        null);
+        final ContextStatementBlock staticFieldAccBlockWithPrefix =
+                new ContextStatementBlock(
+                        KeYJavaASTFactory.assign(lhs,
+                                                 KeYJavaASTFactory.passiveExpression(rhsStaticWithPrefix)),
+                        null);
         final JavaBlock jb = JavaBlock.createJavaBlock(fieldAccBlock);
-        final Term findTerm =
-                tb.apply(update, tf.createTerm(mod, new Term[]{prog}, null, jb));
+        final JavaBlock jbStatic = JavaBlock.createJavaBlock(staticFieldAccBlock);
+        final JavaBlock jbStaticWithPrefix = JavaBlock.createJavaBlock(staticFieldAccBlockWithPrefix);
+        final Term findTerm = hasUpd ?
+                tb.apply(update, tf.createTerm(mod, new Term[]{prog}, null, jb)) :
+                    tf.createTerm(mod, new Term[]{prog}, null, jb);
+        final Term findTermStatic = hasUpd ?
+                tb.apply(update, tf.createTerm(mod, new Term[]{prog}, null, jbStatic)) :
+                    tf.createTerm(mod, new Term[]{prog}, null, jbStatic);
+        final Term findTermStaticWithPrefix = hasUpd ?
+                tb.apply(update, tf.createTerm(mod, new Term[]{prog}, null, jbStaticWithPrefix)) :
+                    tf.createTerm(mod, new Term[]{prog}, null, jbStaticWithPrefix);
 
         final AntecSuccTacletGoalTemplate normalExec =
-                normalFieldAccGoal(prog, update, mod, lhs, rhs, g, tspec, services);
+                normalFieldAccGoal(prog, update, mod, lhs, rhs, g, false, tspec, services);
+        final AntecSuccTacletGoalTemplate normalStaticExec =
+                normalFieldAccGoal(prog, update, mod, lhs, rhsStatic, g, true, tspec, services);
+        final AntecSuccTacletGoalTemplate normalStaticExecWithPrefix =
+                normalFieldAccGoal(prog, update, mod, lhs, rhsStaticWithPrefix, g, true, tspec, services);
         final AntecSuccTacletGoalTemplate nullRef =
                 nullReferenceGoal(prog, update, mod, v, exc, services);
 
         final ImmutableList<TacletGoalTemplate> fieldAccGoals;
+        final ImmutableList<TacletGoalTemplate> staticFieldAccGoals = goals(normalStaticExec);
+        final ImmutableList<TacletGoalTemplate> staticFieldAccWithPrefixGoals =
+                goals(normalStaticExecWithPrefix);
         final ImmutableList<TacletGoalTemplate> fieldAccThisGoals;
+        String tName = null;
         switch (exc) {
             case IGNORE:
                 fieldAccGoals = goals(normalExec);
@@ -542,9 +596,25 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                 throw new RuntimeException("The setting for the RuntimeException-option is not valid: "
                                            + exc);
         }
-        // TODO: static read assignment:
-        // Taclets assignmentReadStaticAttribute + assignmentReadStaticAttributeWithVariablePrefix
-        res = res.add(taclet("Rely " + name + " assignmentReadAttribute",
+
+        tName = "Rely " + name + " assignmentReadStaticAttribute";
+        res = res.add(taclet(tName + (hasUpd ? "Update" : ""),
+                             new String[] {"simplify_prog", "simplify_prog_subset"},
+                             findTermStatic, staticFieldAccGoals,
+                             new VariableCondition[] { new FinalReferenceCondition(sv, true),
+                                                       new StaticReferenceCondition(sv, false),
+                                                       new JavaTypeToSortCondition(sv, g, false)},
+                             tspec.getThreadVar(), tName, services));
+        tName = "Rely " + name + " assignmentReadStaticAttributeWithVariablePrefix";
+        res = res.add(taclet(tName + (hasUpd ? "Update" : ""),
+                             new String[] {"simplify_prog"},
+                             findTermStaticWithPrefix, staticFieldAccWithPrefixGoals,
+                             new VariableCondition[] { new FinalReferenceCondition(sv, true),
+                                                       new StaticReferenceCondition(sv, false),
+                                                       new JavaTypeToSortCondition(sv, g, false)},
+                             null, tName, services));
+        tName = "Rely " + name + " assignmentReadAttribute";
+        res = res.add(taclet(tName + (hasUpd ? "Update" : ""),
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTerm, fieldAccGoals,
                              new VariableCondition[] { new FinalReferenceCondition(a, true),
@@ -552,8 +622,9 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                        new StaticReferenceCondition(a, true),
                                                        new IsThisReference(v, true),
                                                        new JavaTypeToSortCondition(a, g, false)},
-                             tspec.getThreadVar(), services));
-        res = res.add(taclet("Rely " + name + " assignmentReadAttributeThis",
+                             tspec.getThreadVar(), tName, services));
+        tName = "Rely " + name + " assignmentReadAttributeThis";
+        res = res.add(taclet(tName + (hasUpd ? "Update" : ""),
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTerm, fieldAccThisGoals,
                              new VariableCondition[] { new FinalReferenceCondition(a, true),
@@ -561,7 +632,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                                        new StaticReferenceCondition(a, true),
                                                        new IsThisReference(v, false),
                                                        new JavaTypeToSortCondition(a, g, false)},
-                             tspec.getThreadVar(), services));
+                             tspec.getThreadVar(), tName, services));
         return res;
     }
 
@@ -575,6 +646,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final TermBuilder tb = services.getTermBuilder();
         final TermFactory tf = services.getTermFactory();
         ImmutableSet<SuccTaclet> res = DefaultImmutableSet.<SuccTaclet>nil();
+        final boolean hasUpd = update != null;
 
         final ProgramSV v =
                 SchemaVariableFactory.createProgramSV(new ProgramElementName("#v"),
@@ -591,12 +663,16 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final ContextStatementBlock toArrAssignBlock =
                 new ContextStatementBlock(KeYJavaASTFactory.assign(arrRef, expr), null);
         final JavaBlock jbToArr = JavaBlock.createJavaBlock(toArrAssignBlock);
-        final Term findTermToArr = tb.apply(update, tf.createTerm(mod, new Term[]{prog}, null, jbToArr));
+        final Term findTermToArr = update != null ?
+                tb.apply(update, tf.createTerm(mod, new Term[]{prog}, null, jbToArr)) :
+                    tf.createTerm(mod, new Term[]{prog}, null, jbToArr);
 
         final ContextStatementBlock arrToAssignBlock =
                 new ContextStatementBlock(KeYJavaASTFactory.assign(expr, arrRef), null);
         final JavaBlock jbArrTo = JavaBlock.createJavaBlock(arrToAssignBlock);
-        final Term findTermArrTo = tb.apply(update, tf.createTerm(mod, new Term[]{prog}, null, jbArrTo));
+        final Term findTermArrTo = update != null ?
+                tb.apply(update, tf.createTerm(mod, new Term[]{prog}, null, jbArrTo)) :
+                    tf.createTerm(mod, new Term[]{prog}, null, jbArrTo);
 
         final AntecSuccTacletGoalTemplate normalToArrExec =
                 normalToArrayRefGoal(prog, update, mod, arrRef, expr, tspec, services);
@@ -613,6 +689,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final ImmutableList<TacletGoalTemplate> assignToRefArrGoals;
         final ImmutableList<TacletGoalTemplate> assignToPrimArrGoals;
         final ImmutableList<TacletGoalTemplate> arrAccGoals;
+        String tName = null;
         switch (exc) {
             case IGNORE:
                 assignToRefArrGoals = goals(normalToArrExec);
@@ -629,21 +706,37 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                            + exc);
         }
 
-        res = res.add(taclet("Rely " + name + " assignmentToReferenceArrayComponent",
+        tName = "Rely " + name + " assignmentToReferenceArrayComponent";
+        res = res.add(taclet(tName + (hasUpd ? "Update" : ""),
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermToArr, assignToRefArrGoals,
                              new VariableCondition[] { new ArrayComponentTypeCondition(v, true) },
-                             tspec.getThreadVar(), services));
-        res = res.add(taclet("Rely " + name + " assignmentToPrimitiveArrayComponent",
+                             tspec.getThreadVar(), tName, services));
+        tName = "Rely " + name + " assignmentToPrimitiveArrayComponent";
+        res = res.add(taclet(tName + (hasUpd ? "Update" : ""),
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermToArr, assignToPrimArrGoals,
                              new VariableCondition[] { new ArrayComponentTypeCondition(v, false) },
-                             tspec.getThreadVar(), services));
-        res = res.add(taclet("Rely " + name + " assignmentArray2",
+                             tspec.getThreadVar(), tName, services));
+        tName = "Rely " + name + " assignmentArray2";
+        res = res.add(taclet(tName + (hasUpd ? "Update" : ""),
                              new String[] {"simplify_prog", "simplify_prog_subset"},
                              findTermArrTo, arrAccGoals,
                              new VariableCondition[] { new JavaTypeToSortCondition(v, g, true) },
-                             tspec.getThreadVar(), services));
+                             tspec.getThreadVar(), tName, services));
+        return res;
+    }
+
+    private static ImmutableSet<SuccTaclet> createTaclets(String name, Term post, Term update,
+                                                          ModalOperatorSV mod, ThreadSpecification tspec,
+                                                          ExcOption exc, Services services) {
+        ImmutableSet<SuccTaclet> res;
+        res = createFieldAccTaclets(name, post, update, mod, tspec, exc, services);
+        res = res.union(createFieldAccTaclets(name, post, null, mod, tspec, exc, services));
+        res = res.union(createArrayAccTaclets(name, post, update, mod, tspec, exc, services));
+        res = res.union(createArrayAccTaclets(name, post, null, mod, tspec, exc, services));
+        res = res.add(createEmptyModTaclet(name, post, update, mod, tspec, services));
+        res = res.add(createEmptyModTaclet(name, post, null, mod, tspec, services));
         return res;
     }
 
@@ -657,7 +750,6 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
         final TermBuilder tb = services.getTermBuilder();
         final ThreadSpecification tspec = this;
 
-        ImmutableSet<SuccTaclet> res;
         final String name = tspec.getKJT().getFullName();
         final Term prog = tb.var(SchemaVariableFactory.createFormulaSV(new Name("post")));
         final Term update = tb.var(SchemaVariableFactory.createUpdateSV(new Name("#update")));
@@ -665,11 +757,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                 SchemaVariableFactory.createModalOperatorSV(new Name("#allmodal"), Sort.FORMULA,
                                                             DefaultImmutableSet.<Modality>nil()
                                                             .add(Modality.BOX).add(Modality.DIA));
-
-        res = createFieldAccTaclets(name, prog, update, mod, tspec, exc, services);
-        res = res.union(createArrayAccTaclets(name, prog, update, mod, tspec, exc, services));
-        res = res.add(createEmptyModTaclet(name, prog, update, mod, tspec, services));
-        return res;
+        return createTaclets(name, prog, update, mod, tspec, exc, services);
     }
 
     public Term getPre (Term currHeap, Term threadVar, Services services) {
