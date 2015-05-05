@@ -329,47 +329,50 @@ public class LogicPrinter {
 	    		    SVInstantiations sv,
                             boolean showWholeTaclet,
                             boolean declareSchemaVars) {
-	instantiations = sv;
+        instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
-	try {
-	    Debug.log4jDebug(taclet.name().toString(),
-		    	     LogicPrinter.class.getName());
-	    if (showWholeTaclet) {
-		layouter.beginC(2).print(taclet.name().toString()).print(" {");
-	    } else {
-		layouter.beginC();
-	    }
-	    if (declareSchemaVars) {
-		Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
-		layouter.brk();
-		for(SchemaVariable schemaVar : schemaVars) {
+        try {
+            Debug.log4jDebug(taclet.name().toString(),
+                             LogicPrinter.class.getName());
+            if (showWholeTaclet) {
+                layouter.beginC(2).print(taclet.name().toString()).print(" {");
+            } else {
+                layouter.beginC();
+            }
+            if (declareSchemaVars) {
+                Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
+                layouter.brk();
+                for(SchemaVariable schemaVar : schemaVars) {
                     layouter.print(schemaVar.proofToString() + "  ");
-		}
-	    }
-	    if (!(taclet.ifSequent().isEmpty())) {
-		printTextSequent(taclet.ifSequent(), "\\assumes", true);
-	    }
-	    if (showWholeTaclet) {
-		printFind(taclet);
-		if (taclet instanceof RewriteTaclet) {
-		    printRewriteAttributes((RewriteTaclet)taclet);
-		}
-		printVarCond(taclet);
-	    }
-	    printGoalTemplates(taclet);
-	    if (showWholeTaclet) {
-		printHeuristics(taclet);
-	    }
-	    printAttribs(taclet);
-	    if (showWholeTaclet) {
-		layouter.brk(1, -2).print("}");
-	    }
-	    layouter.end();
-	} catch (java.io.IOException e) {
-	    Debug.log4jWarn("xxx exception occurred during printTaclet",
-		    	    LogicPrinter.class.getName());
-	}
-	instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+                }
+            }
+            if (!(taclet.ifSequent().isEmpty())) {
+                printTextSequent(taclet.ifSequent(), "\\assumes", true);
+            }
+            if (showWholeTaclet) {
+                printFind(taclet);
+                if (taclet instanceof RewriteTaclet) {
+                    printRewriteAttributes((RewriteTaclet)taclet);
+                }
+                printVarCond(taclet);
+            }
+            printGoalTemplates(taclet);
+            if (showWholeTaclet) {
+                printHeuristics(taclet);
+            }
+            printAttribs(taclet);
+            if (showWholeTaclet) {
+                printDisplayName(taclet);
+            }
+            if (showWholeTaclet) {
+                layouter.brk(1, -2).print("}");
+            }
+            layouter.end();
+        } catch (java.io.IOException e) {
+            Debug.log4jWarn("xxx exception occurred during printTaclet",
+                            LogicPrinter.class.getName());
+        }
+        instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
     }
 
@@ -389,6 +392,17 @@ public class LogicPrinter {
         // no attributes exist for non-rewrite taclets at the moment
     }
 
+    protected void printDisplayName(Taclet taclet) throws IOException {
+        final String displayName = taclet.displayName();
+        if (displayName.equals(taclet.name().toString())) {
+            // this means there is no special display name
+            return;
+        }
+        layouter.brk().beginC(2).print("\\displayname " + '\"');
+        layouter.print(displayName);
+        layouter.print("" + '\"').end();
+    }
+
     protected void printRewriteAttributes(RewriteTaclet taclet) throws IOException{
         final int applicationRestriction = taclet.getApplicationRestriction();
         if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
@@ -406,43 +420,49 @@ public class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) throws IOException{
-        Iterator<NewVarcond> itVarsNew      = taclet.varsNew().iterator();
-        Iterator<NewDependingOn> itVarsNewDepOn = taclet.varsNewDependingOn();
-        Iterator<NotFreeIn> itVarsNotFreeIn = taclet.varsNotFreeIn();
-        Iterator<VariableCondition> itVC = taclet.getVariableConditions();
+        final ImmutableList<NewVarcond> varsNew      = taclet.varsNew();
+        final ImmutableList<NewDependingOn> varsNewDependingOn = taclet.varsNewDependingOn();
+        final ImmutableList<NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
+        final ImmutableList<VariableCondition> variableConditions = taclet.getVariableConditions();
 
-        if (itVarsNew.hasNext() ||
-                itVarsNotFreeIn.hasNext() ||
-                itVC.hasNext() || itVarsNewDepOn.hasNext()) {
+        if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty() || !varsNewDependingOn.isEmpty()) {
             layouter.brk().beginC(2).print("\\varcond (").brk();
-            while (itVarsNewDepOn.hasNext()) {
-                printNewVarDepOnCond(itVarsNewDepOn.next());
-                if (itVarsNewDepOn.hasNext() ||
-                        itVarsNew.hasNext() ||
-                        itVarsNotFreeIn.hasNext() ||
-                        itVC.hasNext()) {
-                        layouter.print(",").brk();
+            
+            int countNewDependingOn = varsNewDependingOn.size() - 1;
+            for (NewDependingOn ndo: varsNewDependingOn) {
+                printNewVarDepOnCond(ndo);
+                if (countNewDependingOn > 0 ||
+                        !varsNotFreeIn.isEmpty() ||
+                        !varsNotFreeIn.isEmpty() ||
+                        !variableConditions.isEmpty()) {
+                    layouter.print(",").brk();
+                }
+                --countNewDependingOn;
+            }
+            
+            int countVarsNew = varsNew.size() - 1;
+            for (final NewVarcond nvc: varsNew) {
+                printNewVarcond(nvc);
+                if (countVarsNew > 0 || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
+                    layouter.print(",").brk();
                 }
             }
-            while (itVarsNew.hasNext()) {
-            	printNewVarcond(itVarsNew.next());
-            	if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext()
-		    || itVC.hasNext()) {
-            		layouter.print(",").brk();
-            	}
-            }
-            while (itVarsNotFreeIn.hasNext()) {
-                NotFreeIn pair=itVarsNotFreeIn.next();
+            
+            int countNotFreeIn = varsNotFreeIn.size() - 1;
+            for (final NotFreeIn pair: varsNotFreeIn) {
                 printNotFreeIn(pair);
-                if (itVarsNotFreeIn.hasNext() || itVC.hasNext()) {
-                        layouter.print(",").brk();
+                if (countNotFreeIn > 0 || !variableConditions.isEmpty()) {
+                    layouter.print(",").brk();
                 }
+                --countNotFreeIn;
             }
-            while (itVC.hasNext()) {
-                printVariableCondition(itVC.next());
-                if (itVC.hasNext()){
-                        layouter.print(",").brk();
-                }
+
+            final int countVC = variableConditions.size() - 1;
+            for (final VariableCondition vc : variableConditions) {
+                printVariableCondition(vc);
+                if (countVC > 0) { 
+                    layouter.print(",").brk();
+                } 
             }
             layouter.brk(1,-2).print(")").end();
         }

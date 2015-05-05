@@ -42,9 +42,8 @@ public class InfFlowProof extends Proof {
     }
 
     public InfFlowProof(String name, Term problem, String header,
-            TacletIndex rules, BuiltInRuleIndex builtInRules,
             InitConfig initConfig) {
-        super(name, problem, header, rules, builtInRules, initConfig);
+        super(name, problem, header, initConfig);
     }
 
     public InfFlowProof(String name, InitConfig initConfig) {
@@ -99,10 +98,10 @@ public class InfFlowProof extends Proof {
         ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
         assert temps != null;
         for (TacletGoalTemplate tgt: temps) {
-            for (SequentFormula sf: tgt.sequent().antecedent().toList()) {
+            for (SequentFormula sf: tgt.sequent().antecedent().asList()) {
                 addLabeledTotalTerm(sf.formula());
             }
-            for (SequentFormula sf: tgt.sequent().succedent().toList()) {
+            for (SequentFormula sf: tgt.sequent().succedent().asList()) {
                 addLabeledTotalTerm(sf.formula());
             }
         }
