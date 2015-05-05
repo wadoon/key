@@ -761,6 +761,9 @@ public final class UseOperationContractRule implements BuiltInRule {
                         	 	   services)
                          : null;
 
+                         
+        String runtimeExceptionsOption = goal.proof().getSettings().getChoiceSettings().getDefaultChoices().get("runtimeExceptions");
+        boolean slicing = runtimeExceptionsOption != null && runtimeExceptionsOption.equals("runtimeExceptions:slicing");
         //split goal into three/four branches
         final ImmutableList<Goal> result;
         final Goal preGoal, postGoal, excPostGoal, nullGoal;
@@ -774,10 +777,16 @@ public final class UseOperationContractRule implements BuiltInRule {
             postGoal = result.tail().tail().tail().head();
             excPostGoal = result.tail().tail().head();
             preGoal = result.tail().head();
-            nullGoal = result.head();
-            nullGoal.setBranchLabel("Null reference ("
-        	                    + inst.actualSelf
-        	                    + " = null)");
+            if(!slicing){
+            	nullGoal = result.head();
+                nullGoal.setBranchLabel("Null reference ("
+            	                    + inst.actualSelf
+            	                    + " = null)");
+            }
+            else{
+            	nullGoal = null;
+            }
+            
         } else {
             result = goal.split(3);
             postGoal = result.tail().tail().head();
