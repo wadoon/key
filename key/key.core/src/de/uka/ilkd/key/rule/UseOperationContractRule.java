@@ -670,6 +670,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 	//get instantiation
 	final Instantiation inst
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
+	
+	
+	
         final JavaBlock jb = inst.progPost.javaBlock();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -772,20 +775,19 @@ public final class UseOperationContractRule implements BuiltInRule {
            && !(rp instanceof ThisReference)
            && !(rp instanceof SuperReference)
            && !(rp instanceof TypeReference)
-           && !(inst.pm.isStatic())) {
-            result = goal.split(4);
+           && !(inst.pm.isStatic())
+           && !slicing){
+        	
+        	result = goal.split(4);
             postGoal = result.tail().tail().tail().head();
             excPostGoal = result.tail().tail().head();
             preGoal = result.tail().head();
-            if(!slicing){
-            	nullGoal = result.head();
-                nullGoal.setBranchLabel("Null reference ("
-            	                    + inst.actualSelf
-            	                    + " = null)");
-            }
-            else{
-            	nullGoal = null;
-            }
+            nullGoal = result.head();
+            nullGoal.setBranchLabel("Null reference ("
+        	                    + inst.actualSelf
+        	                    + " = null)");
+        	
+            
             
         } else {
             result = goal.split(3);
@@ -869,6 +871,8 @@ public final class UseOperationContractRule implements BuiltInRule {
                                           excCreated,
                                           freeExcPost,
                                           post), null)));
+        
+        final Term notNullAssumption = tb.equals(inst.actualSelf, tb.NULL());
 
         //create "Pre" branch
 	int i = 0;
@@ -911,6 +915,11 @@ public final class UseOperationContractRule implements BuiltInRule {
         finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm, this, preGoal, FINAL_PRE_TERM_HINT, null);
         preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
+        
+        if(slicing && inst.actualSelf!=null){
+            preGoal.addFormula(new SequentFormula(notNullAssumption), false, true);
+        }
+      
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, preGoal, null, null);
 
@@ -945,6 +954,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(postAssumption),
         	            true,
         	            false);
+        
+        if(slicing && inst.actualSelf!=null){
+            postGoal.addFormula(new SequentFormula(notNullAssumption), false, true);
+        }
 
         applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
                      tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
@@ -971,6 +984,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         excPostGoal.addFormula(new SequentFormula(excPostAssumption),
         	               true,
         	               false);
+        
+        if(slicing && inst.actualSelf!=null){
+        	excPostGoal.addFormula(new SequentFormula(notNullAssumption), false, true);
+        }
 
 
         //create "Null Reference" branch
@@ -982,7 +999,6 @@ public final class UseOperationContractRule implements BuiltInRule {
         					               null)),
         	                   ruleApp.posInOccurrence());
         }
-
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, nullGoal, null, null);
 
 
