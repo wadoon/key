@@ -789,7 +789,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         	
             
             
-        } else {
+        }else if(slicing){
+        	result = goal.split(2);
+            postGoal = result.tail().head();
+            excPostGoal = null;
+            preGoal = result.head();
+            nullGoal = null;
+        }else {
             result = goal.split(3);
             postGoal = result.tail().tail().head();
             excPostGoal = result.tail().head();
@@ -798,7 +804,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
         preGoal.setBranchLabel("Pre"+ " ("+contract.getTarget().getName()+")");
         postGoal.setBranchLabel("Post"+ " ("+contract.getTarget().getName()+")");
-        excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
+        if(excPostGoal != null){
+        	excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
+        }
 
         //prepare common stuff for the three branches
         Term anonAssumption = null;
@@ -961,33 +969,36 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
                      tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
-
-        //create "Exceptional Post" branch
-        final StatementBlock excPostSB
-            = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
-        JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term originalExcPost = tb.apply(anonUpdate,
-                                              tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
-                                                      TermLabelManager.instantiateLabels(termLabelState, services, 
-                                                              ruleApp.posInOccurrence(), this,
-                                                              excPostGoal, "ExceptionalPostModality",
-                                                              null, inst.mod,
-                                                              new ImmutableArray<Term>(
-                                                                      inst.progPost.sub(0)),
-                                                              null, excJavaBlock, inst.progPost.getLabels())), null);
-        final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
-        excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
-                	       true,
-                	       false);
-        excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
-        	                  ruleApp.posInOccurrence());
-        excPostGoal.addFormula(new SequentFormula(excPostAssumption),
-        	               true,
-        	               false);
         
-        if(slicing && inst.actualSelf!=null){
-        	excPostGoal.addFormula(new SequentFormula(notNullAssumption), false, true);
+        
+      //create "Exceptional Post" branch
+        if(excPostGoal != null){
+        	
+            final StatementBlock excPostSB
+                = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
+            JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
+            final Term originalExcPost = tb.apply(anonUpdate,
+                                                  tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
+                                                          TermLabelManager.instantiateLabels(termLabelState, services, 
+                                                                  ruleApp.posInOccurrence(), this,
+                                                                  excPostGoal, "ExceptionalPostModality",
+                                                                  null, inst.mod,
+                                                                  new ImmutableArray<Term>(
+                                                                          inst.progPost.sub(0)),
+                                                                  null, excJavaBlock, inst.progPost.getLabels())), null);
+            final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
+            excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
+                    	       true,
+                    	       false);
+            excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
+            	                  ruleApp.posInOccurrence());
+            excPostGoal.addFormula(new SequentFormula(excPostAssumption),
+            	               true,
+            	               false);
         }
+        
+        
+        
 
 
         //create "Null Reference" branch
