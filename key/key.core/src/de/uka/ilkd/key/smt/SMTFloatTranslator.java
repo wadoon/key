@@ -139,7 +139,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 		opTable.put(Junctor.AND, SMTTermMultOp.Op.AND);
 		opTable.put(Junctor.OR, SMTTermMultOp.Op.OR);
 		opTable.put(Junctor.IMP, SMTTermMultOp.Op.IMPLIES);
-		//opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
+		opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
 		
 		//Integer comparison
 		/*
@@ -449,21 +449,6 @@ public class SMTFloatTranslator implements SMTTranslator {
 			|| op == dLDT.getToInterval()
 			) {
 			return translateTerm(term.sub(0)); 
-		} else if (op == Equality.EQUALS) {
-
-		//opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
-			SMTTerm term0 = translateTerm(term.sub(0));
-			SMTTerm term1 = translateTerm(term.sub(1));
-			List<SMTTerm> terms = new LinkedList<SMTTerm>();
-			terms.add(term0);
-			terms.add(term1);
-			Sort sort = term.sub(0).sort();
-			if (sort == services.getTypeConverter().getDoubleLDT().targetSort() ||
-			    sort == services.getTypeConverter().getFloatLDT().targetSort()) {
-				return new SMTTermFloatOp(SMTTermFloatOp.Op.FPEQ, terms);
-			} else {
-				return new SMTTermMultOp(SMTTermMultOp.Op.EQUALS, terms);
-			}
 		} else if (op instanceof Function) {
 			Function fun = (Function) op;
 			if (isTrueConstant(fun, services)) {
