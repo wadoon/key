@@ -7,8 +7,9 @@ import org.junit.Test;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.starvoors.model.io.StaRVOOrSReader;
 import org.key_project.starvoors.util.StaRVOOrSUtil;
+import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 
 /**
  * Contains tests for {@link StaRVOOrSUtil}.
@@ -19,8 +20,10 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
  * @author Jesus Mauricio Chimento
  */
 public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
-   public static final String PLUGIN_PATH_IN_REPOSITORY = "projects/StaRVOOrS/src/tests/org.key_project.starvoors.test/";
+   public static final String PLUGIN_PATH_IN_REPOSITORY = "org.key_project.starvoors.test/";
    
+   public static final File PROJECT_ROOT = IOUtil.getProjectRoot(StaRVOOrSUtilTest.class);
+
    /**
     * Tests {@link StaRVOOrSUtil#start(java.io.File)}.
     */
@@ -34,16 +37,17 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
-         File javaFile = new File(keyRepDirectory, PLUGIN_PATH_IN_REPOSITORY + javaPath);
+         File javaFile = new File(PROJECT_ROOT, PLUGIN_PATH_IN_REPOSITORY + javaPath);
+         assertTrue("Java file '" + javaFile + "' does not exist.", javaFile.exists());
          // Set expected options
-         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, PLUGIN_PATH_IN_REPOSITORY + "data/hashtable/test/HashTable.java", "HashTable", "add");
+         originalTacletOptions = setDefaultTacletOptions(PROJECT_ROOT, PLUGIN_PATH_IN_REPOSITORY + "data/hashtable/test/HashTable.java", "HashTable", "add");
          setOneStepSimplificationEnabled(null, true);
          // Analyze source code
          StaRVOOrSResult result = StaRVOOrSUtil.start(javaFile);
          // Create oracle file if required
          createOracleFile(result, oraclePath);
          // Compare result with oracle file
-         File oracleFile = new File(keyRepDirectory, PLUGIN_PATH_IN_REPOSITORY + oraclePath);
+         File oracleFile = new File(PROJECT_ROOT, PLUGIN_PATH_IN_REPOSITORY + oraclePath);
          StaRVOOrSResult expectedResult = StaRVOOrSReader.load(oracleFile);
          assertResult(expectedResult, result);
       }

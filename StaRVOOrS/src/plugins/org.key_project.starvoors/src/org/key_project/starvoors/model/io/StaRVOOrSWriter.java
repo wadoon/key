@@ -3,7 +3,6 @@ package org.key_project.starvoors.model.io;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -24,7 +23,7 @@ public class StaRVOOrSWriter {
 
    public static void write(StaRVOOrSResult result, File file) throws IOException {
       if (file != null && result != null) {
-         IOUtil.writeTo(new FileOutputStream(file), toXML(result, Charset.defaultCharset().displayName()));
+         IOUtil.writeTo(new FileOutputStream(file), toXML(result, IOUtil.DEFAULT_CHARSET.displayName()));
       }
    }
    

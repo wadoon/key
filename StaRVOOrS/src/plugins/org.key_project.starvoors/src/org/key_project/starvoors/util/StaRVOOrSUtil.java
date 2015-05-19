@@ -9,9 +9,10 @@ import java.util.Set;
 import org.key_project.starvoors.model.StaRVOOrSExecutionPath;
 import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Named;
@@ -33,7 +34,7 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof_references.KeYTypeUtil;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
@@ -45,42 +46,40 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.util.KeYTypeUtil;
 
 public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
    
-   public static StaRVOOrSResult start(File location) throws ProofInputException, IOException {
-     try {
-      // Load source code and rules
-      KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null);
-      
-      try {
-         StaRVOOrSResult result = new StaRVOOrSResult();
-         // Iterate over available types to list proof obligations
-         Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
-         for (KeYJavaType type : kjts) {
-            if (!KeYTypeUtil.isLibraryClass(type)) {
-               ImmutableSet<IObserverFunction> targets = env.getSpecificationRepository().getContractTargets(type);
-               for (IObserverFunction target : targets) {
-                  ImmutableSet<Contract> contracts = env.getSpecificationRepository().getContracts(type, target);
-                  for (Contract contract : contracts) {
-                     StaRVOOrSProof proofResult = verify(env, contract);
-                     if (proofResult != null) {
-                        result.addProof(proofResult);
-                     }
-                  }
-               }
-            }
-         }
-         return result;
-      }
-      finally {
-         env.dispose();
-      }
-    } catch (Exception e) {System.out.println("KeY has failed loading the files."); return null;} 
+   public static StaRVOOrSResult start(File location) throws ProofInputException, IOException, ProblemLoaderException {
+       // Load source code and rules
+       KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
+       
+       try {
+          StaRVOOrSResult result = new StaRVOOrSResult();
+          // Iterate over available types to list proof obligations
+          Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
+          for (KeYJavaType type : kjts) {
+             if (!KeYTypeUtil.isLibraryClass(type)) {
+                ImmutableSet<IObserverFunction> targets = env.getSpecificationRepository().getContractTargets(type);
+                for (IObserverFunction target : targets) {
+                   ImmutableSet<Contract> contracts = env.getSpecificationRepository().getContracts(type, target);
+                   for (Contract contract : contracts) {
+                      StaRVOOrSProof proofResult = verify(env, contract);
+                      if (proofResult != null) {
+                         result.addProof(proofResult);
+                      }
+                   }
+                }
+             }
+          }
+          return result;
+       }
+       finally {
+          env.dispose();
+       }
    }
 
    protected static StaRVOOrSProof verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException, IOException {
@@ -100,10 +99,10 @@ public final class StaRVOOrSUtil {
                                                                          nonExecutionBranchHidingSideProofs, 
                                                                          aliasChecks);
          // Create symbolic execution tree which contains only the start node at beginning
-         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(env.getMediator(), proof, false, false, true);
+         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, false, false, true, false);
          builder.analyse();
          // Run auto mode
-         env.getUi().startAndWaitForAutoMode(proof);
+         env.getProofControl().startAndWaitForAutoMode(proof);
          // Update symbolic execution tree
          builder.analyse();
          // Analyze discovered symbolic execution tree
@@ -112,7 +111,6 @@ public final class StaRVOOrSUtil {
          return proofResult;
       }
       finally {
-         env.getMediator().setProof(null);
          proof.dispose();
       }
    }
@@ -133,7 +131,7 @@ public final class StaRVOOrSUtil {
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(symRoot);
       Map<Term, ExecutionOperationContract> contractResults = new HashMap<Term, ExecutionOperationContract>();
       while (iter.hasNext()) {
-         IExecutionNode next = iter.next();
+         IExecutionNode<?> next = iter.next();
          // Check applied contracts
          if (next instanceof ExecutionOperationContract) {
             ExecutionOperationContract ec = (ExecutionOperationContract)next;
@@ -159,7 +157,7 @@ public final class StaRVOOrSUtil {
       }
    }
    
-   protected static StaRVOOrSExecutionPath workWithLeafNode(IExecutionNode leaf, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
+   protected static StaRVOOrSExecutionPath workWithLeafNode(IExecutionNode<?> leaf, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
       // Check if verified
       boolean verified = leaf instanceof IExecutionTermination && ((IExecutionTermination)leaf).isBranchVerified();
       // Get path condition
@@ -180,9 +178,44 @@ public final class StaRVOOrSUtil {
    }
    
    protected static class TransformationNotationInfo extends NotationInfo {
-      public TransformationNotationInfo(Services services, Map<Term, ExecutionOperationContract> contractResults, Map<LocationVariable, ProgramVariable> preStateMapping) {
-         setNotation(LocationVariable.class, new LocationVariableTransformationNotation(services, contractResults, preStateMapping));
-      }
+       private final Services services;
+       
+       private final Map<Term, ExecutionOperationContract> contractResults;
+       
+       private final Map<LocationVariable, ProgramVariable> preStateMapping;
+       
+       public TransformationNotationInfo(Services services, Map<Term, 
+                                         ExecutionOperationContract> contractResults, 
+                                         Map<LocationVariable, ProgramVariable> preStateMapping) {
+           this.services = services;
+           this.contractResults = contractResults;
+           this.preStateMapping = preStateMapping;
+       }
+
+       @Override
+       protected HashMap<Object, Notation> createDefaultNotation() {
+           HashMap<Object, Notation> notation = super.createDefaultNotation();
+           updateNotation(notation);
+           return notation;
+       }
+
+       @Override
+       protected HashMap<Object, Notation> createPrettyNotation(Services services) {
+           HashMap<Object, Notation> notation = super.createPrettyNotation(services);
+           updateNotation(notation);
+           return notation;
+       }
+
+       @Override
+       protected HashMap<Object, Notation> createUnicodeNotation(Services services) {
+           HashMap<Object, Notation> notation = super.createUnicodeNotation(services);
+           updateNotation(notation);
+           return notation;
+       }
+       
+       protected void updateNotation(HashMap<Object, Notation> notation) {
+           notation.put(LocationVariable.class, new LocationVariableTransformationNotation(services, contractResults, preStateMapping));
+       }
    }
       
    protected static class LocationVariableTransformationNotation extends Notation.VariableNotation {

@@ -120,7 +120,7 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  * </li>
  * </ul>
  */
-public final class NotationInfo {
+public class NotationInfo {
     
 
 
@@ -193,7 +193,7 @@ public final class NotationInfo {
     /** Register the standard set of notations (that can be defined without
      * a services object).
      */
-    private HashMap<Object, Notation> createDefaultNotation() {
+    protected HashMap<Object, Notation> createDefaultNotation() {
 
     HashMap<Object,Notation> tbl = new LinkedHashMap<Object,Notation>();;
 	
@@ -237,7 +237,7 @@ public final class NotationInfo {
      * Adds notations that can only be defined when a services object is 
      * available.
      */
-    private HashMap<Object,Notation> createPrettyNotation(Services services) {
+    protected HashMap<Object,Notation> createPrettyNotation(Services services) {
 
     HashMap<Object,Notation> tbl = createDefaultNotation();
      
@@ -299,7 +299,7 @@ public final class NotationInfo {
      * Add notations with Unicode symbols.
      * @param services
      */
-    private HashMap<Object,Notation> createUnicodeNotation(Services services){
+    protected HashMap<Object,Notation> createUnicodeNotation(Services services){
     
         HashMap<Object,Notation> tbl = createPrettyNotation(services);
         
@@ -333,7 +333,6 @@ public final class NotationInfo {
         tbl.put(TermLabel.class, new Notation.LabelNotation(""+UnicodeHelper.FLQQ, ""+UnicodeHelper.FRQQ, PRIORITY_LABEL));
         return tbl;
     }
-
 
     //-------------------------------------------------------------------------
     //public interface

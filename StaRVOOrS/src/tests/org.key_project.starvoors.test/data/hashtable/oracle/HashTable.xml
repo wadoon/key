@@ -5,7 +5,7 @@ pre: capacity &gt;= 1
 post: self.capacity = capacity
 &amp; (self.size = 0 &amp; self.&lt;inv&gt;)
 &amp; exc = null
-mod: self.h.* \cup {(self, size)}
+mod: self.h.* \cup {(self, HashTable::$size)}
 termination: diamond">
       <executionPath pathCondition="true" verified="true"/>
    </proof>
@@ -19,7 +19,7 @@ post: self.size = javaAddInt(self.size@heapAtPre, 1)
         &amp; self.h[i] = u)
    &amp; self.&lt;inv&gt;)
 &amp; exc = null
-mod: {(self, size)} \cup self.h.*
+mod: {(self, HashTable::$size)} \cup self.h.*
 termination: diamond">
       <executionPath pathCondition="self.h[self.hash_function(key)] = null" verified="true"/>
       <executionPath pathCondition="!self.h[self.hash_function(key)] = null" verified="false"/>
@@ -31,7 +31,7 @@ post: \forall int j;
      -&gt; self.h[j] = (self.h@heapAtPre)[j])
 &amp; self.&lt;inv&gt;
 &amp; exc = null
-mod: empty
+mod: {}
 termination: diamond">
       <executionPath pathCondition="true" verified="true"/>
    </proof>
@@ -41,7 +41,7 @@ post: result &gt;= 0
 &amp; result &lt; self.capacity
 &amp; self.&lt;inv&gt;
 &amp; exc = null
-mod: empty
+mod: {}
 termination: diamond">
       <executionPath pathCondition="val &gt;  -1" verified="true"/>
       <executionPath pathCondition="val &lt; 0" verified="true"/>

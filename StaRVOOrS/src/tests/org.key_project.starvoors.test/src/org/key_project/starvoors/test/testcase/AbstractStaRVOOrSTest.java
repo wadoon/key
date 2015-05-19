@@ -7,9 +7,9 @@ import org.key_project.starvoors.model.StaRVOOrSExecutionPath;
 import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.starvoors.model.io.StaRVOOrSWriter;
-import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 
 public abstract class AbstractStaRVOOrSTest extends AbstractSymbolicExecutionTestCase {
    protected void createOracleFile(StaRVOOrSResult result, String oraclePathInBaseDirFile) throws IOException {
@@ -51,7 +51,7 @@ public abstract class AbstractStaRVOOrSTest extends AbstractSymbolicExecutionTes
       if (expected != null) {
          assertNotNull(actual);
          assertEquals(expected.getContractId(), actual.getContractId());
-         assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getContractText(), actual.getContractText()));
+         TestUtilsUtil.assertEqualsIgnoreWhitespace(expected.getContractText(), actual.getContractText());
          assertPaths(expected.getPaths(), actual.getPaths());
       }
       else {

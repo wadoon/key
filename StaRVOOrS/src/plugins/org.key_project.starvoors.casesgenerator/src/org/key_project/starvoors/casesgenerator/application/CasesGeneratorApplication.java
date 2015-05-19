@@ -6,16 +6,17 @@ import java.util.Map;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
+import org.eclipse.swt.widgets.Display;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.starvoors.model.io.StaRVOOrSWriter;
 import org.key_project.starvoors.util.StaRVOOrSUtil;
+import org.key_project.ui.util.KeYExampleUtil;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * The main entry point of the StaRVOOrS cases generator.
@@ -27,6 +28,11 @@ public class CasesGeneratorApplication implements IApplication {
     */
    @Override
    public Object start(IApplicationContext context) throws Exception {
+      // Ensure that Eclipse 4 is ready
+      while (Display.getDefault().readAndDispatch()) {
+         Thread.sleep(10);
+      }
+      // Launch application
       String[] arguments = getStartArguments(context);
       if (arguments.length == 2) {
          File file = new File(arguments[0]);
@@ -34,7 +40,14 @@ public class CasesGeneratorApplication implements IApplication {
             System.out.println("Setting the taclet options...");
             setYDefaultTacletOptions();
             System.out.println("Analizing the contracts...");
-            StaRVOOrSResult result = StaRVOOrSUtil.start(file);
+            StaRVOOrSResult result;
+            try {
+                result = StaRVOOrSUtil.start(file);
+            }
+            catch (ProblemLoaderException e) {
+                result = null;
+                System.out.println("KeY has failed loading the files.");
+            }
             
             if (result != null) {       
                System.out.println("Generating out.xml file...");
@@ -60,9 +73,9 @@ public class CasesGeneratorApplication implements IApplication {
       return IApplication.EXIT_OK;
    }
    
-   protected void setYDefaultTacletOptions() {
+   protected void setYDefaultTacletOptions() throws ProblemLoaderException {
       // Create and dispose proof required to set Taclet options
-      KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
+      KeYEnvironment<?> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null, null);
       env.dispose();
       // Set default taclet options
       ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();

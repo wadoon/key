@@ -15,4 +15,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
-Export-Package: de.uka.ilkd.key.symbolic_execution.suite
+Export-Package: de.uka.ilkd.key.symbolic_execution.suite,
+ de.uka.ilkd.key.symbolic_execution.testcase

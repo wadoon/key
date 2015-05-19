@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -116,6 +117,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
    private Term uninterpretedPredicate;
 
    protected InitConfig proofConfig;
+   
+   private final Map<LocationVariable, ProgramVariable> currentLocationToPreStateMapping = new HashMap<LocationVariable, ProgramVariable>();
 
    /**
     * Constructor.
@@ -319,6 +322,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
                formalParamVars = formalParamVars.append(formalParamVar);
                register(formalParamVar, proofServices);
+               currentLocationToPreStateMapping.put(formalParamVar, paramVar);
             }
             else {
                formalParamVars = formalParamVars.append((LocationVariable)paramVar); // The cast is ugly but legal. It is a bigger task to refactor TB.paramVars to return a list of LocationVariabe instead of ProgramVariable.
@@ -959,5 +963,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
          }
       }
       return null;
+   }
+
+   /**
+    * Returns the mapping of previous to their original location.
+    * @return The mapping of previous to their original location.
+    */
+   public Map<LocationVariable, ProgramVariable> getCurrentLocationToPreStateMapping() {
+      return currentLocationToPreStateMapping;
    }
 }
