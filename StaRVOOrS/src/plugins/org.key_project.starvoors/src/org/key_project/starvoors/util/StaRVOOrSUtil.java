@@ -11,6 +11,7 @@ import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -118,9 +119,7 @@ public final class StaRVOOrSUtil {
    protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract, StaRVOOrSProof proofResult) throws ProofInputException, IOException {
       System.out.println();
       System.out.println(contract.getName());
-      String line = "";
-      for (int i = 0; i < contract.getName().length();i++)
-         line = line.concat("=");
+      String line = StringUtil.createLine("=", contract.getName().length());
       System.out.println(line);
       System.out.println(contract.getPlainText(builder.getProof().getServices()));
       System.out.println(line);
