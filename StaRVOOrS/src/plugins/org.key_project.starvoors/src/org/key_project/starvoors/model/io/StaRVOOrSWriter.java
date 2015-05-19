@@ -20,6 +20,10 @@ public class StaRVOOrSWriter {
    public static final String TAG_PROOF = "proof";
    public static final String ATTRIBUTE_PATH_CONDITION = "pathCondition";
    public static final String ATTRIBUTE_VERIFIED = "verified";
+   public static final String ATTRIBUTE_ALL_PRECONDITIONS_FULFILLED = "allPreconditionsFulfilled";
+   public static final String ATTRIBUTE_ALL_NOT_NULL_CHECKS_FULFILLED = "allNotNullChecksFulfilled";
+   public static final String ATTRIBUTE_ALL_LOOP_INVARIANTS_INITIALLY_VALID = "allLoopInvariantsInitiallyFulfilled";
+   public static final String ATTRIBUTE_ALL_LOOP_INVARIANTS_PRESERVED = "allLoopInvariantsPreserved";
 
    public static void write(StaRVOOrSResult result, File file) throws IOException {
       if (file != null && result != null) {
@@ -63,6 +67,10 @@ public class StaRVOOrSWriter {
       Map<String, String> attributes = new LinkedHashMap<String, String>();
       attributes.put(ATTRIBUTE_PATH_CONDITION, path.getPathCondition());
       attributes.put(ATTRIBUTE_VERIFIED, path.isVerified() + "");
+      attributes.put(ATTRIBUTE_ALL_PRECONDITIONS_FULFILLED, path.isAllPreconditionsFulfilled() + "");
+      attributes.put(ATTRIBUTE_ALL_NOT_NULL_CHECKS_FULFILLED, path.isAllNotNullChecksFulfilled() + "");
+      attributes.put(ATTRIBUTE_ALL_LOOP_INVARIANTS_INITIALLY_VALID, path.isAllLoopInvariantsInitiallyFulfilled() + "");
+      attributes.put(ATTRIBUTE_ALL_LOOP_INVARIANTS_PRESERVED, path.isAllLoopInvariantsPreserved() + "");
       XMLUtil.appendEmptyTag(level, TAG_EXECUTION_PATH, attributes, sb);
    }
 }

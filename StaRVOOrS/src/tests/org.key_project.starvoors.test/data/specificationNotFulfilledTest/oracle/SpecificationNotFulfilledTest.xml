@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+   <proof contractId="SpecificationNotFulfilledTest[SpecificationNotFulfilledTest::magic(int)].JML normal_behavior operation contract.0" contractText="result = self.magic(x) catch(exc)
+pre: x &gt;= 0 &amp; self.&lt;inv&gt;
+post: result = 42 &amp; self.&lt;inv&gt; &amp; exc = null
+mod: allLocs
+termination: diamond">
+      <executionPath pathCondition="true" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true"/>
+   </proof>
+   <proof contractId="SpecificationNotFulfilledTest[SpecificationNotFulfilledTest::main(SpecificationNotFulfilledTest,int,int)].JML normal_behavior operation contract.0" contractText="result = main(obj, value, z) catch(exc)
+pre: true
+post: exc = null
+mod: allLocs
+termination: diamond">
+      <executionPath pathCondition="value = 1 &amp; !obj = null" verified="true" allPreconditionsFulfilled="false" allNotNullChecksFulfilled="false" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true"/>
+      <executionPath pathCondition="_z_0 &gt;= 3 &amp; value = 2" verified="false" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="false" allLoopInvariantsPreserved="false"/>
+      <executionPath pathCondition="_z_0 = 2 &amp; value = 2" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="false" allLoopInvariantsPreserved="false"/>
+      <executionPath pathCondition="!value = 1 &amp; !value = 2" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true"/>
+   </proof>
+</result>

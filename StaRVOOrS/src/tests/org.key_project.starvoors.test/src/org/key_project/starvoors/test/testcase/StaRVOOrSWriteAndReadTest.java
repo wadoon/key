@@ -20,15 +20,15 @@ public class StaRVOOrSWriteAndReadTest extends AbstractStaRVOOrSTest {
    
    protected static StaRVOOrSResult createExpectedHashtableResult() {
       StaRVOOrSProof p1 = new StaRVOOrSProof("HashTable[HashTable::HashTable(int)].JML normal_behavior operation contract.0", "TODO:");
-      p1.addPath(new StaRVOOrSExecutionPath("true", true));
+      p1.addPath(new StaRVOOrSExecutionPath("true", true, false, false, false, false));
       StaRVOOrSProof p2 = new StaRVOOrSProof("HashTable[HashTable::add(java.lang.Object,int)].JML normal_behavior operation contract.0", "TODO:");
-      p2.addPath(new StaRVOOrSExecutionPath("self.h[self.hash_function(key)] = null", true));
-      p2.addPath(new StaRVOOrSExecutionPath("!self.h[self.hash_function(key)] = null", false));
+      p2.addPath(new StaRVOOrSExecutionPath("self.h[self.hash_function(key)] = null", true, false, true, false, true));
+      p2.addPath(new StaRVOOrSExecutionPath("!self.h[self.hash_function(key)] = null", false, true, false, true, false));
       StaRVOOrSProof p3 = new StaRVOOrSProof("HashTable[HashTable::add(java.lang.Object,int)].JML normal_behavior operation contract.1", "TODO:");
-      p3.addPath(new StaRVOOrSExecutionPath("true", true));
+      p3.addPath(new StaRVOOrSExecutionPath("true", true, true, true, false, false));
       StaRVOOrSProof p4 = new StaRVOOrSProof("HashTable[HashTable::hash_function(int)].JML normal_behavior operation contract.0", "TODO:");
-      p4.addPath(new StaRVOOrSExecutionPath("val >  -1", true));
-      p4.addPath(new StaRVOOrSExecutionPath("val < 0", true));
+      p4.addPath(new StaRVOOrSExecutionPath("val >  -1", true, true, false, false, true));
+      p4.addPath(new StaRVOOrSExecutionPath("val < 0", true, false, false, false, true));
       StaRVOOrSResult result = new StaRVOOrSResult();
       result.addProof(p1);
       result.addProof(p2);

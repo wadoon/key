@@ -11,6 +11,8 @@ import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -36,6 +38,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
@@ -44,10 +48,14 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
 public final class StaRVOOrSUtil {
@@ -55,32 +63,42 @@ public final class StaRVOOrSUtil {
    }
    
    public static StaRVOOrSResult start(File location) throws ProofInputException, IOException, ProblemLoaderException {
-       // Load source code and rules
-       KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
-       
-       try {
-          StaRVOOrSResult result = new StaRVOOrSResult();
-          // Iterate over available types to list proof obligations
-          Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
-          for (KeYJavaType type : kjts) {
-             if (!KeYTypeUtil.isLibraryClass(type)) {
-                ImmutableSet<IObserverFunction> targets = env.getSpecificationRepository().getContractTargets(type);
-                for (IObserverFunction target : targets) {
-                   ImmutableSet<Contract> contracts = env.getSpecificationRepository().getContracts(type, target);
-                   for (Contract contract : contracts) {
-                      StaRVOOrSProof proofResult = verify(env, contract);
-                      if (proofResult != null) {
-                         result.addProof(proofResult);
-                      }
-                   }
-                }
-             }
-          }
-          return result;
-       }
-       finally {
-          env.dispose();
-       }
+      // Ensure that Taclets are parsed
+      if (!ProofSettings.isChoiceSettingInitialised()) {
+         KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
+         env.dispose();
+      }
+      // Set Taclet options
+      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+      HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+      HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+      newSettings.putAll(SymbolicExecutionUtil.getDefaultTacletOptions());
+      choiceSettings.setDefaultChoices(newSettings);
+      // Load source code and rules
+      KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
+      try {
+         StaRVOOrSResult result = new StaRVOOrSResult();
+         // Iterate over available types to list proof obligations
+         Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
+         for (KeYJavaType type : kjts) {
+            if (!KeYTypeUtil.isLibraryClass(type)) {
+               ImmutableSet<IObserverFunction> targets = env.getSpecificationRepository().getContractTargets(type);
+               for (IObserverFunction target : targets) {
+                  ImmutableSet<Contract> contracts = env.getSpecificationRepository().getContracts(type, target);
+                  for (Contract contract : contracts) {
+                     StaRVOOrSProof proofResult = verify(env, contract);
+                     if (proofResult != null) {
+                        result.addProof(proofResult);
+                     }
+                  }
+               }
+            }
+         }
+         return result;
+      }
+      finally {
+         env.dispose();
+      }
    }
 
    protected static StaRVOOrSProof verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException, IOException {
@@ -137,13 +155,17 @@ public final class StaRVOOrSUtil {
             contractResults.put(ec.getResultTerm(), ec);
          }
          // Check if node is a leaf node
-         if (next.getChildren().length == 0) {
+         if (isLeaf(next)) {
             StaRVOOrSExecutionPath path = workWithLeafNode(next, contractResults, preStateMapping);
             if (path != null) {
                proofResult.addPath(path);
             }
          }
       }
+   }
+   
+   protected static boolean isLeaf(IExecutionNode<?> node) {
+      return node.getChildren().length == 0;
    }
    
    protected static Map<LocationVariable, ProgramVariable> getPreStateMapping(Proof proof) {
@@ -156,16 +178,132 @@ public final class StaRVOOrSUtil {
       }
    }
    
+   // TODO: Ignore termination nodes of kind TerminationKind#LOOP_BODY as they only terminate a method body and not the full execution?
    protected static StaRVOOrSExecutionPath workWithLeafNode(IExecutionNode<?> leaf, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
       // Check if verified
-      boolean verified = leaf instanceof IExecutionTermination && ((IExecutionTermination)leaf).isBranchVerified();
+      boolean verified = isVerified(leaf);
+      SpecificationUseInformation useInfo = computeSpecificationUseInformation(leaf);
       // Get path condition
       Term pathCondition = leaf.getPathCondition();
       StringBuffer sb = transformTermPP(pathCondition, contractResults, preStateMapping, leaf.getServices());
       String pathConditionPP = sb.toString();
-      System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified);
+      System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified + " (" + useInfo + ")");
       System.out.println();
-      return new StaRVOOrSExecutionPath(pathConditionPP.trim(), verified);
+      return new StaRVOOrSExecutionPath(pathConditionPP.trim(), 
+                                        verified,
+                                        useInfo.isAllPreconditionsFulfilled(),
+                                        useInfo.isAllNotNullChecksFulfilled(),
+                                        useInfo.isAllLoopInvariantsInitiallyFulfilled(),
+                                        useInfo.isAllLoopInvariantsPreserved());
+   }
+   
+   protected static boolean isVerified(IExecutionNode<?> node) {
+      return node instanceof IExecutionTermination && ((IExecutionTermination)node).isBranchVerified();
+   }
+   
+   protected static SpecificationUseInformation computeSpecificationUseInformation(IExecutionNode<?> node) {
+       boolean allPreconditionsFulfilled = true;
+       boolean allNotNullChecksFulfilled = true;
+       boolean allLoopInvariantsInitiallyFulfilled = true;
+       boolean allLoopInvariantsPreserved = true;
+       while (node != null &&
+              (allPreconditionsFulfilled || allNotNullChecksFulfilled || allLoopInvariantsInitiallyFulfilled)) {
+           if (node instanceof ExecutionOperationContract) {
+               ExecutionOperationContract eoc = (ExecutionOperationContract) node;
+               if (!eoc.isPreconditionComplied()) {
+                   allPreconditionsFulfilled = false;
+               }
+               if (eoc.hasNotNullCheck() && !eoc.isNotNullCheckComplied()) {
+                  allNotNullChecksFulfilled = false;
+               }
+           }
+           else if (node instanceof ExecutionLoopInvariant) {
+               ExecutionLoopInvariant eli = (ExecutionLoopInvariant) node;
+               if (!eli.isInitiallyValid()) {
+                   allLoopInvariantsInitiallyFulfilled = false;
+               }
+               if (allLoopInvariantsPreserved && !isLoopInvariantPreserved(eli)) {
+                  allLoopInvariantsPreserved = false;
+               }
+           }
+           node = node.getParent();
+       }
+       return new SpecificationUseInformation(allPreconditionsFulfilled, 
+                                              allNotNullChecksFulfilled, 
+                                              allLoopInvariantsInitiallyFulfilled, 
+                                              allLoopInvariantsPreserved);
+   }
+   
+   private static boolean isLoopInvariantPreserved(ExecutionLoopInvariant eli) {
+      IExecutionNode<?> preservesBranch = getBodyPreservesInvariantBranchCondition(eli);
+      if (preservesBranch != null) {
+         boolean preserved = true;
+         ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(preservesBranch);
+         while (preserved && iter.hasNext()) {
+            IExecutionNode<?> next = iter.next();
+            if (isLeaf(next) && !isVerified(next)) {
+               preserved = false;
+            }
+         }
+         return preserved;
+      }
+      else {
+         return true; // The preseres branch is not avialable if KeY could close it completely meaning that the loop body is never executed.
+      }
+   }
+   
+   private static IExecutionNode<?> getBodyPreservesInvariantBranchCondition(ExecutionLoopInvariant eli) {
+      return ArrayUtil.search(eli.getChildren(), new IFilter<AbstractExecutionNode<?>>() {
+         @Override
+         public boolean select(AbstractExecutionNode<?> element) {
+            return element instanceof ExecutionBranchCondition &&
+                   "Body Preserves Invariant".equals(((ExecutionBranchCondition) element).getAdditionalBranchLabel());
+         }
+      });
+   }
+
+   private static class SpecificationUseInformation {
+      private final boolean allPreconditionsFulfilled;
+       
+      private final boolean allNotNullChecksFulfilled;
+       
+      private final boolean allLoopInvariantsInitiallyFulfilled;
+      
+      private final boolean allLoopInvariantsPreserved;
+
+      public SpecificationUseInformation(boolean allPreconditionsFulfilled, 
+                                         boolean allNotNullChecksFulfilled, 
+                                         boolean allLoopInvariantsInitiallyFulfilled, 
+                                         boolean allLoopInvariantsPreserved) {
+         this.allPreconditionsFulfilled = allPreconditionsFulfilled;
+         this.allNotNullChecksFulfilled = allNotNullChecksFulfilled;
+         this.allLoopInvariantsInitiallyFulfilled = allLoopInvariantsInitiallyFulfilled;
+         this.allLoopInvariantsPreserved = allLoopInvariantsPreserved;
+      }
+
+      public boolean isAllPreconditionsFulfilled() {
+         return allPreconditionsFulfilled;
+      }
+
+      public boolean isAllNotNullChecksFulfilled() {
+         return allNotNullChecksFulfilled;
+      }
+
+      public boolean isAllLoopInvariantsInitiallyFulfilled() {
+         return allLoopInvariantsInitiallyFulfilled;
+      }
+
+      public boolean isAllLoopInvariantsPreserved() {
+         return allLoopInvariantsPreserved;
+      }
+
+      @Override
+      public String toString() {
+         return "all preconditions fulfilled = " + isAllPreconditionsFulfilled() +
+                ", all not null checks fulfilled = " + isAllNotNullChecksFulfilled() +
+                ", all loop invariants initially fulfilled = " + isAllLoopInvariantsInitiallyFulfilled() +
+                ", all loop invariants preserved = " + isAllLoopInvariantsPreserved();
+      }
    }
    
    protected static StringBuffer transformTermPP(Term term, Map<Term, ExecutionOperationContract> contractResults, Map<LocationVariable, ProgramVariable> preStateMapping, Services services) throws IOException {
@@ -176,7 +314,7 @@ public final class StaRVOOrSUtil {
       return logicPrinter.result();      
    }
    
-   protected static class TransformationNotationInfo extends NotationInfo {
+   private static class TransformationNotationInfo extends NotationInfo {
        private final Services services;
        
        private final Map<Term, ExecutionOperationContract> contractResults;

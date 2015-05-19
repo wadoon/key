@@ -94,7 +94,12 @@ public final class StaRVOOrSReader {
          else if (StaRVOOrSWriter.TAG_EXECUTION_PATH.equals(qName)) {
             Object parent = parentStack.peekFirst();
             Assert.isTrue(parent instanceof StaRVOOrSProof);
-            StaRVOOrSExecutionPath path = new StaRVOOrSExecutionPath(getPathCondition(attributes), isVerified(attributes));
+            StaRVOOrSExecutionPath path = new StaRVOOrSExecutionPath(getPathCondition(attributes), 
+                                                                     isVerified(attributes),
+                                                                     isAllPreconditionsFulfilled(attributes),
+                                                                     isAllNotNullChecksFulfilled(attributes),
+                                                                     isAllLoopInvariantsInitiallyFulfilled(attributes),
+                                                                     isAllLoopInvariantsPreserved(attributes));
             ((StaRVOOrSProof) parent).addPath(path);
             parentStack.addFirst(path);
          }
@@ -128,6 +133,26 @@ public final class StaRVOOrSReader {
 
       public String getContractText(Attributes attributes) {
          return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_CONTRACT_TEXT);
+      }
+
+      public boolean isAllPreconditionsFulfilled(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_PRECONDITIONS_FULFILLED);
+         return value != null && Boolean.parseBoolean(value);
+      }
+
+      public boolean isAllNotNullChecksFulfilled(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_NOT_NULL_CHECKS_FULFILLED);
+         return value != null && Boolean.parseBoolean(value);
+      }
+
+      public boolean isAllLoopInvariantsInitiallyFulfilled(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_LOOP_INVARIANTS_INITIALLY_VALID);
+         return value != null && Boolean.parseBoolean(value);
+      }
+
+      public boolean isAllLoopInvariantsPreserved(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_LOOP_INVARIANTS_PRESERVED);
+         return value != null && Boolean.parseBoolean(value);
       }
 
       /**

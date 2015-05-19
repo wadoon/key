@@ -28,7 +28,16 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
     * Tests {@link StaRVOOrSUtil#start(java.io.File)}.
     */
    @Test
-   public void testStart() throws Exception {
+   public void testStart_SpecificationNotFulfilledTest() throws Exception {
+      doTest("data/specificationNotFulfilledTest/test/SpecificationNotFulfilledTest.java",
+             "data/specificationNotFulfilledTest/oracle/SpecificationNotFulfilledTest.xml");
+   }
+
+   /**
+    * Tests {@link StaRVOOrSUtil#start(java.io.File)}.
+    */
+   @Test
+   public void testStart_HashTable() throws Exception {
       doTest("data/hashtable/test/HashTable.java",
              "data/hashtable/oracle/HashTable.xml");
    }
