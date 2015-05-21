@@ -13,7 +13,6 @@ post: exc = null
 mod: allLocs
 termination: diamond">
       <executionPath pathCondition="value = 1 &amp; !obj = null" verified="true" allPreconditionsFulfilled="false" allNotNullChecksFulfilled="false" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true"/>
-      <executionPath pathCondition="_z_0 &gt;= 3 &amp; value = 2" verified="false" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="false" allLoopInvariantsPreserved="false"/>
       <executionPath pathCondition="_z_0 = 2 &amp; value = 2" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="false" allLoopInvariantsPreserved="false"/>
       <executionPath pathCondition="!value = 1 &amp; !value = 2" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true"/>
    </proof>
