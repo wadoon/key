@@ -63,7 +63,10 @@ public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
    
-   public static StaRVOOrSResult start(File location, boolean ensureDefaultTacletOptions) throws ProofInputException, IOException, ProblemLoaderException {
+   public static StaRVOOrSResult start(File location, 
+                                       boolean ensureDefaultTacletOptions,
+                                       boolean useOperationContracts,
+                                       boolean useLoopInvarints) throws ProofInputException, IOException, ProblemLoaderException {
       if (ensureDefaultTacletOptions) {
          setDefaultTacletOptions(location);
       }
@@ -79,7 +82,7 @@ public final class StaRVOOrSUtil {
                for (IObserverFunction target : targets) {
                   ImmutableSet<Contract> contracts = env.getSpecificationRepository().getContracts(type, target);
                   for (Contract contract : contracts) {
-                     StaRVOOrSProof proofResult = verify(env, contract);
+                     StaRVOOrSProof proofResult = verify(env, contract, useOperationContracts, useLoopInvarints);
                      if (proofResult != null) {
                         result.addProof(proofResult);
                      }
@@ -108,14 +111,15 @@ public final class StaRVOOrSUtil {
       choiceSettings.setDefaultChoices(newSettings);
    }
 
-   protected static StaRVOOrSProof verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException, IOException {
+   protected static StaRVOOrSProof verify(KeYEnvironment<?> env, 
+                                          Contract contract,
+                                          boolean useOperationContracts,
+                                          boolean useLoopInvarints) throws ProofInputException, IOException {
       InitConfig proofInitConfig = env.getInitConfig().deepCopy();
       ProofOblInput proofObligation = new FunctionalOperationContractPO(proofInitConfig, (FunctionalOperationContract)contract, true, true);
       Proof proof = env.getUi().createProof(proofInitConfig, proofObligation);
       try {
          // Configure symbolic execution settings used by the strategy of the auto mode
-         boolean useOperationContracts = true;
-         boolean useLoopInvarints = true;
          boolean nonExecutionBranchHidingSideProofs = false;
          boolean aliasChecks = false; // May set to true to extend path conditions for aliasing checks
          SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
