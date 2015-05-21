@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Permissions: all-permissions
+Class-Path: key.util.jar ../libs/antlr.jar ../libs/recoderKey.jar key.core.jar key.core.symbolic_execution.jar
+Application-Name: StaRVOOrS
+Main-Class: org.key_project.starvoors.CasesGeneratorMain
