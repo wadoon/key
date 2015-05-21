@@ -63,18 +63,10 @@ public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
    
-   public static StaRVOOrSResult start(File location) throws ProofInputException, IOException, ProblemLoaderException {
-      // Ensure that Taclets are parsed
-      if (!ProofSettings.isChoiceSettingInitialised()) {
-         KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
-         env.dispose();
+   public static StaRVOOrSResult start(File location, boolean ensureDefaultTacletOptions) throws ProofInputException, IOException, ProblemLoaderException {
+      if (ensureDefaultTacletOptions) {
+         setDefaultTacletOptions(location);
       }
-      // Set Taclet options
-      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-      HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-      HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
-      newSettings.putAll(SymbolicExecutionUtil.getDefaultTacletOptions());
-      choiceSettings.setDefaultChoices(newSettings);
       // Load source code and rules
       KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
       try {
@@ -100,6 +92,20 @@ public final class StaRVOOrSUtil {
       finally {
          env.dispose();
       }
+   }
+   
+   public static void setDefaultTacletOptions(File location) throws ProblemLoaderException {
+      // Ensure that Taclets are parsed
+      if (!ProofSettings.isChoiceSettingInitialised()) {
+         KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
+         env.dispose();
+      }
+      // Set Taclet options
+      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+      HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+      HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+      newSettings.putAll(SymbolicExecutionUtil.getDefaultTacletOptions());
+      choiceSettings.setDefaultChoices(newSettings);
    }
 
    protected static StaRVOOrSProof verify(KeYEnvironment<?> env, Contract contract) throws ProofInputException, IOException {

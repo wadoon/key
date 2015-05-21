@@ -1,7 +1,6 @@
 package org.key_project.starvoors.casesgenerator.application;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.equinox.app.IApplication;
@@ -10,13 +9,8 @@ import org.eclipse.swt.widgets.Display;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.starvoors.model.io.StaRVOOrSWriter;
 import org.key_project.starvoors.util.StaRVOOrSUtil;
-import org.key_project.ui.util.KeYExampleUtil;
 
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The main entry point of the StaRVOOrS cases generator.
@@ -38,11 +32,11 @@ public class CasesGeneratorApplication implements IApplication {
          File file = new File(arguments[0]);
          if (file.exists()) {
             System.out.println("Setting the taclet options...");
-            setYDefaultTacletOptions();
+            StaRVOOrSUtil.setDefaultTacletOptions(file);
             System.out.println("Analizing the contracts...");
             StaRVOOrSResult result;
             try {
-                result = StaRVOOrSUtil.start(file);
+                result = StaRVOOrSUtil.start(file, false);
             }
             catch (ProblemLoaderException e) {
                 result = null;
@@ -71,18 +65,6 @@ public class CasesGeneratorApplication implements IApplication {
          System.out.println("The file to analyze and the path to the result file are expected as only parameter.");
       }
       return IApplication.EXIT_OK;
-   }
-   
-   protected void setYDefaultTacletOptions() throws ProblemLoaderException {
-      // Create and dispose proof required to set Taclet options
-      KeYEnvironment<?> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null, null);
-      env.dispose();
-      // Set default taclet options
-      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-      HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-      HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
-      newSettings.putAll(SymbolicExecutionUtil.getDefaultTacletOptions());
-      choiceSettings.setDefaultChoices(newSettings);      
    }
 
    /**
