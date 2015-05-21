@@ -67,6 +67,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
 // TODO: List contracts of API methods applied by proofs.
+// TODO: Integrate truth value evaluation (more precise path conditions (left side) and new postcondition (unknown on left and right side))
 public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
