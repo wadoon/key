@@ -12,6 +12,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.starvoors.model.StaRVOOrSExecutionPath;
+import org.key_project.starvoors.model.StaRVOOrSLoopInvariantApplication;
+import org.key_project.starvoors.model.StaRVOOrSMethodContractApplication;
 import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.util.java.StringUtil;
@@ -76,6 +78,11 @@ public final class StaRVOOrSReader {
        * and emptied by {@link #endElement(String, String, String)}.
        */
       private final Deque<Object> parentStack = new LinkedList<Object>();
+      
+      /**
+       * The currently treated {@link StaRVOOrSExecutionPath}.
+       */
+      private StaRVOOrSExecutionPath currentPath;
 
       /**
        * {@inheritDoc}
@@ -99,13 +106,76 @@ public final class StaRVOOrSReader {
             Assert.isTrue(parent instanceof StaRVOOrSProof);
             StaRVOOrSExecutionPath path = new StaRVOOrSExecutionPath(getPathCondition(attributes), 
                                                                      isVerified(attributes),
-                                                                     isAllPreconditionsFulfilled(attributes),
-                                                                     isAllNotNullChecksFulfilled(attributes),
-                                                                     isAllLoopInvariantsInitiallyFulfilled(attributes),
-                                                                     isAllLoopInvariantsPreserved(attributes),
+                                                                     null,
+                                                                     null,
+                                                                     null,
+                                                                     null,
                                                                      getTerminationKind(attributes));
             ((StaRVOOrSProof) parent).addPath(path);
+            currentPath = path;
             parentStack.addFirst(path);
+         }
+         else if (StaRVOOrSWriter.TAG_NOT_FULFILLED_PRECONDITIONS.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            Assert.isTrue(parent instanceof StaRVOOrSExecutionPath);
+            parentStack.addFirst(qName);
+         }
+         else if (StaRVOOrSWriter.TAG_NOT_FULFILLED_NULL_CHECKS.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            Assert.isTrue(parent instanceof StaRVOOrSExecutionPath);
+            parentStack.addFirst(qName);
+         }
+         else if (StaRVOOrSWriter.TAG_NOT_INITIALLY_VALID_LOOP_INVARIANTS.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            Assert.isTrue(parent instanceof StaRVOOrSExecutionPath);
+            parentStack.addFirst(qName);
+         }
+         else if (StaRVOOrSWriter.TAG_NOT_PRESERVED_LOOP_INVARIANTS.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            Assert.isTrue(parent instanceof StaRVOOrSExecutionPath);
+            parentStack.addFirst(qName);
+         }
+         else if (StaRVOOrSWriter.TAG_METHOD_CONTRACT_APPLICATION.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            Assert.isTrue(parent instanceof String);
+            Assert.isNotNull(currentPath);
+            StaRVOOrSMethodContractApplication application = new StaRVOOrSMethodContractApplication(getFile(attributes), 
+                                                                                                    getStartLine(attributes), 
+                                                                                                    getStartColumn(attributes), 
+                                                                                                    getEndLine(attributes), 
+                                                                                                    getEndColumn(attributes), 
+                                                                                                    getMethod(attributes), 
+                                                                                                    getContract(attributes));
+            if (StaRVOOrSWriter.TAG_NOT_FULFILLED_PRECONDITIONS.equals(parent)) {
+               currentPath.addNotFulfilledPrecondition(application);
+            }
+            else if (StaRVOOrSWriter.TAG_NOT_FULFILLED_NULL_CHECKS.equals(parent)) {
+               currentPath.addNotFulfilledNullCheck(application);
+            }
+            else {
+               Assert.isTrue(false, "Unsupported parent '" + parent + "'.");
+            }
+            parentStack.addFirst(application);
+         }
+         else if (StaRVOOrSWriter.TAG_LOOP_INVARIANT_APPLICATION.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            Assert.isTrue(parent instanceof String);
+            Assert.isNotNull(currentPath);
+            StaRVOOrSLoopInvariantApplication application = new StaRVOOrSLoopInvariantApplication(getFile(attributes), 
+                                                                                                  getStartLine(attributes), 
+                                                                                                  getStartColumn(attributes), 
+                                                                                                  getEndLine(attributes), 
+                                                                                                  getEndColumn(attributes));
+            if (StaRVOOrSWriter.TAG_NOT_INITIALLY_VALID_LOOP_INVARIANTS.equals(parent)) {
+               currentPath.addNotInitiallyValidLoopInvariant(application);
+            }
+            else if (StaRVOOrSWriter.TAG_NOT_PRESERVED_LOOP_INVARIANTS.equals(parent)) {
+               currentPath.addNotPreservedLoopInvariant(application);
+            }
+            else {
+               Assert.isTrue(false, "Unsupported parent '" + parent + "'.");
+            }
+            parentStack.addFirst(application);
          }
          else {
             Assert.isTrue(false, "Unsupported tag \"" + qName + "\".");
@@ -122,46 +192,58 @@ public final class StaRVOOrSReader {
          }
       }
 
-      public String getContractId(Attributes attributes) {
+      protected String getContractId(Attributes attributes) {
          return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_CONTRACT_ID);
       }
 
-      public boolean isVerified(Attributes attributes) {
+      protected boolean isVerified(Attributes attributes) {
          String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_VERIFIED);
          return value != null && Boolean.parseBoolean(value);
       }
 
-      public String getPathCondition(Attributes attributes) {
+      protected String getPathCondition(Attributes attributes) {
          return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_PATH_CONDITION);
       }
 
-      public String getContractText(Attributes attributes) {
+      protected String getContractText(Attributes attributes) {
          return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_CONTRACT_TEXT);
       }
 
-      public boolean isAllPreconditionsFulfilled(Attributes attributes) {
-         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_PRECONDITIONS_FULFILLED);
-         return value != null && Boolean.parseBoolean(value);
-      }
-
-      public boolean isAllNotNullChecksFulfilled(Attributes attributes) {
-         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_NOT_NULL_CHECKS_FULFILLED);
-         return value != null && Boolean.parseBoolean(value);
-      }
-
-      public boolean isAllLoopInvariantsInitiallyFulfilled(Attributes attributes) {
-         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_LOOP_INVARIANTS_INITIALLY_VALID);
-         return value != null && Boolean.parseBoolean(value);
-      }
-
-      public boolean isAllLoopInvariantsPreserved(Attributes attributes) {
-         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_LOOP_INVARIANTS_PRESERVED);
-         return value != null && Boolean.parseBoolean(value);
-      }
-
-      public TerminationKind getTerminationKind(Attributes attributes) {
+      protected TerminationKind getTerminationKind(Attributes attributes) {
          String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_TERMINATION_KIND);
          return !StringUtil.isEmpty(value) ? TerminationKind.valueOf(value) : null;
+      }
+
+      protected String getFile(Attributes attributes) {
+         return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_FILE);
+      }
+
+      protected String getContract(Attributes attributes) {
+         return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_CONTRACT);
+      }
+
+      protected String getMethod(Attributes attributes) {
+         return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_METHOD);
+      }
+
+      protected int getEndColumn(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_END_COLUMN);
+         return value != null ? Integer.parseInt(value) : 0;
+      }
+
+      protected int getEndLine(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_END_LINE);
+         return value != null ? Integer.parseInt(value) : 0;
+      }
+
+      protected int getStartColumn(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_START_COLUMN);
+         return value != null ? Integer.parseInt(value) : 0;
+      }
+
+      protected int getStartLine(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_START_LINE);
+         return value != null ? Integer.parseInt(value) : 0;
       }
 
       /**

@@ -2,11 +2,16 @@ package org.key_project.starvoors.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.key_project.starvoors.model.StaRVOOrSExecutionPath;
+import org.key_project.starvoors.model.StaRVOOrSLoopInvariantApplication;
+import org.key_project.starvoors.model.StaRVOOrSMethodContractApplication;
 import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.util.collection.ImmutableList;
@@ -16,6 +21,7 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Named;
@@ -44,6 +50,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
@@ -59,6 +66,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
+// TODO: List contracts of API methods applied by proofs.
 public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
@@ -201,10 +209,10 @@ public final class StaRVOOrSUtil {
       System.out.println();
       return new StaRVOOrSExecutionPath(pathConditionPP.trim(), 
                                         verified,
-                                        useInfo.isAllPreconditionsFulfilled(),
-                                        useInfo.isAllNotNullChecksFulfilled(),
-                                        useInfo.isAllLoopInvariantsInitiallyFulfilled(),
-                                        useInfo.isAllLoopInvariantsPreserved(),
+                                        useInfo.getNotFulfilledPreconditions(),
+                                        useInfo.getNotFulfilledNullChecks(),
+                                        useInfo.getNotInitiallyValidLoopInvariants(),
+                                        useInfo.getNotPreservedLoopInvariants(),
                                         getTerminationKind(leaf));
    }
    
@@ -219,36 +227,29 @@ public final class StaRVOOrSUtil {
    }
    
    protected static SpecificationUseInformation computeSpecificationUseInformation(IExecutionNode<?> node) {
-       boolean allPreconditionsFulfilled = true;
-       boolean allNotNullChecksFulfilled = true;
-       boolean allLoopInvariantsInitiallyFulfilled = true;
-       boolean allLoopInvariantsPreserved = true;
-       while (node != null &&
-              (allPreconditionsFulfilled || allNotNullChecksFulfilled || allLoopInvariantsInitiallyFulfilled)) {
+       SpecificationUseInformation result = new SpecificationUseInformation();
+       while (node != null) {
            if (node instanceof ExecutionOperationContract) {
                ExecutionOperationContract eoc = (ExecutionOperationContract) node;
                if (!eoc.isPreconditionComplied()) {
-                   allPreconditionsFulfilled = false;
+                   result.addNotFulfilledPrecondition(eoc);
                }
                if (eoc.hasNotNullCheck() && !eoc.isNotNullCheckComplied()) {
-                  allNotNullChecksFulfilled = false;
+                  result.addNotFulfilledNullCheck(eoc);
                }
            }
            else if (node instanceof ExecutionLoopInvariant) {
                ExecutionLoopInvariant eli = (ExecutionLoopInvariant) node;
                if (!eli.isInitiallyValid()) {
-                   allLoopInvariantsInitiallyFulfilled = false;
+                   result.addNotInitiallyValidLoopInvariant(eli);
                }
-               if (allLoopInvariantsPreserved && !isLoopInvariantPreserved(eli)) {
-                  allLoopInvariantsPreserved = false;
+               if (!isLoopInvariantPreserved(eli)) {
+                  result.addNotPreservedLoopInvariant(eli);
                }
            }
            node = node.getParent();
        }
-       return new SpecificationUseInformation(allPreconditionsFulfilled, 
-                                              allNotNullChecksFulfilled, 
-                                              allLoopInvariantsInitiallyFulfilled, 
-                                              allLoopInvariantsPreserved);
+       return result;
    }
    
    private static boolean isLoopInvariantPreserved(ExecutionLoopInvariant eli) {
@@ -265,7 +266,7 @@ public final class StaRVOOrSUtil {
          return preserved;
       }
       else {
-         return true; // The preseres branch is not avialable if KeY could close it completely meaning that the loop body is never executed.
+         return true; // The preserves branch is not available if KeY could close it completely meaning that the loop body is never executed.
       }
    }
    
@@ -280,38 +281,104 @@ public final class StaRVOOrSUtil {
    }
 
    private static class SpecificationUseInformation {
-      private final boolean allPreconditionsFulfilled;
+      private final List<ExecutionOperationContract> notFulfilledPreconditions = new LinkedList<ExecutionOperationContract>();
        
-      private final boolean allNotNullChecksFulfilled;
+      private final List<ExecutionOperationContract> notFulfilledNullChecks = new LinkedList<ExecutionOperationContract>();
        
-      private final boolean allLoopInvariantsInitiallyFulfilled;
+      private final List<ExecutionLoopInvariant> notInitiallyValidLoopInvariants = new LinkedList<ExecutionLoopInvariant>();
       
-      private final boolean allLoopInvariantsPreserved;
+      private final List<ExecutionLoopInvariant> notPreservedLoopInvariants = new LinkedList<ExecutionLoopInvariant>();
 
-      public SpecificationUseInformation(boolean allPreconditionsFulfilled, 
-                                         boolean allNotNullChecksFulfilled, 
-                                         boolean allLoopInvariantsInitiallyFulfilled, 
-                                         boolean allLoopInvariantsPreserved) {
-         this.allPreconditionsFulfilled = allPreconditionsFulfilled;
-         this.allNotNullChecksFulfilled = allNotNullChecksFulfilled;
-         this.allLoopInvariantsInitiallyFulfilled = allLoopInvariantsInitiallyFulfilled;
-         this.allLoopInvariantsPreserved = allLoopInvariantsPreserved;
+      public List<StaRVOOrSMethodContractApplication> getNotFulfilledPreconditions() {
+         List<StaRVOOrSMethodContractApplication> result = new ArrayList<StaRVOOrSMethodContractApplication>();
+         for (ExecutionOperationContract eoc : notFulfilledPreconditions) {
+            result.add(toStaRVOOrSMethodContractApplication(eoc));
+         }
+         return result;
+      }
+      
+      public List<StaRVOOrSMethodContractApplication> getNotFulfilledNullChecks() {
+         List<StaRVOOrSMethodContractApplication> result = new ArrayList<StaRVOOrSMethodContractApplication>();
+         for (ExecutionOperationContract eoc : notFulfilledNullChecks) {
+            result.add(toStaRVOOrSMethodContractApplication(eoc));
+         }
+         return result;
+      }
+      
+      protected StaRVOOrSMethodContractApplication toStaRVOOrSMethodContractApplication(ExecutionOperationContract eoc) {
+         IExecutionNode<?> parent = eoc.getParent();
+         while (parent instanceof IExecutionBranchCondition) {
+            parent = parent.getParent();
+         }
+         PositionInfo info = parent != null ? parent.getActivePositionInfo() : null;
+         return new StaRVOOrSMethodContractApplication(info != null ? info.getFileName() : null, 
+                                                       info != null ? info.getStartPosition().getLine() : -1, 
+                                                       info != null ? info.getStartPosition().getColumn() : -1, 
+                                                       info != null ? info.getEndPosition().getLine() : -1, 
+                                                       info != null ? info.getEndPosition().getColumn() : -1, 
+                                                       eoc.getContractProgramMethod().getFullName(), 
+                                                       eoc.getContract().getName());
+      }
+      
+      public List<StaRVOOrSLoopInvariantApplication> getNotInitiallyValidLoopInvariants() {
+         List<StaRVOOrSLoopInvariantApplication> result = new ArrayList<StaRVOOrSLoopInvariantApplication>();
+         for (ExecutionLoopInvariant eli : notInitiallyValidLoopInvariants) {
+            result.add(toStaRVOOrSLoopInvariantApplication(eli));
+         }
+         return result;
+      }
+      
+      public List<StaRVOOrSLoopInvariantApplication> getNotPreservedLoopInvariants() {
+         List<StaRVOOrSLoopInvariantApplication> result = new ArrayList<StaRVOOrSLoopInvariantApplication>();
+         for (ExecutionLoopInvariant eli : notPreservedLoopInvariants) {
+            result.add(toStaRVOOrSLoopInvariantApplication(eli));
+         }
+         return result;
+      }
+
+      protected StaRVOOrSLoopInvariantApplication toStaRVOOrSLoopInvariantApplication(ExecutionLoopInvariant eli) {
+         PositionInfo info = eli.getLoopStatement().getGuardExpression().getPositionInfo();
+         return new StaRVOOrSLoopInvariantApplication(info != null ? info.getFileName() : null, 
+                                                      info != null ? info.getStartPosition().getLine() : -1, 
+                                                      info != null ? info.getStartPosition().getColumn() : -1, 
+                                                      info != null ? info.getEndPosition().getLine() : -1,
+                                                      info != null ? info.getEndPosition().getColumn() : -1);
+      }
+      
+      public void addNotFulfilledPrecondition(ExecutionOperationContract eoc) {
+         assert eoc != null;
+         notFulfilledPreconditions.add(eoc);
+      }
+      
+      public void addNotFulfilledNullCheck(ExecutionOperationContract eoc) {
+         assert eoc != null;
+         notFulfilledNullChecks.add(eoc);
+      }
+      
+      public void addNotInitiallyValidLoopInvariant(ExecutionLoopInvariant eli) {
+         assert eli != null;
+         notInitiallyValidLoopInvariants.add(eli);
+      }
+      
+      public void addNotPreservedLoopInvariant(ExecutionLoopInvariant eli) {
+         assert eli != null;
+         notPreservedLoopInvariants.add(eli);
       }
 
       public boolean isAllPreconditionsFulfilled() {
-         return allPreconditionsFulfilled;
+         return notFulfilledPreconditions.isEmpty();
       }
 
       public boolean isAllNotNullChecksFulfilled() {
-         return allNotNullChecksFulfilled;
+         return notFulfilledNullChecks.isEmpty();
       }
 
       public boolean isAllLoopInvariantsInitiallyFulfilled() {
-         return allLoopInvariantsInitiallyFulfilled;
+         return notInitiallyValidLoopInvariants.isEmpty();
       }
 
       public boolean isAllLoopInvariantsPreserved() {
-         return allLoopInvariantsPreserved;
+         return notPreservedLoopInvariants.isEmpty();
       }
 
       @Override
@@ -330,7 +397,7 @@ public final class StaRVOOrSUtil {
       logicPrinter.printTerm(term);
       return logicPrinter.result();      
    }
-   
+
    private static class TransformationNotationInfo extends NotationInfo {
        private final Services services;
        
