@@ -24,6 +24,7 @@ public class StaRVOOrSWriter {
    public static final String ATTRIBUTE_ALL_NOT_NULL_CHECKS_FULFILLED = "allNotNullChecksFulfilled";
    public static final String ATTRIBUTE_ALL_LOOP_INVARIANTS_INITIALLY_VALID = "allLoopInvariantsInitiallyFulfilled";
    public static final String ATTRIBUTE_ALL_LOOP_INVARIANTS_PRESERVED = "allLoopInvariantsPreserved";
+   public static final String ATTRIBUTE_TERMINATION_KIND = "terminationKind";
 
    public static void write(StaRVOOrSResult result, File file) throws IOException {
       if (file != null && result != null) {
@@ -71,6 +72,9 @@ public class StaRVOOrSWriter {
       attributes.put(ATTRIBUTE_ALL_NOT_NULL_CHECKS_FULFILLED, path.isAllNotNullChecksFulfilled() + "");
       attributes.put(ATTRIBUTE_ALL_LOOP_INVARIANTS_INITIALLY_VALID, path.isAllLoopInvariantsInitiallyFulfilled() + "");
       attributes.put(ATTRIBUTE_ALL_LOOP_INVARIANTS_PRESERVED, path.isAllLoopInvariantsPreserved() + "");
+      if (path.getTerminationKind() != null) {
+         attributes.put(ATTRIBUTE_TERMINATION_KIND, path.getTerminationKind().toString());
+      }
       XMLUtil.appendEmptyTag(level, TAG_EXECUTION_PATH, attributes, sb);
    }
 }

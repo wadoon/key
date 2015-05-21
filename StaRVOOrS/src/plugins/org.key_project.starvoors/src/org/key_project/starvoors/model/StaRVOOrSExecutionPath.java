@@ -1,5 +1,7 @@
 package org.key_project.starvoors.model;
 
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
+
 public class StaRVOOrSExecutionPath {
    private final String pathCondition;
    
@@ -12,19 +14,23 @@ public class StaRVOOrSExecutionPath {
    private final boolean allLoopInvariantsInitiallyFulfilled;
    
    private final boolean allLoopInvariantsPreserved;
+   
+   private final TerminationKind terminationKind;
 
    public StaRVOOrSExecutionPath(String pathCondition, 
                                  boolean verified,
                                  boolean allPreconditionsFulfilled,
                                  boolean allNotNullChecksFulfilled,
                                  boolean allLoopInvariantsInitiallyFulfilled,
-                                 boolean allLoopInvariantsPreserved) {
+                                 boolean allLoopInvariantsPreserved,
+                                 TerminationKind terminationKind) {
       this.pathCondition = pathCondition;
       this.verified = verified;
       this.allPreconditionsFulfilled = allPreconditionsFulfilled;
       this.allNotNullChecksFulfilled = allNotNullChecksFulfilled;
       this.allLoopInvariantsInitiallyFulfilled = allLoopInvariantsInitiallyFulfilled;
       this.allLoopInvariantsPreserved = allLoopInvariantsPreserved;
+      this.terminationKind = terminationKind;
    }
 
    public String getPathCondition() {
@@ -49,5 +55,9 @@ public class StaRVOOrSExecutionPath {
 
    public boolean isAllLoopInvariantsPreserved() {
       return allLoopInvariantsPreserved;
+   }
+
+   public TerminationKind getTerminationKind() {
+      return terminationKind;
    }
 }

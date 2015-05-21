@@ -14,9 +14,12 @@ import org.eclipse.core.runtime.Assert;
 import org.key_project.starvoors.model.StaRVOOrSExecutionPath;
 import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
+import org.key_project.util.java.StringUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 
 public final class StaRVOOrSReader {
    public static StaRVOOrSResult load(File file) throws Exception {
@@ -99,7 +102,8 @@ public final class StaRVOOrSReader {
                                                                      isAllPreconditionsFulfilled(attributes),
                                                                      isAllNotNullChecksFulfilled(attributes),
                                                                      isAllLoopInvariantsInitiallyFulfilled(attributes),
-                                                                     isAllLoopInvariantsPreserved(attributes));
+                                                                     isAllLoopInvariantsPreserved(attributes),
+                                                                     getTerminationKind(attributes));
             ((StaRVOOrSProof) parent).addPath(path);
             parentStack.addFirst(path);
          }
@@ -153,6 +157,11 @@ public final class StaRVOOrSReader {
       public boolean isAllLoopInvariantsPreserved(Attributes attributes) {
          String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_ALL_LOOP_INVARIANTS_PRESERVED);
          return value != null && Boolean.parseBoolean(value);
+      }
+
+      public TerminationKind getTerminationKind(Attributes attributes) {
+         String value = attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_TERMINATION_KIND);
+         return !StringUtil.isEmpty(value) ? TerminationKind.valueOf(value) : null;
       }
 
       /**

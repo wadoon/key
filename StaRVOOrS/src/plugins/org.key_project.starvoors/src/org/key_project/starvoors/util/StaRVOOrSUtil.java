@@ -180,36 +180,32 @@ public final class StaRVOOrSUtil {
    }
    
    protected static StaRVOOrSExecutionPath workWithLeafNode(IExecutionNode<?> leaf, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
-      // Check if termination is relevant
-      if (isRelevantTermination(leaf)) {
-         // Check if verified
-         boolean verified = isVerified(leaf);
-         SpecificationUseInformation useInfo = computeSpecificationUseInformation(leaf);
-         // Get path condition
-         Term pathCondition = leaf.getPathCondition();
-         StringBuffer sb = transformTermPP(pathCondition, contractResults, preStateMapping, leaf.getServices());
-         String pathConditionPP = sb.toString();
-         System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified + " (" + useInfo + ")");
-         System.out.println();
-         return new StaRVOOrSExecutionPath(pathConditionPP.trim(), 
-                                           verified,
-                                           useInfo.isAllPreconditionsFulfilled(),
-                                           useInfo.isAllNotNullChecksFulfilled(),
-                                           useInfo.isAllLoopInvariantsInitiallyFulfilled(),
-                                           useInfo.isAllLoopInvariantsPreserved());
-      }
-      else {
-         return null;
-      }
+      // Check if verified
+      boolean verified = isVerified(leaf);
+      SpecificationUseInformation useInfo = computeSpecificationUseInformation(leaf);
+      // Get path condition
+      Term pathCondition = leaf.getPathCondition();
+      StringBuffer sb = transformTermPP(pathCondition, contractResults, preStateMapping, leaf.getServices());
+      String pathConditionPP = sb.toString();
+      System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified + " (" + useInfo + ")");
+      System.out.println();
+      return new StaRVOOrSExecutionPath(pathConditionPP.trim(), 
+                                        verified,
+                                        useInfo.isAllPreconditionsFulfilled(),
+                                        useInfo.isAllNotNullChecksFulfilled(),
+                                        useInfo.isAllLoopInvariantsInitiallyFulfilled(),
+                                        useInfo.isAllLoopInvariantsPreserved(),
+                                        getTerminationKind(leaf));
    }
    
-   protected static boolean isRelevantTermination(IExecutionNode<?> node) {
-      return node instanceof IExecutionTermination && // Ignore not completed paths (e.g. missing rule or timeout) as the postcondition of the method was not checked at all
-             !TerminationKind.LOOP_BODY.equals(((IExecutionTermination)node).getTerminationKind()); // Ignore terminations of a loop body as such branches do not prove the methods postcondition
+   protected static TerminationKind getTerminationKind(IExecutionNode<?> node) {
+      return node instanceof IExecutionTermination ?
+             ((IExecutionTermination) node).getTerminationKind() :
+             null;
    }
-   
+
    protected static boolean isVerified(IExecutionNode<?> node) {
-      return node instanceof IExecutionTermination && ((IExecutionTermination)node).isBranchVerified();
+      return node instanceof IExecutionTermination && ((IExecutionTermination) node).isBranchVerified();
    }
    
    protected static SpecificationUseInformation computeSpecificationUseInformation(IExecutionNode<?> node) {
