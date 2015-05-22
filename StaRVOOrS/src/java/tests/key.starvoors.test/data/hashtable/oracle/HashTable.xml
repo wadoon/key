@@ -6,8 +6,9 @@ post: self.capacity = capacity
 &amp; (self.size = 0 &amp; self.&lt;inv&gt;)
 &amp; exc = null
 mod: self.h.* \cup {(self, HashTable::$size)}
-termination: diamond">
-      <executionPath pathCondition="true" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true" terminationKind="NORMAL"/>
+termination: diamond" type="HashTable" target="HashTable(int)">
+      <executionPath pathCondition="true" verified="true" terminationKind="NORMAL">
+      </executionPath>
    </proof>
    <proof contractId="HashTable[HashTable::add(java.lang.Object,int)].JML normal_behavior operation contract.0" contractText="self.add(u, key) catch(exc)
 pre: self.size &lt; self.capacity &amp; (self.&lt;inv&gt; &amp; !u = null)
@@ -20,9 +21,11 @@ post: self.size = javaAddInt(self.size@heapAtPre, 1)
    &amp; self.&lt;inv&gt;)
 &amp; exc = null
 mod: {(self, HashTable::$size)} \cup self.h.*
-termination: diamond">
-      <executionPath pathCondition="self.h[self.hash_function(key)] = null" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true" terminationKind="NORMAL"/>
-      <executionPath pathCondition="!self.h[self.hash_function(key)] = null" verified="false" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true"/>
+termination: diamond" type="HashTable" target="add(java.lang.Object, int)">
+      <executionPath pathCondition="self.h[self.hash_function(key)] = null" verified="true" terminationKind="NORMAL">
+      </executionPath>
+      <executionPath pathCondition="!self.h[self.hash_function(key)] = null" verified="false">
+      </executionPath>
    </proof>
    <proof contractId="HashTable[HashTable::add(java.lang.Object,int)].JML normal_behavior operation contract.1" contractText="self.add(u, key) catch(exc)
 pre: self.size &gt;= self.capacity &amp; (self.&lt;inv&gt; &amp; !u = null)
@@ -32,8 +35,9 @@ post: \forall int j;
 &amp; self.&lt;inv&gt;
 &amp; exc = null
 mod: {}
-termination: diamond">
-      <executionPath pathCondition="true" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true" terminationKind="NORMAL"/>
+termination: diamond" type="HashTable" target="add(java.lang.Object, int)">
+      <executionPath pathCondition="true" verified="true" terminationKind="NORMAL">
+      </executionPath>
    </proof>
    <proof contractId="HashTable[HashTable::hash_function(int)].JML normal_behavior operation contract.0" contractText="result = self.hash_function(val) catch(exc)
 pre: self.&lt;inv&gt;
@@ -42,8 +46,10 @@ post: result &gt;= 0
 &amp; self.&lt;inv&gt;
 &amp; exc = null
 mod: {}
-termination: diamond">
-      <executionPath pathCondition="val &gt;  -1" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true" terminationKind="NORMAL"/>
-      <executionPath pathCondition="val &lt; 0" verified="true" allPreconditionsFulfilled="true" allNotNullChecksFulfilled="true" allLoopInvariantsInitiallyFulfilled="true" allLoopInvariantsPreserved="true" terminationKind="NORMAL"/>
+termination: diamond" type="HashTable" target="hash_function(int)">
+      <executionPath pathCondition="val &gt;  -1" verified="true" terminationKind="NORMAL">
+      </executionPath>
+      <executionPath pathCondition="val &lt; 0" verified="true" terminationKind="NORMAL">
+      </executionPath>
    </proof>
 </result>

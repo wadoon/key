@@ -96,7 +96,10 @@ public final class StaRVOOrSReader {
          else if (StaRVOOrSWriter.TAG_PROOF.equals(qName)) {
             Object parent = parentStack.peekFirst();
             assertIsTrue(parent == result, parent + " is not the same as " + result);
-            StaRVOOrSProof proof = new StaRVOOrSProof(getContractId(attributes), getContractText(attributes));
+            StaRVOOrSProof proof = new StaRVOOrSProof(getContractId(attributes), 
+                                                      getContractText(attributes),
+                                                      getType(attributes),
+                                                      getTarget(attributes));
             result.addProof(proof);
             parentStack.addFirst(proof);
          }
@@ -142,7 +145,8 @@ public final class StaRVOOrSReader {
                                                                                                     getStartLine(attributes), 
                                                                                                     getStartColumn(attributes), 
                                                                                                     getEndLine(attributes), 
-                                                                                                    getEndColumn(attributes), 
+                                                                                                    getEndColumn(attributes),
+                                                                                                    getType(attributes),
                                                                                                     getMethod(attributes), 
                                                                                                     getContract(attributes));
             if (StaRVOOrSWriter.TAG_NOT_FULFILLED_PRECONDITIONS.equals(parent)) {
@@ -212,6 +216,14 @@ public final class StaRVOOrSReader {
 
       protected String getContractText(Attributes attributes) {
          return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_CONTRACT_TEXT);
+      }
+
+      protected String getType(Attributes attributes) {
+         return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_TYPE);
+      }
+
+      protected String getTarget(Attributes attributes) {
+         return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_TARGET);
       }
 
       protected TerminationKind getTerminationKind(Attributes attributes) {

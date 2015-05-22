@@ -10,9 +10,15 @@ public class StaRVOOrSProof {
 
    private final String contractText;
    
-   public StaRVOOrSProof(String contractId, String contractText) {
+   private final String type;
+   
+   private final String target;
+   
+   public StaRVOOrSProof(String contractId, String contractText, String type, String target) {
       this.contractId = contractId;
       this.contractText = contractText;
+      this.type = type;
+      this.target = target;
    }
 
    public void addPath(StaRVOOrSExecutionPath path) {
@@ -31,5 +37,13 @@ public class StaRVOOrSProof {
 
    public String getContractText() {
       return contractText;
+   }
+
+   public String getType() {
+      return type;
+   }
+
+   public String getTarget() {
+      return target;
    }
 }

@@ -145,12 +145,38 @@ public final class StaRVOOrSUtil {
          // Update symbolic execution tree
          builder.analyse();
          // Analyze discovered symbolic execution tree
-         StaRVOOrSProof proofResult = new StaRVOOrSProof(contract.getName(), contract.getPlainText(builder.getProof().getServices()));
+         StaRVOOrSProof proofResult = new StaRVOOrSProof(contract.getName(), 
+                                                         contract.getPlainText(builder.getProof().getServices()),
+                                                         contract.getTarget().getContainerType().getFullName(),
+                                                         observerFunctionToString(contract.getTarget()));
          analyzeSymbolicExecutionTree(builder, contract, proofResult);
          return proofResult;
       }
       finally {
          proof.dispose();
+      }
+   }
+   
+   protected static String observerFunctionToString(IObserverFunction target) {
+      if (target instanceof IProgramMethod) {
+         IProgramMethod pm = (IProgramMethod) target;
+         StringBuffer sb = new StringBuffer();
+         sb.append(pm.getFullName());
+         sb.append("(");
+         for (int i = 0; i < pm.getParameters().size(); i++) {
+            if (i >= 1) {
+               sb.append(", ");
+            }
+            sb.append(pm.getParameters().get(i).getTypeReference().getKeYJavaType().getFullName());
+         }
+         sb.append(")");
+         return sb.toString();
+      }
+      else if (target != null) {
+         return target.name().toString();
+      }
+      else {
+         return null;
       }
    }
 
@@ -317,7 +343,8 @@ public final class StaRVOOrSUtil {
                                                        info != null ? info.getStartPosition().getColumn() : -1, 
                                                        info != null ? info.getEndPosition().getLine() : -1, 
                                                        info != null ? info.getEndPosition().getColumn() : -1, 
-                                                       eoc.getContractProgramMethod().getFullName(), 
+                                                       eoc.getContractProgramMethod().getContainerType().getFullName(),
+                                                       observerFunctionToString(eoc.getContractProgramMethod()), 
                                                        eoc.getContract().getName());
       }
       

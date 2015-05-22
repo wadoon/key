@@ -38,6 +38,8 @@ public class StaRVOOrSWriter {
    public static final String ATTRIBUTE_METHOD = "method";
    public static final String ATTRIBUTE_CONTRACT = "contract";
    public static final String TAG_LOOP_INVARIANT_APPLICATION = "loopInvariant";
+   public static final String ATTRIBUTE_TYPE = "type";
+   public static final String ATTRIBUTE_TARGET = "target";
 
    public static void write(StaRVOOrSResult result, File file) throws IOException {
       if (file != null && result != null) {
@@ -70,6 +72,8 @@ public class StaRVOOrSWriter {
       Map<String, String> attributes = new LinkedHashMap<String, String>();
       attributes.put(ATTRIBUTE_CONTRACT_ID, proof.getContractId());
       attributes.put(ATTRIBUTE_CONTRACT_TEXT, proof.getContractText());
+      attributes.put(ATTRIBUTE_TYPE, proof.getType());
+      attributes.put(ATTRIBUTE_TARGET, proof.getTarget());
       XMLUtil.appendStartTag(level, TAG_PROOF, attributes, sb);
       for (StaRVOOrSExecutionPath path : proof.getPaths()) {
          appendPath(level + 1, path, sb);
@@ -106,6 +110,7 @@ public class StaRVOOrSWriter {
             attributes.put(ATTRIBUTE_START_COLUMN, application.getStartColumn() + "");
             attributes.put(ATTRIBUTE_END_LINE, application.getEndLine() + "");
             attributes.put(ATTRIBUTE_END_COLUMN, application.getEndColumn() + "");
+            attributes.put(ATTRIBUTE_TYPE, application.getType());
             attributes.put(ATTRIBUTE_METHOD, application.getMethod());
             attributes.put(ATTRIBUTE_CONTRACT, application.getContract());
             XMLUtil.appendEmptyTag(level + 1, TAG_METHOD_CONTRACT_APPLICATION, attributes, sb);
