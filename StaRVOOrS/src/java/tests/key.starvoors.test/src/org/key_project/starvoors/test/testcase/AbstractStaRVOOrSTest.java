@@ -166,7 +166,10 @@ public abstract class AbstractStaRVOOrSTest extends AbstractSymbolicExecutionTes
          if (expected.getFile() != null) {
             assertNotNull(actual.getFile());
             // Compare only file names as paths is different on each computer
-            File expectedFile = new File(expected.getFile());
+            String expectedPath = expected.getFile();
+            expectedPath = expectedPath.replaceAll("\\\\", File.separator);
+            expectedPath = expectedPath.replaceAll("/", File.separator);
+            File expectedFile = new File(expectedPath);
             File actualFile = new File(actual.getFile());
             assertEquals(expectedFile.getName(), actualFile.getName());
          }
