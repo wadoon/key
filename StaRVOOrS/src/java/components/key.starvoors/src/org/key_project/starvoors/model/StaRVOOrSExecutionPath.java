@@ -10,6 +10,8 @@ public class StaRVOOrSExecutionPath {
    
    private final boolean verified;
    
+   private final String newPrecondition;
+   
    private final List<StaRVOOrSMethodContractApplication> notFulfilledPreconditions = new LinkedList<StaRVOOrSMethodContractApplication>();
    
    private final List<StaRVOOrSMethodContractApplication> notFulfilledNullChecks = new LinkedList<StaRVOOrSMethodContractApplication>();
@@ -26,7 +28,8 @@ public class StaRVOOrSExecutionPath {
                                  List<StaRVOOrSMethodContractApplication> notFulfilledNullChecks,
                                  List<StaRVOOrSLoopInvariantApplication> notInitiallyValidLoopInvariants,
                                  List<StaRVOOrSLoopInvariantApplication> notPreservedLoopInvariants,
-                                 TerminationKind terminationKind) {
+                                 TerminationKind terminationKind,
+                                 String newPrecondition) {
       this.pathCondition = pathCondition;
       this.verified = verified;
       if (notFulfilledPreconditions != null) {
@@ -42,6 +45,7 @@ public class StaRVOOrSExecutionPath {
          this.notPreservedLoopInvariants.addAll(notPreservedLoopInvariants);
       }
       this.terminationKind = terminationKind;
+      this.newPrecondition = newPrecondition;
    }
 
    public String getPathCondition() {
@@ -110,5 +114,9 @@ public class StaRVOOrSExecutionPath {
       if (application != null) {
          notPreservedLoopInvariants.add(application);
       }
+   }
+
+   public String getNewPrecondition() {
+      return newPrecondition;
    }
 }

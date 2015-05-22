@@ -112,7 +112,8 @@ public final class StaRVOOrSReader {
                                                                      null,
                                                                      null,
                                                                      null,
-                                                                     getTerminationKind(attributes));
+                                                                     getTerminationKind(attributes),
+                                                                     getNewPrecondition(attributes));
             ((StaRVOOrSProof) parent).addPath(path);
             currentPath = path;
             parentStack.addFirst(path);
@@ -199,6 +200,10 @@ public final class StaRVOOrSReader {
          if (!parentStack.isEmpty()) {
             parentStack.removeFirst();
          }
+      }
+
+      protected String getNewPrecondition(Attributes attributes) {
+         return attributes.getValue(StaRVOOrSWriter.ATTRIBUTE_NEW_PRECONDITION);
       }
 
       protected String getContractId(Attributes attributes) {

@@ -40,6 +40,7 @@ public class StaRVOOrSWriter {
    public static final String TAG_LOOP_INVARIANT_APPLICATION = "loopInvariant";
    public static final String ATTRIBUTE_TYPE = "type";
    public static final String ATTRIBUTE_TARGET = "target";
+   public static final String ATTRIBUTE_NEW_PRECONDITION = "newPrecondition";
 
    public static void write(StaRVOOrSResult result, File file) throws IOException {
       if (file != null && result != null) {
@@ -85,6 +86,7 @@ public class StaRVOOrSWriter {
       Map<String, String> attributes = new LinkedHashMap<String, String>();
       attributes.put(ATTRIBUTE_PATH_CONDITION, path.getPathCondition());
       attributes.put(ATTRIBUTE_VERIFIED, path.isVerified() + "");
+      attributes.put(ATTRIBUTE_NEW_PRECONDITION, path.getNewPrecondition());
       if (path.getTerminationKind() != null) {
          attributes.put(ATTRIBUTE_TERMINATION_KIND, path.getTerminationKind().toString());
       }

@@ -105,6 +105,9 @@ public abstract class AbstractStaRVOOrSTest extends AbstractSymbolicExecutionTes
          assertEquals(expected.isAllLoopInvariantsInitiallyFulfilled(), actual.isAllLoopInvariantsInitiallyFulfilled());
          assertEquals(expected.isAllLoopInvariantsPreserved(), actual.isAllLoopInvariantsPreserved());
          assertEquals(expected.getTerminationKind(), actual.getTerminationKind());
+         if (!StringUtil.equalIgnoreWhiteSpace(expected.getNewPrecondition(), actual.getNewPrecondition())) {
+            assertEquals(expected.getNewPrecondition(), actual.getNewPrecondition());
+         }
          assertMethodContractApplications(expected.getNotFulfilledPreconditions(), actual.getNotFulfilledPreconditions());
          assertMethodContractApplications(expected.getNotFulfilledNullChecks(), actual.getNotFulfilledNullChecks());
          assertLoopInvariantApplications(expected.getNotInitiallyValidLoopInvariants(), actual.getNotInitiallyValidLoopInvariants());

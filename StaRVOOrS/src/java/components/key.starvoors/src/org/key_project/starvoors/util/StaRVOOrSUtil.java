@@ -203,7 +203,7 @@ public final class StaRVOOrSUtil {
          }
          // Check if node is a leaf node
          if (isLeaf(next)) {
-            StaRVOOrSExecutionPath path = workWithLeafNode(next, contractResults, preStateMapping);
+            StaRVOOrSExecutionPath path = workWithLeafNode(next, contract, contractResults, preStateMapping);
             if (path != null) {
                proofResult.addPath(path);
             }
@@ -225,23 +225,35 @@ public final class StaRVOOrSUtil {
       }
    }
    
-   protected static StaRVOOrSExecutionPath workWithLeafNode(IExecutionNode<?> leaf, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
+   protected static StaRVOOrSExecutionPath workWithLeafNode(IExecutionNode<?> leaf, Contract contract, final Map<Term, ExecutionOperationContract> contractResults, final Map<LocationVariable, ProgramVariable> preStateMapping) throws ProofInputException, IOException {
       // Check if verified
       boolean verified = isVerified(leaf);
       SpecificationUseInformation useInfo = computeSpecificationUseInformation(leaf);
       // Get path condition
       Term pathCondition = leaf.getPathCondition();
       StringBuffer sb = transformTermPP(pathCondition, contractResults, preStateMapping, leaf.getServices());
-      String pathConditionPP = sb.toString();
+      String pathConditionPP = sb.toString().trim();
       System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified + " (" + useInfo + ")");
       System.out.println();
+      // Compute new precondition
+      String newPrecondtionPP = null;
+      if (contract instanceof FunctionalOperationContract) {
+         Term precondition = ((FunctionalOperationContract) contract).getPre();
+         Term newPrecondition = leaf.getServices().getTermBuilder().and(precondition, pathCondition);
+         StringBuffer newSb = transformTermPP(newPrecondition, contractResults, preStateMapping, leaf.getServices());
+         newPrecondtionPP = newSb.toString().trim();
+      }
+      else {
+         throw new IllegalStateException("Contract '" + contract + "' is not supported.");
+      }
       return new StaRVOOrSExecutionPath(pathConditionPP.trim(), 
                                         verified,
                                         useInfo.getNotFulfilledPreconditions(),
                                         useInfo.getNotFulfilledNullChecks(),
                                         useInfo.getNotInitiallyValidLoopInvariants(),
                                         useInfo.getNotPreservedLoopInvariants(),
-                                        getTerminationKind(leaf));
+                                        getTerminationKind(leaf),
+                                        newPrecondtionPP);
    }
    
    protected static TerminationKind getTerminationKind(IExecutionNode<?> node) {
