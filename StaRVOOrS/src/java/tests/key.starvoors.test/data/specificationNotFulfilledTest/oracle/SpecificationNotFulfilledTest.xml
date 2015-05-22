@@ -15,26 +15,26 @@ mod: allLocs
 termination: diamond" type="SpecificationNotFulfilledTest" target="main(SpecificationNotFulfilledTest, int, int)">
       <executionPath pathCondition="value = 1 &amp; !obj = null" verified="true" terminationKind="NORMAL">
          <notFulfilledPreconditions>
-            <methodContractApplication file="D:\Forschung\GIT\KeY_StaRVOOrS\StaRVOOrS\src\java\tests\key.starvoors.test\data\specificationNotFulfilledTest\test\SpecificationNotFulfilledTest.java" startLine="9" startColumn="25" endLine="9" endColumn="48" type="SpecificationNotFulfilledTest" method="magic(int)" contract="SpecificationNotFulfilledTest[SpecificationNotFulfilledTest::magic(int)].JML normal_behavior operation contract.0"/>
+            <methodContractApplication file="/home/chimento/taller/KeY devel/Git/key/StaRVOOrS/src/java/tests/key.starvoors.test/data/specificationNotFulfilledTest/test/SpecificationNotFulfilledTest.java" startLine="9" startColumn="25" endLine="9" endColumn="48" type="SpecificationNotFulfilledTest" method="magic(int)" contract="SpecificationNotFulfilledTest[SpecificationNotFulfilledTest::magic(int)].JML normal_behavior operation contract.0"/>
          </notFulfilledPreconditions>
          <notFulfilledNullChecks>
-            <methodContractApplication file="D:\Forschung\GIT\KeY_StaRVOOrS\StaRVOOrS\src\java\tests\key.starvoors.test\data\specificationNotFulfilledTest\test\SpecificationNotFulfilledTest.java" startLine="9" startColumn="25" endLine="9" endColumn="48" type="SpecificationNotFulfilledTest" method="magic(int)" contract="SpecificationNotFulfilledTest[SpecificationNotFulfilledTest::magic(int)].JML normal_behavior operation contract.0"/>
+            <methodContractApplication file="/home/chimento/taller/KeY devel/Git/key/StaRVOOrS/src/java/tests/key.starvoors.test/data/specificationNotFulfilledTest/test/SpecificationNotFulfilledTest.java" startLine="9" startColumn="25" endLine="9" endColumn="48" type="SpecificationNotFulfilledTest" method="magic(int)" contract="SpecificationNotFulfilledTest[SpecificationNotFulfilledTest::magic(int)].JML normal_behavior operation contract.0"/>
          </notFulfilledNullChecks>
       </executionPath>
       <executionPath pathCondition="_z_0 &gt;= 3 &amp; value = 2" verified="false" terminationKind="LOOP_BODY">
          <notInitiallyValidLoopInvariants>
-            <loopInvariant file="D:\Forschung\GIT\KeY_StaRVOOrS\StaRVOOrS\src\java\tests\key.starvoors.test\data\specificationNotFulfilledTest\test\SpecificationNotFulfilledTest.java" startLine="15" startColumn="34" endLine="15" endColumn="36"/>
+            <loopInvariant file="/home/chimento/taller/KeY devel/Git/key/StaRVOOrS/src/java/tests/key.starvoors.test/data/specificationNotFulfilledTest/test/SpecificationNotFulfilledTest.java" startLine="15" startColumn="34" endLine="15" endColumn="36"/>
          </notInitiallyValidLoopInvariants>
          <notPreservedLoopInvariants>
-            <loopInvariant file="D:\Forschung\GIT\KeY_StaRVOOrS\StaRVOOrS\src\java\tests\key.starvoors.test\data\specificationNotFulfilledTest\test\SpecificationNotFulfilledTest.java" startLine="15" startColumn="34" endLine="15" endColumn="36"/>
+            <loopInvariant file="/home/chimento/taller/KeY devel/Git/key/StaRVOOrS/src/java/tests/key.starvoors.test/data/specificationNotFulfilledTest/test/SpecificationNotFulfilledTest.java" startLine="15" startColumn="34" endLine="15" endColumn="36"/>
          </notPreservedLoopInvariants>
       </executionPath>
       <executionPath pathCondition="_z_0 = 2 &amp; value = 2" verified="true" terminationKind="NORMAL">
          <notInitiallyValidLoopInvariants>
-            <loopInvariant file="D:\Forschung\GIT\KeY_StaRVOOrS\StaRVOOrS\src\java\tests\key.starvoors.test\data\specificationNotFulfilledTest\test\SpecificationNotFulfilledTest.java" startLine="15" startColumn="34" endLine="15" endColumn="36"/>
+            <loopInvariant file="/home/chimento/taller/KeY devel/Git/key/StaRVOOrS/src/java/tests/key.starvoors.test/data/specificationNotFulfilledTest/test/SpecificationNotFulfilledTest.java" startLine="15" startColumn="34" endLine="15" endColumn="36"/>
          </notInitiallyValidLoopInvariants>
          <notPreservedLoopInvariants>
-            <loopInvariant file="D:\Forschung\GIT\KeY_StaRVOOrS\StaRVOOrS\src\java\tests\key.starvoors.test\data\specificationNotFulfilledTest\test\SpecificationNotFulfilledTest.java" startLine="15" startColumn="34" endLine="15" endColumn="36"/>
+            <loopInvariant file="/home/chimento/taller/KeY devel/Git/key/StaRVOOrS/src/java/tests/key.starvoors.test/data/specificationNotFulfilledTest/test/SpecificationNotFulfilledTest.java" startLine="15" startColumn="34" endLine="15" endColumn="36"/>
          </notPreservedLoopInvariants>
       </executionPath>
       <executionPath pathCondition="!value = 1 &amp; !value = 2" verified="true" terminationKind="NORMAL">

@@ -68,6 +68,7 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 
 // TODO: List contracts of API methods applied by proofs.
 // TODO: Integrate truth value evaluation (more precise path conditions (left side) and new postcondition (unknown on left and right side))
+// TODO: Map renamings of program variables with help of Node#getRenamingTable() back to the original name. Do this when loop invariants are supported.
 public final class StaRVOOrSUtil {
    private StaRVOOrSUtil() {
    }
