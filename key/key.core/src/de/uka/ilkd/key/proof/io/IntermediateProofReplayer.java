@@ -49,6 +49,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate.RootBranch;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
@@ -161,6 +162,11 @@ public class IntermediateProofReplayer {
      * {@link #getLastSelectedGoal()}.
      */
     public void replay() {
+        
+        final int totalNrRuleApps = ((RootBranch) queue.getFirst().second).getNrAppNodes();
+        int processedNrRuleApps = 0;
+        float lastDisplayedRatio = 0f;
+        
         while (!queue.isEmpty()) {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
@@ -176,6 +182,18 @@ public class IntermediateProofReplayer {
                 continue;
             }
             else if (currNodeInterm instanceof AppNodeIntermediate) {
+                
+                // Display a progress information
+                final float processedRatio = ((float) processedNrRuleApps) / ((float) totalNrRuleApps);
+                if (processedRatio >= lastDisplayedRatio + 0.1f) {
+                    lastDisplayedRatio = processedRatio;
+                    System.out.format("Replayed %2.1f%% of the loaded proof (%d / %d applications)\n",
+                            processedRatio * 100f,
+                            processedNrRuleApps,
+                            totalNrRuleApps);
+                }
+                processedNrRuleApps++;
+                
                 AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
                 currNode.getNodeInfo().setInteractiveRuleApplication(
                         currInterm.isInteractiveRuleApplication());

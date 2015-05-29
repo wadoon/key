@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate.RootBranch;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
@@ -81,7 +82,7 @@ public class IntermediatePresentationProofFileParser implements
     private RuleInformation ruleInfo = null;
     
     /* + State information that is returned after parsing */
-    private BranchNodeIntermediate root = null; // the "dummy ID" branch
+    private RootBranch root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
 
 
@@ -98,8 +99,7 @@ public class IntermediatePresentationProofFileParser implements
         switch (eid) {
         case 'b': // branch
         {
-            final BranchNodeIntermediate newNode = new BranchNodeIntermediate(
-                    str);
+            final RootBranch newNode = new RootBranch(str);
             
             if (root == null) {
                 root = newNode;
@@ -267,12 +267,18 @@ public class IntermediatePresentationProofFileParser implements
             ((AppNodeIntermediate) currNode)
                     .setIntermediateRuleApp(constructTacletApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp().setLineNr(lineNr);
+            
+            root.incrementRuleAppCounter();
+            
             break;
 
         case 'n': // BuiltIn rules
             ((AppNodeIntermediate) currNode)
                     .setIntermediateRuleApp(constructBuiltInApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp().setLineNr(lineNr);
+            
+            root.incrementRuleAppCounter();
+            
             break;
 
         case 'x': // ifInst (for built in rules)
