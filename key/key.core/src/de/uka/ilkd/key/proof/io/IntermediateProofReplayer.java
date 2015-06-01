@@ -392,6 +392,11 @@ public class IntermediateProofReplayer {
                 }
             }
         }
+        
+        System.out.format("Replayed %2.1f%% of the loaded proof (%d / %d applications)\n",
+                100f,
+                processedNrRuleApps,
+                totalNrRuleApps);
     }
 
     /**
