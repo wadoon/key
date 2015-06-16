@@ -189,6 +189,8 @@ public class FunctionBuilder {
                                 fullyQualifiedName);
 
                         if (funcNS.lookup(funcName) == null) {
+			    System.out.println("Did not find " + funcName);
+			    System.out.println("Lookup " + c.getType().getQualifiedName() );
                             Sort returnSort = info.getTypeByName(
                                     c.getType().getQualifiedName()).getSort();
                             Function constructorFct = new Function(

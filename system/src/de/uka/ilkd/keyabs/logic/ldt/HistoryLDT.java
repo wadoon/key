@@ -21,10 +21,15 @@ public class HistoryLDT extends LDT {
     private final Sort classLabelSort;
     private final Sort methodLabelSort;
     private final Sort futureSort;
-    private LocationVariable history;
-    private Function wellFormed;
-    private Function invocationReactionEvent;
+    private final LocationVariable history;
+    private final Function wellFormed;
+    private final Function invocationReactionEvent;
+    private final Function invocationEvent;
 
+    // the event types
+    private final Function eventTypeIREV;
+    private final Function eventTypeIEV;
+    
     public HistoryLDT(IServices services) {
         super(new Name("Seq"), services);
 
@@ -40,7 +45,11 @@ public class HistoryLDT extends LDT {
         history                 = (LocationVariable) services.getNamespaces().programVariables().lookup("history");
         wellFormed              = addFunction((Function) services.getNamespaces().functions().lookup("wfHist"));
         invocationReactionEvent = addFunction((Function) services.getNamespaces().functions().lookup("invocREv"));
+        invocationEvent = addFunction((Function) services.getNamespaces().functions().lookup("invocEv"));
 
+        eventTypeIREV = addFunction((Function) services.getNamespaces().functions().lookup("iREv"));
+        eventTypeIEV = addFunction((Function) services.getNamespaces().functions().lookup("iEv"));
+        
     }
 
     @Override
@@ -118,4 +127,26 @@ public class HistoryLDT extends LDT {
     public Function getInvocationReactionEvent() {
         return invocationReactionEvent;
     }
+
+    public Function getInvocationEvent() {
+        return invocationEvent;
+    }
+
+    public Function getEventTypeForInvocationReactionEvent() {
+    	return eventTypeIREV;
+    }
+
+    public Function getEventTypeForInvocationEvent() {
+    	return eventTypeIEV;
+    }
+
+	public Function getEventTypeOf(de.uka.ilkd.key.logic.op.Operator eventLabelOp) {
+		Function result = null;
+		if (eventLabelOp == invocationReactionEvent) {
+			result = eventTypeIREV;
+		} else if (eventLabelOp == invocationEvent) {
+			result = eventTypeIEV;
+		} // TODO: else if (eventLabelOp == completion...
+		return result;
+	}
 }

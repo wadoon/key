@@ -106,6 +106,9 @@ public class SortBuilder {
             // create base data type first
             final Name baseName = new Name(createFullyQualifiedName(d));
             final ABSDatatype type = new ABSDatatype(baseName);
+
+	    System.out.println("Read ABS type " + baseName );
+
             Sort dataTypeSort = initConfig.sortNS().lookup(baseName);
             if (dataTypeSort == null) {
                 dataTypeSort = checkBuiltInType(services, baseName);
@@ -113,9 +116,9 @@ public class SortBuilder {
                     dataTypeSort = new SortImpl(baseName, topSort);
                     initConfig.sortNS().addSafely(dataTypeSort);
                 }
-                final KeYJavaType abs2sort = new KeYJavaType(type, dataTypeSort);
-                services.getProgramInfo().rec2key().put(type, abs2sort);
             }
+	    final KeYJavaType abs2sort = new KeYJavaType(type, dataTypeSort);
+            services.getProgramInfo().rec2key().put(type, abs2sort);
 
 
             /* for (DataConstructor cons : d.getDataConstructorList()) {

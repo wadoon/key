@@ -29,7 +29,6 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.metaconstruct.AddCast;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
 import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.EnhancedForInvRule;
 import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
@@ -62,6 +61,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.keyabs.rule.metaconstruct.GetThisReference;
 import de.uka.ilkd.keyabs.rule.metaconstruct.MethodArgsToSeq;
 import de.uka.ilkd.keyabs.rule.metaconstruct.MethodInvoc2MethodLabel;
+import de.uka.ilkd.keyabs.rule.metaconstruct.Retrieve;
 
 
 /**
@@ -150,7 +150,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer ABS_BOOL_TO_FML =
             new ABSBool2Fml();
 
-
+    public static final AbstractTermTransformer ABS_RETRIEVE = new Retrieve();
+    
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
     protected static final JavaDLTermBuilder TB = JavaProfile.DF();
     

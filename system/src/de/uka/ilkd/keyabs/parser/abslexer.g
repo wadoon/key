@@ -107,6 +107,8 @@ tokens {
         FORALL = "\\forall";
         EXISTS = "\\exists";
         SUBST  = "\\subst";
+        LET    = "\\let";
+        IN     = "\\in";
 	IF   = "\\if";
 	IFEX   = "\\ifEx";
 	THEN = "\\then";

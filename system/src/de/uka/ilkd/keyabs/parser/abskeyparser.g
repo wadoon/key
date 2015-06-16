@@ -945,7 +945,9 @@ options {
 	        }
 	        result = new NullSort(objectSort);
 	        sorts().add(result);
-	    } else {
+	    } else if (name.equals("$FORMULA")) {
+            result = Sort.FORMULA;
+        } else {
   	    	result = (Sort) sorts().lookup(new Name("Abs.StdLib."+name));
   	    }
 	}
@@ -2552,7 +2554,7 @@ quantifierterm returns [Term a = null]
 {
     Operator op = null;
     ImmutableList<QuantifiableVariable> vs = null;
-    Term a1 = null;
+    Term a1, a2 = null;
     Namespace orig = variables();  
 }
 :
@@ -2567,6 +2569,23 @@ quantifierterm returns [Term a = null]
             if(!isGlobalDeclTermParser())
               unbindVars(orig);
         }
+    |
+      (LET vs=bound_variables a1=term (IN a2=term60)? 
+        {
+            if (a2 == null) {
+                op = lookupVarfuncId("letInForS", null);
+            } else {
+                op = lookupVarfuncId("letInFor", null);
+            }
+            a = tf.createTerm(op,
+                              new ImmutableArray<Term>(a1, a2),
+	       		      new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()])),
+	       		      null);
+            if(!isGlobalDeclTermParser())
+              unbindVars(orig);
+        }
+       )
+
 ;
 
 //term120_2
