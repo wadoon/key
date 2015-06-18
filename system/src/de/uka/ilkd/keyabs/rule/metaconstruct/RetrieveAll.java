@@ -12,13 +12,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
 
-public class Retrieve extends AbstractTermTransformer {
-	
-	
-	public Retrieve() {
-		super(new Name("#retrieve"), 1);
-	}
 
+public class RetrieveAll extends AbstractTermTransformer  {
+
+	public RetrieveAll() {
+		super(new Name("#retrieveAll"), 1);
+	}
+	
+	
 	@Override
 	public Term transform(Term term, SVInstantiations svInst, IServices services) {
 		final Term retrieveTerm = term.sub(0);
@@ -31,7 +32,7 @@ public class Retrieve extends AbstractTermTransformer {
 		
 		SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
 
-		Term result = retrieve((ABSServices) services, eventSequence, eventType, another,
+		Term result = retrieveAll((ABSServices) services, eventSequence, eventType, another,
 				future, methodLabel, methodArguments, seqLDT);
 
 		if (result == null) {
@@ -39,51 +40,54 @@ public class Retrieve extends AbstractTermTransformer {
 		}
 		return result; 
 	}
-
-	private Term retrieve(ABSServices services, final Term eventSequence,
+	
+	
+	private Term retrieveAll(ABSServices services, final Term eventSequence,
 			final Term eventType, final Term another, final Term future,
 			final Term methodLabel, final Term methodArguments, SeqLDT ldt) {
 		TermBuilder<ABSServices> tb = services.getTermBuilder();
 		final Term zero = tb.zero(services);
-		final Term minusOne = tb.zTerm(services, "-1");
+		final Term emptySequence = tb.seqEmpty(services);
 		
 		Term result = null;
 		
 		if (eventSequence.op() == ldt.getSeqEmpty()) { // base case: the history is empty
-			result = minusOne; // retrieve returns -1
+			result = emptySequence; // retrieveAll returns an empty sequence
 		} else if (eventSequence.op() == ldt.getSeqSingleton()) { // history contains only one element
 			Boolean checkResult = check(eventSequence.sub(0), eventType, another, future, 
 					methodLabel, methodArguments, services);
 			if (checkResult == null) {
 				return null;
 			} else if (checkResult.booleanValue()) { // the only element contained in the sequence satisfies the matching criteria
-				result = zero; // retrieve function returns a sequence which contains an element 0, because the only element contained in the sequence is at index 0
+				result = tb.seqConcat(services, emptySequence, zero); // retrieveAll function returns a sequence which contains an element 0, because the only element contained in the sequence is at index 0
 			} else { // the only element contained in the sequence does not satisfy the matching criteria
-				result = minusOne; // so the retrieve function returns -1
+				result = emptySequence;  // so the retrieveAll function returns an empty sequence
 			}
 		} else if (eventSequence.op() == ldt.getSeqConcat()) { // history contains more than one elements
-			result = retrieve(services, eventSequence.sub(1), eventType, another,
+			result = retrieveAll(services, eventSequence.sub(1), eventType, another,
 					future, methodLabel, methodArguments, ldt);
 			if (result == null) {
 				return result;
-			} else if (result.equals(minusOne)) { // the last element in the history does not satisfies the matching criteria
-				result = retrieve(services, eventSequence.sub(0), eventType, another,
-						future, methodLabel, methodArguments, ldt); // invoke retrieve function on the prefix history
+			} else if (result.equals(emptySequence)) { // the last element in the history does not satisfies the matching criteria
+				result = retrieveAll(services, eventSequence.sub(0), eventType, another, 
+						future, methodLabel, methodArguments, ldt); // invoke retrieveAll function on the prefix history
 			} else { // the last element in the history satisfies the matching criteria
-				result = tb.add(services, 
-							tb.seqLen(services, 
-								eventSequence.sub(0)), result); 
+				result = tb.seqConcat(services, retrieveAll(services, eventSequence.sub(0), eventType, another, future, methodLabel, methodArguments, ldt), 
+							tb.add(services, 
+									tb.seqLen(services, 
+											eventSequence.sub(0)), result));  
 			}
 		} 
 		return result;
 	}
-
+	
+	
 	private Boolean check(Term eventLabel, Term eventType, Term another,
-			Term future, Term methodLabel, Term methodArguments, IServices services) {		
+			Term future, Term methodLabel, Term methodArguments, IServices services) {			
 		HistoryLDT hLDT = ((ABSServices)services).getTypeConverter().getHistoryLDT();
 		Operator eventLabelOp = eventLabel.op();
 		
-		if (hLDT.getEventTypeOf(eventLabelOp) == eventType.op()) {
+		if (hLDT.getEventTypeOf(eventLabelOp) == eventType.op()) { 
 			if (another.equalsModRenaming(eventLabel.sub(1))) { // TODO: since not all the event contains the OID of an object which the current object is communicating with, we need to distinguish the cases for different kinds of events
 				if (future.equalsModRenaming(eventLabel.sub(2))) {
 					if (methodLabel.equalsModRenaming(eventLabel.sub(3))) { // TODO: since not all the event contains a method name, we need to distinguish the cases for different kinds of events

@@ -62,7 +62,7 @@ import de.uka.ilkd.keyabs.rule.metaconstruct.GetThisReference;
 import de.uka.ilkd.keyabs.rule.metaconstruct.MethodArgsToSeq;
 import de.uka.ilkd.keyabs.rule.metaconstruct.MethodInvoc2MethodLabel;
 import de.uka.ilkd.keyabs.rule.metaconstruct.Retrieve;
-
+import de.uka.ilkd.keyabs.rule.metaconstruct.RetrieveAll;
 
 /**
  * Abstract class factoring out commonalities of typcial term transformer implementations. 
@@ -151,6 +151,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
             new ABSBool2Fml();
 
     public static final AbstractTermTransformer ABS_RETRIEVE = new Retrieve();
+    
+    public static final AbstractTermTransformer ABS_RETRIEVEALL = new RetrieveAll();
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
     protected static final JavaDLTermBuilder TB = JavaProfile.DF();

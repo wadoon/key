@@ -23,12 +23,17 @@ public class HistoryLDT extends LDT {
     private final Sort futureSort;
     private final LocationVariable history;
     private final Function wellFormed;
-    private final Function invocationReactionEvent;
     private final Function invocationEvent;
+    private final Function invocationReactionEvent;
+    private final Function completionEvent;
+    private final Function completionReactionEvent;
 
+    
     // the event types
-    private final Function eventTypeIREV;
     private final Function eventTypeIEV;
+    private final Function eventTypeIREV;
+    private final Function eventTypeCEV;
+    private final Function eventTypeCREV;
     
     public HistoryLDT(IServices services) {
         super(new Name("Seq"), services);
@@ -44,11 +49,17 @@ public class HistoryLDT extends LDT {
 
         history                 = (LocationVariable) services.getNamespaces().programVariables().lookup("history");
         wellFormed              = addFunction((Function) services.getNamespaces().functions().lookup("wfHist"));
-        invocationReactionEvent = addFunction((Function) services.getNamespaces().functions().lookup("invocREv"));
+        
         invocationEvent = addFunction((Function) services.getNamespaces().functions().lookup("invocEv"));
+        invocationReactionEvent = addFunction((Function) services.getNamespaces().functions().lookup("invocREv"));
+        completionEvent = addFunction((Function) services.getNamespaces().functions().lookup("compEv"));
+        completionReactionEvent = addFunction((Function) services.getNamespaces().functions().lookup("compREv"));
 
-        eventTypeIREV = addFunction((Function) services.getNamespaces().functions().lookup("iREv"));
+        
         eventTypeIEV = addFunction((Function) services.getNamespaces().functions().lookup("iEv"));
+        eventTypeIREV = addFunction((Function) services.getNamespaces().functions().lookup("iREv"));
+        eventTypeCEV = addFunction((Function) services.getNamespaces().functions().lookup("cEv"));
+        eventTypeCREV = addFunction((Function) services.getNamespaces().functions().lookup("cREv"));
         
     }
 
@@ -124,29 +135,49 @@ public class HistoryLDT extends LDT {
         return wellFormed;
     }
 
+    public Function getInvocationEvent() {
+        return invocationEvent;
+    }
+    
     public Function getInvocationReactionEvent() {
         return invocationReactionEvent;
     }
 
-    public Function getInvocationEvent() {
-        return invocationEvent;
+    public Function getCompletionEvent() {
+        return completionEvent;
     }
-
-    public Function getEventTypeForInvocationReactionEvent() {
-    	return eventTypeIREV;
+    
+    public Function getCompletionReactionEvent() {
+        return completionReactionEvent;
     }
 
     public Function getEventTypeForInvocationEvent() {
     	return eventTypeIEV;
     }
+    
+    public Function getEventTypeForInvocationReactionEvent() {
+    	return eventTypeIREV;
+    }
+    
+    public Function getEventTypeForCompletionEvent() {
+    	return eventTypeCEV;
+    }
+    
+    public Function getEventTypeForCompletionReactionEvent() {
+    	return eventTypeCREV;
+    }
 
 	public Function getEventTypeOf(de.uka.ilkd.key.logic.op.Operator eventLabelOp) {
 		Function result = null;
-		if (eventLabelOp == invocationReactionEvent) {
-			result = eventTypeIREV;
-		} else if (eventLabelOp == invocationEvent) {
+		if (eventLabelOp == invocationEvent) {
 			result = eventTypeIEV;
-		} // TODO: else if (eventLabelOp == completion...
+		} else if (eventLabelOp == invocationReactionEvent) {
+			result = eventTypeIREV;
+		} else if (eventLabelOp == completionEvent) {
+			result = eventTypeCEV;
+		} else if (eventLabelOp == completionReactionEvent) {
+			result = eventTypeCREV;
+		}
 		return result;
 	}
 }
