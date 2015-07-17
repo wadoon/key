@@ -49,7 +49,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate.RootBranch;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
@@ -123,6 +122,7 @@ public class IntermediateProofReplayer {
      * the "skipBranch - 1" parent branch of the current branch is ignored. a
      * value == 0 means that no branch is ignored
      */
+    @SuppressWarnings("unused")
     private int skipBranch = 0;
     // TODO: Implement skipBranch feature.
     // TODO: Could be that this is not needed: If an exception occurs, the
@@ -141,12 +141,12 @@ public class IntermediateProofReplayer {
      * @param intermediate
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
-            IntermediatePresentationProofFileParser parser) {
+            IntermediatePresentationProofFileParser.Result parserResult) {
         this.proof = proof;
         this.loader = loader;
 
-        queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(), parser
-                .getParsedResult()));
+        queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(),
+                parserResult.getParsedResult()));
     }
 
     /**
@@ -161,12 +161,7 @@ public class IntermediateProofReplayer {
      * proof object; the last selected goal may be obtained by
      * {@link #getLastSelectedGoal()}.
      */
-    public void replay() {
-        
-        final int totalNrRuleApps = ((RootBranch) queue.getFirst().second).getNrAppNodes();
-        int processedNrRuleApps = 0;
-        float lastDisplayedRatio = 0f;
-        
+    public Result replay() {
         while (!queue.isEmpty()) {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
@@ -182,18 +177,6 @@ public class IntermediateProofReplayer {
                 continue;
             }
             else if (currNodeInterm instanceof AppNodeIntermediate) {
-                
-                // Display a progress information
-                final float processedRatio = ((float) processedNrRuleApps) / ((float) totalNrRuleApps);
-                if (processedRatio >= lastDisplayedRatio + 0.1f) {
-                    lastDisplayedRatio = processedRatio;
-                    System.out.format("Replayed %2.1f%% of the loaded proof (%d / %d applications)\n",
-                            processedRatio * 100f,
-                            processedNrRuleApps,
-                            totalNrRuleApps);
-                }
-                processedNrRuleApps++;
-                
                 AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
                 currNode.getNodeInfo().setInteractiveRuleApplication(
                         currInterm.isInteractiveRuleApplication());
@@ -212,22 +195,11 @@ public class IntermediateProofReplayer {
                     try {
                         currGoal.apply(constructTacletApp(appInterm, currGoal));
 
-                        int i = 0;
                         Iterator<Node> children = currNode.childrenIterator();
-                        while (!currGoal.node().isClosed()
-                                && children.hasNext()
-                                && currInterm.getChildren().size() > 0) {
+                        LinkedList<NodeIntermediate> intermChildren = currInterm
+                                .getChildren();
 
-                            // NOTE: In the case of an unfinished proof, there
-                            // is another node after the last application which
-                            // is not represented by an intermediate
-                            // application. Therefore, we have to add the last
-                            // check in the above conjunction.
-
-                            Node child = children.next();
-                            queue.addLast(new Pair<Node, NodeIntermediate>(
-                                    child, currInterm.getChildren().get(i++)));
-                        }
+                        addChildren(children, intermChildren);
                     }
                     catch (Exception e) {
                         skipBranch = 1;
@@ -257,14 +229,15 @@ public class IntermediateProofReplayer {
                         if (partnerNodesInfo == null
                                 || partnerNodesInfo.size() < joinAppInterm
                                         .getNrPartners()) {
-                            // Wait until all partners are found
+                            // Wait until all partners are found: Add node
+                            // at the end of the queue. NOTE: DO NOT CHANGE
+                            // THIS to adding the node to the front! This will
+                            // result in non-termination!
                             queue.addLast(new Pair<Node, NodeIntermediate>(
                                     currNode, currNodeInterm));
                         }
                         else {
                             try {
-                                // TODO: Check if this works with the
-                                // constructBuiltinApp method out-of-the-box
                                 JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) constructBuiltinApp(
                                         joinAppInterm, currGoal);
                                 joinApp.setConcreteRule(JoinProcedure
@@ -287,35 +260,37 @@ public class IntermediateProofReplayer {
 
                                 currGoal.apply(joinApp);
 
-                                // Join node has exactly one child
-                                queue.addLast(new Pair<Node, NodeIntermediate>(
-                                        currNode.childrenIterator().next(),
-                                        currInterm.getChildren().get(0)));
+                                // Join node has exactly one child in a closed proof, and
+                                // zero or one children in an open proof.
+                                if (currInterm.getChildren().size() > 0) {
+                                    queue.addFirst(new Pair<Node, NodeIntermediate>(
+                                            currNode.childrenIterator().next(),
+                                            currInterm.getChildren().get(0)));
+                                }
 
                                 // Now add children of partner nodes
                                 for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
-                                    int i = 0;
                                     Iterator<Node> children = partnerNodeInfo.first
                                             .childrenIterator();
-                                    while (children.hasNext()) {
-                                        Node child = children.next();
-                                        if (!proof.getGoal(child).isLinked()) {
-                                            queue.addLast(new Pair<Node, NodeIntermediate>(
-                                                    child,
-                                                    partnerNodeInfo.third
-                                                            .getChildren().get(
-                                                                    i++)));
-                                        }
-                                    }
+                                    LinkedList<NodeIntermediate> intermChildren = partnerNodeInfo.third
+                                            .getChildren();
+
+                                    addChildren(children, intermChildren);
                                 }
                             }
                             catch (SkipSMTRuleException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
+                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                        + appInterm.getLineNr() + ", goal "
+                                        + currGoal.node().serialNr() + ", rule "
+                                        + appInterm.getRuleName() + NOT_APPLICABLE,
+                                        e);
                             }
                             catch (BuiltInConstructionException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
+                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                        + appInterm.getLineNr() + ", goal "
+                                        + currGoal.node().serialNr() + ", rule "
+                                        + appInterm.getRuleName() + NOT_APPLICABLE,
+                                        e);
                             }
                         }
                     }
@@ -350,15 +325,12 @@ public class IntermediateProofReplayer {
                             }
                             currGoal.apply(app);
 
-                            int i = 0;
                             Iterator<Node> children = currNode
                                     .childrenIterator();
-                            while (children.hasNext()) {
-                                Node child = children.next();
-                                queue.addLast(new Pair<Node, NodeIntermediate>(
-                                        child, currInterm.getChildren()
-                                                .get(i++)));
-                            }
+                            LinkedList<NodeIntermediate> intermChildren = currInterm
+                                    .getChildren();
+
+                            addChildren(children, intermChildren);
                         }
                         catch (SkipSMTRuleException e) {
                             // silently continue; status will be reported via
@@ -392,11 +364,41 @@ public class IntermediateProofReplayer {
                 }
             }
         }
-        
-        System.out.format("Replayed %2.1f%% of the loaded proof (%d / %d applications)\n",
-                100f,
-                processedNrRuleApps,
-                totalNrRuleApps);
+
+        return new Result(status, errors, currGoal);
+    }
+
+    /**
+     * Adds the pairs of proof node children and intermediate children to the
+     * queue. At the moment, they are added in the order they were parsed. For
+     * the future, it may be sensible to choose a different procedure, for
+     * instance one that minimizes the number of open goals per time interval to
+     * save memory. Note that in this case, some test cases might be adapted
+     * which depend on fixed node serial numbers.
+     *
+     * @param children
+     *            Iterator of proof node children.
+     * @param intermChildren
+     *            List of corresponding intermediate children.
+     */
+    private void addChildren(Iterator<Node> children,
+            LinkedList<NodeIntermediate> intermChildren) {
+        int i = 0;
+        while (!currGoal.node().isClosed() && children.hasNext()
+                && intermChildren.size() > 0) {
+
+            // NOTE: In the case of an unfinished proof, there
+            // is another node after the last application which
+            // is not represented by an intermediate
+            // application. Therefore, we have to add the last
+            // check in the above conjunction.
+
+            Node child = children.next();
+            if (!proof.getGoal(child).isLinked()) {
+                queue.add(i, new Pair<Node, NodeIntermediate>(child,
+                        intermChildren.get(i++)));
+            }
+        }
     }
 
     /**
@@ -425,7 +427,8 @@ public class IntermediateProofReplayer {
      *            The goal on which to apply the taclet app.
      * @return The taclet application corresponding to the supplied intermediate
      *         representation.
-     * @throws TacletConstructionException In case of an error during construction.
+     * @throws TacletConstructionException
+     *             In case of an error during construction.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
             Goal currGoal) throws TacletConstructionException {
@@ -453,8 +456,10 @@ public class IntermediateProofReplayer {
                         currFormula, currPosInTerm);
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
-            } catch (Exception e) {
-                throw new TacletConstructionException("Wrong position information.");
+            }
+            catch (Exception e) {
+                throw new TacletConstructionException(
+                        "Wrong position information.");
             }
         }
 
@@ -473,6 +478,9 @@ public class IntermediateProofReplayer {
                     new SequentFormula(parseTerm(ifFormulaStr, proof))));
         }
 
+        //TODO: In certain cases, the below method call returns null and
+        // induces follow-up NullPointerExceptions. This was encountered
+        // in a proof of the TimSort method binarySort with several joins.
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
 
         if (!ourApp.complete()) {
@@ -595,7 +603,8 @@ public class IntermediateProofReplayer {
                         currFormula, currPosInTerm);
             }
             catch (RuntimeException e) {
-                throw new BuiltInConstructionException("Wrong position information.", e);
+                throw new BuiltInConstructionException(
+                        "Wrong position information.", e);
             }
         }
 
@@ -912,7 +921,7 @@ public class IntermediateProofReplayer {
         BuiltInConstructionException(Throwable cause) {
             super(cause);
         }
-        
+
         public BuiltInConstructionException(String s, Throwable cause) {
             super(s, cause);
         }
@@ -924,5 +933,35 @@ public class IntermediateProofReplayer {
      */
     static class SkipSMTRuleException extends Exception {
         private static final long serialVersionUID = -2932282883810135168L;
+    }
+
+    /**
+     * Simple structure containing the results of the replay procedure.
+     *
+     * @author Dominic Scheurer
+     */
+    static class Result {
+        private String status;
+        private List<Throwable> errors;
+        private Goal lastSelectedGoal = null;
+
+        public Result(String status, List<Throwable> errors,
+                Goal lastSelectedGoal) {
+            this.status = status;
+            this.errors = errors;
+            this.lastSelectedGoal = lastSelectedGoal;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public List<Throwable> getErrors() {
+            return errors;
+        }
+
+        public Goal getLastSelectedGoal() {
+            return lastSelectedGoal;
+        }
     }
 }

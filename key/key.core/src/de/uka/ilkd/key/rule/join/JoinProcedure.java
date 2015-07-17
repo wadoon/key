@@ -7,7 +7,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
@@ -42,10 +41,10 @@ public abstract class JoinProcedure {
     
     static {
         CONCRETE_RULES = ImmutableSLList.<JoinProcedure>nil()
-                .append(JoinIfThenElse.instance())
-                .append(JoinIfThenElseAntecedent.instance())
-                .append(JoinWithSignLattice.instance())
-                .append(JoinWeaken.instance());
+                .prepend(JoinWeaken.instance())
+                .prepend(JoinWithSignLattice.instance())
+                .prepend(JoinIfThenElseAntecedent.instance())
+                .prepend(JoinIfThenElse.instance());
     }
 
     /**
@@ -68,10 +67,18 @@ public abstract class JoinProcedure {
      *  consisting of new constraints, the actual value and new names introduced.
      */
     public abstract Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            LocationVariable v, SymbolicExecutionState state1,
+            Term v, SymbolicExecutionState state1,
             Term valueInState1, SymbolicExecutionState state2,
             Term valueInState2, Services services);
 
+    /**
+     * @return true iff the join procedure requires distinguishable path
+     *         conditions. This is usually the case for procedures working with
+     *         concrete values of input states, and can be false for abstraction
+     *         methods.
+     */
+    public abstract boolean requiresDistinguishablePathConditions();
+    
     /**
      * Returns the join procedure for the given name.
      *

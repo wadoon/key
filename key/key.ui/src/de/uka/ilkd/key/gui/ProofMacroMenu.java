@@ -14,6 +14,8 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.swing.JMenu;
@@ -23,9 +25,11 @@ import javax.swing.KeyStroke;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * This class provides the user interface to the macro extensions.
@@ -80,11 +84,47 @@ public class ProofMacroMenu extends JMenu {
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy macros");
 
+        // Macros are group according to their category.
+        // Store the submenus in this map.
+        Map<String, JMenu> submenus = new HashMap<>();
+        
         int count = 0;
+        Node node = mediator.getSelectedNode();
         for (ProofMacro macro : loader) {
-            if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
+                
+            boolean applicable;
+            if(node == null) {
+                applicable = macro.isApplicableWithoutPosition();
+            } else {
+                applicable = macro.canApplyTo(node, posInOcc);
+            }
+
+                    // NOTE (DS): At the moment, JoinRule is an experimental
+                    // feature. We therefore only add join-related macros
+                    // if the feature is currently active.
+                    // TODO (DS): Remove below check related to the exp. \\
+            // feature once JoinRule is considered stable.
+            if (!JoinRuleMenuItem.FEATURE.active()
+                    && macro.getName().contains("join")) {
+                applicable = false;
+                }
+                
+            if(applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
-                add(menuItem);
+
+                String category = macro.getCategory();
+                JMenu submenu = this;
+                if(category != null) {
+                    // find the submenu to be used. Create and store if necessary.
+                    submenu = submenus.get(category);
+                    if(submenu == null) {
+                        submenu = new JMenu(category);
+                        submenus.put(category, submenu);
+                        add(submenu);
+            }
+        }
+        
+                submenu.add(menuItem);
                 count++;
             }
         }
@@ -102,20 +142,8 @@ public class ProofMacroMenu extends JMenu {
      *
      * @param mediator the mediator of the current proof.
      */
-    ProofMacroMenu(KeYMediator mediator) {
-        super("Strategy macros");
-
-        int count = 0;
-        for (ProofMacro macro : loader) {
-            if (macro.isApplicableWithoutPosition()) {
-                JMenuItem menuItem = createMenuItem(macro, mediator, null);
-                add(menuItem);
-                count++;
-            }
-        }
-
-        mediator.enableWhenProofLoaded(this);
-        this.numberOfMacros = count;
+    public ProofMacroMenu(KeYMediator mediator) {
+        this(mediator, null);
     }
 
     private JMenuItem createMenuItem(final ProofMacro macro,
@@ -132,7 +160,9 @@ public class ProofMacroMenu extends JMenu {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (mediator.isInAutoMode()) return;
+                if (mediator.isInAutoMode()) {
+                    return;
+                }
                 final ProofMacroWorker worker = new ProofMacroWorker(macro, mediator, posInOcc);
                 mediator.stopInterface(true);
                 mediator.setInteractive(false);
