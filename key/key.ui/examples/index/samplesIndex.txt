@@ -1,6 +1,8 @@
 #
 # List most important files first!
 #
+concurrent/primer/README.txt
+concurrent/inc/README.txt
 
 standard_key/prop_log/contraposition.txt
 standard_key/prop_log/liarsville.txt
