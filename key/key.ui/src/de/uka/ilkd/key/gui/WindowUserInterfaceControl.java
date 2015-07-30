@@ -44,6 +44,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -94,9 +95,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
+        completions.add(JoinRuleCompletion.INSTANCE);
     }
 
-    protected MediatorProofControl createProofControl() {
+    @Override
+   protected MediatorProofControl createProofControl() {
        return new MediatorProofControl(this) {
           /**
            * {@inheritDoc}
@@ -105,7 +108,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
           public boolean isAutoModeSupported(Proof proof) {
              return super.isAutoModeSupported(proof) &&
                     mainWindow.getProofList().containsProof(proof);
-          }          
+          }
        };
     }
     
@@ -410,12 +413,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       ThreadUtilities.invokeAndWait(new Runnable() {
          @Override
          public void run() {
-            mainWindow.getProofList().removeProof(e.getSource());
+            mainWindow.getProofList().removeProof(e.getSource());            
          }
       });
-      // Run the garbage collector.
-      Runtime r = Runtime.getRuntime();
-      r.gc();
     }
 
    @Override
@@ -442,24 +442,26 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       if (proofList != null) {
          getMediator().setProof(loader.getProof());
          if (result != null) {
-            getMediator().getSelectionModel().setSelectedNode(result.getNode());
+             if ("".equals(result.getStatus())) {
+                 this.resetStatus(this);
+              } else {
+                 this.reportStatus(this, result.getStatus());                         
+              }
+             getMediator().getSelectionModel().setSelectedNode(result.getNode());
+             if (result.hasErrors()) {
+                 throw new ProblemLoaderException(loader,
+                       "Proof could only be loaded partially.\n" +
+                             "In summary " + result.getErrorList().size() +
+                             " not loadable rule application(s) have been detected.\n" +
+                             "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
+             }
          } else {
             // should never happen as replay always returns a result object
+             //TODO (DS): Why is it then there? If this happens, we will get\\
+             // a NullPointerException just a line below...
             getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
          }
 
-         if ("".equals(result.getStatus())) {
-            this.resetStatus(this);
-         } else {
-            this.reportStatus(this, result.getStatus());                         
-         }
-         if (result.hasErrors()) {
-            throw new ProblemLoaderException(loader,
-                  "Proof could only be loaded partially.\n" +
-                        "In summary " + result.getErrorList().size() +
-                        " not loadable rule application(s) have been detected.\n" +
-                        "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
-         }
       }
         getMediator().resetNrGoalsClosedByHeuristics();
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
@@ -551,6 +553,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      //ok button
      final JButton button = new JButton("OK");
      button.addActionListener(new ActionListener() {
+         @Override
          public void actionPerformed(ActionEvent e) {
              dialog.setVisible(false);
          }
@@ -565,7 +568,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      
      button.registerKeyboardAction(
          new ActionListener() {
-             public void actionPerformed(ActionEvent event) {
+             @Override
+            public void actionPerformed(ActionEvent event) {
                  if(event.getActionCommand().equals("ESC")) {
                      button.doClick();
                  }
