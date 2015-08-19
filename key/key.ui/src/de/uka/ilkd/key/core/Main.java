@@ -15,7 +15,9 @@ package de.uka.ilkd.key.core;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.key_project.util.java.IOUtil;
@@ -27,6 +29,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -45,6 +48,9 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
 import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.UnicodeHelper;
+import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
 /**
  * The main entry point for KeY
@@ -67,10 +73,10 @@ public final class Main {
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     private static final String TACLET_DIR = "--tacletDir";
     public static final String JUSTIFY_RULES ="--justify-rules";
-    private static final String PRINT_STATISTICS ="--print-statistics";
     private static final String SAVE_ALL_CONTRACTS = "--save-all";
     private static final String TIMEOUT ="--timeout";
     private static final String EXAMPLES = "--examples";
+    private static final String RIFL = "--rifl";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
 //    deprecated
@@ -108,8 +114,6 @@ public final class Main {
     /** Level of verbosity for command line outputs. */
     private static byte verbosity = Verbosity.NORMAL;
 
-    private static String statisticsFile = null;
-
     private static String examplesDir = null;
 
     /**
@@ -143,12 +147,17 @@ public final class Main {
      */
     private static List<File> fileArguments;
 
-    /** Lists all features currently marked as experimental.
-     * Unless invoked with command line option --experimental ,
-     * those will be deactivated.
+    /**
+     * Lists all features currently marked as experimental. Unless invoked with
+     * command line option --experimental , those will be deactivated.
      */
-    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
-        {JoinMenuItem.FEATURE};
+    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES = {
+            JoinMenuItem.FEATURE, JoinRuleMenuItem.FEATURE };
+
+    /**
+     * Path to a RIFL specification file.
+     */
+    private static String riflFileName = null;
 
     /**
      * Save all contracts in selected location to automate the creation
@@ -187,6 +196,7 @@ public final class Main {
             evaluateOptions(cl);
             fileArguments = cl.getFileArguments();
             AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
+            fileArguments = preProcessInput(fileArguments);
             loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
             System.err.println("D'oh! It seems that KeY was not built properly!");
@@ -242,8 +252,8 @@ public final class Main {
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
+        cl.addOption(RIFL, "<filename>", "load RIFL specifications from file (requires GUI and startup file)");
         cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
-        cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
         cl.addOption(SAVE_ALL_CONTRACTS, null, "save all selected contracts for automatic execution");
         cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
@@ -325,10 +335,6 @@ public final class Main {
             GeneralSettings.disableSpecs = true;
         }
 
-        if(cl.isSet(PRINT_STATISTICS)){
-            statisticsFile = cl.getString(PRINT_STATISTICS, null);
-        }
-
         if(cl.isSet(TIMEOUT)){
             if (verbosity >= Verbosity.HIGH) {
             System.out.println("Timeout is set");
@@ -369,12 +375,20 @@ public final class Main {
         }
         }
 
-        if(cl.isSet(EXPERIMENTAL)){
+        if (cl.isSet(EXPERIMENTAL)) {
             if (verbosity > Verbosity.SILENT) {
             System.out.println("Running in experimental mode ...");
             }
+            setEnabledExperimentalFeatures(true);
         } else {
-            deactivateExperimentalFeatures();
+            setEnabledExperimentalFeatures(false);
+        }
+
+        if (cl.isSet(RIFL)) {
+            riflFileName = cl.getString(RIFL, null);
+            if (verbosity > Verbosity.SILENT) {
+                System.out.println("[RIFL] Loading RIFL specification from "+riflFileName+ " ...");
+            }
         }
 
         if(cl.isSet(LAST)){
@@ -423,9 +437,15 @@ public final class Main {
     }
 
     /** Deactivate experimental features. */
-    private static void deactivateExperimentalFeatures () {
+    public static void setEnabledExperimentalFeatures (boolean state) {
+        if(state) {
+            for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
+                feature.activate();
+            }
+        } else {
         for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
             feature.deactivate();
+    }
     }
     }
 
@@ -570,6 +590,36 @@ public final class Main {
         }
     }
 
+    /**
+     * Perform necessary actions before loading any problem files.
+     * Currently only performs RIFL to JML transformation.
+     */
+    private static List<File> preProcessInput (List<File> filesOnStartup) {
+        List<File> result = new ArrayList<File>();
+        // RIFL to JML transformation
+        if (riflFileName != null) {
+            if (filesOnStartup.isEmpty()) {
+                System.out.println("[RIFL] No Java file to load from.");
+                System.exit (-130826);
+            }
+            // only use one input file
+            String fileNameOnStartUp = null;
+			try {
+				fileNameOnStartUp = filesOnStartup.get(0).getCanonicalPath();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
+            RIFLTransformer.transform(riflFileName, fileNameOnStartUp);
+            fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
+            if (verbosity > Verbosity.SILENT)
+                System.out.println("[RIFL] Writing transformed Java files to "+fileNameOnStartUp+" ...");
+            result.add(new File(fileNameOnStartUp));
+        }
+        return result;
+    }
+
     public static String getExamplesDir() {
         return examplesDir;
     }
@@ -582,13 +632,6 @@ public final class Main {
      */
     public static void setExamplesDir(String newExamplesDir) {
         examplesDir = newExamplesDir;
-    }
-
-    /**
-     * @return the statisticsFile
-     */
-    public static String getStatisticsFile() {
-        return statisticsFile;
     }
 
     /**

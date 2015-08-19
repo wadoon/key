@@ -61,6 +61,8 @@ import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 public class HelperClassForTests {
    public static final String TESTCASE_DIRECTORY;
    
+   public static final File DUMMY_KEY_FILE;
+   
    static {
       File projectRoot = IOUtil.getProjectRoot(HelperClassForTests.class);
       // Update path in Eclipse Plug-ins executed as JUnit Test.
@@ -74,12 +76,14 @@ public class HelperClassForTests {
          projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
       }
       TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+ File.separator + "testcase";
+      DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY + File.separator + "dummyTrue.key");
    }
 
     
     private static final Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
-	    public RuleCollection getStandardRules() {
+	    @Override
+      public RuleCollection getStandardRules() {
                 return new RuleCollection(
                                 RuleSourceFactory.fromDefaultLocation(ldtFile), 
                                 ImmutableSLList.<BuiltInRule>nil());
@@ -314,4 +318,19 @@ public class HelperClassForTests {
        Assert.assertNotNull(pm);
        return pm;
     }
+
+   public static Services createServices(File keyFile) {
+      JavaInfo javaInfo = new HelperClassForTests().parse(keyFile)
+            .getFirstProof().getJavaInfo();
+      return javaInfo.getServices();
+   }
+
+   public static Services createServices() {
+      return createServices(DUMMY_KEY_FILE);
+   }
+
+   public static KeYEnvironment<DefaultUserInterfaceControl> createKeYEnvironment() throws ProblemLoaderException {
+      return KeYEnvironment.load(DUMMY_KEY_FILE);
+   }
+   
 }

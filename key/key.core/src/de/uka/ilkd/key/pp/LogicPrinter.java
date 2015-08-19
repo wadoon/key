@@ -984,7 +984,7 @@ public class LogicPrinter {
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
         if (notationInfo.isPrettySyntax()
-                && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT())
+                && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT(), services)
                 && getNotationInfo().isHidePackagePrefix()) {
             // Hide package prefix when printing field constants.
             startTerm(0);
@@ -1223,7 +1223,7 @@ public class LogicPrinter {
                     Term object = t.sub(1);
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
                     if (obs.isStatic()
-                            || javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType)) {
+                            || ((obs instanceof IProgramMethod) && javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType))) {
                         layouter.print(fieldName);
                     } else {
                         layouter.print("(" + t.op() + ")");

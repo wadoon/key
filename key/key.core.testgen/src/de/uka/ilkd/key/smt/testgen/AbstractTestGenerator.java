@@ -71,6 +71,8 @@ public abstract class AbstractTestGenerator {
 
    public void generateTestCases(final StopRequest stopRequest,
                                  final TestGenerationLog log) {
+	   
+	         
       TestGenerationSettings settings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
 
@@ -122,8 +124,7 @@ public abstract class AbstractTestGenerator {
              ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
              synchronized(macro) {
                           info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
-             }
-             
+             }           
            //  System.out.println("Proof after:"+proof.toString());
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {
@@ -233,10 +234,10 @@ public abstract class AbstractTestGenerator {
             Proof p = null;
             if (removeDuplicatePathConditions) {
                p = createProofForTesting_noDuplicate(oldGoalIter.next(),
-                     res);
+                     res, removePostCondition);
             } else {
                p = createProofForTesting_noDuplicate(oldGoalIter.next(),
-                     null);
+                     null, removePostCondition);
             }
             if (p != null) {
                res.add(p);
@@ -271,11 +272,12 @@ public abstract class AbstractTestGenerator {
     * proof is found in otherProofs than null will be returned instead.
     * 
     * @param node
-    * @param otherProofs
+ * @param otherProofs
+ * @param removePostCondition TODO
     * @return
     * @throws ProofInputException 
     */
-   private Proof createProofForTesting_noDuplicate(Node node, List<Proof> otherProofs) throws ProofInputException {
+   private Proof createProofForTesting_noDuplicate(Node node, List<Proof> otherProofs, boolean removePostCondition) throws ProofInputException {
       // System.out.println("Create proof for test case from Node:"+node.serialNr());
       final Proof oldProof = node.proof();
       final Sequent oldSequent = node.sequent();
@@ -284,7 +286,7 @@ public abstract class AbstractTestGenerator {
       Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
       while (it.hasNext()) {
          final SequentFormula sf = it.next();
-         // Allow modailities in the antecedent
+         // Allow updates modailities in the antecedent
          if (hasModalities(sf.formula(), false)) {
             continue;
          }
@@ -293,7 +295,7 @@ public abstract class AbstractTestGenerator {
       it = oldSequent.succedent().iterator();
       while (it.hasNext()) {
          final SequentFormula sf = it.next();
-         if (hasModalities(sf.formula(), true)) {
+         if (hasModalities(sf.formula(), removePostCondition)) {
             continue;
          }
          newSequent = newSequent.addFormula(sf, false, false).sequent();

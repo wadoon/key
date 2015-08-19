@@ -53,6 +53,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
@@ -215,6 +216,7 @@ public class JMLSpecFactory {
         public Term returns;
         public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
+        public JoinProcedure joinProcedure;
     }
 
     //-------------------------------------------------------------------------
@@ -474,6 +476,7 @@ public class JMLSpecFactory {
                 translateInfFlowSpecClauses(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar,
                                             textualSpecCase.getInfFlowSpecs());
+        clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;
     }
 
@@ -528,6 +531,24 @@ public class JMLSpecFactory {
             }
             return result;
         }
+    }
+    
+    private JoinProcedure translateJoinProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
+        if (originalClauses == null || originalClauses.size() == 0) {
+            return null;
+        }
+        
+        // Extract the name of the join procedure: Remove beginning "join_proc " and trailing ";".
+        String joinProcName = originalClauses.head().text.substring(10, originalClauses.head().text.length() - 1);
+        JoinProcedure chosenProc = JoinProcedure.getProcedureByName(joinProcName);
+        
+        if (chosenProc == null) {
+            throw new SLTranslationException("Unknown join procedure: \"" + joinProcName + "\"",
+                    originalClauses.head().fileName,
+                    originalClauses.head().pos);
+        }
+        
+        return chosenProc;
     }
         
     /**
@@ -1347,6 +1368,7 @@ public class JMLSpecFactory {
                                         final StatementBlock block,
                                         final TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
+        //TODO Take join_proc into account
         final Behavior behavior = specificationCase.getBehavior();
         final BlockContract.Variables variables =
                 BlockContract.Variables.create(block, labels, method, services);
@@ -1356,7 +1378,7 @@ public class JMLSpecFactory {
                 translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
             block, labels, method, behavior, variables, clauses.requires,
-            clauses.ensures, clauses.infFlowSpecs,
+            clauses.ensures, clauses.infFlowSpecs, clauses.joinProcedure,
             clauses.breaks, clauses.continues, clauses.returns, clauses.signals,
             clauses.signalsOnly, clauses.diverges, clauses.assignables,
             clauses.hasMod, services).create();

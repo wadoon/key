@@ -45,6 +45,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.DisplayableSpecificationElement;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
@@ -269,6 +271,11 @@ public abstract class AbstractProblemLoader {
                                       
                 // this message is propagated to the top level in console mode
                 return; // Everything fine
+            } catch (Throwable t) {
+                // Throw this exception; otherwise, it can for instance occur
+                // that "result" will be null (if replayProof(...) fails) and
+                // we get a NullPointerException that is hard to analyze.
+                throw t;
             }
             finally {
                control.loadingFinished(this, poContainer, proofList, result);
@@ -486,26 +493,54 @@ public abstract class AbstractProblemLoader {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
+        
+        IProofFileParser parser = null;
+        IntermediateProofReplayer replayer = null;
+        IntermediatePresentationProofFileParser.Result parserResult = null;
+        IntermediateProofReplayer.Result replayResult = null;
 
-        DefaultProofFileParser parser = null;
+        final boolean isOSSActivated =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+        ReplayResult result;
         try {
         	if (envInput instanceof KeYUserProblemFile) {
-        		parser = new DefaultProofFileParser(this, proof);
-        		problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-
-        		lastTouchedNode = parser.getLastSelectedGoal() != null ? parser.getLastSelectedGoal().node() : proof.root();       
+        	    
+                parser = new IntermediatePresentationProofFileParser(proof);
+                problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+                parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
+                
+                // For loading, we generally turn on one step simplification to be
+                // able to load proofs that used it even if the user has currently
+                // turned OSS off.
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+                OneStepSimplifier.refreshOSS(proof);
+                
+                replayer = new IntermediateProofReplayer(this, proof, parserResult);
+                replayResult = replayer.replay();
+                
+                lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
         	}
         } catch (Exception e) {
-        	if (parser == null || parser.getErrors() == null || parser.getErrors().isEmpty()) {
+        	if (parser == null || parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
+        	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
         		// this exception was something unexpected
         		errors.add(e);
         	}
         } finally {
-    		status = parser.getStatus();
-    		errors.addAll(parser.getErrors());
+            if (parserResult != null) {
+                status = parserResult.getStatus();
+                errors.addAll(parserResult.getErrors());
+            }
+            status += (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus() : "Error while loading proof.");
+            if (replayResult != null) {
+                errors.addAll(replayResult.getErrors());
+            }
+            
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
+            OneStepSimplifier.refreshOSS(proof);
+            result = new ReplayResult(status, errors, lastTouchedNode);
         }
         	
-        ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);
         
         return result;
     }
