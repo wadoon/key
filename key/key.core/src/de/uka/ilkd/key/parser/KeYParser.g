@@ -3761,6 +3761,7 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
+    | varcond_atomicOrFinal[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -4115,6 +4116,16 @@ varcond_atomic [TacletBuilder b, boolean negated]
    ATOMIC LPAREN x=varId RPAREN {
       b.addVariableCondition(new AtomicGhostReferenceCondition(
 	(SchemaVariable) x, negated));  
+   }
+;
+
+varcond_atomicOrFinal [TacletBuilder b]
+:
+   ATOMIC_OR_FINAL LPAREN x=varId RPAREN {
+       b.addVariableCondition(new AlternativeVariableCondition(
+           new AtomicGhostReferenceCondition((SchemaVariable) x, false),
+           new FinalReferenceCondition((SchemaVariable) x, false)
+           ));  
    }
 ;
 

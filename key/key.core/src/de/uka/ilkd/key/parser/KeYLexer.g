@@ -229,6 +229,7 @@ lexer grammar KeYLexer;
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
     ATOMIC	: '\\atomic';
+    ATOMIC_OR_FINAL	: '\\atomicOrFinal';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
