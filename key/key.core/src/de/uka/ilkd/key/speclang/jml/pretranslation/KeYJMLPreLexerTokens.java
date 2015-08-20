@@ -93,6 +93,7 @@ public class KeYJMLPreLexerTokens {
         names[KeYJMLPreParser.ASSUME_REDUNDANTLY] = "'assume_redundantly'";
         names[KeYJMLPreParser.ASSIGNABLE] = "'assignable'";
         names[KeYJMLPreParser.ASSIGNABLE_RED] = "'assignable_redundantly'";
+        names[KeYJMLPreParser.ATOMIC] = "'atomic'";
         names[KeYJMLPreParser.AXIOM] = "'axiom'";
         names[KeYJMLPreParser.BEHAVIOR] = "'behavior'";
         names[KeYJMLPreParser.BEHAVIOUR] = "'behaviour'";

@@ -268,9 +268,11 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         //ghost or model?
         boolean isGhost = false;
+        boolean isAtomic = false;
         boolean isModel = false;
         if(decl.getMods().contains("ghost")) {
             isGhost = true;
+            isAtomic = decl.getMods().contains("atomic");
         }
         if(decl.getMods().contains("model")) {
             isModel = true;
@@ -375,6 +377,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         if(mods == null) {
             mods = new ASTArrayList<DeclarationSpecifier>();
         }
+        if (isAtomic) mods.add(new Atomic());
         mods.add(isGhost ? new Ghost() : new Model());
         fieldDecl.setDeclarationSpecifiers(mods);
     }

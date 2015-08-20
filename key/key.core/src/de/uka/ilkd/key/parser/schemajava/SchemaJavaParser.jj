@@ -511,6 +511,7 @@ TOKEN :
 	  	  // TODO
 	  }
   }
+| < ATOMIC: "atomic" >
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
 | < BIGINT: "\\bigint" >

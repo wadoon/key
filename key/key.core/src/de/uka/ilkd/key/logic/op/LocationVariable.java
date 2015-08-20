@@ -25,7 +25,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public final class LocationVariable extends ProgramVariable
 			            implements UpdateableOperator {
-   
+
+    public LocationVariable(ProgramElementName name,
+                        KeYJavaType        t,
+                        KeYJavaType        containingType,
+                        boolean            isStatic,
+                        boolean            isModel,
+                        boolean isGhost, boolean isAtomic,
+                        boolean isFinal) {
+        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isAtomic, isFinal);
+    }
+    
     public LocationVariable(ProgramElementName name,
                         KeYJavaType        t,
                         KeYJavaType        containingType,
@@ -33,7 +43,7 @@ public final class LocationVariable extends ProgramVariable
                         boolean            isModel,
                         boolean isGhost,
                         boolean isFinal) {
-        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
+        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, false, isFinal);
     }
     
     public LocationVariable(ProgramElementName name,
@@ -41,26 +51,26 @@ public final class LocationVariable extends ProgramVariable
             		    KeYJavaType        containingType,
             		    boolean            isStatic,
             		    boolean            isModel) {
-        super(name, t.getSort(), t, containingType, isStatic, isModel, false);
+        super(name, t.getSort(), t, containingType, isStatic, isModel, false, false, false);
     }
 
 
     public LocationVariable(ProgramElementName name, KeYJavaType t) {
-        super(name, t.getSort(), t, null, false, false, false);
+        super(name, t.getSort(), t, null, false, false, false, false, false);
     }
 
 
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal) {
-        super(name, t.getSort(), t, null, false, false, false, isFinal);
+        super(name, t.getSort(), t, null, false, false, false, false, isFinal);
     }
 
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isGhost, boolean isFinal) {
-        super(name, t.getSort(), t, null, false, false, isGhost, isFinal);
+        super(name, t.getSort(), t, null, false, false, isGhost, false, isFinal);
     }
 
 
     public LocationVariable(ProgramElementName name, Sort s) {
-        super(name, s, null, null, false, false, false);
+        super(name, s, null, null, false, false, false, false, false);
     }
 
 

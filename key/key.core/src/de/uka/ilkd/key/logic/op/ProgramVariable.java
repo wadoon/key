@@ -69,7 +69,9 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     private final KeYJavaType type;
     private final boolean isStatic;
     private final boolean isModel;
-    private final boolean isGhost;
+    private final boolean isGhost; 
+    // atomic ghost variables are an extension for concurrency
+    private final boolean isAtomic;
     private final boolean isFinal;
 
     // the type where this program variable is declared if and only if
@@ -77,37 +79,29 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     private final KeYJavaType containingType;
 
     protected ProgramVariable(ProgramElementName name, 
-			      Sort               s,
-			      KeYJavaType        t, 
-			      KeYJavaType        containingType,
-			      boolean            isStatic,
-			      boolean            isModel,
-			      boolean            isGhost,
-			      boolean            isFinal) {
-	super(name, s == null ?  t.getSort() : s, false);
-	this.type = t;
-	this.containingType = containingType;	
-	this.isStatic = isStatic;
-	this.isModel = isModel;
-	this.isGhost = isGhost;
-	    assert !(isModel && isGhost) : "Program variable cannot be model and ghost";
-	this.isFinal = isFinal;
-	
-	assert sort() != Sort.FORMULA;
-	assert sort() != Sort.UPDATE;
+    		Sort               s,
+    		KeYJavaType        t, 
+    		KeYJavaType        containingType,
+    		boolean            isStatic,
+    		boolean            isModel,
+    		boolean            isGhost,
+    		boolean isAtomic,
+    		boolean            isFinal) {
+    	super(name, s == null ?  t.getSort() : s, false);
+    	this.type = t;
+    	this.containingType = containingType;	
+    	this.isStatic = isStatic;
+    	this.isModel = isModel;
+    	this.isGhost = isGhost;
+    	this.isAtomic = isAtomic;
+    	assert !(isModel && isGhost) : "Program variable cannot be model and ghost";
+    	assert !isAtomic || isGhost : "Only ghost variables can be atomic";
+    	this.isFinal = isFinal;
+
+    	assert sort() != Sort.FORMULA;
+    	assert sort() != Sort.UPDATE;
     }
-    
-    
-    protected ProgramVariable(ProgramElementName name, 
-            Sort               s,
-            KeYJavaType        t, 
-            KeYJavaType        containingType,
-            boolean            isStatic,
-            boolean            isModel,
-            boolean            isGhost) {
-        this(name, s, t, containingType, isStatic, isModel, isGhost, false);
-    }
-    
+
  
     /** @return name of the ProgramVariable */
     public ProgramElementName getProgramElementName() {
@@ -135,6 +129,13 @@ public abstract class ProgramVariable extends AbstractSortedOperator
      */
     public boolean isGhost() {
 	return isGhost;
+    }
+
+    /**
+     * returns true if the program variable has been declared as atomic
+     */
+    public boolean isAtomic() {
+	return isAtomic;
     }
     
     

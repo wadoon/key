@@ -51,6 +51,7 @@ import de.uka.ilkd.key.java.declaration.Throws;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Abstract;
 import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.Atomic;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
@@ -2209,6 +2210,10 @@ public class Recoder2KeYConverter {
 
     public Ghost convert(de.uka.ilkd.key.java.recoderext.Ghost m) {
         return new Ghost(collectComments(m));
+    }
+    
+    public Atomic convert(de.uka.ilkd.key.java.recoderext.Atomic m) {
+        return new Atomic(collectComments(m));
     }
 
     public Model convert(de.uka.ilkd.key.java.recoderext.Model m) {

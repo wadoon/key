@@ -34,7 +34,7 @@ public final class ProgramConstant extends ProgramVariable {
             		   KeYJavaType        containingType,
             		   boolean            isStatic,
             		   Literal            compileTimeConstant) {
-        super(name, t.getSort(), t, containingType, isStatic, false, false);
+        super(name, t.getSort(), t, containingType, isStatic, false, false, false, false);
         this.compileTimeConstant = compileTimeConstant;
     }
     
