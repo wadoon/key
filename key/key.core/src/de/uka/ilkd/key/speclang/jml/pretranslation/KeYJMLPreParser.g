@@ -297,6 +297,7 @@ modifiers
 
 modifier returns [String result = null]:
         abs=ABSTRACT            { result = abs.getText(); }
+    |   atm=ATOMIC              { result = atm.getText(); }
     |   fin=FINAL               { result = fin.getText(); }
     |   gho=GHOST               { result = gho.getText(); }
     |   hel=HELPER              { result = hel.getText(); }

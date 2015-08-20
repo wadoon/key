@@ -32,6 +32,7 @@ lexer grammar KeYJMLPreLexer;
     ASSUME_REDUNDANTLY          : 'assume_redundantly';
     ASSIGNABLE 			: 'assignable';
     ASSIGNABLE_RED 		: 'assignable_redundantly';
+    ATOMIC			: 'atomic'; // concurrency extension
     AXIOM                       : 'axiom';
     BEHAVIOR 			: 'behavior';
     BEHAVIOUR 			: 'behaviour';

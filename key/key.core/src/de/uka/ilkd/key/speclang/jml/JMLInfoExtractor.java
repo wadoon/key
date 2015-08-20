@@ -322,7 +322,22 @@ public final class JMLInfoExtractor {
             return nullable;
         }
     }
-    
+
+    /**
+     * Check whether a ghost field is atomic.
+     * Atomic ghost fields are an extension for concurrency verification.
+     * @param fieldName
+     * @param containingClass
+     * @return
+     */
+    public static boolean isAtomic(String fieldName,
+	    			     KeYJavaType containingClass) {
+
+        ImmutableList<Comment> comments = extractFieldModifiers(fieldName, containingClass);
+        if (comments.isEmpty()) return false;
+        else return checkFor("atomic", comments);
+    }
+
     
     /**
      * Returns true iff the given method is specified "pure".
