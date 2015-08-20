@@ -516,7 +516,7 @@ public class IntermediateProofReplayer {
 
         // Load contracts, if applicable
         if (currInterm.getContract() != null) {
-            currContract = proof.getServices().getSpecificationRepository()
+            currContract = (Contract)proof.getServices().getSpecificationRepository()
                     .getContractByName(currInterm.getContract());
             if (currContract == null) {
                 final ProblemLoaderException e = new ProblemLoaderException(

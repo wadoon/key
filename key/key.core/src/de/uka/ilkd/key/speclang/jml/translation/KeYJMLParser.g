@@ -427,9 +427,10 @@ assignableclause returns [Term ret = null] throws SLTranslationException
     ;
 
 
-notassignedclause returns [Term result = null] throws SLTranslationException
+notassignedclause returns [Term ret = null] throws SLTranslationException
+@after{ ret = result; }
 :
-    ass:NOT_ASSIGNED_CLAUSE
+    ass=NOT_ASSIGNED_CLAUSE
     ( result=storeRefUnion
         { result = translator.translate(ass.getText(), Term.class, result, services); }
     | STRICTLY_NOTHING

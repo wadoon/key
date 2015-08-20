@@ -21,6 +21,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -76,6 +77,7 @@ public class GuaranteePO extends AbstractPO {
                               final KeYJavaType threadType,
                               final Services services) {
         final TypeConverter tc = services.getTypeConverter();
+        final TermBuilder tb = services.getTermBuilder();
         final Term baseHeap = tb.getBaseHeap();
         final Term nullTerm = tb.NULL();
 
@@ -120,6 +122,7 @@ public class GuaranteePO extends AbstractPO {
 
     private Term buildFrame(final Term thread, final Term prevHeap, final Term currHeap,
                             final Services services) {
+    	final TermBuilder tb = services.getTermBuilder();
         final Sort fieldSort = heapLDT.getFieldSort();
         final Sort objectSort = javaInfo.objectSort();
 
@@ -145,6 +148,7 @@ public class GuaranteePO extends AbstractPO {
 
     private Term buildTraceProp(final Term thread, final Term heap, final Term heaps,
                                 final Term eStep, final Services services) {
+    	final TermBuilder tb = services.getTermBuilder();
         final TypeConverter tc = services.getTypeConverter();
 
         final Sort heapSort = heapLDT.targetSort();
@@ -169,6 +173,7 @@ public class GuaranteePO extends AbstractPO {
     private Term buildGuaranteeTerm(final LocationVariable threadVar,
                                     final KeYJavaType threadType,
                                     final Services services) {
+    	final TermBuilder tb = services.getTermBuilder();
         final TypeConverter tc = services.getTypeConverter();
         final Term baseHeap = tb.getBaseHeap();
 
@@ -193,6 +198,7 @@ public class GuaranteePO extends AbstractPO {
 
     private Term buildReflexivityAndTransitivityTerm(final Term thread,
                                                      final Services services) {
+    	final TermBuilder tb = services.getTermBuilder();
         final Sort heapSort = heapLDT.targetSort();
 
         // reflexivity / transitivity
@@ -226,6 +232,7 @@ public class GuaranteePO extends AbstractPO {
 
         proofConfig = environmentConfig.deepCopy();
         final Services proofServices = proofConfig.getServices();
+        final TermBuilder tb = proofServices.getTermBuilder();
 
         final KeYJavaType threadType = tspec.getKJT();
         final LocationVariable threadVar = tspec.getThreadVar();
