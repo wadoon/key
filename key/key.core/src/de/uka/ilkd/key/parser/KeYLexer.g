@@ -228,6 +228,7 @@ lexer grammar KeYLexer;
 	VARCOND : '\\varcond';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
+    ATOMIC	: '\\atomic';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';

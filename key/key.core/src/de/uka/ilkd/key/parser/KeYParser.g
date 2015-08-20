@@ -3781,6 +3781,7 @@ varexp[TacletBuilder b]
     (   varcond_abstractOrInterface[b, negated]
 	    | varcond_array[b, negated]
         | varcond_array_length[b, negated]	
+        | varcond_atomic[b, negated]	
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
         | varcond_localvariable[b, negated]        
@@ -4105,6 +4106,15 @@ varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 :
    IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN {
      b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
+   }
+;
+
+
+varcond_atomic [TacletBuilder b, boolean negated]
+:
+   ATOMIC LPAREN x=varId RPAREN {
+      b.addVariableCondition(new AtomicGhostReferenceCondition(
+	(SchemaVariable) x, negated));  
    }
 ;
 
