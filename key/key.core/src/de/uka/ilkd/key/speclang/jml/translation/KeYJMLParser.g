@@ -402,6 +402,8 @@ top returns [Object ret = null] throws  SLTranslationException
     |   returnsclause { ret = $returnsclause.ret; }
     |   signalsclause { ret = $signalsclause.ret; }
     |   signalsonlyclause { ret = $signalsonlyclause.result; }
+// rely/guarantee extensions
+    |   notassignedclause { ret = $notassignedclause.ret; }
     |   termexpression { ret = $termexpression.result; }
     )
     (SEMI)? EOF
