@@ -56,6 +56,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
 import de.uka.ilkd.key.rule.conditions.ArrayLengthCondition;
+import de.uka.ilkd.key.rule.conditions.AtomicGhostReferenceCondition;
 import de.uka.ilkd.key.rule.conditions.FinalReferenceCondition;
 import de.uka.ilkd.key.rule.conditions.IsThisReference;
 import de.uka.ilkd.key.rule.conditions.JavaTypeToSortCondition;
@@ -69,7 +70,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
- * Thread specification for rely/gurantee as described in Daniel Bruns' thesis.
+ * Thread specification for rely/guarantee as described in Daniel Bruns' thesis.
  * The specification consists of two formulas rely and guarantee
  * and two terms of type locSet assignable and notChanged.
  * The formulas are parametric in two heaps.
@@ -811,6 +812,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                  new String[] {"simplify_prog", "simplify_prog_subset"},
                                  findTermStatic, staticFieldAccGoals,
                                  new VariableCondition[] { new FinalReferenceCondition(sv, true),
+                                                           new AtomicGhostReferenceCondition(sv, true),
                                                            new StaticReferenceCondition(sv, false),
                                                            new JavaTypeToSortCondition(sv, g, false)},
                                  tspec.getThreadVar(), tName, services));
@@ -819,6 +821,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                  new String[] {"simplify_prog"},
                                  findTermStaticWithPrefix, staticFieldAccWithPrefixGoals,
                                  new VariableCondition[] { new FinalReferenceCondition(sv, true),
+                                                           new AtomicGhostReferenceCondition(sv, true),
                                                            new StaticReferenceCondition(sv, false),
                                                            new JavaTypeToSortCondition(sv, g, false)},
                                  null, tName, services));
@@ -827,6 +830,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                  new String[] {"simplify_prog", "simplify_prog_subset"},
                                  findTerm, fieldAccGoals,
                                  new VariableCondition[] { new FinalReferenceCondition(a, true),
+                                                           new AtomicGhostReferenceCondition(sv, true),
                                                            new ArrayLengthCondition(a, true),
                                                            new StaticReferenceCondition(a, true),
                                                            new IsThisReference(v, true),
@@ -837,6 +841,7 @@ public class ThreadSpecification implements DisplayableSpecificationElement {
                                  new String[] {"simplify_prog", "simplify_prog_subset"},
                                  findTerm, fieldAccThisGoals,
                                  new VariableCondition[] { new FinalReferenceCondition(a, true),
+                                                           new AtomicGhostReferenceCondition(sv, true),
                                                            new ArrayLengthCondition(a, true),
                                                            new StaticReferenceCondition(a, true),
                                                            new IsThisReference(v, false),
