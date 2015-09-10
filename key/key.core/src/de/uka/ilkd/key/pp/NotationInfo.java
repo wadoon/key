@@ -154,6 +154,8 @@ public final class NotationInfo {
      */
     public static boolean DEFAULT_UNICODE_ENABLED = false;
     
+    public static boolean DEFAULT_SYNTAX_HIGHLIGHTING_ENABLED = false;
+    
     public static boolean DEFAULT_HIDE_PACKAGE_PREFIX = false;
     
     /** This maps operators and classes of operators to {@link
@@ -195,7 +197,7 @@ public final class NotationInfo {
      */
     private HashMap<Object, Notation> createDefaultNotation() {
 
-    HashMap<Object,Notation> tbl = new LinkedHashMap<Object,Notation>();;
+    HashMap<Object,Notation> tbl = new LinkedHashMap<Object,Notation>(50);
 	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));
 	tbl.put(Junctor.FALSE,new Notation.Constant("false", PRIORITY_ATOM));
