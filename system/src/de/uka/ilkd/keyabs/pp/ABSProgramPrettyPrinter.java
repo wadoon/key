@@ -6,7 +6,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.keyabs.abs.*;
-import de.uka.ilkd.keyabs.abs.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.expression.*;
 
 public class ABSProgramPrettyPrinter implements ABSVisitor {
@@ -368,6 +367,15 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     public void performActionOnABSExecutionContext(ABSExecutionContext x) {
         try {
             lp.printABSExecutionContext(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void performActionOnABSNewExp(ABSNewExpression x) {
+        try {
+            lp.printABSNewExp(x);
         } catch (IOException e) {
             e.printStackTrace();
         }

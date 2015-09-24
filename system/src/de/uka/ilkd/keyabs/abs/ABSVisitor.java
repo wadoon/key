@@ -74,4 +74,6 @@ public interface ABSVisitor extends ProgramVisitor {
     void performActionOnABSMethodLabel(IABSMethodLabel x);
 
     void performActionOnABSExecutionContext(ABSExecutionContext x);
+
+    void performActionOnABSNewExp(ABSNewExpression absNewExpression);
 }

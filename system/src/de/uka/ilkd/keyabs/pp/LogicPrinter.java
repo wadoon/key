@@ -20,7 +20,12 @@ import java.util.Stack;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.IServices;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -75,13 +80,31 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
-import de.uka.ilkd.keyabs.abs.*;
+import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
+import de.uka.ilkd.keyabs.abs.ABSAwaitClaimStatement;
+import de.uka.ilkd.keyabs.abs.ABSAwaitStatement;
+import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
+import de.uka.ilkd.keyabs.abs.ABSExecutionContext;
+import de.uka.ilkd.keyabs.abs.ABSFieldReference;
+import de.uka.ilkd.keyabs.abs.ABSGetExp;
+import de.uka.ilkd.keyabs.abs.ABSIfStatement;
+import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
+import de.uka.ilkd.keyabs.abs.ABSMethodFrame;
 import de.uka.ilkd.keyabs.abs.ABSReturnStatement;
+import de.uka.ilkd.keyabs.abs.ABSServices;
+import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
+import de.uka.ilkd.keyabs.abs.ABSTypeReference;
+import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
+import de.uka.ilkd.keyabs.abs.ABSWhileStatement;
+import de.uka.ilkd.keyabs.abs.CopyAssignment;
+import de.uka.ilkd.keyabs.abs.IABSMethodLabel;
+import de.uka.ilkd.keyabs.abs.ThisExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
 import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
 import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNewExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
 
 /**
@@ -2113,6 +2136,18 @@ public final class LogicPrinter implements ILogicPrinter {
 
     public void printABSMethodLabel(IABSMethodLabel x) throws IOException {
         layouter.print(x.toString());
+    }
+
+    public void printABSNewExp(ABSNewExpression x) throws IOException {
+        layouter.print("new").print(" ");
+        x.getChildAt(0).visit(programPrettyPrinter);
+        layouter.beginC(0).print("(");
+        for (int i = 0; i < x.getArgumentCount(); i++) {
+            if (i != 0)
+                layouter.print(",").brk(1);
+            x.getArgumentAt(i).visit(programPrettyPrinter);
+        }
+        layouter.print(")").end();	
     }
 
 }

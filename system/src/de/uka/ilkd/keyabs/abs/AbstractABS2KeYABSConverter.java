@@ -75,7 +75,9 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((GetExp)x);
         } else if (x instanceof ReturnStmt) {
             result = convert((ReturnStmt)x);
-        }
+        } else if (x instanceof NewExp) {
+            result = convert((NewExp)x);
+        } 
 
         if (result == null) {
             result = requestConversion(x);
@@ -310,6 +312,20 @@ public abstract class AbstractABS2KeYABSConverter {
         return new ABSReturnStatement((IABSExpression)convert(x.getRetExp()));
     }
 
+    public ABSNewExpression convert(NewExp x) {
+        ProgramElementName className = new ProgramElementName(x.getClassName(), x.getModuleDecl().getName());
+        IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
+
+        int i = 0;
+        for (PureExp arg : x.getParamList()) {
+            arguments[i] = (IABSPureExpression) convert(arg);
+            i++;
+        }
+        
+        return new ABSNewExpression(className, lookupType(x.getType().getQualifiedName()) , arguments);
+    }
+
+    
     protected KeYJavaType lookupType(String qualifiedName) {
         return services.getProgramInfo().getKeYJavaType(qualifiedName);
     }
