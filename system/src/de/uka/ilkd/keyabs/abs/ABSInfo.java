@@ -273,4 +273,8 @@ public class ABSInfo implements IProgramInfo {
     public boolean isClass(ProgramElementName check) {	
 	return absInfo.getClasses().get(new Name(check.getQualifier()+"."+check.getProgramName())) != null;
     }
+
+    public Function getClassLabelFor(ProgramElementName className) {
+	return (Function) services.getNamespaces().functions().lookup(new Name(className.getQualifier()+"."+className.getProgramName()));
+    }
 }

@@ -57,6 +57,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
+import de.uka.ilkd.keyabs.logic.sort.ABSProgramSVSort;
 
 public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 
@@ -281,7 +282,8 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 			return instantiateElementaryUpdate((ElementaryUpdate)op);
 		}  else if (op instanceof ProgramSV && ((ProgramSV)op).isListSV()){
 			return op;
-		} else if (op instanceof SchemaVariable) {
+		} else if (op instanceof SchemaVariable && 
+			(!(op instanceof ProgramSV && op.sort(null) == ABSProgramSVSort.ABS_CLASSNAME))) {
 			return (Operator)svInst.getInstantiation((SchemaVariable)op);
 		}
 		return op;
@@ -328,7 +330,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (visitedOp instanceof SchemaVariable
                 && visitedOp.arity() == 0
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
+                && (! (visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp).isListSV() || visitedOp.sort(null) == ABSProgramSVSort.ABS_CLASSNAME)))) {
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
         } else if((visitedOp instanceof Metavariable)
                 && metavariableInst.getInstantiation((Metavariable) visitedOp).op() != visitedOp) {
