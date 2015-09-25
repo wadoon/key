@@ -269,4 +269,8 @@ public class ABSInfo implements IProgramInfo {
         return (Function) services.getNamespaces().functions().lookup(FunctionBuilder.createNameFor(method.getMethodSig(),
                 (InterfaceDecl) context));
     }
+
+    public boolean isClass(ProgramElementName check) {	
+	return absInfo.getClasses().get(new Name(check.getQualifier()+"."+check.getProgramName())) != null;
+    }
 }

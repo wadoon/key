@@ -47,6 +47,7 @@ public class SchemaABSReader implements SchemaJavaReader {
         CoreAbsBackend absReader = new CoreAbsBackend();
         absReader.setWithStdLib(false);
         absReader.setAllowIncompleteExpr(true);
+        absReader.setTypeChecking(false);
         try {
             Model m = absReader.parse(
                     File.createTempFile("taclet_", ".keyabs"), blockStr,

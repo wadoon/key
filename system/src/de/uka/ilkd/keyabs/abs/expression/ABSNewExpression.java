@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.keyabs.abs.ABSNonTerminalProgramElement;
 import de.uka.ilkd.keyabs.abs.ABSVisitor;
 import de.uka.ilkd.keyabs.abs.IABSExpression;
@@ -13,15 +14,24 @@ import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 public class ABSNewExpression extends ABSNonTerminalProgramElement implements IABSExpression {
 
     private final ProgramElementName className;
+    private final ProgramSV classNameSV;
+    
     private final KeYJavaType type;
     private final IABSPureExpression[] args;
     
     public ABSNewExpression(ProgramElementName className, KeYJavaType type, IABSPureExpression[] args) {
 	this.args = (args == null ? new IABSPureExpression[0] : args);
 	this.className = className;
+	this.classNameSV = null;
 	this.type = type;
     }
     
+    public ABSNewExpression(ProgramSV classNameSV, IABSPureExpression[] args) {
+	this.args = (args == null ? new IABSPureExpression[0] : args);
+	this.className = null;
+	this.classNameSV = classNameSV;
+	this.type = null;
+    }
     
     @Override
     public int getChildCount() {
@@ -31,7 +41,7 @@ public class ABSNewExpression extends ABSNonTerminalProgramElement implements IA
     @Override
     public ProgramElement getChildAt(int index) {
 	if (index == 0) {
-	    return className;
+	    return className == null ? classNameSV : className;
 	}
 	return args[index - 1];
     }
@@ -43,7 +53,7 @@ public class ABSNewExpression extends ABSNonTerminalProgramElement implements IA
     
     public String toString() {
 	StringBuilder sb = new StringBuilder();
-	sb.append(className);
+	sb.append(className == null ? classNameSV : className);
 	sb.append("(");
 	for (IABSPureExpression exp : args) {
 	    sb.append(exp);

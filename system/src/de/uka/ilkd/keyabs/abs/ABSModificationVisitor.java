@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.keyabs.abs.expression.*;
+import de.uka.ilkd.keyabs.logic.sort.ABSClassNameSV;
 
 import java.util.Stack;
 
@@ -549,7 +550,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            ProgramElementName className = children
+            ProgramElement className = children
                     .removeFirstOccurrence(ProgramElementName.class);
 
             IABSPureExpression[] arguments = new IABSPureExpression[children
@@ -557,7 +558,12 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             for (int i = 0; i < children.size(); i++) {
                 arguments[i] = (IABSPureExpression) children.get(i);
             }
-            addNewChild(new ABSNewExpression(className, x.getKeYJavaType(null, null), arguments));
+            
+            if (className instanceof ProgramSV) {
+        	addNewChild(new ABSNewExpression((ProgramSV) className, arguments));
+            } else {
+        	addNewChild(new ABSNewExpression((ProgramElementName) className, x.getKeYJavaType(null, null), arguments));        	
+            }
         } else {
             addChild(x);
         }

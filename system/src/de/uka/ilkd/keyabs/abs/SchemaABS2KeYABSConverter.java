@@ -3,7 +3,9 @@ package de.uka.ilkd.keyabs.abs;
 import abs.frontend.ast.ASTNode;
 import abs.frontend.ast.AsyncCall;
 import abs.frontend.ast.ExpressionStmt;
+import abs.frontend.ast.IncompleteNewExp;
 import abs.frontend.ast.IncompleteSyncAccess;
+import abs.frontend.ast.NewExp;
 import abs.frontend.ast.PureExp;
 import abs.frontend.ast.VarDeclStmt;
 import abs.frontend.ast.VarUse;
@@ -19,6 +21,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.keyabs.abs.expression.ABSNewExpression;
 import de.uka.ilkd.keyabs.logic.sort.ABSProgramSVSort;
 
 public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
@@ -42,8 +45,29 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
                     result = lookup(name);
                 }
             }
+        } else if (x instanceof IncompleteNewExp) {
+            result = null;
         }
         return result;
+    }
+
+    
+    public ABSNewExpression convert(NewExp x) {                
+        IProgramVariable classNameSV = lookup(x.getClassName());
+        
+        if (classNameSV == null) {
+            throw new IllegalArgumentException("Could not find schemavariable of name " + x.getClassName());
+        }
+        
+        IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
+
+        int i = 0;
+        for (PureExp arg : x.getParamList()) {
+            arguments[i] = (IABSPureExpression) convert(arg);
+            i++;
+        }
+
+        return new ABSNewExpression((ProgramSV) classNameSV, arguments);
     }
 
     public ABSAsyncMethodCall convert(AsyncCall x) {
@@ -76,11 +100,11 @@ public class SchemaABS2KeYABSConverter extends AbstractABS2KeYABSConverter {
         IProgramVariable var = lookupLocalVariable(varUse.getName());
 
         if (var instanceof SchemaVariable) {
-            if (var.sort() == ABSProgramSVSort.ABS_PUREEXPRESSION) {
+            if (var.sort() == ABSProgramSVSort.ABS_PUREEXPRESSION || var.sort() == ABSProgramSVSort.ABS_STATEMENT) {
                 return (ProgramSV) var;
             } else if (var.sort() == ABSProgramSVSort.ABS_FIELD) {
                 return new ABSFieldReference(var);
-            }
+            } 
         }
         return new ABSLocalVariableReference(var);
     }
