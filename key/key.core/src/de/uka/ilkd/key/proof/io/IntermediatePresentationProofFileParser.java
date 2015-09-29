@@ -90,6 +90,7 @@ public class IntermediatePresentationProofFileParser implements
     /* + State information that is returned after parsing */
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
+    private int nrRuleApps = 0;
 
     /**
      * @param proof
@@ -106,8 +107,8 @@ public class IntermediatePresentationProofFileParser implements
         switch (eid) {
         case BRANCH: // branch
         {
-            final BranchNodeIntermediate newNode = new BranchNodeIntermediate(
-                    str);
+            final BranchNodeIntermediate newNode =
+                    new BranchNodeIntermediate(str);
 
             if (root == null) {
                 root = newNode;
@@ -168,16 +169,16 @@ public class IntermediatePresentationProofFileParser implements
         case ASSUMES_FORMULA_IN_SEQUENT: // ifseqformula
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
-            tacletInfo.ifSeqFormulaList = tacletInfo.ifSeqFormulaList
-                    .append(str);
+            tacletInfo.ifSeqFormulaList =
+                    tacletInfo.ifSeqFormulaList.append(str);
         }
             break;
 
         case ASSUMES_FORMULA_DIRECT: // ifdirectformula
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
-            tacletInfo.ifDirectFormulaList = tacletInfo.ifDirectFormulaList
-                    .append(str);
+            tacletInfo.ifDirectFormulaList =
+                    tacletInfo.ifDirectFormulaList.append(str);
         }
             break;
 
@@ -214,11 +215,12 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
-            BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
+            BuiltinRuleInformation builtinInfo =
+                    (BuiltinRuleInformation) ruleInfo;
 
             if (builtinInfo.builtinIfInsts == null) {
-                builtinInfo.builtinIfInsts = ImmutableSLList
-                        .<Pair<Integer, PosInTerm>> nil();
+                builtinInfo.builtinIfInsts =
+                        ImmutableSLList.<Pair<Integer, PosInTerm>> nil();
             }
             builtinInfo.currIfInstFormula = 0;
             builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
@@ -228,8 +230,8 @@ public class IntermediatePresentationProofFileParser implements
             final String[] newNames = str.split(",");
             ruleInfo.currNewNames = ImmutableSLList.<Name> nil();
             for (int in = 0; in < newNames.length; in++) {
-                ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(
-                        newNames[in]));
+                ruleInfo.currNewNames =
+                        ruleInfo.currNewNames.append(new Name(newNames[in]));
             }
             break;
 
@@ -247,24 +249,24 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case NUMBER_JOIN_PARTNERS: // number of join partners
-            ((BuiltinRuleInformation) ruleInfo).currNrPartners = Integer
-                    .parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currNrPartners =
+                    Integer.parseInt(str);
             break;
 
         case JOIN_NODE: // corresponding join node id
-            ((BuiltinRuleInformation) ruleInfo).currCorrespondingJoinNodeId = Integer
-                    .parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currCorrespondingJoinNodeId =
+                    Integer.parseInt(str);
             break;
 
         case JOIN_ID: // join node id
-            ((BuiltinRuleInformation) ruleInfo).currJoinNodeId = Integer
-                    .parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currJoinNodeId =
+                    Integer.parseInt(str);
             break;
-            
+
         case JOIN_DIST_FORMULA: // distinguishing formula for joins
             ((BuiltinRuleInformation) ruleInfo).currDistFormula = str;
             break;
-            
+
         default:
             break;
         }
@@ -290,6 +292,7 @@ public class IntermediatePresentationProofFileParser implements
                     .setIntermediateRuleApp(constructTacletApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp()
                     .setLineNr(lineNr);
+            nrRuleApps++;
             break;
 
         case BUILT_IN_RULE: // BuiltIn rules
@@ -297,14 +300,17 @@ public class IntermediatePresentationProofFileParser implements
                     .setIntermediateRuleApp(constructBuiltInApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp()
                     .setLineNr(lineNr);
+            nrRuleApps++;
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
-            BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
-            builtinInfo.builtinIfInsts = builtinInfo.builtinIfInsts
-                    .append(new Pair<Integer, PosInTerm>(
-                            builtinInfo.currIfInstFormula,
-                            builtinInfo.currIfInstPosInTerm));
+            BuiltinRuleInformation builtinInfo =
+                    (BuiltinRuleInformation) ruleInfo;
+            builtinInfo.builtinIfInsts =
+                    builtinInfo.builtinIfInsts
+                            .append(new Pair<Integer, PosInTerm>(
+                                    builtinInfo.currIfInstFormula,
+                                    builtinInfo.currIfInstPosInTerm));
             break;
 
         default:
@@ -316,7 +322,7 @@ public class IntermediatePresentationProofFileParser implements
      * @return The results of the parsing procedure.
      */
     public Result getResult() {
-        return new Result(getErrors(), getStatus(), root);
+        return new Result(getErrors(), getStatus(), nrRuleApps, root);
     }
 
     @Override
@@ -359,26 +365,35 @@ public class IntermediatePresentationProofFileParser implements
         BuiltInAppIntermediate result = null;
 
         if (builtinInfo.currRuleName.equals("JoinRule")) {
-            result = new JoinAppIntermediate(builtinInfo.currRuleName,
-                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
-                            builtinInfo.currPosInTerm),
-                    builtinInfo.currJoinNodeId, builtinInfo.currJoinProc,
-                    builtinInfo.currNrPartners, builtinInfo.currNewNames,
-                    builtinInfo.currDistFormula);
+            result =
+                    new JoinAppIntermediate(builtinInfo.currRuleName,
+                            new Pair<Integer, PosInTerm>(
+                                    builtinInfo.currFormula,
+                                    builtinInfo.currPosInTerm),
+                            builtinInfo.currJoinNodeId,
+                            builtinInfo.currJoinProc,
+                            builtinInfo.currNrPartners,
+                            builtinInfo.currNewNames,
+                            builtinInfo.currDistFormula);
         }
         else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
-            result = new JoinPartnerAppIntermediate(builtinInfo.currRuleName,
-                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
-                            builtinInfo.currPosInTerm),
-                    builtinInfo.currCorrespondingJoinNodeId,
-                    builtinInfo.currNewNames);
+            result =
+                    new JoinPartnerAppIntermediate(builtinInfo.currRuleName,
+                            new Pair<Integer, PosInTerm>(
+                                    builtinInfo.currFormula,
+                                    builtinInfo.currPosInTerm),
+                            builtinInfo.currCorrespondingJoinNodeId,
+                            builtinInfo.currNewNames);
         }
         else {
-            result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
-                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
-                            builtinInfo.currPosInTerm),
-                    builtinInfo.currContract, builtinInfo.builtinIfInsts,
-                    builtinInfo.currNewNames);
+            result =
+                    new BuiltInAppIntermediate(builtinInfo.currRuleName,
+                            new Pair<Integer, PosInTerm>(
+                                    builtinInfo.currFormula,
+                                    builtinInfo.currPosInTerm),
+                            builtinInfo.currContract,
+                            builtinInfo.builtinIfInsts,
+                            builtinInfo.currNewNames);
         }
 
         return result;
@@ -476,11 +491,13 @@ public class IntermediatePresentationProofFileParser implements
         private List<Throwable> errors;
         private String status;
         private BranchNodeIntermediate parsedResult = null;
+        private int nrRuleApps;
 
-        public Result(List<Throwable> errors, String status,
+        public Result(List<Throwable> errors, String status, int nrRuleApps,
                 BranchNodeIntermediate parsedResult) {
             this.errors = errors;
             this.status = status;
+            this.nrRuleApps = nrRuleApps;
             this.parsedResult = parsedResult;
         }
 
@@ -490,6 +507,10 @@ public class IntermediatePresentationProofFileParser implements
 
         public String getStatus() {
             return status;
+        }
+
+        public int getNrRuleApps() {
+            return nrRuleApps;
         }
 
         public BranchNodeIntermediate getParsedResult() {
