@@ -88,6 +88,7 @@ import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
 import de.uka.ilkd.key.gui.actions.OpenExampleAction;
@@ -108,6 +109,7 @@ import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
@@ -207,7 +209,7 @@ public final class MainWindow extends JFrame  {
     private final AutoModeAction autoModeAction;
 
     /** action for opening a KeY file */
-    private MainWindowAction openFileAction;
+    private OpenFileAction openFileAction;
 
     /** action for opening an example */
     private OpenExampleAction openExampleAction;
@@ -707,6 +709,7 @@ public final class MainWindow extends JFrame  {
         
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
+        view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
         view.add(termLabelMenu);
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
 
@@ -774,6 +777,7 @@ public final class MainWindow extends JFrame  {
         help.add(new AboutAction(this));
         help.add(new KeYProjectHomepageAction(this));
 //        help.add(new SystemInfoAction(this));
+           help.add(new MenuSendFeedackAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -1057,7 +1061,9 @@ public final class MainWindow extends JFrame  {
         /** focused node has changed */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().isInAutoMode()) return;
+            if (getMediator().isInAutoMode()) {
+                return;
+            }
             updateSequentView();
         }
 
@@ -1249,8 +1255,9 @@ public final class MainWindow extends JFrame  {
             // components, but it scales well ;-)
             while ( c != null ) {
                 if ( (c instanceof JComponent) &&
-                        AUTO_MODE_TEXT.equals(((JComponent)c).getToolTipText()) )
+                        AUTO_MODE_TEXT.equals(((JComponent)c).getToolTipText()) ) {
                     return true;
+                }
                 c = c.getParent ();
             }
             return false;
