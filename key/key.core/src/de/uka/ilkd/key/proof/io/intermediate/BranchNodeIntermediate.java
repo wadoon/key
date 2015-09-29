@@ -23,36 +23,4 @@ public class BranchNodeIntermediate extends NodeIntermediate {
         return branchTitle;
     }
     
-    /**
-     * Root branch of a proof; encapsulates the number of rule
-     * applications inside the proof.
-     *
-     * @author Dominic Scheurer
-     *
-     */
-    public static class RootBranch extends BranchNodeIntermediate {
-        
-        private int nrAppNodes = 0;
-
-        public RootBranch(String branchTitle) {
-            super(branchTitle);
-        }
-        
-        /**
-         * @return The number of rule applications inside this proof.
-         */
-        public int getNrAppNodes() {
-            return nrAppNodes;
-        }
-        
-        /**
-         * Increments the registered number of rule applications inside
-         * the proof by one.
-         */
-        public void incrementRuleAppCounter() {
-            nrAppNodes++;
-        }
-        
-    }
-    
 }
