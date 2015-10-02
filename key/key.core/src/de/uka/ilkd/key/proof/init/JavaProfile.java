@@ -122,7 +122,7 @@ public class JavaProfile extends AbstractProfile {
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(getOneStepSimpilifier())
+//                                   .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(JoinRule.INSTANCE);
   
@@ -147,10 +147,11 @@ public class JavaProfile extends AbstractProfile {
      */
     public OneStepSimplifier getOneStepSimpilifier() {
        synchronized (this) {
-          if (oneStepSimpilifier == null) {
-             oneStepSimpilifier = new OneStepSimplifier();
-          }
-          return oneStepSimpilifier;
+           return null; // :)
+//          if (oneStepSimpilifier == null) {
+//             oneStepSimpilifier = new OneStepSimplifier();
+//          }
+//          return oneStepSimpilifier;
        }
     }
 
