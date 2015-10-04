@@ -1,0 +1,14 @@
+#soundness test for taclet oleq_antisym
+
+macro split-prop;
+
+rule oleq_replace
+ formula="oleq(f_i1, f_i)";
+rule oleq_replace;
+
+
+macro split-prop;
+
+rule olt_trans 
+  formula="olt(f_i, f_i1)";
+tryclose;
