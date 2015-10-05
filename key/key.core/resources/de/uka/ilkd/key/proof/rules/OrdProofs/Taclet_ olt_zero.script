@@ -1,0 +1,15 @@
+#soundness test for taclet olt_zero
+
+rule "oleq_zeroAxiom";
+
+instantiate hide var=nv with=f_i;
+
+rule oleq_replace;
+rule orLeft;
+
+rule notRight;
+rule olt_trans
+  formula="olt(o_0, f_i)";
+
+tryclose;
+
