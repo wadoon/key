@@ -1,0 +1,47 @@
+macro split-prop;
+
+rule "apply_subst_for"
+  formula="{\subst Ord v_nv;o_0}f_phi(v_nv)";
+
+rule oIndBasic;
+
+rule allRight;
+
+cut "nv1_0=o_0 | lim(nv1_0) | \exists Ord ov;(nv1_0 = oadd(ov,o_1))";
+
+rule impRight;
+
+cut "o_0 = nv1_0";
+rule eqSymm
+  formula="o_0 = nv1_0";
+auto steps=10;
+
+cut "lim(nv1_0)";
+
+instantiate hide var=v_nv1 with=nv1_0;
+
+auto steps=20;
+
+macro split-prop;
+
+rule eqSymm
+  formula="nv1_0=o_0";
+
+rule close
+  formula="o_0 = nv1_0";
+
+rule exLeft;
+
+rule oSucc;
+instantiate hide var=nv2 with=ov_0;
+instantiate hide var=v_nv with=ov_0;
+instantiate hide var=nv with=ov_0;
+
+auto steps=20;
+
+macro split-prop;
+
+rule olimDef
+  formula="lim(nv1_0)";
+
+tryclose;
