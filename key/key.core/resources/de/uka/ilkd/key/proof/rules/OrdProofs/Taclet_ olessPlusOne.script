@@ -1,0 +1,24 @@
+rule equiv_right;
+
+rule olt_total_Axiom;
+instantiate hide var=nv with=f_i;
+instantiate hide var=nv1 with=f_j;
+rule orLeft
+ formula="olt(f_i, f_j) | f_i = f_j | olt(f_j, f_i)";
+rule close
+ formula="olt(f_i, f_j) | f_i = f_j";
+rule oLeastSucc;
+instantiate hide var=nv with=f_j;
+instantiate hide var=nv1 with=f_i;
+macro split-prop;
+tryclose;
+rule oleqolt_trans;
+tryclose;
+
+rule oSucc;
+instantiate hide var=nv with=f_j;
+rule orLeft;
+rule olt_trans
+  formula="olt(f_j, oadd(f_j, o_1))";
+tryclose;
+
