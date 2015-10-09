@@ -1,0 +1,27 @@
+rule omaxDef;
+rule equiv_right;
+rule ifthenelse_split;
+
+macro split-prop;
+
+rule olt_trans
+  formula="olt(f_i1, f_i)";
+
+rule close;
+
+rule olt_total_Axiom;
+
+instantiate hide var=nv with=f_i0;
+instantiate hide var=nv1 with=f_i1;
+
+#rule replace_known_right
+# formula="olt(f_i0, f_i1) | f_i0 = f_i1 | olt(f_i1, f_i0)";
+
+rule orLeft;
+
+tryclose;
+
+rule olt_trans
+  formula="olt(f_i0, f_i)";
+
+tryclose;
