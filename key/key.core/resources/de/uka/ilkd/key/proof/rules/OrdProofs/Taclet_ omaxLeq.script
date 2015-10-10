@@ -1,0 +1,34 @@
+rule equiv_right;
+rule oleq_replace
+  formula="oleq(f_i, omax(f_i0, f_i1))";
+rule orRight;
+rule oleq_replace
+  formula="oleq(f_i, f_i0)";
+rule oleq_replace;
+rule orLeft;
+rule omaxLess;
+tryclose;
+rule omaxDef;
+tryclose;
+
+# End of first branch of equiv_right
+
+rule omaxDef;
+rule olt_total_Axiom;
+instantiate hide var=nv with=f_i0;
+instantiate hide var=nv1 with=f_i1;
+rule ifthenelse_split;
+macro split-prop;
+ rule oltleq_trans
+   formula="olt(f_i0, f_i1)";
+ tryclose;
+rule oltleq_trans
+  formula="olt(f_i0, f_i1)";
+tryclose;
+
+macro split-prop;
+tryclose;
+rule oltleq_trans
+  formula="olt(f_i1, f_i0)";
+tryclose;
+
