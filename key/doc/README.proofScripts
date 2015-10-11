@@ -170,7 +170,7 @@ Examples:
        # changes sequent "a=b ==> c=d" to "b=a ==> c=d"
        # "rule eqSymm;" alone would have been ambiguous.
 
-   rule eqSymm formula="a=b->c=d" occ=2
+   rule eqSymm formula="a=b->c=d" occ=2;
        # changes sequent "a=b->c=d ==>" to "a=b->d=c ==>".
        # occurrence number needed since there are 
        # two possible applications on the formula
