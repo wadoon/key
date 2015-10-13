@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,8 +26,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import recoder.service.DefaultImplicitElementInfo;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
@@ -46,6 +50,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
@@ -228,6 +233,15 @@ public abstract class AbstractProblemLoader {
      * @throws ProblemLoaderException Occurred Exception.
      */
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
+            if (Files.isRegularFile(file.toPath()) &&
+                    !Files.isWritable(file.toPath())) {
+                ImmutableSet<PositionedString> warning = DefaultImmutableSet.nil();
+                control.reportWarnings(warning.add(new PositionedString(
+                        "[WARNING] The selected file is not writable. "
+                        + "Make sure that there is not, e.g., an SVN lock set on the file.",
+                        file.getName())));
+            }
+        
             control.loadingStarted(this);
             // Read environment
             envInput = createEnvInput();
