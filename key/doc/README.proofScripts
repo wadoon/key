@@ -69,7 +69,7 @@ attach a proof script directly in double quotes following the keyword
    rule 'close';"
 ----------8<----------
 
-Since the script is no enclosed in "...", only single quotes '...' can
+Since the script is now enclosed in "...", only single quotes '...' can
 be used in the script. You can also load a script from an external
 file by writing
 
