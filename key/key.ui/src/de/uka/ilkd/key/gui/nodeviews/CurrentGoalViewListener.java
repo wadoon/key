@@ -33,8 +33,12 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
@@ -74,7 +78,43 @@ class CurrentGoalViewListener
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        if (!modalDragNDropEnabled()) {
+        if (me.isControlDown()) {
+            PosInSequent mousePos = currentGoalView.getPosInSequent(me.getPoint());
+
+            if ((mousePos != null)
+                    && !("".equals(currentGoalView.getHighlightedText(mousePos)))) {
+
+                final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
+                if (posInOcc != null) {
+
+                    ImmutableList<TacletApp> apps =
+                            mediator.getUI()
+                                    .getProofControl()
+                                    .getFindTaclet(mediator.getSelectedGoal(),
+                                            posInOcc);
+
+                    TacletApp hideTacletApp = null;
+                    for (TacletApp app : apps) {
+                        if (app.taclet().displayName().startsWith("hide")) {
+                            hideTacletApp = app;
+                            break;
+                        }
+                    }
+
+                    if (hideTacletApp != null) {
+                        hideTacletApp =
+                                PosTacletApp.createPosTacletApp(
+                                        (FindTaclet) hideTacletApp.taclet(),
+                                        hideTacletApp.instantiations(),
+                                        posInOcc,
+                                        mediator.getServices());
+                        
+                        mediator.getSelectedGoal().apply(hideTacletApp);
+                    }
+                }
+
+            }
+        } else if (!modalDragNDropEnabled()) {
             // if a popup menu is cancelled by a click we do not want to 
             // activate another using the same click event 
             if (Math.abs(System.currentTimeMillis() - block) >= POPUP_DELAY) {
