@@ -1,7 +1,7 @@
 #soundness test for taclet osup0
 
 rule osupEQDef;
-rule "oleq_zeroAxiom";
+rule 'oleq_zeroAxiom';
 
 macro split-prop;
 
@@ -9,8 +9,11 @@ rule allRight;
 
 rule impRight;
 
-instantiate hide var=nv with="nv1_0";
-rule "oltleq_trans";
+instantiate hide var=nv with='nv1_0';
+rule 'oltleq_trans';
 
-tryclose;
+rule olt_irref;
+rule closeFalse;
+
+#tryclose;
 
