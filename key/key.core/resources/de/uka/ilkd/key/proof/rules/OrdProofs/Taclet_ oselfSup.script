@@ -6,9 +6,13 @@ tryclose;
 
 rule allRight;
 rule  impRight;
-rule "olt_total_Axiom";
+rule 'olt_total_Axiom';
 
-instantiate hide var=nv with="v_nv_0";
-instantiate hide var=nv1 with="nv2_1";
+instantiate hide var=nv with='v_nv_0';
+instantiate hide var=nv1 with='nv1_0';
+auto;
 
-tryclose;
+rule allRight;
+rule impRight;
+
+#tryclose;
