@@ -74,6 +74,7 @@ lexer grammar KeYJMLLexer;
     EMPTYSET             : '\\empty';
     ERASES               : '\\erases';  //KeY extension, not official JML
     EVERYTHING           : '\\everything';
+    EXCEPTION            : '\\exception';
     EXISTS               : '\\exists';
     FORALL               : '\\forall';
     FREE                 : '\\free';  //KeY extension, not official JML

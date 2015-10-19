@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -183,8 +182,6 @@ public class TestFile implements Serializable {
          } else {
              // ... script
              ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-             // XXX This seems a hack ...
-             env.getLoadedProof().setEnv(new ProofEnvironment(env.getInitConfig()));
              pse.execute(env.getUi(), env.getLoadedProof());
          }
 

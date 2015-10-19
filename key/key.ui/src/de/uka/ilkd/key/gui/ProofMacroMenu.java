@@ -10,6 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 // 
+
 package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
@@ -96,15 +97,7 @@ public class ProofMacroMenu extends JMenu {
         Node node = mediator.getSelectedNode();
         for (ProofMacro macro : REGISTERED_MACROS) {
                 
-            // This here is for the global strategy menu in "Proof" toplevel menu.
-            // Its entries are needed to anchor keyboard shortcuts for macros
-            // TODO refactor
-            boolean applicable;
-            if(node == null) {
-                applicable = macro.isApplicableWithoutPosition();
-            } else {
-                applicable = macro.canApplyTo(node, posInOcc);
-            }
+            boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
 
                     // NOTE (DS): At the moment, JoinRule is an experimental
                     // feature. We therefore only add join-related macros
