@@ -1,4 +1,0 @@
-rule olt_trans_Axiom;
-instantiate hide var=nv with=f_i;
-tryclose;
-
