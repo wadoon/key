@@ -5,50 +5,50 @@ instantiate hide var=nv with=f_i0;
 instantiate hide var=nv1 with=f_i1;
 rule andRight;
 rule orLeft
- formula="olt(f_i0, f_i1) | f_i0 = f_i1 | olt(f_i1, f_i0)";
+ formula='olt(f_i0, f_i1) | f_i0 = f_i1 | olt(f_i1, f_i0)';
 rule orLeft;
 rule replace_known_left
-  formula="oleq(\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0), f_i)"
+  formula='oleq(\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0), f_i)'
   occ=1;
 auto steps=1;
 rule oleqolt_trans
- formula="oleq(f_i1, f_i)";
+ formula='oleq(f_i1, f_i)';
 auto steps=4;
-cut  "olt(f_i0, f_i1)";
+cut  'olt(f_i0, f_i1)';
 auto steps=17;
 auto steps=4;
 
-cut "olt(f_i0, f_i1)";
+cut 'olt(f_i0, f_i1)';
 auto steps=2;
 rule oleqolt_trans
- formula="oleq(f_i1, f_i)";
+ formula='oleq(f_i1, f_i)';
 auto steps=4;
 auto steps=3;
 rule orLeft
- formula="olt(f_i0, f_i1) | f_i0 = f_i1 | olt(f_i1, f_i0)";
+ formula='olt(f_i0, f_i1) | f_i0 = f_i1 | olt(f_i1, f_i0)';
 rule orLeft;
-cut "olt(f_i0, f_i1)";
+cut 'olt(f_i0, f_i1)';
 auto steps=3;
 auto steps=12;
-cut "olt(f_i0, f_i1)";
+cut 'olt(f_i0, f_i1)';
 auto steps=3;
 auto steps=2;
 auto steps=3;
-cut "oleq(f_i1, f_i)";
+cut 'oleq(f_i1, f_i)';
 rule close
-  formula="oleq(f_i1, f_i)";
+  formula='oleq(f_i1, f_i)';
 auto steps=12;
-cut "olt(f_i0, f_i1)";
+cut 'olt(f_i0, f_i1)';
 rule olt_trans
- formula="olt(f_i0, f_i1)";
+ formula='olt(f_i0, f_i1)';
 rule olt_irref
-  formula="olt(f_i1, f_i1)";
+  formula='olt(f_i1, f_i1)';
 auto steps=1;
 auto steps=2;
 rule oleqolt_trans
-  formula="oleq(f_i0, f_i)";
+  formula='oleq(f_i0, f_i)';
 rule oleq_replace
-  formula="oleq(f_i1, f_i)";
+  formula='oleq(f_i1, f_i)';
 auto steps=2;
 
 # proof of first implication 
@@ -56,21 +56,21 @@ auto steps=2;
 
 rule omaxDef;
 auto steps=3;
-cut "olt(f_i0, f_i1)";
+cut 'olt(f_i0, f_i1)';
 rule replace_known_left
- formula="olt(\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0), f_i)"
+ formula='olt(\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0), f_i)'
   occ=1;
 rule replace_known_left
- formula="\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0) = f_i"
+ formula='\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0) = f_i'
   occ=1;
 auto steps=6;
 
 rule replace_known_right
- formula="olt(\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0), f_i)"
+ formula='olt(\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0), f_i)'
   occ=1;
 rule replace_known_right
- formula="\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0) = f_i"
+ formula='\if (olt(f_i0, f_i1))  \then (f_i1)  \else (f_i0) = f_i'
   occ=1;
 rule oleq_replace
-  formula="oleq(f_i0, f_i)";
+  formula='oleq(f_i0, f_i)';
 auto steps=5;
