@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -156,7 +157,11 @@ public final class IntegerLDT extends LDT {
     private final Term one;
     private final Term zero;
 
-    
+    //---added by Huy for some function: power, round, floor
+    private final Function power;
+    private final Function round;
+    private final Function floor;
+    //---------------------------------------
     
     //-------------------------------------------------------------------------
     //constructors
@@ -259,7 +264,12 @@ public final class IntegerLDT extends LDT {
 
         //cache often used constants       
         zero = translateLiteral(new IntLiteral(0), services);
-        one = translateLiteral(new IntLiteral(1), services);        
+        one = translateLiteral(new IntLiteral(1), services);
+        
+        //--------added by Huy for power, floor, round function ------------
+        power				= new Function(new Name("power"), Sort.ANY);
+        round				= new Function(new Name("round"), Sort.ANY);
+        floor				= new Function(new Name("floor"), Sort.ANY);
     }
     
     
@@ -1006,4 +1016,23 @@ public final class IntegerLDT extends LDT {
     public Term one() {	
 	return one;
     }
+
+
+	
+    
+    //----------added by Huy to support power, floor, round
+    public Function getPower() {
+		return power;
+	}
+
+
+	public Function getRound() {
+		return round;
+	}
+
+
+	public Function getFloor() {
+		return floor;
+	}
+    
 }

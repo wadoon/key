@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -2218,5 +2219,75 @@ public class TermBuilder {
                         : func((Function) services.getNamespaces().functions().lookup(new Name(
                                 "__EQUALS__LOCS__POST__")), // TODO: define string constant elsewhere
                                 heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
+    }
+    
+    /*-------------------------------------------------------------------------------------------
+     * added by Huy for following operators: div, mult, power, round, floor 
+     *-------------------------------------------------------------------------------------------*/
+    public Term mul(Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Term zero = integerLDT.zero();
+        final Term one = integerLDT.one();
+        if(t1.equals(zero)||(t2.equals(zero))) {
+            return zero;
+        }else if(t1.equals(one)){
+        	return t2;
+        }else if(t2.equals(one)){
+        	return t1;
+        }else {
+            return func(integerLDT.getMul(), t1, t2);
+        }
+    }
+    
+    public Term minus(Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Term zero = integerLDT.zero();
+        final Term one = integerLDT.one();
+        if(t2.equals(zero)) {
+            return t1;     
+        }else {
+            return func(integerLDT.getSub(), t1, t2);
+        }
+    }
+    
+    public Term div(Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Term zero = integerLDT.zero();
+        final Term one = integerLDT.one();
+        if(t1.equals(zero)) {
+            return zero;
+        } else if(t2.equals(zero)){
+        	return null; //unidentified
+        }else if(t2.equals(one)){
+        	return t1;
+        }	
+        else {
+            return func(integerLDT.getDiv(), t1, t2);
+        }        
+    }
+
+    public Term power(Term base, Term exponent){
+    	final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+    	final Term zero = integerLDT.zero();
+        final Term one = integerLDT.one();
+        if(base.equals(zero))
+        	return zero;
+        else if(base.equals(one))
+        	return one;
+        else if(exponent.equals(zero))
+        	return one;
+        else if(exponent.equals(one))
+        	return base;
+        else
+        	return func(integerLDT.getPower(),base,exponent);
+    }
+    
+    public Term ground(Term t){
+    	final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();    	
+    	return func(integerLDT.getRound(),t);
+    }
+    public Term floor(Term t){
+    	final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();    	
+    	return func(integerLDT.getFloor(),t);
     }
 }
