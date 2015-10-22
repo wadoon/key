@@ -9,6 +9,6 @@ macro split-prop;
 tryclose;
 
 rule olt_trans 
-  formula="olt(f_i0, f_i1)";
+  formula='olt(f_i0, f_i1)';
 
 tryclose;
