@@ -1,4 +1,4 @@
-package key.nui.fx;
+package de.uka.ikd.key.nui;
 	
 import javafx.application.Application;
 import javafx.stage.Stage;
