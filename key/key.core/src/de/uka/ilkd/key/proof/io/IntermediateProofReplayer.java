@@ -63,11 +63,13 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -78,6 +80,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -395,7 +398,7 @@ public class IntermediateProofReplayer {
                                                 appInterm.getPosInfo().first,
                                                 appInterm.getPosInfo().second),
                                         currNodeInterm));
-                    }
+                    } 
                     else {
                         try {
                             IBuiltInRuleApp app =
@@ -403,6 +406,17 @@ public class IntermediateProofReplayer {
                             if (!app.complete()) {
                                 app = app.tryToInstantiate(currGoal);
                             }
+
+                            if (app instanceof LoopInvariantBuiltInRuleApp)  {
+                                if (appInterm.getContractOrLoopInvariant() != null) {
+                                    LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp)app;
+                                    LoopInvariant inv = loopApp.getInvariant();                                                                
+                                    inv.getInternalInvariants().put(proof.getServices().getTypeConverter().getHeapLDT().getHeap(), 
+                                            parseTerm(appInterm.getContractOrLoopInvariant(),proof));                                    
+                                    app = loopApp.setLoopInvariant(inv);
+                                }
+                            }
+                            
                             currGoal.apply(app);
 
                             final Iterator<Node> children =
@@ -520,7 +534,7 @@ public class IntermediateProofReplayer {
 
         TacletApp ourApp = null;
         PosInOccurrence pos = null;
-
+        
         Taclet t =
                 proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
@@ -603,15 +617,15 @@ public class IntermediateProofReplayer {
         ImmutableList<PosInOccurrence> builtinIfInsts = null;
 
         // Load contracts, if applicable
-        if (currInterm.getContract() != null) {
+        if (!WhileInvariantRule.INSTANCE.name().toString().equals(ruleName) && currInterm.getContractOrLoopInvariant() != null) {
             currContract =
                     proof.getServices().getSpecificationRepository()
-                            .getContractByName(currInterm.getContract());
+                            .getContractByName(currInterm.getContractOrLoopInvariant());
             if (currContract == null) {
                 final ProblemLoaderException e =
                         new ProblemLoaderException(loader,
                                 "Error loading proof: contract \""
-                                        + currInterm.getContract()
+                                        + currInterm.getContractOrLoopInvariant()
                                         + "\" not found.");
                 reportError(ERROR_LOADING_PROOF_LINE + ", goal "
                         + currGoal.node().serialNr() + ", rule " + ruleName

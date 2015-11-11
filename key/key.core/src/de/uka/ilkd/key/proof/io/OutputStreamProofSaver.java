@@ -51,6 +51,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -62,6 +63,7 @@ import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
@@ -341,6 +343,14 @@ public class OutputStreamProofSaver {
             RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
             tree.append(" (contract \"");
             tree.append(ruleJustiBySpec.getSpec().getName());
+            tree.append("\")");
+        }
+        
+        if (appliedRuleApp instanceof LoopInvariantBuiltInRuleApp) {
+            // by far not complete
+            final LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) appliedRuleApp;
+            tree.append(" (loopInvariant \"");
+            tree.append(printAnything(loopApp.getInvariant().getInvariant(proof.getServices()), proof.getServices(), false));
             tree.append("\")");
         }
         

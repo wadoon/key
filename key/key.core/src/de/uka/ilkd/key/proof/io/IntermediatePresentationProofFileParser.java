@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -210,8 +211,10 @@ public class IntermediatePresentationProofFileParser implements
             ruleInfo = new BuiltinRuleInformation(str);
             break;
 
-        case CONTRACT: // contract
-            ((BuiltinRuleInformation) ruleInfo).currContract = str;
+        case CONTRACT:
+            case LOOP_INVARIANT:
+            // contract or loop invariant
+            ((BuiltinRuleInformation) ruleInfo).currContractOrLoopInvariant = str;
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
@@ -243,7 +246,8 @@ public class IntermediatePresentationProofFileParser implements
                 /* ignore */
             }
             break;
-
+            
+            
         case JOIN_PROCEDURE: // join procedure
             ((BuiltinRuleInformation) ruleInfo).currJoinProc = str;
             break;
@@ -385,13 +389,13 @@ public class IntermediatePresentationProofFileParser implements
                             builtinInfo.currCorrespondingJoinNodeId,
                             builtinInfo.currNewNames);
         }
-        else {
+        else if (builtinInfo.currRuleName.equals(WhileInvariantRule.INSTANCE.name().toString())) {
             result =
                     new BuiltInAppIntermediate(builtinInfo.currRuleName,
                             new Pair<Integer, PosInTerm>(
                                     builtinInfo.currFormula,
                                     builtinInfo.currPosInTerm),
-                            builtinInfo.currContract,
+                            builtinInfo.currContractOrLoopInvariant,
                             builtinInfo.builtinIfInsts,
                             builtinInfo.currNewNames);
         }
@@ -468,8 +472,8 @@ public class IntermediatePresentationProofFileParser implements
         protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
         protected int currIfInstFormula;
         protected PosInTerm currIfInstPosInTerm;
-        /* > Method Contract */
-        protected String currContract = null;
+        /* > Method Contract or loop invariant*/
+        protected String currContractOrLoopInvariant = null;
         /* > Join Rule */
         protected String currJoinProc = null;
         protected int currNrPartners = 0;

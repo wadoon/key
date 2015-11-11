@@ -61,7 +61,7 @@ public class LoopInvariantRuleCompletion implements
                                                 .getSelfTerm(JavaTools.getInnermostMethodFrame(
                                                                 progPost.javaBlock(), services),
                                                              services),
-                                        null);
+                                        null);  
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
                         services, false, loopApp.getHeapContext());
