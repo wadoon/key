@@ -389,7 +389,7 @@ public class IntermediatePresentationProofFileParser implements
                             builtinInfo.currCorrespondingJoinNodeId,
                             builtinInfo.currNewNames);
         }
-        else if (builtinInfo.currRuleName.equals(WhileInvariantRule.INSTANCE.name().toString())) {
+        else {
             result =
                     new BuiltInAppIntermediate(builtinInfo.currRuleName,
                             new Pair<Integer, PosInTerm>(
