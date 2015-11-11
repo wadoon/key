@@ -350,7 +350,7 @@ public class OutputStreamProofSaver {
             // by far not complete
             final LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) appliedRuleApp;
             tree.append(" (loopInvariant \"");
-            tree.append(printAnything(loopApp.getInvariant().getInvariant(proof.getServices()), proof.getServices(), false));
+            tree.append(escapeCharacters(printAnything(loopApp.getInvariant().getInvariant(proof.getServices()), proof.getServices(), false).toString()));
             tree.append("\")");
         }
         
