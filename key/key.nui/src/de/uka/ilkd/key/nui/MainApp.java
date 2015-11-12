@@ -1,4 +1,4 @@
-package de.uka.ikd.key.nui;
+package de.uka.ilkd.key.nui;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ public class MainApp extends Application {
         this.primaryStage.setTitle("KeY Project");
 
         initRootLayout();
-        show();
+        showMainView();
     }
 
     /**
@@ -41,15 +41,15 @@ public class MainApp extends Application {
         }
     }
 
-    public void show() {
+    public void showMainView() {
         try {
             // Load main view
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("view/MainView.fxml"));
-            AnchorPane personOverview = (AnchorPane) loader.load();
+            AnchorPane mainView = (AnchorPane) loader.load();
 
-            // Set person overview into the center of root layout.
-            rootLayout.setCenter(personOverview);
+            // Set main view into the center of root layout.
+            rootLayout.setCenter(mainView);
         } catch (IOException e) {
             e.printStackTrace();
         }

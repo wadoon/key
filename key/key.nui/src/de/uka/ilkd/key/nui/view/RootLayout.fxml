@@ -12,42 +12,37 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.web.HTMLEditor?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity"
-	minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-	prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="de.uka.ikd.key.nui.MenuController" fx:id="mainPane">
+<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.MenuController">
 	<top>
 		<MenuBar BorderPane.alignment="CENTER">
 			<menus>
 				<Menu mnemonicParsing="false" text="File">
 					<items>
 						<MenuItem mnemonicParsing="false" text="Open" />
-						<MenuItem mnemonicParsing="false" text="Close" onAction="#handleClose" />
+						<MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
 					</items>
 				</Menu>
 				<Menu mnemonicParsing="false" text="Views">
 					<items>
-						<MenuItem mnemonicParsing="false" text="Sequent View"
-							onAction="#handleSequentView" />
+						<MenuItem mnemonicParsing="false" onAction="#handleSequentView" text="Sequent View" />
 					</items>
 				</Menu>
 				<Menu mnemonicParsing="false" text="Help">
 					<items>
-						<MenuItem mnemonicParsing="false" text="About" onAction="#handleAbout" />
+						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />
 					</items>
 				</Menu>
 			</menus>
 		</MenuBar>
 	</top>
 	<left>
-		<VBox spacing="100" alignment="CENTER">
+		<VBox alignment="CENTER" spacing="100">
 			<Label text="View 1" />
 			<Label text="View 2" />
 		</VBox>
 	</left>
 	<right>
-		<VBox spacing="100" alignment="CENTER">
+		<VBox alignment="CENTER" spacing="100">
 			<Label text="View 3" />
 			<Label text="View 4" />
 		</VBox>
@@ -57,4 +52,7 @@
 			<Menu text="STATUS" />
 		</MenuBar>
 	</bottom>
+   <center>
+      <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
 </BorderPane>
