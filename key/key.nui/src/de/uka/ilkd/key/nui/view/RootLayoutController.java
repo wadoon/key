@@ -10,7 +10,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -20,18 +19,30 @@ import javafx.stage.Stage;
  */
 public class RootLayoutController {
     
+    // Reference to the main application
+    private MainApp mainApp;
+
+    /**
+     * Is called by the main application to give a reference back to itself.
+     * 
+     * @param mainApp
+     */
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
+    }
+    
 	/**
 	 * The BorderPane from the Main Window
 	 */
-	@FXML
-	BorderPane mainPane;
+	//@FXML
+	//BorderPane mainPane;
 	
 	/**
 	 * Opens a new Window with About Functionality. View: AboutView.fxml
 	 * @param event ActionEvent
 	 */
 	@FXML
-	protected void handleAbout(ActionEvent event) {
+	private void handleAbout(ActionEvent event) {
 		System.out.println("About clicked");
 
 		try {
@@ -52,59 +63,29 @@ public class RootLayoutController {
 	
 	/**
 	 * Closes the program on Click
-	 * @param event ActionEvent
 	 */
 	@FXML
-	protected void handleClose(ActionEvent event) {
+	private void handleClose() {
 		System.exit(0);
 	}
 	
 	/**
-	 * Adds the SequentView to the CENTER Position
-	 * @param event ActionEvent
-	 * @throws IOException 
+	 * Shows the Sequent View.
 	 */
 	@FXML
-	protected void handleSequentView(ActionEvent event) {
-	    //System.out.println(event.getSource());
-	    
-	    try {
-	        FXMLLoader loader = new FXMLLoader();
-	        loader.setLocation(MainApp.class.getResource("view/SequentView.fxml"));
-	        AnchorPane sequentView = (AnchorPane) loader.load();
-	        
-	        mainPane.setCenter(sequentView);
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+	private void handleSequentView() {
+	    mainApp.showSequentView();
 	    
 		//mainPane.setCenter(node);
 		//mainView.getChildren().add(new Label("MAINVIEW"));
-		
 	}
 	
 	/**
-     * Adds the SequentView to the CENTER Position
-     * @param event ActionEvent
-     * @throws IOException 
+     * Shows the Main View.
      */
     @FXML
-    protected void handleMainView(ActionEvent event) {
-        //System.out.println(event.getSource());
-        
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/MainView.fxml"));
-            AnchorPane mainView = (AnchorPane) loader.load();
-            
-            mainPane.setCenter(mainView);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        //mainPane.setCenter(node);
-        //mainView.getChildren().add(new Label("MAINVIEW"));
-        
+    private void handleMainView() {
+        mainApp.showMainView();
     }
 	
 	/**
