@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.nui.view;
 
-import de.uka.ilkd.key.nui.MainApp;
+import de.uka.ilkd.key.nui.ViewController;
 import javafx.fxml.FXML;
 
-public class SequentViewController {
+public class SequentViewController extends ViewController {
     
     // Reference to the main application.
-    private MainApp mainApp;
+    
     
     /**
      * The constructor.
@@ -21,14 +21,5 @@ public class SequentViewController {
      */
     @FXML
     private void initialize() {
-    }
-    
-    /**
-     * Is called by the main application to give a reference back to itself.
-     * 
-     * @param mainApp
-     */
-    public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
     }
 }

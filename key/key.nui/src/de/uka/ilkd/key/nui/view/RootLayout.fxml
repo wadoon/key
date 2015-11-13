@@ -22,12 +22,7 @@
 						<MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
 					</items>
 				</Menu>
-				<Menu mnemonicParsing="false" text="Views">
-					<items>
-                  <MenuItem mnemonicParsing="false" onAction="#handleMainView" text="Main View" />
-						<MenuItem mnemonicParsing="false" onAction="#handleSequentView" text="Sequent View" />
-					</items>
-				</Menu>
+				<Menu mnemonicParsing="false" text="Views" fx:id="registeredViewsMenu" />
 				<Menu mnemonicParsing="false" text="Help">
 					<items>
 						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />

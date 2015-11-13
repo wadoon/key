@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui.view;
 
-public class AboutViewController {
+import de.uka.ilkd.key.nui.ViewController;
+
+public class AboutViewController extends ViewController {
 
 }
