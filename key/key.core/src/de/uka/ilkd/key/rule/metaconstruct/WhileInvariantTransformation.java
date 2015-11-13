@@ -305,9 +305,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
-            
-//            if (!changeList.isEmpty()) {
-            
+
+            // if (!changeList.isEmpty()) {
+
             Expression guard =
                     ((Guard) changeList.removeFirst()).getExpression();
             Statement body =
@@ -315,14 +315,14 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                             .removeFirst());
 
             body = resetBrkVariableToDefVal(body);
-            
+
             addChild(KeYJavaASTFactory.whileLoop(guard, body,
                     x.getPositionInfo()));
             changed();
-                
-//            } else {
-//                doDefaultAction(x);
-//            }
+
+            // } else {
+            // doDefaultAction(x);
+            // }
         }
     }
 
@@ -338,19 +338,25 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
         ImmutableList<Statement> bodyList;
         if (body instanceof StatementBlock) {
-            bodyList = ((StatementBlock) body)
-                    .getBody().toImmutableList();
-        } else {
+            bodyList = ((StatementBlock) body).getBody().toImmutableList();
+        }
+        else {
             bodyList = ImmutableSLList.nil();
             bodyList = bodyList.prepend(body);
         }
-        
+
+        for (BreakToBeReplaced btbr : breakList) {
+            bodyList =
+                    bodyList.prepend(KeYJavaASTFactory.assign(
+                            btbr.getProgramVariable(), BooleanLiteral.FALSE));
+        }
+
         body =
-                KeYJavaASTFactory.block(bodyList
-                        .prepend(assignFlag).toArray(Statement.class));
+                KeYJavaASTFactory.block(bodyList.prepend(assignFlag).toArray(
+                        Statement.class));
         return body;
     }
-    
+
     @Override
     public void performActionOnDo(Do x) {
         ExtList changeList = stack.peek();
@@ -362,7 +368,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             Statement body =
                     (Statement) (changeList.isEmpty() ? null : changeList
                             .removeFirst());
-            
+
             Expression guard =
                     ((Guard) changeList.removeFirst()).getExpression();
             Statement unwindedBody = null;
@@ -402,26 +408,23 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
-            
-            Statement body =
-                    changeList.removeFirstOccurrence(Statement.class);
+
+            Statement body = changeList.removeFirstOccurrence(Statement.class);
 
             body = resetBrkVariableToDefVal(body);
-            
+
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
             Do newLoop =
-                    KeYJavaASTFactory.doLoop(guard, body,
-                            x.getPositionInfo());
-            services.getSpecificationRepository().copyLoopInvariant(x,
-                    newLoop);
+                    KeYJavaASTFactory.doLoop(guard, body, x.getPositionInfo());
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
-            
-//            }
-//            else {
-//                doDefaultAction(x);
-//            }
+
+            // }
+            // else {
+            // doDefaultAction(x);
+            // }
         }
     }
 
@@ -483,22 +486,20 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
-            
+
             Statement body = changeList.get(Statement.class);
-            
+
             body = resetBrkVariableToDefVal(body);
-            
+
             changeList.addFirst(body);
-            
-            EnhancedFor newLoop =
-                    KeYJavaASTFactory.enhancedForLoop(changeList);
-            services.getSpecificationRepository().copyLoopInvariant(x,
-                    newLoop);
+
+            EnhancedFor newLoop = KeYJavaASTFactory.enhancedForLoop(changeList);
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
         }
     }
-    
+
     @Override
     public void performActionOnFor(For x) {
         ExtList changeList = stack.peek();
@@ -592,16 +593,15 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
-            
+
             Statement body = changeList.get(Statement.class);
-            
+
             body = resetBrkVariableToDefVal(body);
-            
+
             changeList.addFirst(body);
-            
+
             For newLoop = KeYJavaASTFactory.forLoop(changeList);
-            services.getSpecificationRepository().copyLoopInvariant(x,
-                    newLoop);
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
         }
