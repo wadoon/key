@@ -1,10 +1,11 @@
 /**
  * 
  */
-package de.uka.ilkd.key.nui;
+package de.uka.ilkd.key.nui.view;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.nui.MainApp;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +18,7 @@ import javafx.stage.Stage;
  * @author Maximilian Li
  *
  */
-public class MenuController {
+public class RootLayoutController {
     
 	/**
 	 * The BorderPane from the Main Window
@@ -83,9 +84,33 @@ public class MenuController {
 	}
 	
 	/**
+     * Adds the SequentView to the CENTER Position
+     * @param event ActionEvent
+     * @throws IOException 
+     */
+    @FXML
+    protected void handleMainView(ActionEvent event) {
+        //System.out.println(event.getSource());
+        
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("view/MainView.fxml"));
+            AnchorPane mainView = (AnchorPane) loader.load();
+            
+            mainPane.setCenter(mainView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        //mainPane.setCenter(node);
+        //mainView.getChildren().add(new Label("MAINVIEW"));
+        
+    }
+	
+	/**
 	 * 
 	 */
-	public MenuController() {
+	public RootLayoutController() {
 		// TODO Auto-generated constructor stub
 	}
 

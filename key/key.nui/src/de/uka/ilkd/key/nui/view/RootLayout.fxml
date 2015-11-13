@@ -12,7 +12,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.web.HTMLEditor?>
 
-<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.MenuController">
+<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.RootLayoutController">
 	<top>
 		<MenuBar BorderPane.alignment="CENTER">
 			<menus>
@@ -24,6 +24,7 @@
 				</Menu>
 				<Menu mnemonicParsing="false" text="Views">
 					<items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleMainView" text="Main View" />
 						<MenuItem mnemonicParsing="false" onAction="#handleSequentView" text="Sequent View" />
 					</items>
 				</Menu>
@@ -35,24 +36,28 @@
 			</menus>
 		</MenuBar>
 	</top>
-	<left>
-		<VBox alignment="CENTER" spacing="100">
-			<Label text="View 1" />
-			<Label text="View 2" />
-		</VBox>
-	</left>
-	<right>
-		<VBox alignment="CENTER" spacing="100">
-			<Label text="View 3" />
-			<Label text="View 4" />
-		</VBox>
-	</right>
 	<bottom>
 		<MenuBar>
 			<Menu text="STATUS" />
 		</MenuBar>
 	</bottom>
    <center>
-      <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
+   <left>
+      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
+        </items>
+      </SplitPane>
+   </left>
+   <right>
+      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
+        </items>
+      </SplitPane>
+   </right>
 </BorderPane>
