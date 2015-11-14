@@ -76,8 +76,8 @@ public class RootLayoutController extends ViewController implements IViewContain
 
     @FXML
     private Menu registeredViewsMenu;
-    
-    private Menu otherViews = null;
+
+    private Menu otherViewsMenu = null;
 
     public void registerView(String title,URL path, KeyCombination keys){
         MenuItem item = new MenuItem();
@@ -86,37 +86,68 @@ public class RootLayoutController extends ViewController implements IViewContain
 
         if(keys != null)
             item.setAccelerator(keys);
-        
+
         if(registeredViewsMenu.getItems().size() < MaxMenuEntries) {
             registeredViewsMenu.getItems().add(item);
         }
         else{
-            if(otherViews == null){
-                otherViews = new Menu("Other");
-                registeredViewsMenu.getItems().add(otherViews);
+            if(otherViewsMenu == null){
+                otherViewsMenu = new Menu("Other");
+                registeredViewsMenu.getItems().add(otherViewsMenu);
             }
-            otherViews.getItems().add(item);
+            otherViewsMenu.getItems().add(item);
         }
     } 
 
     public void registerView(String title, URL path) {
-       registerView(title,path,null);
+        registerView(title,path,null);
     }
-    
+
     private void showView(URL path) {
+        mainPane.setCenter(loadFxml(path));
+    }
+
+    @FXML
+    private MenuBar menuBar;
+
+    @FXML
+    private Menu helpMenu;
+
+    public void registerMenu(URL sourcePath){
+        // add additional menus right before the "Help" entry
+        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),loadFxml(sourcePath));
+    }
+/*
+    public enum MainMenus{
+        File,
+        Views,
+        Help
+    }
+
+    public void registerSubMenu(MainMenus menu,URL sourcePath){
+        // add additional menus right before the "Help" entry
+        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),loadFxml(sourcePath));
+    }
+*/
+
+    private <T> T loadFxml(URL path){
         try {
             // Load main view
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(path);
-            
-            mainPane.setCenter(loader.load());
-            
+
+            T content = loader.load();
+
             // Give the controller access to the main app.
             ViewController controller = loader.getController();
             controller.setMainApp(mainApp);
-            
+
+            return content;
+
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
     }
+
 }

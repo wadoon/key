@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+
+
+<Menu text="Test" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.testimplementation.TestMenuEntryController">
+   <items>
+      <MenuItem mnemonicParsing="false" onAction="#DoClose" text="Test Close" />
+      <MenuItem mnemonicParsing="false" text="Test2" />
+      <MenuItem mnemonicParsing="false" text="Test3" />
+   </items>
+</Menu>

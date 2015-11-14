@@ -104,6 +104,7 @@ public class MainApp extends Application {
     private void registerViews(){
         rootLayoutController.registerView("Sequent", MainApp.class.getResource("view/SequentView.fxml"));
         rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"));
+        rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
     }
 
     /**
