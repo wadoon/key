@@ -6,9 +6,11 @@ import java.io.IOException;
 import de.uka.ilkd.key.nui.view.MainViewController;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import de.uka.ilkd.key.nui.view.SequentViewController;
+import de.uka.ilkd.key.nui.view.TreeViewController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -93,6 +95,33 @@ public class MainApp extends Application {
             
             // Give the controller access to the main app.
             SequentViewController controller = loader.getController();
+            controller.setMainApp(this);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    /**
+     * Shows the TreeView inside the root layout.
+     */
+    public void showTreeView() {
+        try {
+            // Load Tree view
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("view/TreeView.fxml"));
+            AnchorPane treeView = (AnchorPane) loader.load();
+
+            // Set Tree view into the center of root layout.
+            SplitPane left = (SplitPane) rootLayout.getLeft();
+            AnchorPane topLeft = (AnchorPane) left.getItems().get(0);
+            topLeft.setTopAnchor(treeView, 0.0);
+            topLeft.getChildren().add(treeView);
+            left.setPrefWidth(200.0);
+            
+            // Give the controller access to the main app.
+            TreeViewController controller = loader.getController();
             controller.setMainApp(this);
             
         } catch (IOException e) {
