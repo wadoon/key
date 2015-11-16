@@ -40,6 +40,7 @@ import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -316,8 +317,13 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
             body = resetBrkVariableToDefVal(body);
 
-            addChild(KeYJavaASTFactory.whileLoop(guard, body,
-                    x.getPositionInfo()));
+
+            final While newLoop = KeYJavaASTFactory.whileLoop(guard, body, x.getPositionInfo());
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            StatementBlock block = 
+                    insertBreakReinitializationAferLoopStatement(newLoop);
+
+            addChild(block);
             changed();
 
             // } else {
@@ -333,28 +339,33 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @return
      */
     private Statement resetBrkVariableToDefVal(Statement body) {
-        Statement assignFlag =
-                KeYJavaASTFactory.assign(brk, BooleanLiteral.FALSE);
-
         ImmutableList<Statement> bodyList;
         if (body instanceof StatementBlock) {
             bodyList = ((StatementBlock) body).getBody().toImmutableList();
         }
         else {
-            bodyList = ImmutableSLList.nil();
+            bodyList = ImmutableSLList.<Statement>nil();
             bodyList = bodyList.prepend(body);
         }
 
+        bodyList = reinitializeBreakVariables(bodyList);
+
+        body =
+                KeYJavaASTFactory.block(bodyList.toArray(Statement.class));
+        return body;
+    }
+
+    private ImmutableList<Statement> reinitializeBreakVariables(
+            ImmutableList<Statement> bodyList) {
         for (BreakToBeReplaced btbr : breakList) {
             bodyList =
                     bodyList.prepend(KeYJavaASTFactory.assign(
                             btbr.getProgramVariable(), BooleanLiteral.FALSE));
         }
-
-        body =
-                KeYJavaASTFactory.block(bodyList.prepend(assignFlag).toArray(
-                        Statement.class));
-        return body;
+        bodyList = bodyList.prepend(KeYJavaASTFactory.assign(brk, BooleanLiteral.FALSE));
+        bodyList = bodyList.prepend(KeYJavaASTFactory.assign(rtrn, BooleanLiteral.FALSE));
+        bodyList = bodyList.prepend(KeYJavaASTFactory.assign(exc, BooleanLiteral.FALSE));
+        return bodyList;
     }
 
     @Override
@@ -415,17 +426,23 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
-            Do newLoop =
-                    KeYJavaASTFactory.doLoop(guard, body, x.getPositionInfo());
+            LoopStatement newLoop =
+                    KeYJavaASTFactory.doLoop(guard, body, x.getPositionInfo());            
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
-            addChild(newLoop);
-            changed();
 
-            // }
-            // else {
-            // doDefaultAction(x);
-            // }
+            StatementBlock block = insertBreakReinitializationAferLoopStatement(
+                    newLoop);
+            
+            addChild(block);
+            changed();
         }
+    }
+
+    private StatementBlock insertBreakReinitializationAferLoopStatement(
+            LoopStatement newLoop) {
+        StatementBlock block = 
+                new StatementBlock(reinitializeBreakVariables(ImmutableSLList.<Statement>nil()).prepend(newLoop).toArray(Statement.class));
+        return block;
     }
 
     /**
@@ -495,7 +512,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
             EnhancedFor newLoop = KeYJavaASTFactory.enhancedForLoop(changeList);
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
-            addChild(newLoop);
+            StatementBlock block = insertBreakReinitializationAferLoopStatement(
+                    newLoop);
+
+            addChild(block);
             changed();
         }
     }
@@ -602,7 +622,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
             For newLoop = KeYJavaASTFactory.forLoop(changeList);
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
-            addChild(newLoop);
+            StatementBlock block = insertBreakReinitializationAferLoopStatement(
+                    newLoop);
+            addChild(block);
             changed();
         }
     }
