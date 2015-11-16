@@ -8,7 +8,9 @@
 
 <AnchorPane prefHeight="300.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.SequentViewController">
    <children>
-      <Label text="Sequent View" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="100.0" />
-      <Pane onMouseEntered="#printSomething" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0" />
+      <Label text="Sequent View" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="50.0" />
+      <Button mnemonicParsing="false" onAction="#printSomething" text="printSomething()" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+      <TextArea fx:id="textArea" prefHeight="200.0" prefWidth="200.0" text="hu" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <TextField fx:id="textField" text="hi" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="100.0" />
    </children>
 </AnchorPane>

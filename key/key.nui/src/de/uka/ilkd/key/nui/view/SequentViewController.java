@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.view;
 
 import de.uka.ilkd.key.nui.ViewController;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -29,6 +30,8 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.util.pp.Layouter;
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 public class SequentViewController extends ViewController {
     
@@ -44,7 +47,13 @@ public class SequentViewController extends ViewController {
     private Term t2;
     private Proof proof = new Proof("testProof", new InitConfig(new Services(null)));
     private Services services = proof.getServices();
-    private TermBuilder tb = new TermBuilder(new TermFactory(null), services);
+    //private TermBuilder tb = new TermBuilder(new TermFactory(null), services);
+
+    @FXML
+    private TextArea textArea;
+    
+    @FXML
+    private TextField textField;
     
     /**
      * The constructor.
@@ -62,9 +71,10 @@ public class SequentViewController extends ViewController {
     }
     
     @FXML
-    private void printSomething() throws ParserException {
-        
-        t1 = tb.parseTerm("abc");
+    private void printSomething() {
+        textArea.setText("hello");
+        textField.setText("World");
+        //t1 = tb.parseTerm("abc");
         //t2 = tb.parseTerm("def");
         //ListA.prepend(new SequentFormula(t1));
         //ListB.prepend(new SequentFormula(t2));
@@ -75,6 +85,6 @@ public class SequentViewController extends ViewController {
         //seq = Sequent.createSequent(ssa, ssb);
         
         //lp.printSequent(seq);
-        //System.out.println(LogicPrinter.quickPrintSequent(seq, null));
+        //textArea.setText(LogicPrinter.quickPrintSequent(seq, null));
     }
 }
