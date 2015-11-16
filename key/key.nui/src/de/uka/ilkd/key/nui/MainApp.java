@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui;
 
 
 import java.io.IOException;
+import java.net.URL;
 
 import de.uka.ilkd.key.nui.view.MainViewController;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
@@ -17,9 +18,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
-    
+
     private Stage primaryStage;
     private BorderPane rootLayout;
+    private RootLayoutController rootLayoutController;
 
     @Override
     public void start(Stage primaryStage) {
@@ -28,10 +30,10 @@ public class MainApp extends Application {
 
         // Set the application icon.
         this.primaryStage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
-        
+
         initRootLayout();
-        
-        showMainView();
+        registerViews();
+        primaryStage.show();
     }
 
     /**
@@ -47,12 +49,11 @@ public class MainApp extends Application {
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
-            
+
             // Give the controller access to the main app.
             RootLayoutController controller = loader.getController();
             controller.setMainApp(this);
-            
-            primaryStage.show();
+            rootLayoutController = controller;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,7 +61,7 @@ public class MainApp extends Application {
 
     /**
      * Shows the Main View inside the root layout.
-     */
+
     public void showMainView() {
         try {
             // Load main view
@@ -70,19 +71,19 @@ public class MainApp extends Application {
 
             // Set main view into the center of root layout.
             rootLayout.setCenter(mainView);
-            
+
             // Give the controller access to the main app.
             MainViewController controller = loader.getController();
             controller.setMainApp(this);
-            
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-    
+    }*/
+
     /**
      * Shows the SequentView inside the root layout.
-     */
+
     public void showSequentView() {
         try {
             // Load Sequent view
@@ -92,14 +93,20 @@ public class MainApp extends Application {
 
             // Set sequent view into the center of root layout.
             rootLayout.setCenter(mainView);
-            
+
             // Give the controller access to the main app.
             SequentViewController controller = loader.getController();
             controller.setMainApp(this);
-            
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }*/
+
+    private void registerViews(){
+        rootLayoutController.registerView("Sequent", MainApp.class.getResource("view/SequentView.fxml"));
+        rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"));
+        rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
     }
     
     
@@ -136,7 +143,7 @@ public class MainApp extends Application {
     public Stage getPrimaryStage() {
         return primaryStage;
     }
-    
+
     public static void main(String[] args) {
         launch(args);
     }
