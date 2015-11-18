@@ -5,7 +5,6 @@ package de.uka.ilkd.key.nui.view;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.nui.IViewContainer;
 import de.uka.ilkd.key.nui.MainApp;
@@ -14,7 +13,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
@@ -117,18 +115,16 @@ public class RootLayoutController extends ViewController implements IViewContain
         // add additional menus right before the "Help" entry
         menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),loadFxml(sourcePath));
     }
-/*
-    public enum MainMenus{
-        File,
-        Views,
-        Help
+    
+    public void registerMenuEntry(URL sourcePath,String parentMenu) throws IllegalStateException{
+        for(Menu m : menuBar.getMenus()){
+            if(m.getText() == parentMenu){
+                m.getItems().add(loadFxml(sourcePath));
+                return;
+            }
+        }
+        throw new IllegalStateException("Menu " + parentMenu + " was not found");
     }
-
-    public void registerSubMenu(MainMenus menu,URL sourcePath){
-        // add additional menus right before the "Help" entry
-        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),loadFxml(sourcePath));
-    }
-*/
 
     private <T> T loadFxml(URL path){
         try {
