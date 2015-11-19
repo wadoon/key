@@ -5,6 +5,6 @@ import java.net.URL;
 import javafx.scene.input.KeyCombination;
 
 public interface IViewContainer {
-    public void registerView(String title,URL path, KeyCombination keys);
-    public void registerView(String title,URL path);
+    public void registerView(String title,URL path, String prefLoc, KeyCombination keys);
+    public void registerView(String title,URL path, String prefLoc);
 }

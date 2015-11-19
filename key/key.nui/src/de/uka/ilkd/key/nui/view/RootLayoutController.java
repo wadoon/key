@@ -5,19 +5,20 @@ package de.uka.ilkd.key.nui.view;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.nui.IViewContainer;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -28,6 +29,11 @@ import javafx.stage.Stage;
 public class RootLayoutController extends ViewController implements IViewContainer {
 
     private static final int MaxMenuEntries = 8;
+    private final String main = "MAIN";
+    private final String topLeft = "TOPLEFT";
+    private final String bottomLeft = "BOTTOMLEFT";
+    private final String topRight = "TOPRIGHT";
+    private final String bottomRight = "BOTTOMRIGHT";
 
     /**
      * The BorderPane from the Main Window
@@ -79,10 +85,10 @@ public class RootLayoutController extends ViewController implements IViewContain
 
     private Menu otherViewsMenu = null;
 
-    public void registerView(String title,URL path, KeyCombination keys){
+    public void registerView(String title,URL path, String prefLoc, KeyCombination keys){
         MenuItem item = new MenuItem();
         item.setText(title);
-        item.setOnAction(e -> showView(path)); 
+        item.setOnAction(e -> showView(path, prefLoc)); 
 
         if(keys != null)
             item.setAccelerator(keys);
@@ -99,12 +105,27 @@ public class RootLayoutController extends ViewController implements IViewContain
         }
     } 
 
-    public void registerView(String title, URL path) {
-        registerView(title,path,null);
+    public void registerView(String title, URL path, String prefLoc) {
+        registerView(title,path,prefLoc,null);
     }
 
-    private void showView(URL path) {
-        mainPane.setCenter(loadFxml(path));
+    private void showView(URL path, String prefLoc) {
+    	switch (prefLoc) {
+		case main:
+			mainPane.setCenter(loadFxml(path));
+			break;
+		case topLeft:
+			AnchorPane view = (AnchorPane) loadFxml(path);
+			SplitPane left = (SplitPane) mainPane.getLeft();
+            AnchorPane ancTopLeft = (AnchorPane) left.getItems().get(0);
+            ancTopLeft.setTopAnchor(view, 0.0);
+            ancTopLeft.getChildren().add(view);
+            left.setPrefWidth(200.0);
+            break;
+		default:
+			mainPane.setCenter(loadFxml(path));
+			break;
+		}
     }
 
     @FXML
