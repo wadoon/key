@@ -6,13 +6,17 @@ package de.uka.ilkd.key.nui.view;
 import java.io.IOException;
 import java.net.URL;
 
+import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.nui.IViewContainer;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -127,10 +131,20 @@ public class RootLayoutController extends ViewController implements IViewContain
     private Menu otherViewsMenu = null;
 
     public void registerView(String title,URL path, int prefLoc, KeyCombination keys){
-        MenuItem item = new MenuItem();
+        //MenuItem item = new MenuItem();
+    	CheckMenuItem item = new CheckMenuItem();
         item.setText(title);
-        item.setOnAction(e -> showView(path, prefLoc)); 
-
+        //item.setOnAction(e -> showView(path, prefLoc)); 
+        item.selectedProperty().addListener(new ChangeListener<Boolean>() {
+        	public void  changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue){
+        		if (newValue){
+        			showView(path, prefLoc);
+        		} else {
+        			clearView(prefLoc);
+        		}
+        		resize();
+        	}
+		});
         if(keys != null)
             item.setAccelerator(keys);
 
@@ -160,49 +174,27 @@ public class RootLayoutController extends ViewController implements IViewContain
     	switch (prefLoc) {
 		case centerPos:
 			position = center;
+			centerUsed = true;
 			break;
 		case topLeftPos:
 			position = topLeft;
-			mainSplitPane.setDividerPosition(0, 0.3);
-			if (bottomLeftUsed){
-				leftPane.setDividerPositions(0.5);
-			} else {
-				leftPane.setDividerPositions(1.0);
-			}
 			topLeftUsed = true;
             break;
 		case bottomLeftPos:
 			position = bottomLeft;
-			mainSplitPane.setDividerPosition(0, 0.3);
-			if (topLeftUsed){
-				leftPane.setDividerPositions(0.5);
-			} else {
-				leftPane.setDividerPositions(0.0);
-			}
 			bottomLeftUsed = true;
 			break;
 		case topRightPos:
 			position = topRight;
-			mainSplitPane.setDividerPosition(1, 0.7);
-			if (bottomRightUsed){
-				rightPane.setDividerPositions(0.5);
-			} else {
-				rightPane.setDividerPositions(0.0);
-			}
 			topRightUsed = true;
 			break;
 		case bottomRightPos:
 			position = bottomRight;
-			mainSplitPane.setDividerPosition(1, 0.7);
-			if (topRightUsed){
-				rightPane.setDividerPositions(0.5);
-			} else {
-				rightPane.setDividerPositions(0.0);
-			}
 			bottomRightUsed = true;
 			break;
 		default:
 			position = center;
+			centerUsed = true;
 			break;
 		}
     	position.setTopAnchor(view, 0.0);
@@ -210,6 +202,66 @@ public class RootLayoutController extends ViewController implements IViewContain
     	position.getChildren().add(view);
     	if (position.getPrefWidth() < 200) {
     		position.setPrefWidth(200);
+    	}
+    }
+    
+    private void clearView(int prefLoc){
+    	AnchorPane position;
+    	switch (prefLoc){
+    	case centerPos:
+			position = center;
+			centerUsed = false;
+			break;
+		case topLeftPos:
+			position = topLeft;
+			topLeftUsed = false;
+            break;
+		case bottomLeftPos:
+			position = bottomLeft;
+			bottomLeftUsed = false;
+			break;
+		case topRightPos:
+			position = topRight;
+			topRightUsed = false;
+			break;
+		case bottomRightPos:
+			position = bottomRight;
+			bottomRightUsed = false;
+			break;
+		default:
+			position = center;
+			centerUsed = false;
+			break;
+		}
+    	position.getChildren().clear();
+    }
+    
+    private void resize(){
+    	mainSplitPane.setDividerPositions(0.0, 1.0);
+    	if (topLeftUsed){
+    		if (bottomLeftUsed){
+    			leftPane.setDividerPositions(0.5);
+    			mainSplitPane.setDividerPosition(0, 0.3);
+    		} else{
+    			leftPane.setDividerPositions(1.0);
+    			mainSplitPane.setDividerPosition(0, 0.3);
+    		}
+    	} else if (bottomLeftUsed){
+    		leftPane.setDividerPositions(0.0);
+			mainSplitPane.setDividerPosition(0, 0.3);
+    	}
+    	
+    	if (topRightUsed){
+    		if (bottomRightUsed){
+    			rightPane.setDividerPositions(0.5);
+    			mainSplitPane.setDividerPosition(0, 0.7);
+    		} else{
+    			rightPane.setDividerPositions(1.0);
+    			mainSplitPane.setDividerPosition(0, 0.7);
+    		}
+    	} else if (bottomRightUsed){
+    		rightPane.setDividerPositions(0.0);
+			mainSplitPane.setDividerPosition(0, 0.7);
     	}
     }
 
