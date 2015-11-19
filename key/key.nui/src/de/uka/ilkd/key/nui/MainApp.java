@@ -2,7 +2,15 @@ package de.uka.ilkd.key.nui;
 
 
 import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Set;
+
+import org.reflections.Reflections;
 
 import de.uka.ilkd.key.nui.view.MainViewController;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
@@ -42,6 +50,8 @@ public class MainApp extends Application {
 
         initRootLayout();
         registerViews();
+        scanForViews();
+        scanForMenus();
         primaryStage.show();
     }
 
@@ -113,12 +123,33 @@ public class MainApp extends Application {
     }*/
 
     private void registerViews(){
-        rootLayoutController.registerView("Sequent", MainApp.class.getResource("view/SequentView.fxml"), centerPos);
+        //rootLayoutController.registerView("Sequent", MainApp.class.getResource("view/SequentView.fxml"), centerPos);
         rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), bottomLeftPos);
         rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), topLeftPos);
-        rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
+        //rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
     }
     
+    private Reflections reflections = new Reflections("de.uka.ilkd.key.nui");
+    
+    private void scanForViews(){
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
+        for(Class<?> c : annotated){
+            KeYView annot = c.getAnnotation(KeYView.class);
+            if(Arrays.asList(annot.windows()).contains("Main"))
+                rootLayoutController.registerView(annot.title(),c.getResource(annot.path()) , annot.preferredPosition());
+        }
+        System.out.println("Views: " + annotated.size());
+    }
+    
+    private void scanForMenus(){
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
+        for(Class<?> c : annotated){
+            KeYMenu annot = c.getAnnotation(KeYMenu.class);
+            if(Arrays.asList(annot.windows()).contains("Main"))
+                rootLayoutController.registerMenu(c.getResource(annot.path()));
+        }
+        System.out.println("Menus: " + annotated.size());
+    }
     
     /**
      * Shows the TreeView inside the root layout.

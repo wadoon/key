@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.view;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -19,6 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
+@KeYView(title="Sequent",path="SequentView.fxml",preferredPosition=0)
 public class SequentViewController extends ViewController {
 
     @FXML
