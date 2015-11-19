@@ -29,17 +29,41 @@ import javafx.stage.Stage;
 public class RootLayoutController extends ViewController implements IViewContainer {
 
     private static final int MaxMenuEntries = 8;
-    private final String main = "MAIN";
-    private final String topLeft = "TOPLEFT";
-    private final String bottomLeft = "BOTTOMLEFT";
-    private final String topRight = "TOPRIGHT";
-    private final String bottomRight = "BOTTOMRIGHT";
+    
+    /**
+     * Constant Strings for positioning
+     */
+    private final String centerPos = "CENTER";
+    private final String topLeftPos = "TOPLEFT";
+    private final String bottomLeftPos = "BOTTOMLEFT";
+    private final String topRightPos = "TOPRIGHT";
+    private final String bottomRightPos = "BOTTOMRIGHT";
 
     /**
      * The BorderPane from the Main Window
      */
     @FXML
     BorderPane mainPane;
+    
+    /**
+     * The Splitpane in the BorderPane Center, Root of AnchorPane Positions
+     */
+    @FXML
+    SplitPane mainSplitPane;
+    
+    /**
+     * The AnchorPane Positions
+     */
+    @FXML
+    AnchorPane topLeft;
+    @FXML
+    AnchorPane bottomLeft;
+    @FXML
+    AnchorPane center;
+    @FXML
+    AnchorPane topRight;
+    @FXML
+    AnchorPane bottomRight;
 
     /**
      * Opens a new Window with About Functionality. View: AboutView.fxml
@@ -110,22 +134,45 @@ public class RootLayoutController extends ViewController implements IViewContain
     }
 
     private void showView(URL path, String prefLoc) {
+    	AnchorPane position;
+    	AnchorPane view = (AnchorPane) loadFxml(path);
     	switch (prefLoc) {
-		case main:
-			mainPane.setCenter(loadFxml(path));
+		case centerPos:
+			position = center;
+			//mainPane.setCenter(loadFxml(path));
 			break;
-		case topLeft:
-			AnchorPane view = (AnchorPane) loadFxml(path);
+		case topLeftPos:
+			position = topLeft;
+/*			AnchorPane view = (AnchorPane) loadFxml(path);
 			SplitPane left = (SplitPane) mainPane.getLeft();
             AnchorPane ancTopLeft = (AnchorPane) left.getItems().get(0);
             ancTopLeft.setTopAnchor(view, 0.0);
             ancTopLeft.getChildren().add(view);
-            left.setPrefWidth(200.0);
+            left.setPrefWidth(200.0);*/
+			mainSplitPane.setDividerPosition(0, 0.3);
             break;
+		case bottomLeftPos:
+			position = bottomLeft;
+			mainSplitPane.setDividerPosition(0, 0.3);
+			break;
+		case topRightPos:
+			position = topRight;
+			mainSplitPane.setDividerPosition(1, 0.7);
+			break;
+		case bottomRightPos:
+			position = bottomRight;
+			mainSplitPane.setDividerPosition(1, 0.7);
+			break;
 		default:
-			mainPane.setCenter(loadFxml(path));
+			position = center;
 			break;
 		}
+    	position.setTopAnchor(view, 0.0);
+    	position.getChildren().clear();
+    	position.getChildren().add(view);
+    	if (position.getPrefWidth() < 200) {
+    		position.setPrefWidth(200);
+    	}
     }
 
     @FXML
