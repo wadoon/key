@@ -31,13 +31,22 @@ public class RootLayoutController extends ViewController implements IViewContain
     private static final int MaxMenuEntries = 8;
     
     /**
-     * Constant Strings for positioning
+     * Constants for positioning
      */
-    private final String centerPos = "CENTER";
-    private final String topLeftPos = "TOPLEFT";
-    private final String bottomLeftPos = "BOTTOMLEFT";
-    private final String topRightPos = "TOPRIGHT";
-    private final String bottomRightPos = "BOTTOMRIGHT";
+    private final int centerPos = 0;
+    private final int topLeftPos = 1;
+    private final int bottomLeftPos = 2;
+    private final int topRightPos = 3;
+    private final int bottomRightPos = 4;
+    
+    /**
+     * Checks for keeping track of used AnchorPane
+     */
+    private boolean centerUsed = false;
+    private boolean topLeftUsed = false;
+    private boolean bottomLeftUsed = false;
+    private boolean topRightUsed = false;
+    private boolean bottomRightUsed = false;
 
     /**
      * The BorderPane from the Main Window
@@ -50,6 +59,14 @@ public class RootLayoutController extends ViewController implements IViewContain
      */
     @FXML
     SplitPane mainSplitPane;
+    
+    /**
+     * SplitPanes left and right
+     */
+    @FXML
+    SplitPane leftPane;
+    @FXML
+    SplitPane rightPane;
     
     /**
      * The AnchorPane Positions
@@ -109,7 +126,7 @@ public class RootLayoutController extends ViewController implements IViewContain
 
     private Menu otherViewsMenu = null;
 
-    public void registerView(String title,URL path, String prefLoc, KeyCombination keys){
+    public void registerView(String title,URL path, int prefLoc, KeyCombination keys){
         MenuItem item = new MenuItem();
         item.setText(title);
         item.setOnAction(e -> showView(path, prefLoc)); 
@@ -129,39 +146,60 @@ public class RootLayoutController extends ViewController implements IViewContain
         }
     } 
 
-    public void registerView(String title, URL path, String prefLoc) {
+    public void registerView(String title, URL path, int prefLoc) {
         registerView(title,path,prefLoc,null);
     }
 
-    private void showView(URL path, String prefLoc) {
+    private void showView(URL path, int prefLoc) {
     	AnchorPane position;
     	AnchorPane view = (AnchorPane) loadFxml(path);
+    	
+    	int leftElements = leftPane.getChildrenUnmodifiable().size();
+    	int rightElements = rightPane.getChildrenUnmodifiable().size();
+    	
     	switch (prefLoc) {
 		case centerPos:
 			position = center;
-			//mainPane.setCenter(loadFxml(path));
 			break;
 		case topLeftPos:
 			position = topLeft;
-/*			AnchorPane view = (AnchorPane) loadFxml(path);
-			SplitPane left = (SplitPane) mainPane.getLeft();
-            AnchorPane ancTopLeft = (AnchorPane) left.getItems().get(0);
-            ancTopLeft.setTopAnchor(view, 0.0);
-            ancTopLeft.getChildren().add(view);
-            left.setPrefWidth(200.0);*/
 			mainSplitPane.setDividerPosition(0, 0.3);
+			if (bottomLeftUsed){
+				leftPane.setDividerPositions(0.5);
+			} else {
+				leftPane.setDividerPositions(1.0);
+			}
+			topLeftUsed = true;
             break;
 		case bottomLeftPos:
 			position = bottomLeft;
 			mainSplitPane.setDividerPosition(0, 0.3);
+			if (topLeftUsed){
+				leftPane.setDividerPositions(0.5);
+			} else {
+				leftPane.setDividerPositions(0.0);
+			}
+			bottomLeftUsed = true;
 			break;
 		case topRightPos:
 			position = topRight;
 			mainSplitPane.setDividerPosition(1, 0.7);
+			if (bottomRightUsed){
+				rightPane.setDividerPositions(0.5);
+			} else {
+				rightPane.setDividerPositions(0.0);
+			}
+			topRightUsed = true;
 			break;
 		case bottomRightPos:
 			position = bottomRight;
 			mainSplitPane.setDividerPosition(1, 0.7);
+			if (topRightUsed){
+				rightPane.setDividerPositions(0.5);
+			} else {
+				rightPane.setDividerPositions(0.0);
+			}
+			bottomRightUsed = true;
 			break;
 		default:
 			position = center;

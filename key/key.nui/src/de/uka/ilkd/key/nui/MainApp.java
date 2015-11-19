@@ -26,11 +26,11 @@ public class MainApp extends Application {
     /**
      * Constant Strings for positioning
      */
-    private final String centerPos = "CENTER";
-    private final String topLeftPos = "TOPLEFT";
-    private final String bottomLeftPos = "BOTTOMLEFT";
-    private final String topRightPos = "TOPRIGHT";
-    private final String bottomRightPos = "BOTTOMRIGHT";
+    private final int centerPos = 0;
+    private final int topLeftPos = 1;
+    private final int bottomLeftPos = 2;
+    private final int topRightPos = 3;
+    private final int bottomRightPos = 4;
 
     @Override
     public void start(Stage primaryStage) {
@@ -114,7 +114,7 @@ public class MainApp extends Application {
 
     private void registerViews(){
         rootLayoutController.registerView("Sequent", MainApp.class.getResource("view/SequentView.fxml"), centerPos);
-        rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), centerPos);
+        rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), bottomLeftPos);
         rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), topLeftPos);
         rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
     }
