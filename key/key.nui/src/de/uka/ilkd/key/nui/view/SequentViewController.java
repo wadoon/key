@@ -1,59 +1,33 @@
 package de.uka.ilkd.key.nui.view;
 
-import de.uka.ilkd.key.nui.ViewController;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.nui.MainApp;
-import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.proof.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.util.pp.Layouter;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
+
+import java.io.File;
 
 public class SequentViewController extends ViewController {
-    
-    private Layouter layouter;
-    private Sequent seq;
-    private LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
-    private SequentViewLogicPrinter sqvlp;
-    private Semisequent ssa;
-    private Semisequent ssb;
-    private ImmutableList<SequentFormula> ListA;
-    private ImmutableList<SequentFormula> ListB;
-    private Term t1;
-    private Term t2;
-    private Proof proof = new Proof("testProof", new InitConfig(new Services(null)));
-    private Services services = proof.getServices();
-    //private TermBuilder tb = new TermBuilder(new TermFactory(null), services);
 
     @FXML
     private TextArea textArea;
     
     @FXML
     private TextField textField;
+    
+    private Proof proof;
     
     /**
      * The constructor.
@@ -64,27 +38,76 @@ public class SequentViewController extends ViewController {
 
     /**
      * Initializes the controller class. This method is automatically called
-     * after the fxml file has been loaded.
+     * after the FXML file has been loaded.
      */
     @FXML
     private void initialize() {
+        textField.setText("Welcome to the Sequent View.");
     }
     
+    /**
+     * Opens a file chooser to select a proof and loads that proof.
+     */
     @FXML
-    private void printSomething() {
-        textArea.setText("hello");
-        textField.setText("World");
-        //t1 = tb.parseTerm("abc");
-        //t2 = tb.parseTerm("def");
-        //ListA.prepend(new SequentFormula(t1));
-        //ListB.prepend(new SequentFormula(t2));
+    private void chooseProof() {
+        textField.setText("Loading Proof...");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select a proof to load");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Proofs", "*.proof"),
+                new ExtensionFilter("All Files", "*.*"));
+        fileChooser.setInitialDirectory(new File("../"));
         
-        //ssa.insertFirst(ListA);
-        //ssb.insertFirst(ListB);
+        File file = fileChooser.showOpenDialog(new Stage());
         
-        //seq = Sequent.createSequent(ssa, ssb);
+        if (file == null) {
+            textField.setText("No File Selected");
+            return;
+        }
         
-        //lp.printSequent(seq);
-        //textArea.setText(LogicPrinter.quickPrintSequent(seq, null));
+        proof = loadProof(file);
+        textField.appendText("\n Proof loaded: " + file.getName());
+    }
+    
+    /**
+     * After a proof has been loaded, the sequent of the root node can be displayed
+     */
+    @FXML
+    private void showRootSequent() {
+        if (proof == null) {
+            textField.setText("Please Select a Proof first.");
+            return;
+        }
+        Node node = proof.root();
+        Sequent sequent = node.sequent();
+        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+        
+        logicPrinter.printSequent(sequent);
+        
+        textArea.setText(logicPrinter.toString());
+    }
+    
+    /**
+     * Loads the given proof file. Checks if the proof file exists and the proof
+     * is not null, and fails if the proof could not be loaded.
+     *
+     * @param proofFileName
+     *            The file name of the proof file to load.
+     * @return The loaded proof.
+     */
+    private Proof loadProof(File proofFile) {
+        //File proofFile = new File("../" + proofFileName);
+
+        try {
+            KeYEnvironment<?> environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFile, null, null,
+                    null, true);
+            Proof proof = environment.getLoadedProof();
+
+            return proof;
+        }
+        catch (ProblemLoaderException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

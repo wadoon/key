@@ -22,6 +22,15 @@ public class MainApp extends Application {
     private Stage primaryStage;
     private BorderPane rootLayout;
     private RootLayoutController rootLayoutController;
+    
+    /**
+     * Constant Strings for positioning
+     */
+    private final int centerPos = 0;
+    private final int topLeftPos = 1;
+    private final int bottomLeftPos = 2;
+    private final int topRightPos = 3;
+    private final int bottomRightPos = 4;
 
     @Override
     public void start(Stage primaryStage) {
@@ -104,15 +113,16 @@ public class MainApp extends Application {
     }*/
 
     private void registerViews(){
-        rootLayoutController.registerView("Sequent", MainApp.class.getResource("view/SequentView.fxml"));
-        rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"));
+        rootLayoutController.registerView("Sequent", MainApp.class.getResource("view/SequentView.fxml"), centerPos);
+        rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), bottomLeftPos);
+        rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), topLeftPos);
         rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
     }
     
     
     /**
      * Shows the TreeView inside the root layout.
-     */
+     *
     public void showTreeView() {
         try {
             // Load Tree view
@@ -134,7 +144,7 @@ public class MainApp extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     /**
      * Returns the main stage.
