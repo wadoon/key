@@ -3,12 +3,18 @@
  */
 package de.uka.ilkd.key.nui.view;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.IViewContainer;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -16,13 +22,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * @author Maximilian Li
@@ -31,6 +40,11 @@ import javafx.stage.Stage;
 public class RootLayoutController extends ViewController implements IViewContainer {
 
     private static final int MaxMenuEntries = 8;
+    
+    private Proof proof;
+    
+    @FXML
+    private Label statusLabel;
     
     /**
      * Constants for positioning
@@ -115,6 +129,34 @@ public class RootLayoutController extends ViewController implements IViewContain
     private void handleClose() {
         System.exit(0);
     }
+    
+    @FXML
+    private void handleOpen() {
+        setStatus("Loading Proof...");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select a proof to load");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Proofs", "*.proof"),
+                new ExtensionFilter("All Files", "*.*"));
+        fileChooser.setInitialDirectory(new File("../"));
+        
+        File file = fileChooser.showOpenDialog(new Stage());
+        
+        if (file == null) {
+            setStatus("No File Selected");
+            return;
+        }
+        
+        proof = loadProof(file);
+        setStatus("Proof loaded: " + file.getName());
+    }
+    
+    public Proof getProof() {
+        return this.proof;
+    }
+    
+    public void setStatus(String status) {
+        statusLabel.setText(status);
+    }
 
     /**
      * 
@@ -128,15 +170,15 @@ public class RootLayoutController extends ViewController implements IViewContain
 
     private Menu otherViewsMenu = null;
 
-    public void registerView(String title,URL path, int prefLoc, KeyCombination keys){
+    public void registerView(String title,URL path, ViewPosition prefPos, KeyCombination keys){
     	CheckMenuItem item = new CheckMenuItem();
         item.setText(title); 
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
         	public void  changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue){
         		if (newValue){
-        			showView(path, prefLoc);
+        			showView(path, prefPos);
         		} else {
-        			clearView(prefLoc);
+        			clearView(prefPos);
         		}
         		resize();
         	}
@@ -156,35 +198,35 @@ public class RootLayoutController extends ViewController implements IViewContain
         }
     } 
 
-    public void registerView(String title, URL path, int prefLoc) {
-        registerView(title,path,prefLoc,null);
+    public void registerView(String title, URL path, ViewPosition prefPos) {
+        registerView(title,path,prefPos,null);
     }
 
-    private void showView(URL path, int prefLoc) {
+    private void showView(URL path, ViewPosition prefPos) {
     	AnchorPane position;
     	AnchorPane view = (AnchorPane) loadFxml(path);
     	
     	int leftElements = leftPane.getChildrenUnmodifiable().size();
     	int rightElements = rightPane.getChildrenUnmodifiable().size();
     	
-    	switch (prefLoc) {
-		case centerPos:
+    	switch (prefPos) {
+		case CENTER:
 			position = center;
 			centerUsed = true;
 			break;
-		case topLeftPos:
+		case TOPLEFT:
 			position = topLeft;
 			topLeftUsed = true;
             break;
-		case bottomLeftPos:
+		case BOTTOMLEFT:
 			position = bottomLeft;
 			bottomLeftUsed = true;
 			break;
-		case topRightPos:
+		case TOPRIGHT:
 			position = topRight;
 			topRightUsed = true;
 			break;
-		case bottomRightPos:
+		case BOTTOMRIGHT:
 			position = bottomRight;
 			bottomRightUsed = true;
 			break;
@@ -198,26 +240,26 @@ public class RootLayoutController extends ViewController implements IViewContain
     	position.getChildren().add(view);
     }
     
-    private void clearView(int prefLoc){
+    private void clearView(ViewPosition prefPos){
     	AnchorPane position;
-    	switch (prefLoc){
-    	case centerPos:
+    	switch (prefPos){
+    	case CENTER:
 			position = center;
 			centerUsed = false;
 			break;
-		case topLeftPos:
+		case TOPLEFT:
 			position = topLeft;
 			topLeftUsed = false;
             break;
-		case bottomLeftPos:
+		case BOTTOMLEFT:
 			position = bottomLeft;
 			bottomLeftUsed = false;
 			break;
-		case topRightPos:
+		case TOPRIGHT:
 			position = topRight;
 			topRightUsed = false;
 			break;
-		case bottomRightPos:
+		case BOTTOMRIGHT:
 			position = bottomRight;
 			bottomRightUsed = false;
 			break;
@@ -271,7 +313,7 @@ public class RootLayoutController extends ViewController implements IViewContain
     
     public void registerMenuEntry(URL sourcePath,String parentMenu) throws IllegalStateException{
         for(Menu m : menuBar.getMenus()){
-            if(m.getText() == parentMenu){
+            if(m.getText().equals(parentMenu)){
                 m.getItems().add(loadFxml(sourcePath));
                 return;
             }
@@ -294,6 +336,31 @@ public class RootLayoutController extends ViewController implements IViewContain
             return content;
 
         } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    /**
+     * Loads the given proof file. Checks if the proof file exists and the proof
+     * is not null, and fails if the proof could not be loaded.
+     *
+     * @param proofFileName
+     *            The file name of the proof file to load.
+     * @return The loaded proof.
+     */
+    private Proof loadProof(File proofFile) {
+        //File proofFile = new File("../" + proofFileName);
+
+        try {
+            KeYEnvironment<?> environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFile, null, null,
+                    null, true);
+            Proof proof = environment.getLoadedProof();
+
+            return proof;
+        }
+        catch (ProblemLoaderException e) {
             e.printStackTrace();
             return null;
         }

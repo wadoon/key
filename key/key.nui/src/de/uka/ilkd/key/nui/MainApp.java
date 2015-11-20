@@ -7,6 +7,7 @@ import java.util.Set;
 import org.reflections.Reflections;
 
 import de.uka.ilkd.key.nui.view.RootLayoutController;
+import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,15 +20,7 @@ public class MainApp extends Application {
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	private RootLayoutController rootLayoutController;
-
-	/**
-	 * Constant Strings for positioning
-	 */
-	private final int centerPos = 0;
-	private final int topLeftPos = 1;
-	private final int bottomLeftPos = 2;
-	private final int topRightPos = 3;
-	private final int bottomRightPos = 4;
+    private Reflections reflections = new Reflections("de.uka.ilkd.key");
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -70,12 +63,10 @@ public class MainApp extends Application {
 	private void registerViews() {
 		// rootLayoutController.registerView("Sequent",
 		// MainApp.class.getResource("view/SequentView.fxml"), centerPos);
-		rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), bottomLeftPos);
-		rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), topLeftPos);
+		rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), ViewPosition.BOTTOMLEFT);
+		rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), ViewPosition.TOPLEFT);
 		// rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
 	}
-
-	private Reflections reflections = new Reflections("de.uka.ilkd.key.nui");
 
 	private void scanForViews() {
 		Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
@@ -92,11 +83,24 @@ public class MainApp extends Application {
 		Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
 		for (Class<?> c : annotated) {
 			KeYMenu annot = c.getAnnotation(KeYMenu.class);
-			if (Arrays.asList(annot.windows()).contains("Main"))
-				rootLayoutController.registerMenu(c.getResource(annot.path()));
+			if (Arrays.asList(annot.windows()).contains("Main")) {
+			    if (annot.parentMenu().equals("")){
+	                rootLayoutController.registerMenu(c.getResource(annot.path()));
+			    } else {
+			        rootLayoutController.registerMenuEntry(c.getResource(annot.path()), annot.parentMenu());
+			    }
+			}
 		}
 		System.out.println("Menus: " + annotated.size());
 	}
+	
+	public Proof getProof() {
+	    return rootLayoutController.getProof();
+	}
+	
+	public void setStatus(String status) {
+        rootLayoutController.setStatus(status);
+    }
 
 	/**
 	 * Returns the main stage.

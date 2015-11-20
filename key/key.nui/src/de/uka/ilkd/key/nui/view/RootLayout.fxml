@@ -13,60 +13,49 @@
 <?import javafx.scene.web.HTMLEditor?>
 <?import javafx.scene.control.SplitPane?>
 
-<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
-	minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
-	prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="de.uka.ilkd.key.nui.view.RootLayoutController">
+<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.RootLayoutController">
 	<top>
-		<MenuBar BorderPane.alignment="CENTER" fx:id="menuBar">
+		<MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
 			<menus>
 				<Menu mnemonicParsing="false" text="File">
 					<items>
-						<MenuItem mnemonicParsing="false" text="Open" />
-						<MenuItem mnemonicParsing="false" onAction="#handleClose"
-							text="Close" />
+						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open" />
+						<MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
 					</items>
 				</Menu>
-				<Menu mnemonicParsing="false" text="Views" fx:id="registeredViewsMenu" />
-				<Menu mnemonicParsing="false" text="Help" fx:id="helpMenu">
+				<Menu fx:id="registeredViewsMenu" mnemonicParsing="false" text="Views" />
+				<Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
 					<items>
-						<MenuItem mnemonicParsing="false" onAction="#handleAbout"
-							text="About" />
+						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />
 					</items>
 				</Menu>
 			</menus>
 		</MenuBar>
 	</top>
-	<bottom>
-		<MenuBar>
-			<Menu text="STATUS" />
-		</MenuBar>
-	</bottom>
 	<center>
-		<SplitPane dividerPositions="0.0, 1" orientation="HORIZONTAL"
-			prefHeight="400" prefWidth="200" BorderPane.alignment="CENTER" fx:id="mainSplitPane">
+		<SplitPane fx:id="mainSplitPane" dividerPositions="0.0, 1.0" orientation="HORIZONTAL" prefHeight="400" prefWidth="200" BorderPane.alignment="CENTER">
 			<items>
-				<SplitPane dividerPositions="0.5" orientation="VERTICAL"
-					prefHeight="200.0" prefWidth="0.0" BorderPane.alignment="CENTER" fx:id="leftPane">
+				<SplitPane fx:id="leftPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0" BorderPane.alignment="CENTER">
 					<items>
-						<AnchorPane fx:id="topLeft" minHeight="0.0" minWidth="0.0"
-							prefHeight="100.0" prefWidth="0.0" />
-						<AnchorPane fx:id="bottomLeft" minHeight="0.0"
-							minWidth="0.0" prefHeight="100.0" prefWidth="0.0" />
+						<AnchorPane fx:id="topLeft" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="0.0" />
+						<AnchorPane fx:id="bottomLeft" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="0.0" />
 					</items>
 				</SplitPane>
-				<AnchorPane prefHeight="200.0" prefWidth="200.0" fx:id="center"
-					BorderPane.alignment="CENTER" />
-				<SplitPane dividerPositions="0.5" orientation="VERTICAL"
-					prefHeight="200.0" prefWidth="0.0" BorderPane.alignment="CENTER" fx:id="rightPane">
+				<AnchorPane fx:id="center" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+				<SplitPane fx:id="rightPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0" BorderPane.alignment="CENTER">
 					<items>
-						<AnchorPane fx:id="topRight" minHeight="0.0" minWidth="0.0"
-							prefHeight="100.0" prefWidth="0.0" />
-						<AnchorPane fx:id="bottomRight" minHeight="0.0"
-							minWidth="0.0" prefHeight="100.0" prefWidth="0.0" />
+						<AnchorPane fx:id="topRight" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="0.0" />
+						<AnchorPane fx:id="bottomRight" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="0.0" />
 					</items>
 				</SplitPane>
 			</items>
 		</SplitPane>
 	</center>
+   <bottom>
+      <AnchorPane BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="statusLabel" text="Status" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children>
+      </AnchorPane>
+   </bottom>
 </BorderPane>

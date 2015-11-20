@@ -11,5 +11,5 @@ public @interface KeYView {
     String title();
     String path();
     String windows() default "Main";
-    int preferredPosition() default 0;
+    ViewPosition preferredPosition() default ViewPosition.CENTER;
 }
