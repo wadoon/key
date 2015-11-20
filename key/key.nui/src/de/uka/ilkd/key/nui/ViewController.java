@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.nui;
 
-public abstract class ViewController {
+import javafx.fxml.Initializable;
+
+public abstract class ViewController implements Initializable {
     
     protected MainApp mainApp;
     

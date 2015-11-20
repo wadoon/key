@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.nui.view;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import de.uka.ilkd.key.nui.ViewController;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
@@ -12,9 +15,13 @@ public class TreeViewController extends ViewController{
     public void setRoot(TreeItem<String> t) {
     	treeView.setRoot(t);
     }
-    
-    @FXML
-    private void initialize(){
-    	setRoot(new TreeItem<String>("RootNode"));
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        TreeItem<String> root = new TreeItem<String>("RootNode");
+        for (int i=0; i<20; i++) {
+            root.getChildren().add(new TreeItem<String>("" + i));
+        }
+        setRoot(root);
     }
 }

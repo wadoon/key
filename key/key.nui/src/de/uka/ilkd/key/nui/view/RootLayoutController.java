@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nui.view;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.IViewContainer;
@@ -27,8 +28,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -47,16 +48,7 @@ public class RootLayoutController extends ViewController implements IViewContain
     private Label statusLabel;
     
     /**
-     * Constants for positioning
-     */
-    private final int centerPos = 0;
-    private final int topLeftPos = 1;
-    private final int bottomLeftPos = 2;
-    private final int topRightPos = 3;
-    private final int bottomRightPos = 4;
-    
-    /**
-     * Checks for keeping track of used AnchorPane
+     * Checks for keeping track of used BorderPane
      */
     private boolean centerUsed = false;
     private boolean topLeftUsed = false;
@@ -88,15 +80,15 @@ public class RootLayoutController extends ViewController implements IViewContain
      * The AnchorPane Positions
      */
     @FXML
-    AnchorPane topLeft;
+    BorderPane topLeft;
     @FXML
-    AnchorPane bottomLeft;
+    BorderPane bottomLeft;
     @FXML
-    AnchorPane center;
+    BorderPane center;
     @FXML
-    AnchorPane topRight;
+    BorderPane topRight;
     @FXML
-    AnchorPane bottomRight;
+    BorderPane bottomRight;
 
     /**
      * Opens a new Window with About Functionality. View: AboutView.fxml
@@ -203,8 +195,8 @@ public class RootLayoutController extends ViewController implements IViewContain
     }
 
     private void showView(URL path, ViewPosition prefPos) {
-    	AnchorPane position;
-    	AnchorPane view = (AnchorPane) loadFxml(path);
+        BorderPane position;
+        Pane view = (Pane) loadFxml(path);
     	
     	int leftElements = leftPane.getChildrenUnmodifiable().size();
     	int rightElements = rightPane.getChildrenUnmodifiable().size();
@@ -235,13 +227,12 @@ public class RootLayoutController extends ViewController implements IViewContain
 			centerUsed = true;
 			break;
 		}
-    	position.setTopAnchor(view, 0.0);
     	position.getChildren().clear();
-    	position.getChildren().add(view);
+    	position.setCenter(view);
     }
     
     private void clearView(ViewPosition prefPos){
-    	AnchorPane position;
+        BorderPane position;
     	switch (prefPos){
     	case CENTER:
 			position = center;
@@ -364,6 +355,12 @@ public class RootLayoutController extends ViewController implements IViewContain
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

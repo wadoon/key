@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.nui.view;
 
-import de.uka.ilkd.key.control.KeYEnvironment;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
@@ -10,16 +12,8 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
-
-import java.io.File;
 
 @KeYView(title="Sequent",path="SequentView.fxml",preferredPosition=ViewPosition.CENTER)
 public class SequentViewController extends ViewController {
@@ -27,23 +21,11 @@ public class SequentViewController extends ViewController {
     @FXML
     private TextArea textArea;
     
-    @FXML
-    private TextField textField;
-    
     /**
      * The constructor.
      * The constructor is called before the initialize() method.
      */
     public SequentViewController() {
-    }
-
-    /**
-     * Initializes the controller class. This method is automatically called
-     * after the FXML file has been loaded.
-     */
-    @FXML
-    private void initialize() {
-        textField.setText("Welcome to the Sequent View.");
     }
     
     /**
@@ -63,5 +45,9 @@ public class SequentViewController extends ViewController {
         logicPrinter.printSequent(sequent);
         
         textArea.setText(logicPrinter.toString());
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
     }
 }
