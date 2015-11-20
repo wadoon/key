@@ -31,8 +31,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 /**
  * @author Maximilian Li
@@ -197,9 +197,6 @@ public class RootLayoutController extends ViewController implements IViewContain
     private void showView(URL path, ViewPosition prefPos) {
         BorderPane position;
         Pane view = (Pane) loadFxml(path);
-    	
-    	int leftElements = leftPane.getChildrenUnmodifiable().size();
-    	int rightElements = rightPane.getChildrenUnmodifiable().size();
     	
     	switch (prefPos) {
 		case CENTER:
