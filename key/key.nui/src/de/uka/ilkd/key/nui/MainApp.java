@@ -1,191 +1,113 @@
 package de.uka.ilkd.key.nui;
 
-
 import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
 
 import org.reflections.Reflections;
 
-import de.uka.ilkd.key.nui.view.MainViewController;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
-import de.uka.ilkd.key.nui.view.SequentViewController;
-import de.uka.ilkd.key.nui.view.TreeViewController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
 
-    private Stage primaryStage;
-    private BorderPane rootLayout;
-    private RootLayoutController rootLayoutController;
-    
-    /**
-     * Constant Strings for positioning
-     */
-    private final int centerPos = 0;
-    private final int topLeftPos = 1;
-    private final int bottomLeftPos = 2;
-    private final int topRightPos = 3;
-    private final int bottomRightPos = 4;
+	private Stage primaryStage;
+	private BorderPane rootLayout;
+	private RootLayoutController rootLayoutController;
 
-    @Override
-    public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("KeY Project");
+	/**
+	 * Constant Strings for positioning
+	 */
+	private final int centerPos = 0;
+	private final int topLeftPos = 1;
+	private final int bottomLeftPos = 2;
+	private final int topRightPos = 3;
+	private final int bottomRightPos = 4;
 
-        // Set the application icon.
-        this.primaryStage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
+	@Override
+	public void start(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+		this.primaryStage.setTitle("KeY Project");
 
-        initRootLayout();
-        registerViews();
-        scanForViews();
-        scanForMenus();
-        primaryStage.show();
-    }
+		// Set the application icon.
+		this.primaryStage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
 
-    /**
-     * Initializes the root layout.
-     */
-    public void initRootLayout() {
-        try {
-            // Load root layout from fxml file.
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
-            rootLayout = (BorderPane) loader.load();
+		initRootLayout();
+		registerViews();
+		scanForViews();
+		scanForMenus();
+		primaryStage.show();
+	}
 
-            // Show the scene containing the root layout.
-            Scene scene = new Scene(rootLayout);
-            primaryStage.setScene(scene);
+	/**
+	 * Initializes the root layout.
+	 */
+	public void initRootLayout() {
+		try {
+			// Load root layout from fxml file.
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+			rootLayout = (BorderPane) loader.load();
 
-            // Give the controller access to the main app.
-            RootLayoutController controller = loader.getController();
-            controller.setMainApp(this);
-            rootLayoutController = controller;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+			// Show the scene containing the root layout.
+			Scene scene = new Scene(rootLayout);
+			primaryStage.setScene(scene);
 
-    /**
-     * Shows the Main View inside the root layout.
+			// Give the controller access to the main app.
+			RootLayoutController controller = loader.getController();
+			controller.setMainApp(this);
+			rootLayoutController = controller;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    public void showMainView() {
-        try {
-            // Load main view
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/MainView.fxml"));
-            AnchorPane mainView = (AnchorPane) loader.load();
+	private void registerViews() {
+		// rootLayoutController.registerView("Sequent",
+		// MainApp.class.getResource("view/SequentView.fxml"), centerPos);
+		rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), bottomLeftPos);
+		rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), topLeftPos);
+		// rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
+	}
 
-            // Set main view into the center of root layout.
-            rootLayout.setCenter(mainView);
+	private Reflections reflections = new Reflections("de.uka.ilkd.key.nui");
 
-            // Give the controller access to the main app.
-            MainViewController controller = loader.getController();
-            controller.setMainApp(this);
+	private void scanForViews() {
+		Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
+		for (Class<?> c : annotated) {
+			KeYView annot = c.getAnnotation(KeYView.class);
+			if (Arrays.asList(annot.windows()).contains("Main"))
+				rootLayoutController.registerView(annot.title(), c.getResource(annot.path()),
+						annot.preferredPosition());
+		}
+		System.out.println("Views: " + annotated.size());
+	}
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
+	private void scanForMenus() {
+		Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
+		for (Class<?> c : annotated) {
+			KeYMenu annot = c.getAnnotation(KeYMenu.class);
+			if (Arrays.asList(annot.windows()).contains("Main"))
+				rootLayoutController.registerMenu(c.getResource(annot.path()));
+		}
+		System.out.println("Menus: " + annotated.size());
+	}
 
-    /**
-     * Shows the SequentView inside the root layout.
+	/**
+	 * Returns the main stage.
+	 * 
+	 * @return
+	 */
+	public Stage getPrimaryStage() {
+		return primaryStage;
+	}
 
-    public void showSequentView() {
-        try {
-            // Load Sequent view
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/SequentView.fxml"));
-            AnchorPane mainView = (AnchorPane) loader.load();
-
-            // Set sequent view into the center of root layout.
-            rootLayout.setCenter(mainView);
-
-            // Give the controller access to the main app.
-            SequentViewController controller = loader.getController();
-            controller.setMainApp(this);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-
-    private void registerViews(){
-        //rootLayoutController.registerView("Sequent", MainApp.class.getResource("view/SequentView.fxml"), centerPos);
-        rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), bottomLeftPos);
-        rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), topLeftPos);
-        //rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
-    }
-    
-    private Reflections reflections = new Reflections("de.uka.ilkd.key.nui");
-    
-    private void scanForViews(){
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
-        for(Class<?> c : annotated){
-            KeYView annot = c.getAnnotation(KeYView.class);
-            if(Arrays.asList(annot.windows()).contains("Main"))
-                rootLayoutController.registerView(annot.title(),c.getResource(annot.path()) , annot.preferredPosition());
-        }
-        System.out.println("Views: " + annotated.size());
-    }
-    
-    private void scanForMenus(){
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
-        for(Class<?> c : annotated){
-            KeYMenu annot = c.getAnnotation(KeYMenu.class);
-            if(Arrays.asList(annot.windows()).contains("Main"))
-                rootLayoutController.registerMenu(c.getResource(annot.path()));
-        }
-        System.out.println("Menus: " + annotated.size());
-    }
-    
-    /**
-     * Shows the TreeView inside the root layout.
-     *
-    public void showTreeView() {
-        try {
-            // Load Tree view
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/TreeView.fxml"));
-            AnchorPane treeView = (AnchorPane) loader.load();
-
-            // Set Tree view into the center of root layout.
-            SplitPane left = (SplitPane) rootLayout.getLeft();
-            AnchorPane topLeft = (AnchorPane) left.getItems().get(0);
-            topLeft.setTopAnchor(treeView, 0.0);
-            topLeft.getChildren().add(treeView);
-            left.setPrefWidth(200.0);
-            
-            // Give the controller access to the main app.
-            TreeViewController controller = loader.getController();
-            controller.setMainApp(this);
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-
-    /**
-     * Returns the main stage.
-     * @return
-     */
-    public Stage getPrimaryStage() {
-        return primaryStage;
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
+	public static void main(String[] args) {
+		launch(args);
+	}
 }

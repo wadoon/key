@@ -6,7 +6,6 @@ package de.uka.ilkd.key.nui.view;
 import java.io.IOException;
 import java.net.URL;
 
-import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.nui.IViewContainer;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
@@ -19,7 +18,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
@@ -131,10 +129,8 @@ public class RootLayoutController extends ViewController implements IViewContain
     private Menu otherViewsMenu = null;
 
     public void registerView(String title,URL path, int prefLoc, KeyCombination keys){
-        //MenuItem item = new MenuItem();
     	CheckMenuItem item = new CheckMenuItem();
-        item.setText(title);
-        //item.setOnAction(e -> showView(path, prefLoc)); 
+        item.setText(title); 
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
         	public void  changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue){
         		if (newValue){
@@ -200,9 +196,6 @@ public class RootLayoutController extends ViewController implements IViewContain
     	position.setTopAnchor(view, 0.0);
     	position.getChildren().clear();
     	position.getChildren().add(view);
-    	if (position.getPrefWidth() < 200) {
-    		position.setPrefWidth(200);
-    	}
     }
     
     private void clearView(int prefLoc){
