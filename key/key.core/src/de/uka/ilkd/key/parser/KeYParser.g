@@ -128,6 +128,7 @@ options {
          prooflabel2tag.put("keyVersion", ProofElementID.KeY_VERSION);
          prooflabel2tag.put("keySettings", ProofElementID.KeY_SETTINGS);
          prooflabel2tag.put("contract", ProofElementID.CONTRACT);
+         prooflabel2tag.put("loopInvariant", ProofElementID.LOOP_INVARIANT);
          prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);

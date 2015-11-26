@@ -69,11 +69,13 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
@@ -85,6 +87,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -118,7 +121,9 @@ public class IntermediateProofReplayer {
     /** The problem loader, for reporting errors */
     private final AbstractProblemLoader loader;
     /** The proof object into which to load the replayed proof */
-    private Proof proof = null;
+    private final Proof proof;
+    /** Number of rule apps to replay */
+    private final int totalNrRuleApps;
 
     /** Encountered errors */
     private List<Throwable> errors = new LinkedList<Throwable>();
@@ -160,6 +165,7 @@ public class IntermediateProofReplayer {
             IntermediatePresentationProofFileParser.Result parserResult) {
         this.proof = proof;
         this.loader = loader;
+        this.totalNrRuleApps = parserResult.getNrRuleApps();
 
         queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(),
                 parserResult.getParsedResult()));
@@ -178,6 +184,9 @@ public class IntermediateProofReplayer {
      * {@link #getLastSelectedGoal()}.
      */
     public Result replay() {
+        int nrNodesReplayed = 0;
+        int lastDisplayedNrNodes = -1;
+
         while (!queue.isEmpty()) {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
@@ -193,6 +202,16 @@ public class IntermediateProofReplayer {
                 continue;
             }
             else if (currNodeInterm instanceof AppNodeIntermediate) {
+                if ((((double) nrNodesReplayed - (double) lastDisplayedNrNodes) / (double) totalNrRuleApps) >= 0.1d) {
+                    System.out
+                            .printf("Replayed %d of %d nodes (%d%%)%n",
+                                    nrNodesReplayed,
+                                    totalNrRuleApps,
+                                    Math.round(((double) nrNodesReplayed / (double) totalNrRuleApps) * 100));
+                    lastDisplayedNrNodes = nrNodesReplayed;
+                }
+                nrNodesReplayed++;
+
                 AppNodeIntermediate currInterm =
                         (AppNodeIntermediate) currNodeInterm;
                 currNode.getNodeInfo().setInteractiveRuleApplication(
@@ -237,6 +256,16 @@ public class IntermediateProofReplayer {
 
                 }
                 else if (currInterm.getIntermediateRuleApp() instanceof BuiltInAppIntermediate) {
+                    if ((((double) nrNodesReplayed - (double) lastDisplayedNrNodes) / (double) totalNrRuleApps) >= 0.1d) {
+                        System.out
+                                .printf("Replayed %d of %d nodes (%d%%)%n",
+                                        nrNodesReplayed,
+                                        totalNrRuleApps,
+                                        Math.round(((double) nrNodesReplayed / (double) totalNrRuleApps) * 100));
+                        lastDisplayedNrNodes = nrNodesReplayed;
+                    }
+                    nrNodesReplayed++;
+
                     BuiltInAppIntermediate appInterm =
                             (BuiltInAppIntermediate) currInterm
                                     .getIntermediateRuleApp();
@@ -252,20 +281,17 @@ public class IntermediateProofReplayer {
                         if (partnerNodesInfo == null
                                 || partnerNodesInfo.size() < joinAppInterm
                                         .getNrPartners()) {
-                            // In case of an exception happening during the
-                            // replay
-                            // process, it can happen that the queue is empty
-                            // when
-                            // reaching this point. Then, we may not add the
-                            // join
-                            // node to the end of the queue since this will
-                            // result
+                            
+                            // In case of an exception happening during the replay
+                            // process, it can happen that the queue is empty when
+                            // reaching this point. Then, we may not add the join
+                            // node to the end of the queue since this will result
                             // in non-termination.
-
+                            
                             if (queue.isEmpty()) {
                                 continue;
                             }
-
+                            
                             // Wait until all partners are found: Add node
                             // at the end of the queue. NOTE: DO NOT CHANGE
                             // THIS to adding the node to the front! This will
@@ -411,8 +437,7 @@ public class IntermediateProofReplayer {
 
                                 currGoal.apply(joinApp);
 
-                                // Join node has exactly one child in a closed
-                                // proof, and
+                                // Join node has exactly one child in a closed proof, and
                                 // zero or one children in an open proof.
                                 if (currInterm.getChildren().size() > 0) {
                                     queue.addFirst(new Pair<Node, NodeIntermediate>(
@@ -471,7 +496,7 @@ public class IntermediateProofReplayer {
                                                 appInterm.getPosInfo().first,
                                                 appInterm.getPosInfo().second),
                                         currNodeInterm));
-                    }
+                    } 
                     else {
                         try {
                             IBuiltInRuleApp app =
@@ -479,6 +504,17 @@ public class IntermediateProofReplayer {
                             if (!app.complete()) {
                                 app = app.tryToInstantiate(currGoal);
                             }
+
+                            if (app instanceof LoopInvariantBuiltInRuleApp)  {
+                                if (appInterm.getContractOrLoopInvariant() != null) {
+                                    LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp)app;
+                                    LoopInvariant inv = loopApp.getInvariant();                                                                
+                                    inv.getInternalInvariants().put(proof.getServices().getTypeConverter().getHeapLDT().getHeap(), 
+                                            parseTerm(appInterm.getContractOrLoopInvariant(),proof));                                    
+                                    app = loopApp.setLoopInvariant(inv);
+                                }
+                            }
+                            
                             currGoal.apply(app);
 
                             final Iterator<Node> children =
@@ -679,15 +715,15 @@ public class IntermediateProofReplayer {
         ImmutableList<PosInOccurrence> builtinIfInsts = null;
 
         // Load contracts, if applicable
-        if (currInterm.getContract() != null) {
+        if (!WhileInvariantRule.INSTANCE.name().toString().equals(ruleName) && currInterm.getContractOrLoopInvariant() != null) {
             currContract =
                     proof.getServices().getSpecificationRepository()
-                            .getContractByName(currInterm.getContract());
+                            .getContractByName(currInterm.getContractOrLoopInvariant());
             if (currContract == null) {
                 final ProblemLoaderException e =
                         new ProblemLoaderException(loader,
                                 "Error loading proof: contract \""
-                                        + currInterm.getContract()
+                                        + currInterm.getContractOrLoopInvariant()
                                         + "\" not found.");
                 reportError(ERROR_LOADING_PROOF_LINE + ", goal "
                         + currGoal.node().serialNr() + ", rule " + ruleName
@@ -808,8 +844,8 @@ public class IntermediateProofReplayer {
             return ourApp;
         }
 
-        final ImmutableSet<IBuiltInRuleApp> ruleApps =
-                collectAppsForRule(ruleName, currGoal, pos);
+        final ImmutableSet<IBuiltInRuleApp> ruleApps = collectAppsForRule(
+                ruleName, currGoal, pos);
         if (ruleApps.size() != 1) {
             if (ruleApps.size() < 1) {
                 throw new BuiltInConstructionException(ruleName
@@ -840,8 +876,7 @@ public class IntermediateProofReplayer {
      *            Error encountered.
      */
     private void reportError(String string, Throwable e) {
-        status =
-                "Errors while reading the proof. Not all branches could be load successfully.";
+        status = "Errors while reading the proof. Not all branches could be load successfully.";
         errors.add(new ProblemLoaderException(loader, string, e));
     }
 
@@ -859,12 +894,11 @@ public class IntermediateProofReplayer {
      */
     private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(
             String ruleName, Goal g, PosInOccurrence pos) {
-
-        ImmutableSet<IBuiltInRuleApp> result =
+        
+        ImmutableSet<IBuiltInRuleApp> result = 
                 DefaultImmutableSet.<IBuiltInRuleApp> nil();
 
-        for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g,
-                pos)) {
+        for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g, pos)) {
             if (app.rule().name().toString().equals(ruleName)) {
                 result = result.add(app);
             }
@@ -893,7 +927,7 @@ public class IntermediateProofReplayer {
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
         // first pass: add variables
-        for (final String s : loadedInsts) {
+        for (final String s: loadedInsts) {
             int eq = s.indexOf('=');
             final String varname = s.substring(0, eq);
 

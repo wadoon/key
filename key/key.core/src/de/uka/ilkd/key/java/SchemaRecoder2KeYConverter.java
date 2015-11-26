@@ -57,6 +57,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayLength;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayPostDecl;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
+import de.uka.ilkd.key.rule.metaconstruct.ReattachLoopInvariant;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.DoBreak;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
@@ -184,6 +185,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#init-array-creation".equals(mcName)) {
             return new InitArrayCreation(mc.getFirstSV().getSV(),
                     list.get(Expression.class));
+        } else if ("#reattachLoopInvariant".equals(mcName)) { 
+            return new ReattachLoopInvariant(list.get(LoopStatement.class));
         } else {
             throw new ConvertException("Program meta construct "
                     + mc.toString() + " unknown.");

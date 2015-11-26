@@ -39,7 +39,7 @@ public class StatementBlock extends JavaStatement
     /**
      *      Body.
      */
-    private final ImmutableArray<? extends Statement> body;
+    private final ImmutableArray<Statement> body;
     
     private final int prefixLength; 
     
@@ -68,7 +68,7 @@ public class StatementBlock extends JavaStatement
         innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
-    public StatementBlock(ImmutableArray<? extends Statement> as) {
+    public StatementBlock(ImmutableArray<Statement> as) {
         // check for non-null elements (bug fix)
         Debug.assertDeepNonNull(as, "statement block contructor");
         body = as;
@@ -120,7 +120,7 @@ public class StatementBlock extends JavaStatement
      *      @return the statement array wrapper.
      */
 
-    public ImmutableArray<? extends Statement> getBody() {
+    public ImmutableArray<Statement> getBody() {
         return body;
     }
 

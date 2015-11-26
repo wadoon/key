@@ -95,6 +95,7 @@ public class IntermediatePresentationProofFileParser implements
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
     private LinkedList<Throwable> errors = new LinkedList<Throwable>();
+    private int nrRuleApps = 0;
 
     /**
      * @param proof
@@ -215,8 +216,10 @@ public class IntermediatePresentationProofFileParser implements
             ruleInfo = new BuiltinRuleInformation(str);
             break;
 
-        case CONTRACT: // contract
-            ((BuiltinRuleInformation) ruleInfo).currContract = str;
+        case CONTRACT:
+            case LOOP_INVARIANT:
+            // contract or loop invariant
+            ((BuiltinRuleInformation) ruleInfo).currContractOrLoopInvariant = str;
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
@@ -254,8 +257,8 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case NUMBER_JOIN_PARTNERS: // number of join partners
-            ((BuiltinRuleInformation) ruleInfo).currNrPartners =
-                    Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currNrPartners = Integer
+                    .parseInt(str);
             break;
 
         case JOIN_NODE: // corresponding join node id
@@ -340,6 +343,7 @@ public class IntermediatePresentationProofFileParser implements
                     .setIntermediateRuleApp(constructTacletApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp()
                     .setLineNr(lineNr);
+            nrRuleApps++;
             break;
 
         case BUILT_IN_RULE: // BuiltIn rules
@@ -347,6 +351,7 @@ public class IntermediatePresentationProofFileParser implements
                     .setIntermediateRuleApp(constructBuiltInApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp()
                     .setLineNr(lineNr);
+            nrRuleApps++;
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
@@ -368,7 +373,7 @@ public class IntermediatePresentationProofFileParser implements
      * @return The results of the parsing procedure.
      */
     public Result getResult() {
-        return new Result(getErrors(), getStatus(), root);
+        return new Result(getErrors(), getStatus(), nrRuleApps, root);
     }
 
     @Override
@@ -439,7 +444,7 @@ public class IntermediatePresentationProofFileParser implements
                             new Pair<Integer, PosInTerm>(
                                     builtinInfo.currFormula,
                                     builtinInfo.currPosInTerm),
-                            builtinInfo.currContract,
+                            builtinInfo.currContractOrLoopInvariant,
                             builtinInfo.builtinIfInsts,
                             builtinInfo.currNewNames);
         }
@@ -516,8 +521,8 @@ public class IntermediatePresentationProofFileParser implements
         protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
         protected int currIfInstFormula;
         protected PosInTerm currIfInstPosInTerm;
-        /* > Method Contract */
-        protected String currContract = null;
+        /* > Method Contract or loop invariant*/
+        protected String currContractOrLoopInvariant = null;
         /* > Join Rule */
         protected String currJoinProc = null;
         protected int currNrPartners = 0;
@@ -543,11 +548,13 @@ public class IntermediatePresentationProofFileParser implements
         private List<Throwable> errors;
         private String status;
         private BranchNodeIntermediate parsedResult = null;
+        private int nrRuleApps;
 
-        public Result(List<Throwable> errors, String status,
+        public Result(List<Throwable> errors, String status, int nrRuleApps,
                 BranchNodeIntermediate parsedResult) {
             this.errors = errors;
             this.status = status;
+            this.nrRuleApps = nrRuleApps;
             this.parsedResult = parsedResult;
         }
 
@@ -557,6 +564,10 @@ public class IntermediatePresentationProofFileParser implements
 
         public String getStatus() {
             return status;
+        }
+
+        public int getNrRuleApps() {
+            return nrRuleApps;
         }
 
         public BranchNodeIntermediate getParsedResult() {

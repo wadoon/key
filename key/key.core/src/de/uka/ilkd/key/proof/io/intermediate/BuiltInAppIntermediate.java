@@ -10,25 +10,24 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * Encapsulates intermediate information for constructing a built-in rule application.
- *
+ * EncapsulatecontractOrLoopInvariantmediate information for constructing a built-contractOrLoopInvariant applicatcontractOrLoopInvariant
  * @author Dominic Scheurer
  */
 public class BuiltInAppIntermediate extends AppIntermediate {
 
     private String ruleName = null;
     private Pair<Integer, PosInTerm> posInfo = null;
-    private String contract = null;
+    private String contractOrLoopInvariant = null;
     private ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
     private ImmutableList<Name> newNames = null;
 
     public BuiltInAppIntermediate(String ruleName,
-            Pair<Integer, PosInTerm> pos, String contract,
+            Pair<Integer, PosInTerm> pos, String contract,            
             ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
             ImmutableList<Name> newNames) {
         this.ruleName = ruleName;
         this.posInfo = pos;
-        this.contract = contract;
+        this.contractOrLoopInvariant = contract;
         this.builtInIfInsts = builtInIfInsts;
         this.newNames = newNames;
     }
@@ -41,8 +40,8 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return posInfo;
     }
 
-    public String getContract() {
-        return contract;
+    public String getContractOrLoopInvariant() {
+        return contractOrLoopInvariant;
     }
 
     public ImmutableList<Pair<Integer, PosInTerm>> getBuiltInIfInsts() {

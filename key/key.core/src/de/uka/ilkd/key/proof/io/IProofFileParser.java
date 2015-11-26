@@ -45,7 +45,7 @@ public interface IProofFileParser {
                 "distFormula"), USER_INTERACTION("userinteraction"), NEW_NAMES(
                 "newnames"), AUTOMODE_TIME("autoModeTime"), KeY_LOG("keyLog"), KeY_USER(
                 "keyUser"), KeY_VERSION("keyVersion"), KeY_SETTINGS(
-                "keySettings"), OPEN_GOAL("opengoal");
+                "keySettings"), OPEN_GOAL("opengoal"), LOOP_INVARIANT("loopInvariant");
 
         private String rawName;
 

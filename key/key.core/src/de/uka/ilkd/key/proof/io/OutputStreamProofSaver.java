@@ -56,6 +56,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -385,11 +386,24 @@ public class OutputStreamProofSaver {
                 tree.append("\")");
             }
 
+            if (appliedRuleApp instanceof LoopInvariantBuiltInRuleApp) {
+                // by far not complete
+                final LoopInvariantBuiltInRuleApp loopApp =
+                        (LoopInvariantBuiltInRuleApp) appliedRuleApp;
+                tree.append(" (loopInvariant \"");
+                tree.append(escapeCharacters(printAnything(
+                        loopApp.getInvariant()
+                                .getInvariant(proof.getServices()),
+                        proof.getServices(), false).toString()));
+                tree.append("\")");
+            }
+
             if (appliedRuleApp instanceof JoinRuleBuiltInRuleApp) {
                 JoinRuleBuiltInRuleApp joinApp =
                         (JoinRuleBuiltInRuleApp) appliedRuleApp;
+                
                 JoinProcedure concreteRule = joinApp.getConcreteRule();
-
+                
                 tree.append(" (joinProc \"");
                 tree.append(concreteRule.toString());
                 tree.append("\")");
@@ -431,15 +445,15 @@ public class OutputStreamProofSaver {
                                     .append(LogicPrinter
                                             .quickPrintTerm(
                                                     predicateFormWithPlaceholder.second,
-                                                    proof.getServices()).replace("\n", ""))
-                                    .append("'), ");
+                                                    proof.getServices())
+                                            .replace("\n", "")).append("'), ");
                         }
                     }
                     // Delete the last ", ".
                     tree.delete(tree.length() - 2, tree.length());
 
                     tree.append("\")");
-                    
+
                     tree.append(" (latticeType \"");
                     tree.append(predAbstrRule.getLatticeType().getName());
                     tree.append("\")");

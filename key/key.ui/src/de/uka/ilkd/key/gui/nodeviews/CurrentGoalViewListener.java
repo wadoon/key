@@ -33,8 +33,13 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
@@ -46,8 +51,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * sequent part into some other GUI component (e.g. some Taclet rule
  * instantiation dialog)
  */
-class CurrentGoalViewListener
-        implements MouseListener, DragGestureListener {
+class CurrentGoalViewListener implements MouseListener, DragGestureListener {
 
     private static final int POPUP_DELAY = 400;
     private final KeYMediator mediator;
@@ -61,7 +65,8 @@ class CurrentGoalViewListener
      */
     private long block = 0;
 
-    CurrentGoalViewListener(final CurrentGoalView currentGoalView, final KeYMediator mediator) {
+    CurrentGoalViewListener(final CurrentGoalView currentGoalView,
+            final KeYMediator mediator) {
         this.mediator = mediator;
         this.currentGoalView = currentGoalView;
         menu = new TacletMenu();
@@ -74,40 +79,109 @@ class CurrentGoalViewListener
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        if (!modalDragNDropEnabled()) {
-            // if a popup menu is cancelled by a click we do not want to 
-            // activate another using the same click event 
+        if (me.isControlDown()) {
+            PosInSequent mousePos =
+                    currentGoalView.getPosInSequent(me.getPoint());
+
+            if ((mousePos != null)
+                    && !("".equals(currentGoalView.getHighlightedText(mousePos)))) {
+
+                final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
+                final Goal goal = mediator.getSelectedGoal();
+
+                if (posInOcc != null) {
+
+                    ImmutableList<TacletApp> apps =
+                            mediator.getUI().getProofControl()
+                                    .getFindTaclet(goal, posInOcc);
+
+                    TacletApp hideTacletApp = null;
+                    for (TacletApp app : apps) {
+                        if (app.taclet().displayName().equals("hide_left")
+                                || app.taclet().displayName()
+                                        .equals("hide_right")) {
+                            hideTacletApp = app;
+                            break;
+                        }
+                    }
+
+                    if (hideTacletApp != null) {
+                        hideTacletApp =
+                                PosTacletApp.createPosTacletApp(
+                                        (FindTaclet) hideTacletApp.taclet(),
+                                        hideTacletApp.instantiations(),
+                                        posInOcc, mediator.getServices());
+
+                        goal.node().getNodeInfo()
+                                .setInteractiveRuleApplication(true);
+                        goal.apply(hideTacletApp);
+                    }
+                }
+
+            }
+        }
+        else if (!modalDragNDropEnabled()) {
+            // if a popup menu is cancelled by a click we do not want to
+            // activate another using the same click event
             if (Math.abs(System.currentTimeMillis() - block) >= POPUP_DELAY) {
-                PosInSequent mousePos = currentGoalView.getPosInSequent(me.getPoint());
-                boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro();
+                PosInSequent mousePos =
+                        currentGoalView.getPosInSequent(me.getPoint());
+                boolean macroActive =
+                        ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings().isRightClickMacro();
                 if (mediator != null && mousePos != null) {
                     if (me.isShiftDown()) {
-                        mediator.getUI().getProofControl().
-                                startFocussedAutoMode(mousePos.getPosInOccurrence(),
-                                mediator.getSelectedGoal());
-                    } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {
-                        ProofMacroMenu macroMenu = new ProofMacroMenu(mediator,
-                                mousePos.getPosInOccurrence());
+                        mediator.getUI()
+                                .getProofControl()
+                                .startFocussedAutoMode(
+                                        mousePos.getPosInOccurrence(),
+                                        mediator.getSelectedGoal());
+                    }
+                    else if (macroActive
+                            && SwingUtilities.isRightMouseButton(me)) {
+                        ProofMacroMenu macroMenu =
+                                new ProofMacroMenu(mediator,
+                                        mousePos.getPosInOccurrence());
                         if (macroMenu.isEmpty()) {
-                            macroMenu.add(new JLabel("no strategies available"));
+                            macroMenu
+                                    .add(new JLabel("no strategies available"));
                         }
                         JPopupMenu popupMenu = macroMenu.getPopupMenu();
                         popupMenu.setLabel("Strategy macros");
-                        popupMenu.show(currentGoalView, me.getX() - 5, me.getY() - 5);
-                    } else {
-                        //done before collecting the taclets because initialising 
-                        //built in rules may have side effects on the set of applicable
-                        //taclets
-                        final ImmutableList<BuiltInRule> builtInRules
-                                = mediator.getUI().getProofControl().getBuiltInRule
-                         (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
+                        popupMenu.show(currentGoalView, me.getX() - 5,
+                                me.getY() - 5);
+                    }
+                    else {
+                        // done before collecting the taclets because
+                        // initialising
+                        // built in rules may have side effects on the set of
+                        // applicable
+                        // taclets
+                        final ImmutableList<BuiltInRule> builtInRules =
+                                mediator.getUI()
+                                        .getProofControl()
+                                        .getBuiltInRule(
+                                                mediator.getSelectedGoal(),
+                                                mousePos.getPosInOccurrence());
 
-                        menu = new TacletMenu(currentGoalView,
-                                mediator.getUI().getProofControl().getFindTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                                mediator.getUI().getProofControl().getRewriteTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                                mediator.getUI().getProofControl().getNoFindTaclet(mediator.getSelectedGoal()),
-                                builtInRules,
-                                mousePos);
+                        menu =
+                                new TacletMenu(
+                                        currentGoalView,
+                                        mediator.getUI()
+                                                .getProofControl()
+                                                .getFindTaclet(
+                                                        mediator.getSelectedGoal(),
+                                                        mousePos.getPosInOccurrence()),
+                                        mediator.getUI()
+                                                .getProofControl()
+                                                .getRewriteTaclet(
+                                                        mediator.getSelectedGoal(),
+                                                        mousePos.getPosInOccurrence()),
+                                        mediator.getUI()
+                                                .getProofControl()
+                                                .getNoFindTaclet(
+                                                        mediator.getSelectedGoal()),
+                                        builtInRules, mousePos);
 
                         currentGoalView.refreshHighlightning = false;
 
@@ -120,25 +194,30 @@ class CurrentGoalViewListener
                             }
 
                             @Override
-                            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                            public void popupMenuWillBecomeInvisible(
+                                    PopupMenuEvent e) {
                                 currentGoalView.refreshHighlightning = true;
                                 block = System.currentTimeMillis();
                             }
 
                             @Override
-                            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                            public void popupMenuWillBecomeVisible(
+                                    PopupMenuEvent e) {
                                 currentGoalView.refreshHighlightning = false;
                             }
                         });
 
-                        popup.show(currentGoalView, me.getX() - 5, me.getY() - 5);
+                        popup.show(currentGoalView, me.getX() - 5,
+                                me.getY() - 5);
                         popup.requestFocusInWindow();
                     }
-                } else {
+                }
+                else {
                     hideMenu();
                     currentGoalView.highlight(me.getPoint());
                 }
-            } else {
+            }
+            else {
                 currentGoalView.highlight(me.getPoint());
             }
         }
@@ -150,9 +229,10 @@ class CurrentGoalViewListener
 
     @Override
     public void mouseReleased(MouseEvent me) {
-        if (!modalDragNDropEnabled() && menu.isPopupMenuVisible()
+        if (!modalDragNDropEnabled()
+                && menu.isPopupMenuVisible()
                 && !menu.getPopupMenu().contains(me.getX() - menu.getX(),
-                me.getY() - menu.getY())) {
+                        me.getY() - menu.getY())) {
             hideMenu();
         }
     }
@@ -165,7 +245,8 @@ class CurrentGoalViewListener
         menu.setPopupMenuVisible(false);
     }
 
-    public final synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
+    public final synchronized void setModalDragNDropEnabled(
+            boolean allowDragNDrop) {
         modalDragNDropEnabled = allowDragNDrop;
     }
 
@@ -182,27 +263,30 @@ class CurrentGoalViewListener
         currentGoalView.setCurrentHighlight(currentGoalView.dndHighlight);
         hideMenu();
         Point dragOrigin = dgEvent.getDragOrigin();
-        PosInSequent localMousePos = currentGoalView.getPosInSequent(dragOrigin);
+        PosInSequent localMousePos =
+                currentGoalView.getPosInSequent(dragOrigin);
 
         if (localMousePos != null) {
             try {
-                currentGoalView.getDragSource().
-                        startDrag(dgEvent,
+                currentGoalView.getDragSource().startDrag(
+                        dgEvent,
                         DragSource.DefaultCopyDrop,
-                        new PosInSequentTransferable(localMousePos,
-                        mediator.getServices()),
-                        new DragSourceAdapter() {
+                        new PosInSequentTransferable(localMousePos, mediator
+                                .getServices()), new DragSourceAdapter() {
                             @Override
                             public void dragDropEnd(DragSourceDropEvent event) {
-                                // Enable updating the subterm 
+                                // Enable updating the subterm
                                 // highlightning ...
-                                currentGoalView.disableHighlight(currentGoalView.dndHighlight);
-                                currentGoalView.setCurrentHighlight(oldHighlight);
+                                currentGoalView
+                                        .disableHighlight(currentGoalView.dndHighlight);
+                                currentGoalView
+                                        .setCurrentHighlight(oldHighlight);
                             }
                         });
-            } catch (InvalidDnDOperationException dnd) {
+            }
+            catch (InvalidDnDOperationException dnd) {
                 // system not in proper dnd state
-                // Enable updating the subterm 
+                // Enable updating the subterm
                 // highlightning ...
                 currentGoalView.disableHighlight(currentGoalView.dndHighlight);
                 currentGoalView.setCurrentHighlight(oldHighlight);

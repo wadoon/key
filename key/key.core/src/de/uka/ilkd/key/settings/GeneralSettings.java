@@ -44,7 +44,8 @@ public class GeneralSettings implements Settings, Cloneable {
     private boolean dndDirectionSensitive = true;
 
     /** is one-step simplification enabled */
-    private boolean oneStepSimplification = true;
+//    private boolean oneStepSimplification = true;
+    private boolean oneStepSimplification = false;
 
     /** launches the rightclick the macro menu. on by default. */
     private boolean rightClickMacros = true;
@@ -109,10 +110,10 @@ public class GeneralSettings implements Settings, Cloneable {
     
     
     public void setOneStepSimplification(boolean b) {
-	if (oneStepSimplification != b) {
-	    oneStepSimplification = b;
-	    fireSettingsChanged();
-	}
+//	if (oneStepSimplification != b) {
+//	    oneStepSimplification = b;
+//	    fireSettingsChanged();
+//	}
     }
 
 
