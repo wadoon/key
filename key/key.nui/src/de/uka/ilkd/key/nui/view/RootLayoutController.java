@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nui.view;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -13,21 +14,27 @@ import de.uka.ilkd.key.nui.IViewContainer;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
@@ -41,33 +48,27 @@ import javafx.stage.Stage;
 public class RootLayoutController extends ViewController implements IViewContainer {
 
     private static final int MaxMenuEntries = 8;
-    
+
     private Proof proof;
-    
+
     @FXML
     private Label statusLabel;
-    
-    /**
-     * Checks for keeping track of used BorderPane
-     */
-    private boolean centerUsed = false;
-    private boolean topLeftUsed = false;
-    private boolean bottomLeftUsed = false;
-    private boolean topRightUsed = false;
-    private boolean bottomRightUsed = false;
+
+    private final HashMap<ViewPosition,BorderPane> positionMapping;
+    private final HashMap<ViewPosition,Boolean> positionUsage;
 
     /**
      * The BorderPane from the Main Window
      */
     @FXML
     BorderPane mainPane;
-    
+
     /**
      * The Splitpane in the BorderPane Center, Root of AnchorPane Positions
      */
     @FXML
     SplitPane mainSplitPane;
-    
+
     /**
      * SplitPanes left and right
      */
@@ -75,7 +76,7 @@ public class RootLayoutController extends ViewController implements IViewContain
     SplitPane leftPane;
     @FXML
     SplitPane rightPane;
-    
+
     /**
      * The AnchorPane Positions
      */
@@ -89,6 +90,33 @@ public class RootLayoutController extends ViewController implements IViewContain
     BorderPane topRight;
     @FXML
     BorderPane bottomRight;
+
+
+    @FXML
+    private MenuBar menuBar;
+
+    @FXML
+    private Menu helpMenu;
+
+    public RootLayoutController(){
+        positionUsage = new HashMap<ViewPosition,Boolean>();
+        positionUsage.put(ViewPosition.BOTTOMLEFT, false);
+        positionUsage.put(ViewPosition.BOTTOMRIGHT, false);
+        positionUsage.put(ViewPosition.CENTER, false);
+        positionUsage.put(ViewPosition.TOPLEFT, false);
+        positionUsage.put(ViewPosition.TOPRIGHT, false);
+
+        positionMapping = new HashMap<ViewPosition,BorderPane>();
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        positionMapping.put(ViewPosition.BOTTOMLEFT, bottomLeft);
+        positionMapping.put(ViewPosition.BOTTOMRIGHT, bottomRight);
+        positionMapping.put(ViewPosition.CENTER, center);
+        positionMapping.put(ViewPosition.TOPLEFT, topLeft);
+        positionMapping.put(ViewPosition.TOPRIGHT, topRight);
+    }
 
     /**
      * Opens a new Window with About Functionality. View: AboutView.fxml
@@ -121,7 +149,7 @@ public class RootLayoutController extends ViewController implements IViewContain
     private void handleClose() {
         System.exit(0);
     }
-    
+
     @FXML
     private void handleOpen() {
         setStatus("Loading Proof...");
@@ -130,31 +158,25 @@ public class RootLayoutController extends ViewController implements IViewContain
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Proofs", "*.proof"),
                 new ExtensionFilter("All Files", "*.*"));
         fileChooser.setInitialDirectory(new File("../"));
-        
+
         File file = fileChooser.showOpenDialog(new Stage());
-        
+
         if (file == null) {
             setStatus("No File Selected");
             return;
         }
-        
+
         proof = loadProof(file);
         setStatus("Proof loaded: " + file.getName());
     }
-    
+
+
     public Proof getProof() {
         return this.proof;
     }
-    
+
     public void setStatus(String status) {
         statusLabel.setText(status);
-    }
-
-    /**
-     * 
-     */
-    public RootLayoutController() {
-        // TODO Auto-generated constructor stub
     }
 
     @FXML
@@ -163,21 +185,22 @@ public class RootLayoutController extends ViewController implements IViewContain
     private Menu otherViewsMenu = null;
 
     public void registerView(String title,URL path, ViewPosition prefPos, KeyCombination keys){
-    	CheckMenuItem item = new CheckMenuItem();
+        CheckMenuItem item = new CheckMenuItem();
         item.setText(title); 
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
-        	public void  changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue){
-        		if (newValue){
-        			showView(path, prefPos);
-        		} else {
-        			clearView(prefPos);
-        		}
-        		resize();
-        	}
-		});
+            public void  changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue){
+                if (newValue){
+                    showView(path, prefPos);
+                } else {
+                    clearView(prefPos);
+                }
+                resize();
+            }
+        });
         if(keys != null)
             item.setAccelerator(keys);
 
+        // make overflow menu "Others" if items exceed max
         if(registeredViewsMenu.getItems().size() < MaxMenuEntries) {
             registeredViewsMenu.getItems().add(item);
         }
@@ -194,111 +217,87 @@ public class RootLayoutController extends ViewController implements IViewContain
         registerView(title,path,prefPos,null);
     }
 
-    private void showView(URL path, ViewPosition prefPos) {
-        BorderPane position;
+    public void showView(URL path, ViewPosition prefPos) {
         Pane view = (Pane) loadFxml(path);
-    	
-    	switch (prefPos) {
-		case CENTER:
-			position = center;
-			centerUsed = true;
-			break;
-		case TOPLEFT:
-			position = topLeft;
-			topLeftUsed = true;
-            break;
-		case BOTTOMLEFT:
-			position = bottomLeft;
-			bottomLeftUsed = true;
-			break;
-		case TOPRIGHT:
-			position = topRight;
-			topRightUsed = true;
-			break;
-		case BOTTOMRIGHT:
-			position = bottomRight;
-			bottomRightUsed = true;
-			break;
-		default:
-			position = center;
-			centerUsed = true;
-			break;
-		}
-    	position.getChildren().clear();
-    	position.setCenter(view);
+        view.setOnMouseClicked((event) -> { 
+            if(event.getButton() == MouseButton.SECONDARY) 
+                loadViewContextMenu(view).show(view,Side.TOP, event.getX(), event.getY());
+        });
+        setPosition(prefPos,view);
     }
-    
-    private void clearView(ViewPosition prefPos){
-        BorderPane position;
-    	switch (prefPos){
-    	case CENTER:
-			position = center;
-			centerUsed = false;
-			break;
-		case TOPLEFT:
-			position = topLeft;
-			topLeftUsed = false;
-            break;
-		case BOTTOMLEFT:
-			position = bottomLeft;
-			bottomLeftUsed = false;
-			break;
-		case TOPRIGHT:
-			position = topRight;
-			topRightUsed = false;
-			break;
-		case BOTTOMRIGHT:
-			position = bottomRight;
-			bottomRightUsed = false;
-			break;
-		default:
-			position = center;
-			centerUsed = false;
-			break;
-		}
-    	position.getChildren().clear();
+
+    public void clearView(ViewPosition prefPos){
+        setPosition(prefPos,null);
     }
-    
+
+    public void moveView(ViewPosition previous, ViewPosition next){
+        Node node = getView(previous);
+        setPosition(previous,null);
+        setPosition(next,node);
+    }
+
+    private Node getView(ViewPosition pos){
+        BorderPane container = positionMapping.get(pos);
+
+        if(container != null && container.getChildren().size() == 1)
+            return container.getChildren().get(0);
+        else return null;
+    }
+
+    public ViewPosition getViewPosition(Node node){
+        for (ViewPosition key : positionMapping.keySet()) {
+            if(positionMapping.get(key).getChildren().size() == 1 &&
+                    positionMapping.get(key).getChildren().get(0) == node)
+                return key;
+        }
+        return null;
+    }
+
+    private void setPosition(ViewPosition pos, Node node){
+        BorderPane container = positionMapping.get(pos);
+        container.getChildren().clear();
+        if(node != null){ 
+            container.setCenter(node);
+            positionUsage.put(pos, true);
+        }else{
+            positionUsage.put(pos, false);
+        }
+    }
+
     private void resize(){
-    	mainSplitPane.setDividerPositions(0.0, 1.0);
-    	if (topLeftUsed){
-    		if (bottomLeftUsed){
-    			leftPane.setDividerPositions(0.5);
-    			mainSplitPane.setDividerPosition(0, 0.3);
-    		} else{
-    			leftPane.setDividerPositions(1.0);
-    			mainSplitPane.setDividerPosition(0, 0.3);
-    		}
-    	} else if (bottomLeftUsed){
-    		leftPane.setDividerPositions(0.0);
-			mainSplitPane.setDividerPosition(0, 0.3);
-    	}
-    	
-    	if (topRightUsed){
-    		if (bottomRightUsed){
-    			rightPane.setDividerPositions(0.5);
-    			mainSplitPane.setDividerPosition(0, 0.7);
-    		} else{
-    			rightPane.setDividerPositions(1.0);
-    			mainSplitPane.setDividerPosition(0, 0.7);
-    		}
-    	} else if (bottomRightUsed){
-    		rightPane.setDividerPositions(0.0);
-			mainSplitPane.setDividerPosition(0, 0.7);
-    	}
+        mainSplitPane.setDividerPositions(0.0, 1.0);
+        if (positionUsage.get(ViewPosition.TOPLEFT)){
+            if (positionUsage.get(ViewPosition.BOTTOMLEFT)){
+                leftPane.setDividerPositions(0.5);
+                mainSplitPane.setDividerPosition(0, 0.3);
+            } else{
+                leftPane.setDividerPositions(1.0);
+                mainSplitPane.setDividerPosition(0, 0.3);
+            }
+        } else if (positionUsage.get(ViewPosition.BOTTOMLEFT)){
+            leftPane.setDividerPositions(0.0);
+            mainSplitPane.setDividerPosition(0, 0.3);
+        }
+
+        if (positionUsage.get(ViewPosition.TOPRIGHT)){
+            if (positionUsage.get(ViewPosition.BOTTOMRIGHT)){
+                rightPane.setDividerPositions(0.5);
+                mainSplitPane.setDividerPosition(0, 0.7);
+            } else{
+                rightPane.setDividerPositions(1.0);
+                mainSplitPane.setDividerPosition(0, 0.7);
+            }
+        } else if (positionUsage.get(ViewPosition.BOTTOMRIGHT)){
+            rightPane.setDividerPositions(0.0);
+            mainSplitPane.setDividerPosition(0, 0.7);
+        }
     }
-
-    @FXML
-    private MenuBar menuBar;
-
-    @FXML
-    private Menu helpMenu;
 
     public void registerMenu(URL sourcePath){
         // add additional menus right before the "Help" entry
         menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),loadFxml(sourcePath));
     }
-    
+
     public void registerMenuEntry(URL sourcePath,String parentMenu) throws IllegalStateException{
         for(Menu m : menuBar.getMenus()){
             if(m.getText().equals(parentMenu)){
@@ -309,26 +308,29 @@ public class RootLayoutController extends ViewController implements IViewContain
         throw new IllegalStateException("Menu " + parentMenu + " was not found");
     }
 
-    private <T> T loadFxml(URL path){
+    private ContextMenu loadViewContextMenu(Node parentView){
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
+        ContextMenu content;
         try {
-            // Load main view
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(path);
-
-            T content = loader.load();
-
-            // Give the controller access to the main app.
-            ViewController controller = loader.getController();
-            controller.setMainApp(mainApp);
-
-            return content;
-
-        } catch (IOException e) {
+            content = loader.load();
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }
+
+        // Give the controller access to the main app.
+        ViewContextMenuController controller = loader.getController();
+        controller.setMainApp(mainApp);
+        controller.setParentView(this,parentView);
+        content.setOnShowing((event) -> {
+            // select current position    
+        });
+        return content;
     }
-    
+
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
@@ -354,10 +356,23 @@ public class RootLayoutController extends ViewController implements IViewContain
         }
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // TODO Auto-generated method stub
-        
-    }
+    private <T> T loadFxml(URL path){
+        try {
+            // Load main view
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(path);
 
+            T content = loader.load();
+
+            // Give the controller access to the main app.
+            ViewController controller = loader.getController();
+            controller.setMainApp(mainApp);
+
+            return content;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

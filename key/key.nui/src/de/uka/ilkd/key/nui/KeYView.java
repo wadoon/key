@@ -8,8 +8,21 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface KeYView {
+    /**
+     * Text of the menu entry
+     */
     String title();
+    
+    /**
+     * Url to the fxml file of the view
+     */
     String path();
-    String windows() default "Main";
+    
+// not used yet
+//    String windows() default "Main";
+    
+    /**
+     * Positon in which the view is displayed as default
+     */
     ViewPosition preferredPosition() default ViewPosition.CENTER;
 }

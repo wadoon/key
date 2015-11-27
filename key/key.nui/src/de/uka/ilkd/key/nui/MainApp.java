@@ -17,101 +17,103 @@ import javafx.stage.Stage;
 
 public class MainApp extends Application {
 
-	private Stage primaryStage;
-	private BorderPane rootLayout;
-	private RootLayoutController rootLayoutController;
+    private Stage primaryStage;
+    private BorderPane rootLayout;
+    private RootLayoutController rootLayoutController;
     private Reflections reflections = new Reflections("de.uka.ilkd.key");
 
-	@Override
-	public void start(Stage primaryStage) {
-		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("KeY Project");
+    @Override
+    public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        this.primaryStage.setTitle("KeY Project");
 
-		// Set the application icon.
-		this.primaryStage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
+        // Set the application icon.
+        this.primaryStage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
 
-		initRootLayout();
-		registerViews();
-		scanForViews();
-		scanForMenus();
-		primaryStage.show();
-	}
+        initRootLayout();
+        registerViews();
+        scanForViews();
+        scanForMenus();
+        primaryStage.show();
+    }
 
-	/**
-	 * Initializes the root layout.
-	 */
-	public void initRootLayout() {
-		try {
-			// Load root layout from fxml file.
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
-			rootLayout = (BorderPane) loader.load();
+    /**
+     * Initializes the root layout.
+     */
+    public void initRootLayout() {
+        try {
+            // Load root layout from fxml file.
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+            rootLayout = (BorderPane) loader.load();
 
-			// Show the scene containing the root layout.
-			Scene scene = new Scene(rootLayout);
-			primaryStage.setScene(scene);
+            // Show the scene containing the root layout.
+            Scene scene = new Scene(rootLayout);
+            primaryStage.setScene(scene);
 
-			// Give the controller access to the main app.
-			RootLayoutController controller = loader.getController();
-			controller.setMainApp(this);
-			rootLayoutController = controller;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            // Give the controller access to the main app.
+            RootLayoutController controller = loader.getController();
+            controller.setMainApp(this);
+            rootLayoutController = controller;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	private void registerViews() {
-		// rootLayoutController.registerView("Sequent",
-		// MainApp.class.getResource("view/SequentView.fxml"), centerPos);
-		rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), ViewPosition.BOTTOMLEFT);
-		rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), ViewPosition.TOPLEFT);
-		// rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
-	}
+    private void registerViews() {
+        // rootLayoutController.registerView("Sequent",
+        // MainApp.class.getResource("view/SequentView.fxml"), centerPos);
+        rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), ViewPosition.BOTTOMLEFT);
+        rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), ViewPosition.TOPLEFT);
+        // rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
+    }
 
-	private void scanForViews() {
-		Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
-		for (Class<?> c : annotated) {
-			KeYView annot = c.getAnnotation(KeYView.class);
-			if (Arrays.asList(annot.windows()).contains("Main"))
-				rootLayoutController.registerView(annot.title(), c.getResource(annot.path()),
-						annot.preferredPosition());
-		}
-		System.out.println("Views: " + annotated.size());
-	}
+    private void scanForViews() {
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
+        for (Class<?> c : annotated) {
+            KeYView annot = c.getAnnotation(KeYView.class);
+            // no used yet
+            //if (Arrays.asList(annot.windows()).contains("Main"))
+            rootLayoutController.registerView(annot.title(), c.getResource(annot.path()),
+                    annot.preferredPosition());
+        }
+        System.out.println("Views: " + annotated.size());
+    }
 
-	private void scanForMenus() {
-		Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
-		for (Class<?> c : annotated) {
-			KeYMenu annot = c.getAnnotation(KeYMenu.class);
-			if (Arrays.asList(annot.windows()).contains("Main")) {
-			    if (annot.parentMenu().equals("")){
-	                rootLayoutController.registerMenu(c.getResource(annot.path()));
-			    } else {
-			        rootLayoutController.registerMenuEntry(c.getResource(annot.path()), annot.parentMenu());
-			    }
-			}
-		}
-		System.out.println("Menus: " + annotated.size());
-	}
-	
-	public Proof getProof() {
-	    return rootLayoutController.getProof();
-	}
-	
-	public void setStatus(String status) {
+    private void scanForMenus() {
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
+        for (Class<?> c : annotated) {
+            KeYMenu annot = c.getAnnotation(KeYMenu.class);
+            // not used yet
+            //if (Arrays.asList(annot.windows()).contains("Main")) {
+            if (annot.parentMenu().equals("")){
+                rootLayoutController.registerMenu(c.getResource(annot.path()));
+            } else {
+                rootLayoutController.registerMenuEntry(c.getResource(annot.path()), annot.parentMenu());
+            }
+            //}
+        }
+        System.out.println("Menus: " + annotated.size());
+    }
+
+    public Proof getProof() {
+        return rootLayoutController.getProof();
+    }
+
+    public void setStatus(String status) {
         rootLayoutController.setStatus(status);
     }
 
-	/**
-	 * Returns the main stage.
-	 * 
-	 * @return
-	 */
-	public Stage getPrimaryStage() {
-		return primaryStage;
-	}
+    /**
+     * Returns the main stage.
+     * 
+     * @return
+     */
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
