@@ -14,20 +14,28 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.Pane;
 
 @KeYView(title="Sequent",path="SequentView.fxml",preferredPosition=ViewPosition.CENTER)
 public class SequentViewController extends ViewController {
 
     @FXML
     private TextArea textArea;
-    
+
+    @FXML
+    private ToggleButton filterButton;
+
+    @FXML
+    private Pane filterParent;
+
     /**
      * The constructor.
      * The constructor is called before the initialize() method.
      */
     public SequentViewController() {
     }
-    
+
     /**
      * After a proof has been loaded, the sequent of the root node can be displayed
      */
@@ -41,13 +49,21 @@ public class SequentViewController extends ViewController {
         Node node = proof.root();
         Sequent sequent = node.sequent();
         LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
-        
+
         logicPrinter.printSequent(sequent);
-        
+
         textArea.setText(logicPrinter.toString());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // hide the filter at the beginning
+        toggleFilter();
+    }
+
+    @FXML
+    private void toggleFilter(){
+        filterParent.managedProperty().bind(filterParent.visibleProperty());
+        filterParent.setVisible(filterButton.isSelected());
     }
 }

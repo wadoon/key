@@ -3,11 +3,14 @@ package de.uka.ilkd.key.nui.view;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.ViewPosition;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
+@KeYView(title="Tree",path="TreeView.fxml",preferredPosition=ViewPosition.TOPLEFT)
 public class TreeViewController extends ViewController{
     // Reference to the main application.
     @FXML private TreeView<String> treeView;

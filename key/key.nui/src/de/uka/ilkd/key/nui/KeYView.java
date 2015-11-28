@@ -25,4 +25,10 @@ public @interface KeYView {
      * Positon in which the view is displayed as default
      */
     ViewPosition preferredPosition() default ViewPosition.CENTER;
+    
+    /**
+     * Shortcut KeyCombination (as String)
+     * default "" will be ignored
+     */
+    String accelerator() default ""; 
 }
