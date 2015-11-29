@@ -9,13 +9,14 @@ import de.uka.ilkd.key.nui.view.RootLayoutController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Tab;
 
 public class ViewContextMenuController extends ViewController{
     private RootLayoutController controller;
-    private Node parent;
-    public void setParentView(RootLayoutController controller,Node parent){
+    private Tab tab;
+    public void setParentView(RootLayoutController controller, Tab tab){
         this.controller = controller;
-        this.parent = parent;
+        this.tab = tab;
     }
     
     @Override
@@ -24,27 +25,27 @@ public class ViewContextMenuController extends ViewController{
     
     @FXML
     private void handleTopLeft(ActionEvent event){
-        controller.moveView(controller.getViewPosition(parent), ViewPosition.TOPLEFT);
+        controller.moveView(tab, ViewPosition.TOPLEFT);
     }
     
     @FXML
     private void handleTopRight(ActionEvent event){
-        controller.moveView(controller.getViewPosition(parent), ViewPosition.TOPRIGHT);
+        controller.moveView(tab, ViewPosition.TOPRIGHT);
     }
     
     @FXML
     private void handleBottomLeft(ActionEvent event){
-        controller.moveView(controller.getViewPosition(parent), ViewPosition.BOTTOMLEFT);
+        controller.moveView(tab, ViewPosition.BOTTOMLEFT);
     }
     
     @FXML
     private void handleBottomRight(ActionEvent event){
-        controller.moveView(controller.getViewPosition(parent), ViewPosition.BOTTOMRIGHT);
+        controller.moveView(tab, ViewPosition.BOTTOMRIGHT);
     }
     
     @FXML
     private void handleCenter(ActionEvent event){
-        controller.moveView(controller.getViewPosition(parent), ViewPosition.CENTER);
+        controller.moveView(tab, ViewPosition.CENTER);
     }
     
 }

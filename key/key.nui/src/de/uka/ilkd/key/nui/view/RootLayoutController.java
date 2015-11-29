@@ -22,6 +22,8 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
@@ -33,8 +35,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.effect.Glow;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
@@ -43,9 +53,11 @@ import javafx.stage.Stage;
 
 /**
  * @author Maximilian Li
+ * @author Victor Schuemmer
  *
  */
-public class RootLayoutController extends ViewController implements IViewContainer {
+public class RootLayoutController extends ViewController
+        implements IViewContainer {
 
     private static final int MaxMenuEntries = 8;
 
@@ -54,8 +66,11 @@ public class RootLayoutController extends ViewController implements IViewContain
     @FXML
     private Label statusLabel;
 
-    private final HashMap<ViewPosition,BorderPane> positionMapping;
-    private final HashMap<ViewPosition,Boolean> positionUsage;
+    private final HashMap<ViewPosition, BorderPane> positionMapping;
+    private final HashMap<ViewPosition, Boolean> positionUsage;
+
+    private HashMap<URL, Tab> tabs;
+    private Tab dragTab;
 
     /**
      * The BorderPane from the Main Window
@@ -91,22 +106,22 @@ public class RootLayoutController extends ViewController implements IViewContain
     @FXML
     BorderPane bottomRight;
 
-
     @FXML
     private MenuBar menuBar;
 
     @FXML
     private Menu helpMenu;
 
-    public RootLayoutController(){
-        positionUsage = new HashMap<ViewPosition,Boolean>();
+    public RootLayoutController() {
+        positionUsage = new HashMap<ViewPosition, Boolean>();
         positionUsage.put(ViewPosition.BOTTOMLEFT, false);
         positionUsage.put(ViewPosition.BOTTOMRIGHT, false);
         positionUsage.put(ViewPosition.CENTER, false);
         positionUsage.put(ViewPosition.TOPLEFT, false);
         positionUsage.put(ViewPosition.TOPRIGHT, false);
 
-        positionMapping = new HashMap<ViewPosition,BorderPane>();
+        positionMapping = new HashMap<ViewPosition, BorderPane>();
+        tabs = new HashMap<URL, Tab>();
     }
 
     @Override
@@ -116,11 +131,65 @@ public class RootLayoutController extends ViewController implements IViewContain
         positionMapping.put(ViewPosition.CENTER, center);
         positionMapping.put(ViewPosition.TOPLEFT, topLeft);
         positionMapping.put(ViewPosition.TOPRIGHT, topRight);
+
+        positionMapping.forEach((k, v) -> {
+            v.setCenter(new TabPane());
+            registerDragListeners(v.getCenter());
+        });
+    }
+
+    /**
+     * Adds Drag&Drop acceptance to Pane
+     * 
+     * @param node
+     */
+    private void registerDragListeners(Node node) {
+        node.setOnDragOver(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() != node) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            }
+        });
+        node.setOnDragEntered(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() != node) {
+                    System.out.println("valid target entered");
+                    // node.setEffect(new Glow());
+                    node.setStyle(
+                            "-fx-padding: 1; -fx-background-color: yellow, -fx-control-inner-background; -fx-background-insets: 0, 1;");
+                }
+                event.consume();
+            }
+        });
+        node.setOnDragExited(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event) {
+                System.out.println("target exited");
+                // node.setEffect(null);
+                node.setStyle("");
+                event.consume();
+            }
+        });
+        node.setOnDragDropped(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event) {
+                boolean success = false;
+                if (dragTab != null) {
+                    moveView(dragTab, getViewPosition(node));
+                    dragTab = null;
+                    success = true;
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            }
+        });
     }
 
     /**
      * Opens a new Window with About Functionality. View: AboutView.fxml
-     * @param event ActionEvent
+     * 
+     * @param event
+     *            ActionEvent
      */
     @FXML
     private void handleAbout(ActionEvent event) {
@@ -128,7 +197,8 @@ public class RootLayoutController extends ViewController implements IViewContain
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/AboutView.fxml"));
+            loader.setLocation(
+                    MainApp.class.getResource("view/AboutView.fxml"));
 
             Stage stage = new Stage();
             stage.setTitle("About Key");
@@ -137,7 +207,8 @@ public class RootLayoutController extends ViewController implements IViewContain
 
             stage.show();
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -155,7 +226,8 @@ public class RootLayoutController extends ViewController implements IViewContain
         setStatus("Loading Proof...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Proofs", "*.proof"),
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter("Proofs", "*.proof"),
                 new ExtensionFilter("All Files", "*.*"));
         fileChooser.setInitialDirectory(new File("../"));
 
@@ -170,7 +242,6 @@ public class RootLayoutController extends ViewController implements IViewContain
         setStatus("Proof loaded: " + file.getName());
     }
 
-
     public Proof getProof() {
         return this.proof;
     }
@@ -184,133 +255,182 @@ public class RootLayoutController extends ViewController implements IViewContain
 
     private Menu otherViewsMenu = null;
 
-    public void registerView(String title,URL path, ViewPosition prefPos, KeyCombination keys){
+    public void registerView(String title, URL path, ViewPosition prefPos,
+            KeyCombination keys) {
         CheckMenuItem item = new CheckMenuItem();
-        item.setText(title); 
+        item.setText(title);
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            public void  changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue){
-                if (newValue){
-                    showView(path, prefPos);
-                } else {
-                    clearView(prefPos);
+            public void changed(ObservableValue<? extends Boolean> ov,
+                    Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    showView(title, path, prefPos);
+                }
+                else {
+                    hideView(tabs.get(path));
                 }
                 resize();
             }
         });
-        if(keys != null)
+        if (!positionUsage.get(prefPos))
+            item.setSelected(true);
+        if (keys != null)
             item.setAccelerator(keys);
 
         // make overflow menu "Others" if items exceed max
-        if(registeredViewsMenu.getItems().size() < MaxMenuEntries) {
+        if (registeredViewsMenu.getItems().size() < MaxMenuEntries) {
             registeredViewsMenu.getItems().add(item);
         }
-        else{
-            if(otherViewsMenu == null){
+        else {
+            if (otherViewsMenu == null) {
                 otherViewsMenu = new Menu("Other");
                 registeredViewsMenu.getItems().add(otherViewsMenu);
             }
             otherViewsMenu.getItems().add(item);
         }
-    } 
+    }
 
     public void registerView(String title, URL path, ViewPosition prefPos) {
-        registerView(title,path,prefPos,null);
+        registerView(title, path, prefPos, null);
     }
 
-    public void showView(URL path, ViewPosition prefPos) {
+    public void showView(String title, URL path, ViewPosition prefPos) {
         Pane view = (Pane) loadFxml(path);
-        view.setOnMouseClicked((event) -> { 
-            if(event.getButton() == MouseButton.SECONDARY) 
-                loadViewContextMenu(view).show(view,Side.TOP, event.getX(), event.getY());
+        Tab tab = createTab(title, view);
+        tabs.put(path, tab);
+        tab.getGraphic().setOnMouseClicked((event) -> {
+            if (event.getButton() == MouseButton.SECONDARY)
+                loadViewContextMenu(tab).show(tab.getGraphic(), Side.TOP,
+                        event.getX(), event.getY());
         });
-        setPosition(prefPos,view);
+        setPosition(prefPos, tab);
     }
 
-    public void clearView(ViewPosition prefPos){
-        setPosition(prefPos,null);
+    /**
+     * 
+     * @param title
+     * @param node
+     * @return a tab with content node and title as lable, also drag
+     *         functionality
+     */
+    private Tab createTab(String title, Node node) {
+        Tab t = new Tab();
+        Label l = new Label(title);
+        t.setGraphic(l);
+        t.setContent(node);
+
+        l.setOnDragDetected(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event) {
+                Dragboard db = l.startDragAndDrop(TransferMode.MOVE);
+
+                ClipboardContent content = new ClipboardContent();
+                content.putString(title);
+                db.setContent(content);
+                dragTab = t;
+                event.consume();
+            }
+        });
+
+        t.setOnClosed(new EventHandler<Event>() {
+            public void handle(Event event) {
+                // TODO handle
+            }
+        });
+
+        return t;
     }
 
-    public void moveView(ViewPosition previous, ViewPosition next){
-        Node node = getView(previous);
-        setPosition(previous,null);
-        setPosition(next,node);
+    public void hideView(Tab tab) {
+        TabPane tabPane = tab.getTabPane();
+        tabPane.getTabs().remove(tab);
+        if (tabPane.getTabs().size() == 0)
+            positionUsage.put(getViewPosition(tabPane.getParent()), false);
+        resize();
     }
 
-    private Node getView(ViewPosition pos){
+    public void moveView(Tab tab, ViewPosition next) {
+        hideView(tab);
+        setPosition(next, tab);
+    }
+
+    private Node getView(ViewPosition pos) {
         BorderPane container = positionMapping.get(pos);
 
-        if(container != null && container.getChildren().size() == 1)
+        if (container != null && container.getChildren().size() == 1)
             return container.getChildren().get(0);
-        else return null;
+        else
+            return null;
     }
 
-    public ViewPosition getViewPosition(Node node){
+    public ViewPosition getViewPosition(Node node) {
         for (ViewPosition key : positionMapping.keySet()) {
-            if(positionMapping.get(key).getChildren().size() == 1 &&
-                    positionMapping.get(key).getChildren().get(0) == node)
+            if (positionMapping.get(key).getChildren().size() == 1
+                    && positionMapping.get(key).getChildren().get(0) == node)
                 return key;
         }
         return null;
     }
 
-    private void setPosition(ViewPosition pos, Node node){
-        BorderPane container = positionMapping.get(pos);
-        container.getChildren().clear();
-        if(node != null){ 
-            container.setCenter(node);
-            positionUsage.put(pos, true);
-        }else{
-            positionUsage.put(pos, false);
-        }
+    private void setPosition(ViewPosition pos, Tab tab) {
+        TabPane container = (TabPane) positionMapping.get(pos).getCenter();
+        container.getTabs().add(tab);
+        positionUsage.put(pos, true);
     }
 
-    private void resize(){
+    private void resize() {
         mainSplitPane.setDividerPositions(0.0, 1.0);
-        if (positionUsage.get(ViewPosition.TOPLEFT)){
-            if (positionUsage.get(ViewPosition.BOTTOMLEFT)){
+        if (positionUsage.get(ViewPosition.TOPLEFT)) {
+            if (positionUsage.get(ViewPosition.BOTTOMLEFT)) {
                 leftPane.setDividerPositions(0.5);
                 mainSplitPane.setDividerPosition(0, 0.3);
-            } else{
+            }
+            else {
                 leftPane.setDividerPositions(1.0);
                 mainSplitPane.setDividerPosition(0, 0.3);
             }
-        } else if (positionUsage.get(ViewPosition.BOTTOMLEFT)){
+        }
+        else if (positionUsage.get(ViewPosition.BOTTOMLEFT)) {
             leftPane.setDividerPositions(0.0);
             mainSplitPane.setDividerPosition(0, 0.3);
         }
 
-        if (positionUsage.get(ViewPosition.TOPRIGHT)){
-            if (positionUsage.get(ViewPosition.BOTTOMRIGHT)){
+        if (positionUsage.get(ViewPosition.TOPRIGHT)) {
+            if (positionUsage.get(ViewPosition.BOTTOMRIGHT)) {
                 rightPane.setDividerPositions(0.5);
                 mainSplitPane.setDividerPosition(0, 0.7);
-            } else{
+            }
+            else {
                 rightPane.setDividerPositions(1.0);
                 mainSplitPane.setDividerPosition(0, 0.7);
             }
-        } else if (positionUsage.get(ViewPosition.BOTTOMRIGHT)){
+        }
+        else if (positionUsage.get(ViewPosition.BOTTOMRIGHT)) {
             rightPane.setDividerPositions(0.0);
             mainSplitPane.setDividerPosition(0, 0.7);
         }
     }
 
-    public void registerMenu(URL sourcePath){
+    public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
-        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),loadFxml(sourcePath));
+        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),
+                loadFxml(sourcePath));
     }
 
-    public void registerMenuEntry(URL sourcePath,String parentMenu) throws IllegalStateException{
-        for(Menu m : menuBar.getMenus()){
-            if(m.getText().equals(parentMenu)){
+    public void registerMenuEntry(URL sourcePath, String parentMenu)
+            throws IllegalStateException {
+        for (Menu m : menuBar.getMenus()) {
+            if (m.getText().equals(parentMenu)) {
                 m.getItems().add(loadFxml(sourcePath));
                 return;
             }
         }
-        throw new IllegalStateException("Menu " + parentMenu + " was not found");
+        throw new IllegalStateException(
+                "Menu " + parentMenu + " was not found");
     }
 
-    private ContextMenu loadViewContextMenu(Node parentView){
+    private ContextMenu loadViewContextMenu(Tab tab) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
+        loader.setLocation(ViewContextMenuController.class
+                .getResource("ViewContextMenu.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
@@ -324,9 +444,9 @@ public class RootLayoutController extends ViewController implements IViewContain
         // Give the controller access to the main app.
         ViewContextMenuController controller = loader.getController();
         controller.setMainApp(mainApp);
-        controller.setParentView(this,parentView);
+        controller.setParentView(this, tab);
         content.setOnShowing((event) -> {
-            // select current position    
+            // select current position
         });
         return content;
     }
@@ -340,7 +460,7 @@ public class RootLayoutController extends ViewController implements IViewContain
      * @return The loaded proof.
      */
     private Proof loadProof(File proofFile) {
-        //File proofFile = new File("../" + proofFileName);
+        // File proofFile = new File("../" + proofFileName);
 
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(
@@ -356,7 +476,7 @@ public class RootLayoutController extends ViewController implements IViewContain
         }
     }
 
-    private <T> T loadFxml(URL path){
+    private <T> T loadFxml(URL path) {
         try {
             // Load main view
             FXMLLoader loader = new FXMLLoader();
@@ -370,7 +490,8 @@ public class RootLayoutController extends ViewController implements IViewContain
 
             return content;
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
