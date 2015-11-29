@@ -34,6 +34,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -255,8 +256,7 @@ public class RootLayoutController extends ViewController
 
     private Menu otherViewsMenu = null;
 
-    public void registerView(String title, URL path, ViewPosition prefPos,
-            KeyCombination keys) {
+    public void registerView(String title,URL path, ViewPosition prefPos, String accelerator){        
         CheckMenuItem item = new CheckMenuItem();
         item.setText(title);
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -272,9 +272,9 @@ public class RootLayoutController extends ViewController
             }
         });
         if (!positionUsage.get(prefPos))
-            item.setSelected(true);
-        if (keys != null)
-            item.setAccelerator(keys);
+            item.setSelected(true);        
+        if(!accelerator.equals(""))
+            item.setAccelerator(KeyCombination.valueOf(accelerator));
 
         // make overflow menu "Others" if items exceed max
         if (registeredViewsMenu.getItems().size() < MaxMenuEntries) {
@@ -287,10 +287,6 @@ public class RootLayoutController extends ViewController
             }
             otherViewsMenu.getItems().add(item);
         }
-    }
-
-    public void registerView(String title, URL path, ViewPosition prefPos) {
-        registerView(title, path, prefPos, null);
     }
 
     public void showView(String title, URL path, ViewPosition prefPos) {

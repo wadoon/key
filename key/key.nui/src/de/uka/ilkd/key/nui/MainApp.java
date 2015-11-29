@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -31,7 +32,6 @@ public class MainApp extends Application {
         this.primaryStage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
 
         initRootLayout();
-        registerViews();
         scanForViews();
         scanForMenus();
         primaryStage.show();
@@ -44,7 +44,10 @@ public class MainApp extends Application {
         try {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+            URL path= MainApp.class.getResource("view/RootLayout.fxml");
+            if(path == null)
+                throw new RuntimeException("Could not find RootLayout.fxml");
+            loader.setLocation(path);
             rootLayout = (BorderPane) loader.load();
 
             // Show the scene containing the root layout.
@@ -55,17 +58,9 @@ public class MainApp extends Application {
             RootLayoutController controller = loader.getController();
             controller.setMainApp(this);
             rootLayoutController = controller;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void registerViews() {
-        // rootLayoutController.registerView("Sequent",
-        // MainApp.class.getResource("view/SequentView.fxml"), centerPos);
-        rootLayoutController.registerView("Main", MainApp.class.getResource("view/MainView.fxml"), ViewPosition.BOTTOMLEFT);
-        rootLayoutController.registerView("Tree", MainApp.class.getResource("view/TreeView.fxml"), ViewPosition.TOPLEFT);
-        // rootLayoutController.registerMenu(MainApp.class.getResource("testimplementation/TestMenuEntry.fxml"));
     }
 
     private void scanForViews() {
@@ -75,7 +70,7 @@ public class MainApp extends Application {
             // no used yet
             //if (Arrays.asList(annot.windows()).contains("Main"))
             rootLayoutController.registerView(annot.title(), c.getResource(annot.path()),
-                    annot.preferredPosition());
+                    annot.preferredPosition(),annot.accelerator());
         }
         System.out.println("Views: " + annotated.size());
     }
