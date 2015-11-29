@@ -12,9 +12,12 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 
 @KeYView(title="Sequent",path="SequentView.fxml",preferredPosition=ViewPosition.CENTER)
@@ -28,12 +31,20 @@ public class SequentViewController extends ViewController {
 
     @FXML
     private Pane filterParent;
+    
+    @FXML
+    private TextField searchBox;
 
     /**
      * The constructor.
      * The constructor is called before the initialize() method.
      */
     public SequentViewController() {
+        searchBox.setOnKeyTyped(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent event){
+                
+            }
+        });
     }
 
     /**
