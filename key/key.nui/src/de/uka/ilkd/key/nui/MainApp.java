@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -43,7 +44,10 @@ public class MainApp extends Application {
         try {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+            URL path= MainApp.class.getResource("view/RootLayout.fxml");
+            if(path == null)
+                throw new RuntimeException("Could not find RootLayout.fxml");
+            loader.setLocation(path);
             rootLayout = (BorderPane) loader.load();
 
             // Show the scene containing the root layout.
@@ -54,7 +58,7 @@ public class MainApp extends Application {
             RootLayoutController controller = loader.getController();
             controller.setMainApp(this);
             rootLayoutController = controller;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
