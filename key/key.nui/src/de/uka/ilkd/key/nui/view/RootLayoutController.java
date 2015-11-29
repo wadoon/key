@@ -339,7 +339,7 @@ public class RootLayoutController extends ViewController
         TabPane tabPane = tab.getTabPane();
         tabPane.getTabs().remove(tab);
         if (tabPane.getTabs().size() == 0){
-            System.out.println(getViewPosition(tabPane.getParent()));
+            //System.out.println(getViewPosition(tabPane.getParent()));
             positionUsage.put(getViewPosition(tabPane.getParent()), false);
         }
             
@@ -383,6 +383,7 @@ public class RootLayoutController extends ViewController
         TabPane container = (TabPane) positionMapping.get(pos).getCenter();
         container.getTabs().add(tab);
         positionUsage.put(pos, true);
+        resize();
     }
 
     private void resize() {
@@ -405,16 +406,16 @@ public class RootLayoutController extends ViewController
         if (positionUsage.get(ViewPosition.TOPRIGHT)) {
             if (positionUsage.get(ViewPosition.BOTTOMRIGHT)) {
                 rightPane.setDividerPositions(0.5);
-                mainSplitPane.setDividerPosition(0, 0.7);
+                mainSplitPane.setDividerPosition(1, 0.7);
             }
             else {
                 rightPane.setDividerPositions(1.0);
-                mainSplitPane.setDividerPosition(0, 0.7);
+                mainSplitPane.setDividerPosition(1, 0.7);
             }
         }
         else if (positionUsage.get(ViewPosition.BOTTOMRIGHT)) {
             rightPane.setDividerPositions(0.0);
-            mainSplitPane.setDividerPosition(0, 0.7);
+            mainSplitPane.setDividerPosition(1, 0.7);
         }
     }
 
