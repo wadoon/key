@@ -61,7 +61,7 @@ public class RootLayoutController extends ViewController
         implements IViewContainer {
 
     private static final int MaxMenuEntries = 8;
-
+    
     private Proof proof;
 
     @FXML
@@ -137,6 +137,12 @@ public class RootLayoutController extends ViewController
             v.setCenter(new TabPane());
             registerDragListeners(v.getCenter());
         });
+        
+        // Load a standard proof when starting the program for testing purposes
+        // TODO Remove then following 3 lines and folder "resources/proofs" at end of project or when not needed anymore
+        File file = new File("resources/proofs/gcd.closed.proof");
+        proof = loadProof(file);
+        statusLabel.setText("Proof loaded: " + file.getName());
     }
 
     /**
