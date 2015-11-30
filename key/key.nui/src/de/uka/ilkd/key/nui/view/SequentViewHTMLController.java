@@ -3,12 +3,8 @@ package de.uka.ilkd.key.nui.view;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import org.antlr.grammar.v3.ANTLRParser.option_return;
-
-import de.uka.ilkd.key.java.recoderext.EscapeExpression;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
-import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -17,7 +13,6 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.HTMLEditor;
@@ -59,9 +54,9 @@ public class SequentViewHTMLController extends SequentViewController {
         String proofString;
         proofString = logicPrinter.toString();
         SequentPrinter printer = new SequentPrinter();
-        System.out.println(printer.escape(proofString));
+        //System.out.println(printer.escape(proofString));
         
-        textAreaHTML.setHtmlText(printer.toHTML(proofString));
+        textAreaHTML.setHtmlText(printer.printSequent(proofString));
     }
     
     @Override
