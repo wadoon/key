@@ -12,7 +12,7 @@
       <AnchorPane>
          <children>
             <Label layoutX="14.0" layoutY="12.0" text="Welcome to the Sequent View" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="12.0" />
-            <HTMLEditor disable="true" fx:id="textAreaHTML" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0" />
+            <HTMLEditor fx:id="textAreaHTML" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0" />
             <ButtonBar layoutX="220.0" prefHeight="40.0" prefWidth="280.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <buttons>
                   <ToggleButton fx:id="filterButton" mnemonicParsing="false" onAction="#toggleFilter" text="Filter" />
