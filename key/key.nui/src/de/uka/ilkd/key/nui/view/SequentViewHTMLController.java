@@ -53,7 +53,7 @@ public class SequentViewHTMLController extends SequentViewController {
         
         String proofString;
         proofString = logicPrinter.toString();
-        SequentPrinter printer = new SequentPrinter("resources/css/sequentStyle.css");
+        SequentPrinter printer = new SequentPrinter("resources/css/sequentStyle.css","resources/css/sequentClasses.ini");
         //System.out.println(printer.escape(proofString));
         
         textAreaHTML.setHtmlText(printer.printSequent(proofString));

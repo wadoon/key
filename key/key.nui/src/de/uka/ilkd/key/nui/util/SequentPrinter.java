@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nui.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * @author Maximilian Li
@@ -13,18 +14,27 @@ import java.io.IOException;
  */
 public class SequentPrinter {
     private String css;
+    private HashMap<String, String> classMap = new HashMap<String, String>();
 
     /**
      * Constructor for the SequentPrinter
-     * @param cssPath Path to the CSS file for Styling
+     * 
+     * @param cssPath
+     *            Path to the CSS file for Styling
      */
-    public SequentPrinter(String cssPath) {
+    public SequentPrinter(String cssPath, String classPath) {
         // TODO Auto-generated constructor stub
         try {
             setCSS(cssPath);
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        try {
+            setClassMap(classPath);
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -73,15 +83,19 @@ public class SequentPrinter {
      */
     public String printSequent(String s) {
         String result = toHTML(s);
-        //result = colorString(result, "\\\\forall", "red");
-        result = styleHTML(result, "\\\\forall", "forall");
-        result = highlightString(result, "->");
+        for (String classString : classMap.keySet()) {
+            result = styleHTML(result, classMap.get(classString), classString);
+        }
+        //result = highlightString(result, "->");
 
         return result;
     }
+
     /**
      * sets the CSS information
-     * @param fileName path to the CSS file
+     * 
+     * @param fileName
+     *            path to the CSS file
      * @throws IOException
      */
     public void setCSS(String fileName) throws IOException {
@@ -96,6 +110,22 @@ public class SequentPrinter {
                 line = br.readLine();
             }
             this.css = sb.toString();
+        }
+        finally {
+            br.close();
+        }
+    }
+
+    public void setClassMap(String fileName) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        try {
+            String line = br.readLine();
+            String[] lineParts;
+            while (line != null) {
+                lineParts = line.split(" ");
+                classMap.put(lineParts[0], lineParts[1]);
+                line = br.readLine();
+            }
         }
         finally {
             br.close();
@@ -127,21 +157,31 @@ public class SequentPrinter {
             }
         return sb.toString();
     }
+
     /**
-     * Styles all the appearances of the given substring with given CSS Styleclass
-     * @param s input string
-     * @param searchString string to be styled
-     * @param styleClass the CSS StyleClass
+     * Styles all the appearances of the given substring with given CSS
+     * Styleclass
+     * 
+     * @param s
+     *            input string
+     * @param searchString
+     *            string to be styled
+     * @param styleClass
+     *            the CSS StyleClass
      * @return string with HTML style tags applied
      */
     public String styleHTML(String s, String searchString, String styleClass) {
         return s.replaceAll(searchString, "<span class=\"" + styleClass + "\">"
                 + searchString + "</span>");
     }
+
     /**
      * highlights all the appearances of the given substring according to CSS
-     * @param s input string 
-     * @param searchString string to be highlighted
+     * 
+     * @param s
+     *            input string
+     * @param searchString
+     *            string to be highlighted
      * @return string with HTML style tags applied
      */
     public String highlightString(String s, String searchString) {
