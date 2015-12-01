@@ -2,9 +2,13 @@
 	background-color:yellow;
 }
 .forall{
-	color: red;
+	color: blue;
 	font-weight: bold;
 }
 .arrow{
 	background-color:red;
+}
+.slashed{
+	color:red;
+	background-color:blue;
 }

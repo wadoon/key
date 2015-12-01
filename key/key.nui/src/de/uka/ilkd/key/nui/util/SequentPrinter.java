@@ -14,7 +14,8 @@ import java.util.HashMap;
  */
 public class SequentPrinter {
     private String css;
-    private HashMap<String, String> classMap = new HashMap<String, String>();
+    private HashMap<String, String> dictionaryMap = new HashMap<String, String>();
+    private HashMap<String, String> regexMap = new HashMap<String, String>();
 
     /**
      * Constructor for the SequentPrinter
@@ -25,14 +26,14 @@ public class SequentPrinter {
     public SequentPrinter(String cssPath, String classPath) {
         // TODO Auto-generated constructor stub
         try {
-            setCSS(cssPath);
+            readCSS(cssPath);
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         try {
-            setClassMap(classPath);
+            readIni(classPath);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -83,10 +84,11 @@ public class SequentPrinter {
      */
     public String printSequent(String s) {
         String result = toHTML(s);
-        for (String classString : classMap.keySet()) {
-            result = styleHTML(result, classMap.get(classString), classString);
+        for (String classString : dictionaryMap.keySet()) {
+            result = styleHTML(result, dictionaryMap.get(classString),
+                    classString);
         }
-        //result = highlightString(result, "->");
+        // result = highlightString(result, "->");
 
         return result;
     }
@@ -98,7 +100,7 @@ public class SequentPrinter {
      *            path to the CSS file
      * @throws IOException
      */
-    public void setCSS(String fileName) throws IOException {
+    public void readCSS(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         try {
             StringBuilder sb = new StringBuilder();
@@ -116,14 +118,33 @@ public class SequentPrinter {
         }
     }
 
-    public void setClassMap(String fileName) throws IOException {
+    /**
+     * reads the .ini file and builds the Dictionary and RegEx Maps
+     * 
+     * @param fileName
+     *            path to the .ini file
+     * @throws IOException
+     */
+    public void readIni(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         try {
             String line = br.readLine();
             String[] lineParts;
             while (line != null) {
                 lineParts = line.split(" ");
-                classMap.put(lineParts[0], lineParts[1]);
+                switch (line.charAt(0)) {
+                case '/':
+                    break;
+                case 'd':
+                    dictionaryMap.put(lineParts[1], lineParts[2]);
+                    break;
+                case 'r':
+                    regexMap.put(lineParts[1], lineParts[2]);
+                    break;
+                default:
+                    break;
+                }
+
                 line = br.readLine();
             }
         }
@@ -144,17 +165,14 @@ public class SequentPrinter {
         sb.append("<style>");
         sb.append(css);
         sb.append("</style>");
-        for (int i = 0; i < s.length(); i++)
-            switch (s.charAt(i)) {
-            case '\n':
-                sb.append("</br>");
-                break;
-            case ' ':
-                sb.append("&nbsp;");
-                break;
-            default:
-                sb.append(s.charAt(i));
-            }
+        /*
+         * for (int i = 0; i < s.length(); i++) switch (s.charAt(i)) { case
+         * '\n': sb.append("</br>"); break; case ' ': sb.append("&nbsp;");
+         * break; default: sb.append(s.charAt(i)); }
+         */
+        sb.append("<pre>");
+        sb.append(s);
+        sb.append("</pre>");
         return sb.toString();
     }
 
@@ -176,6 +194,27 @@ public class SequentPrinter {
     }
 
     /**
+     * styles the substring from start to end
+     * 
+     * @param s
+     *            the input string
+     * @param start
+     *            startIndex of the substring
+     * @param length
+     *            length of the substring
+     * @param styleClass
+     *            the CSS style which is to be applied
+     * @return string with HTML style tags applied
+     */
+    public String styleHTML(String s, int start, int length,
+            String styleClass) {
+        StringBuilder sb = new StringBuilder(s);
+        sb.insert(start + length, "</span>");
+        sb.insert(start, "<span class=\"" + styleClass + "\">");
+        return sb.toString();
+    }
+
+    /**
      * highlights all the appearances of the given substring according to CSS
      * 
      * @param s
@@ -186,6 +225,21 @@ public class SequentPrinter {
      */
     public String highlightString(String s, String searchString) {
         return styleHTML(s, searchString, "highlighted");
+    }
+
+    /**
+     * highlights the substring from start to end
+     * 
+     * @param s
+     *            the input string
+     * @param start
+     *            startIndex of the substring
+     * @param length
+     *            length of the substring
+     * @return string with HTML style tags applied
+     */
+    public String highlightString(String s, int start, int length) {
+        return styleHTML(s, start, length, "highlighted");
     }
 
     /**
