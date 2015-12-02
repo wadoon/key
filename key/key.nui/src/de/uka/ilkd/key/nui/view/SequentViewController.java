@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -14,34 +13,60 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
+import javafx.geometry.Point2D;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import static javafx.scene.AccessibleAttribute.OFFSET_AT_POINT;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebView;
 
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER)
 
 public class SequentViewController extends ViewController {
 
+    private boolean sequentLoaded = false;
+    private SequentPrinter printer;
+    private String proofString;
+
     @FXML
-    private WebView textAreaHTML;
+    private WebView textAreaWebView;
 
     @FXML
     private ToggleButton filterButton;
 
     @FXML
     private Pane filterParent;
-    
+
     @FXML
     private TextField filterText;
 
     @FXML
     private TextField searchBox;
+
+    private EventHandler<MouseEvent> mousehandler = new EventHandler<MouseEvent>() {
+
+        @Override
+        public void handle(MouseEvent mouseEvent) {
+            final int idx = (int) textAreaWebView.queryAccessibleAttribute(OFFSET_AT_POINT,
+                    new Point2D(mouseEvent.getScreenX(), mouseEvent.getScreenY()));
+            // System.out.println(idx);
+            System.out.println("Character moved over: " + textAreaWebView.getAccessibleText().charAt(idx));
+            /*
+             * System.out.println( mouseEvent.getEventType() + "\n" + "X : Y - "
+             * + mouseEvent.getX() + " : " + mouseEvent.getY() + "\n" +
+             * "SceneX : SceneY - " + mouseEvent.getSceneX() + " : " +
+             * mouseEvent.getSceneY() + "\n" + "ScreenX : ScreenY - " +
+             * mouseEvent.getScreenX() + " : " + mouseEvent.getScreenY());
+             */
+
+        }
+    };
 
     /**
      * The constructor. The constructor is called before the initialize()
@@ -50,40 +75,10 @@ public class SequentViewController extends ViewController {
     public SequentViewController() {
     }
 
-    private boolean sequentLoaded = false;
-    private SequentPrinter printer;
-    private String proofString;
-
-    /**
-     * After a proof has been loaded, the sequent of the root node can be
-     * displayed
-     */
-    @FXML
-    private void showRootSequent() {
-        Proof proof = mainApp.getProof();
-        if (proof == null) {
-            mainApp.setStatus("Please Select a Proof first.");
-            return;
-        }
-        Node node = proof.root();
-        Sequent sequent = node.sequent();
-        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(),
-                new NotationInfo(), proof.getServices());
-
-        logicPrinter.printSequent(sequent);
-
-        proofString = logicPrinter.toString();
-        printer = new SequentPrinter("resources/css/sequentStyle.css","resources/css/sequentClasses.ini");
-        sequentLoaded = true;
-        //System.out.println(printer.escape(proofString));
-        updateHtml(printer.printSequent(proofString));
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // hide the filter at the beginning
         toggleFilter();
-
         initializeSearchBox();
     }
 
@@ -91,8 +86,8 @@ public class SequentViewController extends ViewController {
         searchBox.setText("Search...");
         searchBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> arg0,
-                    Boolean oldPropertyValue, Boolean newPropertyValue) {
+            public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue,
+                    Boolean newPropertyValue) {
                 if (newPropertyValue) {
                     if (searchBox.getText().equals("Search..."))
                         searchBox.setText("");
@@ -112,7 +107,39 @@ public class SequentViewController extends ViewController {
         });
     }
     
-    //TODO replace
+
+    /**
+     * After a proof has been loaded, the sequent of the root node can be
+     * displayed
+     */
+    @FXML
+    private void showRootSequent() {
+        Proof proof = mainApp.getProof();
+        if (proof == null) {
+            mainApp.setStatus("Please Select a Proof first.");
+            return;
+        }
+        Node node = proof.root();
+        System.out.println("number of nodes: " + proof.countNodes());
+        System.out.println("getNodeInfo(): " + node.getNodeInfo());
+        Sequent sequent = node.sequent();
+        // System.out.println(sequent.getFormulabyNr(0).toString());
+        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+
+        logicPrinter.printSequent(sequent);
+
+        //textAreaWebView.setAccessibleText(logicPrinter.toString());
+
+        //textAreaWebView.setOnMouseMoved(mousehandler);
+
+        proofString = logicPrinter.toString();
+        printer = new SequentPrinter("resources/css/sequentStyle.css", "resources/css/sequentClasses.ini");
+        sequentLoaded = true;
+        // System.out.println(printer.escape(proofString));
+        updateHtml(printer.printSequent(proofString));
+    }
+
+    // TODO replace
     private void highlight(String s) {
         if (!s.isEmpty()) {
             String text = proofString;
@@ -135,16 +162,15 @@ public class SequentViewController extends ViewController {
         filterParent.managedProperty().bind(filterParent.visibleProperty());
         filterParent.setVisible(filterButton.isSelected());
     }
-    
+
     private void updateHtml(String s){
-        textAreaHTML.getEngine().loadContent(s);
+        textAreaWebView.getEngine().loadContent(s);
     }
-    
+
     @FXML
-    private void handleKeyTyped(){
-      doFilter(filterText.getText());
+    private void handleKeyTyped() {
+        doFilter(filterText.getText());
     }
-    
     //just dummy method
     private void doFilter(String filterstring){
         if(!sequentLoaded)return;
