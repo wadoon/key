@@ -100,8 +100,10 @@ public class SequentViewController extends ViewController {
         });
         searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent event) {
+                printer.setFreeTextSearch(searchBox.getText());
                 //highlight(searchBox.getText());
-                updateHtml(printer.printSequent(printer.highlightString(proofString, searchBox.getText())));
+                //updateHtml(printer.printSequent(printer.highlightString(proofString, searchBox.getText())));
+                updateHtml(printer.printSequent(proofString));
                 event.consume();
             }
         });
