@@ -76,7 +76,7 @@ public class SequentViewController extends ViewController {
         printer = new SequentPrinter("resources/css/sequentStyle.css","resources/css/sequentClasses.ini");
         sequentLoaded = true;
         //System.out.println(printer.escape(proofString));
-        updateHtml();
+        updateHtml(printer.printSequent(proofString));
     }
 
     @Override
@@ -84,6 +84,10 @@ public class SequentViewController extends ViewController {
         // hide the filter at the beginning
         toggleFilter();
 
+        initializeSearchBox();
+    }
+
+    private void initializeSearchBox() {
         searchBox.setText("Search...");
         searchBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -101,17 +105,17 @@ public class SequentViewController extends ViewController {
         });
         searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent event) {
-                highlight(searchBox.getText());
+                //highlight(searchBox.getText());
+                updateHtml(printer.printSequent(printer.highlightString(proofString, searchBox.getText())));
                 event.consume();
             }
         });
-
     }
-
+    
     //TODO replace
     private void highlight(String s) {
         if (!s.isEmpty()) {
-            String text = "dummy";
+            String text = proofString;
             int lastIndex = 0;
             while (lastIndex != -1) {
                 lastIndex = text.indexOf(s, lastIndex);
@@ -132,8 +136,8 @@ public class SequentViewController extends ViewController {
         filterParent.setVisible(filterButton.isSelected());
     }
     
-    private void updateHtml(){
-        textAreaHTML.getEngine().loadContent(printer.printSequent(proofString));
+    private void updateHtml(String s){
+        textAreaHTML.getEngine().loadContent(s);
     }
     
     @FXML
@@ -145,6 +149,6 @@ public class SequentViewController extends ViewController {
     private void doFilter(String filterstring){
         if(!sequentLoaded)return;
         printer.infuseCSS(String.format("not(%s){display:none;}",filterstring));
-        updateHtml();
+        updateHtml(printer.printSequent(proofString));
     }
 }

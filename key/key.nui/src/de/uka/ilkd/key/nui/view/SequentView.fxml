@@ -24,8 +24,8 @@
    <top>
       <AnchorPane fx:id="filterParent" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-         	<TextField fx:id="searchBox" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="12.0" />
-            <TextField fx:id="filter" layoutX="13.0" layoutY="13.0" onKeyTyped="#handleKeyTyped" prefHeight="25.0" prefWidth="473.0" />
+         	<TextField fx:id="searchBox" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="13.0" />
+            <TextField fx:id="filter" layoutX="13.0" layoutY="13.0" onKeyTyped="#handleKeyTyped" prefHeight="25.0" prefWidth="300.0" />
          </children></AnchorPane>
    </top>
 </BorderPane>
