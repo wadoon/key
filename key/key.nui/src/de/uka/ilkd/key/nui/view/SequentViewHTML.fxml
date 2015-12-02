@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.web.HTMLEditor?>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.SequentViewHTMLController">
+   <center>
+      <AnchorPane>
+         <children>
+            <Label layoutX="14.0" layoutY="12.0" text="Welcome to the Sequent View" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="12.0" />
+            <HTMLEditor fx:id="textAreaHTML" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0"/>
+            <ButtonBar layoutX="220.0" prefHeight="40.0" prefWidth="280.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <buttons>
+                  <ToggleButton fx:id="filterButton" mnemonicParsing="false" onAction="#toggleFilter" text="Filter" />
+                <Button mnemonicParsing="false" onAction="#showRootSequent" text="Show Root Sequent" />
+              </buttons>
+            </ButtonBar>
+         </children>
+      </AnchorPane>
+   </center>
+   <top>
+      <AnchorPane fx:id="filterParent" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Filter" />
+         </children></AnchorPane>
+   </top>
+</BorderPane>
