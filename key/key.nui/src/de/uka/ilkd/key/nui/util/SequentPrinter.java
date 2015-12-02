@@ -16,6 +16,7 @@ public class SequentPrinter {
     private String css;
     private HashMap<String, String> dictionaryMap = new HashMap<String, String>();
     private HashMap<String, String> regexMap = new HashMap<String, String>();
+    private HashMap<String, String> tempCss = new HashMap<>();
 
     /**
      * Constructor for the SequentPrinter
@@ -74,9 +75,13 @@ public class SequentPrinter {
             }
         return sb.toString();
     }
-    
-    public void infuseCSS(String additionalCss){
-        css += additionalCss;
+
+    public void addTempCss(String tmpName, String additionalCss) {
+        tempCss.put(tmpName, additionalCss);
+    }
+
+    public void removeTempCss(String tmpName) {
+        tempCss.remove(tmpName);
     }
 
     /**
@@ -104,7 +109,7 @@ public class SequentPrinter {
      *            path to the CSS file
      * @throws IOException
      */
-    public void readCSS(String fileName) throws IOException {
+    private void readCSS(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         try {
             StringBuilder sb = new StringBuilder();
@@ -129,7 +134,7 @@ public class SequentPrinter {
      *            path to the .ini file
      * @throws IOException
      */
-    public void readIni(String fileName) throws IOException {
+    private void readIni(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         try {
             String line = br.readLine();
@@ -168,6 +173,8 @@ public class SequentPrinter {
         StringBuilder sb = new StringBuilder();
         sb.append("<style>");
         sb.append(css);
+        for (String temp : tempCss.values())
+            sb.append(temp);
         sb.append("</style>");
         /*
          * for (int i = 0; i < s.length(); i++) switch (s.charAt(i)) { case

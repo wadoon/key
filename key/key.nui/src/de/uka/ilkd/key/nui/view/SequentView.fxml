@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.web.WebView?>
+
 <BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.SequentViewController">
    <center>
       <AnchorPane>
          <children>
             <Label layoutX="14.0" layoutY="12.0" text="Welcome to the Sequent View" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="12.0" />
-            <WebView fx:id="textAreaWebView" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0"/>
+            <WebView fx:id="textAreaWebView" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0" />
             <ButtonBar layoutX="220.0" prefHeight="40.0" prefWidth="280.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <buttons>
                   <ToggleButton fx:id="filterButton" mnemonicParsing="false" onAction="#toggleFilter" text="Search/Filter" />
@@ -25,7 +27,8 @@
       <AnchorPane fx:id="filterParent" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
          	<TextField fx:id="searchBox" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="13.0" />
-            <TextField fx:id="filter" layoutX="13.0" layoutY="13.0" onKeyTyped="#handleKeyTyped" prefHeight="25.0" prefWidth="300.0" />
+            <Button alignment="CENTER" layoutX="282.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleApplyFilter" text="Apply" AnchorPane.topAnchor="13.0" />
+            <TextField fx:id="filterText" layoutX="13.0" layoutY="13.0" prefHeight="25.0" prefWidth="259.0" AnchorPane.leftAnchor="13.0" AnchorPane.topAnchor="13.0" />
          </children></AnchorPane>
    </top>
 </BorderPane>
