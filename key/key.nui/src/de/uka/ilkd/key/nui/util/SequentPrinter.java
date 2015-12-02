@@ -234,8 +234,8 @@ public class SequentPrinter {
     private String styleHTMLEscaped(String s, String searchString,
             String styleClass) {
         if (!searchString.isEmpty())
-            return s.replaceAll(searchString, "<span class=\"" + styleClass
-                    + "\">" + searchString + "</span>");
+            return s.replaceAll(htmlEncode(searchString), "<span class=\"" + styleClass
+                    + "\">" + htmlEncode(searchString) + "</span>");
         else
             return s;
     }
