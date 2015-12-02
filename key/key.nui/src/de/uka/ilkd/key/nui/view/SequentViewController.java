@@ -40,11 +40,6 @@ public class SequentViewController extends ViewController {
      * The constructor is called before the initialize() method.
      */
     public SequentViewController() {
-        searchBox.setOnKeyTyped(new EventHandler<KeyEvent>() {
-            public void handle(KeyEvent event){
-                
-            }
-        });
     }
 
     /**
@@ -70,6 +65,30 @@ public class SequentViewController extends ViewController {
     public void initialize(URL location, ResourceBundle resources) {
         // hide the filter at the beginning
         toggleFilter();
+        
+        searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent event){
+                highlight(searchBox.getText());
+                event.consume();      
+            }
+        });
+        
+    }
+    
+    private void highlight(String s) {
+        if (! s.isEmpty()){
+            String text = textArea.getText();
+            int lastIndex = 0;
+            while (lastIndex != -1) {
+                lastIndex = text.indexOf(s,lastIndex);
+
+                if( lastIndex != -1){
+                    //TODO instead of printing the index, it should be highlighted in the textArea
+                    System.out.println(lastIndex);
+                    lastIndex += s.length();
+                }
+            }
+        }
     }
 
     @FXML
