@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 /**
  * @author Maximilian Li
- *
+ * @author Victor Schuemmer
  */
 public class SequentPrinter {
     private String css;
@@ -66,8 +66,14 @@ public class SequentPrinter {
             case '\b':
                 sb.append("\\b");
                 break;
-            case ' ':
-                sb.append("°");
+            case '\\':
+                sb.append("\\\\");
+                break;
+            case '(':
+                sb.append("\\(");
+                break;
+            case ')':
+                sb.append("\\)");
                 break;
             default:
                 sb.append(s.charAt(i));
@@ -193,8 +199,10 @@ public class SequentPrinter {
      * @return string with HTML style tags applied
      */
     public String styleHTML(String s, String searchString, String styleClass) {
-        return s.replaceAll(searchString, "<span class=\"" + styleClass + "\">"
-                + searchString + "</span>");
+        if (! searchString.isEmpty())
+            return s.replaceAll(escape(searchString), "<span class=\"" + styleClass + "\">"
+                    + escape(searchString) + "</span>");
+        else return s;
     }
 
     /**
@@ -433,11 +441,12 @@ public class SequentPrinter {
      */
     public String styleString(String s, String searchString, String fontColor,
             String backgroundColor, String fontWeight) {
-
-        return s.replaceAll(searchString,
-                "<span style=\"color:" + fontColor + ";background-color:"
-                        + backgroundColor + ";font-weight:" + fontWeight + "\">"
-                        + searchString + "</span>");
+        if (! searchString.isEmpty())
+            return s.replaceAll(escape(searchString),
+                    "<span style=\"color:" + fontColor + ";background-color:"
+                            + backgroundColor + ";font-weight:" + fontWeight + "\">"
+                            + searchString + "</span>");
+        else return s;
     }
 
     /**
