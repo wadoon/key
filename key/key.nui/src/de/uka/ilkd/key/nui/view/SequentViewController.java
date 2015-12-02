@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -14,10 +15,11 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
 
-@KeYView(title="Sequent",path="SequentView.fxml",preferredPosition=ViewPosition.CENTER)
+@KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER)
 public class SequentViewController extends ViewController {
 
     @FXML
@@ -28,16 +30,20 @@ public class SequentViewController extends ViewController {
 
     @FXML
     private Pane filterParent;
+    
+    @FXML
+    private TextField filter;
 
     /**
-     * The constructor.
-     * The constructor is called before the initialize() method.
+     * The constructor. The constructor is called before the initialize()
+     * method.
      */
     public SequentViewController() {
     }
 
     /**
-     * After a proof has been loaded, the sequent of the root node can be displayed
+     * After a proof has been loaded, the sequent of the root node can be
+     * displayed
      */
     @FXML
     private void showRootSequent() {
@@ -48,7 +54,8 @@ public class SequentViewController extends ViewController {
         }
         Node node = proof.root();
         Sequent sequent = node.sequent();
-        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(),
+                new NotationInfo(), proof.getServices());
 
         logicPrinter.printSequent(sequent);
 
@@ -62,8 +69,20 @@ public class SequentViewController extends ViewController {
     }
 
     @FXML
-    private void toggleFilter(){
+    private void toggleFilter() {
         filterParent.managedProperty().bind(filterParent.visibleProperty());
         filterParent.setVisible(filterButton.isSelected());
+    }
+    
+    @FXML
+    private void handleKeyTyped(){
+    }
+    
+    private List<Object> filter(){
+        Proof proof = mainApp.getProof();
+        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+        printer.printSequent(proof.root().sequent());
+        //printer.
+        return null;
     }
 }

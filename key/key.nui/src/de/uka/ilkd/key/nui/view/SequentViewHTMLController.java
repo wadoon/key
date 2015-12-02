@@ -13,6 +13,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.HTMLEditor;
@@ -28,6 +29,9 @@ public class SequentViewHTMLController extends SequentViewController {
 
     @FXML
     private Pane filterParent;
+    
+    @FXML
+    private TextField filterText;
 
     /**
      * The constructor.
@@ -35,6 +39,10 @@ public class SequentViewHTMLController extends SequentViewController {
      */
     public SequentViewHTMLController() {
     }
+    
+    private boolean sequentLoaded = false;
+    private SequentPrinter printer;
+    private String proofString;
 
     /**
      * After a proof has been loaded, the sequent of the root node can be displayed
@@ -51,12 +59,12 @@ public class SequentViewHTMLController extends SequentViewController {
         LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
         logicPrinter.printSequent(sequent);
         
-        String proofString;
-        proofString = logicPrinter.toString();
-        SequentPrinter printer = new SequentPrinter("resources/css/sequentStyle.css","resources/css/sequentClasses.ini");
-        //System.out.println(printer.escape(proofString));
         
-        textAreaHTML.setHtmlText(printer.printSequent(proofString));
+        proofString = logicPrinter.toString();
+        printer = new SequentPrinter("resources/css/sequentStyle.css","resources/css/sequentClasses.ini");
+        sequentLoaded = true;
+        //System.out.println(printer.escape(proofString));
+        updateHtml();
     }
     
     @Override
@@ -74,5 +82,21 @@ public class SequentViewHTMLController extends SequentViewController {
     private void toggleFilter(){
         filterParent.managedProperty().bind(filterParent.visibleProperty());
         filterParent.setVisible(filterButton.isSelected());
+    }
+    
+    private void updateHtml(){
+        textAreaHTML.setHtmlText(printer.printSequent(proofString));
+    }
+    
+    @FXML
+    private void handleKeyTyped(){
+      doFilter(filterText.getText());
+    }
+    
+    //just dummy method
+    private void doFilter(String filterstring){
+        if(!sequentLoaded)return;
+        printer.infuseCSS(String.format("not(%s){display:none;}",filterstring));
+        updateHtml();
     }
 }
