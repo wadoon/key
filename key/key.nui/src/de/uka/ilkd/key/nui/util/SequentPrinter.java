@@ -95,10 +95,6 @@ public class SequentPrinter {
         return sb.toString();
     }
 
-    public void infuseCSS(String additionalCss) {
-        css += additionalCss;
-    }
-
     public void addTempCss(String tmpName, String additionalCss) {
         tempCss.put(tmpName, additionalCss);
     }
@@ -115,7 +111,8 @@ public class SequentPrinter {
      * @return HTML Text with default style
      */
     public String printSequent(String s) {
-        String result = highlightString(s, freeTextSearch);
+        String htmlEncoded = htmlEncode(s);
+        String result = highlightString(htmlEncoded, freeTextSearch);
         result = toHTML(result);
         for (String classString : dictionaryMap.keySet()) {
             result = styleHTMLEscaped(result, dictionaryMap.get(classString),
@@ -205,10 +202,14 @@ public class SequentPrinter {
          * '\n': sb.append("</br>"); break; case ' ': sb.append("&nbsp;");
          * break; default: sb.append(s.charAt(i)); }
          */
-        sb.append("<pre>");
+        sb.append("<pre class=\"content\">");
         sb.append(s);
         sb.append("</pre>");
         return sb.toString();
+    }
+    
+    private String htmlEncode(String text){
+        return text.replace("<", "&lt;").replace(">", "&gt;");
     }
 
     /**
