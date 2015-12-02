@@ -170,13 +170,13 @@ public class SequentViewController extends ViewController {
     }
 
     @FXML
-    private void handleKeyTyped() {
+    private void handleApplyFilter() {
         doFilter(filterText.getText());
     }
     //just dummy method
     private void doFilter(String filterstring){
         if(!sequentLoaded)return;
-        printer.infuseCSS(String.format("not(%s){display:none;}",filterstring));
+        printer.addTempCss("filterCss", String.format("pre :not(%s) *{display: none !important;}",filterstring));
         updateHtml(printer.printSequent(proofString));
     }
 }
