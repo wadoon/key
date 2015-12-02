@@ -1,49 +1,55 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebView;
 
-@KeYView(title="Sequent",path="SequentView.fxml",preferredPosition=ViewPosition.CENTER)
-public class SequentViewController extends ViewController {
+@KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER)
+public class SequentViewController extends ViewController{
 
     @FXML
-    private TextArea textArea;
+    private WebView textAreaHTML;
 
     @FXML
     private ToggleButton filterButton;
 
     @FXML
     private Pane filterParent;
-    
+
     @FXML
     private TextField searchBox;
 
     /**
-     * The constructor.
-     * The constructor is called before the initialize() method.
+     * The constructor. The constructor is called before the initialize()
+     * method.
      */
     public SequentViewController() {
     }
 
     /**
-     * After a proof has been loaded, the sequent of the root node can be displayed
+     * After a proof has been loaded, the sequent of the root node can be
+     * displayed
      */
     @FXML
     private void showRootSequent() {
@@ -54,36 +60,67 @@ public class SequentViewController extends ViewController {
         }
         Node node = proof.root();
         Sequent sequent = node.sequent();
-        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
-
+        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(),
+                new NotationInfo(), proof.getServices());
         logicPrinter.printSequent(sequent);
 
-        textArea.setText(logicPrinter.toString());
+        String proofString;
+        proofString = logicPrinter.toString();
+        SequentPrinter printer = new SequentPrinter(
+                "resources/css/sequentStyle.css",
+                "resources/css/sequentClasses.ini");
+        // System.out.println(printer.escape(proofString));
+
+        textAreaHTML.getEngine().loadContent(printer.printSequent(proofString));
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        /*
+        textAreaHTML.lookup(".top-toolbar").setManaged(false);
+        textAreaHTML.lookup(".top-toolbar").setVisible(false);
+
+        textAreaHTML.lookup(".bottom-toolbar").setManaged(false);
+        textAreaHTML.lookup(".bottom-toolbar").setVisible(false);
+        */
         // hide the filter at the beginning
         toggleFilter();
-        
-        searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            public void handle(KeyEvent event){
-                highlight(searchBox.getText());
-                event.consume();      
+
+        searchBox.setText("Search...");
+        searchBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> arg0,
+                    Boolean oldPropertyValue, Boolean newPropertyValue) {
+                if (newPropertyValue) {
+                    if (searchBox.getText().equals("Search..."))
+                        searchBox.setText("");
+                }
+                else {
+                    if (searchBox.getText().isEmpty())
+                        searchBox.setText("Search...");
+                }
             }
         });
-        
+        searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent event) {
+                highlight(searchBox.getText());
+                event.consume();
+            }
+        });
+
     }
-    
+
+    //TODO replace
     private void highlight(String s) {
-        if (! s.isEmpty()){
-            String text = textArea.getText();
+        if (!s.isEmpty()) {
+            String text = "dummy";
             int lastIndex = 0;
             while (lastIndex != -1) {
-                lastIndex = text.indexOf(s,lastIndex);
+                lastIndex = text.indexOf(s, lastIndex);
 
-                if( lastIndex != -1){
-                    //TODO instead of printing the index, it should be highlighted in the textArea
+                if (lastIndex != -1) {
+                    // TODO instead of printing the index, it should be
+                    // highlighted in the textArea
                     System.out.println(lastIndex);
                     lastIndex += s.length();
                 }
@@ -92,8 +129,16 @@ public class SequentViewController extends ViewController {
     }
 
     @FXML
-    private void toggleFilter(){
+    private void toggleFilter() {
         filterParent.managedProperty().bind(filterParent.visibleProperty());
         filterParent.setVisible(filterButton.isSelected());
+    }
+    
+    private List<Object> filter(){
+        Proof proof = mainApp.getProof();
+        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+        printer.printSequent(proof.root().sequent());
+        //printer.
+        return null;
     }
 }
