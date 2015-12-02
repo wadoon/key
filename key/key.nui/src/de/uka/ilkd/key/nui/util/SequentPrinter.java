@@ -74,6 +74,10 @@ public class SequentPrinter {
             }
         return sb.toString();
     }
+    
+    public void infuseCSS(String additionalCss){
+        css += additionalCss;
+    }
 
     /**
      * prints a Sequent as HTML with basic markup

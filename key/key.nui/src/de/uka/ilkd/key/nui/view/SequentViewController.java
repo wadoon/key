@@ -22,11 +22,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebView;
 
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER)
-public class SequentViewController extends ViewController{
+
+public class SequentViewController extends ViewController {
 
     @FXML
     private WebView textAreaHTML;
@@ -36,6 +36,9 @@ public class SequentViewController extends ViewController{
 
     @FXML
     private Pane filterParent;
+    
+    @FXML
+    private TextField filterText;
 
     @FXML
     private TextField searchBox;
@@ -46,6 +49,10 @@ public class SequentViewController extends ViewController{
      */
     public SequentViewController() {
     }
+
+    private boolean sequentLoaded = false;
+    private SequentPrinter printer;
+    private String proofString;
 
     /**
      * After a proof has been loaded, the sequent of the root node can be
@@ -62,27 +69,18 @@ public class SequentViewController extends ViewController{
         Sequent sequent = node.sequent();
         LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(),
                 new NotationInfo(), proof.getServices());
+
         logicPrinter.printSequent(sequent);
 
-        String proofString;
         proofString = logicPrinter.toString();
-        SequentPrinter printer = new SequentPrinter(
-                "resources/css/sequentStyle.css",
-                "resources/css/sequentClasses.ini");
-        // System.out.println(printer.escape(proofString));
-
-        textAreaHTML.getEngine().loadContent(printer.printSequent(proofString));
+        printer = new SequentPrinter("resources/css/sequentStyle.css","resources/css/sequentClasses.ini");
+        sequentLoaded = true;
+        //System.out.println(printer.escape(proofString));
+        updateHtml();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        /*
-        textAreaHTML.lookup(".top-toolbar").setManaged(false);
-        textAreaHTML.lookup(".top-toolbar").setVisible(false);
-
-        textAreaHTML.lookup(".bottom-toolbar").setManaged(false);
-        textAreaHTML.lookup(".bottom-toolbar").setVisible(false);
-        */
         // hide the filter at the beginning
         toggleFilter();
 
@@ -134,11 +132,19 @@ public class SequentViewController extends ViewController{
         filterParent.setVisible(filterButton.isSelected());
     }
     
-    private List<Object> filter(){
-        Proof proof = mainApp.getProof();
-        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
-        printer.printSequent(proof.root().sequent());
-        //printer.
-        return null;
+    private void updateHtml(){
+        textAreaHTML.getEngine().loadContent(printer.printSequent(proofString));
+    }
+    
+    @FXML
+    private void handleKeyTyped(){
+      doFilter(filterText.getText());
+    }
+    
+    //just dummy method
+    private void doFilter(String filterstring){
+        if(!sequentLoaded)return;
+        printer.infuseCSS(String.format("not(%s){display:none;}",filterstring));
+        updateHtml();
     }
 }
