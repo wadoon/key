@@ -89,6 +89,12 @@ public class SequentPrinter {
             case '}':
                 sb.append("\\}");
                 break;
+            case '?':
+                sb.append("\\?");
+            case '*':
+                sb.append("\\*");
+            case '+':
+                sb.append("\\+");
             default:
                 sb.append(s.charAt(i));
             }
