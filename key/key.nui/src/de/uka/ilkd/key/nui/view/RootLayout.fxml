@@ -23,6 +23,11 @@
 						<MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
 					</items>
 				</Menu>
+            <Menu mnemonicParsing="false" text="Edit">
+              <items>
+                  <CheckMenuItem mnemonicParsing="false" onAction="#handlePrettySyntax" selected="true" text="Use Pretty Syntax" />
+              </items>
+            </Menu>
 				<Menu fx:id="registeredViewsMenu" mnemonicParsing="false" text="Views" />
 				<Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
 					<items>

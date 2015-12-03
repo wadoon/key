@@ -54,11 +54,10 @@ import javafx.stage.Stage;
  * @author Victor Schuemmer
  *
  */
-public class RootLayoutController extends ViewController
-        implements IViewContainer {
+public class RootLayoutController extends ViewController implements IViewContainer {
 
     private static final int MaxMenuEntries = 8;
-    
+
     private Proof proof;
 
     @FXML
@@ -134,12 +133,13 @@ public class RootLayoutController extends ViewController
             v.setCenter(new TabPane());
             registerDragListeners(v.getCenter());
         });
-        
+
         // Load a standard proof when starting the program for testing purposes
-        // TODO Remove then following 3 lines and folder "resources/proofs" at end of project or when not needed anymore
-        File file = new File("resources/proofs/gcd.closed.proof");
-        proof = loadProof(file);
-        statusLabel.setText("Proof loaded: " + file.getName());
+        // TODO Remove then following 3 lines and folder "resources/proofs" at
+        // end of project or when not needed anymore
+        // File file = new File("resources/proofs/gcd.closed.proof");
+        // proof = loadProof(file);
+        // statusLabel.setText("Proof loaded: " + file.getName());
     }
 
     /**
@@ -201,8 +201,7 @@ public class RootLayoutController extends ViewController
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(
-                    MainApp.class.getResource("view/AboutView.fxml"));
+            loader.setLocation(MainApp.class.getResource("view/AboutView.fxml"));
 
             Stage stage = new Stage();
             stage.setTitle("About Key");
@@ -225,13 +224,15 @@ public class RootLayoutController extends ViewController
         System.exit(0);
     }
 
+    /**
+     * Opens a file chooser to choose a proof to be loaded.
+     */
     @FXML
     private void handleOpen() {
         setStatus("Loading Proof...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
-        fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("Proofs", "*.proof"),
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Proofs", "*.proof"),
                 new ExtensionFilter("All Files", "*.*"));
         fileChooser.setInitialDirectory(new File("../"));
 
@@ -242,16 +243,46 @@ public class RootLayoutController extends ViewController
             return;
         }
 
-        proof = loadProof(file);
-        setStatus("Proof loaded: " + file.getName());
+        setProof(file);
     }
 
+    /**
+     * Getter method for a proof.
+     * 
+     * @return The loaded Proof.
+     */
     public Proof getProof() {
         return this.proof;
     }
 
+    /**
+     * Load a Proof.
+     * 
+     * @param file
+     *            Proof to be loaded.
+     */
+    public void setProof(File file) {
+        setStatus("Loading Proof...");
+        proof = loadProof(file);
+        setStatus("Proof loaded: " + file.getName());
+    }
+
+    /**
+     * Set a status in the status bar.
+     * 
+     * @param status
+     *            Status to be set.
+     */
     public void setStatus(String status) {
         statusLabel.setText(status);
+    }
+
+    /**
+     * Enable/Disable Pretty Syntax
+     */
+    @FXML
+    private void handlePrettySyntax() {
+        // TODO implement functionality
     }
 
     @FXML
@@ -259,12 +290,11 @@ public class RootLayoutController extends ViewController
 
     private Menu otherViewsMenu = null;
 
-    public void registerView(String title,URL path, ViewPosition prefPos, String accelerator){        
+    public void registerView(String title, URL path, ViewPosition prefPos, String accelerator) {
         CheckMenuItem item = new CheckMenuItem();
         item.setText(title);
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            public void changed(ObservableValue<? extends Boolean> ov,
-                    Boolean oldValue, Boolean newValue) {
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue) {
                 if (newValue) {
                     showView(title, path, prefPos);
                 }
@@ -275,8 +305,8 @@ public class RootLayoutController extends ViewController
             }
         });
         if (!positionUsage.get(prefPos))
-            item.setSelected(true);        
-        if(!accelerator.equals(""))
+            item.setSelected(true);
+        if (!accelerator.equals(""))
             item.setAccelerator(KeyCombination.valueOf(accelerator));
 
         // make overflow menu "Others" if items exceed max
@@ -298,8 +328,7 @@ public class RootLayoutController extends ViewController
         tabs.put(path, tab);
         tab.getGraphic().setOnMouseClicked((event) -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(tab).show(tab.getGraphic(), Side.TOP,
-                        event.getX(), event.getY());
+                loadViewContextMenu(tab).show(tab.getGraphic(), Side.TOP, event.getX(), event.getY());
         });
         setPosition(prefPos, tab);
     }
@@ -341,11 +370,11 @@ public class RootLayoutController extends ViewController
     public void hideView(Tab tab) {
         TabPane tabPane = tab.getTabPane();
         tabPane.getTabs().remove(tab);
-        if (tabPane.getTabs().size() == 0){
-            //System.out.println(getViewPosition(tabPane.getParent()));
+        if (tabPane.getTabs().size() == 0) {
+            // System.out.println(getViewPosition(tabPane.getParent()));
             positionUsage.put(getViewPosition(tabPane.getParent()), false);
         }
-            
+
         resize();
     }
 
@@ -365,17 +394,17 @@ public class RootLayoutController extends ViewController
 
     public ViewPosition getTabPosition(Node node) {
         for (ViewPosition key : positionMapping.keySet()) {
-            //System.out.println(positionMapping.get(key));
+            // System.out.println(positionMapping.get(key));
             if (positionMapping.get(key).getChildren().size() == 1
                     && positionMapping.get(key).getChildren().get(0) == node)
                 return key;
         }
         return null;
     }
-    
+
     public ViewPosition getViewPosition(Node node) {
         for (ViewPosition key : positionMapping.keySet()) {
-            //System.out.println(positionMapping.get(key));
+            // System.out.println(positionMapping.get(key));
             if (positionMapping.get(key) == node)
                 return key;
         }
@@ -424,26 +453,22 @@ public class RootLayoutController extends ViewController
 
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
-        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),
-                loadFxml(sourcePath));
+        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu), loadFxml(sourcePath));
     }
 
-    public void registerMenuEntry(URL sourcePath, String parentMenu)
-            throws IllegalStateException {
+    public void registerMenuEntry(URL sourcePath, String parentMenu) throws IllegalStateException {
         for (Menu m : menuBar.getMenus()) {
             if (m.getText().equals(parentMenu)) {
                 m.getItems().add(loadFxml(sourcePath));
                 return;
             }
         }
-        throw new IllegalStateException(
-                "Menu " + parentMenu + " was not found");
+        throw new IllegalStateException("Menu " + parentMenu + " was not found");
     }
 
     private ContextMenu loadViewContextMenu(Tab tab) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class
-                .getResource("ViewContextMenu.fxml"));
+        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
@@ -476,8 +501,7 @@ public class RootLayoutController extends ViewController
         // File proofFile = new File("../" + proofFileName);
 
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFile, null, null,
+            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
                     null, true);
             Proof proof = environment.getLoadedProof();
 

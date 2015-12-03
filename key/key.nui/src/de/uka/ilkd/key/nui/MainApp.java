@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.nui;
 
-import java.io.IOException;
+import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Set;
 
 import org.reflections.Reflections;
@@ -44,8 +43,8 @@ public class MainApp extends Application {
         try {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
-            URL path= MainApp.class.getResource("view/RootLayout.fxml");
-            if(path == null)
+            URL path = MainApp.class.getResource("view/RootLayout.fxml");
+            if (path == null)
                 throw new RuntimeException("Could not find RootLayout.fxml");
             loader.setLocation(path);
             rootLayout = (BorderPane) loader.load();
@@ -58,7 +57,8 @@ public class MainApp extends Application {
             RootLayoutController controller = loader.getController();
             controller.setMainApp(this);
             rootLayoutController = controller;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -68,9 +68,9 @@ public class MainApp extends Application {
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
             // no used yet
-            //if (Arrays.asList(annot.windows()).contains("Main"))
-            rootLayoutController.registerView(annot.title(), c.getResource(annot.path()),
-                    annot.preferredPosition(),annot.accelerator());
+            // if (Arrays.asList(annot.windows()).contains("Main"))
+            rootLayoutController.registerView(annot.title(), c.getResource(annot.path()), annot.preferredPosition(),
+                    annot.accelerator());
         }
         System.out.println("Views: " + annotated.size());
     }
@@ -80,19 +80,24 @@ public class MainApp extends Application {
         for (Class<?> c : annotated) {
             KeYMenu annot = c.getAnnotation(KeYMenu.class);
             // not used yet
-            //if (Arrays.asList(annot.windows()).contains("Main")) {
-            if (annot.parentMenu().equals("")){
+            // if (Arrays.asList(annot.windows()).contains("Main")) {
+            if (annot.parentMenu().equals("")) {
                 rootLayoutController.registerMenu(c.getResource(annot.path()));
-            } else {
+            }
+            else {
                 rootLayoutController.registerMenuEntry(c.getResource(annot.path()), annot.parentMenu());
             }
-            //}
+            // }
         }
         System.out.println("Menus: " + annotated.size());
     }
 
     public Proof getProof() {
         return rootLayoutController.getProof();
+    }
+
+    public void setProof(File file) {
+        rootLayoutController.setProof(file);
     }
 
     public void setStatus(String status) {

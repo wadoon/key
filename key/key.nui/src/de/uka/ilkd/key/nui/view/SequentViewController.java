@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.nui.view;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
@@ -15,15 +17,15 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import static javafx.scene.AccessibleAttribute.OFFSET_AT_POINT;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER)
@@ -32,7 +34,21 @@ public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
     private SequentPrinter printer;
+    private LogicPrinter logicPrinter;
     private String proofString;
+    private WebEngine webEngine;
+    private NotationInfo notationInfo = new NotationInfo();
+    private Services services;
+    private Sequent sequent;
+
+    // @FXML
+    // private TextArea textArea;
+
+    @FXML
+    private CheckBox checkBoxPrettySyntax;
+
+    @FXML
+    private CheckBox checkBoxUnicode;
 
     @FXML
     private WebView textAreaWebView;
@@ -53,17 +69,11 @@ public class SequentViewController extends ViewController {
 
         @Override
         public void handle(MouseEvent mouseEvent) {
-            final int idx = (int) textAreaWebView.queryAccessibleAttribute(OFFSET_AT_POINT,
-                    new Point2D(mouseEvent.getScreenX(), mouseEvent.getScreenY()));
-            // System.out.println(idx);
-            System.out.println("Character moved over: " + textAreaWebView.getAccessibleText().charAt(idx));
-            /*
-             * System.out.println( mouseEvent.getEventType() + "\n" + "X : Y - "
-             * + mouseEvent.getX() + " : " + mouseEvent.getY() + "\n" +
-             * "SceneX : SceneY - " + mouseEvent.getSceneX() + " : " +
-             * mouseEvent.getSceneY() + "\n" + "ScreenX : ScreenY - " +
-             * mouseEvent.getScreenX() + " : " + mouseEvent.getScreenY());
-             */
+
+            System.out.println(
+                    mouseEvent.getEventType() + "\n" + "X : Y - " + mouseEvent.getX() + " : " + mouseEvent.getY() + "\n"
+                            + "SceneX : SceneY - " + mouseEvent.getSceneX() + " : " + mouseEvent.getSceneY() + "\n"
+                            + "ScreenX : ScreenY - " + mouseEvent.getScreenX() + " : " + mouseEvent.getScreenY());
 
         }
     };
@@ -100,16 +110,15 @@ public class SequentViewController extends ViewController {
         });
         searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent event) {
-                //highlight(searchBox.getText());
+                // highlight(searchBox.getText());
                 updateHtml(printer.printSequent(printer.highlightString(proofString, searchBox.getText())));
                 event.consume();
             }
         });
     }
-    
 
     /**
-     * After a proof has been loaded, the sequent of the root node can be
+     * After a proof has been loaded, the sequent of the root node will be
      * displayed
      */
     @FXML
@@ -119,24 +128,90 @@ public class SequentViewController extends ViewController {
             mainApp.setStatus("Please Select a Proof first.");
             return;
         }
+        services = proof.getServices();
         Node node = proof.root();
-        System.out.println("number of nodes: " + proof.countNodes());
-        System.out.println("getNodeInfo(): " + node.getNodeInfo());
-        Sequent sequent = node.sequent();
-        // System.out.println(sequent.getFormulabyNr(0).toString());
-        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+        sequent = node.sequent();
 
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        notationInfo.refresh(services, false, false);
+        printSequent();
+
+        // textAreaWebView.setOnMouseMoved(mousehandler);
+    }
+
+    /**
+     * Enables/Disables Pretty Syntax. Only works when a sequent is displayed.
+     */
+    @FXML
+    private void usePrettySyntax() {
+        if (!sequentLoaded) {
+            mainApp.setStatus("Please load and diplay a proof first.");
+            checkBoxPrettySyntax.setSelected(false);
+            return;
+        }
+        else if (notationInfo.isPrettySyntax()) {
+            logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+            notationInfo.refresh(services, false, false);
+            checkBoxPrettySyntax.setSelected(false);
+            checkBoxUnicode.setSelected(false);
+            printSequent();
+            return;
+        }
+        else {
+            logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+            notationInfo.refresh(services, true, false);
+            checkBoxPrettySyntax.setSelected(true);
+            printSequent();
+        }
+    }
+
+    /**
+     * Enables/Disables Unicode. Only works when a sequent is displayed and
+     * Pretty Syntax is enabled.
+     */
+    @FXML
+    private void useUnicode() {
+        if (!notationInfo.isPrettySyntax() || !sequentLoaded) {
+            mainApp.setStatus("Please enable Pretty Syntax first.");
+            checkBoxUnicode.setSelected(false);
+            return;
+        }
+        else if (notationInfo.isUnicodeEnabled()) {
+            logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+            notationInfo.refresh(services, true, false);
+            checkBoxUnicode.setSelected(false);
+            printSequent();
+            return;
+        }
+        else {
+            logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+            notationInfo.refresh(services, true, true);
+            checkBoxUnicode.setSelected(true);
+            printSequent();
+        }
+    }
+
+    /**
+     * Helper method to print a sequent into the webview.
+     */
+    private void printSequent() {
         logicPrinter.printSequent(sequent);
-
-        //textAreaWebView.setAccessibleText(logicPrinter.toString());
-
-        //textAreaWebView.setOnMouseMoved(mousehandler);
-
         proofString = logicPrinter.toString();
+
         printer = new SequentPrinter("resources/css/sequentStyle.css", "resources/css/sequentClasses.ini");
         sequentLoaded = true;
         // System.out.println(printer.escape(proofString));
         updateHtml(printer.printSequent(proofString));
+    }
+
+    /**
+     * Loads a default proof and displays the sequent of its root node.
+     */
+    @FXML
+    private void loadDefaultProof() {
+        File file = new File("resources/proofs/gcd.closed.proof");
+        mainApp.setProof(file);
+        showRootSequent();
     }
 
     // TODO replace
@@ -163,18 +238,23 @@ public class SequentViewController extends ViewController {
         filterParent.setVisible(filterButton.isSelected());
     }
 
-    private void updateHtml(String s){
-        textAreaWebView.getEngine().loadContent(s);
+    private void updateHtml(String s) {
+        webEngine = textAreaWebView.getEngine();
+        webEngine.loadContent(s);
+
+        // textAreaWebView.getEngine().loadContent(s);
     }
 
     @FXML
     private void handleKeyTyped() {
         doFilter(filterText.getText());
     }
-    //just dummy method
-    private void doFilter(String filterstring){
-        if(!sequentLoaded)return;
-        printer.infuseCSS(String.format("not(%s){display:none;}",filterstring));
+
+    // just dummy method
+    private void doFilter(String filterstring) {
+        if (!sequentLoaded)
+            return;
+        printer.infuseCSS(String.format("not(%s){display:none;}", filterstring));
         updateHtml(printer.printSequent(proofString));
     }
 }
