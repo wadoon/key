@@ -276,6 +276,10 @@ public class RootLayoutController extends ViewController implements IViewContain
     public void setStatus(String status) {
         statusLabel.setText(status);
     }
+    
+    public void clearStatus() {
+        setStatus("");
+    }
 
     /**
      * Enable/Disable Pretty Syntax

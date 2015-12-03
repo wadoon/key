@@ -119,6 +119,10 @@ public class MainApp extends Application {
     public void setStatus(String status) {
         rootLayoutController.setStatus(status);
     }
+    
+    public void clearStatus() {
+        rootLayoutController.clearStatus();
+    }
 
     /**
      * Returns the main stage.

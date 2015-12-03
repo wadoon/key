@@ -147,6 +147,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void usePrettySyntax() {
+        mainApp.clearStatus();
         if (!sequentLoaded) {
             mainApp.setStatus("Please load and diplay a proof first.");
             checkBoxPrettySyntax.setSelected(false);
@@ -174,6 +175,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void useUnicode() {
+        mainApp.clearStatus();
         if (!notationInfo.isPrettySyntax() || !sequentLoaded) {
             mainApp.setStatus("Please enable Pretty Syntax first.");
             checkBoxUnicode.setSelected(false);
