@@ -418,7 +418,7 @@ public class RootLayoutController extends ViewController implements IViewContain
         resize();
     }
 
-    private void resize() {
+    public void resize() {
         mainSplitPane.setDividerPositions(0.0, 1.0);
         if (positionUsage.get(ViewPosition.TOPLEFT)) {
             if (positionUsage.get(ViewPosition.BOTTOMLEFT)) {

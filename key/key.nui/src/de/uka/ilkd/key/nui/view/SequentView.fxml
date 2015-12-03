@@ -40,7 +40,8 @@
       <AnchorPane fx:id="filterParent" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
          	<TextField fx:id="searchBox" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="13.0" />
-            <TextField fx:id="filterText" layoutX="13.0" layoutY="13.0" onKeyTyped="#handleKeyTyped" prefHeight="25.0" prefWidth="300.0" />
+            <Button alignment="CENTER" layoutX="282.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleApplyFilter" text="Apply" AnchorPane.topAnchor="13.0" />
+            <TextField fx:id="filterText" layoutX="13.0" layoutY="13.0" prefHeight="25.0" prefWidth="259.0" AnchorPane.leftAnchor="13.0" AnchorPane.topAnchor="13.0" />
          </children></AnchorPane>
    </top>
 </BorderPane>

@@ -110,8 +110,11 @@ public class SequentViewController extends ViewController {
         });
         searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent event) {
+                printer.setFreeTextSearch(searchBox.getText());
                 // highlight(searchBox.getText());
-                updateHtml(printer.printSequent(printer.highlightString(proofString, searchBox.getText())));
+                // updateHtml(printer.printSequent(printer.highlightString(proofString,
+                // searchBox.getText())));
+                updateHtml(printer.printSequent(proofString));
                 event.consume();
             }
         });
@@ -246,7 +249,7 @@ public class SequentViewController extends ViewController {
     }
 
     @FXML
-    private void handleKeyTyped() {
+    private void handleApplyFilter() {
         doFilter(filterText.getText());
     }
 
@@ -254,7 +257,7 @@ public class SequentViewController extends ViewController {
     private void doFilter(String filterstring) {
         if (!sequentLoaded)
             return;
-        printer.infuseCSS(String.format("not(%s){display:none;}", filterstring));
+        printer.addTempCss("filterCss", String.format(".content %s * {display: none !important;}", filterstring));
         updateHtml(printer.printSequent(proofString));
     }
 }

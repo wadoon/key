@@ -9,6 +9,8 @@ import org.reflections.Reflections;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -51,6 +53,20 @@ public class MainApp extends Application {
 
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
+            scene.widthProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth,
+                        Number newSceneWidth) {
+                    ((RootLayoutController) loader.getController()).resize();
+                }
+            });
+            scene.heightProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight,
+                        Number newSceneHeight) {
+                    ((RootLayoutController) loader.getController()).resize();
+                }
+            });
             primaryStage.setScene(scene);
 
             // Give the controller access to the main app.

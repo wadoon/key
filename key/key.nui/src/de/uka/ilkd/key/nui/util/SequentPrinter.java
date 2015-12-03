@@ -10,12 +10,16 @@ import java.util.HashMap;
 
 /**
  * @author Maximilian Li
- *
+ * @author Victor Schuemmer
  */
 public class SequentPrinter {
     private String css;
     private HashMap<String, String> dictionaryMap = new HashMap<String, String>();
     private HashMap<String, String> regexMap = new HashMap<String, String>();
+
+    private String freeTextSearch = "";
+
+    private HashMap<String, String> tempCss = new HashMap<>();
 
     /**
      * Constructor for the SequentPrinter
@@ -38,6 +42,10 @@ public class SequentPrinter {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setFreeTextSearch(String searchString) {
+        freeTextSearch = searchString;
     }
 
     /**
@@ -66,17 +74,33 @@ public class SequentPrinter {
             case '\b':
                 sb.append("\\b");
                 break;
-            case ' ':
-                sb.append("°");
+            case '\\':
+                sb.append("\\\\");
+                break;
+            case '(':
+                sb.append("\\(");
+                break;
+            case ')':
+                sb.append("\\)");
+                break;
+            case '{':
+                sb.append("\\{");
+                break;
+            case '}':
+                sb.append("\\}");
                 break;
             default:
                 sb.append(s.charAt(i));
             }
         return sb.toString();
     }
-    
-    public void infuseCSS(String additionalCss){
-        css += additionalCss;
+
+    public void addTempCss(String tmpName, String additionalCss) {
+        tempCss.put(tmpName, additionalCss);
+    }
+
+    public void removeTempCss(String tmpName) {
+        tempCss.remove(tmpName);
     }
 
     /**
@@ -87,13 +111,15 @@ public class SequentPrinter {
      * @return HTML Text with default style
      */
     public String printSequent(String s) {
-        String result = toHTML(s);
+        String htmlEncoded = htmlEncode(s);
+        String result = highlightString(htmlEncoded, freeTextSearch);
+        result = toHTML(result);
         for (String classString : dictionaryMap.keySet()) {
-            result = styleHTML(result, dictionaryMap.get(classString),
+            result = styleHTMLEscaped(result, dictionaryMap.get(classString),
                     classString);
         }
         // result = highlightString(result, "->");
-
+        // result = highlightString(result, freeTextSearch);
         return result;
     }
 
@@ -104,7 +130,7 @@ public class SequentPrinter {
      *            path to the CSS file
      * @throws IOException
      */
-    public void readCSS(String fileName) throws IOException {
+    private void readCSS(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         try {
             StringBuilder sb = new StringBuilder();
@@ -129,7 +155,7 @@ public class SequentPrinter {
      *            path to the .ini file
      * @throws IOException
      */
-    public void readIni(String fileName) throws IOException {
+    private void readIni(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         try {
             String line = br.readLine();
@@ -168,16 +194,22 @@ public class SequentPrinter {
         StringBuilder sb = new StringBuilder();
         sb.append("<style>");
         sb.append(css);
+        for (String temp : tempCss.values())
+            sb.append(temp);
         sb.append("</style>");
         /*
          * for (int i = 0; i < s.length(); i++) switch (s.charAt(i)) { case
          * '\n': sb.append("</br>"); break; case ' ': sb.append("&nbsp;");
          * break; default: sb.append(s.charAt(i)); }
          */
-        sb.append("<pre>");
+        sb.append("<pre class=\"content\">");
         sb.append(s);
         sb.append("</pre>");
         return sb.toString();
+    }
+    
+    private String htmlEncode(String text){
+        return text.replace("<", "&lt;").replace(">", "&gt;");
     }
 
     /**
@@ -193,8 +225,19 @@ public class SequentPrinter {
      * @return string with HTML style tags applied
      */
     public String styleHTML(String s, String searchString, String styleClass) {
-        return s.replaceAll(searchString, "<span class=\"" + styleClass + "\">"
-                + searchString + "</span>");
+        if (!searchString.isEmpty())
+            return styleHTMLEscaped(s, escape(searchString), styleClass);
+        else
+            return s;
+    }
+
+    private String styleHTMLEscaped(String s, String searchString,
+            String styleClass) {
+        if (!searchString.isEmpty())
+            return s.replaceAll(htmlEncode(searchString), "<span class=\"" + styleClass
+                    + "\">" + htmlEncode(searchString) + "</span>");
+        else
+            return s;
     }
 
     /**
@@ -433,11 +476,13 @@ public class SequentPrinter {
      */
     public String styleString(String s, String searchString, String fontColor,
             String backgroundColor, String fontWeight) {
-
-        return s.replaceAll(searchString,
-                "<span style=\"color:" + fontColor + ";background-color:"
-                        + backgroundColor + ";font-weight:" + fontWeight + "\">"
-                        + searchString + "</span>");
+        if (!searchString.isEmpty())
+            return s.replaceAll(escape(searchString),
+                    "<span style=\"color:" + fontColor + ";background-color:"
+                            + backgroundColor + ";font-weight:" + fontWeight
+                            + "\">" + searchString + "</span>");
+        else
+            return s;
     }
 
     /**
