@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ContextMenu xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.menu.ViewContextMenuController">
+   <items>
+      <RadioMenuItem mnemonicParsing="false" onAction="#handleTopLeft" text="Top Left">
+         <toggleGroup>
+            <ToggleGroup fx:id="position" />
+         </toggleGroup>
+      </RadioMenuItem>
+      <RadioMenuItem mnemonicParsing="false" onAction="#handleTopRight" text="Top Right" toggleGroup="$position" />
+      <RadioMenuItem mnemonicParsing="false" onAction="#handleCenter" text="Center" toggleGroup="$position" />
+      <RadioMenuItem mnemonicParsing="false" onAction="#handleBottomLeft" text="Bottom Left" toggleGroup="$position" />
+      <RadioMenuItem mnemonicParsing="false" onAction="#handleBottomRight" text="Bottom Right" toggleGroup="$position" />
+   </items>
+</ContextMenu>
