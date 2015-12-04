@@ -84,15 +84,16 @@ public class MainApp extends Application {
     }
 
     private void scanForViews() {
+        ViewObserver rootViewObserver =new ViewObserver(rootLayoutController);
         Set<Class<?>> annotated = reflections
                 .getTypesAnnotatedWith(KeYView.class);
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
-            // no used yet
-            // if (Arrays.asList(annot.windows()).contains("Main"))
-            rootLayoutController.registerView(annot.title(),
-                    c.getResource(annot.path()), annot.preferredPosition(),
-                    annot.accelerator());
+            ViewInformation info = new ViewInformation(annot.title(),
+                    c.getResource(annot.path()), annot.preferredPosition());
+            info.addObserver(rootViewObserver);
+            rootLayoutController.registerView(info, annot.accelerator());
+            
         }
         System.out.println("Views: " + annotated.size());
     }
