@@ -40,7 +40,6 @@ public class SequentViewController extends ViewController {
     private NotationInfo notationInfo = new NotationInfo();
     private Services services;
     private Sequent sequent;
-    private ProofManager proofManager = new ProofManager();
 
     // @FXML
     // private TextArea textArea;
@@ -129,7 +128,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void showRootSequent() {
-        Proof proof = proofManager.getProof();
+        Proof proof = context.getProofManager().getProof();
         services = proof.getServices();
         sequent = proof.root().sequent();
 
@@ -197,8 +196,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        proofManager.setMainApp(mainApp);
-        proofManager.setProof(new File("resources/proofs/gcd.closed.proof"));
+        context.getProofManager().setProof(new File("resources/proofs/gcd.closed.proof"));
         
         //File file = new File("resources/proofs/gcd.closed.proof");
         //mainApp.setProof(file);

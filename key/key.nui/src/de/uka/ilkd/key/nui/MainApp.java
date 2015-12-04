@@ -78,7 +78,9 @@ public class MainApp extends Application {
 
             // Give the controller access to the main app.
             RootLayoutController controller = loader.getController();
-            controller.setMainApp(this,new Context());
+            Context context = new Context();
+            context.getProofManager().setMainApp(this);
+            controller.setMainApp(this, context);
             rootLayoutController = controller;
         }
         catch (Exception e) {

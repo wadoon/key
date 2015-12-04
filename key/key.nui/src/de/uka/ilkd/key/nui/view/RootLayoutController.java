@@ -58,8 +58,6 @@ public class RootLayoutController extends ViewController {
 
     private static final int MaxMenuEntries = 8;
 
-    private ProofManager proofManager = new ProofManager();
-
     @FXML
     private Label statusLabel;
 
@@ -244,8 +242,7 @@ public class RootLayoutController extends ViewController {
             return;
         }
 
-        proofManager.setMainApp(mainApp);
-        proofManager.setProof(file);
+        context.getProofManager().setProof(file);
     }
 
     /**
