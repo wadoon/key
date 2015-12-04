@@ -87,6 +87,9 @@ public class MainApp extends Application {
         }
     }
 
+    /**
+     * Listens for a Window Close Request and prompts the user to confirm.
+     */
     private void closeWindowConfirmHandler() {
         scene.getWindow().setOnCloseRequest(new EventHandler<WindowEvent>() {
 
@@ -98,6 +101,9 @@ public class MainApp extends Application {
         });
     }
 
+    /**
+     * Alert that pops up when trying to close the application.
+     */
     public void closeWindowAlert() {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Close KeY");

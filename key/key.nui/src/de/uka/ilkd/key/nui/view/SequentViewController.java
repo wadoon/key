@@ -90,6 +90,8 @@ public class SequentViewController extends ViewController {
         // hide the filter at the beginning
         toggleFilter();
         initializeSearchBox();
+        checkBoxPrettySyntax.setDisable(true);
+        checkBoxUnicode.setDisable(true);
     }
 
     private void initializeSearchBox() {
@@ -136,62 +138,47 @@ public class SequentViewController extends ViewController {
         sequent = node.sequent();
 
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
-        notationInfo.refresh(services, false, false);
         printSequent();
+        
+        checkBoxPrettySyntax.setDisable(false);
+        checkBoxUnicode.setDisable(false);
 
         // textAreaWebView.setOnMouseMoved(mousehandler);
     }
 
     /**
-     * Enables/Disables Pretty Syntax. Only works when a sequent is displayed.
+     * Enables/Disables Pretty Syntax.
      */
     @FXML
     private void usePrettySyntax() {
-        mainApp.clearStatus();
-        if (!sequentLoaded) {
-            mainApp.setStatus("Please load and diplay a proof first.");
-            checkBoxPrettySyntax.setSelected(false);
-            return;
-        }
-        else if (notationInfo.isPrettySyntax()) {
-            logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        if (!checkBoxPrettySyntax.isSelected()) {
             notationInfo.refresh(services, false, false);
-            checkBoxPrettySyntax.setSelected(false);
             checkBoxUnicode.setSelected(false);
+            checkBoxUnicode.setDisable(true);
             printSequent();
             return;
         }
         else {
-            logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
             notationInfo.refresh(services, true, false);
-            checkBoxPrettySyntax.setSelected(true);
+            checkBoxUnicode.setDisable(false);
             printSequent();
         }
     }
 
     /**
-     * Enables/Disables Unicode. Only works when a sequent is displayed and
-     * Pretty Syntax is enabled.
+     * Enables/Disables Unicode.
      */
     @FXML
     private void useUnicode() {
-        mainApp.clearStatus();
-        if (!notationInfo.isPrettySyntax() || !sequentLoaded) {
-            mainApp.setStatus("Please enable Pretty Syntax first.");
-            checkBoxUnicode.setSelected(false);
-            return;
-        }
-        else if (notationInfo.isUnicodeEnabled()) {
-            logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        if (!checkBoxUnicode.isSelected()) {
             notationInfo.refresh(services, true, false);
-            checkBoxUnicode.setSelected(false);
             printSequent();
             return;
         }
         else {
-            logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
             notationInfo.refresh(services, true, true);
-            checkBoxUnicode.setSelected(true);
             printSequent();
         }
     }

@@ -27,7 +27,7 @@
                   </Separator>
                   <VBox>
                      <children>
-                        <CheckBox fx:id="checkBoxPrettySyntax" mnemonicParsing="false" onAction="#usePrettySyntax" text="Use Pretty Syntax" />
+                        <CheckBox fx:id="checkBoxPrettySyntax" mnemonicParsing="false" onAction="#usePrettySyntax" selected="true" text="Use Pretty Syntax" />
                         <CheckBox fx:id="checkBoxUnicode" mnemonicParsing="false" onAction="#useUnicode" text="Enable Unicode" />
                      </children>
                   </VBox>
