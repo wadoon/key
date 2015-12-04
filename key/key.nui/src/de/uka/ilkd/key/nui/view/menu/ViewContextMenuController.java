@@ -3,8 +3,8 @@ package de.uka.ilkd.key.nui.view.menu;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.model.ViewInformation;
 import de.uka.ilkd.key.nui.ViewController;
-import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import javafx.event.ActionEvent;

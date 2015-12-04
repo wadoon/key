@@ -1,7 +1,9 @@
-package de.uka.ilkd.key.nui;
+package de.uka.ilkd.key.model;
 
 import java.net.URL;
 import java.util.Observable;
+
+import de.uka.ilkd.key.nui.ViewPosition;
 
 public class ViewInformation extends Observable {
 

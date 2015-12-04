@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.model.ProofManager;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -40,6 +41,7 @@ public class SequentViewController extends ViewController {
     private NotationInfo notationInfo = new NotationInfo();
     private Services services;
     private Sequent sequent;
+    private ProofManager proofManager = new ProofManager();
 
     // @FXML
     // private TextArea textArea;
@@ -128,14 +130,9 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void showRootSequent() {
-        Proof proof = mainApp.getProof();
-        if (proof == null) {
-            mainApp.setStatus("Please Select a Proof first.");
-            return;
-        }
+        Proof proof = proofManager.getProof();
         services = proof.getServices();
-        Node node = proof.root();
-        sequent = node.sequent();
+        sequent = proof.root().sequent();
 
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         printSequent();
@@ -201,8 +198,11 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        File file = new File("resources/proofs/gcd.closed.proof");
-        mainApp.setProof(file);
+        proofManager.setMainApp(mainApp);
+        proofManager.setProof(new File("resources/proofs/gcd.closed.proof"));
+        
+        //File file = new File("resources/proofs/gcd.closed.proof");
+        //mainApp.setProof(file);
         showRootSequent();
     }
 

@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.nui;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
 
 import org.reflections.Reflections;
 
+import de.uka.ilkd.key.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
-import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -150,14 +149,6 @@ public class MainApp extends Application {
             // }
         }
         System.out.println("Menus: " + annotated.size());
-    }
-
-    public Proof getProof() {
-        return rootLayoutController.getProof();
-    }
-
-    public void setProof(File file) {
-        rootLayoutController.setProof(file);
     }
 
     public void setStatus(String status) {

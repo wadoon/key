@@ -11,15 +11,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.model.ProofManager;
+import de.uka.ilkd.key.model.ViewInformation;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
-import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -61,7 +58,7 @@ public class RootLayoutController extends ViewController {
 
     private static final int MaxMenuEntries = 8;
 
-    private Proof proof;
+    private ProofManager proofManager = new ProofManager();
 
     @FXML
     private Label statusLabel;
@@ -247,28 +244,8 @@ public class RootLayoutController extends ViewController {
             return;
         }
 
-        setProof(file);
-    }
-
-    /**
-     * Getter method for a proof.
-     * 
-     * @return The loaded Proof.
-     */
-    public Proof getProof() {
-        return this.proof;
-    }
-
-    /**
-     * Load a Proof.
-     * 
-     * @param file
-     *            Proof to be loaded.
-     */
-    public void setProof(File file) {
-        setStatus("Loading Proof...");
-        proof = loadProof(file);
-        setStatus("Proof loaded: " + file.getName());
+        proofManager.setMainApp(mainApp);
+        proofManager.setProof(file);
     }
 
     /**
@@ -519,30 +496,6 @@ public class RootLayoutController extends ViewController {
             // select current position
         });
         return content;
-    }
-
-    /**
-     * Loads the given proof file. Checks if the proof file exists and the proof
-     * is not null, and fails if the proof could not be loaded.
-     *
-     * @param proofFileName
-     *            The file name of the proof file to load.
-     * @return The loaded proof.
-     */
-    private Proof loadProof(File proofFile) {
-        // File proofFile = new File("../" + proofFileName);
-
-        try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
-                    null, true);
-            Proof proof = environment.getLoadedProof();
-
-            return proof;
-        }
-        catch (ProblemLoaderException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private <T> T loadFxml(URL path) {
