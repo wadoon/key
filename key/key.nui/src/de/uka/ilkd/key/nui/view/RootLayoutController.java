@@ -342,6 +342,9 @@ public class RootLayoutController extends ViewController {
             }
             otherViewsMenu.getItems().add(item);
         }
+        
+        //dummy until last opened or config was developed
+        info.setIsActive(true);
     }
 
     public void showView(ViewInformation view) {
@@ -412,14 +415,14 @@ public class RootLayoutController extends ViewController {
         setPosition(title, next);
     }
 
-    private Node getView(ViewPosition pos) {
+ /*   private Node getView(ViewPosition pos) {
         BorderPane container = positionMapping.get(pos);
 
         if (container != null && container.getChildren().size() == 1)
             return container.getChildren().get(0);
         else
             return null;
-    }
+    }*/
 
     public ViewPosition getTabPosition(Node node) {
         for (ViewPosition key : positionMapping.keySet()) {
