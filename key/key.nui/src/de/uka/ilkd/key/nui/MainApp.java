@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 
-import de.uka.ilkd.key.model.ViewInformation;
+import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -78,7 +78,7 @@ public class MainApp extends Application {
 
             // Give the controller access to the main app.
             RootLayoutController controller = loader.getController();
-            controller.setMainApp(this);
+            controller.setMainApp(this,new Context());
             rootLayoutController = controller;
         }
         catch (Exception e) {

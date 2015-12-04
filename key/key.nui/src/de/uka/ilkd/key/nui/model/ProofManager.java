@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.model;
+package de.uka.ilkd.key.nui.model;
 
 import java.io.File;
 
