@@ -22,10 +22,18 @@ public class ProofManager {
     }
     
     /**
-     * constructor
+     * Empty constructor.
      */
     public ProofManager() {
         
+    }
+    
+    /**
+     * This constructor sets the mainApp when instantiating.
+     * @param mainApp The MainApp
+     */
+    public ProofManager(MainApp mainApp) {
+        setMainApp(mainApp);
     }
     
     /**
