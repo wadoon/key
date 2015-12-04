@@ -245,7 +245,13 @@ public class SequentViewController extends ViewController {
     private void doFilter(String filterstring) {
         if (!sequentLoaded)
             return;
-        printer.addTempCss("filterCss", String.format(".content %s * {display: none !important;}", filterstring));
+        if(filterstring.startsWith("."))
+        printer.addTempCss("filterCss",
+                String.format(
+                        ".content :not(%s),.content :not(%s) *{display: none !important;}",
+                        filterstring, filterstring));
+        else
+            printer.addTempCss("filterCss", "");
         updateHtml(printer.printSequent(proofString));
     }
 }

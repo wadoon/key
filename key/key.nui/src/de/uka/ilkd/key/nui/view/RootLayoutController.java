@@ -490,7 +490,7 @@ public class RootLayoutController extends ViewController {
 
         // Give the controller access to the main app.
         ViewContextMenuController controller = loader.getController();
-        controller.setMainApp(mainApp);
+        controller.setMainApp(mainApp,context);
         controller.setParentView(view);
         content.setOnShowing((event) -> {
             // select current position
@@ -508,7 +508,7 @@ public class RootLayoutController extends ViewController {
 
             // Give the controller access to the main app.
             ViewController controller = loader.getController();
-            controller.setMainApp(mainApp);
+            controller.setMainApp(mainApp,context);
 
             return content;
 
