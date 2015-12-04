@@ -11,11 +11,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import de.uka.ilkd.key.model.ProofManager;
-import de.uka.ilkd.key.model.ViewInformation;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.nui.model.ProofManager;
+import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
