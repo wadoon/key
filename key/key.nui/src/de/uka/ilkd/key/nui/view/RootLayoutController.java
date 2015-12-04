@@ -189,8 +189,7 @@ public class RootLayoutController extends ViewController {
             public void handle(DragEvent event) {
                 boolean success = false;
                 if (dragTab != null) {
-                    views.get(dragTab.getText())
-                            .setCurrentPosition(getTabPosition(node));
+                    views.get(dragTab.getText()).setCurrentPosition(getTabPosition(node));
                     dragTab = null;
                     success = true;
                 }
@@ -212,8 +211,7 @@ public class RootLayoutController extends ViewController {
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(
-                    MainApp.class.getResource("view/AboutView.fxml"));
+            loader.setLocation(MainApp.class.getResource("view/AboutView.fxml"));
 
             Stage stage = new Stage();
             stage.setTitle("About Key");
@@ -233,20 +231,7 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void handleClose() {
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Close KeY");
-        alert.setHeaderText(null);
-        alert.setContentText("Really quit?");
-        // Get the Stage.
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-
-        // Add a custom icon.
-        stage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
-            System.exit(0);
-        }
+        mainApp.closeWindowAlert();
     }
 
     /**
@@ -257,8 +242,7 @@ public class RootLayoutController extends ViewController {
         setStatus("Loading Proof...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
-        fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("Proofs", "*.proof"),
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Proofs", "*.proof"),
                 new ExtensionFilter("All Files", "*.*"));
         fileChooser.setInitialDirectory(new File("../"));
 
@@ -344,8 +328,7 @@ public class RootLayoutController extends ViewController {
         CheckMenuItem item = new CheckMenuItem();
         item.setText(info.getTitle());
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            public void changed(ObservableValue<? extends Boolean> ov,
-                    Boolean oldValue, Boolean newValue) {
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue) {
                 info.setIsActive(newValue);
                 resize();
             }
@@ -413,8 +396,7 @@ public class RootLayoutController extends ViewController {
         });
         l.setOnMouseClicked((event) -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(view).show(l, Side.TOP, event.getX(),
-                        event.getY());
+                loadViewContextMenu(view).show(l, Side.TOP, event.getX(), event.getY());
         });
 
         return t;
@@ -506,26 +488,22 @@ public class RootLayoutController extends ViewController {
 
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
-        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),
-                loadFxml(sourcePath));
+        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu), loadFxml(sourcePath));
     }
 
-    public void registerMenuEntry(URL sourcePath, String parentMenu)
-            throws IllegalStateException {
+    public void registerMenuEntry(URL sourcePath, String parentMenu) throws IllegalStateException {
         for (Menu m : menuBar.getMenus()) {
             if (m.getText().equals(parentMenu)) {
                 m.getItems().add(loadFxml(sourcePath));
                 return;
             }
         }
-        throw new IllegalStateException(
-                "Menu " + parentMenu + " was not found");
+        throw new IllegalStateException("Menu " + parentMenu + " was not found");
     }
 
     private ContextMenu loadViewContextMenu(ViewInformation view) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class
-                .getResource("ViewContextMenu.fxml"));
+        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
@@ -558,8 +536,7 @@ public class RootLayoutController extends ViewController {
         // File proofFile = new File("../" + proofFileName);
 
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFile, null, null,
+            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
                     null, true);
             Proof proof = environment.getLoadedProof();
 
