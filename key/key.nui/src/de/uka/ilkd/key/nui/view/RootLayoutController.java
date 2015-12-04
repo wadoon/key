@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -28,6 +29,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -36,6 +40,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -221,7 +226,20 @@ public class RootLayoutController extends ViewController implements IViewContain
      */
     @FXML
     private void handleClose() {
-        System.exit(0);
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Close KeY");
+        alert.setHeaderText(null);
+        alert.setContentText("Really quit?");
+        // Get the Stage.
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+
+        // Add a custom icon.
+        stage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            System.exit(0);
+        }
     }
 
     /**
