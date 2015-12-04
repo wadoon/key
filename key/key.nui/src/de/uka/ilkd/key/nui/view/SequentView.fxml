@@ -14,11 +14,9 @@
       <AnchorPane>
          <children>
             <WebView fx:id="textAreaWebView" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0" />
-            <ButtonBar layoutX="88.0" prefHeight="40.0" prefWidth="412.0" AnchorPane.leftAnchor="88.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
             <ToolBar prefHeight="40.0" prefWidth="500.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <items>
                   <Button mnemonicParsing="false" onAction="#loadDefaultProof" text="Load Default Proof" />
-                <Button mnemonicParsing="false" onAction="#showRootSequent" text="Show Root Sequent" />
                   <ToggleButton fx:id="filterButton" mnemonicParsing="false" onAction="#toggleFilter" text="Search/Filter" />
                   <Separator orientation="VERTICAL">
                      <padding>
