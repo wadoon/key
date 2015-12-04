@@ -1,23 +1,15 @@
 /**
  * 
  */
-package de.uka.ilkd.key.nui.view;
+package playground.richtextFX.view;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nui.MainApp;
-import de.uka.ilkd.key.nui.ViewController;
-import de.uka.ilkd.key.nui.ViewInformation;
-import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -36,7 +28,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -51,6 +42,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import playground.richtextFX.IViewContainer;
+import playground.richtextFX.MainApp;
+import playground.richtextFX.ViewController;
+import playground.richtextFX.ViewPosition;
+import playground.richtextFX.view.menu.ViewContextMenuController;
 import javafx.stage.Stage;
 
 /**
@@ -58,7 +54,7 @@ import javafx.stage.Stage;
  * @author Victor Schuemmer
  *
  */
-public class RootLayoutController extends ViewController {
+public class RootLayoutController extends ViewController implements IViewContainer {
 
     private static final int MaxMenuEntries = 8;
 
@@ -69,8 +65,8 @@ public class RootLayoutController extends ViewController {
 
     private final HashMap<ViewPosition, BorderPane> positionMapping;
     private final HashMap<ViewPosition, Boolean> positionUsage;
-    private final HashMap<String, Tab> viewTabs;
-    private final HashMap<String, ViewInformation> views;
+
+    private HashMap<URL, Tab> tabs;
     private Tab dragTab;
 
     /**
@@ -121,9 +117,8 @@ public class RootLayoutController extends ViewController {
         positionUsage.put(ViewPosition.TOPLEFT, false);
         positionUsage.put(ViewPosition.TOPRIGHT, false);
 
-        positionMapping = new HashMap<>();
-        viewTabs = new HashMap<>();
-        views = new HashMap<>();
+        positionMapping = new HashMap<ViewPosition, BorderPane>();
+        tabs = new HashMap<URL, Tab>();
     }
 
     @Override
@@ -184,8 +179,7 @@ public class RootLayoutController extends ViewController {
             public void handle(DragEvent event) {
                 boolean success = false;
                 if (dragTab != null) {
-                    views.get(dragTab.getText())
-                            .setCurrentPosition(getTabPosition(node));
+                    moveView(dragTab, getTabPosition(node));
                     dragTab = null;
                     success = true;
                 }
@@ -207,8 +201,7 @@ public class RootLayoutController extends ViewController {
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(
-                    MainApp.class.getResource("view/AboutView.fxml"));
+            loader.setLocation(MainApp.class.getResource("view/AboutView.fxml"));
 
             Stage stage = new Stage();
             stage.setTitle("About Key");
@@ -239,8 +232,7 @@ public class RootLayoutController extends ViewController {
         setStatus("Loading Proof...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
-        fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("Proofs", "*.proof"),
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Proofs", "*.proof"),
                 new ExtensionFilter("All Files", "*.*"));
         fileChooser.setInitialDirectory(new File("../"));
 
@@ -285,10 +277,6 @@ public class RootLayoutController extends ViewController {
         statusLabel.setText(status);
     }
 
-    public void clearStatus() {
-        setStatus("");
-    }
-
     /**
      * Enable/Disable Pretty Syntax
      */
@@ -298,69 +286,51 @@ public class RootLayoutController extends ViewController {
     }
 
     @FXML
-    private Menu viewsMenu;
+    private Menu registeredViewsMenu;
 
     private Menu otherViewsMenu = null;
 
-    public void checkViewMenuItem(String title, boolean active) {
-        List<MenuItem> items = new LinkedList<>(viewsMenu.getItems());
-        if (otherViewsMenu != null)
-            items.addAll(otherViewsMenu.getItems());
-        for (MenuItem item : items) {
-            if (item.getText().equals(title)) {
-                if (item instanceof CheckMenuItem) {
-                    // TODO: prevent triggering selected. not critical since the
-                    // observer also handles that
-                    ((CheckMenuItem) item).setSelected(active);
-                }
-                break;
-            }
-        }
-    }
-
-    public void registerView(ViewInformation info, String accelerator) {
-        if (views.containsKey(info.getTitle()))
-            throw new RuntimeException("Multiple views with the same name");
-
-        views.put(info.getTitle(), info);
+    public void registerView(String title, URL path, ViewPosition prefPos, String accelerator) {
         CheckMenuItem item = new CheckMenuItem();
-        item.setText(info.getTitle());
+        item.setText(title);
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            public void changed(ObservableValue<? extends Boolean> ov,
-                    Boolean oldValue, Boolean newValue) {
-                info.setIsActive(newValue);
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    showView(title, path, prefPos);
+                }
+                else {
+                    hideView(tabs.get(path));
+                }
                 resize();
             }
         });
-        item.setSelected(info.getIsActive());
+        if (!positionUsage.get(prefPos))
+            item.setSelected(true);
         if (!accelerator.equals(""))
             item.setAccelerator(KeyCombination.valueOf(accelerator));
 
         // make overflow menu "Others" if items exceed max
-        if (viewsMenu.getItems().size() < MaxMenuEntries) {
-            viewsMenu.getItems().add(item);
+        if (registeredViewsMenu.getItems().size() < MaxMenuEntries) {
+            registeredViewsMenu.getItems().add(item);
         }
         else {
             if (otherViewsMenu == null) {
                 otherViewsMenu = new Menu("Other");
-                viewsMenu.getItems().add(otherViewsMenu);
+                registeredViewsMenu.getItems().add(otherViewsMenu);
             }
             otherViewsMenu.getItems().add(item);
         }
     }
 
-    public void showView(ViewInformation view) {
-        Pane pane = (Pane) loadFxml(view.getFxmlPath());
-        Tab tab;
-        // check if tab was already created
-        if (viewTabs.containsKey(view.getTitle())) {
-            tab = viewTabs.get(view.getTitle());
-        }
-        else {
-            tab = createTab(view, pane);
-            viewTabs.put(view.getTitle(), tab);
-        }
-        setPosition(view.getTitle(), view.getPreferedPosition());
+    public void showView(String title, URL path, ViewPosition prefPos) {
+        Pane view = (Pane) loadFxml(path);
+        Tab tab = createTab(title, view);
+        tabs.put(path, tab);
+        tab.getGraphic().setOnMouseClicked((event) -> {
+            if (event.getButton() == MouseButton.SECONDARY)
+                loadViewContextMenu(tab).show(tab.getGraphic(), Side.TOP, event.getX(), event.getY());
+        });
+        setPosition(prefPos, tab);
     }
 
     /**
@@ -370,9 +340,9 @@ public class RootLayoutController extends ViewController {
      * @return a tab with content node and title as lable, also drag
      *         functionality
      */
-    private Tab createTab(ViewInformation view, Node node) {
+    private Tab createTab(String title, Node node) {
         Tab t = new Tab();
-        Label l = new Label(view.getTitle());
+        Label l = new Label(title);
         t.setGraphic(l);
         t.setContent(node);
 
@@ -381,41 +351,36 @@ public class RootLayoutController extends ViewController {
                 Dragboard db = l.startDragAndDrop(TransferMode.MOVE);
 
                 ClipboardContent content = new ClipboardContent();
-                content.putString(view.getTitle());
+                content.putString(title);
                 db.setContent(content);
                 dragTab = t;
                 event.consume();
             }
         });
 
-        t.setOnCloseRequest(new EventHandler<Event>() {
+        t.setOnClosed(new EventHandler<Event>() {
             public void handle(Event event) {
-                view.setIsActive(false);
+                // TODO handle
             }
-        });
-        l.setOnMouseClicked((event) -> {
-            if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(view).show(l, Side.TOP, event.getX(),
-                        event.getY());
         });
 
         return t;
     }
 
-    public void hideView(String title) {
-        Tab tab = viewTabs.get(title);
+    public void hideView(Tab tab) {
         TabPane tabPane = tab.getTabPane();
         tabPane.getTabs().remove(tab);
         if (tabPane.getTabs().size() == 0) {
             // System.out.println(getViewPosition(tabPane.getParent()));
             positionUsage.put(getViewPosition(tabPane.getParent()), false);
         }
+
         resize();
     }
 
-    public void moveView(String title, ViewPosition next) {
-        hideView(title);
-        setPosition(title, next);
+    public void moveView(Tab tab, ViewPosition next) {
+        hideView(tab);
+        setPosition(next, tab);
     }
 
     private Node getView(ViewPosition pos) {
@@ -446,10 +411,10 @@ public class RootLayoutController extends ViewController {
         return null;
     }
 
-    private void setPosition(String title, ViewPosition position) {
-        TabPane container = (TabPane) positionMapping.get(position).getCenter();
-        container.getTabs().add(viewTabs.get(title));
-        positionUsage.put(position, true);
+    private void setPosition(ViewPosition pos, Tab tab) {
+        TabPane container = (TabPane) positionMapping.get(pos).getCenter();
+        container.getTabs().add(tab);
+        positionUsage.put(pos, true);
         resize();
     }
 
@@ -488,26 +453,22 @@ public class RootLayoutController extends ViewController {
 
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
-        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),
-                loadFxml(sourcePath));
+        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu), loadFxml(sourcePath));
     }
 
-    public void registerMenuEntry(URL sourcePath, String parentMenu)
-            throws IllegalStateException {
+    public void registerMenuEntry(URL sourcePath, String parentMenu) throws IllegalStateException {
         for (Menu m : menuBar.getMenus()) {
             if (m.getText().equals(parentMenu)) {
                 m.getItems().add(loadFxml(sourcePath));
                 return;
             }
         }
-        throw new IllegalStateException(
-                "Menu " + parentMenu + " was not found");
+        throw new IllegalStateException("Menu " + parentMenu + " was not found");
     }
 
-    private ContextMenu loadViewContextMenu(ViewInformation view) {
+    private ContextMenu loadViewContextMenu(Tab tab) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class
-                .getResource("ViewContextMenu.fxml"));
+        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
@@ -521,7 +482,7 @@ public class RootLayoutController extends ViewController {
         // Give the controller access to the main app.
         ViewContextMenuController controller = loader.getController();
         controller.setMainApp(mainApp);
-        controller.setParentView(view);
+        controller.setParentView(this, tab);
         content.setOnShowing((event) -> {
             // select current position
         });
@@ -540,8 +501,7 @@ public class RootLayoutController extends ViewController {
         // File proofFile = new File("../" + proofFileName);
 
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFile, null, null,
+            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
                     null, true);
             Proof proof = environment.getLoadedProof();
 

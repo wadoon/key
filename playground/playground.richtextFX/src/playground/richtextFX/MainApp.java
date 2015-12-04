@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui;
+package playground.richtextFX;
 
 import java.io.File;
 import java.net.URL;
@@ -6,24 +6,28 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 
-import de.uka.ilkd.key.nui.view.RootLayoutController;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import playground.richtextFX.view.RootLayoutController;
 
 public class MainApp extends Application {
 
     private Stage primaryStage;
     private BorderPane rootLayout;
     private RootLayoutController rootLayoutController;
-    private Reflections reflections = new Reflections("de.uka.ilkd.key");
-
+    private Reflections reflections = new Reflections("playground.richtextFX");
+    private Popup popup = new Popup();
+    private Label popupMsg = new Label();
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -32,13 +36,29 @@ public class MainApp extends Application {
         // Set the application icon.
         this.primaryStage.getIcons().add(
                 new Image("file:resources/images/key-color-icon-square.png"));
+        
+        
+        
+        popupMsg.setStyle(
+                "-fx-background-color: black;" +
+                "-fx-text-fill: white;" +
+                "-fx-padding: 5;");
+        popup.getContent().add(popupMsg);
 
         initRootLayout();
         scanForViews();
         scanForMenus();
         primaryStage.show();
     }
-
+    public void setPopUp(String s){
+        popupMsg.setText(s);
+    }
+    public void showPopUp(Node node, double a, double b){
+        popup.show(node, a, b);
+    }
+    public void hidePopUp(){
+        popup.hide();
+    }
     /**
      * Initializes the root layout.
      */
@@ -83,15 +103,15 @@ public class MainApp extends Application {
     }
 
     private void scanForViews() {
-        ViewObserver rootViewObserver = new ViewObserver(rootLayoutController);
         Set<Class<?>> annotated = reflections
                 .getTypesAnnotatedWith(KeYView.class);
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
-            ViewInformation info = new ViewInformation(annot.title(),
-                    c.getResource(annot.path()), annot.preferredPosition());
-            info.addObserver(rootViewObserver);
-            rootLayoutController.registerView(info, annot.accelerator());
+            // no used yet
+            // if (Arrays.asList(annot.windows()).contains("Main"))
+            rootLayoutController.registerView(annot.title(),
+                    c.getResource(annot.path()), annot.preferredPosition(),
+                    annot.accelerator());
         }
         System.out.println("Views: " + annotated.size());
     }
@@ -118,17 +138,11 @@ public class MainApp extends Application {
     public Proof getProof() {
         return rootLayoutController.getProof();
     }
-
     public void setProof(File file) {
         rootLayoutController.setProof(file);
     }
-
     public void setStatus(String status) {
         rootLayoutController.setStatus(status);
-    }
-
-    public void clearStatus() {
-        rootLayoutController.clearStatus();
     }
 
     /**

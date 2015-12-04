@@ -1,39 +1,36 @@
-package de.uka.ilkd.key.nui.view;
+package playground.richtextFX.view;
 
 import java.io.File;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ResourceBundle;
+
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.MouseOverTextEvent;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.nui.KeYView;
-import de.uka.ilkd.key.nui.ViewController;
-import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
+import playground.richtextFX.KeYView;
+import playground.richtextFX.ViewController;
+import playground.richtextFX.ViewPosition;
 
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER)
 
 public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
-    private SequentPrinter printer;
+    //private SequentPrinter printer;
     private LogicPrinter logicPrinter;
     private String proofString;
     private WebEngine webEngine;
@@ -51,7 +48,7 @@ public class SequentViewController extends ViewController {
     private CheckBox checkBoxUnicode;
 
     @FXML
-    private WebView textAreaWebView;
+    private CodeArea textAreaCodeArea;
 
     @FXML
     private ToggleButton filterButton;
@@ -64,7 +61,7 @@ public class SequentViewController extends ViewController {
 
     @FXML
     private TextField searchBox;
-
+    /*
     private EventHandler<MouseEvent> mousehandler = new EventHandler<MouseEvent>() {
 
         @Override
@@ -76,8 +73,11 @@ public class SequentViewController extends ViewController {
                             + "ScreenX : ScreenY - " + mouseEvent.getScreenX() + " : " + mouseEvent.getScreenY());
 
         }
-    };
-
+    };*/
+    
+    
+    
+    
     /**
      * The constructor. The constructor is called before the initialize()
      * method.
@@ -89,9 +89,22 @@ public class SequentViewController extends ViewController {
     public void initialize(URL location, ResourceBundle resources) {
         // hide the filter at the beginning
         toggleFilter();
-        initializeSearchBox();
+        //initializeSearchBox();
+        System.out.println("init");
+        textAreaCodeArea.setMouseOverTextDelay(Duration.ofSeconds(1));
+        textAreaCodeArea.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN, e -> {
+            int chIdx = e.getCharacterIndex();
+            System.out.println(chIdx);
+            javafx.geometry.Point2D pos = e.getScreenPosition();
+            mainApp.setPopUp("Character '" + textAreaCodeArea.getText(chIdx, chIdx+1) + "' at " + pos);
+            mainApp.showPopUp(textAreaCodeArea, pos.getX(), pos.getY() + 10);
+        });
+        textAreaCodeArea.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_END, e -> {
+            mainApp.hidePopUp();
+        });
+        
     }
-
+    /*
     private void initializeSearchBox() {
         searchBox.setText("Search...");
         searchBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
@@ -118,7 +131,7 @@ public class SequentViewController extends ViewController {
                 event.consume();
             }
         });
-    }
+    }*/
 
     /**
      * After a proof has been loaded, the sequent of the root node will be
@@ -147,7 +160,6 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void usePrettySyntax() {
-        mainApp.clearStatus();
         if (!sequentLoaded) {
             mainApp.setStatus("Please load and diplay a proof first.");
             checkBoxPrettySyntax.setSelected(false);
@@ -175,7 +187,6 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void useUnicode() {
-        mainApp.clearStatus();
         if (!notationInfo.isPrettySyntax() || !sequentLoaded) {
             mainApp.setStatus("Please enable Pretty Syntax first.");
             checkBoxUnicode.setSelected(false);
@@ -203,10 +214,11 @@ public class SequentViewController extends ViewController {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
 
-        printer = new SequentPrinter("resources/css/sequentStyle.css", "resources/css/sequentClasses.ini");
+        //printer = new SequentPrinter("resources/css/sequentStyle.css", "resources/css/sequentClasses.ini");
         sequentLoaded = true;
         // System.out.println(printer.escape(proofString));
-        updateHtml(printer.printSequent(proofString));
+        //updateHtml(printer.printSequent(proofString));
+        updateHtml(proofString);
     }
 
     /**
@@ -244,9 +256,9 @@ public class SequentViewController extends ViewController {
     }
 
     private void updateHtml(String s) {
-        webEngine = textAreaWebView.getEngine();
-        webEngine.loadContent(s);
-
+        //webEngine = textAreaWebView.getEngine();
+        //webEngine.loadContent(s);
+        textAreaCodeArea.replaceText(s);
         // textAreaWebView.getEngine().loadContent(s);
     }
 
@@ -259,7 +271,7 @@ public class SequentViewController extends ViewController {
     private void doFilter(String filterstring) {
         if (!sequentLoaded)
             return;
-        printer.addTempCss("filterCss", String.format(".content %s * {display: none !important;}", filterstring));
-        updateHtml(printer.printSequent(proofString));
+        //printer.addTempCss("filterCss", String.format(".content %s * {display: none !important;}", filterstring));
+        //updateHtml(printer.printSequent(proofString));
     }
 }
