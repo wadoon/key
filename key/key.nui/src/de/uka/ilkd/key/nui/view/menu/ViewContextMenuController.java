@@ -44,4 +44,10 @@ public class ViewContextMenuController extends ViewController{
     private void handleCenter(ActionEvent event){
         viewInformation.setCurrentPosition(ViewPosition.CENTER);
     }
+
+    @Override
+    public void initializeAfterLoadingFxml() {
+        // TODO Auto-generated method stub
+        
+    }
 }

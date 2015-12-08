@@ -10,5 +10,8 @@ public abstract class ViewController implements Initializable {
     public void setMainApp(MainApp mainApp, Context context) {
         this.mainApp = mainApp;
         this.context = context;
+        initializeAfterLoadingFxml();
     }
+    
+    public abstract void initializeAfterLoadingFxml();
 }

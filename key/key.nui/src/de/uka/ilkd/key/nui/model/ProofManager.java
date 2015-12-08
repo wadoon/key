@@ -58,7 +58,6 @@ public class ProofManager {
         while (listeners.hasNext()) {
             ((IProofListener) listeners.next()).proofUpdated(proofEvent);
         }
-        System.out.println("proof updated");
     }
 
     /**

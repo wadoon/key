@@ -45,7 +45,7 @@ public class SequentViewController extends ViewController {
 
         @Override
         public void proofUpdated(ProofEvent proofEvent) {
-            System.out.println("proof event called");
+            showRootSequent();
         }
     };
 
@@ -100,8 +100,10 @@ public class SequentViewController extends ViewController {
         initializeSearchBox();
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
-        // context.getProofManager().addProofListener(proofChangeListener);
-        System.out.println(context);
+    }
+    
+    public void initializeAfterLoadingFxml() {
+        context.getProofManager().addProofListener(proofChangeListener);
     }
 
     private void initializeSearchBox() {
@@ -209,7 +211,7 @@ public class SequentViewController extends ViewController {
         context.getProofManager().setProof(new File("resources/proofs/gcd.closed.proof"));
         // File file = new File("resources/proofs/gcd.closed.proof");
         // mainApp.setProof(file);
-        showRootSequent();
+        // showRootSequent();
     }
 
     // TODO replace

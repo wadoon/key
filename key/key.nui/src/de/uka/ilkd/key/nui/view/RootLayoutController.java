@@ -514,4 +514,10 @@ public class RootLayoutController extends ViewController {
             return null;
         }
     }
+
+    @Override
+    public void initializeAfterLoadingFxml() {
+        // TODO Auto-generated method stub
+        
+    }
 }
