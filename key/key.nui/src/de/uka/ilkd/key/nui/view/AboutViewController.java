@@ -10,5 +10,4 @@ public class AboutViewController extends ViewController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     }
-
 }

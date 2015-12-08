@@ -6,11 +6,8 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
-import de.uka.ilkd.key.nui.view.RootLayoutController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.Tab;
 
 public class ViewContextMenuController extends ViewController{
     
@@ -47,5 +44,4 @@ public class ViewContextMenuController extends ViewController{
     private void handleCenter(ActionEvent event){
         viewInformation.setCurrentPosition(ViewPosition.CENTER);
     }
-    
 }

@@ -9,7 +9,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.ProofManager;
+import de.uka.ilkd.key.nui.model.IProofListener;
+import de.uka.ilkd.key.nui.model.ProofEvent;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -40,6 +41,13 @@ public class SequentViewController extends ViewController {
     private NotationInfo notationInfo = new NotationInfo();
     private Services services;
     private Sequent sequent;
+    private IProofListener proofChangeListener = new IProofListener() {
+
+        @Override
+        public void proofUpdated(ProofEvent proofEvent) {
+            System.out.println("proof event called");
+        }
+    };
 
     // @FXML
     // private TextArea textArea;
@@ -92,6 +100,8 @@ public class SequentViewController extends ViewController {
         initializeSearchBox();
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
+        // context.getProofManager().addProofListener(proofChangeListener);
+        System.out.println(context);
     }
 
     private void initializeSearchBox() {
@@ -134,7 +144,7 @@ public class SequentViewController extends ViewController {
 
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         printSequent();
-        
+
         checkBoxPrettySyntax.setDisable(false);
         checkBoxUnicode.setDisable(false);
 
@@ -197,9 +207,8 @@ public class SequentViewController extends ViewController {
     @FXML
     private void loadDefaultProof() {
         context.getProofManager().setProof(new File("resources/proofs/gcd.closed.proof"));
-        
-        //File file = new File("resources/proofs/gcd.closed.proof");
-        //mainApp.setProof(file);
+        // File file = new File("resources/proofs/gcd.closed.proof");
+        // mainApp.setProof(file);
         showRootSequent();
     }
 
@@ -243,11 +252,9 @@ public class SequentViewController extends ViewController {
     private void doFilter(String filterstring) {
         if (!sequentLoaded)
             return;
-        if(filterstring.startsWith("."))
-        printer.addTempCss("filterCss",
-                String.format(
-                        ".content :not(%s),.content :not(%s) *{display: none !important;}",
-                        filterstring, filterstring));
+        if (filterstring.startsWith("."))
+            printer.addTempCss("filterCss", String.format(
+                    ".content :not(%s),.content :not(%s) *{display: none !important;}", filterstring, filterstring));
         else
             printer.addTempCss("filterCss", "");
         updateHtml(printer.printSequent(proofString));
