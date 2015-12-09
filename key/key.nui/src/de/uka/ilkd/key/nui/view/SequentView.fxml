@@ -8,6 +8,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.web.WebView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.CheckBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.SequentViewController">
    <center>
@@ -23,12 +26,26 @@
                         <Insets left="5.0" right="5.0" />
                      </padding>
                   </Separator>
-                  <VBox>
-                     <children>
-                        <CheckBox fx:id="checkBoxPrettySyntax" mnemonicParsing="false" onAction="#usePrettySyntax" selected="true" text="Use Pretty Syntax" />
-                        <CheckBox fx:id="checkBoxUnicode" mnemonicParsing="false" onAction="#useUnicode" text="Enable Unicode" />
-                     </children>
-                  </VBox>
+                  <HBox>
+                  	 <children> 
+		                <VBox>
+		                   <children>
+		                      	<CheckBox fx:id="checkBoxPrettySyntax" mnemonicParsing="false" onAction="#usePrettySyntax" selected="true" text="Use Pretty Syntax" />
+		                      	<CheckBox fx:id="checkBoxUnicode" mnemonicParsing="false" onAction="#useUnicode" text="Enable Unicode" />
+		                   </children>
+		                </VBox>
+		                <Separator orientation="VERTICAL">
+                     		<padding>
+                        		<Insets left="5.0" right="5.0" />
+                     		</padding>
+                  		</Separator>
+		                <VBox>
+		                	<children>
+		                		<CheckBox fx:id="checkBoxRegexSearch" mnemonicParsing="false" onAction="#useRegex" text="Enable Regex Search" />
+		                	</children>
+		                </VBox>
+		             </children>   
+                  </HBox>
                </items>
             </ToolBar>
          </children>

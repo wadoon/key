@@ -57,6 +57,9 @@ public class SequentViewController extends ViewController {
 
     @FXML
     private CheckBox checkBoxUnicode;
+    
+    @FXML
+    private CheckBox checkBoxRegexSearch;
 
     @FXML
     private WebView textAreaWebView;
@@ -189,7 +192,14 @@ public class SequentViewController extends ViewController {
             printSequent();
         }
     }
-
+    
+    /**
+     * Enables/Disables Regex Search
+     */
+    @FXML
+    private void useRegex(){
+        printer.setUseRegex(checkBoxRegexSearch.isSelected());
+    }
     /**
      * Helper method to print a sequent into the webview.
      */
