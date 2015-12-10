@@ -51,6 +51,12 @@ public class SequentViewController extends ViewController {
 
     // @FXML
     // private TextArea textArea;
+    
+    @FXML
+    private ToggleButton searchButton;
+    
+    @FXML
+    private Pane searchParent;
 
     @FXML
     private CheckBox checkBoxPrettySyntax;
@@ -63,15 +69,6 @@ public class SequentViewController extends ViewController {
 
     @FXML
     private WebView textAreaWebView;
-
-    @FXML
-    private ToggleButton filterButton;
-
-    @FXML
-    private Pane filterParent;
-
-    @FXML
-    private TextField filterText;
 
     @FXML
     private TextField searchBox;
@@ -98,8 +95,7 @@ public class SequentViewController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // hide the filter at the beginning
-        toggleFilter();
+        toggleSearch();
         initializeSearchBox();
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
@@ -135,6 +131,12 @@ public class SequentViewController extends ViewController {
                 event.consume();
             }
         });
+    }
+    
+    @FXML
+    private void toggleSearch() {
+        searchParent.managedProperty().bind(searchParent.visibleProperty());
+        searchParent.setVisible(searchButton.isSelected());
     }
 
     /**
@@ -242,33 +244,10 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    @FXML
-    private void toggleFilter() {
-        filterParent.managedProperty().bind(filterParent.visibleProperty());
-        filterParent.setVisible(filterButton.isSelected());
-    }
-
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
         webEngine.loadContent(s);
 
         // textAreaWebView.getEngine().loadContent(s);
-    }
-
-    @FXML
-    private void handleApplyFilter() {
-        doFilter(filterText.getText());
-    }
-
-    // just dummy method
-    private void doFilter(String filterstring) {
-        if (!sequentLoaded)
-            return;
-        if (filterstring.startsWith("."))
-            printer.addTempCss("filterCss", String.format(
-                    ".content :not(%s),.content :not(%s) *{display: none !important;}", filterstring, filterstring));
-        else
-            printer.addTempCss("filterCss", "");
-        updateHtml(printer.printSequent(proofString));
     }
 }
