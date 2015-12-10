@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.util.joinrule;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,9 +58,6 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -136,11 +132,7 @@ public class JoinRuleUtils {
      */
     public static Term translateToFormula(final Services services, final String toTranslate) {
         try {
-            final KeYParserF parser =
-                    new KeYParserF(ParserMode.TERM, new KeYLexerF(
-                            new StringReader(toTranslate), ""), services,
-                            services.getNamespaces());
-            final Term result = parser.term();
+            final Term result = services.getTermBuilder().parseTerm(toTranslate);
             return result.sort() == Sort.FORMULA ? result : null;
         }
         catch (Throwable e) {

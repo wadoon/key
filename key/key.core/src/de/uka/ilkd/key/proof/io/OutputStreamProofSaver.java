@@ -63,7 +63,6 @@ import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
@@ -369,7 +368,7 @@ public class OutputStreamProofSaver {
             tree.append("\")");
             
             tree.append(" (distFormula \"");
-            tree.append(joinApp.getDistinguishingFormula());
+            tree.append(escapeCharacters(printAnything(joinApp.getDistinguishingFormula(), proof.getServices(), false).toString()));
             tree.append("\")");
         }
         
