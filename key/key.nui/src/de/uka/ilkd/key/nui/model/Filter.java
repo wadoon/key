@@ -2,6 +2,14 @@ package de.uka.ilkd.key.nui.model;
 
 public class Filter {
     
+    private String name;
+    public String getName(){
+        return name;
+    }
+    public void setName(String value){
+        name = value;
+    }
+    
     private String searchString;
     
     public String getSearchString(){
@@ -29,5 +37,13 @@ public class Filter {
     public void reset(){
         useTerm = false;
         searchString = null;
+    }
+    
+    public Filter Clone(){
+        Filter filter = new Filter();
+        filter.setName(this.name);
+        filter.setSearchString(this.searchString);
+        filter.setUseTerm(this.useTerm);
+        return filter;
     }
 }

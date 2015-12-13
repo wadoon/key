@@ -6,10 +6,24 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="103.0" prefWidth="208.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
+<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="131.0" prefWidth="219.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
    <children>
       <VBox AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="0.0">
          <children>
+            <HBox>
+               <children>
+                  <ComboBox fx:id="filters" editable="true" onAction="#handleFilterSelectionChanged" prefWidth="150.0">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                     </HBox.margin>
+                  </ComboBox>
+                  <Button mnemonicParsing="false" onAction="#handleSaveFilter" text="Save">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
             <HBox alignment="TOP_CENTER">
                <children>
                   <Label alignment="TOP_LEFT" text="Text:">
