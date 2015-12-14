@@ -367,7 +367,7 @@ public class OutputStreamProofSaver {
         	tree.append(joinApp.getJoinNode().serialNr());
             tree.append("\")");
             
-            if (joinApp.getDistinguishingFormula() == null) {
+            if (joinApp.getDistinguishingFormula() != null) {
                 tree.append(" (distFormula \"");
                 tree.append(escapeCharacters(printAnything(
                         joinApp.getDistinguishingFormula(),
