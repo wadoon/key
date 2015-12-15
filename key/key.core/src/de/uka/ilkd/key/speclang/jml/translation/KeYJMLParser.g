@@ -2,7 +2,7 @@ parser grammar KeYJMLParser;
 
 options {
     tokenVocab = KeYJMLLexer;
-    k = 1;
+    k = 1; // lookahead depth
 }
 
 @header {
@@ -371,7 +371,7 @@ options {
         throw new MismatchedTokenException(ttype, input);
     }
 
-}
+}   // end of @members
 
 @rulecatch {
     catch(RecognitionException re) {
