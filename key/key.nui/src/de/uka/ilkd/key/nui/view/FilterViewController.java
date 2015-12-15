@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
+import java.security.spec.ECPrivateKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -10,9 +11,12 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.Filter;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
 public class FilterViewController extends ViewController {
@@ -37,9 +41,21 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleApply() {
-        currentFilter.setSearchString(searchText.getText());
-        currentFilter.setUseTerm(toggleUseTerm.isSelected());
+        fillCurrentFilter();
+        for (Node node : dummy.getChildren()) {
+            if (node instanceof Text) {
+                Text text = (Text) node;
+                if (currentFilter.getSearchString() != null
+                        && !currentFilter.getSearchString().equals("")
+                        && text.getText().contains(currentFilter.getSearchString()))
+                    text.setVisible(false);
+                else text.setVisible(true);
+            }
+        }
     }
+
+    @FXML
+    private TextFlow dummy;
 
     // TODO: save filter on disk
     // TODO: clear textbox if value changed
@@ -52,10 +68,10 @@ public class FilterViewController extends ViewController {
 
         if (savedFilters.containsKey(name)) {
             currentFilter = savedFilters.get(name);
-            handleApply();
+            fillCurrentFilter();
         }
         else {
-            handleApply();
+            fillCurrentFilter();
             currentFilter.setName(name);
             savedFilters.put(name, currentFilter.Clone());
             filters.getItems().add(currentFilter.getName());
@@ -77,6 +93,12 @@ public class FilterViewController extends ViewController {
         searchText.setText(currentFilter.getSearchString());
         toggleUseTerm.setSelected(currentFilter.getUseTerm());
     }
+
+    private void fillCurrentFilter() {
+        currentFilter.setSearchString(searchText.getText());
+        currentFilter.setUseTerm(toggleUseTerm.isSelected());
+    }
+
     /*
      * private void doFilter(String filterstring) { if (!sequentLoaded) return;
      * if (filterstring.startsWith(".")) printer.addTempCss("filterCss",
@@ -89,6 +111,11 @@ public class FilterViewController extends ViewController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         currentFilter = new Filter();
+        dummy.getChildren().add(new Text(" \\forall "));
+        dummy.getChildren().add(new Text(" forall "));
+        dummy.getChildren().add(new Text("<>"));
+        dummy.getChildren().add(new Text(" and "));
+        dummy.getChildren().add(new Text(" or "));
     }
 
     @Override
