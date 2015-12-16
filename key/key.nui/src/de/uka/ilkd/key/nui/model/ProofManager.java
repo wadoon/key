@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.nui.model;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.Context;
@@ -14,23 +17,31 @@ public class ProofManager {
 
     private Proof proof;
     private IStatusManager status;
+    private List<IProofListener> listeners = new ArrayList<IProofListener>();
 
     /**
-     * grant access to the mainapp
-     * 
-     * @param mainApp
+     * Constructor
      */
-    public void setStatusManager(IStatusManager status) {
+    public ProofManager(IStatusManager status) {
         this.status = status;
     }
 
-    /**
-     * constructor
-     */
-    public ProofManager() {
-
+    public synchronized void addProofListener(IProofListener proofListener) {
+        this.listeners.add(proofListener);
     }
 
+    public synchronized void removeProofListener(IProofListener proofListener) {
+        this.listeners.remove(proofListener);
+    }
+
+    private synchronized void fireProofUpdatedEvent() {
+        ProofEvent proofEvent = new ProofEvent(this.proof);
+        Iterator<IProofListener> listeners = this.listeners.iterator();
+        while (listeners.hasNext()) {
+            ((IProofListener) listeners.next()).proofUpdated(proofEvent);
+        }
+    }
+    
     /**
      * Getter method for a proof.
      * 
@@ -46,10 +57,12 @@ public class ProofManager {
      * @param file
      *            Proof to be loaded.
      */
-    public void setProof(File proofFile) {
+    public synchronized void setProof(File proofFile) {
+        // this.proof.setProofFile(proofFile);
         status.setStatus("Loading Proof...");
         this.proof = loadProof(proofFile);
         status.setStatus("Proof loaded: " + proofFile.getName());
+        fireProofUpdatedEvent();
     }
 
     /**

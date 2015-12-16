@@ -11,4 +11,9 @@ public class AboutViewController extends ViewController {
     public void initialize(URL location, ResourceBundle resources) {
     }
 
+    @Override
+    public void initializeAfterLoadingFxml() {
+        // TODO Auto-generated method stub
+        
+    }
 }

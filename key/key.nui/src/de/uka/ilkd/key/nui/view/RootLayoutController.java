@@ -14,7 +14,6 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.ProofManager;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
@@ -59,8 +58,6 @@ public class RootLayoutController extends ViewController
         implements IStatusManager {
 
     private static final int MaxMenuEntries = 8;
-
-    private ProofManager proofManager = new ProofManager();
 
     @FXML
     private Label statusLabel;
@@ -248,9 +245,7 @@ public class RootLayoutController extends ViewController
             setStatus("No File Selected");
             return;
         }
-
-        proofManager.setStatusManager(context.getStatusManager());
-        proofManager.setProof(file);
+        context.getProofManager().setProof(file);
     }
 
     /**
@@ -527,5 +522,11 @@ public class RootLayoutController extends ViewController
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public void initializeAfterLoadingFxml() {
+        // TODO Auto-generated method stub
+        
     }
 }

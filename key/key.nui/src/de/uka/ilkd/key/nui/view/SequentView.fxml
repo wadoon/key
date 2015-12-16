@@ -8,6 +8,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.web.WebView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.CheckBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.SequentViewController">
    <center>
@@ -17,29 +20,41 @@
             <ToolBar prefHeight="40.0" prefWidth="500.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <items>
                   <Button mnemonicParsing="false" onAction="#loadDefaultProof" text="Load Default Proof" />
-                  <ToggleButton fx:id="filterButton" mnemonicParsing="false" onAction="#toggleFilter" text="Search/Filter" />
+                  <ToggleButton fx:id="searchButton" mnemonicParsing="false" onAction="#toggleSearch" text="Search" />
                   <Separator orientation="VERTICAL">
                      <padding>
                         <Insets left="5.0" right="5.0" />
                      </padding>
                   </Separator>
-                  <VBox>
-                     <children>
-                        <CheckBox fx:id="checkBoxPrettySyntax" mnemonicParsing="false" onAction="#usePrettySyntax" selected="true" text="Use Pretty Syntax" />
-                        <CheckBox fx:id="checkBoxUnicode" mnemonicParsing="false" onAction="#useUnicode" text="Enable Unicode" />
-                     </children>
-                  </VBox>
+                  <HBox>
+                  	 <children> 
+		                <VBox>
+		                   <children>
+		                      	<CheckBox fx:id="checkBoxPrettySyntax" mnemonicParsing="false" onAction="#usePrettySyntax" selected="true" text="Use Pretty Syntax" />
+		                      	<CheckBox fx:id="checkBoxUnicode" mnemonicParsing="false" onAction="#useUnicode" text="Enable Unicode" />
+		                   </children>
+		                </VBox>
+		                <Separator orientation="VERTICAL">
+                     		<padding>
+                        		<Insets left="5.0" right="5.0" />
+                     		</padding>
+                  		</Separator>
+		                <VBox>
+		                	<children>
+		                		<CheckBox fx:id="checkBoxRegexSearch" mnemonicParsing="false" onAction="#useRegex" text="Enable Regex Search" />
+		                	</children>
+		                </VBox>
+		             </children>   
+                  </HBox>
                </items>
             </ToolBar>
          </children>
       </AnchorPane>
    </center>
    <top>
-      <AnchorPane fx:id="filterParent" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <AnchorPane fx:id="searchParent" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-         	<TextField fx:id="searchBox" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="13.0" />
-            <Button alignment="CENTER" layoutX="282.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleApplyFilter" text="Apply" AnchorPane.topAnchor="13.0" />
-            <TextField fx:id="filterText" layoutX="13.0" layoutY="13.0" prefHeight="25.0" prefWidth="259.0" AnchorPane.leftAnchor="13.0" AnchorPane.topAnchor="13.0" />
+         	<TextField fx:id="searchBox" prefHeight="25.0" prefWidth="476.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="13.0" />
          </children></AnchorPane>
    </top>
 </BorderPane>

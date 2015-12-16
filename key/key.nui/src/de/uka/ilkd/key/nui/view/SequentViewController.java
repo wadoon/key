@@ -9,7 +9,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.ProofManager;
+import de.uka.ilkd.key.nui.model.IProofListener;
+import de.uka.ilkd.key.nui.model.ProofEvent;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -40,28 +41,34 @@ public class SequentViewController extends ViewController {
     private NotationInfo notationInfo = new NotationInfo();
     private Services services;
     private Sequent sequent;
-    private ProofManager proofManager = new ProofManager();
+    private IProofListener proofChangeListener = new IProofListener() {
+
+        @Override
+        public void proofUpdated(ProofEvent proofEvent) {
+            showRootSequent();
+        }
+    };
 
     // @FXML
     // private TextArea textArea;
+    
+    @FXML
+    private ToggleButton searchButton;
+    
+    @FXML
+    private Pane searchParent;
 
     @FXML
     private CheckBox checkBoxPrettySyntax;
 
     @FXML
     private CheckBox checkBoxUnicode;
+    
+    @FXML
+    private CheckBox checkBoxRegexSearch;
 
     @FXML
     private WebView textAreaWebView;
-
-    @FXML
-    private ToggleButton filterButton;
-
-    @FXML
-    private Pane filterParent;
-
-    @FXML
-    private TextField filterText;
 
     @FXML
     private TextField searchBox;
@@ -88,11 +95,14 @@ public class SequentViewController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // hide the filter at the beginning
-        toggleFilter();
+        toggleSearch();
         initializeSearchBox();
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
+    }
+    
+    public void initializeAfterLoadingFxml() {
+        context.getProofManager().addProofListener(proofChangeListener);
     }
 
     private void initializeSearchBox() {
@@ -122,6 +132,12 @@ public class SequentViewController extends ViewController {
             }
         });
     }
+    
+    @FXML
+    private void toggleSearch() {
+        searchParent.managedProperty().bind(searchParent.visibleProperty());
+        searchParent.setVisible(searchButton.isSelected());
+    }
 
     /**
      * After a proof has been loaded, the sequent of the root node will be
@@ -129,13 +145,13 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void showRootSequent() {
-        Proof proof = proofManager.getProof();
+        Proof proof = context.getProofManager().getProof();
         services = proof.getServices();
         sequent = proof.root().sequent();
 
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         printSequent();
-        
+
         checkBoxPrettySyntax.setDisable(false);
         checkBoxUnicode.setDisable(false);
 
@@ -178,7 +194,14 @@ public class SequentViewController extends ViewController {
             printSequent();
         }
     }
-
+    
+    /**
+     * Enables/Disables Regex Search
+     */
+    @FXML
+    private void useRegex(){
+        printer.setUseRegex(checkBoxRegexSearch.isSelected());
+    }
     /**
      * Helper method to print a sequent into the webview.
      */
@@ -197,12 +220,10 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        proofManager.setStatusManager(context.getStatusManager());
-        proofManager.setProof(new File("resources/proofs/gcd.closed.proof"));
-        
-        //File file = new File("resources/proofs/gcd.closed.proof");
-        //mainApp.setProof(file);
-        showRootSequent();
+        context.getProofManager().setProof(new File("resources/proofs/gcd.closed.proof"));
+        // File file = new File("resources/proofs/gcd.closed.proof");
+        // mainApp.setProof(file);
+        // showRootSequent();
     }
 
     // TODO replace
@@ -223,35 +244,10 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    @FXML
-    private void toggleFilter() {
-        filterParent.managedProperty().bind(filterParent.visibleProperty());
-        filterParent.setVisible(filterButton.isSelected());
-    }
-
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
         webEngine.loadContent(s);
 
         // textAreaWebView.getEngine().loadContent(s);
-    }
-
-    @FXML
-    private void handleApplyFilter() {
-        doFilter(filterText.getText());
-    }
-
-    // just dummy method
-    private void doFilter(String filterstring) {
-        if (!sequentLoaded)
-            return;
-        if(filterstring.startsWith("."))
-        printer.addTempCss("filterCss",
-                String.format(
-                        ".content :not(%s),.content :not(%s) *{display: none !important;}",
-                        filterstring, filterstring));
-        else
-            printer.addTempCss("filterCss", "");
-        updateHtml(printer.printSequent(proofString));
     }
 }

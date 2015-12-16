@@ -8,8 +8,9 @@ public class Context {
     private ProofManager proofManager = null;
 
     public ProofManager getProofManager() {
-        if (proofManager == null)
-            proofManager = new ProofManager();
+        if (proofManager == null){
+            proofManager = new ProofManager(status);
+        }
         return proofManager;
     }
 
@@ -22,8 +23,7 @@ public class Context {
     public void setStatusManager(IStatusManager value){
         status = value;
     }
-
+    
     public Context() {
     }
-
 }

@@ -20,4 +20,10 @@ public class TestMenuEntryController extends ViewController {
         // TODO Auto-generated method stub
         
     }
+
+    @Override
+    public void initializeAfterLoadingFxml() {
+        // TODO Auto-generated method stub
+        
+    }
 }

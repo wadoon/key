@@ -27,4 +27,10 @@ public class TreeViewController extends ViewController{
         }
         setRoot(root);
     }
+
+    @Override
+    public void initializeAfterLoadingFxml() {
+        // TODO Auto-generated method stub
+        
+    }
 }
