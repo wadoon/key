@@ -3,7 +3,9 @@ package de.uka.ilkd.key.nui.model;
 import java.io.File;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.nui.Context;
 import de.uka.ilkd.key.nui.MainApp;
+import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -11,23 +13,24 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 public class ProofManager {
 
     private Proof proof;
-    private MainApp mainApp;
-    
+    private IStatusManager status;
+
     /**
      * grant access to the mainapp
+     * 
      * @param mainApp
      */
-    public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
+    public void setStatusManager(IStatusManager status) {
+        this.status = status;
     }
-    
+
     /**
      * constructor
      */
     public ProofManager() {
-        
+
     }
-    
+
     /**
      * Getter method for a proof.
      * 
@@ -44,11 +47,11 @@ public class ProofManager {
      *            Proof to be loaded.
      */
     public void setProof(File proofFile) {
-        mainApp.setStatus("Loading Proof...");
+        status.setStatus("Loading Proof...");
         this.proof = loadProof(proofFile);
-        mainApp.setStatus("Proof loaded: " + proofFile.getName());
+        status.setStatus("Proof loaded: " + proofFile.getName());
     }
-    
+
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
@@ -61,7 +64,8 @@ public class ProofManager {
         // File proofFile = new File("../" + proofFileName);
 
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
+            KeYEnvironment<?> environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFile, null, null,
                     null, true);
             Proof proof = environment.getLoadedProof();
 

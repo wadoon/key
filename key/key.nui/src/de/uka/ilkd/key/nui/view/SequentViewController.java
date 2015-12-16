@@ -197,7 +197,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        proofManager.setMainApp(mainApp);
+        proofManager.setStatusManager(context.getStatusManager());
         proofManager.setProof(new File("resources/proofs/gcd.closed.proof"));
         
         //File file = new File("resources/proofs/gcd.closed.proof");

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ProofManager;
 import de.uka.ilkd.key.nui.model.ViewInformation;
+import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -54,7 +55,8 @@ import javafx.stage.Stage;
  * @author Victor Schuemmer
  *
  */
-public class RootLayoutController extends ViewController {
+public class RootLayoutController extends ViewController
+        implements IStatusManager {
 
     private static final int MaxMenuEntries = 8;
 
@@ -180,7 +182,8 @@ public class RootLayoutController extends ViewController {
             public void handle(DragEvent event) {
                 boolean success = false;
                 if (dragTab != null) {
-                    views.get(dragTab.getText()).setCurrentPosition(getTabPosition(node));
+                    views.get(dragTab.getText())
+                            .setCurrentPosition(getTabPosition(node));
                     dragTab = null;
                     success = true;
                 }
@@ -202,7 +205,8 @@ public class RootLayoutController extends ViewController {
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/AboutView.fxml"));
+            loader.setLocation(
+                    MainApp.class.getResource("view/AboutView.fxml"));
 
             Stage stage = new Stage();
             stage.setTitle("About Key");
@@ -233,7 +237,8 @@ public class RootLayoutController extends ViewController {
         setStatus("Loading Proof...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Proofs", "*.proof"),
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter("Proofs", "*.proof"),
                 new ExtensionFilter("All Files", "*.*"));
         fileChooser.setInitialDirectory(new File("../"));
 
@@ -244,7 +249,7 @@ public class RootLayoutController extends ViewController {
             return;
         }
 
-        proofManager.setMainApp(mainApp);
+        proofManager.setStatusManager(context.getStatusManager());
         proofManager.setProof(file);
     }
 
@@ -299,7 +304,8 @@ public class RootLayoutController extends ViewController {
         CheckMenuItem item = new CheckMenuItem();
         item.setText(info.getTitle());
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            public void changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue) {
+            public void changed(ObservableValue<? extends Boolean> ov,
+                    Boolean oldValue, Boolean newValue) {
                 info.setIsActive(newValue);
                 resize();
             }
@@ -319,8 +325,8 @@ public class RootLayoutController extends ViewController {
             }
             otherViewsMenu.getItems().add(item);
         }
-        
-        //dummy until last opened or config was developed
+
+        // dummy until last opened or config was developed
         info.setIsActive(true);
     }
 
@@ -370,7 +376,8 @@ public class RootLayoutController extends ViewController {
         });
         l.setOnMouseClicked((event) -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(view).show(l, Side.TOP, event.getX(), event.getY());
+                loadViewContextMenu(view).show(l, Side.TOP, event.getX(),
+                        event.getY());
         });
 
         return t;
@@ -392,14 +399,13 @@ public class RootLayoutController extends ViewController {
         setPosition(title, next);
     }
 
- /*   private Node getView(ViewPosition pos) {
-        BorderPane container = positionMapping.get(pos);
-
-        if (container != null && container.getChildren().size() == 1)
-            return container.getChildren().get(0);
-        else
-            return null;
-    }*/
+    /*
+     * private Node getView(ViewPosition pos) { BorderPane container =
+     * positionMapping.get(pos);
+     * 
+     * if (container != null && container.getChildren().size() == 1) return
+     * container.getChildren().get(0); else return null; }
+     */
 
     public ViewPosition getTabPosition(Node node) {
         for (ViewPosition key : positionMapping.keySet()) {
@@ -462,22 +468,26 @@ public class RootLayoutController extends ViewController {
 
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
-        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu), loadFxml(sourcePath));
+        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),
+                loadFxml(sourcePath));
     }
 
-    public void registerMenuEntry(URL sourcePath, String parentMenu) throws IllegalStateException {
+    public void registerMenuEntry(URL sourcePath, String parentMenu)
+            throws IllegalStateException {
         for (Menu m : menuBar.getMenus()) {
             if (m.getText().equals(parentMenu)) {
                 m.getItems().add(loadFxml(sourcePath));
                 return;
             }
         }
-        throw new IllegalStateException("Menu " + parentMenu + " was not found");
+        throw new IllegalStateException(
+                "Menu " + parentMenu + " was not found");
     }
 
     private ContextMenu loadViewContextMenu(ViewInformation view) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
+        loader.setLocation(ViewContextMenuController.class
+                .getResource("ViewContextMenu.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
@@ -490,7 +500,7 @@ public class RootLayoutController extends ViewController {
 
         // Give the controller access to the main app.
         ViewContextMenuController controller = loader.getController();
-        controller.setMainApp(mainApp,context);
+        controller.setMainApp(mainApp, context);
         controller.setParentView(view);
         content.setOnShowing((event) -> {
             // select current position
@@ -508,7 +518,7 @@ public class RootLayoutController extends ViewController {
 
             // Give the controller access to the main app.
             ViewController controller = loader.getController();
-            controller.setMainApp(mainApp,context);
+            controller.setMainApp(mainApp, context);
 
             return content;
 

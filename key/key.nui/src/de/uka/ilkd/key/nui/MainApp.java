@@ -78,7 +78,9 @@ public class MainApp extends Application {
 
             // Give the controller access to the main app.
             RootLayoutController controller = loader.getController();
-            controller.setMainApp(this,new Context());
+            Context rootContext = new Context();
+            rootContext.setStatusManager(rootLayoutController);
+            controller.setMainApp(this,rootContext);
             rootLayoutController = controller;
         }
         catch (Exception e) {
@@ -149,14 +151,6 @@ public class MainApp extends Application {
             // }
         }
         System.out.println("Menus: " + annotated.size());
-    }
-
-    public void setStatus(String status) {
-        rootLayoutController.setStatus(status);
-    }
-
-    public void clearStatus() {
-        rootLayoutController.clearStatus();
     }
 
     /**
