@@ -16,7 +16,7 @@
    <center>
       <AnchorPane>
          <children>
-            <WebView fx:id="textAreaWebView" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0" />
+            <WebView fx:id="textAreaWebView" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
             <ToolBar prefHeight="40.0" prefWidth="500.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <items>
                   <Button mnemonicParsing="false" onAction="#loadDefaultProof" text="Load Default Proof" />
@@ -34,16 +34,6 @@
 		                      	<CheckBox fx:id="checkBoxUnicode" mnemonicParsing="false" onAction="#useUnicode" text="Enable Unicode" />
 		                   </children>
 		                </VBox>
-		                <Separator orientation="VERTICAL">
-                     		<padding>
-                        		<Insets left="5.0" right="5.0" />
-                     		</padding>
-                  		</Separator>
-		                <VBox>
-		                	<children>
-		                		<CheckBox fx:id="checkBoxRegexSearch" mnemonicParsing="false" onAction="#useRegex" text="Enable Regex Search" />
-		                	</children>
-		                </VBox>
 		             </children>   
                   </HBox>
                </items>
@@ -54,7 +44,17 @@
    <top>
       <AnchorPane fx:id="searchParent" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-         	<TextField fx:id="searchBox" prefHeight="25.0" prefWidth="476.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="13.0" />
+            <HBox AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="15.0">
+               <children>
+      		                		<CheckBox fx:id="checkBoxRegexSearch" mnemonicParsing="false" onAction="#useRegex" prefHeight="17.0" prefWidth="270.0" text="Enable Regex Search" />
+      		                <Separator orientation="VERTICAL">
+               		<padding>
+                  		<Insets left="5.0" right="5.0" />
+               		</padding>
+            		</Separator>
+               	<TextField fx:id="searchBox" prefHeight="25.0" prefWidth="476.0" />
+               </children>
+            </HBox>
          </children></AnchorPane>
    </top>
 </BorderPane>

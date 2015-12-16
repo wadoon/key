@@ -99,8 +99,10 @@ public class SequentViewController extends ViewController {
         initializeSearchBox();
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
+        searchButton.setDisable(true);
     }
     
+    @Override
     public void initializeAfterLoadingFxml() {
         context.getProofManager().addProofListener(proofChangeListener);
     }
@@ -143,7 +145,6 @@ public class SequentViewController extends ViewController {
      * After a proof has been loaded, the sequent of the root node will be
      * displayed
      */
-    @FXML
     private void showRootSequent() {
         Proof proof = context.getProofManager().getProof();
         services = proof.getServices();
@@ -154,6 +155,7 @@ public class SequentViewController extends ViewController {
 
         checkBoxPrettySyntax.setDisable(false);
         checkBoxUnicode.setDisable(false);
+        searchButton.setDisable(false);
 
         // textAreaWebView.setOnMouseMoved(mousehandler);
     }
