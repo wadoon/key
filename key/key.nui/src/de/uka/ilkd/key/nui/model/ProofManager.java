@@ -20,7 +20,8 @@ public class ProofManager {
     private List<IProofListener> listeners = new ArrayList<IProofListener>();
 
     /**
-     * Constructor
+     * Creates a new Proofmanager
+     * @param status a StatusManager to print status texts to
      */
     public ProofManager(IStatusManager status) {
         this.status = status;
