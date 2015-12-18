@@ -159,7 +159,6 @@ public class RootLayoutController extends ViewController
         node.setOnDragEntered(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
                 if (event.getGestureSource() != node) {
-                    System.out.println("valid target entered");
                     // node.setEffect(new Glow());
                     node.setStyle(
                             "-fx-padding: 1; -fx-background-color: yellow, -fx-control-inner-background; -fx-background-insets: 0, 1;");
@@ -169,7 +168,6 @@ public class RootLayoutController extends ViewController
         });
         node.setOnDragExited(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
-                System.out.println("target exited");
                 // node.setEffect(null);
                 node.setStyle("");
                 event.consume();
@@ -179,7 +177,7 @@ public class RootLayoutController extends ViewController
             public void handle(DragEvent event) {
                 boolean success = false;
                 if (dragTab != null) {
-                    views.get(dragTab.getText())
+                    views.get(((Label) dragTab.getGraphic()).getText())
                             .setCurrentPosition(getTabPosition(node));
                     dragTab = null;
                     success = true;
@@ -424,6 +422,7 @@ public class RootLayoutController extends ViewController
     private void setPosition(String title, ViewPosition position) {
         TabPane container = (TabPane) positionMapping.get(position).getCenter();
         container.getTabs().add(viewTabs.get(title));
+        container.getSelectionModel().select(viewTabs.get(title));
         positionUsage.put(position, true);
         resize();
     }

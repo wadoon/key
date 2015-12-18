@@ -118,7 +118,7 @@ public class MainApp extends Application {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK) {
-            System.out.println("Have a great day!");
+            System.out.println("Where we go from here is a choice I leave to you.");
             System.exit(0);
         }
     }
