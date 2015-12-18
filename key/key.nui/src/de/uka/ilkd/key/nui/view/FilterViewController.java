@@ -25,6 +25,9 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private TextField searchText;
+    
+    @FXML
+    private TextField excludeText;
 
     @FXML
     private CheckBox toggleUseTerm;
@@ -47,7 +50,11 @@ public class FilterViewController extends ViewController {
                 Text text = (Text) node;
                 if (currentFilter.getSearchString() != null
                         && !currentFilter.getSearchString().equals("")
-                        && text.getText().contains(currentFilter.getSearchString()))
+                        && !text.getText().contains(currentFilter.getSearchString()))
+                    text.setVisible(false);
+                else if(currentFilter.getExcludeString() != null
+                        && !currentFilter.getExcludeString().equals("")
+                        && text.getText().contains(currentFilter.getExcludeString()))
                     text.setVisible(false);
                 else text.setVisible(true);
             }
@@ -91,11 +98,13 @@ public class FilterViewController extends ViewController {
 
     private void loadCurrentFilter() {
         searchText.setText(currentFilter.getSearchString());
+        excludeText.setText(currentFilter.getExcludeString());
         toggleUseTerm.setSelected(currentFilter.getUseTerm());
     }
 
     private void fillCurrentFilter() {
         currentFilter.setSearchString(searchText.getText());
+        currentFilter.setExcludeString(excludeText.getText());
         currentFilter.setUseTerm(toggleUseTerm.isSelected());
     }
 
