@@ -77,7 +77,7 @@
             </TabPane>
          </children>
       </VBox>
-      <HBox alignment="CENTER" prefWidth="199.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+      <HBox alignment="CENTER" prefWidth="199.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <children>
             <Button mnemonicParsing="false" onAction="#handleReset" text="Reset">
                <HBox.margin>
