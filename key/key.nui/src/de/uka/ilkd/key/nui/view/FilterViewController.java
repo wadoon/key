@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-@KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
+@KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
 public class FilterViewController extends ViewController {
 
     private Filter currentFilter;
