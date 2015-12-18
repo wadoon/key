@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,8 +20,8 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * Instances of this class encapsulate statistical information about proofs,
  * such as the number of nodes, or the number of interactions.
+ * 
  * @author bruns
- *
  */
 public class Statistics {
     public final int nodes;
@@ -38,23 +39,17 @@ public class Statistics {
     public final long timeInNano;
     public final float timePerStepInNano;
 
-    private List<Pair<String, String>> summaryList =
-                    new ArrayList<Pair<String, String>>(14);
+    public final HashMap<String, Integer> interactiveAppsDetails =
+            new HashMap<String, Integer>();
 
-    protected Statistics(int nodes,
-                       int branches,
-                       int interactiveSteps,
-                       int quantifierInstantiations,
-                       int ossApps,
-                       int joinRuleApps,
-                       int totalRuleApps,
-                       int smtSolverApps,
-                       int dependencyContractApps,
-                       int operationContractApps,
-                       int loopInvApps,
-                       long autoModeTimeInNano,
-                       long timeInNano,
-                       float timePerStepInNano) {
+    private List<Pair<String, String>> summaryList =
+            new ArrayList<Pair<String, String>>(14);
+
+    protected Statistics(int nodes, int branches, int interactiveSteps,
+            int quantifierInstantiations, int ossApps, int joinRuleApps,
+            int totalRuleApps, int smtSolverApps, int dependencyContractApps,
+            int operationContractApps, int loopInvApps,
+            long autoModeTimeInNano, long timeInNano, float timePerStepInNano) {
         this.nodes = nodes;
         this.branches = branches;
         this.interactiveSteps = interactiveSteps;
@@ -67,25 +62,17 @@ public class Statistics {
         this.operationContractApps = operationContractApps;
         this.loopInvApps = loopInvApps;
         this.autoModeTimeInNano = autoModeTimeInNano;
-        this.timeInNano = timeInNano/1000000;
+        this.timeInNano = timeInNano / 1000000;
         this.timePerStepInNano = timePerStepInNano;
     }
 
     static Statistics create(Statistics side, long creationTime) {
-    	return new Statistics(side.nodes,
-                                  side.branches,
-                                  side.interactiveSteps,
-                                  side.quantifierInstantiations,
-                                  side.ossApps,
-                                  side.joinRuleApps,
-                                  side.totalRuleApps,
-                                  side.smtSolverApps,
-                                  side.dependencyContractApps,
-                                  side.operationContractApps,
-                                  side.loopInvApps,
-                                  side.autoModeTimeInNano,
-                                  System.nanoTime() - creationTime,
-                                  side.timePerStepInNano);
+        return new Statistics(side.nodes, side.branches, side.interactiveSteps,
+                side.quantifierInstantiations, side.ossApps, side.joinRuleApps,
+                side.totalRuleApps, side.smtSolverApps,
+                side.dependencyContractApps, side.operationContractApps,
+                side.loopInvApps, side.autoModeTimeInNano, System.nanoTime()
+                        - creationTime, side.timePerStepInNano);
     }
 
     Statistics(Proof proof) {
@@ -113,6 +100,17 @@ public class Statistics {
 
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 tmpInteractive++;
+
+                final String ruleAppName =
+                        node.getAppliedRuleApp().rule().name().toString();
+
+                if (!interactiveAppsDetails.containsKey(ruleAppName)) {
+                    interactiveAppsDetails.put(ruleAppName, 1);
+                }
+                else {
+                    interactiveAppsDetails.put(ruleAppName,
+                            interactiveAppsDetails.get(ruleAppName) + 1);
+                }
             }
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
@@ -121,22 +119,30 @@ public class Statistics {
                 if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
                     tmpOss++;
                     final Protocol protocol =
-                                    ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                            ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp)
+                                    .getProtocol();
                     if (protocol != null) {
                         tmpOssCaptured += protocol.size() - 1;
                     }
-                } else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) {
+                }
+                else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) {
                     tmpSmt++;
-                } else if (ruleApp instanceof UseDependencyContractApp) {
+                }
+                else if (ruleApp instanceof UseDependencyContractApp) {
                     tmpDep++;
-                } else if (ruleApp instanceof ContractRuleApp) {
+                }
+                else if (ruleApp instanceof ContractRuleApp) {
                     tmpContr++;
-                } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
+                }
+                else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
                     tmpInv++;
-                } else if (ruleApp instanceof JoinRuleBuiltInRuleApp) {
+                }
+                else if (ruleApp instanceof JoinRuleBuiltInRuleApp) {
                     tmpJoinApps++;
-                } else if (ruleApp instanceof TacletApp) {
-                    final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
+                }
+                else if (ruleApp instanceof TacletApp) {
+                    final de.uka.ilkd.key.rule.Taclet t =
+                            ((TacletApp) ruleApp).taclet();
                     final String tName = t.name().toString();
                     if (tName.startsWith("allLeft")
                             || tName.startsWith("exRight")
@@ -153,80 +159,84 @@ public class Statistics {
         this.quantifierInstantiations = tmpQuant;
         this.ossApps = tmpOss;
         this.joinRuleApps = tmpJoinApps;
-        this.totalRuleApps = tmpNodes + tmpOssCaptured -1;
+        this.totalRuleApps = tmpNodes + tmpOssCaptured - 1;
         this.smtSolverApps = tmpSmt;
         this.dependencyContractApps = tmpDep;
         this.operationContractApps = tmpContr;
         this.loopInvApps = tmpInv;
         this.autoModeTimeInNano = proof.getAutoModeTime();
         this.timeInNano = (System.nanoTime() - proof.creationTime);
-        timePerStepInNano = nodes<=1? .0f: (autoModeTimeInNano/(float)(nodes-1));
+        timePerStepInNano =
+                nodes <= 1 ? .0f : (autoModeTimeInNano / (float) (nodes - 1));
 
         generateSummary(proof);
     }
 
     private void generateSummary(Proof proof) {
         Statistics stat = this;
-       
+
         boolean sideProofs = false;
-        if (proof instanceof InfFlowProof) { // TODO: get rid of that instanceof by subclassing
+        if (proof instanceof InfFlowProof) { // TODO: get rid of that instanceof
+                                             // by subclassing
             sideProofs = ((InfFlowProof) proof).hasSideProofs();
             if (sideProofs) {
-                final long autoTime = proof.getAutoModeTime()
-                        + ((InfFlowProof)proof).getSideProofStatistics().autoModeTimeInNano;
-                final SideProofStatistics side = ((InfFlowProof) proof).getSideProofStatistics().add(this).setAutoModeTime(autoTime);
+                final long autoTime =
+                        proof.getAutoModeTime()
+                                + ((InfFlowProof) proof)
+                                        .getSideProofStatistics().autoModeTimeInNano;
+                final SideProofStatistics side =
+                        ((InfFlowProof) proof).getSideProofStatistics()
+                                .add(this).setAutoModeTime(autoTime);
                 stat = Statistics.create(side, proof.creationTime);
-            } 
+            }
         }
 
         final String nodeString =
-                        EnhancedStringBuffer.format(stat.nodes).toString();
+                EnhancedStringBuffer.format(stat.nodes).toString();
         summaryList.add(new Pair<String, String>("Nodes", nodeString));
         summaryList.add(new Pair<String, String>("Branches",
-                        EnhancedStringBuffer.format(stat.branches).toString()));
-        summaryList.add(new Pair<String, String>("Interactive steps", "" +
-                        stat.interactiveSteps));
-        
-        
-        final long time = sideProofs ? stat.autoModeTimeInNano : proof.getAutoModeTime();
-        
+                EnhancedStringBuffer.format(stat.branches).toString()));
+        summaryList.add(new Pair<String, String>("Interactive steps", ""
+                + stat.interactiveSteps));
+
+        final long time =
+                sideProofs ? stat.autoModeTimeInNano : proof.getAutoModeTime();
+
         summaryList.add(new Pair<String, String>("Automode time",
-                        EnhancedStringBuffer.formatTime(time/1000000).toString()));
+                EnhancedStringBuffer.formatTime(time / 1000000).toString()));
         if (time >= 10000000000L) {
-            summaryList.add(new Pair<String, String>("Automode time", "" +
-                            (time/1000000) +
-                            "ms"));
+            summaryList.add(new Pair<String, String>("Automode time", ""
+                    + (time / 1000000) + "ms"));
         }
         if (stat.nodes > 0) {
-            String avgTime = "" + (stat.timePerStepInNano/1000000);
+            String avgTime = "" + (stat.timePerStepInNano / 1000000);
             // round to 3 digits after point
-            int i = avgTime.indexOf('.')+4;
-            if (i > avgTime.length()) i = avgTime.length();
-            avgTime = avgTime.substring(0,i);
-            summaryList.add(new Pair<String, String>("Avg. time per step", "" +
-                            avgTime +
-                            "ms"));
+            int i = avgTime.indexOf('.') + 4;
+            if (i > avgTime.length())
+                i = avgTime.length();
+            avgTime = avgTime.substring(0, i);
+            summaryList.add(new Pair<String, String>("Avg. time per step", ""
+                    + avgTime + "ms"));
         }
 
         summaryList.add(new Pair<String, String>("Rule applications", ""));
         summaryList.add(new Pair<String, String>("Quantifier instantiations",
-                                                 ""+stat.quantifierInstantiations));
-        summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
-                        stat.ossApps));
-        summaryList.add(new Pair<String, String>("SMT solver apps", "" +
-                        stat.smtSolverApps));
-        summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
-                        stat.dependencyContractApps));
-        summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
-                        stat.operationContractApps));
-        summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
-                        stat.loopInvApps));
-        summaryList.add(new Pair<String, String>("Join Rule apps", "" +
-                stat.joinRuleApps));
+                "" + stat.quantifierInstantiations));
+        summaryList.add(new Pair<String, String>("One-step Simplifier apps", ""
+                + stat.ossApps));
+        summaryList.add(new Pair<String, String>("SMT solver apps", ""
+                + stat.smtSolverApps));
+        summaryList.add(new Pair<String, String>("Dependency Contract apps", ""
+                + stat.dependencyContractApps));
+        summaryList.add(new Pair<String, String>("Operation Contract apps", ""
+                + stat.operationContractApps));
+        summaryList.add(new Pair<String, String>("Loop invariant apps", ""
+                + stat.loopInvApps));
+        summaryList.add(new Pair<String, String>("Join Rule apps", ""
+                + stat.joinRuleApps));
         summaryList.add(new Pair<String, String>("Total rule apps",
-                        EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
+                EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
     }
-
 
     public List<Pair<String, String>> getSummary() {
         return summaryList;
@@ -235,7 +245,7 @@ public class Statistics {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer("Proof Statistics:\n");
-        for (Pair<String,String> p: summaryList) {
+        for (Pair<String, String> p : summaryList) {
             final String c = p.first;
             final String s = p.second;
             sb = sb.append(c);
@@ -244,7 +254,7 @@ public class Statistics {
             }
             sb = sb.append('\n');
         }
-        sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
 
