@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nui.Context;
-import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;

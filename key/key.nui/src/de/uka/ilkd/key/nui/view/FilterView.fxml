@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
+<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="290.0" prefWidth="219.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
    <children>
       <VBox AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -25,29 +25,56 @@
                   </Button>
                </children>
             </HBox>
-            <HBox alignment="TOP_CENTER">
-               <children>
-                  <Label alignment="TOP_LEFT" text="Exclude:">
-                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </HBox.margin>
-                  </Label>
-                  <TextField fx:id="searchText" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </TextField>
-               </children>
-               <VBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </VBox.margin>
-            </HBox>
-            <CheckBox fx:id="toggleUseTerm" mnemonicParsing="false" text="Term">
-               <VBox.margin>
-                  <Insets left="20.0" />
-               </VBox.margin>
-            </CheckBox>
-            <TextFlow fx:id="dummy" prefHeight="185.0" prefWidth="206.0" />
+            <TabPane>
+               <tabs>
+                  <Tab closable="false" text="Filter">
+                     <content>
+                        <VBox>
+                           <children>
+                              <HBox alignment="TOP_CENTER">
+                                 <children>
+                                    <Label alignment="TOP_LEFT" text="Exclude:">
+                                       <HBox.margin>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="excludeText" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
+                                       <HBox.margin>
+                                          <Insets />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="TOP_CENTER">
+                                 <children>
+                                    <Label alignment="TOP_LEFT" text="Search:">
+                                       <HBox.margin>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="searchText" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
+                                       <HBox.margin>
+                                          <Insets />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                              </HBox>
+                              <CheckBox fx:id="toggleUseTerm" mnemonicParsing="false" text="Term" />
+                              <Label text="Dummy Textflow:" />
+                              <TextFlow fx:id="dummy" prefHeight="80.0" style="-fx-border-color: Black;" textAlignment="CENTER">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </VBox.margin>
+                              </TextFlow>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                     </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
          </children>
       </VBox>
       <HBox alignment="CENTER" prefWidth="199.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">

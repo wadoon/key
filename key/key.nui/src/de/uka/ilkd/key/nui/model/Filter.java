@@ -20,6 +20,16 @@ public class Filter {
         searchString = value;
     }
     
+    private String excludeString;
+    
+    public String getExcludeString(){
+        return excludeString;
+    }
+    
+    public void setExcludeString(String value){
+        excludeString = value;
+    }
+    
     private boolean useTerm;
     
     public boolean getUseTerm(){
@@ -37,12 +47,14 @@ public class Filter {
     public void reset(){
         useTerm = false;
         searchString = null;
+        excludeString = null;
     }
     
     public Filter Clone(){
         Filter filter = new Filter();
         filter.setName(this.name);
         filter.setSearchString(this.searchString);
+        filter.setExcludeString(this.excludeString);
         filter.setUseTerm(this.useTerm);
         return filter;
     }
