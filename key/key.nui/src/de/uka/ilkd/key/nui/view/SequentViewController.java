@@ -222,7 +222,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        context.getProofManager().loadProblem(new File("resources/proofs/gcd.closed.proof"));
+        context.getProofManager().setProof(new File("resources/proofs/gcd.closed.proof"));
         // File file = new File("resources/proofs/gcd.closed.proof");
         // mainApp.setProof(file);
         // showRootSequent();
