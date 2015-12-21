@@ -658,7 +658,7 @@ public final class StrategySelectionView extends JPanel {
                 StrategyProperties.NON_LIN_ARITH_NONE);
 
         newProps.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                StrategyProperties.QUANTIFIERS_NON_SPLITTING);
+                StrategyProperties.QUANTIFIERS_NONE);
 
         newProps.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
                 StrategyProperties.CLASS_AXIOM_OFF);
