@@ -518,6 +518,7 @@ public final class StrategySelectionView extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 setPredefBtn.setEnabled(true);
+                setPredefBtn.getActionListeners()[0].actionPerformed(null);
             }
         });
 
