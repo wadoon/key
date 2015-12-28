@@ -111,6 +111,15 @@ lexer grammar KeYJMLLexer;
     NOT_SPECIFIED        : '\\not_specified';
     NUM_OF               : '\\num_of';
     OLD                  : '\\old';
+    ONAT                 : '\\onat';       //KeY extension, not official JML
+    ORD                  : '\\ord';        //KeY extension, not official JML
+    ORDADD               : '\\ord_add' ;   //KeY extension, not official JML
+    ORDEXP               : '\\ord_exp';    //KeY extension, not official JML 
+    ORDMAX               : '\\ord_max' ;   //KeY extension, not official JML
+    ORDONE               : '\\o_1';        //KeY extension, not official JML
+    ORDOMEGA             : '\\omega' ;     //KeY extension, not official JML
+    ORDTIMES             : '\\ord_times' ; //KeY extension, not official JML
+    ORDZERO              : '\\o_0';        //KeY extension, not official JML
     PERMISSION           : '\\permission';
     PRE                  : '\\pre';
     PRODUCT              : '\\product';
