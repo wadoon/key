@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
-import java.security.spec.ECPrivateKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;

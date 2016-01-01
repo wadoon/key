@@ -25,10 +25,10 @@ public class ViewObserver implements Observer {
             if (info.getIsActive())
                 container.showView(info);
             else
-                container.hideView(info.getTitle());
+                container.hideView(info);
             container.checkViewMenuItem(info.getTitle(), info.getIsActive());
         }
         else
-            container.moveView(info.getTitle(), info.getCurrentPosition());
+            container.moveView(info, info.getCurrentPosition());
     }
 }

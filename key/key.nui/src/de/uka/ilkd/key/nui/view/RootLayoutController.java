@@ -17,11 +17,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
@@ -37,11 +33,9 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -107,7 +101,10 @@ public class RootLayoutController extends ViewController
 
     @FXML
     private Menu helpMenu;
-
+    
+    /**
+     * The constructor
+     */
     public RootLayoutController() {
         positionUsage = new HashMap<ViewPosition, Boolean>();
         positionUsage.put(ViewPosition.BOTTOMLEFT, false);
@@ -121,6 +118,9 @@ public class RootLayoutController extends ViewController
         views = new HashMap<>();
     }
 
+    /**
+     * Called once when the rootlayout is loaded.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         positionMapping.put(ViewPosition.BOTTOMLEFT, bottomLeft);
@@ -133,58 +133,43 @@ public class RootLayoutController extends ViewController
             v.setCenter(new TabPane());
             registerDragListeners(v.getCenter());
         });
-
-        // Load a standard proof when starting the program for testing purposes
-        // TODO Remove then following 3 lines and folder "resources/proofs" at
-        // end of project or when not needed anymore
-        // File file = new File("resources/proofs/gcd.closed.proof");
-        // proof = loadProof(file);
-        // statusLabel.setText("Proof loaded: " + file.getName());
     }
 
     /**
-     * Adds Drag&Drop acceptance to Pane
+     * Adds Drag&Drop acceptance to node
      * 
      * @param node
      */
     private void registerDragListeners(Node node) {
-        node.setOnDragOver(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() != node) {
-                    event.acceptTransferModes(TransferMode.MOVE);
-                }
-                event.consume();
+        node.setOnDragOver(event -> {
+            if (event.getGestureSource() != node) {
+                event.acceptTransferModes(TransferMode.MOVE);
             }
+            event.consume();
         });
-        node.setOnDragEntered(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() != node) {
-                    // node.setEffect(new Glow());
-                    node.setStyle(
-                            "-fx-padding: 1; -fx-background-color: yellow, -fx-control-inner-background; -fx-background-insets: 0, 1;");
-                }
-                event.consume();
+        node.setOnDragEntered(event -> {
+            if (event.getGestureSource() != node) {
+                // node.setEffect(new Glow());
+                node.setStyle(
+                        "-fx-padding: 1; -fx-background-color: yellow, -fx-control-inner-background; -fx-background-insets: 0, 1;");
             }
+            event.consume();
         });
-        node.setOnDragExited(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                // node.setEffect(null);
-                node.setStyle("");
-                event.consume();
-            }
+        node.setOnDragExited(event -> {
+            // node.setEffect(null);
+            node.setStyle("");
+            event.consume();
         });
-        node.setOnDragDropped(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                boolean success = false;
-                if (dragTab != null) {
-                    views.get(((Label) dragTab.getGraphic()).getText())
-                            .setCurrentPosition(getTabPosition(node));
-                    dragTab = null;
-                    success = true;
-                }
-                event.setDropCompleted(success);
-                event.consume();
+        node.setOnDragDropped(event -> {
+            boolean success = false;
+            if (dragTab != null) {
+                views.get(((Label) dragTab.getGraphic()).getText())
+                        .setCurrentPosition(getTabPosition(node));
+                dragTab = null;
+                success = true;
             }
+            event.setDropCompleted(success);
+            event.consume();
         });
     }
 
@@ -256,6 +241,9 @@ public class RootLayoutController extends ViewController
         statusLabel.setText(status);
     }
 
+    /**
+     * Sets status text to empty string.
+     */
     public void clearStatus() {
         setStatus("");
     }
@@ -273,6 +261,11 @@ public class RootLayoutController extends ViewController
 
     private Menu otherViewsMenu = null;
 
+    /**
+     * Sets selected to active where the menuitems title matches the given title.
+     * @param title The title of the menuitem which should be changed
+     * @param active true for check, false for uncheck
+     */
     public void checkViewMenuItem(String title, boolean active) {
         List<MenuItem> items = new LinkedList<>(viewsMenu.getItems());
         if (otherViewsMenu != null)
@@ -289,6 +282,11 @@ public class RootLayoutController extends ViewController
         }
     }
 
+    /**
+     * 
+     * @param info
+     * @param accelerator
+     */
     public void registerView(ViewInformation info, String accelerator) {
         if (views.containsKey(info.getTitle()))
             throw new RuntimeException("Multiple views with the same name");
@@ -296,12 +294,9 @@ public class RootLayoutController extends ViewController
         views.put(info.getTitle(), info);
         CheckMenuItem item = new CheckMenuItem();
         item.setText(info.getTitle());
-        item.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            public void changed(ObservableValue<? extends Boolean> ov,
-                    Boolean oldValue, Boolean newValue) {
-                info.setIsActive(newValue);
-                resize();
-            }
+        item.selectedProperty().addListener((ov, oldValue, newValue) -> {
+            info.setIsActive(newValue);
+            resize();
         });
         item.setSelected(info.getIsActive());
         if (!accelerator.equals(""))
@@ -323,6 +318,10 @@ public class RootLayoutController extends ViewController
         info.setIsActive(true);
     }
 
+    /**
+     * Shows view at its preferred viewposition
+     * @param view 
+     */
     public void showView(ViewInformation view) {
         Pane pane = (Pane) loadFxml(view.getFxmlPath());
         Tab tab;
@@ -334,7 +333,7 @@ public class RootLayoutController extends ViewController
             tab = createTab(view, pane);
             viewTabs.put(view.getTitle(), tab);
         }
-        setPosition(view.getTitle(), view.getPreferedPosition());
+        setPosition(view, view.getPreferedPosition());
     }
 
     /**
@@ -350,24 +349,21 @@ public class RootLayoutController extends ViewController
         t.setGraphic(l);
         t.setContent(node);
 
-        l.setOnDragDetected(new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent event) {
-                Dragboard db = l.startDragAndDrop(TransferMode.MOVE);
+        l.setOnDragDetected(event -> {
+            Dragboard db = l.startDragAndDrop(TransferMode.MOVE);
 
-                ClipboardContent content = new ClipboardContent();
-                content.putString(view.getTitle());
-                db.setContent(content);
-                dragTab = t;
-                event.consume();
-            }
+            ClipboardContent content = new ClipboardContent();
+            content.putString(view.getTitle());
+            db.setContent(content);
+            dragTab = t;
+            event.consume();
         });
 
-        t.setOnCloseRequest(new EventHandler<Event>() {
-            public void handle(Event event) {
-                view.setIsActive(false);
-            }
+        t.setOnCloseRequest(event -> {
+            view.setIsActive(false);
         });
-        l.setOnMouseClicked((event) -> {
+        
+        l.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
                 loadViewContextMenu(view).show(l, Side.TOP, event.getX(),
                         event.getY());
@@ -376,33 +372,36 @@ public class RootLayoutController extends ViewController
         return t;
     }
 
-    public void hideView(String title) {
-        Tab tab = viewTabs.get(title);
+    /**
+     * Hides the view which belongs to given ViewInformation
+     * @param view
+     */
+    public void hideView(ViewInformation view) {
+        Tab tab = viewTabs.get(view.getTitle());
         TabPane tabPane = tab.getTabPane();
         tabPane.getTabs().remove(tab);
         if (tabPane.getTabs().size() == 0) {
-            // System.out.println(getViewPosition(tabPane.getParent()));
             positionUsage.put(getViewPosition(tabPane.getParent()), false);
         }
         resize();
     }
 
-    public void moveView(String title, ViewPosition next) {
-        hideView(title);
-        setPosition(title, next);
+    /**
+     * Moves the view which belongs to given ViewInformation to ViewPosition next
+     * @param view
+     * @param next
+     */
+    public void moveView(ViewInformation view, ViewPosition next) {
+        hideView(view);
+        setPosition(view, next);
     }
 
-    /*
-     * private Node getView(ViewPosition pos) { BorderPane container =
-     * positionMapping.get(pos);
-     * 
-     * if (container != null && container.getChildren().size() == 1) return
-     * container.getChildren().get(0); else return null; }
+    /**
+     * @param node
+     * @return 
      */
-
     public ViewPosition getTabPosition(Node node) {
         for (ViewPosition key : positionMapping.keySet()) {
-            // System.out.println(positionMapping.get(key));
             if (positionMapping.get(key).getChildren().size() == 1
                     && positionMapping.get(key).getChildren().get(0) == node)
                 return key;
@@ -410,23 +409,30 @@ public class RootLayoutController extends ViewController
         return null;
     }
 
+    /**
+     * @param node
+     * @return ViewPosition where the given node is currently placed.
+     */
     public ViewPosition getViewPosition(Node node) {
         for (ViewPosition key : positionMapping.keySet()) {
-            // System.out.println(positionMapping.get(key));
             if (positionMapping.get(key) == node)
                 return key;
         }
         return null;
     }
 
-    private void setPosition(String title, ViewPosition position) {
+    private void setPosition(ViewInformation view, ViewPosition position) {
         TabPane container = (TabPane) positionMapping.get(position).getCenter();
-        container.getTabs().add(viewTabs.get(title));
-        container.getSelectionModel().select(viewTabs.get(title));
+        container.getTabs().add(viewTabs.get(view.getTitle()));
+        container.getSelectionModel().select(viewTabs.get(view.getTitle()));
         positionUsage.put(position, true);
         resize();
     }
 
+    /**
+     * Resizes the splitpanes which build the main frame
+     * TODO needs to be redone, as it currently is kind of a hack.
+     */
     public void resize() {
         mainSplitPane.setDividerPositions(0.0, 1.0);
         if (positionUsage.get(ViewPosition.TOPLEFT)) {
@@ -460,6 +466,10 @@ public class RootLayoutController extends ViewController
         }
     }
 
+    /**
+     * 
+     * @param sourcePath
+     */
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
         menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),

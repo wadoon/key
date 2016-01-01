@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.Proof;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -72,19 +71,6 @@ public class SequentViewController extends ViewController {
 
     @FXML
     private TextField searchBox;
-
-    private EventHandler<MouseEvent> mousehandler = new EventHandler<MouseEvent>() {
-
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-
-            System.out.println(
-                    mouseEvent.getEventType() + "\n" + "X : Y - " + mouseEvent.getX() + " : " + mouseEvent.getY() + "\n"
-                            + "SceneX : SceneY - " + mouseEvent.getSceneX() + " : " + mouseEvent.getSceneY() + "\n"
-                            + "ScreenX : ScreenY - " + mouseEvent.getScreenX() + " : " + mouseEvent.getScreenY());
-
-        }
-    };
 
     /**
      * The constructor. The constructor is called before the initialize()
@@ -226,24 +212,6 @@ public class SequentViewController extends ViewController {
         // File file = new File("resources/proofs/gcd.closed.proof");
         // mainApp.setProof(file);
         // showRootSequent();
-    }
-
-    // TODO replace
-    private void highlight(String s) {
-        if (!s.isEmpty()) {
-            String text = proofString;
-            int lastIndex = 0;
-            while (lastIndex != -1) {
-                lastIndex = text.indexOf(s, lastIndex);
-
-                if (lastIndex != -1) {
-                    // TODO instead of printing the index, it should be
-                    // highlighted in the textArea
-                    System.out.println(lastIndex);
-                    lastIndex += s.length();
-                }
-            }
-        }
     }
 
     private void updateHtml(String s) {
