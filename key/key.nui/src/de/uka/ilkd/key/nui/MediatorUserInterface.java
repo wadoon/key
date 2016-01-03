@@ -2,6 +2,8 @@ package de.uka.ilkd.key.nui;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -12,19 +14,28 @@ import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 public class MediatorUserInterface
         extends AbstractMediatorUserInterfaceControl {
 
     private IStatusManager statusManager;
     private KeYMediator mediator;
-    private final LinkedList<InteractiveRuleApplicationCompletion> completions =
-            new LinkedList<InteractiveRuleApplicationCompletion>();
+    private final LinkedList<InteractiveRuleApplicationCompletion> completions = new LinkedList<InteractiveRuleApplicationCompletion>();
 
     public MediatorUserInterface(IStatusManager statusManager) {
         this.statusManager = statusManager;
@@ -41,7 +52,8 @@ public class MediatorUserInterface
     public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app,
             Goal goal, boolean forced) {
         if (getMediator().isInAutoMode()) {
-            return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
+            return AbstractProofControl.completeBuiltInRuleAppByDefault(app,
+                    goal, forced);
         }
         IBuiltInRuleApp result = app;
         for (InteractiveRuleApplicationCompletion compl : completions) {
@@ -67,14 +79,12 @@ public class MediatorUserInterface
 
     @Override
     public void progressStarted(Object sender) {
-        // TODO Auto-generated method stub
-
+        mediator.stopInterface(true);
     }
 
     @Override
     public void progressStopped(Object sender) {
-        // TODO Auto-generated method stub
-
+        mediator.startInterface(true);
     }
 
     @Override
@@ -115,19 +125,20 @@ public class MediatorUserInterface
         // TODO Auto-generated method stub
 
     }
-    
+
     @Override
     public KeYMediator getMediator() {
         return mediator;
     }
-    
-    public void setMediator(KeYMediator value){
+
+    public void setMediator(KeYMediator value) {
         mediator = value;
     }
 
     @Override
     public void loadProblem(File file) {
-        getProblemLoader(file, null, null, null, getMediator()).runAsynchronously();
+        getProblemLoader(file, null, null, null, getMediator())
+                .runAsynchronously();
     }
 
     @Override
@@ -135,5 +146,57 @@ public class MediatorUserInterface
         // TODO Auto-generated method stub
 
     }
+    
+    @Override
+    public void taskProgress(int position) {
+        super.taskProgress(position);
+       // mainWindow.getStatusLine().setProgress(position);
 
+    }
+
+    @Override
+    public void taskStarted(TaskStartedInfo info) {
+        super.taskStarted(info);
+      //  mainWindow.setStatusLine(info.getMessage(), info.getSize());
+    }
+    
+    @Override
+    public void loadingStarted(AbstractProblemLoader loader) {
+       getMediator().stopInterface(true);
+       super.loadingStarted(loader);
+    }
+
+    //TODO: remove unnecessary code - just copied from WindowUserInterfaceController
+    @Override
+    public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+       super.loadingFinished(loader, poContainer, proofList, result);
+       if (proofList != null) {
+          getMediator().setProof(loader.getProof());
+          if (result != null) {
+              if ("".equals(result.getStatus())) {
+                  this.resetStatus(this);
+               } else {
+                  this.reportStatus(this, result.getStatus());                         
+               }
+              getMediator().getSelectionModel().setSelectedNode(result.getNode());
+              if (result.hasErrors()) {
+                  throw new ProblemLoaderException(loader,
+                        "Proof could only be loaded partially.\n" +
+                              "In summary " + result.getErrorList().size() +
+                              " not loadable rule application(s) have been detected.\n" +
+                              "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
+              }
+          } else {
+             // should never happen as replay always returns a result object
+              //TODO (DS): Why is it then there? If this happens, we will get\\
+              // a NullPointerException just a line below...
+             getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
+          }
+
+       }
+         getMediator().resetNrGoalsClosedByHeuristics();
+         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+             ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+         }
+    }
 }

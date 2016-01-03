@@ -20,6 +20,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
@@ -44,16 +45,23 @@ public class SequentViewController extends ViewController {
 
         @Override
         public void proofUpdated(ProofEvent proofEvent) {
-            showRootSequent();
+            // execute ui update on javafx thread
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    showRootSequent();
+                }
+            });
+
         }
     };
 
     // @FXML
     // private TextArea textArea;
-    
+
     @FXML
     private ToggleButton searchButton;
-    
+
     @FXML
     private Pane searchParent;
 
@@ -62,7 +70,7 @@ public class SequentViewController extends ViewController {
 
     @FXML
     private CheckBox checkBoxUnicode;
-    
+
     @FXML
     private CheckBox checkBoxRegexSearch;
 
@@ -87,7 +95,7 @@ public class SequentViewController extends ViewController {
         checkBoxUnicode.setDisable(true);
         searchButton.setDisable(true);
     }
-    
+
     @Override
     public void initializeAfterLoadingFxml() {
         context.getProofManager().addProofListener(proofChangeListener);
@@ -120,7 +128,7 @@ public class SequentViewController extends ViewController {
             }
         });
     }
-    
+
     @FXML
     private void toggleSearch() {
         searchParent.managedProperty().bind(searchParent.visibleProperty());
@@ -182,12 +190,12 @@ public class SequentViewController extends ViewController {
             printSequent();
         }
     }
-    
+
     /**
      * Enables/Disables Regex Search
      */
     @FXML
-    private void useRegex(){
+    private void useRegex() {
         printer.setUseRegex(checkBoxRegexSearch.isSelected());
     }
     /**
