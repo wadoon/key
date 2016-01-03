@@ -27,7 +27,7 @@ public class ProofManager {
         MediatorUserInterface userInterface = new MediatorUserInterface(statusManager);
         mediator = new KeYMediator(userInterface);
         userInterface.setMediator(mediator);
-        mediator.addKeYSelectionListener(new DummyProofListener());
+        mediator.addKeYSelectionListener(new ProofListener());
     }
 
     public synchronized void addProofListener(IProofListener proofListener) {
@@ -69,7 +69,7 @@ public class ProofManager {
        // fireProofUpdatedEvent();
     }
 
-    class DummyProofListener implements  KeYSelectionListener {
+    class ProofListener implements  KeYSelectionListener {
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
             if (mediator.isInAutoMode()) {
