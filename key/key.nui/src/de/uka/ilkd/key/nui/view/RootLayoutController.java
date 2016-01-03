@@ -17,6 +17,10 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
+import de.uka.ilkd.key.util.Debug;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -228,7 +232,7 @@ public class RootLayoutController extends ViewController
             setStatus("No File Selected");
             return;
         }
-        context.getProofManager().setProof(file);
+        context.getProofManager().loadProblem(file);
     }
 
     /**
@@ -238,7 +242,14 @@ public class RootLayoutController extends ViewController
      *            Status to be set.
      */
     public void setStatus(String status) {
-        statusLabel.setText(status);
+        // execute ui update on javafx thread
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                statusLabel.setText(status);
+            }
+        });
+        System.out.println(status);
     }
 
     /**
@@ -536,6 +547,6 @@ public class RootLayoutController extends ViewController
     @Override
     public void initializeAfterLoadingFxml() {
         // TODO Auto-generated method stub
-        
+
     }
 }
