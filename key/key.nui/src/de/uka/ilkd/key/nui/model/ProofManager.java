@@ -2,22 +2,15 @@ package de.uka.ilkd.key.nui.model;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
-import de.uka.ilkd.key.nui.model.ProofManager.DummyProofListener;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.settings.SettingsListener;
 
 public class ProofManager {
     private Proof proof;
@@ -75,32 +68,6 @@ public class ProofManager {
      //   statusManager.setStatus("Proof loaded: " + proofFile.getName());
        // fireProofUpdatedEvent();
     }
-
-//    /**
-//     * Loads the given proof file. Checks if the proof file exists and the proof
-//     * is not null, and fails if the proof could not be loaded.
-//     *
-//     * @param proofFileName
-//     *            The file name of the proof file to load.
-//     * @return The loaded proof.
-//     */
-//    private Proof loadProof(File proofFile) {
-//        // File proofFile = new File("../" + proofFileName);
-//        
-//        try {
-//            KeYEnvironment<?> environment = KeYEnvironment.load(
-//                    JavaProfile.getDefaultInstance(), proofFile, null, null,
-//                    null, true);
-//            Proof proof = environment.getLoadedProof();
-//
-//            return proof;
-//        }
-//        catch (ProblemLoaderException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-//    
 
     class DummyProofListener implements  KeYSelectionListener {
         @Override
