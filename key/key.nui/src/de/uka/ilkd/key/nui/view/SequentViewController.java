@@ -20,6 +20,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
@@ -44,16 +45,23 @@ public class SequentViewController extends ViewController {
 
         @Override
         public void proofUpdated(ProofEvent proofEvent) {
-            showRootSequent();
+            // execute ui update on javafx thread
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    showRootSequent();
+                }
+            });
+
         }
     };
 
     // @FXML
     // private TextArea textArea;
-    
+
     @FXML
     private ToggleButton searchButton;
-    
+
     @FXML
     private Pane searchParent;
 
@@ -62,7 +70,7 @@ public class SequentViewController extends ViewController {
 
     @FXML
     private CheckBox checkBoxUnicode;
-    
+
     @FXML
     private CheckBox checkBoxRegexSearch;
 
@@ -87,7 +95,7 @@ public class SequentViewController extends ViewController {
         checkBoxUnicode.setDisable(true);
         searchButton.setDisable(true);
     }
-    
+
     @Override
     public void initializeAfterLoadingFxml() {
         context.getProofManager().addProofListener(proofChangeListener);
@@ -97,8 +105,8 @@ public class SequentViewController extends ViewController {
         searchBox.setText("Search...");
         searchBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue,
-                    Boolean newPropertyValue) {
+            public void changed(ObservableValue<? extends Boolean> arg0,
+                    Boolean oldPropertyValue, Boolean newPropertyValue) {
                 if (newPropertyValue) {
                     if (searchBox.getText().equals("Search..."))
                         searchBox.setText("");
@@ -120,7 +128,7 @@ public class SequentViewController extends ViewController {
             }
         });
     }
-    
+
     @FXML
     private void toggleSearch() {
         searchParent.managedProperty().bind(searchParent.visibleProperty());
@@ -136,7 +144,8 @@ public class SequentViewController extends ViewController {
         services = proof.getServices();
         sequent = proof.root().sequent();
 
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         printSequent();
 
         checkBoxPrettySyntax.setDisable(false);
@@ -151,7 +160,8 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void usePrettySyntax() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         if (!checkBoxPrettySyntax.isSelected()) {
             notationInfo.refresh(services, false, false);
             checkBoxUnicode.setSelected(false);
@@ -171,7 +181,8 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void useUnicode() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         if (!checkBoxUnicode.isSelected()) {
             notationInfo.refresh(services, true, false);
             printSequent();
@@ -182,14 +193,15 @@ public class SequentViewController extends ViewController {
             printSequent();
         }
     }
-    
+
     /**
      * Enables/Disables Regex Search
      */
     @FXML
-    private void useRegex(){
+    private void useRegex() {
         printer.setUseRegex(checkBoxRegexSearch.isSelected());
     }
+
     /**
      * Helper method to print a sequent into the webview.
      */
@@ -197,7 +209,8 @@ public class SequentViewController extends ViewController {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
 
-        printer = new SequentPrinter("resources/css/sequentStyle.css", "resources/css/sequentClasses.ini");
+        printer = new SequentPrinter("resources/css/sequentStyle.css",
+                "resources/css/sequentClasses.ini");
         sequentLoaded = true;
         // System.out.println(printer.escape(proofString));
         updateHtml(printer.printSequent(proofString));
@@ -208,7 +221,8 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        context.getProofManager().setProof(new File("resources/proofs/gcd.closed.proof"));
+        context.getProofManager()
+                .loadProblem(new File("resources/proofs/gcd.closed.proof"));
         // File file = new File("resources/proofs/gcd.closed.proof");
         // mainApp.setProof(file);
         // showRootSequent();
