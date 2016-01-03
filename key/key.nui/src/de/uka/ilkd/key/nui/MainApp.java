@@ -60,20 +60,18 @@ public class MainApp extends Application {
 
             // Show the scene containing the root layout.
             scene = new Scene(rootLayout);
-            scene.widthProperty().addListener(new ChangeListener<Number>() {
-                @Override
-                public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth,
-                        Number newSceneWidth) {
-                    ((RootLayoutController) loader.getController()).resize();
-                }
+            
+            rootLayout.prefHeightProperty().bind(scene.heightProperty());
+            
+            scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
+                ((RootLayoutController) loader.getController()).resize();
             });
-            scene.heightProperty().addListener(new ChangeListener<Number>() {
-                @Override
-                public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight,
-                        Number newSceneHeight) {
-                    ((RootLayoutController) loader.getController()).resize();
-                }
+            /*
+            scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> {
+                ((RootLayoutController) loader.getController()).resize();
             });
+           */
+            
             primaryStage.setScene(scene);
 
             // Give the controller access to the main app.
