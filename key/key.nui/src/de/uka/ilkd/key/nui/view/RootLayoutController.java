@@ -17,10 +17,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
-import de.uka.ilkd.key.util.Debug;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -105,7 +102,7 @@ public class RootLayoutController extends ViewController
 
     @FXML
     private Menu helpMenu;
-    
+
     /**
      * The constructor
      */
@@ -273,9 +270,13 @@ public class RootLayoutController extends ViewController
     private Menu otherViewsMenu = null;
 
     /**
-     * Sets selected to active where the menuitems title matches the given title.
-     * @param title The title of the menuitem which should be changed
-     * @param active true for check, false for uncheck
+     * Sets selected to active where the menuitems title matches the given
+     * title.
+     * 
+     * @param title
+     *            The title of the menuitem which should be changed
+     * @param active
+     *            true for check, false for uncheck
      */
     public void checkViewMenuItem(String title, boolean active) {
         List<MenuItem> items = new LinkedList<>(viewsMenu.getItems());
@@ -331,7 +332,8 @@ public class RootLayoutController extends ViewController
 
     /**
      * Shows view at its preferred viewposition
-     * @param view 
+     * 
+     * @param view
      */
     public void showView(ViewInformation view) {
         Pane pane = (Pane) loadFxml(view.getFxmlPath());
@@ -373,7 +375,7 @@ public class RootLayoutController extends ViewController
         t.setOnCloseRequest(event -> {
             view.setIsActive(false);
         });
-        
+
         l.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
                 loadViewContextMenu(view).show(l, Side.TOP, event.getX(),
@@ -385,6 +387,7 @@ public class RootLayoutController extends ViewController
 
     /**
      * Hides the view which belongs to given ViewInformation
+     * 
      * @param view
      */
     public void hideView(ViewInformation view) {
@@ -398,7 +401,9 @@ public class RootLayoutController extends ViewController
     }
 
     /**
-     * Moves the view which belongs to given ViewInformation to ViewPosition next
+     * Moves the view which belongs to given ViewInformation to ViewPosition
+     * next
+     * 
      * @param view
      * @param next
      */
@@ -409,7 +414,7 @@ public class RootLayoutController extends ViewController
 
     /**
      * @param node
-     * @return 
+     * @return
      */
     public ViewPosition getTabPosition(Node node) {
         for (ViewPosition key : positionMapping.keySet()) {
@@ -441,8 +446,8 @@ public class RootLayoutController extends ViewController
     }
 
     /**
-     * Resizes the splitpanes which build the main frame
-     * TODO needs to be redone, as it currently is kind of a hack.
+     * Resizes the splitpanes which build the main frame TODO needs to be
+     * redone, as it currently is kind of a hack.
      */
     public void resize() {
         mainSplitPane.setDividerPositions(0.0, 1.0);

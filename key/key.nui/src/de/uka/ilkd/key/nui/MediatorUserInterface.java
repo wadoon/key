@@ -146,57 +146,69 @@ public class MediatorUserInterface
         // TODO Auto-generated method stub
 
     }
-    
+
     @Override
     public void taskProgress(int position) {
         super.taskProgress(position);
-       // mainWindow.getStatusLine().setProgress(position);
+        // mainWindow.getStatusLine().setProgress(position);
 
     }
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-      //  mainWindow.setStatusLine(info.getMessage(), info.getSize());
+        // mainWindow.setStatusLine(info.getMessage(), info.getSize());
     }
-    
+
     @Override
     public void loadingStarted(AbstractProblemLoader loader) {
-       getMediator().stopInterface(true);
-       super.loadingStarted(loader);
+        getMediator().stopInterface(true);
+        super.loadingStarted(loader);
     }
 
-    //TODO: remove unnecessary code - just copied from WindowUserInterfaceController
+    // TODO: remove unnecessary code - just copied from
+    // WindowUserInterfaceController
     @Override
-    public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
-       super.loadingFinished(loader, poContainer, proofList, result);
-       if (proofList != null) {
-          getMediator().setProof(loader.getProof());
-          if (result != null) {
-              if ("".equals(result.getStatus())) {
-                  this.resetStatus(this);
-               } else {
-                  this.reportStatus(this, result.getStatus());                         
-               }
-              getMediator().getSelectionModel().setSelectedNode(result.getNode());
-              if (result.hasErrors()) {
-                  throw new ProblemLoaderException(loader,
-                        "Proof could only be loaded partially.\n" +
-                              "In summary " + result.getErrorList().size() +
-                              " not loadable rule application(s) have been detected.\n" +
-                              "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
-              }
-          } else {
-             // should never happen as replay always returns a result object
-              //TODO (DS): Why is it then there? If this happens, we will get\\
-              // a NullPointerException just a line below...
-             getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
-          }
+    public void loadingFinished(AbstractProblemLoader loader,
+            LoadedPOContainer poContainer, ProofAggregate proofList,
+            ReplayResult result) throws ProblemLoaderException {
+        super.loadingFinished(loader, poContainer, proofList, result);
+        if (proofList != null) {
+            getMediator().setProof(loader.getProof());
+            if (result != null) {
+                if ("".equals(result.getStatus())) {
+                    this.resetStatus(this);
+                }
+                else {
+                    this.reportStatus(this, result.getStatus());
+                }
+                getMediator().getSelectionModel()
+                        .setSelectedNode(result.getNode());
+                if (result.hasErrors()) {
+                    throw new ProblemLoaderException(loader,
+                            "Proof could only be loaded partially.\n"
+                                    + "In summary "
+                                    + result.getErrorList().size()
+                                    + " not loadable rule application(s) have been detected.\n"
+                                    + "The first one:\n"
+                                    + result.getErrorList().get(0).getMessage(),
+                            result.getErrorList().get(0));
+                }
+            }
+            else {
+                // should never happen as replay always returns a result object
+                // TODO (DS): Why is it then there? If this happens, we will
+                // get\\
+                // a NullPointerException just a line below...
+                getMediator().getSelectionModel()
+                        .setSelectedNode(loader.getProof().root());
+            }
 
-       }
-         getMediator().resetNrGoalsClosedByHeuristics();
-         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-             ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-         }
+        }
+        getMediator().resetNrGoalsClosedByHeuristics();
+        if (poContainer != null && poContainer
+                .getProofOblInput() instanceof KeYUserProblemFile) {
+            ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
+        }
     }
 }

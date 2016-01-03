@@ -20,11 +20,14 @@ public class ProofManager {
 
     /**
      * Creates a new Proofmanager
-     * @param status a StatusManager to print status texts to
+     * 
+     * @param status
+     *            a StatusManager to print status texts to
      */
     public ProofManager(IStatusManager statusManager) {
         this.statusManager = statusManager;
-        MediatorUserInterface userInterface = new MediatorUserInterface(statusManager);
+        MediatorUserInterface userInterface = new MediatorUserInterface(
+                statusManager);
         mediator = new KeYMediator(userInterface);
         userInterface.setMediator(mediator);
         mediator.addKeYSelectionListener(new ProofListener());
@@ -45,7 +48,7 @@ public class ProofManager {
             ((IProofListener) listeners.next()).proofUpdated(proofEvent);
         }
     }
-    
+
     /**
      * Getter method for a proof.
      * 
@@ -65,11 +68,11 @@ public class ProofManager {
         // this.proof.setProofFile(proofFile);
         statusManager.setStatus("Loading Proof...");
         mediator.getUI().loadProblem(proofFile);
-     //   statusManager.setStatus("Proof loaded: " + proofFile.getName());
-       // fireProofUpdatedEvent();
+        // statusManager.setStatus("Proof loaded: " + proofFile.getName());
+        // fireProofUpdatedEvent();
     }
 
-    class ProofListener implements  KeYSelectionListener {
+    class ProofListener implements KeYSelectionListener {
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
             if (mediator.isInAutoMode()) {

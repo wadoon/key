@@ -105,8 +105,8 @@ public class SequentViewController extends ViewController {
         searchBox.setText("Search...");
         searchBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue,
-                    Boolean newPropertyValue) {
+            public void changed(ObservableValue<? extends Boolean> arg0,
+                    Boolean oldPropertyValue, Boolean newPropertyValue) {
                 if (newPropertyValue) {
                     if (searchBox.getText().equals("Search..."))
                         searchBox.setText("");
@@ -144,7 +144,8 @@ public class SequentViewController extends ViewController {
         services = proof.getServices();
         sequent = proof.root().sequent();
 
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         printSequent();
 
         checkBoxPrettySyntax.setDisable(false);
@@ -159,7 +160,8 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void usePrettySyntax() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         if (!checkBoxPrettySyntax.isSelected()) {
             notationInfo.refresh(services, false, false);
             checkBoxUnicode.setSelected(false);
@@ -179,7 +181,8 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void useUnicode() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         if (!checkBoxUnicode.isSelected()) {
             notationInfo.refresh(services, true, false);
             printSequent();
@@ -198,6 +201,7 @@ public class SequentViewController extends ViewController {
     private void useRegex() {
         printer.setUseRegex(checkBoxRegexSearch.isSelected());
     }
+
     /**
      * Helper method to print a sequent into the webview.
      */
@@ -205,7 +209,8 @@ public class SequentViewController extends ViewController {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
 
-        printer = new SequentPrinter("resources/css/sequentStyle.css", "resources/css/sequentClasses.ini");
+        printer = new SequentPrinter("resources/css/sequentStyle.css",
+                "resources/css/sequentClasses.ini");
         sequentLoaded = true;
         // System.out.println(printer.escape(proofString));
         updateHtml(printer.printSequent(proofString));
@@ -216,7 +221,8 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        context.getProofManager().loadProblem(new File("resources/proofs/gcd.closed.proof"));
+        context.getProofManager()
+                .loadProblem(new File("resources/proofs/gcd.closed.proof"));
         // File file = new File("resources/proofs/gcd.closed.proof");
         // mainApp.setProof(file);
         // showRootSequent();
