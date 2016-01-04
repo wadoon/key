@@ -8,13 +8,20 @@ import de.uka.ilkd.key.nui.ViewPosition;
 public class ViewInformation extends Observable {
 
     public ViewInformation(String title, URL pathToFxml,
-            ViewPosition preferedPosition) {
+            ViewPosition preferedPosition, boolean hasMenuItem) {
         fxmlPath = pathToFxml;
         this.preferedPosition = preferedPosition;
         currentPosition = preferedPosition;
         this.title = title;
+        this.hasMenuItem = hasMenuItem;
     }
 
+    private boolean hasMenuItem;
+    
+    public boolean hasMenuItem() {
+        return hasMenuItem;
+    }
+    
     private URL fxmlPath;
 
     public URL getFxmlPath() {
