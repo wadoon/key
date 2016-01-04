@@ -10,7 +10,6 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.IProofListener;
-import de.uka.ilkd.key.nui.model.ProofEvent;
 import de.uka.ilkd.key.nui.util.PositionConverter;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -23,7 +22,6 @@ import javafx.scene.layout.Pane;
 import javafx.application.Platform;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -126,7 +124,7 @@ public class SequentViewController extends ViewController {
      * displayed
      */
     private void showRootSequent() {
-        Proof proof = context.getProofManager().getProof();
+        Proof proof = context.getProofManager().getMediator().getSelectedProof();
         services = proof.getServices();
         sequent = proof.root().sequent();
 
