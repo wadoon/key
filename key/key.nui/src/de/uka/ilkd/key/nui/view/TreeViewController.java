@@ -7,7 +7,6 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import javafx.application.Platform;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
@@ -35,8 +34,6 @@ public class TreeViewController extends ViewController {
     }
 
     private void createSwingContent(final SwingNode swingNode) {
-        Platform.runLater(() -> {
-            swingNode.setContent(proofTreeView);
-        });
+        swingNode.setContent(proofTreeView);
     }
 }
