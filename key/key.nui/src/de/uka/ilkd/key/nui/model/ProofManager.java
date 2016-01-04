@@ -18,6 +18,10 @@ public class ProofManager {
     private List<IProofListener> listeners = new ArrayList<IProofListener>();
     private KeYMediator mediator;
 
+    public KeYMediator getMediator() {
+        return mediator;
+    }
+
     /**
      * Creates a new Proofmanager
      * 
@@ -26,8 +30,7 @@ public class ProofManager {
      */
     public ProofManager(IStatusManager statusManager) {
         this.statusManager = statusManager;
-        MediatorUserInterface userInterface = new MediatorUserInterface(
-                statusManager);
+        MediatorUserInterface userInterface = new MediatorUserInterface(statusManager);
         mediator = new KeYMediator(userInterface);
         userInterface.setMediator(mediator);
         mediator.addKeYSelectionListener(new ProofListener());
