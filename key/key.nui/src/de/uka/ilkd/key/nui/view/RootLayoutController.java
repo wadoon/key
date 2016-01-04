@@ -240,11 +240,8 @@ public class RootLayoutController extends ViewController
      */
     public void setStatus(String status) {
         // execute ui update on javafx thread
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
+        Platform.runLater(() -> {
                 statusLabel.setText(status);
-            }
         });
         System.out.println(status);
     }
@@ -304,28 +301,29 @@ public class RootLayoutController extends ViewController
             throw new RuntimeException("Multiple views with the same name");
 
         views.put(info.getTitle(), info);
-        CheckMenuItem item = new CheckMenuItem();
-        item.setText(info.getTitle());
-        item.selectedProperty().addListener((ov, oldValue, newValue) -> {
-            info.setIsActive(newValue);
-            resize();
-        });
-        item.setSelected(info.getIsActive());
-        if (!accelerator.equals(""))
-            item.setAccelerator(KeyCombination.valueOf(accelerator));
-
-        // make overflow menu "Others" if items exceed max
-        if (viewsMenu.getItems().size() < MaxMenuEntries) {
-            viewsMenu.getItems().add(item);
-        }
-        else {
-            if (otherViewsMenu == null) {
-                otherViewsMenu = new Menu("Other");
-                viewsMenu.getItems().add(otherViewsMenu);
+        if (info.hasMenuItem()) {
+            CheckMenuItem item = new CheckMenuItem();
+            item.setText(info.getTitle());
+            item.selectedProperty().addListener((ov, oldValue, newValue) -> {
+                info.setIsActive(newValue);
+                resize();
+            });
+            item.setSelected(info.getIsActive());
+            if (!accelerator.equals(""))
+                item.setAccelerator(KeyCombination.valueOf(accelerator));
+    
+            // make overflow menu "Others" if items exceed max
+            if (viewsMenu.getItems().size() < MaxMenuEntries) {
+                viewsMenu.getItems().add(item);
             }
-            otherViewsMenu.getItems().add(item);
+            else {
+                if (otherViewsMenu == null) {
+                    otherViewsMenu = new Menu("Other");
+                    viewsMenu.getItems().add(otherViewsMenu);
+                }
+                otherViewsMenu.getItems().add(item);
+            }
         }
-
         // dummy until last opened or config was developed
         info.setIsActive(true);
     }

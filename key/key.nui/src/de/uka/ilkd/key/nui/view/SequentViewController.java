@@ -10,27 +10,24 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.IProofListener;
-import de.uka.ilkd.key.nui.model.ProofEvent;
+import de.uka.ilkd.key.nui.util.PositionConverter;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
-@KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER)
-
+@KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = false)
 public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
@@ -41,20 +38,14 @@ public class SequentViewController extends ViewController {
     private NotationInfo notationInfo = new NotationInfo();
     private Services services;
     private Sequent sequent;
-    private IProofListener proofChangeListener = new IProofListener() {
-
-        @Override
-        public void proofUpdated(ProofEvent proofEvent) {
-            // execute ui update on javafx thread
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    showRootSequent();
-                }
-            });
-
-        }
+    private IProofListener proofChangeListener = (proofEvent) -> {
+        // execute ui update on javafx thread
+        Platform.runLater(() -> {
+            // When loading a new proof the root sequent is shown.
+            showSequent(context.getProofManager().getMediator().getSelectedNode());
+        });
     };
+    private PositionConverter posConverter;
 
     // @FXML
     // private TextArea textArea;
@@ -94,6 +85,8 @@ public class SequentViewController extends ViewController {
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
         searchButton.setDisable(true);
+        printer = new SequentPrinter("resources/css/sequentStyle.css",
+                "resources/css/sequentClasses.ini");
     }
 
     @Override
@@ -102,30 +95,21 @@ public class SequentViewController extends ViewController {
     }
 
     private void initializeSearchBox() {
-        searchBox.setText("Search...");
-        searchBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0,
-                    Boolean oldPropertyValue, Boolean newPropertyValue) {
-                if (newPropertyValue) {
-                    if (searchBox.getText().equals("Search..."))
-                        searchBox.setText("");
-                }
-                else {
-                    if (searchBox.getText().isEmpty())
-                        searchBox.setText("Search...");
-                }
-            }
-        });
-        searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            public void handle(KeyEvent event) {
-                printer.setFreeTextSearch(searchBox.getText());
-                // highlight(searchBox.getText());
-                // updateHtml(printer.printSequent(printer.highlightString(proofString,
-                // searchBox.getText())));
-                updateHtml(printer.printSequent(proofString));
-                event.consume();
-            }
+        String searchBoxLabel = "Search...";
+        searchBox.setText(searchBoxLabel);
+        searchBox.focusedProperty()
+                .addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+                    if (newPropertyValue
+                            && searchBox.getText().equals(searchBoxLabel))
+                        searchBox.clear();
+                    else if (searchBox.getText().isEmpty())
+                        searchBox.setText(searchBoxLabel);
+                });
+
+        searchBox.setOnKeyReleased((event) -> {
+            printer.setFreeTextSearch(searchBox.getText());
+            updateHtml(printer.printSequent(proofString));
+            event.consume();
         });
     }
 
@@ -134,25 +118,18 @@ public class SequentViewController extends ViewController {
         searchParent.managedProperty().bind(searchParent.visibleProperty());
         searchParent.setVisible(searchButton.isSelected());
     }
-
-    /**
-     * After a proof has been loaded, the sequent of the root node will be
-     * displayed
-     */
-    private void showRootSequent() {
-        Proof proof = context.getProofManager().getProof();
+    
+    private void showSequent(Node node) {
+        Proof proof = context.getProofManager().getMediator().getSelectedProof();
         services = proof.getServices();
-        sequent = proof.root().sequent();
-
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
-                services);
+        sequent = node.sequent();
+        
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         printSequent();
-
+        
         checkBoxPrettySyntax.setDisable(false);
         checkBoxUnicode.setDisable(false);
         searchButton.setDisable(false);
-
-        // textAreaWebView.setOnMouseMoved(mousehandler);
     }
 
     /**
@@ -208,9 +185,11 @@ public class SequentViewController extends ViewController {
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
-
+        
+        posConverter = new PositionConverter(proofString);
         printer = new SequentPrinter("resources/css/sequentStyle.css",
                 "resources/css/sequentClasses.ini");
+
         sequentLoaded = true;
         // System.out.println(printer.escape(proofString));
         updateHtml(printer.printSequent(proofString));
@@ -233,5 +212,16 @@ public class SequentViewController extends ViewController {
         webEngine.loadContent(s);
 
         // textAreaWebView.getEngine().loadContent(s);
+        webEngine.loadContent(s);    
+    }
+    /**
+     * registered MouseMoveEventHandler. Event is given to posConverter.
+     * @param event MouseEvent
+     */
+    @FXML
+    private void webViewMouseMove(MouseEvent event) {
+        if (sequentLoaded) {
+            posConverter.takeMouseEvent(event);
+        }
     }
 }

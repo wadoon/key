@@ -2,8 +2,6 @@ package de.uka.ilkd.key.nui;
 
 import java.io.File;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -16,10 +14,8 @@ import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
@@ -28,7 +24,6 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
  * provides functionallity of UserInterface logic for the KeYMediator

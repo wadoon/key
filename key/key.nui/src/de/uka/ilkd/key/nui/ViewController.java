@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui;
 
+import javafx.embed.swing.SwingNode;
 import javafx.fxml.Initializable;
 
 public abstract class ViewController implements Initializable {
@@ -12,6 +13,10 @@ public abstract class ViewController implements Initializable {
         this.context = context;
         initializeAfterLoadingFxml();
     }
-    
+
     public abstract void initializeAfterLoadingFxml();
+    
+    public void createSwingContent(final SwingNode swingNode) {
+        swingNode.setContent(context.getProofManager().getProofTreeView());
+    }
 }

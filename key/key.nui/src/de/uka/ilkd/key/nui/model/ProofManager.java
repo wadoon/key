@@ -8,9 +8,9 @@ import java.util.List;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.util.IStatusManager;
-import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Provides a wrapper of the KeYMediator
@@ -19,10 +19,18 @@ import de.uka.ilkd.key.proof.Proof;
  *
  */
 public class ProofManager {
-    private Proof proof;
     private IStatusManager statusManager;
     private List<IProofListener> listeners = new ArrayList<IProofListener>();
     private KeYMediator mediator;
+    private ProofTreeView proofTreeView;
+
+    public ProofTreeView getProofTreeView() {
+        return proofTreeView;
+    }
+
+    public KeYMediator getMediator() {
+        return mediator;
+    }
 
     /**
      * Creates a new Proofmanager
@@ -32,11 +40,11 @@ public class ProofManager {
      */
     public ProofManager(IStatusManager statusManager) {
         this.statusManager = statusManager;
-        MediatorUserInterface userInterface = new MediatorUserInterface(
-                statusManager);
+        MediatorUserInterface userInterface = new MediatorUserInterface(statusManager);
         mediator = new KeYMediator(userInterface);
         userInterface.setMediator(mediator);
         mediator.addKeYSelectionListener(new ProofListener());
+        proofTreeView = new ProofTreeView(mediator);
     }
 
     public synchronized void addProofListener(IProofListener proofListener) {
@@ -48,20 +56,11 @@ public class ProofManager {
     }
 
     private synchronized void fireProofUpdatedEvent() {
-        ProofEvent proofEvent = new ProofEvent(this.proof);
+        ProofEvent proofEvent = new ProofEvent(mediator.getSelectedProof());
         Iterator<IProofListener> listeners = this.listeners.iterator();
         while (listeners.hasNext()) {
             ((IProofListener) listeners.next()).proofUpdated(proofEvent);
         }
-    }
-
-    /**
-     * Getter method for a proof.
-     * 
-     * @return The loaded Proof.
-     */
-    public Proof getProof() {
-        return this.proof;
     }
 
     /**
@@ -84,11 +83,12 @@ public class ProofManager {
             if (mediator.isInAutoMode()) {
                 return;
             }
+            fireProofUpdatedEvent();
         }
 
         @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
-            proof = e.getSource().getSelectedProof();
+            //proof = e.getSource().getSelectedProof();
             fireProofUpdatedEvent();
         }
     }

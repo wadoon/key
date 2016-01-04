@@ -9,9 +9,6 @@ import org.reflections.Reflections;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -20,7 +17,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class MainApp extends Application {
 
@@ -29,6 +25,7 @@ public class MainApp extends Application {
     private RootLayoutController rootLayoutController;
     private Reflections reflections = new Reflections("de.uka.ilkd.key");
     private Scene scene;
+    boolean ctrlPressed = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -36,9 +33,11 @@ public class MainApp extends Application {
         this.primaryStage.setTitle("KeY Project");
 
         // Set the application icon.
-        this.primaryStage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
+        this.primaryStage.getIcons().add(
+                new Image("file:resources/images/key-color-icon-square.png"));
 
         initRootLayout();
+        ctrlPressedHandler();
         closeWindowConfirmHandler();
         scanForViews();
         scanForMenus();
@@ -60,42 +59,57 @@ public class MainApp extends Application {
 
             // Show the scene containing the root layout.
             scene = new Scene(rootLayout);
-            
+
             rootLayout.prefHeightProperty().bind(scene.heightProperty());
-            
-            scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
-                ((RootLayoutController) loader.getController()).resize();
-            });
+
+            scene.widthProperty().addListener(
+                    (observableValue, oldSceneWidth, newSceneWidth) -> {
+                        ((RootLayoutController) loader.getController())
+                                .resize();
+                    });
             /*
-            scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> {
-                ((RootLayoutController) loader.getController()).resize();
-            });
-           */
-            
+             * scene.heightProperty().addListener((observableValue,
+             * oldSceneHeight, newSceneHeight) -> { ((RootLayoutController)
+             * loader.getController()).resize(); });
+             */
+
             primaryStage.setScene(scene);
 
             // Give the controller access to the main app.
             RootLayoutController controller = loader.getController();
             Context rootContext = new Context();
             rootContext.setStatusManager(controller);
-            controller.setMainApp(this,rootContext);
+            controller.setMainApp(this, rootContext);
             rootLayoutController = controller;
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * Listens for ControlDown Event.
+     */
+    private void ctrlPressedHandler() {
+        scene.setOnKeyPressed((value) -> {
+            if (value.isControlDown()) 
+                ctrlPressed = true;  
+        });
+        scene.setOnKeyReleased((value) -> { 
+            ctrlPressed = false;  
+        });
+    }
+    
     /**
      * Listens for a Window Close Request and prompts the user to confirm.
      */
     private void closeWindowConfirmHandler() {
-        scene.getWindow().setOnCloseRequest(new EventHandler<WindowEvent>() {
-
-            @Override
-            public void handle(WindowEvent event) {
+        scene.getWindow().setOnCloseRequest((event) -> {
+            if (!ctrlPressed) {
                 closeWindowAlert();
                 event.consume();
+            } else {
+                System.exit(0);
             }
         });
     }
@@ -112,22 +126,25 @@ public class MainApp extends Application {
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 
         // Add a custom icon.
-        stage.getIcons().add(new Image("file:resources/images/key-color-icon-square.png"));
+        stage.getIcons().add(
+                new Image("file:resources/images/key-color-icon-square.png"));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK) {
-            System.out.println("Where we go from here is a choice I leave to you.");
+            System.out.println(
+                    "Where we go from here is a choice I leave to you.");
             System.exit(0);
         }
     }
 
     private void scanForViews() {
         ViewObserver rootViewObserver = new ViewObserver(rootLayoutController);
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
+        Set<Class<?>> annotated = reflections
+                .getTypesAnnotatedWith(KeYView.class);
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
-            ViewInformation info = new ViewInformation(annot.title(), c.getResource(annot.path()),
-                    annot.preferredPosition());
+            ViewInformation info = new ViewInformation(annot.title(),
+                    c.getResource(annot.path()), annot.preferredPosition(), annot.hasMenuItem());
             info.addObserver(rootViewObserver);
             rootLayoutController.registerView(info, annot.accelerator());
         }
@@ -135,7 +152,8 @@ public class MainApp extends Application {
     }
 
     private void scanForMenus() {
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
+        Set<Class<?>> annotated = reflections
+                .getTypesAnnotatedWith(KeYMenu.class);
         for (Class<?> c : annotated) {
             KeYMenu annot = c.getAnnotation(KeYMenu.class);
             // not used yet
@@ -144,7 +162,8 @@ public class MainApp extends Application {
                 rootLayoutController.registerMenu(c.getResource(annot.path()));
             }
             else {
-                rootLayoutController.registerMenuEntry(c.getResource(annot.path()), annot.parentMenu());
+                rootLayoutController.registerMenuEntry(
+                        c.getResource(annot.path()), annot.parentMenu());
             }
             // }
         }
