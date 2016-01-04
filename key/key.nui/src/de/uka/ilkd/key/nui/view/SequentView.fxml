@@ -16,7 +16,7 @@
    <center>
       <AnchorPane>
          <children>
-            <WebView fx:id="textAreaWebView" layoutY="45.0" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+            <WebView fx:id="textAreaWebView" layoutY="45.0"  onMouseMoved="#webViewMouseMove" prefHeight="255.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
             <ToolBar prefHeight="40.0" prefWidth="500.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <items>
                   <Button mnemonicParsing="false" onAction="#loadDefaultProof" text="Load Default Proof" />

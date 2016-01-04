@@ -10,6 +10,8 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.IProofListener;
+import de.uka.ilkd.key.nui.model.ProofEvent;
+import de.uka.ilkd.key.nui.util.PositionConverter;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -21,6 +23,8 @@ import javafx.scene.layout.Pane;
 import javafx.application.Platform;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
@@ -43,6 +47,7 @@ public class SequentViewController extends ViewController {
         });
 
     };
+    private PositionConverter posConverter;
 
     // @FXML
     // private TextArea textArea;
@@ -187,6 +192,11 @@ public class SequentViewController extends ViewController {
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
+        
+        posConverter = new PositionConverter(proofString);
+        printer = new SequentPrinter("resources/css/sequentStyle.css",
+                "resources/css/sequentClasses.ini");
+
         sequentLoaded = true;
         // System.out.println(printer.escape(proofString));
         updateHtml(printer.printSequent(proofString));
@@ -206,5 +216,19 @@ public class SequentViewController extends ViewController {
 
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
-        webEngine.loadContent(s);    }
+        webEngine.loadContent(s);
+
+        // textAreaWebView.getEngine().loadContent(s);
+        webEngine.loadContent(s);    
+    }
+    /**
+     * registered MouseMoveEventHandler. Event is given to posConverter.
+     * @param event MouseEvent
+     */
+    @FXML
+    private void webViewMouseMove(MouseEvent event) {
+        if (sequentLoaded) {
+            posConverter.takeMouseEvent(event);
+        }
+    }
 }

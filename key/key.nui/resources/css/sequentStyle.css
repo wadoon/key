@@ -1,3 +1,8 @@
+body{
+	font-family: "Courier New", Courier, monospace;
+	font-size: 16px;
+}
+
 .highlighted{
 	background-color:yellow;
 }
