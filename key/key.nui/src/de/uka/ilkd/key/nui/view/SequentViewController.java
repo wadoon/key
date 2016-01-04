@@ -41,19 +41,12 @@ public class SequentViewController extends ViewController {
     private NotationInfo notationInfo = new NotationInfo();
     private Services services;
     private Sequent sequent;
-    private IProofListener proofChangeListener = new IProofListener() {
+    private IProofListener proofChangeListener = (proofEvent) -> {
+        // execute ui update on javafx thread
+        Platform.runLater(() -> {
+            showRootSequent();
+        });
 
-        @Override
-        public void proofUpdated(ProofEvent proofEvent) {
-            // execute ui update on javafx thread
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    showRootSequent();
-                }
-            });
-
-        }
     };
 
     // @FXML
@@ -102,30 +95,21 @@ public class SequentViewController extends ViewController {
     }
 
     private void initializeSearchBox() {
-        searchBox.setText("Search...");
-        searchBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0,
-                    Boolean oldPropertyValue, Boolean newPropertyValue) {
-                if (newPropertyValue) {
-                    if (searchBox.getText().equals("Search..."))
-                        searchBox.setText("");
-                }
-                else {
-                    if (searchBox.getText().isEmpty())
-                        searchBox.setText("Search...");
-                }
-            }
-        });
-        searchBox.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            public void handle(KeyEvent event) {
-                printer.setFreeTextSearch(searchBox.getText());
-                // highlight(searchBox.getText());
-                // updateHtml(printer.printSequent(printer.highlightString(proofString,
-                // searchBox.getText())));
-                updateHtml(printer.printSequent(proofString));
-                event.consume();
-            }
+        String searchBoxLabel = "Search...";
+        searchBox.setText(searchBoxLabel);
+        searchBox.focusedProperty()
+                .addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+                    if (newPropertyValue
+                            && searchBox.getText().equals(searchBoxLabel))
+                        searchBox.clear();
+                    else if (searchBox.getText().isEmpty())
+                        searchBox.setText(searchBoxLabel);
+                });
+
+        searchBox.setOnKeyReleased((event) -> {
+            printer.setFreeTextSearch(searchBox.getText());
+            updateHtml(printer.printSequent(proofString));
+            event.consume();
         });
     }
 
@@ -151,8 +135,6 @@ public class SequentViewController extends ViewController {
         checkBoxPrettySyntax.setDisable(false);
         checkBoxUnicode.setDisable(false);
         searchButton.setDisable(false);
-
-        // textAreaWebView.setOnMouseMoved(mousehandler);
     }
 
     /**

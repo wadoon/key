@@ -240,11 +240,8 @@ public class RootLayoutController extends ViewController
      */
     public void setStatus(String status) {
         // execute ui update on javafx thread
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
+        Platform.runLater(() -> {
                 statusLabel.setText(status);
-            }
         });
         System.out.println(status);
     }

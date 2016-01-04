@@ -20,7 +20,7 @@ public class SequentPrinter {
     private String freeTextSearch = "";
 
     private HashMap<String, String> tempCss = new HashMap<>();
-    
+
     private boolean useRegex = false;
 
     /**
@@ -51,7 +51,8 @@ public class SequentPrinter {
     }
 
     /**
-     * @param useRegex the useRegex to set
+     * @param useRegex
+     *            the useRegex to set
      */
     public void setUseRegex(boolean useRegex) {
         this.useRegex = useRegex;
@@ -222,8 +223,8 @@ public class SequentPrinter {
         sb.append("</pre>");
         return sb.toString();
     }
-    
-    private String htmlEncode(String text){
+
+    private String htmlEncode(String text) {
         return text.replace("<", "&lt;").replace(">", "&gt;");
     }
 
@@ -249,8 +250,8 @@ public class SequentPrinter {
     private String styleHTMLEscaped(String s, String searchString,
             String styleClass) {
         if (!searchString.isEmpty())
-            return s.replaceAll("("+htmlEncode(searchString)+")", "<span class=\"" + styleClass
-                    + "\">" + "$1" + "</span>");
+            return s.replaceAll("(" + htmlEncode(searchString) + ")",
+                    "<span class=\"" + styleClass + "\">" + "$1" + "</span>");
         else
             return s;
     }
@@ -286,7 +287,8 @@ public class SequentPrinter {
      * @return string with HTML style tags applied
      */
     public String highlightString(String s, String searchString) {
-        if (useRegex) return styleHTMLEscaped(s, searchString, "highlighted");
+        if (useRegex)
+            return styleHTMLEscaped(s, searchString, "highlighted");
         return styleHTML(s, searchString, "highlighted");
     }
 
