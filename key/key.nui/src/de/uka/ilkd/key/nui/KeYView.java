@@ -31,4 +31,6 @@ public @interface KeYView {
      * default "" will be ignored
      */
     String accelerator() default ""; 
+    
+    boolean hasMenuItem() default true;
 }

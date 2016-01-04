@@ -129,7 +129,7 @@ public class MainApp extends Application {
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
             ViewInformation info = new ViewInformation(annot.title(),
-                    c.getResource(annot.path()), annot.preferredPosition());
+                    c.getResource(annot.path()), annot.preferredPosition(), annot.hasMenuItem());
             info.addObserver(rootViewObserver);
             rootLayoutController.registerView(info, annot.accelerator());
         }

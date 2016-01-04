@@ -30,12 +30,10 @@ public class SequentPrinter {
      *            Path to the CSS file for Styling
      */
     public SequentPrinter(String cssPath, String classPath) {
-        // TODO Auto-generated constructor stub
         try {
             readCSS(cssPath);
         }
         catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         try {
@@ -66,6 +64,7 @@ public class SequentPrinter {
      * @return String with escaped chars
      */
     public String escape(String s) {
+        //XXX could instead use StringEscapeUtils from Apache Commons Lang
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++)
             switch (s.charAt(i)) {
