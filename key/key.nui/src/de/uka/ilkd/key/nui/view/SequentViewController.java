@@ -10,11 +10,8 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.IProofListener;
-<<<<<<< HEAD
 import de.uka.ilkd.key.nui.model.ProofEvent;
 import de.uka.ilkd.key.nui.util.PositionConverter;
-=======
->>>>>>> 658e1f2abe1ce680503b4fa97e5d4602e667cbc7
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -26,11 +23,8 @@ import javafx.scene.layout.Pane;
 import javafx.application.Platform;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-<<<<<<< HEAD
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-=======
->>>>>>> 658e1f2abe1ce680503b4fa97e5d4602e667cbc7
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
@@ -198,14 +192,11 @@ public class SequentViewController extends ViewController {
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
-<<<<<<< HEAD
-
+        
         posConverter = new PositionConverter(proofString);
         printer = new SequentPrinter("resources/css/sequentStyle.css",
                 "resources/css/sequentClasses.ini");
 
-=======
->>>>>>> 658e1f2abe1ce680503b4fa97e5d4602e667cbc7
         sequentLoaded = true;
         // System.out.println(printer.escape(proofString));
         updateHtml(printer.printSequent(proofString));
@@ -225,10 +216,10 @@ public class SequentViewController extends ViewController {
 
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
-<<<<<<< HEAD
         webEngine.loadContent(s);
 
         // textAreaWebView.getEngine().loadContent(s);
+        webEngine.loadContent(s);    
     }
     /**
      * registered MouseMoveEventHandler. Event is given to posConverter.
@@ -240,7 +231,4 @@ public class SequentViewController extends ViewController {
             posConverter.takeMouseEvent(event);
         }
     }
-=======
-        webEngine.loadContent(s);    }
->>>>>>> 658e1f2abe1ce680503b4fa97e5d4602e667cbc7
 }
