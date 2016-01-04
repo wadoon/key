@@ -30,6 +30,11 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+/**
+ * provides functionallity of UserInterface logic for the KeYMediator
+ * @author Benedikt Gross
+ *
+ */
 public class MediatorUserInterface
         extends AbstractMediatorUserInterfaceControl {
 

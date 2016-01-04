@@ -12,6 +12,12 @@ import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * Provides a wrapper of the KeYMediator
+ * with basic loading of proofs
+ * @author Benedikt Gross
+ *
+ */
 public class ProofManager {
     private Proof proof;
     private IStatusManager statusManager;
