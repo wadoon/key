@@ -29,6 +29,7 @@ public class MainApp extends Application {
     private RootLayoutController rootLayoutController;
     private Reflections reflections = new Reflections("de.uka.ilkd.key");
     private Scene scene;
+    boolean ctrlPressed = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -40,6 +41,7 @@ public class MainApp extends Application {
                 new Image("file:resources/images/key-color-icon-square.png"));
 
         initRootLayout();
+        ctrlPressedHandler();
         closeWindowConfirmHandler();
         scanForViews();
         scanForMenus();
@@ -88,14 +90,31 @@ public class MainApp extends Application {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * Listens for ControlDown Event.
+     */
+    private void ctrlPressedHandler() {
+        scene.setOnKeyPressed((value) -> {
+            if (value.isControlDown()) 
+                ctrlPressed = true;  
+        });
+        scene.setOnKeyReleased((value) -> { 
+            ctrlPressed = false;  
+        });
+    }
+    
     /**
      * Listens for a Window Close Request and prompts the user to confirm.
      */
     private void closeWindowConfirmHandler() {
         scene.getWindow().setOnCloseRequest((event) -> {
-            closeWindowAlert();
-            event.consume();
+            if (!ctrlPressed) {
+                closeWindowAlert();
+                event.consume();
+            } else {
+                System.exit(0);
+            }
         });
     }
 
