@@ -15,6 +15,7 @@ import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
@@ -27,7 +28,6 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = false)
-
 public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
@@ -41,9 +41,9 @@ public class SequentViewController extends ViewController {
     private IProofListener proofChangeListener = (proofEvent) -> {
         // execute ui update on javafx thread
         Platform.runLater(() -> {
-            showRootSequent();
+            // When loading a new proof the root sequent is shown.
+            showSequent(context.getProofManager().getMediator().getSelectedNode());
         });
-
     };
     private PositionConverter posConverter;
 
@@ -118,20 +118,15 @@ public class SequentViewController extends ViewController {
         searchParent.managedProperty().bind(searchParent.visibleProperty());
         searchParent.setVisible(searchButton.isSelected());
     }
-
-    /**
-     * After a proof has been loaded, the sequent of the root node will be
-     * displayed
-     */
-    private void showRootSequent() {
+    
+    private void showSequent(Node node) {
         Proof proof = context.getProofManager().getMediator().getSelectedProof();
         services = proof.getServices();
-        sequent = proof.root().sequent();
-
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
-                services);
+        sequent = node.sequent();
+        
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         printSequent();
-
+        
         checkBoxPrettySyntax.setDisable(false);
         checkBoxUnicode.setDisable(false);
         searchButton.setDisable(false);

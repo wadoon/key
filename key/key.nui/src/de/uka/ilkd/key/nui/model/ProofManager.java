@@ -77,6 +77,7 @@ public class ProofManager {
             if (mediator.isInAutoMode()) {
                 return;
             }
+            fireProofUpdatedEvent();
         }
 
         @Override
