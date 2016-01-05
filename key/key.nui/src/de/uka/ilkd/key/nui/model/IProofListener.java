@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui.model;
 
-public interface IProofListener {
+import java.util.EventListener;
+
+public interface IProofListener extends EventListener {
     public void proofUpdated(ProofEvent proofEvent);
 }

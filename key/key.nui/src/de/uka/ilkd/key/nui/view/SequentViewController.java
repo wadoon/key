@@ -34,6 +34,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
+import javafx.embed.swing.SwingNode;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -258,5 +259,11 @@ public class SequentViewController extends ViewController {
         if (sequentLoaded) {
             posConverter.takeMouseEvent(event);
         }
+    }
+
+    @Override
+    public void createSwingContent(SwingNode swingNode) {
+        // TODO Auto-generated method stub
+        
     }
 }

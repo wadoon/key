@@ -16,7 +16,5 @@ public abstract class ViewController implements Initializable {
 
     public abstract void initializeAfterLoadingFxml();
     
-    public void createSwingContent(final SwingNode swingNode) {
-        swingNode.setContent(context.getProofManager().getProofTreeView());
-    }
+    public abstract void createSwingContent(final SwingNode swingNode);
 }
