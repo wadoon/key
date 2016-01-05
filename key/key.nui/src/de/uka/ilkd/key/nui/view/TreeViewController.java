@@ -27,4 +27,9 @@ public class TreeViewController extends ViewController {
         createSwingContent(swingNode);
         stackPane.getChildren().add(swingNode);
     }
+
+    @Override
+    public void createSwingContent(SwingNode swingNode) {
+        swingNode.setContent(context.getProofManager().getProofTreeView());
+    }
 }

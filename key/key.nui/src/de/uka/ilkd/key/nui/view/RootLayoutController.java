@@ -18,6 +18,7 @@ import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -551,5 +552,11 @@ public class RootLayoutController extends ViewController
     public void initializeAfterLoadingFxml() {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public void createSwingContent(SwingNode swingNode) {
+        // TODO Auto-generated method stub
+        
     }
 }
