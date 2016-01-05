@@ -257,7 +257,7 @@ public class SequentViewController extends ViewController {
     @FXML
     private void webViewMouseMove(MouseEvent event) {
         if (sequentLoaded) {
-            posConverter.takeMouseEvent(event);
+            posConverter.getCharIdxUnderPointer(event);
         }
     }
 
