@@ -10,7 +10,7 @@ import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 
-@KeYView(title = "Goal List", path = "GoalListView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
+//@KeYView(title = "Goal List", path = "GoalListView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
 public class GoalListViewController extends ViewController {
 
     private final SwingNode swingNodeG = new SwingNode();
