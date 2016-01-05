@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui.view;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -30,6 +31,7 @@ public class TreeViewController extends ViewController {
 
     @Override
     public void createSwingContent(SwingNode swingNode) {
-        swingNode.setContent(context.getProofManager().getProofTreeView());
+        ProofTreeView proofTreeView = new ProofTreeView(context.getProofManager().getMediator());
+        swingNode.setContent(proofTreeView);
     }
 }
