@@ -8,6 +8,7 @@ import java.util.List;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.util.IStatusManager;
@@ -17,6 +18,11 @@ public class ProofManager {
     private List<IProofListener> listeners = new ArrayList<IProofListener>();
     private KeYMediator mediator;
     private ProofTreeView proofTreeView;
+    private GoalList goalList;
+
+    public GoalList getGoalList() {
+        return goalList;
+    }
 
     public ProofTreeView getProofTreeView() {
         return proofTreeView;
@@ -39,6 +45,7 @@ public class ProofManager {
         userInterface.setMediator(mediator);
         mediator.addKeYSelectionListener(new ProofListener());
         proofTreeView = new ProofTreeView(mediator);
+        goalList = new GoalList(mediator);
     }
 
     public synchronized void addProofListener(IProofListener proofListener) {
