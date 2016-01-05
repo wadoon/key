@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui;
 
+import javafx.embed.swing.SwingNode;
 import javafx.fxml.Initializable;
 
 public abstract class ViewController implements Initializable {
@@ -14,4 +15,6 @@ public abstract class ViewController implements Initializable {
     }
 
     public abstract void initializeAfterLoadingFxml();
+    
+    public abstract void createSwingContent(final SwingNode swingNode);
 }

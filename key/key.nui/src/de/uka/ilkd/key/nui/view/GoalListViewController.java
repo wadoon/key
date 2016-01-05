@@ -10,13 +10,13 @@ import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 
-@KeYView(title = "Tree", path = "TreeView.fxml", preferredPosition = ViewPosition.TOPLEFT)
-public class TreeViewController extends ViewController {
+//@KeYView(title = "Goal List", path = "GoalListView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
+public class GoalListViewController extends ViewController {
 
-    private final SwingNode swingNode = new SwingNode();
+    private final SwingNode swingNodeG = new SwingNode();
 
     @FXML
-    private StackPane stackPane;
+    private StackPane stackPaneG;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -24,12 +24,12 @@ public class TreeViewController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
-        createSwingContent(swingNode);
-        stackPane.getChildren().add(swingNode);
+        createSwingContent(swingNodeG);
+        stackPaneG.getChildren().add(swingNodeG);
     }
 
     @Override
     public void createSwingContent(SwingNode swingNode) {
-        swingNode.setContent(context.getProofManager().getProofTreeView());
+        swingNode.setContent(context.getProofManager().getGoalList());
     }
 }
