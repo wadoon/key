@@ -17,12 +17,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
@@ -91,6 +95,9 @@ public class IntermediatePresentationProofFileParser implements
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
     private int nrRuleApps = 0;
+
+    /* + Errors occurred during the parsing */
+    private LinkedList<Throwable> errors = new LinkedList<Throwable>();
 
     /**
      * @param proof
@@ -211,7 +218,7 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case CONTRACT:
-            case LOOP_INVARIANT:
+        case LOOP_INVARIANT:
             // contract or loop invariant
             ((BuiltinRuleInformation) ruleInfo).currContractOrLoopInvariant = str;
             break;
@@ -245,8 +252,7 @@ public class IntermediatePresentationProofFileParser implements
                 /* ignore */
             }
             break;
-            
-            
+
         case JOIN_PROCEDURE: // join procedure
             ((BuiltinRuleInformation) ruleInfo).currJoinProc = str;
             break;
@@ -268,6 +274,49 @@ public class IntermediatePresentationProofFileParser implements
 
         case JOIN_DIST_FORMULA: // distinguishing formula for joins
             ((BuiltinRuleInformation) ruleInfo).currDistFormula = str;
+            break;
+
+        case JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE: // type of predicate
+                                                      // abstraction lattice
+            try {
+                ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType =
+                        (Class<? extends AbstractPredicateAbstractionLattice>) Class
+                                .forName(str);
+            }
+            catch (ClassNotFoundException e) {
+                errors.add(e);
+            }
+            break;
+
+        case JOIN_ABSTRACTION_PREDICATES:
+            ImmutableList<Pair<String, String>> currAbstractionPredicates =
+                    ImmutableSLList.nil();
+
+            Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
+            Matcher m = p.matcher(str);
+
+            boolean matched = false;
+            while (m.find()) {
+                matched = true;
+
+                for (int i = 1; i < m.groupCount(); i += 2) {
+                    assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
+                            + "There should always be pairs of placeholders and predicate terms.";
+
+                    currAbstractionPredicates =
+                            currAbstractionPredicates
+                                    .append(new Pair<String, String>(
+                                            m.group(i), m.group(i + 1)));
+                }
+            }
+
+            if (!matched) {
+                errors.add(new ParserException(
+                        "Wrong format of join abstraction predicates", null));
+            }
+
+            ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates =
+                    currAbstractionPredicates;
             break;
 
         default:
@@ -335,7 +384,7 @@ public class IntermediatePresentationProofFileParser implements
 
     @Override
     public List<Throwable> getErrors() {
-        return new LinkedList<Throwable>();
+        return errors;
     }
 
     /**
@@ -377,7 +426,9 @@ public class IntermediatePresentationProofFileParser implements
                             builtinInfo.currJoinProc,
                             builtinInfo.currNrPartners,
                             builtinInfo.currNewNames,
-                            builtinInfo.currDistFormula);
+                            builtinInfo.currDistFormula,
+                            builtinInfo.currPredAbstraLatticeType,
+                            builtinInfo.currAbstractionPredicates);
         }
         else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
             result =
@@ -479,6 +530,10 @@ public class IntermediatePresentationProofFileParser implements
         protected int currCorrespondingJoinNodeId = 0;
         protected int currJoinNodeId = 0;
         protected String currDistFormula = null;
+        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
+                null;
+        protected ImmutableList<Pair<String, String>> currAbstractionPredicates =
+                null;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);

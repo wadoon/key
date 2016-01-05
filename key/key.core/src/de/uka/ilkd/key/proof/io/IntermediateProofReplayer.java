@@ -29,21 +29,27 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -72,10 +78,12 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
@@ -190,8 +198,8 @@ public class IntermediateProofReplayer {
                 if (currNodeInterm instanceof BranchNodeIntermediate) {
                     assert currNodeInterm.getChildren().size() <= 1 : "Branch node should have exactly one child.";
                     if (currNodeInterm.getChildren().size() == 1) {
-                        queue.addFirst(new Pair<Node, NodeIntermediate>(currNode,
-                                currNodeInterm.getChildren().get(0)));
+                        queue.addFirst(new Pair<Node, NodeIntermediate>(
+                                currNode, currNodeInterm.getChildren().get(0)));
                     }
                     continue;
                 }
@@ -205,32 +213,33 @@ public class IntermediateProofReplayer {
                         lastDisplayedNrNodes = nrNodesReplayed;
                     }
                     nrNodesReplayed++;
-    
+
                     AppNodeIntermediate currInterm =
                             (AppNodeIntermediate) currNodeInterm;
                     currNode.getNodeInfo().setInteractiveRuleApplication(
                             currInterm.isInteractiveRuleApplication());
-    
+
                     // Register name proposals
                     proof.getServices()
                             .getNameRecorder()
                             .setProposals(
                                     currInterm.getIntermediateRuleApp()
                                             .getNewNames());
-    
+
                     if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
                         TacletAppIntermediate appInterm =
                                 (TacletAppIntermediate) currInterm
                                         .getIntermediateRuleApp();
-    
+
                         try {
-                            currGoal.apply(constructTacletApp(appInterm, currGoal));
-    
+                            currGoal.apply(constructTacletApp(appInterm,
+                                    currGoal));
+
                             final Iterator<Node> children =
                                     currNode.childrenIterator();
                             final LinkedList<NodeIntermediate> intermChildren =
                                     currInterm.getChildren();
-    
+
                             addChildren(children, intermChildren);
                         }
                         catch (Exception e) {
@@ -238,16 +247,18 @@ public class IntermediateProofReplayer {
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                     + appInterm.getLineNr() + ", goal "
                                     + currGoal.node().serialNr() + ", rule "
-                                    + appInterm.getRuleName() + NOT_APPLICABLE, e);
+                                    + appInterm.getRuleName() + NOT_APPLICABLE,
+                                    e);
                         }
                         catch (AssertionError e) {
                             skipBranch = 1;
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                     + appInterm.getLineNr() + ", goal "
                                     + currGoal.node().serialNr() + ", rule "
-                                    + appInterm.getRuleName() + NOT_APPLICABLE, e);
+                                    + appInterm.getRuleName() + NOT_APPLICABLE,
+                                    e);
                         }
-    
+
                     }
                     else if (currInterm.getIntermediateRuleApp() instanceof BuiltInAppIntermediate) {
                         if ((((double) nrNodesReplayed - (double) lastDisplayedNrNodes) / (double) totalNrRuleApps) >= 0.1d) {
@@ -259,11 +270,11 @@ public class IntermediateProofReplayer {
                             lastDisplayedNrNodes = nrNodesReplayed;
                         }
                         nrNodesReplayed++;
-    
+
                         BuiltInAppIntermediate appInterm =
                                 (BuiltInAppIntermediate) currInterm
                                         .getIntermediateRuleApp();
-    
+
                         if (appInterm instanceof JoinAppIntermediate) {
                             JoinAppIntermediate joinAppInterm =
                                     (JoinAppIntermediate) appInterm;
@@ -271,24 +282,29 @@ public class IntermediateProofReplayer {
                                     joinPartnerNodes
                                             .get(((JoinAppIntermediate) appInterm)
                                                     .getId());
-    
+
                             if (partnerNodesInfo == null
                                     || partnerNodesInfo.size() < joinAppInterm
                                             .getNrPartners()) {
-                                
-                                // In case of an exception happening during the replay
-                                // process, it can happen that the queue is empty when
-                                // reaching this point. Then, we may not add the join
-                                // node to the end of the queue since this will result
+
+                                // In case of an exception happening during the
+                                // replay
+                                // process, it can happen that the queue is
+                                // empty when
+                                // reaching this point. Then, we may not add the
+                                // join
+                                // node to the end of the queue since this will
+                                // result
                                 // in non-termination.
-                                
+
                                 if (queue.isEmpty()) {
                                     continue;
                                 }
-                                
+
                                 // Wait until all partners are found: Add node
                                 // at the end of the queue. NOTE: DO NOT CHANGE
-                                // THIS to adding the node to the front! This will
+                                // THIS to adding the node to the front! This
+                                // will
                                 // result in non-termination!
                                 queue.addLast(new Pair<Node, NodeIntermediate>(
                                         currNode, currNodeInterm));
@@ -304,15 +320,98 @@ public class IntermediateProofReplayer {
                                     joinApp.setDistinguishingFormula(JoinRuleUtils.translateToFormula(
                                             proof.getServices(), joinAppInterm
                                                     .getDistinguishingFormula()));
-    
+
+                                    // Predicate abstraction join rule
+                                    if (joinApp.getConcreteRule() instanceof JoinWithPredicateAbstractionFactory) {
+                                        final ArrayList<AbstractionPredicate> predicates =
+                                                new ArrayList<AbstractionPredicate>();
+                                        
+                                        final Services services = proof.getServices();
+
+                                        // It may happen that the abstraction
+                                        // predicates are null -- in this case,
+                                        // it is the expected behavior to create
+                                        // a default lattice with top and bottom
+                                        // elements only, which is accomplished
+                                        // by just supplying an empty list of
+                                        // predicates to the join procedure.
+                                        if (joinAppInterm
+                                                .getAbstractionPredicates() != null) {
+
+                                            for (Pair<String, String> rawPred : joinAppInterm
+                                                    .getAbstractionPredicates()) {
+
+                                                // Parse the placeholder
+                                                Pair<Sort, Name> ph = null;
+                                                try {
+                                                    ph =
+                                                            JoinRuleUtils
+                                                                    .parsePlaceholder(
+                                                                            rawPred.first,
+                                                                            false,
+                                                                            services);
+                                                }
+                                                catch (RuntimeException e) {
+                                                    errors.add(e);
+                                                    continue;
+                                                }
+
+                                                // Add placeholder to
+                                                // namespaces, if
+                                                // necessary
+                                                if (services.getNamespaces()
+                                                        .variables()
+                                                        .lookup(ph.second) == null) {
+                                                    services.getNamespaces()
+                                                            .variables()
+                                                            .add(new LocationVariable(
+                                                                    new ProgramElementName(
+                                                                            ph.second
+                                                                                    .toString()),
+                                                                    ph.first));
+                                                }
+
+                                                // Parse the predicate
+                                                try {
+                                                    predicates
+                                                            .add(JoinRuleUtils
+                                                                    .parsePredicate(
+                                                                            rawPred.second,
+                                                                            JoinRuleUtils
+                                                                                    .singletonArrayList(ph),
+                                                                            services));
+                                                }
+                                                catch (ParserException e) {
+                                                    errors.add(e);
+                                                    continue;
+                                                }
+                                            }
+
+                                        }
+
+                                        Class<? extends AbstractPredicateAbstractionLattice> latticeType =
+                                                joinAppInterm
+                                                        .getPredAbstrLatticeType();
+
+                                        // Instantiate the join procedure
+                                        joinApp.setConcreteRule(((JoinWithPredicateAbstractionFactory) joinApp
+                                                .getConcreteRule())
+                                                .instantiate(
+                                                        predicates,
+                                                        latticeType == null ? SimplePredicateAbstractionLattice.class
+                                                                : latticeType));
+
+                                    }
+
                                     ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
                                             ImmutableSLList.nil();
                                     for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                         final Services services =
                                                 currGoal.proof().getServices();
-    
+
                                         Triple<Term, Term, Term> ownSEState =
-                                                sequentToSETriple(currNode,
+                                                sequentToSETriple(
+                                                        currNode,
                                                         joinApp.posInOccurrence(),
                                                         services);
                                         Triple<Term, Term, Term> partnerSEState =
@@ -330,9 +429,9 @@ public class IntermediateProofReplayer {
                                                                 .program(),
                                                         services);
                                         matchVisitor.start();
-    
+
                                         assert !matchVisitor.isIncompatible() : "Cannot join incompatible program counters";
-    
+
                                         joinPartners =
                                                 joinPartners
                                                         .append(new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
@@ -342,47 +441,60 @@ public class IntermediateProofReplayer {
                                                                         .getMatches()
                                                                         .getValue()));
                                     }
-    
+
                                     joinApp.setJoinNode(currNode);
                                     joinApp.setJoinPartners(joinPartners);
-    
+
                                     assert joinApp.complete() : "Join app should be automatically completed in replay";
-    
+
                                     currGoal.apply(joinApp);
-    
-                                    // Join node has exactly one child in a closed
+
+                                    // Join node has exactly one child in a
+                                    // closed
                                     // proof, and
                                     // zero or one children in an open proof.
                                     if (currInterm.getChildren().size() > 0) {
                                         queue.addFirst(new Pair<Node, NodeIntermediate>(
-                                                currNode.childrenIterator().next(),
-                                                currInterm.getChildren().get(0)));
+                                                currNode.childrenIterator()
+                                                        .next(), currInterm
+                                                        .getChildren().get(0)));
                                     }
-    
+
                                     // Now add children of partner nodes
                                     for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                         Iterator<Node> children =
                                                 partnerNodeInfo.first
                                                         .childrenIterator();
                                         LinkedList<NodeIntermediate> intermChildren =
-                                                partnerNodeInfo.third.getChildren();
-    
+                                                partnerNodeInfo.third
+                                                        .getChildren();
+
                                         addChildren(children, intermChildren);
                                     }
                                 }
                                 catch (SkipSMTRuleException e) {
-                                    reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                            + appInterm.getLineNr() + ", goal "
-                                            + currGoal.node().serialNr()
-                                            + ", rule " + appInterm.getRuleName()
-                                            + NOT_APPLICABLE, e);
+                                    reportError(
+                                            ERROR_LOADING_PROOF_LINE
+                                                    + "Line "
+                                                    + appInterm.getLineNr()
+                                                    + ", goal "
+                                                    + currGoal.node()
+                                                            .serialNr()
+                                                    + ", rule "
+                                                    + appInterm.getRuleName()
+                                                    + NOT_APPLICABLE, e);
                                 }
                                 catch (BuiltInConstructionException e) {
-                                    reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                            + appInterm.getLineNr() + ", goal "
-                                            + currGoal.node().serialNr()
-                                            + ", rule " + appInterm.getRuleName()
-                                            + NOT_APPLICABLE, e);
+                                    reportError(
+                                            ERROR_LOADING_PROOF_LINE
+                                                    + "Line "
+                                                    + appInterm.getLineNr()
+                                                    + ", goal "
+                                                    + currGoal.node()
+                                                            .serialNr()
+                                                    + ", rule "
+                                                    + appInterm.getRuleName()
+                                                    + NOT_APPLICABLE, e);
                                 }
                             }
                         }
@@ -393,7 +505,7 @@ public class IntermediateProofReplayer {
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
                                     joinPartnerNodes.get(joinPartnerApp
                                             .getJoinNodeId());
-    
+
                             if (partnerNodeInfo == null) {
                                 partnerNodeInfo =
                                         new HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>();
@@ -401,7 +513,7 @@ public class IntermediateProofReplayer {
                                         joinPartnerApp.getJoinNodeId(),
                                         partnerNodeInfo);
                             }
-    
+
                             partnerNodeInfo
                                     .add(new Triple<Node, PosInOccurrence, NodeIntermediate>(
                                             currNode,
@@ -410,7 +522,7 @@ public class IntermediateProofReplayer {
                                                     appInterm.getPosInfo().first,
                                                     appInterm.getPosInfo().second),
                                             currNodeInterm));
-                        } 
+                        }
                         else {
                             try {
                                 IBuiltInRuleApp app =
@@ -418,58 +530,68 @@ public class IntermediateProofReplayer {
                                 if (!app.complete()) {
                                     app = app.tryToInstantiate(currGoal);
                                 }
-    
-                                if (app instanceof LoopInvariantBuiltInRuleApp)  {
+
+                                if (app instanceof LoopInvariantBuiltInRuleApp) {
                                     if (appInterm.getContractOrLoopInvariant() != null) {
-                                        LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp)app;
-                                        LoopInvariant inv = loopApp.getInvariant();                                                                
-                                        inv.getInternalInvariants().put(proof.getServices().getTypeConverter().getHeapLDT().getHeap(), 
-                                                parseTerm(appInterm.getContractOrLoopInvariant(),proof));                                    
+                                        LoopInvariantBuiltInRuleApp loopApp =
+                                                (LoopInvariantBuiltInRuleApp) app;
+                                        LoopInvariant inv =
+                                                loopApp.getInvariant();
+                                        inv.getInternalInvariants()
+                                                .put(proof.getServices()
+                                                        .getTypeConverter()
+                                                        .getHeapLDT().getHeap(),
+                                                        parseTerm(
+                                                                appInterm
+                                                                        .getContractOrLoopInvariant(),
+                                                                proof));
                                         app = loopApp.setLoopInvariant(inv);
                                     }
                                 }
-                                
+
                                 currGoal.apply(app);
-    
+
                                 final Iterator<Node> children =
                                         currNode.childrenIterator();
                                 LinkedList<NodeIntermediate> intermChildren =
                                         currInterm.getChildren();
-    
+
                                 addChildren(children, intermChildren);
                             }
                             catch (SkipSMTRuleException e) {
-                                // silently continue; status will be reported via
+                                // silently continue; status will be reported
+                                // via
                                 // polling
                             }
                             catch (BuiltInConstructionException e) {
                                 skipBranch = 1;
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                         + appInterm.getLineNr() + ", goal "
-                                        + currGoal.node().serialNr() + ", rule "
-                                        + appInterm.getRuleName() + NOT_APPLICABLE,
-                                        e);
+                                        + currGoal.node().serialNr()
+                                        + ", rule " + appInterm.getRuleName()
+                                        + NOT_APPLICABLE, e);
                             }
                             catch (RuntimeException e) {
                                 skipBranch = 1;
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                         + appInterm.getLineNr() + ", goal "
-                                        + currGoal.node().serialNr() + ", rule "
-                                        + appInterm.getRuleName() + NOT_APPLICABLE,
-                                        e);
+                                        + currGoal.node().serialNr()
+                                        + ", rule " + appInterm.getRuleName()
+                                        + NOT_APPLICABLE, e);
                             }
                             catch (AssertionError e) {
                                 skipBranch = 1;
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                         + appInterm.getLineNr() + ", goal "
-                                        + currGoal.node().serialNr() + ", rule "
-                                        + appInterm.getRuleName() + NOT_APPLICABLE,
-                                        e);
+                                        + currGoal.node().serialNr()
+                                        + ", rule " + appInterm.getRuleName()
+                                        + NOT_APPLICABLE, e);
                             }
                         }
                     }
                 }
-            } catch (Throwable throwable) {
+            }
+            catch (Throwable throwable) {
                 // Default exception catcher -- proof should not stop loading
                 // if anything goes wrong, but instead continue with the next
                 // node in the queue.
@@ -552,7 +674,7 @@ public class IntermediateProofReplayer {
 
         TacletApp ourApp = null;
         PosInOccurrence pos = null;
-        
+
         Taclet t =
                 proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
@@ -635,15 +757,19 @@ public class IntermediateProofReplayer {
         ImmutableList<PosInOccurrence> builtinIfInsts = null;
 
         // Load contracts, if applicable
-        if (!WhileInvariantRule.INSTANCE.name().toString().equals(ruleName) && currInterm.getContractOrLoopInvariant() != null) {
+        if (!WhileInvariantRule.INSTANCE.name().toString().equals(ruleName)
+                && currInterm.getContractOrLoopInvariant() != null) {
             currContract =
-                    proof.getServices().getSpecificationRepository()
-                            .getContractByName(currInterm.getContractOrLoopInvariant());
+                    proof.getServices()
+                            .getSpecificationRepository()
+                            .getContractByName(
+                                    currInterm.getContractOrLoopInvariant());
             if (currContract == null) {
                 final ProblemLoaderException e =
                         new ProblemLoaderException(loader,
                                 "Error loading proof: contract \""
-                                        + currInterm.getContractOrLoopInvariant()
+                                        + currInterm
+                                                .getContractOrLoopInvariant()
                                         + "\" not found.");
                 reportError(ERROR_LOADING_PROOF_LINE + ", goal "
                         + currGoal.node().serialNr() + ", rule " + ruleName

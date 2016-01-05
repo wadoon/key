@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+
+import de.uka.ilkd.key.parser.Location;
 
 /**
  *
@@ -22,7 +23,7 @@ class ScriptLineParser {
 
     public static final String LITERAL_KEY = "#literal";
 
-    private static final String ADMISSIBLE_CHARS = "-_$";
+    private static final String ADMISSIBLE_CHARS = "-_$@";
 
     /**
      * This is the source of characters
@@ -40,11 +41,20 @@ class ScriptLineParser {
     private int line = 1;
 
     /**
+     * the filename from which the script is taken.
+     */
+    private String file;
+
+    /**
      * number of characters read so far
      */
     private int readChars;
 
-    private String file;
+    /**
+     * While within a string literal, this stores the character with which the
+     * string has started.
+     */
+    private int stringInitChar;
 
     /**
      * The state of the regular expression parser.
@@ -125,11 +135,23 @@ class ScriptLineParser {
                 break;
             case '\r': break;
             case '"':
+            case '\'':
                 switch(state) {
-                case INIT: state = State.IN_QUOTE; key = "#" + (impCounter++); break;
-                case AFTER_EQ: state = State.IN_QUOTE; break;
-                case IN_QUOTE: state = State.INIT;
-                    result.put(key, sb.toString()); sb.setLength(0); break;
+                case INIT: state = State.IN_QUOTE;
+                    stringInitChar = c;
+                    key = "#" + (impCounter++); break;
+                case AFTER_EQ: state = State.IN_QUOTE;
+                    stringInitChar = c;
+                    break;
+                case IN_QUOTE:
+                    if(stringInitChar == c) {
+                        state = State.INIT;
+                        result.put(key, sb.toString());
+                        sb.setLength(0);
+                    } else {
+                        sb.append((char)c);
+                    }
+                    break;
                 case IN_COMMENT: break;
                 default: exc(c);
                 }
@@ -150,7 +172,7 @@ class ScriptLineParser {
                 case IN_UNQUOTE: result.put(key, sb.toString()); break;
                 default: exc(c);
                 }
-                if(state != State.IN_COMMENT) {
+                if(state != State.IN_COMMENT && state != State.IN_QUOTE) {
                     result.put(LITERAL_KEY, cmdBuilder.toString().trim());
                     return result;
                 }
@@ -197,6 +219,7 @@ class ScriptLineParser {
                 "command ; \n\n" +
                 "# some comment\n" +
                 "multiline #comment internal\n command \n with=\"line breaks in \n values\"; \n" +
+                "select formula=\"a;b\"; \n" +
                 "hyphened-command;\n" +
                 "ignored ";
 
@@ -222,6 +245,12 @@ class ScriptLineParser {
 
     public int getColumn() {
         return col;
+    }
+
+    public void setLocation(Location location) {
+        this.line = location.getLine();
+        this.col = location.getColumn();
+        this.file = location.getFilename();
     }
 
 }

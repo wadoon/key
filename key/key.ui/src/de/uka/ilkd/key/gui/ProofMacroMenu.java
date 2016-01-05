@@ -10,6 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 // 
+
 package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
@@ -65,8 +66,11 @@ public class ProofMacroMenu extends JMenu {
 
     /**
      * The loader used to access the providers for macros.
+     *
+     * This is used as iteration source in other parts of KeY's ui.
      */
-    private static Iterable<ProofMacro> loader = ClassLoaderUtil.loadServices(ProofMacro.class);
+    public static final Iterable<ProofMacro> REGISTERED_MACROS =
+            ClassLoaderUtil.loadServices(ProofMacro.class);
 
     /**
      * The number of defined macros.
@@ -91,14 +95,9 @@ public class ProofMacroMenu extends JMenu {
         
         int count = 0;
         Node node = mediator.getSelectedNode();
-        for (ProofMacro macro : loader) {
+        for (ProofMacro macro : REGISTERED_MACROS) {
                 
-            boolean applicable;
-            if(node == null) {
-                applicable = macro.isApplicableWithoutPosition();
-            } else {
-                applicable = macro.canApplyTo(node, posInOcc);
-            }
+            boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
 
                     // NOTE (DS): At the moment, JoinRule is an experimental
                     // feature. We therefore only add join-related macros

@@ -1,27 +1,40 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observer;
 import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 
 public class ProofScriptEngine {
 
+    private static final int MAX_CHARS_PER_COMMAND = 80;
+
+    public static final String BASE_FILE_NAME_KEY = "baseFileName";
+    public static final String OBSERVER_KEY = "commandMonitor";
+
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
-    private final File file;
+    private final Location initialLocation;
+    private final String script;
 
     private Observer commandMonitor;
 
-    public ProofScriptEngine(File file) {
-        this.file = file;
+    public ProofScriptEngine(File file) throws IOException {
+        this.initialLocation = new Location(file.getAbsolutePath(), 1, 1);
+        this.script = new String(Files.readAllBytes(file.toPath()));
+    }
+
+    public ProofScriptEngine(String script, Location initLocation) {
+        this.script = script;
+        this.initialLocation = initLocation;
     }
 
     private static Map<String, ProofScriptCommand> loadCommands() {
@@ -38,7 +51,21 @@ public class ProofScriptEngine {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
-        ScriptLineParser mlp = new ScriptLineParser(file.getAbsolutePath());
+        ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
+        mlp.setLocation(initialLocation);
+
+        Map<String, Object> stateMap = new HashMap<String, Object>();
+
+        // add the filename (if available) to the statemap.
+        String filename = initialLocation.getFilename();
+        if(filename != null && filename.length() > 0) {
+            stateMap.put(BASE_FILE_NAME_KEY, filename);
+        }
+
+        // add the observer (if installed) to the state map
+        if(commandMonitor != null) {
+            stateMap.put(OBSERVER_KEY, commandMonitor);
+        }
 
         while(true) {
 
@@ -53,8 +80,8 @@ public class ProofScriptEngine {
             }
 
             String cmd = "'" + argMap.get(ScriptLineParser.LITERAL_KEY) + "'";
-            if(cmd.length() > 40) {
-                cmd = cmd.substring(0,40) + " ...'";
+            if(cmd.length() > MAX_CHARS_PER_COMMAND) {
+                cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
             if(commandMonitor != null) {
@@ -73,13 +100,13 @@ public class ProofScriptEngine {
                     throw new ScriptException("Unknown command " + name);
                 }
 
-                command.execute(uiControl, proof, argMap);
+                command.execute(uiControl, proof, argMap, stateMap);
             } catch(InterruptedException ie) {
                 throw ie;
             } catch (Exception e) {
                 throw new ScriptException("Error while executing script: " + e.getMessage() +
                         "\n\nCommand:" + argMap.get(ScriptLineParser.LITERAL_KEY),
-                        file.getAbsolutePath(), mlp.getLine(), mlp.getColumn(), e);
+                        initialLocation.getFilename(), mlp.getLine(), mlp.getColumn(), e);
             }
         }
     }

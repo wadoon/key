@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.StringReader;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -19,10 +20,20 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 public abstract class AbstractCommand implements ProofScriptCommand {
 
+    public static final String GOAL_KEY = "goal";
+    public static final String ABBREV_KEY = "abbrMap";
     private static DefaultTermParser PARSER = new DefaultTermParser();
     private static AbbrevMap EMPTY_MAP = new AbbrevMap();
 
-    final protected Goal getFirstOpenGoal(Proof proof) throws ScriptException {
+    protected static Goal getFirstOpenGoal(Proof proof, Map<String, Object> state) throws ScriptException {
+
+        Object fixedGoal = state.get(GOAL_KEY);
+        if(fixedGoal instanceof Node) {
+            Goal g = getGoal(proof.openGoals(), (Node)fixedGoal);
+            if(g != null) {
+                return g;
+            }
+        }
 
         Node node = proof.root();
 
@@ -71,20 +82,33 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         return null;
     }
 
-    final protected static Term toTerm(Proof proof, String string, Sort sort) throws ParserException {
+    final protected static Term toTerm(Proof proof, Map<String, Object> state, String string, Sort sort) throws ParserException, ScriptException {
+
+        AbbrevMap abbrMap = (AbbrevMap)state.get(ABBREV_KEY);
+        if(abbrMap == null) {
+            abbrMap = EMPTY_MAP;
+        }
+
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        Term formula = PARSER.parse(reader, sort, services, services.getNamespaces(), EMPTY_MAP);
+        Term formula = PARSER.parse(reader, sort, services, services.getNamespaces(), abbrMap);
         return formula;
     }
 
-    private static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
+    final protected static Sort toSort(Proof proof, Map<String, Object> state, String string) throws ParserException, ScriptException {
+        StringReader reader = new StringReader(string);
+        Services services = proof.getServices();
+        Sort sort = (Sort) services.getNamespaces().sorts().lookup(string);
+        return sort;
+    }
+
+    final protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
             if(goal.node() == node) {
                 return goal;
             }
         }
-        throw new Error("unreachable");
+        return null;
     }
 
     final protected static int getMaxAutomaticSteps(Proof proof) {
@@ -95,7 +119,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         }
     }
 
-    public void setMaxAutomaticSteps(Proof proof, int steps) {
+    final protected void setMaxAutomaticSteps(Proof proof, int steps) {
         if (proof != null) {
             proof.getSettings().getStrategySettings().setMaxSteps(steps);
         }

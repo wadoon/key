@@ -143,6 +143,11 @@ public interface ProofMacro {
      * This method may be called from within the GUI thread and be compatible
      * with that fact.
      *
+     * This method must be implemented to have the same effect as calling
+     * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence)} with
+     * <code>node.proof()</code> as proof and all open goals below
+     * <code>node</code>.
+     *
      * @param node
      *            the node (not <code>null</code>)
      * @param posInOcc
@@ -152,14 +157,6 @@ public interface ProofMacro {
      */
     public boolean canApplyTo(Node node,
                               PosInOccurrence posInOcc);
-
-    /**
-     * Can this macro be applied with no {@link PosInOccurrence} given?
-     * This method is necessary because we need to check global applicability
-     * even when no proof is loaded (e.g., in GUI initialization).
-     * Fixes bug #1495
-     */
-    public boolean isApplicableWithoutPosition();
 
     /**
      * Apply this macro on the given goals.
@@ -237,8 +234,8 @@ public interface ProofMacro {
      * fixes #1356
      */
     class ProgressBarListener extends ProofMacroListener {
-        private int numberGoals;
-        private int numberSteps;
+        private final int numberGoals;
+        private final int numberSteps;
         private int completedGoals;
 
         ProgressBarListener(String name, int numberGoals,

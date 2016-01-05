@@ -13,6 +13,13 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.countAtoms;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getDistinguishingFormula;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.trySimplify;
+
+import java.util.LinkedHashSet;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -26,8 +33,8 @@ import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils.Option;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
  * Rule that joins two sequents based on the if-then-else construction: If two
@@ -58,18 +65,26 @@ public class JoinIfThenElse extends JoinProcedure {
 
     private static final String DISPLAY_NAME = "JoinByIfThenElse";
     static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     */
+    @Override
+    public boolean complete() {
+        return true;
+    }
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
+    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
             Term v, SymbolicExecutionState state1,
             Term valueInState1, SymbolicExecutionState state2,
             Term valueInState2, Term distinguishingFormula, Services services) {
 
-        return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+        return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
                 DefaultImmutableSet.<Term> nil(), createIfThenElseTerm(state1,
                         state2, valueInState1, valueInState2,
                         distinguishingFormula, services),
-                DefaultImmutableSet.<Name> nil());
+                new LinkedHashSet<Name>());
 
     }
     @Override

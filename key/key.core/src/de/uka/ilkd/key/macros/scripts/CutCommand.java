@@ -24,12 +24,12 @@ public class CutCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException, InterruptedException {
+            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
         Term formula;
         try {
             String formString = args.get("#2");
-            formula = toTerm(proof, formString, Sort.FORMULA);
+            formula = toTerm(proof, state, formString, Sort.FORMULA);
         } catch (ParserException e) {
             throw new ScriptException(e);
         }
@@ -39,7 +39,7 @@ public class CutCommand extends AbstractCommand {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
         app = app.addCheckedInstantiation(sv, formula, proof.getServices(), true);
-        getFirstOpenGoal(proof).apply(app);
+        getFirstOpenGoal(proof, state).apply(app);
     }
 
 }

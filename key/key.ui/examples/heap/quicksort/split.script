@@ -1,4 +1,7 @@
-macro autopilot;
+macro autopilot-prep;
+
+# the power of autopilot is not enough. run another 10000 on open goals
+tryclose;
 
 # two goals remain open after autopilot
 # both have to do with the seqPerm condition
