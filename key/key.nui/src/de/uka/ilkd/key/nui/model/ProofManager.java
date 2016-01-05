@@ -13,6 +13,12 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 
+/**
+ * Provides a wrapper of the KeYMediator
+ * with basic loading of proofs
+ * @author Benedikt Gross
+ *
+ */
 public class ProofManager {
     private IStatusManager statusManager;
     private List<IProofListener> listeners = new ArrayList<IProofListener>();

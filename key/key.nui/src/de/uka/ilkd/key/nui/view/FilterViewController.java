@@ -2,8 +2,15 @@ package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
@@ -11,12 +18,9 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.Filter;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
 public class FilterViewController extends ViewController {
@@ -25,7 +29,7 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private TextField searchText;
-    
+
     @FXML
     private TextField excludeText;
 
@@ -42,27 +46,76 @@ public class FilterViewController extends ViewController {
         loadCurrentFilter();
     }
 
+    private Document dummyDoc;
+
     @FXML
     private void handleApply() {
         fillCurrentFilter();
-        for (Node node : dummy.getChildren()) {
-            if (node instanceof Text) {
-                Text text = (Text) node;
+        NodeList nodeList = dummyDoc.getElementsByTagName("*");
+        List<Node> excludes = new LinkedList<>();
+        List<Node> includes = new LinkedList<>();
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
                 if (currentFilter.getSearchString() != null
                         && !currentFilter.getSearchString().equals("")
-                        && !text.getText().contains(currentFilter.getSearchString()))
-                    text.setVisible(false);
-                else if(currentFilter.getExcludeString() != null
+                        && !node.getTextContent()
+                                .contains(currentFilter.getSearchString()))
+                    includes.add(node);
+                else if (currentFilter.getExcludeString() != null
                         && !currentFilter.getExcludeString().equals("")
-                        && text.getText().contains(currentFilter.getExcludeString()))
-                    text.setVisible(false);
-                else text.setVisible(true);
+                        && node.getTextContent()
+                                .contains(currentFilter.getExcludeString()))
+                    excludes.add(node);
             }
         }
+        String filterStyles = "";
+        filterStyles += applyInclude(includes);
+        filterStyles += applyExclude(excludes);
+        Element element = dummyDoc.getElementById("filterCss");
+        if (element != null)
+            element.setTextContent(filterStyles);
+        else {
+            element = dummyDoc.createElement("style");
+            element.setIdAttribute("filterCss", true);
+            element.setTextContent(filterStyles);
+        }
+        /*
+         * for (Node node : dummy.getChildren()) { if (node instanceof Text) {
+         * Text text = (Text) node; if (currentFilter.getSearchString() != null
+         * && !currentFilter.getSearchString().equals("") &&
+         * !text.getText().contains(currentFilter.getSearchString()))
+         * text.setVisible(false); else if(currentFilter.getExcludeString() !=
+         * null && !currentFilter.getExcludeString().equals("") &&
+         * text.getText().contains(currentFilter.getExcludeString()))
+         * text.setVisible(false); else text.setVisible(true); } }
+         */
     }
 
-    @FXML
-    private TextFlow dummy;
+    private String applyInclude(List<Node> applyTo) {
+        return addFilter(
+                ".content :not(%s),.content :not(%s) *{display: none !important;}",
+                applyTo);
+    }
+
+    private String applyExclude(List<Node> applyTo) {
+        return addFilter(
+                ".content (%s),.content (%s) *{display: none !important;}",
+                applyTo);
+    }
+
+    private String addFilter(String css, List<Node> applyTo) {
+        List<String> classes = new LinkedList<>();
+        for (Node node : applyTo)
+            classes.add(node.getAttributes().getNamedItem("class")
+                    .getTextContent());
+        String htmlClasses = String.join(",", classes);
+        if (applyTo.size() > 0)
+            return String.format(css, htmlClasses, htmlClasses);
+        else
+            return "";
+    }
 
     // TODO: save filter on disk
     // TODO: clear textbox if value changed
@@ -120,11 +173,6 @@ public class FilterViewController extends ViewController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         currentFilter = new Filter();
-        dummy.getChildren().add(new Text(" \\forall "));
-        dummy.getChildren().add(new Text(" forall "));
-        dummy.getChildren().add(new Text("<>"));
-        dummy.getChildren().add(new Text(" and "));
-        dummy.getChildren().add(new Text(" or "));
     }
 
     @Override
