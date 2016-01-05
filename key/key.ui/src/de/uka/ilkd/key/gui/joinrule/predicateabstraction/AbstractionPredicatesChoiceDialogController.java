@@ -194,8 +194,11 @@ public class AbstractionPredicatesChoiceDialogController {
                         resourcePath + "css/bootstrap/bootstrap-theme.min.css");
         final URL infoTextResource =
                 getURLForResourceFile(AbstractionPredicatesChoiceDialog.class,
-                        resourcePath
-                                + "help/abstrPredsJoinDialogInfo.html");
+                        resourcePath + "help/abstrPredsJoinDialogInfo.html");
+
+        assert bootstrapCssResource != null
+                && bootstrapThemeCssResource != null
+                && infoTextResource != null : "Could not find css/html resources for the abstraction predicates choice dialog.";
 
         mainPane.prefWidthProperty().bind(wvInfo.prefWidthProperty());
 
