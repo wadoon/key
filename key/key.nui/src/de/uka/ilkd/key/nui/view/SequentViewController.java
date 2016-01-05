@@ -1,8 +1,17 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.io.File;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -21,6 +30,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -41,7 +54,6 @@ public class SequentViewController extends ViewController {
     private IProofListener proofChangeListener = (proofEvent) -> {
         // execute ui update on javafx thread
         Platform.runLater(() -> {
-            // When loading a new proof the root sequent is shown.
             showSequent(context.getProofManager().getMediator().getSelectedNode());
         });
     };
@@ -209,10 +221,33 @@ public class SequentViewController extends ViewController {
 
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
+        
+        /*webEngine.getLoadWorker().stateProperty().addListener(
+                new ChangeListener<State>() {
+                    public void changed(ObservableValue ov, State oldState, State newState) {
+                        if (newState == Worker.State.SUCCEEDED) {
+                            Document doc = webEngine.getDocument();
+                            try {
+                                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                                transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+                                transformer.transform(new DOMSource(doc),
+                                        new StreamResult(new OutputStreamWriter(System.out, "UTF-8")));
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                });*/
+        
         webEngine.loadContent(s);
 
         // textAreaWebView.getEngine().loadContent(s);
-        webEngine.loadContent(s);    
+        // webEngine.loadContent(s);    
     }
     /**
      * registered MouseMoveEventHandler. Event is given to posConverter.
@@ -221,7 +256,7 @@ public class SequentViewController extends ViewController {
     @FXML
     private void webViewMouseMove(MouseEvent event) {
         if (sequentLoaded) {
-            posConverter.takeMouseEvent(event);
+            posConverter.getCharIdxUnderPointer(event);
         }
     }
 }
