@@ -5,7 +5,6 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.nui.KeYMenu;
 import de.uka.ilkd.key.nui.ViewController;
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 
 @KeYMenu(path="TestMenuEntry.fxml")
@@ -18,18 +17,6 @@ public class TestMenuEntryController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void initializeAfterLoadingFxml() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void createSwingContent(SwingNode swingNode) {
         // TODO Auto-generated method stub
         
     }

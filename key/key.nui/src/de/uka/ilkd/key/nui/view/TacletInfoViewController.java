@@ -6,7 +6,6 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import javafx.embed.swing.SwingNode;
 
 //@KeYView(title = "TacletInfo", path = "TacletInfoView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = false)
 public class TacletInfoViewController extends ViewController {
@@ -16,17 +15,4 @@ public class TacletInfoViewController extends ViewController {
         // TODO Auto-generated method stub
         
     }
-
-    @Override
-    public void initializeAfterLoadingFxml() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void createSwingContent(SwingNode swingNode) {
-        // TODO Auto-generated method stub
-        
-    }
-
 }
