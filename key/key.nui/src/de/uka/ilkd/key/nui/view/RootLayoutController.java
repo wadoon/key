@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -164,7 +165,7 @@ public class RootLayoutController extends ViewController
         node.setOnDragDropped(event -> {
             boolean success = false;
             if (dragTab != null) {
-                views.get(((Label) dragTab.getGraphic()).getText())
+                views.get(((Label)((BorderPane) dragTab.getGraphic()).getCenter()).getText())
                         .setCurrentPosition(getTabPosition(node));
                 dragTab = null;
                 success = true;
@@ -182,8 +183,6 @@ public class RootLayoutController extends ViewController
      */
     @FXML
     private void handleAbout(ActionEvent event) {
-        System.out.println("About clicked");
-
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(
@@ -349,12 +348,14 @@ public class RootLayoutController extends ViewController
      */
     private Tab createTab(ViewInformation view, Node node) {
         Tab t = new Tab();
-        Label l = new Label(view.getTitle());
-        t.setGraphic(l);
+        Label title = new Label(view.getTitle());
+        BorderPane header = new BorderPane();
+        header.setCenter(title);
+        t.setGraphic(header);
         t.setContent(node);
 
-        l.setOnDragDetected(event -> {
-            Dragboard db = l.startDragAndDrop(TransferMode.MOVE);
+        header.setOnDragDetected(event -> {
+            Dragboard db = header.startDragAndDrop(TransferMode.MOVE);
 
             ClipboardContent content = new ClipboardContent();
             content.putString(view.getTitle());
@@ -367,9 +368,9 @@ public class RootLayoutController extends ViewController
             view.setIsActive(false);
         });
 
-        l.setOnMouseClicked(event -> {
+        header.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(view).show(l, Side.TOP, event.getX(),
+                loadViewContextMenu(view).show(title, Side.TOP, event.getX(),
                         event.getY());
         });
 
