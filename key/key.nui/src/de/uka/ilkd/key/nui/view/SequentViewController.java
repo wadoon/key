@@ -12,7 +12,6 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.IProofListener;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
-import de.uka.ilkd.key.nui.util.SequentPrinterCorrected;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -35,7 +34,6 @@ public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
     private SequentPrinter printer;
-    private SequentPrinterCorrected printerCorrected;
     private LogicPrinter logicPrinter;
     private InitialPositionTable abstractSyntaxTree;
     private String proofString;
@@ -90,22 +88,21 @@ public class SequentViewController extends ViewController {
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
         searchButton.setDisable(true);
-        printer = new SequentPrinter("resources/css/sequentStyle.css",
-                "resources/css/sequentClasses.ini");
+        
         textAreaWebView.setOnMouseMoved(event -> {
             if (sequentLoaded) {
 
                 int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
                 
-                this.printerCorrected.applyMouseHighlighting(range);
+                this.printer.applyMouseHighlighting(range);
                 this.updateView();
 
             }
         });
         textAreaWebView.setOnMouseExited(event -> {
             if (sequentLoaded) {
-                this.printerCorrected.removeMouseHighlighting();
+                this.printer.removeMouseHighlighting();
                 this.updateView();
             }
         });
@@ -130,7 +127,7 @@ public class SequentViewController extends ViewController {
 
         searchBox.setOnKeyReleased((event) -> {
             //printer.setFreeTextSearch(searchBox.getText());
-            printerCorrected.setFreetextSearch(searchBox.getText());
+            printer.setFreetextSearch(searchBox.getText());
             updateView();
             event.consume();
         });
@@ -151,7 +148,7 @@ public class SequentViewController extends ViewController {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printerCorrected = new SequentPrinterCorrected(
+        printer = new SequentPrinter(
                 "resources/css/sequentStyle.css", abstractSyntaxTree);
 
         printSequent();
@@ -216,7 +213,7 @@ public class SequentViewController extends ViewController {
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
-        printerCorrected.setProofString(proofString);
+        printer.setProofString(proofString);
 
         posTranslator = new PositionTranslator(proofString);
 
@@ -259,7 +256,7 @@ public class SequentViewController extends ViewController {
     }
     
     private void updateView(){
-        updateHtml(this.printerCorrected.printProofString());
+        updateHtml(this.printer.printProofString());
     }
 
     @Override
