@@ -221,7 +221,8 @@ public class RootLayoutController extends ViewController
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter("Proofs", "*.proof"),
                 new ExtensionFilter("All Files", "*.*"));
-        fileChooser.setInitialDirectory(new File("../"));
+        //TODO reset initial directory to "../" (changed for faster access to proofs for testing purposes)
+        fileChooser.setInitialDirectory(new File("../key.core.test/resources/testcase/join"));
 
         File file = fileChooser.showOpenDialog(new Stage());
 

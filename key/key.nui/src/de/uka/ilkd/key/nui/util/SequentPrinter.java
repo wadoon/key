@@ -128,6 +128,7 @@ public class SequentPrinter {
     public String printSequent(String s) {
         String htmlEncoded = htmlEncode(s);
         String result = highlightString(htmlEncoded, freeTextSearch);
+        
         result = toHTML(result);
         for (String classString : dictionaryMap.keySet()) {
             result = styleHTMLEscaped(result, dictionaryMap.get(classString),

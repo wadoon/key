@@ -1,17 +1,8 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.io.File;
-import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -19,25 +10,23 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.IProofListener;
-import de.uka.ilkd.key.nui.util.PositionConverter;
+import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
+import de.uka.ilkd.key.nui.util.SequentPrinterCorrected;
+import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import javafx.fxml.FXML;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.Pane;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
-import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingNode;
+import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
@@ -46,7 +35,9 @@ public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
     private SequentPrinter printer;
+    private SequentPrinterCorrected printerCorrected;
     private LogicPrinter logicPrinter;
+    private InitialPositionTable abstractSyntaxTree;
     private String proofString;
     private WebEngine webEngine;
     private NotationInfo notationInfo = new NotationInfo();
@@ -55,10 +46,11 @@ public class SequentViewController extends ViewController {
     private IProofListener proofChangeListener = (proofEvent) -> {
         // execute ui update on javafx thread
         Platform.runLater(() -> {
-            showSequent(context.getProofManager().getMediator().getSelectedNode());
+            showSequent(
+                    context.getProofManager().getMediator().getSelectedNode());
         });
     };
-    private PositionConverter posConverter;
+    private PositionTranslator posTranslator;
 
     // @FXML
     // private TextArea textArea;
@@ -100,6 +92,27 @@ public class SequentViewController extends ViewController {
         searchButton.setDisable(true);
         printer = new SequentPrinter("resources/css/sequentStyle.css",
                 "resources/css/sequentClasses.ini");
+        textAreaWebView.setOnMouseMoved(event -> {
+            if (sequentLoaded) {
+
+                int pos = posTranslator.getCharIdxUnderPointer(event);
+                Range range = this.abstractSyntaxTree.rangeForIndex(pos);
+                // String highlighted =
+                // this.printer.highlightString(proofString, range.start(),
+                // range.end()-range.start());
+                System.out.println("POS: " + pos);
+                System.out.println("RANGE: " + range);
+                this.printerCorrected.applyMouseHighlighting(range);
+                this.updateHtml(this.printerCorrected.printProofString());
+                System.out.println();
+            }
+        });
+        textAreaWebView.setOnMouseExited(event -> {
+            if (sequentLoaded) {
+                this.printerCorrected.removeMouseHighlighting();
+                this.updateHtml(this.printerCorrected.printProofString());
+            }
+        });
     }
 
     @Override
@@ -131,15 +144,21 @@ public class SequentViewController extends ViewController {
         searchParent.managedProperty().bind(searchParent.visibleProperty());
         searchParent.setVisible(searchButton.isSelected());
     }
-    
+
     private void showSequent(Node node) {
-        Proof proof = context.getProofManager().getMediator().getSelectedProof();
+        Proof proof = context.getProofManager().getMediator()
+                .getSelectedProof();
         services = proof.getServices();
         sequent = node.sequent();
-        
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
+        abstractSyntaxTree = logicPrinter.getInitialPositionTable();
+        printerCorrected = new SequentPrinterCorrected(
+                "resources/css/sequentStyle.css", abstractSyntaxTree);
+
         printSequent();
-        
+
         checkBoxPrettySyntax.setDisable(false);
         checkBoxUnicode.setDisable(false);
         searchButton.setDisable(false);
@@ -152,6 +171,7 @@ public class SequentViewController extends ViewController {
     private void usePrettySyntax() {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
+        abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         if (!checkBoxPrettySyntax.isSelected()) {
             notationInfo.refresh(services, false, false);
             checkBoxUnicode.setSelected(false);
@@ -173,6 +193,7 @@ public class SequentViewController extends ViewController {
     private void useUnicode() {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
+        abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         if (!checkBoxUnicode.isSelected()) {
             notationInfo.refresh(services, true, false);
             printSequent();
@@ -198,14 +219,12 @@ public class SequentViewController extends ViewController {
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
-        
-        posConverter = new PositionConverter(proofString);
-        printer = new SequentPrinter("resources/css/sequentStyle.css",
-                "resources/css/sequentClasses.ini");
+        printerCorrected.setProofString(proofString);
+
+        posTranslator = new PositionTranslator(proofString);
 
         sequentLoaded = true;
-        // System.out.println(printer.escape(proofString));
-        updateHtml(printer.printSequent(proofString));
+        updateHtml(printerCorrected.printProofString());
     }
 
     /**
@@ -215,50 +234,31 @@ public class SequentViewController extends ViewController {
     private void loadDefaultProof() {
         context.getProofManager()
                 .loadProblem(new File("resources/proofs/gcd.closed.proof"));
-        // File file = new File("resources/proofs/gcd.closed.proof");
-        // mainApp.setProof(file);
-        // showRootSequent();
     }
 
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
-        
-        /*webEngine.getLoadWorker().stateProperty().addListener(
-                new ChangeListener<State>() {
-                    public void changed(ObservableValue ov, State oldState, State newState) {
-                        if (newState == Worker.State.SUCCEEDED) {
-                            Document doc = webEngine.getDocument();
-                            try {
-                                Transformer transformer = TransformerFactory.newInstance().newTransformer();
-                                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-                                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-                                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                                transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-                                transformer.transform(new DOMSource(doc),
-                                        new StreamResult(new OutputStreamWriter(System.out, "UTF-8")));
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }
-                });*/
-        
+        /*
+         * webEngine.getLoadWorker().stateProperty().addListener( new
+         * ChangeListener<State>() { public void changed(ObservableValue ov,
+         * State oldState, State newState) { if (newState ==
+         * Worker.State.SUCCEEDED) { Document doc = webEngine.getDocument(); try
+         * { Transformer transformer =
+         * TransformerFactory.newInstance().newTransformer();
+         * transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+         * transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+         * transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+         * transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+         * transformer.setOutputProperty(
+         * "{http://xml.apache.org/xslt}indent-amount", "4");
+         * 
+         * transformer.transform(new DOMSource(doc), new StreamResult(new
+         * OutputStreamWriter(System.out, "UTF-8"))); } catch (Exception ex) {
+         * ex.printStackTrace(); } } } });
+         */
+
         webEngine.loadContent(s);
-
-        // textAreaWebView.getEngine().loadContent(s);
-        // webEngine.loadContent(s);    
-    }
-    /**
-     * registered MouseMoveEventHandler. Event is given to posConverter.
-     * @param event MouseEvent
-     */
-    @FXML
-    private void webViewMouseMove(MouseEvent event) {
-        if (sequentLoaded) {
-            posConverter.getCharIdxUnderPointer(event);
-        }
     }
 
     @Override
