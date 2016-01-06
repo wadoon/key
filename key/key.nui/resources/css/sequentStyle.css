@@ -6,6 +6,9 @@ body{
 .highlighted{
 	background-color:yellow;
 }
+.mouseover{
+	background-color:B0C4DE;
+}
 .forall{
 	color: blue;
 	font-weight: bold;

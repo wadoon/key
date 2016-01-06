@@ -12,14 +12,12 @@ import javafx.scene.text.Text;
  *
  */
 public class PositionConverter {
-    // private String proofString;
     private String[] strings;
 
     /**
      * 
      */
     public PositionConverter(String proofString) {
-        // this.proofString = proofString;
         strings = proofString.split("\n");
     }
 
@@ -32,27 +30,23 @@ public class PositionConverter {
      *         proofstring.
      */
     public int getCharIdxUnderPointer(MouseEvent event) {
-        int idx = -1;
+        // Approximate Row. TODO: Different Sizes
         int row = (int) Math.round((event.getY() - 15.0) / 18.0);
-
+        // If valid Row
         if (row >= 0 && row < strings.length) {
-            int charInRow = getCharIdxInRow(event.getX(), row);
+            // Get Position of the Char under MousePointer in this specific row
+            int charPosInRow = getCharIdxInRow(event.getX(), row);
 
-            if (charInRow != -1) {
-
-                idx = getCharIndex(row, charInRow);
-                // char c = proofString.charAt(idx);
-
-                /*
-                 * System.out.println("Hack Index: " + idx); System.out.println(
-                 * "Hack Char at this Pos: " + proofString.charAt(idx));
-                 * System.out .println(event.getY() + ", " + event.getX() + ": "
-                 * + c);
-                 */
+            // If to the right of last char in row, return last char (-2
+            // adjustment for linebreak)
+            if (charPosInRow == -1) {
+                return getCharIndex(row, strings[row].length() - 2);
+            }
+            else {
+                return getCharIndex(row, charPosInRow);
             }
         }
-        // System.out.println("####");
-        return idx;
+        return -1;
     }
 
     /**
@@ -89,10 +83,6 @@ public class PositionConverter {
             return -1;
         }
 
-        /*
-         * System.out.println("Graphic Result: " + result); System.out.println(
-         * "Graphic ResultString: " + strings[row].charAt(result));
-         */
         return result;
     }
 
@@ -105,12 +95,14 @@ public class PositionConverter {
      *            the position of the char inside of the row
      * @return returns the index of the char in proofstring
      */
-    private int getCharIndex(int row, int charInRow) {
+    private int getCharIndex(int row, int charPosInRow) {
         int idx = 0;
+        // ++ length of rows before
         for (int i = 0; i < row; i++) {
             idx += strings[i].length();
         }
-        idx += charInRow + row;
+        // ++ position of char in row; ++ (number of linebreaks) == row
+        idx += charPosInRow + row;
 
         return idx;
     }
