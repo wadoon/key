@@ -17,7 +17,7 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.util.IStatusManager;
-import de.uka.ilkd.key.nui.view.fxmlparts.ViewContextMenuController;
+import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
@@ -166,7 +166,7 @@ public class RootLayoutController extends ViewController
         node.setOnDragDropped(event -> {
             boolean success = false;
             if (dragTab != null) {
-                views.get(((Label) dragTab.getGraphic()).getText())
+                views.get(((Label)((BorderPane) dragTab.getGraphic()).getCenter()).getText())
                         .setCurrentPosition(getTabPosition(node));
                 dragTab = null;
                 success = true;

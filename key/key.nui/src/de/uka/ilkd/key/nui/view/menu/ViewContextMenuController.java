@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.view.fxmlparts;
+package de.uka.ilkd.key.nui.view.menu;
 
 import java.net.URL;
 import java.util.ResourceBundle;
