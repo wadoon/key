@@ -11,6 +11,12 @@ import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 
+/**
+ * Embeds the Tree View from the old UI.
+ * 
+ * @author Nils Muzzulini
+ *
+ */
 @KeYView(title = "Tree", path = "TreeView.fxml", preferredPosition = ViewPosition.TOPLEFT)
 public class TreeViewController extends ViewControllerSwingContent {
 

@@ -14,6 +14,12 @@ import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 
+/**
+ * Embeds the Open Goals View from the old UI.
+ * 
+ * @author Nils Muzzulini
+ *
+ */
 @KeYView(title = "Open Goals", path = "OpenGoalsView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
 public class OpenGoalsViewController extends ViewControllerSwingContent {
 
@@ -35,12 +41,12 @@ public class OpenGoalsViewController extends ViewControllerSwingContent {
 
     @Override
     public void createSwingContent(SwingNode swingNode) {
-        // set openGoalsView (From old UI)
+        // set openGoalsView
         openGoalsView = new JScrollPane();
-        //GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
+        // GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
         GoalList goalList = new GoalList(context.getProofManager().getMediator());
         openGoalsView.setViewportView(goalList);
-        
+
         swingNode.setContent(openGoalsView);
     }
 }
