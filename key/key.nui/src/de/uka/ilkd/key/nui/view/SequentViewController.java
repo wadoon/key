@@ -10,7 +10,7 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.IProofListener;
-import de.uka.ilkd.key.nui.util.PositionConverter;
+import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.nui.util.SequentPrinterCorrected;
 import de.uka.ilkd.key.pp.InitialPositionTable;
@@ -50,7 +50,7 @@ public class SequentViewController extends ViewController {
                     context.getProofManager().getMediator().getSelectedNode());
         });
     };
-    private PositionConverter posConverter;
+    private PositionTranslator posTranslator;
 
     // @FXML
     // private TextArea textArea;
@@ -95,7 +95,7 @@ public class SequentViewController extends ViewController {
         textAreaWebView.setOnMouseMoved(event -> {
             if (sequentLoaded) {
 
-                int pos = posConverter.getCharIdxUnderPointer(event);
+                int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
                 // String highlighted =
                 // this.printer.highlightString(proofString, range.start(),
@@ -221,7 +221,7 @@ public class SequentViewController extends ViewController {
         proofString = logicPrinter.toString();
         printerCorrected.setProofString(proofString);
 
-        posConverter = new PositionConverter(proofString);
+        posTranslator = new PositionTranslator(proofString);
 
         sequentLoaded = true;
         updateHtml(printerCorrected.printProofString());

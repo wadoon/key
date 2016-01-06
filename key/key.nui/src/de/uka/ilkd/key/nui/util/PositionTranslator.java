@@ -13,13 +13,13 @@ import javafx.scene.text.Text;
  * @author Maximilian Li
  *
  */
-public class PositionConverter {
+public class PositionTranslator {
     private String[] strings;
 
     /**
      * 
      */
-    public PositionConverter(String proofString) {
+    public PositionTranslator(String proofString) {
         strings = proofString.split("\n");
     }
 
