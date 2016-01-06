@@ -8,19 +8,19 @@ import java.util.List;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 
+/**
+ * Provides a wrapper of the KeYMediator
+ * with basic loading of proofs
+ * @author Benedikt Gross
+ *
+ */
 public class ProofManager {
     private IStatusManager statusManager;
     private List<IProofListener> listeners = new ArrayList<IProofListener>();
     private KeYMediator mediator;
-    private ProofTreeView proofTreeView;
-
-    public ProofTreeView getProofTreeView() {
-        return proofTreeView;
-    }
 
     public KeYMediator getMediator() {
         return mediator;
@@ -38,7 +38,6 @@ public class ProofManager {
         mediator = new KeYMediator(userInterface);
         userInterface.setMediator(mediator);
         mediator.addKeYSelectionListener(new ProofListener());
-        proofTreeView = new ProofTreeView(mediator);
     }
 
     public synchronized void addProofListener(IProofListener proofListener) {

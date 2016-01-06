@@ -21,7 +21,15 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
+<<<<<<< HEAD
 import javafx.fxml.FXML;
+=======
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
+import javafx.embed.swing.SwingNode;
+>>>>>>> 3ceaaac237d16ec19172d2f39e5a3bd4b8d4c841
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -258,5 +266,11 @@ public class SequentViewController extends ViewController {
          */
 
         webEngine.loadContent(s);
+    }
+
+    @Override
+    public void createSwingContent(SwingNode swingNode) {
+        // TODO Auto-generated method stub
+        
     }
 }

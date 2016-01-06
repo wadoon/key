@@ -23,6 +23,9 @@ public class MainApp extends Application {
     private Stage primaryStage;
     private BorderPane rootLayout;
     private RootLayoutController rootLayoutController;
+    /**
+     * the string specifies the prefix for packages that should be scanned for annotations
+     */
     private Reflections reflections = new Reflections("de.uka.ilkd.key");
     private Scene scene;
     boolean ctrlPressed = false;
