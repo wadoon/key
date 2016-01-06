@@ -3,6 +3,8 @@
  */
 package de.uka.ilkd.key.nui.util;
 
+import org.stringtemplate.v4.compiler.CodeGenerator.primary_return;
+
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -30,37 +32,64 @@ public class PositionConverter {
      *         proofstring.
      */
     public int getCharIdxUnderPointer(MouseEvent event) {
-        // Approximate Row. TODO: Different Sizes
-        int row = (int) Math.round((event.getY() - 15.0) / 18.0);
-        // If valid Row
-        if (row >= 0 && row < strings.length) {
-            // Get Position of the Char under MousePointer in this specific row
-            int charPosInRow = getCharIdxInRow(event.getX(), row);
+        // Compute Line
+        int line = getLine(event.getY());
+        
+        // If valid Line
+        if (line != -1) {
+            // Get Position of the Char under MousePointer in this specific Line
+            int charPosInLine = getCharIdxInLine(event.getX(), line);
 
-            // If to the right of last char in row, return last char (-2
+            // If to the right of last char in Line, return last char (-2
             // adjustment for linebreak)
-            if (charPosInRow == -1) {
-                return getCharIndex(row, strings[row].length() - 2);
+            if (charPosInLine == -1) {
+                return getCharIndex(line, strings[line].length() - 2);
             }
             else {
-                return getCharIndex(row, charPosInRow);
+                return getCharIndex(line, charPosInLine);
             }
         }
         return -1;
     }
+    /**
+     * uses the Y-Coordinate of MouseEvent to compute underlying line
+     * @param yCoordinate the YCoordinate of the MouseEvent
+     * @return the number of the underlying line
+     */
+    private int getLine(double yCoordinate){
+        double yCoord = yCoordinate -5;
+        int result;
+        
+        Text text = new Text(" ");
+        text.setFont(new Font("Courier New", 16));
+        
+        for (result = 0; result < strings.length; result++) {
+            yCoord -= text.getLayoutBounds().getHeight();
+            
+            if(yCoord < 0){
+                break;
+            }
+        }
+        
+        if (yCoord > 0) {
+            return -1;
+        }
+
+        return result;
+    }
 
     /**
-     * returns the idx of the char under the mousepointer relative to the row
+     * returns the idx of the char under the mousepointer relative to the line
      * 
      * @param xCoordinate
      *            the x-value of the Mouse event
-     * @param row
-     *            the row in which the char is located
-     * @return the idx of the char inside of the given row
+     * @param line
+     *            the line in which the char is located
+     * @return the idx of the char inside of the given line
      */
-    private int getCharIdxInRow(double xCoordinate, int row) {
+    private int getCharIdxInLine(double xCoordinate, int line) {
         // Adjust for left margin
-        double xCord = xCoordinate - 5;
+        double xCoord = xCoordinate - 5;
         int result = 0;
 
         // Generate Text Object with Font and Size for computing width
@@ -68,18 +97,18 @@ public class PositionConverter {
         text.setFont(new Font("Courier New", 16));
 
         // For each char check width
-        for (char c : strings[row].toCharArray()) {
+        for (char c : strings[line].toCharArray()) {
             text.setText("" + c);
-            xCord -= (text.getLayoutBounds().getWidth());
+            xCoord -= text.getLayoutBounds().getWidth();
 
-            if (xCord < 0) {
+            if (xCoord < 0) {
                 break;
             }
 
             result++;
         }
         // If MousePointer is to the right to end of line, return -1
-        if (xCord > 0) {
+        if (xCoord > 0) {
             return -1;
         }
 
@@ -89,20 +118,20 @@ public class PositionConverter {
     /**
      * gets the Index of a specific Char in the proofString
      * 
-     * @param row
-     *            the row of the char
-     * @param charInRow
-     *            the position of the char inside of the row
+     * @param line
+     *            the line of the char
+     * @param charInLine
+     *            the position of the char inside of the line
      * @return returns the index of the char in proofstring
      */
-    private int getCharIndex(int row, int charPosInRow) {
+    private int getCharIndex(int line, int charPosInLine) {
         int idx = 0;
-        // ++ length of rows before
-        for (int i = 0; i < row; i++) {
+        // ++ length of lines before
+        for (int i = 0; i < line; i++) {
             idx += strings[i].length();
         }
-        // ++ position of char in row; ++ (number of linebreaks) == row
-        idx += charPosInRow + row;
+        // ++ position of char in line; ++ (number of linebreaks) == line
+        idx += charPosInLine + line;
 
         return idx;
     }
