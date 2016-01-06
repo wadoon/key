@@ -51,10 +51,4 @@ public class ViewContextMenuController extends ViewController{
         // TODO Auto-generated method stub
         
     }
-
-    @Override
-    public void createSwingContent(SwingNode swingNode) {
-        // TODO Auto-generated method stub
-        
-    }
 }

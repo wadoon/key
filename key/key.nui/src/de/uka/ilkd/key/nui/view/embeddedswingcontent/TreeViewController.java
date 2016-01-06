@@ -1,18 +1,18 @@
-package de.uka.ilkd.key.nui.view;
+package de.uka.ilkd.key.nui.view.embeddedswingcontent;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.nui.KeYView;
-import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.ViewControllerSwingContent;
 import de.uka.ilkd.key.nui.ViewPosition;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 
 @KeYView(title = "Tree", path = "TreeView.fxml", preferredPosition = ViewPosition.TOPLEFT)
-public class TreeViewController extends ViewController {
+public class TreeViewController extends ViewControllerSwingContent {
 
     private final SwingNode swingNode = new SwingNode();
 

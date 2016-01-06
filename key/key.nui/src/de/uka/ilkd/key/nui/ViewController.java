@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nui;
 
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.Initializable;
 
 /**
@@ -23,14 +22,6 @@ public abstract class ViewController implements Initializable {
      * Virtual method to be implemented if needed. This function is called after the FXML is loaded.
      */
     public void initializeAfterLoadingFxml() {
-        
-    }
-    
-    /**
-     * This method embeds Swing Content into a view. If implemented it needs to be called after the FXML is loaded.
-     * @param swingNode
-     */
-    public void createSwingContent(final SwingNode swingNode) {
         
     }
 }
