@@ -457,7 +457,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
     }
 
     /**
-     * @param <T>
+     * @param <T> Type of join procedure.
      * @return The chosen join rule.
      */
     @SuppressWarnings("unchecked")
