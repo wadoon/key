@@ -6,10 +6,10 @@ package de.uka.ilkd.key.nui.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.TreeMap;
 
-import de.uka.ilkd.key.pp.Notation.Constant;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 
@@ -22,10 +22,14 @@ public class SequentPrinterCorrected {
     private String proofString;
     private String css;
     private PositionTable posTable;
+
     private TreeMap<Integer, String[]> tagsAtIndex;
     private Range mouseoverRange;
+    private ArrayList<Integer> searchIndices;
 
     private final String closingTag = "</span>";
+    private final String mouseTagOpen = "<span class=\"mouseover\">";
+    private final String highlightedTagOpen = "<span class=\"highlighted\">";
 
     /**
      * 
@@ -128,7 +132,7 @@ public class SequentPrinterCorrected {
      */
     public void applyMouseHighlighting(Range range) {
         removeMouseHighlighting();
-        putTag(range.start(), 1, "<span class=\"mouseover\">");
+        putTag(range.start(), 1, mouseTagOpen);
         putTag(range.end(), 1, closingTag);
         mouseoverRange = range;
     }
@@ -169,6 +173,45 @@ public class SequentPrinterCorrected {
         if (mouseoverRange != null) {
             putTag(mouseoverRange.start(), 1, null);
             putTag(mouseoverRange.end(), 1, null);
+        }
+    }
+
+    /**
+     * set the String used for Freetext Search Highlighting
+     * 
+     * @param searchString
+     *            the freeetext searchString
+     */
+    public void setFreetextSearch(String searchString) {
+        // remove old Search Highlighting
+        cleanSearchIndices();
+        searchIndices = new ArrayList<Integer>();
+
+        if (!searchString.isEmpty()) {
+            // Find indices of all matches. Put in Map. Put in ArrayList for
+            // removal
+            for (int i = -1; (i = proofString.indexOf(searchString,
+                    i + 1)) != -1;) {
+                putTag(i, 2, highlightedTagOpen);
+                putTag(i + searchString.length(), 2, closingTag);
+
+                searchIndices.add(i);
+                searchIndices.add(i + searchString.length());
+            }
+        }
+    }
+
+    /**
+     * iterates over the searchIndices ArrayList. Uses this information to
+     * remove references in Styling TreeMap
+     */
+    private void cleanSearchIndices() {
+        if (searchIndices != null) {
+            for (Iterator<Integer> iterator = searchIndices.iterator(); iterator
+                    .hasNext();) {
+                int index = (int) iterator.next();
+                putTag(index, 2, null);
+            }
         }
     }
 

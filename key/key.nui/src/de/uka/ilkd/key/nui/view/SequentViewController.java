@@ -97,20 +97,16 @@ public class SequentViewController extends ViewController {
 
                 int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
-                // String highlighted =
-                // this.printer.highlightString(proofString, range.start(),
-                // range.end()-range.start());
-                System.out.println("POS: " + pos);
-                System.out.println("RANGE: " + range);
+                
                 this.printerCorrected.applyMouseHighlighting(range);
-                this.updateHtml(this.printerCorrected.printProofString());
-                System.out.println();
+                this.updateView();
+
             }
         });
         textAreaWebView.setOnMouseExited(event -> {
             if (sequentLoaded) {
                 this.printerCorrected.removeMouseHighlighting();
-                this.updateHtml(this.printerCorrected.printProofString());
+                this.updateView();
             }
         });
     }
@@ -133,8 +129,9 @@ public class SequentViewController extends ViewController {
                 });
 
         searchBox.setOnKeyReleased((event) -> {
-            printer.setFreeTextSearch(searchBox.getText());
-            updateHtml(printer.printSequent(proofString));
+            //printer.setFreeTextSearch(searchBox.getText());
+            printerCorrected.setFreetextSearch(searchBox.getText());
+            updateView();
             event.consume();
         });
     }
@@ -224,7 +221,7 @@ public class SequentViewController extends ViewController {
         posTranslator = new PositionTranslator(proofString);
 
         sequentLoaded = true;
-        updateHtml(printerCorrected.printProofString());
+        updateView();
     }
 
     /**
@@ -259,6 +256,10 @@ public class SequentViewController extends ViewController {
          */
 
         webEngine.loadContent(s);
+    }
+    
+    private void updateView(){
+        updateHtml(this.printerCorrected.printProofString());
     }
 
     @Override
