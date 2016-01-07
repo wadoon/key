@@ -192,22 +192,31 @@ public class SequentPrinter {
         searchIndices = new ArrayList<Integer>();
 
         if (!searchString.isEmpty()) {
-            // Find indices of all matches. Put in Map. Put in ArrayList for
-            // removal
             if (useRegex) {
-                Pattern pattern = Pattern.compile(searchString);
-                Matcher matcher = pattern.matcher(proofString);
-                while (matcher.find()) {
+                // try-catch block for incomplete Regex Patterns
+                try {
+                    Pattern pattern = Pattern.compile(searchString);
+                    Matcher matcher = pattern.matcher(proofString);
 
-                    // Check all occurrences
-                    putTag(matcher.start(), 2, highlightedTagOpen);
-                    putTag(matcher.end(), 2, closingTag);
+                    // Iterate over all findings and add to TreeMap
+                    while (matcher.find()) {
 
-                    searchIndices.add(matcher.start());
-                    searchIndices.add(matcher.end());
+                        // Check all occurrences
+                        putTag(matcher.start(), 2, highlightedTagOpen);
+                        putTag(matcher.end(), 2, closingTag);
+
+                        searchIndices.add(matcher.start());
+                        searchIndices.add(matcher.end());
+                    }
                 }
+                catch (Exception e) {
+                    return;
+                }
+
             }
             else {
+                // Find indices of all matches. Put in Map. Put in ArrayList for
+                // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
                     putTag(i, 2, highlightedTagOpen);
