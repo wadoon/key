@@ -11,37 +11,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
+import de.uka.ilkd.key.nui.model.ViewSlot;
 import de.uka.ilkd.key.nui.util.IStatusManager;
-import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -59,11 +50,8 @@ public class RootLayoutController extends ViewController
     @FXML
     private Label statusLabel;
 
-    private final HashMap<ViewPosition, BorderPane> positionMapping;
-    private final HashMap<ViewPosition, Boolean> positionUsage;
-    private final HashMap<String, Tab> viewTabs;
-    private final HashMap<String, ViewInformation> views;
-    private Tab dragTab;
+    private HashMap<ViewPosition, ViewSlot> viewSlots = new HashMap<>();
+    private HashMap<Integer, ViewInformation> allViews = new HashMap<>();
 
     /**
      * The BorderPane from the Main Window
@@ -109,16 +97,7 @@ public class RootLayoutController extends ViewController
      * The constructor
      */
     public RootLayoutController() {
-        positionUsage = new HashMap<ViewPosition, Boolean>();
-        positionUsage.put(ViewPosition.BOTTOMLEFT, false);
-        positionUsage.put(ViewPosition.BOTTOMRIGHT, false);
-        positionUsage.put(ViewPosition.CENTER, false);
-        positionUsage.put(ViewPosition.TOPLEFT, false);
-        positionUsage.put(ViewPosition.TOPRIGHT, false);
 
-        positionMapping = new HashMap<>();
-        viewTabs = new HashMap<>();
-        views = new HashMap<>();
     }
 
     /**
@@ -126,54 +105,48 @@ public class RootLayoutController extends ViewController
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        positionMapping.put(ViewPosition.BOTTOMLEFT, bottomLeft);
-        positionMapping.put(ViewPosition.BOTTOMRIGHT, bottomRight);
-        positionMapping.put(ViewPosition.CENTER, center);
-        positionMapping.put(ViewPosition.TOPLEFT, topLeft);
-        positionMapping.put(ViewPosition.TOPRIGHT, topRight);
-
-        positionMapping.forEach((k, v) -> {
-            v.setCenter(new TabPane());
-            registerDragListeners(v.getCenter());
+        ViewSlot.setRegisterDrag(node -> {
+            node.setOnDragOver(event -> {
+                if (event.getGestureSource() != node) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            });
+            node.setOnDragEntered(event -> {
+                if (event.getGestureSource() != node) {
+                    // node.setEffect(new Glow());
+                    node.setStyle(
+                            "-fx-padding: 1; -fx-background-color: yellow, -fx-control-inner-background; -fx-background-insets: 0, 1;");
+                }
+                event.consume();
+            });
+            node.setOnDragExited(event -> {
+                // node.setEffect(null);
+                node.setStyle("");
+                event.consume();
+            });
+            node.setOnDragDropped(event -> {
+                boolean success = false;
+                if (event.getDragboard().hasString()) {
+                    String id = event.getDragboard().getString();
+                    allViews.get(Integer.parseInt(id))
+                            .setCurrentPosition(getTabPosition(node));
+                    success = true;
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            });
         });
-    }
-
-    /**
-     * Adds Drag&Drop acceptance to node
-     * 
-     * @param node
-     */
-    private void registerDragListeners(Node node) {
-        node.setOnDragOver(event -> {
-            if (event.getGestureSource() != node) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
-            event.consume();
-        });
-        node.setOnDragEntered(event -> {
-            if (event.getGestureSource() != node) {
-                // node.setEffect(new Glow());
-                node.setStyle(
-                        "-fx-padding: 1; -fx-background-color: yellow, -fx-control-inner-background; -fx-background-insets: 0, 1;");
-            }
-            event.consume();
-        });
-        node.setOnDragExited(event -> {
-            // node.setEffect(null);
-            node.setStyle("");
-            event.consume();
-        });
-        node.setOnDragDropped(event -> {
-            boolean success = false;
-            if (dragTab != null) {
-                views.get(((Label)((BorderPane) dragTab.getGraphic()).getCenter()).getText())
-                        .setCurrentPosition(getTabPosition(node));
-                dragTab = null;
-                success = true;
-            }
-            event.setDropCompleted(success);
-            event.consume();
-        });
+        viewSlots.put(ViewPosition.BOTTOMLEFT,
+                new ViewSlot(ViewPosition.BOTTOMLEFT, bottomLeft));
+        viewSlots.put(ViewPosition.BOTTOMRIGHT,
+                new ViewSlot(ViewPosition.BOTTOMRIGHT, bottomRight));
+        viewSlots.put(ViewPosition.CENTER,
+                new ViewSlot(ViewPosition.CENTER, center));
+        viewSlots.put(ViewPosition.TOPLEFT,
+                new ViewSlot(ViewPosition.TOPLEFT, topLeft));
+        viewSlots.put(ViewPosition.TOPRIGHT,
+                new ViewSlot(ViewPosition.TOPRIGHT, topRight));
     }
 
     /**
@@ -221,8 +194,10 @@ public class RootLayoutController extends ViewController
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter("Proofs", "*.proof"),
                 new ExtensionFilter("All Files", "*.*"));
-        //TODO reset initial directory to "../" (changed for faster access to proofs for testing purposes)
-        fileChooser.setInitialDirectory(new File("../key.core.test/resources/testcase/join"));
+        // TODO reset initial directory to "../" (changed for faster access to
+        // proofs for testing purposes)
+        fileChooser.setInitialDirectory(
+                new File("../key.core.test/resources/testcase/join"));
 
         File file = fileChooser.showOpenDialog(new Stage());
 
@@ -242,7 +217,7 @@ public class RootLayoutController extends ViewController
     public void setStatus(String status) {
         // execute ui update on javafx thread
         Platform.runLater(() -> {
-                statusLabel.setText(status);
+            statusLabel.setText(status);
         });
         System.out.println(status);
     }
@@ -298,10 +273,7 @@ public class RootLayoutController extends ViewController
      * @param accelerator
      */
     public void registerView(ViewInformation info, String accelerator) {
-        if (views.containsKey(info.getTitle()))
-            throw new RuntimeException("Multiple views with the same name");
-
-        views.put(info.getTitle(), info);
+        allViews.put(info.getId(), info);
         if (info.hasMenuItem()) {
             CheckMenuItem item = new CheckMenuItem();
             item.setText(info.getTitle());
@@ -312,7 +284,7 @@ public class RootLayoutController extends ViewController
             item.setSelected(info.getIsActive());
             if (!accelerator.equals(""))
                 item.setAccelerator(KeyCombination.valueOf(accelerator));
-    
+
             // make overflow menu "Others" if items exceed max
             if (viewsMenu.getItems().size() < MaxMenuEntries) {
                 viewsMenu.getItems().add(item);
@@ -335,55 +307,10 @@ public class RootLayoutController extends ViewController
      * @param view
      */
     public void showView(ViewInformation view) {
-        Pane pane = (Pane) loadFxml(view.getFxmlPath());
-        Tab tab;
-        // check if tab was already created
-        if (viewTabs.containsKey(view.getTitle())) {
-            tab = viewTabs.get(view.getTitle());
-        }
-        else {
-            tab = createTab(view, pane);
-            viewTabs.put(view.getTitle(), tab);
+        if (view.getUiTab() == null) {
+            view.loadUiTab(this);
         }
         setPosition(view, view.getPreferedPosition());
-    }
-
-    /**
-     * 
-     * @param title
-     * @param node
-     * @return a tab with content node and title as lable, also drag
-     *         functionality
-     */
-    private Tab createTab(ViewInformation view, Node node) {
-        Tab t = new Tab();
-        Label title = new Label(view.getTitle());
-        BorderPane header = new BorderPane();
-        header.setCenter(title);
-        t.setGraphic(header);
-        t.setContent(node);
-
-        header.setOnDragDetected(event -> {
-            Dragboard db = header.startDragAndDrop(TransferMode.MOVE);
-
-            ClipboardContent content = new ClipboardContent();
-            content.putString(view.getTitle());
-            db.setContent(content);
-            dragTab = t;
-            event.consume();
-        });
-
-        t.setOnCloseRequest(event -> {
-            view.setIsActive(false);
-        });
-
-        header.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(view).show(title, Side.TOP, event.getX(),
-                        event.getY());
-        });
-
-        return t;
     }
 
     /**
@@ -392,12 +319,12 @@ public class RootLayoutController extends ViewController
      * @param view
      */
     public void hideView(ViewInformation view) {
-        Tab tab = viewTabs.get(view.getTitle());
-        TabPane tabPane = tab.getTabPane();
-        tabPane.getTabs().remove(tab);
-        if (tabPane.getTabs().size() == 0) {
-            positionUsage.put(getViewPosition(tabPane.getParent()), false);
-        }
+        viewSlots.get(view.getCurrentPosition()).removeTab(view);
+        resize();
+    }
+
+    private void setPosition(ViewInformation view, ViewPosition position) {
+        viewSlots.get(position).addTab(view);
         resize();
     }
 
@@ -409,6 +336,7 @@ public class RootLayoutController extends ViewController
      * @param next
      */
     public void moveView(ViewInformation view, ViewPosition next) {
+        //TODO: fix already updated previous position
         hideView(view);
         setPosition(view, next);
     }
@@ -418,10 +346,10 @@ public class RootLayoutController extends ViewController
      * @return
      */
     public ViewPosition getTabPosition(Node node) {
-        for (ViewPosition key : positionMapping.keySet()) {
-            if (positionMapping.get(key).getChildren().size() == 1
-                    && positionMapping.get(key).getChildren().get(0) == node)
-                return key;
+        for (ViewSlot slot : viewSlots.values()) {
+            if (slot.getUiPane().getChildren().size() == 1
+                    && slot.getUiPane().getChildren().get(0) == node)
+                return slot.getViewPosition();
         }
         return null;
     }
@@ -431,19 +359,11 @@ public class RootLayoutController extends ViewController
      * @return ViewPosition where the given node is currently placed.
      */
     public ViewPosition getViewPosition(Node node) {
-        for (ViewPosition key : positionMapping.keySet()) {
-            if (positionMapping.get(key) == node)
-                return key;
+        for (ViewSlot slot : viewSlots.values()) {
+            if (slot.getUiPane() == node)
+                return slot.getViewPosition();
         }
         return null;
-    }
-
-    private void setPosition(ViewInformation view, ViewPosition position) {
-        TabPane container = (TabPane) positionMapping.get(position).getCenter();
-        container.getTabs().add(viewTabs.get(view.getTitle()));
-        container.getSelectionModel().select(viewTabs.get(view.getTitle()));
-        positionUsage.put(position, true);
-        resize();
     }
 
     /**
@@ -452,8 +372,8 @@ public class RootLayoutController extends ViewController
      */
     public void resize() {
         mainSplitPane.setDividerPositions(0.0, 1.0);
-        if (positionUsage.get(ViewPosition.TOPLEFT)) {
-            if (positionUsage.get(ViewPosition.BOTTOMLEFT)) {
+        if (viewSlots.get(ViewPosition.TOPLEFT).getUsed()) {
+            if (viewSlots.get(ViewPosition.BOTTOMLEFT).getUsed()) {
                 leftPane.setDividerPositions(0.5);
                 mainSplitPane.setDividerPosition(0, 0.3);
             }
@@ -462,13 +382,13 @@ public class RootLayoutController extends ViewController
                 mainSplitPane.setDividerPosition(0, 0.3);
             }
         }
-        else if (positionUsage.get(ViewPosition.BOTTOMLEFT)) {
+        else if (viewSlots.get(ViewPosition.BOTTOMLEFT).getUsed()) {
             leftPane.setDividerPositions(0.0);
             mainSplitPane.setDividerPosition(0, 0.3);
         }
 
-        if (positionUsage.get(ViewPosition.TOPRIGHT)) {
-            if (positionUsage.get(ViewPosition.BOTTOMRIGHT)) {
+        if (viewSlots.get(ViewPosition.TOPRIGHT).getUsed()) {
+            if (viewSlots.get(ViewPosition.BOTTOMRIGHT).getUsed()) {
                 rightPane.setDividerPositions(0.5);
                 mainSplitPane.setDividerPosition(1, 0.7);
             }
@@ -477,7 +397,7 @@ public class RootLayoutController extends ViewController
                 mainSplitPane.setDividerPosition(1, 0.7);
             }
         }
-        else if (positionUsage.get(ViewPosition.BOTTOMRIGHT)) {
+        else if (viewSlots.get(ViewPosition.BOTTOMRIGHT).getUsed()) {
             rightPane.setDividerPositions(0.0);
             mainSplitPane.setDividerPosition(1, 0.7);
         }
@@ -490,64 +410,19 @@ public class RootLayoutController extends ViewController
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
         menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),
-                loadFxml(sourcePath));
+                loadFxmlFromContext(sourcePath));
     }
 
     public void registerMenuEntry(URL sourcePath, String parentMenu)
             throws IllegalStateException {
         for (Menu m : menuBar.getMenus()) {
             if (m.getText().equals(parentMenu)) {
-                m.getItems().add(loadFxml(sourcePath));
+                m.getItems().add(loadFxmlFromContext(sourcePath));
                 return;
             }
         }
         throw new IllegalStateException(
                 "Menu " + parentMenu + " was not found");
-    }
-
-    private ContextMenu loadViewContextMenu(ViewInformation view) {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class
-                .getResource("ViewContextMenu.fxml"));
-        ContextMenu content;
-        try {
-            content = loader.load();
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
-
-        // Give the controller access to the main app.
-        ViewContextMenuController controller = loader.getController();
-        controller.setMainApp(mainApp, context);
-        controller.setParentView(view);
-        content.setOnShowing((event) -> {
-            // select current position
-        });
-        return content;
-    }
-
-    private <T> T loadFxml(URL path) {
-        try {
-            // Load main view
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(path);
-
-            T content = loader.load();
-
-            // Give the controller access to the main app.
-            ViewController controller = loader.getController();
-            controller.setMainApp(mainApp, context);
-
-            return content;
-
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     @Override
@@ -559,6 +434,6 @@ public class RootLayoutController extends ViewController
     @Override
     public void createSwingContent(SwingNode swingNode) {
         // TODO Auto-generated method stub
-        
+
     }
 }

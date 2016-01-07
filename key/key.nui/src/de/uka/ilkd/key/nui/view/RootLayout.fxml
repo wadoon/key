@@ -42,15 +42,30 @@
 			<items>
 				<SplitPane fx:id="leftPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0" BorderPane.alignment="CENTER">
 					<items>
-                  <BorderPane fx:id="topLeft" />
-                  <BorderPane fx:id="bottomLeft" />
+                  <BorderPane fx:id="topLeft">
+                     <center>
+                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+                     </center></BorderPane>
+                  <BorderPane fx:id="bottomLeft">
+                     <center>
+                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+                     </center></BorderPane>
 					</items>
 				</SplitPane>
-            <BorderPane fx:id="center" BorderPane.alignment="CENTER" />
+            <BorderPane fx:id="center" BorderPane.alignment="CENTER">
+               <center>
+                  <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+               </center></BorderPane>
 				<SplitPane fx:id="rightPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0" BorderPane.alignment="CENTER">
 					<items>
-                  <BorderPane fx:id="topRight" />
-                  <BorderPane fx:id="bottomRight" />
+                  <BorderPane fx:id="topRight">
+                     <center>
+                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+                     </center></BorderPane>
+                  <BorderPane fx:id="bottomRight">
+                     <center>
+                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+                     </center></BorderPane>
 					</items>
 				</SplitPane>
 			</items>
