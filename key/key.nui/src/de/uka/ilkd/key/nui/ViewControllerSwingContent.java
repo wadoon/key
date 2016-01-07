@@ -14,7 +14,7 @@ import javafx.scene.layout.StackPane;
  * @author Nils Muzzulini
  *
  */
-public class ViewControllerSwingContent extends ViewController {
+public abstract class ViewControllerSwingContent extends ViewController {
 
     @FXML
     private StackPane stackPane;
@@ -47,8 +47,6 @@ public class ViewControllerSwingContent extends ViewController {
      * In the corresponding FXML file a StackPane with fx:id "stackPane" needs
      * to be added.
      */
-    public void createSwingContent() {
-
-    }
+    public abstract void createSwingContent();
 
 }
