@@ -28,6 +28,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+/**
+ * @author Maximilian Li
+ * @author Victor Schuemmer
+ * @author Nils Muzzulini
+ *
+ */
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = false)
 public class SequentViewController extends ViewController {
 
@@ -48,9 +54,6 @@ public class SequentViewController extends ViewController {
         });
     };
     private PositionTranslator posTranslator;
-
-    // @FXML
-    // private TextArea textArea;
 
     @FXML
     private ToggleButton searchButton;
@@ -112,6 +115,7 @@ public class SequentViewController extends ViewController {
         context.getProofManager().addProofListener(proofChangeListener);
     }
 
+    // TODO add comments
     private void initializeSearchBox() {
         String searchBoxLabel = "Search...";
         searchBox.setText(searchBoxLabel);
@@ -138,6 +142,10 @@ public class SequentViewController extends ViewController {
         searchParent.setVisible(searchButton.isSelected());
     }
 
+    /**
+     * Displays the sequent of the currently selected node in the tree.
+     * @param node The selected node.
+     */
     private void showSequent(Node node) {
         Proof proof = context.getProofManager().getMediator()
                 .getSelectedProof();
@@ -232,6 +240,8 @@ public class SequentViewController extends ViewController {
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
 
+        // The following code prints the org.w3c.document into the console.
+        // TODO remove if not needed.
         /*
          * webEngine.getLoadWorker().stateProperty().addListener( new
          * ChangeListener<State>() { public void changed(ObservableValue ov,
