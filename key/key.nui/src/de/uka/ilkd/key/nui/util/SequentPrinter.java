@@ -6,141 +6,257 @@ package de.uka.ilkd.key.nui.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import de.uka.ilkd.key.pp.PositionTable;
+import de.uka.ilkd.key.pp.Range;
 
 /**
  * @author Maximilian Li
  * @author Victor Schuemmer
+ *
  */
 public class SequentPrinter {
+    private String proofString;
     private String css;
-    private HashMap<String, String> dictionaryMap = new HashMap<String, String>();
-    private HashMap<String, String> regexMap = new HashMap<String, String>();
-
-    private String freeTextSearch = "";
-
-    private HashMap<String, String> tempCss = new HashMap<>();
+    private PositionTable posTable;
 
     private boolean useRegex = false;
 
+    private TreeMap<Integer, String[]> tagsAtIndex;
+    private Range mouseoverRange;
+    private ArrayList<Integer> searchIndices;
+
+    private final String closingTag = "</span>";
+    private final String mouseTagOpen = "<span class=\"mouseover\">";
+    private final String highlightedTagOpen = "<span class=\"highlighted\">";
+
     /**
-     * Constructor for the SequentPrinter
      * 
-     * @param cssPath
-     *            Path to the CSS file for Styling
      */
-    public SequentPrinter(String cssPath, String classPath) {
+    public SequentPrinter(String cssPath, PositionTable posTable) {
         try {
             readCSS(cssPath);
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            readIni(classPath);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setFreeTextSearch(String searchString) {
-        freeTextSearch = searchString;
+        this.setPosTable(posTable);
+        tagsAtIndex = new TreeMap<Integer, String[]>();
     }
 
     /**
-     * @param useRegex
-     *            the useRegex to set
-     */
-    public void setUseRegex(boolean useRegex) {
-        this.useRegex = useRegex;
-    }
-
-    /**
-     * debug function for escaping LogicPrinter output
-     * 
-     * @param s
-     *            input String
-     * @return String with escaped chars
-     */
-    public String escape(String s) {
-        //XXX could instead use StringEscapeUtils from Apache Commons Lang
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++)
-            switch (s.charAt(i)) {
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '(':
-                sb.append("\\(");
-                break;
-            case ')':
-                sb.append("\\)");
-                break;
-            case '{':
-                sb.append("\\{");
-                break;
-            case '}':
-                sb.append("\\}");
-                break;
-            case '?':
-                sb.append("\\?");
-            case '*':
-                sb.append("\\*");
-            case '+':
-                sb.append("\\+");
-            default:
-                sb.append(s.charAt(i));
-            }
-        return sb.toString();
-    }
-
-    public void addTempCss(String tmpName, String additionalCss) {
-        tempCss.put(tmpName, additionalCss);
-    }
-
-    public void removeTempCss(String tmpName) {
-        tempCss.remove(tmpName);
-    }
-
-    /**
-     * prints a Sequent as HTML with basic markup
+     * prints a Sequent as HTML with styling
      * 
      * @param s
      *            input SequentString from LogicPrinter
      * @return HTML Text with default style
      */
-    public String printSequent(String s) {
-        String htmlEncoded = htmlEncode(s);
-        String result = highlightString(htmlEncoded, freeTextSearch);
-        
-        result = toHTML(result);
-        for (String classString : dictionaryMap.keySet()) {
-            result = styleHTMLEscaped(result, dictionaryMap.get(classString),
-                    classString);
+    public String printProofString() {
+        int offset = 0;
+        StringBuilder sb = new StringBuilder(proofString);
+
+        String insertTag;
+        // Iterate over sorted Map
+        for (int index : tagsAtIndex.keySet()) {
+
+            // Insert closeTag "<\span>"
+            for (int i = 0; i < 3; i++) {
+                insertTag = tagsAtIndex.get(index)[i];
+                if (insertTag != null && insertTag.equals(closingTag)) {
+                    sb.insert(index + offset, closingTag);
+
+                    // Adjust Offset for following insertions
+                    offset += closingTag.length();
+                }
+            }
+
+            // insert openTags "<span class=...>"
+            for (int i = 0; i < 3; i++) {
+                insertTag = tagsAtIndex.get(index)[i];
+                if (insertTag != null && !insertTag.equals(closingTag)) {
+                    sb.insert(index + offset, insertTag);
+
+                    // Adjust Offset
+                    offset += insertTag.length();
+                }
+
+            }
         }
-        // result = highlightString(result, "->");
-        // result = highlightString(result, freeTextSearch);
-        return result;
+        // Apply HTML formatting and return
+        return toHTML(encodeLessThan(sb.toString()));
     }
 
     /**
-     * sets the CSS information
+     * replaces all "<" signs of the orig. proofString with "&lt;". This avoids
+     * HTML Tag misinterpretation. "<" Signs from the HTML tags used for styling
+     * are not affected.
+     * 
+     * @param string
+     *            The String in which the < signs shall be replaced
+     * @return a cleaned up string.
+     */
+    private String encodeLessThan(String string) {
+
+        String[] strings = string.split("<");
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // Iterate to i < Length-1, as last String[] part has no following "<"
+        // sign.
+        for (int i = 0; i < strings.length - 1; i++) {
+            stringBuilder.append(strings[i]);
+
+            // Append "<" or "&lt;" depending on the beginning of the following
+            // String[] part
+            if (strings[i + 1].startsWith("span ")
+                    || strings[i + 1].startsWith("/span")) {
+                stringBuilder.append("<");
+            }
+            else {
+                stringBuilder.append("&lt;");
+            }
+
+        }
+        // Append last String[]
+        stringBuilder.append(strings[strings.length - 1]);
+
+        return stringBuilder.toString();
+    }
+
+    /**
+     * applies mouseoverHighlighting for the given range
+     * 
+     * @param range
+     *            the Range Object specifying the proofstring part to be
+     *            highlighted
+     */
+    public void applyMouseHighlighting(Range range) {
+        removeMouseHighlighting();
+        putTag(range.start(), 1, mouseTagOpen);
+        putTag(range.end(), 1, closingTag);
+        mouseoverRange = range;
+    }
+
+    /**
+     * inserts the given Tags at the specified position in the TreeMap. This
+     * TreeMap is used to define the stylingTag positions
+     * 
+     * @param index
+     *            index position for the style Tag
+     * @param arrayPos
+     *            the arrayPosition. Equals Priority: 0=Syntax < 1=Mouseover <
+     *            2= searchHighlight. Smaller Number equals Higher Priority
+     * @param tag
+     *            the HTML tag to be inserted.
+     * @return the TreeMap with the new HashMap.
+     */
+    private TreeMap<Integer, String[]> putTag(int index, int arrayPos,
+            String tag) {
+        String[] mapValue = tagsAtIndex.get(index);
+
+        if (mapValue != null) {
+            mapValue[arrayPos] = tag;
+        }
+        else {
+            tagsAtIndex.put(index, new String[3]);
+            putTag(index, arrayPos, tag);
+        }
+
+        return tagsAtIndex;
+    }
+
+    /**
+     * removes all the Mouseover Highlighting currently applied.
+     */
+    public void removeMouseHighlighting() {
+        // TODO Delete empty Hashmap
+        if (mouseoverRange != null) {
+            putTag(mouseoverRange.start(), 1, null);
+            putTag(mouseoverRange.end(), 1, null);
+        }
+    }
+
+    /**
+     * set the String used for Freetext Search Highlighting
+     * 
+     * @param searchString
+     *            the freetext searchString
+     */
+    public void setFreetextSearch(String searchString) {
+        // remove old Search Highlighting
+        cleanSearchIndices();
+        searchIndices = new ArrayList<Integer>();
+
+        if (!searchString.isEmpty()) {
+            if (useRegex) {
+                // try-catch block for incomplete Regex Patterns
+                try {
+                    Pattern pattern = Pattern.compile(searchString);
+                    Matcher matcher = pattern.matcher(proofString);
+
+                    // Iterate over all findings and add to TreeMap
+                    while (matcher.find()) {
+
+                        // Check all occurrences
+                        putTag(matcher.start(), 2, highlightedTagOpen);
+                        putTag(matcher.end(), 2, closingTag);
+
+                        searchIndices.add(matcher.start());
+                        searchIndices.add(matcher.end());
+                    }
+                }
+                catch (Exception e) {
+                    return;
+                }
+
+            }
+            else {
+                // Find indices of all matches. Put in Map. Put in ArrayList for
+                // removal
+                for (int i = -1; (i = proofString.indexOf(searchString,
+                        i + 1)) != -1;) {
+                    putTag(i, 2, highlightedTagOpen);
+                    putTag(i + searchString.length(), 2, closingTag);
+
+                    searchIndices.add(i);
+                    searchIndices.add(i + searchString.length());
+                }
+            }
+        }
+    }
+
+    /**
+     * iterates over the searchIndices ArrayList. Uses this information to
+     * remove references in Styling TreeMap
+     */
+    private void cleanSearchIndices() {
+        if (searchIndices != null) {
+            for (Iterator<Integer> iterator = searchIndices.iterator(); iterator
+                    .hasNext();) {
+                int index = (int) iterator.next();
+                putTag(index, 2, null);
+            }
+        }
+    }
+
+    /**
+     * @param proofString
+     *            the proofString to set
+     */
+    public void setProofString(String proofString) {
+        this.proofString = proofString;
+
+        // As a new ProofString means old styling Info is deprecated, Map is
+        // cleared.
+        tagsAtIndex.clear();
+    }
+
+    /**
+     * reads the CSS information for HTML Styling
      * 
      * @param fileName
      *            path to the CSS file
@@ -165,38 +281,11 @@ public class SequentPrinter {
     }
 
     /**
-     * reads the .ini file and builds the Dictionary and RegEx Maps
-     * 
-     * @param fileName
-     *            path to the .ini file
-     * @throws IOException
+     * @param posTable
+     *            the posTable to set
      */
-    private void readIni(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
-        try {
-            String line = br.readLine();
-            String[] lineParts;
-            while (line != null) {
-                lineParts = line.split(" ");
-                switch (line.charAt(0)) {
-                case '/':
-                    break;
-                case 'd':
-                    dictionaryMap.put(lineParts[1], lineParts[2]);
-                    break;
-                case 'r':
-                    regexMap.put(lineParts[1], lineParts[2]);
-                    break;
-                default:
-                    break;
-                }
-
-                line = br.readLine();
-            }
-        }
-        finally {
-            br.close();
-        }
+    public void setPosTable(PositionTable posTable) {
+        this.posTable = posTable;
     }
 
     /**
@@ -210,325 +299,24 @@ public class SequentPrinter {
         StringBuilder sb = new StringBuilder();
         sb.append("<style>");
         sb.append(css);
-        for (String temp : tempCss.values())
-            sb.append(temp);
         sb.append("</style>");
-        /*
-         * for (int i = 0; i < s.length(); i++) switch (s.charAt(i)) { case
-         * '\n': sb.append("</br>"); break; case ' ': sb.append("&nbsp;");
-         * break; default: sb.append(s.charAt(i)); }
-         */
         sb.append("<pre class=\"content\">");
+
         sb.append(s);
+
         sb.append("</pre>");
-        return sb.toString();
-    }
 
-    private String htmlEncode(String text) {
-        return text.replace("<", "&lt;").replace(">", "&gt;");
-    }
-
-    /**
-     * Styles all the appearances of the given substring with given CSS
-     * Styleclass
-     * 
-     * @param s
-     *            input string
-     * @param searchString
-     *            string to be styled
-     * @param styleClass
-     *            the CSS StyleClass
-     * @return string with HTML style tags applied
-     */
-    public String styleHTML(String s, String searchString, String styleClass) {
-        if (!searchString.isEmpty())
-            return styleHTMLEscaped(s, escape(searchString), styleClass);
-        else
-            return s;
-    }
-
-    private String styleHTMLEscaped(String s, String searchString,
-            String styleClass) {
-        if (!searchString.isEmpty())
-            return s.replaceAll("(" + htmlEncode(searchString) + ")",
-                    "<span class=\"" + styleClass + "\">" + "$1" + "</span>");
-        else
-            return s;
-    }
-
-    /**
-     * styles the substring from start to end
-     * 
-     * @param s
-     *            the input string
-     * @param start
-     *            startIndex of the substring
-     * @param length
-     *            length of the substring
-     * @param styleClass
-     *            the CSS style which is to be applied
-     * @return string with HTML style tags applied
-     */
-    public String styleHTML(String s, int start, int length,
-            String styleClass) {
-        StringBuilder sb = new StringBuilder(s);
-        sb.insert(start + length, "</span>");
-        sb.insert(start, "<span class=\"" + styleClass + "\">");
         return sb.toString();
     }
 
     /**
-     * highlights all the appearances of the given substring according to CSS
+     * sets useRegex
      * 
-     * @param s
-     *            input string
-     * @param searchString
-     *            string to be highlighted
-     * @return string with HTML style tags applied
+     * @param b
+     *            new boolean Value
      */
-    public String highlightString(String s, String searchString) {
-        if (useRegex)
-            return styleHTMLEscaped(s, searchString, "highlighted");
-        return styleHTML(s, searchString, "highlighted");
-    }
-
-    /**
-     * highlights the substring from start to end
-     * 
-     * @param s
-     *            the input string
-     * @param start
-     *            startIndex of the substring
-     * @param length
-     *            length of the substring
-     * @return string with HTML style tags applied
-     */
-    public String highlightString(String s, int start, int length) {
-        return styleHTML(s, start, length, "highlighted");
-    }
-
-    /**
-     * colors all the appearances of the given substring
-     * 
-     * @param s
-     *            input string
-     * @param searchString
-     *            string to be searched for
-     * @param fontColor
-     *            color for the results
-     * @return string with HTML style tags applied
-     */
-    public String colorString(String s, String searchString, String fontColor) {
-        return styleString(s, searchString, fontColor, "white", "normal");
-    }
-
-    /**
-     * colors all the appearances of the given substring
-     * 
-     * @param s
-     *            input string
-     * @param searchString
-     *            string to be searched for
-     * @param fontColor
-     *            color for the results
-     * @param boldness
-     *            true if results should be bold
-     * @return string with HTML style tags applied
-     */
-    public String colorString(String s, String searchString, String fontColor,
-            boolean boldness) {
-        if (boldness) {
-            return styleString(s, searchString, fontColor, "white", "bold");
-        }
-        else {
-            return styleString(s, searchString, fontColor, "white", "normal");
-        }
-    }
-
-    /**
-     * colors the substring from start to end
-     * 
-     * @param s
-     *            the input string
-     * @param start
-     *            startIndex of the substring
-     * @param length
-     *            length of the substring
-     * @param fontColor
-     *            the color
-     * @return string with HTML style tags applied
-     */
-    public String colorString(String s, int start, int length,
-            String fontColor) {
-        return styleString(s, start, length, fontColor, "white", "normal");
-    }
-
-    /**
-     * colors the substring from start to end
-     * 
-     * @param s
-     *            the input string
-     * @param start
-     *            startIndex of the substring
-     * @param length
-     *            length of the substring
-     * @param fontColor
-     *            the color
-     * @param boldness
-     *            true if results should be bold
-     * @return string with HTML style tags applied
-     */
-    public String colorString(String s, int start, int length, String fontColor,
-            Boolean boldness) {
-        if (boldness) {
-            return styleString(s, start, length, fontColor, "white", "bold");
-        }
-        else {
-            return styleString(s, start, length, fontColor, "white", "normal");
-        }
+    public void setUseRegex(boolean b) {
+        useRegex = b;
 
     }
-
-    /**
-     * highlights all the appearances of given substring
-     * 
-     * @param s
-     *            the input string
-     * @param searchString
-     *            the substring to be searched for
-     * @param backgroundColor
-     *            the highlighting color
-     * @return string with HTML style tags applied
-     */
-    public String highlightStringCustom(String s, String searchString,
-            String backgroundColor) {
-        return styleString(s, searchString, "black", backgroundColor, "normal");
-    }
-
-    /**
-     * highlights all the appearances of given substring
-     * 
-     * @param s
-     *            the input string
-     * @param searchString
-     *            the substring to be searched for
-     * @param backgroundColor
-     *            the highlighting color
-     * @param boldness
-     *            true if results should be bold
-     * @return string with HTML style tags applied
-     */
-    public String highlightStringCustom(String s, String searchString,
-            String backgroundColor, boolean boldness) {
-        if (boldness) {
-            return styleString(s, searchString, "black", backgroundColor,
-                    "bold");
-        }
-        else {
-            return styleString(s, searchString, "black", backgroundColor,
-                    "normal");
-        }
-    }
-
-    /**
-     * highlights the substring from start to end
-     * 
-     * @param s
-     *            the input string
-     * @param start
-     *            startIndex of the substring
-     * @param length
-     *            length of the substring
-     * @param backgroundColor
-     *            the highlighting color
-     * @return string with HTML style tags applied
-     */
-    public String highlightStringCustom(String s, int start, int length,
-            String backgroundColor) {
-        return styleString(s, start, length, "black", backgroundColor,
-                "normal");
-    }
-
-    /**
-     * highlights the substring from start to end
-     * 
-     * @param s
-     *            the input string
-     * @param start
-     *            startIndex of the substring
-     * @param length
-     *            length of the substring
-     * @param backgroundColor
-     *            the highlighting color
-     * @param boldness
-     *            true if results should be bold
-     * @return string with HTML style tags applied
-     */
-    public String highlightStringCustom(String s, int start, int length,
-            String backgroundColor, boolean boldness) {
-        if (boldness) {
-            return styleString(s, start, length, "black", backgroundColor,
-                    "bold");
-        }
-        else {
-            return styleString(s, start, length, "black", backgroundColor,
-                    "normal");
-        }
-
-    }
-
-    /**
-     * styles all the appearances of given substring
-     * 
-     * @param s
-     *            the input string
-     * @param searchString
-     *            the substring to be searched for
-     * @param fontColor
-     *            the color
-     * @param backgroundColor
-     *            the highlighting color
-     * @param fontWeight
-     *            "bold" for bold, else "normal
-     * @return string with HTML style tags applied
-     */
-    public String styleString(String s, String searchString, String fontColor,
-            String backgroundColor, String fontWeight) {
-        if (!searchString.isEmpty())
-            return s.replaceAll(escape(searchString),
-                    "<span style=\"color:" + fontColor + ";background-color:"
-                            + backgroundColor + ";font-weight:" + fontWeight
-                            + "\">" + searchString + "</span>");
-        else
-            return s;
-    }
-
-    /**
-     * highlights the substring from start to end
-     * 
-     * @param s
-     *            the input string
-     * @param start
-     *            startIndex of the substring
-     * @param length
-     *            length of the substring
-     * @param fontColor
-     *            the color
-     * @param backgroundColor
-     *            the highlighting color
-     * @param fontWeight
-     *            "bold" for bold, else "normal
-     * @return string with HTML style tags applied
-     */
-    public String styleString(String s, int start, int length, String fontColor,
-            String backgroundColor, String fontWeight) {
-        StringBuilder sb = new StringBuilder(s);
-        sb.insert(start + length, "</span>");
-        sb.insert(start,
-                "<span style=\"color:" + fontColor + ";background-color:"
-                        + backgroundColor + ";font-weight:" + fontWeight
-                        + "\">");
-        return sb.toString();
-    }
-
 }

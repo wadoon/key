@@ -16,7 +16,6 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.Filter;
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -173,16 +172,5 @@ public class FilterViewController extends ViewController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         currentFilter = new Filter();
-    }
-
-    @Override
-    public void initializeAfterLoadingFxml() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void createSwingContent(SwingNode swingNode) {
-        // TODO Auto-generated method stub
-        
     }
 }

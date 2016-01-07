@@ -18,7 +18,6 @@ import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.model.ViewSlot;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,6 +30,11 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -41,12 +45,17 @@ import javafx.stage.Stage;
 /**
  * @author Maximilian Li
  * @author Victor Schuemmer
- *
+ * @author Benedikt Gross
+ * @author Nils Muzzulini
  */
 public class RootLayoutController extends ViewController
         implements IStatusManager {
 
-    private static final int MaxMenuEntries = 8;
+    private static final int MAXMENUENTRIES = 8;
+    private static final Image STATUSLOGO = new Image(
+            "file:resources/images/key-color.gif");
+    private static final String STATUSWELCOMETEXT = "\u00a9 Copyright 2001 - 2016 Karlsruhe Institute of Technology, Chalmers University of Technology, and Technische Universitaet Darmstadt \n"
+            + "KeY is free Software and comes with ABSOLUTELY NO WARRANTY";
 
     @FXML
     private Label statusLabel;
@@ -148,6 +157,9 @@ public class RootLayoutController extends ViewController
                 new ViewSlot(ViewPosition.TOPLEFT, topLeft));
         viewSlots.put(ViewPosition.TOPRIGHT,
                 new ViewSlot(ViewPosition.TOPRIGHT, topRight));
+
+        statusLabel.setGraphic(new ImageView(STATUSLOGO));
+        statusLabel.setText(STATUSWELCOMETEXT);
     }
 
     /**
@@ -230,14 +242,6 @@ public class RootLayoutController extends ViewController
         setStatus("");
     }
 
-    /**
-     * Enable/Disable Pretty Syntax
-     */
-    @FXML
-    private void handlePrettySyntax() {
-        // TODO implement functionality
-    }
-
     @FXML
     private Menu viewsMenu;
 
@@ -287,7 +291,7 @@ public class RootLayoutController extends ViewController
                 item.setAccelerator(KeyCombination.valueOf(accelerator));
 
             // make overflow menu "Others" if items exceed max
-            if (viewsMenu.getItems().size() < MaxMenuEntries) {
+            if (viewsMenu.getItems().size() < MAXMENUENTRIES) {
                 viewsMenu.getItems().add(item);
             }
             else {
@@ -298,7 +302,7 @@ public class RootLayoutController extends ViewController
                 otherViewsMenu.getItems().add(item);
             }
         }
-        // dummy until last opened or config was developed
+        //TODO: dummy until last opened or config was developed
         info.setIsActive(true);
     }
 
@@ -320,13 +324,12 @@ public class RootLayoutController extends ViewController
      * @param view
      */
     public void hideView(ViewInformation view) {
-        //XXX: workaround
-        loop:
-        for(ViewSlot slot:viewSlots.values()){
-            for(ViewInformation info:slot.getTabs()){
-                if(info == view){
+        // XXX: workaround
+        loop: for (ViewSlot slot : viewSlots.values()) {
+            for (ViewInformation info : slot.getTabs()) {
+                if (info == view) {
                     slot.removeTab(view);
-                 break loop;   
+                    break loop;
                 }
             }
         }
@@ -432,17 +435,5 @@ public class RootLayoutController extends ViewController
         }
         throw new IllegalStateException(
                 "Menu " + parentMenu + " was not found");
-    }
-
-    @Override
-    public void initializeAfterLoadingFxml() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void createSwingContent(SwingNode swingNode) {
-        // TODO Auto-generated method stub
-
     }
 }

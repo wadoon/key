@@ -12,7 +12,6 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.IProofListener;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
-import de.uka.ilkd.key.nui.util.SequentPrinterCorrected;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -21,7 +20,6 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -30,12 +28,17 @@ import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+/**
+ * @author Maximilian Li
+ * @author Victor Schuemmer
+ * @author Nils Muzzulini
+ *
+ */
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = false)
 public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
     private SequentPrinter printer;
-    private SequentPrinterCorrected printerCorrected;
     private LogicPrinter logicPrinter;
     private InitialPositionTable abstractSyntaxTree;
     private String proofString;
@@ -51,9 +54,6 @@ public class SequentViewController extends ViewController {
         });
     };
     private PositionTranslator posTranslator;
-
-    // @FXML
-    // private TextArea textArea;
 
     @FXML
     private ToggleButton searchButton;
@@ -90,27 +90,23 @@ public class SequentViewController extends ViewController {
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
         searchButton.setDisable(true);
-        printer = new SequentPrinter("resources/css/sequentStyle.css",
-                "resources/css/sequentClasses.ini");
+        posTranslator = new PositionTranslator("resources/css/sequentStyle.css");
+        
         textAreaWebView.setOnMouseMoved(event -> {
             if (sequentLoaded) {
 
                 int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
-                // String highlighted =
-                // this.printer.highlightString(proofString, range.start(),
-                // range.end()-range.start());
-                System.out.println("POS: " + pos);
-                System.out.println("RANGE: " + range);
-                this.printerCorrected.applyMouseHighlighting(range);
-                this.updateHtml(this.printerCorrected.printProofString());
-                System.out.println();
+                
+                this.printer.applyMouseHighlighting(range);
+                this.updateView();
+
             }
         });
         textAreaWebView.setOnMouseExited(event -> {
             if (sequentLoaded) {
-                this.printerCorrected.removeMouseHighlighting();
-                this.updateHtml(this.printerCorrected.printProofString());
+                this.printer.removeMouseHighlighting();
+                this.updateView();
             }
         });
     }
@@ -120,6 +116,7 @@ public class SequentViewController extends ViewController {
         context.getProofManager().addProofListener(proofChangeListener);
     }
 
+    // TODO add comments
     private void initializeSearchBox() {
         String searchBoxLabel = "Search...";
         searchBox.setText(searchBoxLabel);
@@ -133,8 +130,9 @@ public class SequentViewController extends ViewController {
                 });
 
         searchBox.setOnKeyReleased((event) -> {
-            printer.setFreeTextSearch(searchBox.getText());
-            updateHtml(printer.printSequent(proofString));
+            //printer.setFreeTextSearch(searchBox.getText());
+            printer.setFreetextSearch(searchBox.getText());
+            updateView();
             event.consume();
         });
     }
@@ -145,6 +143,10 @@ public class SequentViewController extends ViewController {
         searchParent.setVisible(searchButton.isSelected());
     }
 
+    /**
+     * Displays the sequent of the currently selected node in the tree.
+     * @param node The selected node.
+     */
     private void showSequent(Node node) {
         Proof proof = context.getProofManager().getMediator()
                 .getSelectedProof();
@@ -154,7 +156,7 @@ public class SequentViewController extends ViewController {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printerCorrected = new SequentPrinterCorrected(
+        printer = new SequentPrinter(
                 "resources/css/sequentStyle.css", abstractSyntaxTree);
 
         printSequent();
@@ -219,12 +221,12 @@ public class SequentViewController extends ViewController {
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
-        printerCorrected.setProofString(proofString);
+        printer.setProofString(proofString);
 
-        posTranslator = new PositionTranslator(proofString);
+        posTranslator.setProofString(proofString);
 
         sequentLoaded = true;
-        updateHtml(printerCorrected.printProofString());
+        updateView();
     }
 
     /**
@@ -239,6 +241,8 @@ public class SequentViewController extends ViewController {
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
 
+        // The following code prints the org.w3c.document into the console.
+        // TODO remove if not needed.
         /*
          * webEngine.getLoadWorker().stateProperty().addListener( new
          * ChangeListener<State>() { public void changed(ObservableValue ov,
@@ -260,10 +264,8 @@ public class SequentViewController extends ViewController {
 
         webEngine.loadContent(s);
     }
-
-    @Override
-    public void createSwingContent(SwingNode swingNode) {
-        // TODO Auto-generated method stub
-        
+    
+    private void updateView(){
+        updateHtml(this.printer.printProofString());
     }
 }

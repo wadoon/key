@@ -6,7 +6,6 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
-import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
@@ -44,17 +43,5 @@ public class ViewContextMenuController extends ViewController{
     @FXML
     private void handleCenter(ActionEvent event){
         viewInformation.setCurrentPosition(ViewPosition.CENTER);
-    }
-
-    @Override
-    public void initializeAfterLoadingFxml() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void createSwingContent(SwingNode swingNode) {
-        // TODO Auto-generated method stub
-        
     }
 }
