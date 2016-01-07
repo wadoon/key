@@ -30,6 +30,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -319,7 +320,16 @@ public class RootLayoutController extends ViewController
      * @param view
      */
     public void hideView(ViewInformation view) {
-        viewSlots.get(view.getCurrentPosition()).removeTab(view);
+        //XXX: workaround
+        loop:
+        for(ViewSlot slot:viewSlots.values()){
+            for(ViewInformation info:slot.getTabs()){
+                if(info == view){
+                    slot.removeTab(view);
+                 break loop;   
+                }
+            }
+        }
         resize();
     }
 
@@ -336,7 +346,6 @@ public class RootLayoutController extends ViewController
      * @param next
      */
     public void moveView(ViewInformation view, ViewPosition next) {
-        //TODO: fix already updated previous position
         hideView(view);
         setPosition(view, next);
     }
