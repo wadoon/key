@@ -34,6 +34,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCombination;
@@ -136,6 +138,10 @@ public class RootLayoutController extends ViewController
             v.setCenter(new TabPane());
             registerDragListeners(v.getCenter());
         });
+        
+        statusLabel.setGraphic(new ImageView(new Image("file:resources/images/key-color.gif")));
+        statusLabel.setText("\u00a9 Copyright 2001 - 2015 Karlsruhe Institute of Technology, Chalmers University of Technology, and Technische Universitaet Darmstadt \n"
+                + "KeY is free Software and comes with ABSOLUTELY NO WARRANTY");
     }
 
     /**
