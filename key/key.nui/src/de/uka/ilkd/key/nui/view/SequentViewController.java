@@ -87,6 +87,7 @@ public class SequentViewController extends ViewController {
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
         searchButton.setDisable(true);
+        posTranslator = new PositionTranslator("resources/css/sequentStyle.css");
         
         textAreaWebView.setOnMouseMoved(event -> {
             if (sequentLoaded) {
@@ -214,7 +215,7 @@ public class SequentViewController extends ViewController {
         proofString = logicPrinter.toString();
         printer.setProofString(proofString);
 
-        posTranslator = new PositionTranslator(proofString);
+        posTranslator.setProofString(proofString);
 
         sequentLoaded = true;
         updateView();
