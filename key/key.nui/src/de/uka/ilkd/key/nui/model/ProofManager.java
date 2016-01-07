@@ -15,6 +15,7 @@ import de.uka.ilkd.key.nui.util.IStatusManager;
  * Provides a wrapper of the KeYMediator
  * with basic loading of proofs
  * @author Benedikt Gross
+ * @author Nils Muzzulini
  *
  */
 public class ProofManager {
@@ -27,9 +28,9 @@ public class ProofManager {
     }
 
     /**
-     * Creates a new Proofmanager
+     * Creates a new Proofmanager.
      * 
-     * @param status
+     * @param statusManager
      *            a StatusManager to print status texts to
      */
     public ProofManager(IStatusManager statusManager) {

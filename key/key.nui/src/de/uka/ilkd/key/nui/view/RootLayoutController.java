@@ -48,7 +48,8 @@ import javafx.stage.Stage;
 /**
  * @author Maximilian Li
  * @author Victor Schuemmer
- *
+ * @author Benedikt Gross
+ * @author Nils Muzzulini
  */
 public class RootLayoutController extends ViewController
         implements IStatusManager {
