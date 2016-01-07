@@ -54,7 +54,7 @@
    <bottom>
       <AnchorPane BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="statusLabel" alignment="CENTER" text="Status" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <Label fx:id="statusLabel" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
    </bottom>

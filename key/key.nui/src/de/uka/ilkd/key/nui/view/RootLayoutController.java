@@ -56,7 +56,10 @@ import javafx.stage.Stage;
 public class RootLayoutController extends ViewController
         implements IStatusManager {
 
-    private static final int MaxMenuEntries = 8;
+    private static final int MAXMENUENTRIES = 8;
+    private static final Image STATUSLOGO = new Image("file:resources/images/key-color.gif");
+    private static final String STATUSWELCOMETEXT = "\u00a9 Copyright 2001 - 2015 Karlsruhe Institute of Technology, Chalmers University of Technology, and Technische Universitaet Darmstadt \n"
+            + "KeY is free Software and comes with ABSOLUTELY NO WARRANTY";
 
     @FXML
     private Label statusLabel;
@@ -139,9 +142,8 @@ public class RootLayoutController extends ViewController
             registerDragListeners(v.getCenter());
         });
         
-        statusLabel.setGraphic(new ImageView(new Image("file:resources/images/key-color.gif")));
-        statusLabel.setText("\u00a9 Copyright 2001 - 2015 Karlsruhe Institute of Technology, Chalmers University of Technology, and Technische Universitaet Darmstadt \n"
-                + "KeY is free Software and comes with ABSOLUTELY NO WARRANTY");
+        statusLabel.setGraphic(new ImageView(STATUSLOGO));
+        statusLabel.setText(STATUSWELCOMETEXT);
     }
 
     /**
@@ -312,7 +314,7 @@ public class RootLayoutController extends ViewController
                 item.setAccelerator(KeyCombination.valueOf(accelerator));
     
             // make overflow menu "Others" if items exceed max
-            if (viewsMenu.getItems().size() < MaxMenuEntries) {
+            if (viewsMenu.getItems().size() < MAXMENUENTRIES) {
                 viewsMenu.getItems().add(item);
             }
             else {
