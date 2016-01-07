@@ -34,6 +34,14 @@ public class SequentPrinter {
     private final String closingTag = "</span>";
     private final String mouseTagOpen = "<span class=\"mouseover\">";
     private final String highlightedTagOpen = "<span class=\"highlighted\">";
+    
+    private enum StylePos{
+        SYNTAX(0), MOUSE(1), SEARCH(2);
+        private int slotPosition;
+        private StylePos(int i){
+            slotPosition = i;
+        }
+    }
 
     /**
      * 
@@ -136,8 +144,8 @@ public class SequentPrinter {
      */
     public void applyMouseHighlighting(Range range) {
         removeMouseHighlighting();
-        putTag(range.start(), 1, mouseTagOpen);
-        putTag(range.end(), 1, closingTag);
+        putTag(range.start(), StylePos.MOUSE, mouseTagOpen);
+        putTag(range.end(), StylePos.MOUSE, closingTag);
         mouseoverRange = range;
     }
 
@@ -154,15 +162,15 @@ public class SequentPrinter {
      *            the HTML tag to be inserted.
      * @return the TreeMap with the new HashMap.
      */
-    private TreeMap<Integer, String[]> putTag(int index, int arrayPos,
+    private TreeMap<Integer, String[]> putTag(int index, StylePos arrayPos,
             String tag) {
         String[] mapValue = tagsAtIndex.get(index);
 
         if (mapValue != null) {
-            mapValue[arrayPos] = tag;
+            mapValue[arrayPos.slotPosition] = tag;
         }
         else {
-            tagsAtIndex.put(index, new String[3]);
+            tagsAtIndex.put(index, new String[StylePos.values().length]);
             putTag(index, arrayPos, tag);
         }
 
@@ -175,8 +183,8 @@ public class SequentPrinter {
     public void removeMouseHighlighting() {
         // TODO Delete empty Hashmap
         if (mouseoverRange != null) {
-            putTag(mouseoverRange.start(), 1, null);
-            putTag(mouseoverRange.end(), 1, null);
+            putTag(mouseoverRange.start(), StylePos.MOUSE, null);
+            putTag(mouseoverRange.end(), StylePos.MOUSE, null);
         }
     }
 
@@ -202,8 +210,8 @@ public class SequentPrinter {
                     while (matcher.find()) {
 
                         // Check all occurrences
-                        putTag(matcher.start(), 2, highlightedTagOpen);
-                        putTag(matcher.end(), 2, closingTag);
+                        putTag(matcher.start(), StylePos.SEARCH, highlightedTagOpen);
+                        putTag(matcher.end(), StylePos.SEARCH, closingTag);
 
                         searchIndices.add(matcher.start());
                         searchIndices.add(matcher.end());
@@ -219,8 +227,8 @@ public class SequentPrinter {
                 // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
-                    putTag(i, 2, highlightedTagOpen);
-                    putTag(i + searchString.length(), 2, closingTag);
+                    putTag(i, StylePos.SEARCH, highlightedTagOpen);
+                    putTag(i + searchString.length(), StylePos.SEARCH, closingTag);
 
                     searchIndices.add(i);
                     searchIndices.add(i + searchString.length());
@@ -238,7 +246,7 @@ public class SequentPrinter {
             for (Iterator<Integer> iterator = searchIndices.iterator(); iterator
                     .hasNext();) {
                 int index = (int) iterator.next();
-                putTag(index, 2, null);
+                putTag(index, StylePos.SEARCH, null);
             }
         }
     }
