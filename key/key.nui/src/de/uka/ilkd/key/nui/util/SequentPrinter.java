@@ -407,14 +407,16 @@ public class SequentPrinter {
     public void setPosTable(PositionTable posTable) {
         this.posTable = posTable;
     }
-    /*
-     * private void applySyntaxHighlighting() { InitialPositionTable initPos =
-     * (InitialPositionTable) posTable; IdentitySequentPrintFilter filter = new
-     * IdentitySequentPrintFilter(p_s); for (int i = 0; i <
-     * proofString.length(); i++) { System.out.println(
-     * initPos.getPosInSequent(i, filter).getPosInOccurrence()
-     * .constrainedFormula().getClass().getName()); } }
-     */
+
+//    private void applySyntaxHighlighting() {
+//        InitialPositionTable initPos = (InitialPositionTable) posTable;
+//        IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(p_s);
+//        for (int i = 0; i < proofString.length(); i++) {
+//            System.out.println(
+//                    initPos.getPosInSequent(i, filter).getPosInOccurrence()
+//                            .constrainedFormula().getClass().getName());
+//        }
+//    }
 
     /**
      * converts the input String to HTML tagged text

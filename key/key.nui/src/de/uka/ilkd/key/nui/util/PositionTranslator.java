@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nui.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,9 @@ public class PositionTranslator {
     private String cssPath;
     private String font;
     private int fontSize;
+    private int minimizedSize;
+    private boolean filterCollapsed = false;
+    private ArrayList<Integer> filteredLines = new ArrayList<Integer>();
 
     /**
      * 
@@ -89,9 +93,20 @@ public class PositionTranslator {
         int result;
 
         Text text = new Text(" ");
-        text.setFont(new Font(font, fontSize));
 
         for (result = 0; result < strings.length; result++) {
+            // Adjust for filtering
+            if (filteredLines.contains(result)) {
+                if (filterCollapsed) {
+                    continue;
+                }
+                else {
+                    text.setFont(new Font(font, minimizedSize));
+                }
+            }
+            else {
+                text.setFont(new Font(font, fontSize));
+            }
             yCoord -= text.getLayoutBounds().getHeight();
 
             if (yCoord < 0) {
@@ -122,7 +137,13 @@ public class PositionTranslator {
 
         // Generate Text Object with Font and Size for computing width
         Text text = new Text();
-        text.setFont(new Font(font, fontSize));
+        //Adjust for minimized Filter
+        if (!filterCollapsed && filteredLines.contains(line)) {
+            text.setFont(new Font(font, minimizedSize));
+        }
+        else {
+            text.setFont(new Font(font, fontSize));
+        }
 
         // For each char check width
         for (char c : strings[line].toCharArray()) {
@@ -177,15 +198,15 @@ public class PositionTranslator {
             String line = br.readLine();
 
             boolean inPre = false;
+            boolean inMinimized = false;
             while (line != null) {
                 // Set the Font Style and Family Information used in <Pre> Block
                 if (inPre) {
                     if (line.startsWith("}")) {
                         inPre = false;
-                        break;
                     }
-                    if (line.contains("font-family")) {
-                        font = line.split("\"")[1];                        
+                    else if (line.contains("font-family")) {
+                        font = line.split("\"")[1];
                     }
                     else if (line.contains("font-size")) {
                         Pattern pattern = Pattern.compile("[0-9]+");
@@ -194,8 +215,22 @@ public class PositionTranslator {
                         fontSize = Integer.parseInt(matcher.group());
                     }
                 }
+                else if (inMinimized) {
+                    if (line.startsWith("}")) {
+                        inMinimized = false;
+                    }
+                    else if (line.contains("font-size")) {
+                        Pattern pattern = Pattern.compile("[0-9]+");
+                        Matcher matcher = pattern.matcher(line);
+                        matcher.find();
+                        minimizedSize = Integer.parseInt(matcher.group());
+                    }
+                }
                 else if (line.startsWith("pre{")) {
                     inPre = true;
+                }
+                else if (line.startsWith(".minimized{")) {
+                    inMinimized = true;
                 }
 
                 line = br.readLine();
@@ -206,4 +241,12 @@ public class PositionTranslator {
         }
     }
 
+    /**
+     * @param filterCollapsed
+     *            the filterCollapsed to set
+     */
+    public void setFilter(ArrayList<Integer> lines, boolean filterCollapsed) {
+        filteredLines = lines;
+        this.filterCollapsed = filterCollapsed;
+    }
 }
