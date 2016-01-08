@@ -14,8 +14,8 @@ import javafx.util.Pair;
  */
 public abstract class ViewController implements Initializable {
 
-    protected Context context;
-    protected MainApp mainApp;
+    private Context context;
+    private MainApp mainApp;
 
     public void setMainApp(MainApp mainApp, Context context) {
         this.mainApp = mainApp;
