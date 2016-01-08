@@ -8,6 +8,13 @@ pre{
 .mouseover{
 	background-color: B0C4DE;
 }
+.minimized{
+	font-size: 6px;
+}
+.collapsed{
+	visibility: collapsed;
+}
+
 .forall{
 	color: blue;
 	font-weight: bold;

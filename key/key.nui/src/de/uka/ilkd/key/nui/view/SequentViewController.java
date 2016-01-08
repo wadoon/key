@@ -90,17 +90,17 @@ public class SequentViewController extends ViewController {
         checkBoxPrettySyntax.setDisable(true);
         checkBoxUnicode.setDisable(true);
         searchButton.setDisable(true);
-        posTranslator = new PositionTranslator("resources/css/sequentStyle.css");
-        
+        posTranslator = new PositionTranslator(
+                "resources/css/sequentStyle.css");
+
         textAreaWebView.setOnMouseMoved(event -> {
             if (sequentLoaded) {
 
                 int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
-                
+
                 this.printer.applyMouseHighlighting(range);
                 this.updateView();
-
             }
         });
         textAreaWebView.setOnMouseExited(event -> {
@@ -130,8 +130,8 @@ public class SequentViewController extends ViewController {
                 });
 
         searchBox.setOnKeyReleased((event) -> {
-            //printer.setFreeTextSearch(searchBox.getText());
-            printer.setFreetextSearch(searchBox.getText());
+            // printer.setFreeTextSearch(searchBox.getText());
+            printer.applyFreetextSearch(searchBox.getText());
             updateView();
             event.consume();
         });
@@ -145,7 +145,9 @@ public class SequentViewController extends ViewController {
 
     /**
      * Displays the sequent of the currently selected node in the tree.
-     * @param node The selected node.
+     * 
+     * @param node
+     *            The selected node.
      */
     private void showSequent(Node node) {
         Proof proof = context.getProofManager().getMediator()
@@ -156,8 +158,8 @@ public class SequentViewController extends ViewController {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printer = new SequentPrinter(
-                "resources/css/sequentStyle.css", abstractSyntaxTree);
+        printer = new SequentPrinter("resources/css/sequentStyle.css",
+                abstractSyntaxTree);
 
         printSequent();
 
@@ -261,11 +263,13 @@ public class SequentViewController extends ViewController {
          * OutputStreamWriter(System.out, "UTF-8"))); } catch (Exception ex) {
          * ex.printStackTrace(); } } } });
          */
-
+        // int h = (int) webEngine.executeScript("document.body.scrollTop");
         webEngine.loadContent(s);
+
+        // webEngine.executeScript("window.scrollTo(" + 0 + ", " + h + ")");
     }
-    
-    private void updateView(){
+
+    private void updateView() {
         updateHtml(this.printer.printProofString());
     }
 }

@@ -185,8 +185,7 @@ public class PositionTranslator {
                         break;
                     }
                     if (line.contains("font-family")) {
-                        font = line.split("\"")[1];
-                        System.out.println(font);
+                        font = line.split("\"")[1];                        
                     }
                     else if (line.contains("font-size")) {
                         Pattern pattern = Pattern.compile("[0-9]+");

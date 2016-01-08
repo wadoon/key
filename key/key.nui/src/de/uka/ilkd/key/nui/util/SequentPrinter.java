@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -28,17 +29,24 @@ public class SequentPrinter {
     private boolean useRegex = false;
 
     private TreeMap<Integer, String[]> tagsAtIndex;
+
     private Range mouseoverRange;
     private ArrayList<Integer> searchIndices;
+    private ArrayList<Integer> filterIndices;
 
-    private final String closingTag = "</span>";
-    private final String mouseTagOpen = "<span class=\"mouseover\">";
-    private final String highlightedTagOpen = "<span class=\"highlighted\">";
-    
-    private enum StylePos{
-        SYNTAX(0), MOUSE(1), SEARCH(2);
+    private final static String closingTag = "</span>";
+
+    private final static String mouseTagOpen = "<span class=\"mouseover\">";
+    private final static String highlightedTagOpen = "<span class=\"highlighted\">";
+    private final static String filterMinimizeTagOpen = "<span class=\"minimized\">";
+    private final static String filterCollapsedTagOpen = "<span class=\"collapsed\">";
+
+    private enum StylePos {
+        SYNTAX(0), MOUSE(1), SEARCH(2), FILTER(3);
+
         private int slotPosition;
-        private StylePos(int i){
+
+        private StylePos(int i) {
             slotPosition = i;
         }
     }
@@ -54,7 +62,10 @@ public class SequentPrinter {
             e.printStackTrace();
         }
         this.setPosTable(posTable);
+
         tagsAtIndex = new TreeMap<Integer, String[]>();
+        searchIndices = new ArrayList<Integer>();
+        filterIndices = new ArrayList<Integer>();
     }
 
     /**
@@ -150,6 +161,103 @@ public class SequentPrinter {
     }
 
     /**
+     * applies minimized or collapsed Stylint to the lines included in the list
+     * 
+     * @param indicesOfLines
+     *            an Arraylist of the line numbers, beginning at 0
+     * @param collapseNotMinimize
+     *            true if Style=collpased, false if Style=minimzed
+     */
+    public void applyFilter(ArrayList<Integer> indicesOfLines,
+            boolean collapseNotMinimize) {
+        // remove old Filter styling
+        removeFilter();
+
+        if (!indicesOfLines.isEmpty()) {
+            // Sort Lines
+            Collections.sort(indicesOfLines);
+            // get line information
+            String[] lines = proofString.split("\n");
+
+            int styleStart = 0;
+            // Pointer at the current entry of the ArrayList
+            int linePointer = 0;
+
+            // Iterate over the lines
+            for (int i = 0; i < lines.length; i++) {
+                // Compute Endindex of Line
+                int styleEnd = styleStart + lines[i].length();
+                // If line is in list apply styles
+                if (i == indicesOfLines.get(linePointer)) {
+
+                    if (collapseNotMinimize) {
+                        collapseLine(styleStart, styleEnd);
+                    }
+                    else {
+                        minimizeLine(styleStart, styleEnd);
+                    }
+                    // Increase Linepointer for the ArrayList entry
+                    linePointer++;
+                }
+                // If all the entries have been resolved, return
+                if (linePointer == indicesOfLines.size()) {
+                    return;
+                }
+                // Set the start of the next line to the end of the current
+                // line. Adjust +1 for \n char
+                styleStart = styleEnd + 1;
+            }
+        }
+
+    }
+
+    /**
+     * adds collapsed Style for the line defined by the indices
+     * 
+     * @param lineStart
+     *            startIndex of line
+     * @param lineEnd
+     *            endIndex of line
+     */
+    private void collapseLine(int lineStart, int lineEnd) {
+        putTag(lineStart, StylePos.FILTER, filterCollapsedTagOpen);
+        putTag(lineEnd, StylePos.FILTER, closingTag);
+
+        filterIndices.add(lineStart);
+        filterIndices.add(lineEnd);
+    }
+
+    /**
+     * adds minimized Style for the line defined by the indices
+     * 
+     * @param lineStart
+     *            startIndex of line
+     * @param lineEnd
+     *            endIndex of line
+     */
+    private void minimizeLine(int lineStart, int lineEnd) {
+        putTag(lineStart, StylePos.FILTER, filterMinimizeTagOpen);
+        putTag(lineEnd, StylePos.FILTER, closingTag);
+
+        filterIndices.add(lineStart);
+        filterIndices.add(lineEnd);
+    }
+
+    /**
+     * removes all the applied Styling by the filter functions
+     */
+    private void removeFilter() {
+        if (filterIndices != null) {
+            for (Iterator<Integer> iterator = filterIndices.iterator(); iterator
+                    .hasNext();) {
+                int index = (int) iterator.next();
+                putTag(index, StylePos.FILTER, null);
+            }
+            filterIndices.clear();
+        }
+    }
+
+    /**
      * inserts the given Tags at the specified position in the TreeMap. This
      * TreeMap is used to define the stylingTag positions
      * 
@@ -181,7 +289,6 @@ public class SequentPrinter {
      * removes all the Mouseover Highlighting currently applied.
      */
     public void removeMouseHighlighting() {
-        // TODO Delete empty Hashmap
         if (mouseoverRange != null) {
             putTag(mouseoverRange.start(), StylePos.MOUSE, null);
             putTag(mouseoverRange.end(), StylePos.MOUSE, null);
@@ -194,10 +301,9 @@ public class SequentPrinter {
      * @param searchString
      *            the freetext searchString
      */
-    public void setFreetextSearch(String searchString) {
+    public void applyFreetextSearch(String searchString) {
         // remove old Search Highlighting
-        cleanSearchIndices();
-        searchIndices = new ArrayList<Integer>();
+        removeSearchIndices();
 
         if (!searchString.isEmpty()) {
             if (useRegex) {
@@ -210,7 +316,8 @@ public class SequentPrinter {
                     while (matcher.find()) {
 
                         // Check all occurrences
-                        putTag(matcher.start(), StylePos.SEARCH, highlightedTagOpen);
+                        putTag(matcher.start(), StylePos.SEARCH,
+                                highlightedTagOpen);
                         putTag(matcher.end(), StylePos.SEARCH, closingTag);
 
                         searchIndices.add(matcher.start());
@@ -228,7 +335,8 @@ public class SequentPrinter {
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
                     putTag(i, StylePos.SEARCH, highlightedTagOpen);
-                    putTag(i + searchString.length(), StylePos.SEARCH, closingTag);
+                    putTag(i + searchString.length(), StylePos.SEARCH,
+                            closingTag);
 
                     searchIndices.add(i);
                     searchIndices.add(i + searchString.length());
@@ -241,13 +349,14 @@ public class SequentPrinter {
      * iterates over the searchIndices ArrayList. Uses this information to
      * remove references in Styling TreeMap
      */
-    private void cleanSearchIndices() {
+    private void removeSearchIndices() {
         if (searchIndices != null) {
             for (Iterator<Integer> iterator = searchIndices.iterator(); iterator
                     .hasNext();) {
                 int index = (int) iterator.next();
                 putTag(index, StylePos.SEARCH, null);
             }
+            searchIndices.clear();
         }
     }
 
@@ -261,6 +370,9 @@ public class SequentPrinter {
         // As a new ProofString means old styling Info is deprecated, Map is
         // cleared.
         tagsAtIndex.clear();
+        /*
+         * applySyntaxHighlighting();
+         */
     }
 
     /**
@@ -295,6 +407,14 @@ public class SequentPrinter {
     public void setPosTable(PositionTable posTable) {
         this.posTable = posTable;
     }
+    /*
+     * private void applySyntaxHighlighting() { InitialPositionTable initPos =
+     * (InitialPositionTable) posTable; IdentitySequentPrintFilter filter = new
+     * IdentitySequentPrintFilter(p_s); for (int i = 0; i <
+     * proofString.length(); i++) { System.out.println(
+     * initPos.getPosInSequent(i, filter).getPosInOccurrence()
+     * .constrainedFormula().getClass().getName()); } }
+     */
 
     /**
      * converts the input String to HTML tagged text
@@ -305,14 +425,16 @@ public class SequentPrinter {
      */
     private String toHTML(String s) {
         StringBuilder sb = new StringBuilder();
+        sb.append("<head>");
         sb.append("<style>");
         sb.append(css);
         sb.append("</style>");
+        sb.append("</head><body>");
         sb.append("<pre class=\"content\">");
 
         sb.append(s);
 
-        sb.append("</pre>");
+        sb.append("</pre></body>");
 
         return sb.toString();
     }
