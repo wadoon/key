@@ -172,7 +172,7 @@ public class MainApp extends Application {
         }
         System.out.println("Menus: " + annotated.size());
     }
-
+    
     /**
      * Returns the main stage.
      * 

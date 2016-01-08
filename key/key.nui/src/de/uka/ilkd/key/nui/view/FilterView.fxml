@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="185.0" prefWidth="219.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
+<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="219.0" prefWidth="219.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
    <children>
       <VBox AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -27,58 +27,48 @@
             </HBox>
             <TabPane>
                <tabs>
-                  <Tab closable="false" text="Filter">
+                  <Tab closable="false" text="Sequent Filter">
                      <content>
-                        <VBox>
-                           <children>
-                              <HBox alignment="TOP_CENTER">
+                        <BorderPane>
+                           <center>
+                              <GridPane>
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="61.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="10.0" prefWidth="135.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
                                  <children>
-                                    <Label alignment="TOP_LEFT" text="Exclude:">
-                                       <HBox.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <TextField fx:id="excludeText" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                    </TextField>
+                                    <Label text="After:" GridPane.rowIndex="3" />
+                                    <CheckBox fx:id="revertFilter" mnemonicParsing="false" text="Revert" GridPane.rowIndex="1" />
+                                    <TextField fx:id="searchText" alignment="TOP_LEFT" GridPane.columnIndex="1" />
+                                    <Slider fx:id="linesAfter" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Slider fx:id="linesBefore" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Label text="Before:" GridPane.rowIndex="2" />
+                                    <Label alignment="TOP_LEFT" text="Search:" />
                                  </children>
-                              </HBox>
-                              <HBox alignment="TOP_CENTER">
-                                 <children>
-                                    <Label alignment="TOP_LEFT" text="Search:">
-                                       <HBox.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <TextField fx:id="searchText" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                    </TextField>
-                                 </children>
-                              </HBox>
-                              <CheckBox fx:id="toggleUseTerm" mnemonicParsing="false" text="Term" />
-                           </children>
-                           <padding>
-                              <Insets bottom="10.0" top="10.0" />
-                           </padding>
-                        </VBox>
+                                 <BorderPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </BorderPane.margin>
+                              </GridPane>
+                           </center>
+                        </BorderPane>
                      </content>
                   </Tab>
                </tabs>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
             </TabPane>
          </children>
       </VBox>
       <HBox alignment="CENTER" prefWidth="199.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <children>
             <Button mnemonicParsing="false" onAction="#handleReset" text="Reset">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
-          <Button mnemonicParsing="false" onAction="#handleApply" text="Apply">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>

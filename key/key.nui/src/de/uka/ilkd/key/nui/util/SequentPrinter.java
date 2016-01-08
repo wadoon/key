@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.nui.model.Filter;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 
@@ -159,7 +160,7 @@ public class SequentPrinter {
         putTag(range.end(), StylePos.MOUSE, closingTag);
         mouseoverRange = range;
     }
-
+    
     /**
      * applies minimized or collapsed Stylint to the lines included in the list
      * 
@@ -168,8 +169,9 @@ public class SequentPrinter {
      * @param collapseNotMinimize
      *            true if Style=collpased, false if Style=minimzed
      */
-    public void applyFilter(ArrayList<Integer> indicesOfLines,
-            boolean collapseNotMinimize) {
+    public void applyFilter(Filter filter, boolean collapseNotMinimize) {
+        ArrayList<Integer> indicesOfLines = SequentFilterer.ApplyFilter(proofString, filter);
+        
         // remove old Filter styling
         removeFilter();
 
