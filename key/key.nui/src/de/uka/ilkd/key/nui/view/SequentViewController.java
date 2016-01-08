@@ -50,7 +50,7 @@ public class SequentViewController extends ViewController {
         // execute ui update on javafx thread
         Platform.runLater(() -> {
             showSequent(
-                    context.getProofManager().getMediator().getSelectedNode());
+                    getContext().getProofManager().getMediator().getSelectedNode());
         });
     };
     private PositionTranslator posTranslator;
@@ -113,7 +113,7 @@ public class SequentViewController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
-        context.getProofManager().addProofListener(proofChangeListener);
+        getContext().getProofManager().addProofListener(proofChangeListener);
     }
 
     // TODO add comments
@@ -148,7 +148,7 @@ public class SequentViewController extends ViewController {
      * @param node The selected node.
      */
     private void showSequent(Node node) {
-        Proof proof = context.getProofManager().getMediator()
+        Proof proof = getContext().getProofManager().getMediator()
                 .getSelectedProof();
         services = proof.getServices();
         sequent = node.sequent();
@@ -234,7 +234,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        context.getProofManager()
+        getContext().getProofManager()
                 .loadProblem(new File("resources/proofs/gcd.closed.proof"));
     }
 

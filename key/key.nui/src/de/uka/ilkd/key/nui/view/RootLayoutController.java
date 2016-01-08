@@ -193,7 +193,7 @@ public class RootLayoutController extends ViewController
      */
     @FXML
     private void handleClose() {
-        mainApp.closeWindowAlert();
+        getMainApp().closeWindowAlert();
     }
 
     /**
@@ -218,7 +218,7 @@ public class RootLayoutController extends ViewController
             setStatus("No File Selected");
             return;
         }
-        context.getProofManager().loadProblem(file);
+        getContext().getProofManager().loadProblem(file);
     }
 
     /**
