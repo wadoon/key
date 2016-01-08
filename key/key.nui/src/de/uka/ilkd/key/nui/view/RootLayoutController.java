@@ -53,7 +53,7 @@ public class RootLayoutController extends ViewController
 
     private static final int MAXMENUENTRIES = 8;
     private static final Image STATUSLOGO = new Image(
-            "file:resources/images/key-color.gif");
+            "file:resources/images/key-color-transparent-background.png");
     private static final String STATUSWELCOMETEXT = "\u00a9 Copyright 2001 - 2016 Karlsruhe Institute of Technology, Chalmers University of Technology, and Technische Universitaet Darmstadt \n"
             + "KeY is free Software and comes with ABSOLUTELY NO WARRANTY";
 

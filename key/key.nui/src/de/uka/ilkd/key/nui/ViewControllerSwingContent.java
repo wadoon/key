@@ -27,8 +27,6 @@ public abstract class ViewControllerSwingContent extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -41,11 +39,11 @@ public abstract class ViewControllerSwingContent extends ViewController {
      * Embeds Swing content into a StackPane inside the view. To implement use
      * {@link #getSwingNode()}.
      * {@link javafx.embed.swing.SwingNode#setContent(javax.swing.JComponent)
-     * setContent(JComponent)} where the JComponent is the Swing Component to be
-     * added.
+     * setContent(JComponent)} where the {@link JComponent} is the Swing
+     * Component to be added.
      * 
-     * In the corresponding FXML file a StackPane with fx:id "stackPane" needs
-     * to be added.
+     * In the corresponding FXML file a {@link StackPane} with fx:id "stackPane"
+     * needs to be added.
      */
     public abstract void createSwingContent();
 
