@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.nui.model.PrintFilter;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -21,10 +22,12 @@ import javafx.scene.text.Text;
 public class PositionTranslator {
     private String[] strings;
     private String cssPath;
+    private String proofString;
     private String font;
     private int fontSize;
     private int minimizedSize;
     private boolean filterCollapsed = false;
+    private boolean filterInverted = false;
     private ArrayList<Integer> filteredLines = new ArrayList<Integer>();
 
     /**
@@ -43,6 +46,7 @@ public class PositionTranslator {
     }
 
     public void setProofString(String proofString) {
+    	this.proofString = proofString;
         strings = proofString.split("\n");
         try {
             readCSS(cssPath);
@@ -93,19 +97,20 @@ public class PositionTranslator {
         int result;
 
         Text text = new Text(" ");
-
+        text.setFont(new Font(font, fontSize));
         for (result = 0; result < strings.length; result++) {
             // Adjust for filtering
-            if (filteredLines.contains(result)) {
+            if (filteredLines.contains(result) != filterInverted) {
                 if (filterCollapsed) {
                     continue;
-                }
+                }/*
                 else {
-                    text.setFont(new Font(font, minimizedSize));
+                    //text.setFont(new Font(font, minimizedSize));
                 }
             }
             else {
                 text.setFont(new Font(font, fontSize));
+            }*/
             }
             yCoord -= text.getLayoutBounds().getHeight();
 
@@ -138,7 +143,7 @@ public class PositionTranslator {
         // Generate Text Object with Font and Size for computing width
         Text text = new Text();
         //Adjust for minimized Filter
-        if (!filterCollapsed && filteredLines.contains(line)) {
+        if (!filterCollapsed && (filteredLines.contains(line) != filterInverted)) {
             text.setFont(new Font(font, minimizedSize));
         }
         else {
@@ -241,12 +246,11 @@ public class PositionTranslator {
         }
     }
 
-    /**
-     * @param filterCollapsed
-     *            the filterCollapsed to set
-     */
-    public void setFilter(ArrayList<Integer> lines, boolean filterCollapsed) {
-        filteredLines = lines;
-        this.filterCollapsed = filterCollapsed;
+    
+    public void applyFilter(PrintFilter filter){
+    	filteredLines = SequentFilterer.ApplyFilter(proofString, filter);
+    	//XXX
+    	filterCollapsed = false;
+    	filterInverted = filter.getInvert(); 
     }
 }

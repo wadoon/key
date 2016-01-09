@@ -282,5 +282,6 @@ public class SequentViewController extends ViewController implements IAcceptSequ
     @Override
     public void Apply(PrintFilter filter) {
         printer.applyFilter(filter);
+        posTranslator.applyFilter(filter);
     }
 }
