@@ -147,7 +147,7 @@ public class PositionTranslator {
 
         // For each char check width
         for (char c : strings[line].toCharArray()) {
-            text.setText("" + c);
+            text.setText(String.valueOf(c));
             xCoord -= text.getLayoutBounds().getWidth();
 
             if (xCoord < 0) {
