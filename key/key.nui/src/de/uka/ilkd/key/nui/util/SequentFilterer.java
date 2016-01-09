@@ -19,8 +19,6 @@ public class SequentFilterer {
                 filterFor.add(i);
             }
         }
-        
-        filterFor.stream().distinct().collect(Collectors.toList());
-        return filterFor;
+        return new ArrayList<>(filterFor.stream().distinct().collect(Collectors.toList()));
     }
 }
