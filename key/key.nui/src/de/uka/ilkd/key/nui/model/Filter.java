@@ -27,7 +27,7 @@ public class Filter extends Observable {
     public boolean getRevert(){
         return revert;
     }
-    public void setRever(boolean value){
+    public void setRevert(boolean value){
         if(revert == value) return;
         revert = value;
         notifyObservers();
@@ -64,7 +64,7 @@ public class Filter extends Observable {
         Filter filter = new Filter();
         filter.setName(this.name);
         filter.setSearchString(this.searchString);
-        filter.setRever(this.revert);
+        filter.setRevert(this.revert);
         filter.setAfter(this.after);
         filter.setBefore(this.before);
         return filter;

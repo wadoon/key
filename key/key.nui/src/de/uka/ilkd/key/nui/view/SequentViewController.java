@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javax.annotation.processing.Filer;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
@@ -116,6 +118,8 @@ public class SequentViewController extends ViewController implements IAcceptSequ
     @Override
     public void initializeAfterLoadingFxml() {
         getContext().getProofManager().addProofListener(proofChangeListener);
+        //XXX see FilterView
+        getContext().registerFilterConsumer(this);
     }
 
     // TODO add comments
@@ -277,6 +281,6 @@ public class SequentViewController extends ViewController implements IAcceptSequ
 
     @Override
     public void Apply(Filter filter) {
-        
+        printer.applyFilter(filter);
     }
 }

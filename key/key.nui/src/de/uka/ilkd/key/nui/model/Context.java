@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.nui.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import de.uka.ilkd.key.nui.util.IAcceptSequentFilter;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 
 public class Context {
@@ -38,4 +42,21 @@ public class Context {
     
     public Context() {
     }
+    
+    //XXX ulgy workaround ---
+    private List<IAcceptSequentFilter> acceptSequentFilters = new LinkedList<>();
+    public void registerFilterConsumer(IAcceptSequentFilter acceptSequentFilter){
+        acceptSequentFilters.add(acceptSequentFilter);
+    }
+    
+    public void unregisterFilterConsumer(IAcceptSequentFilter acceptSequentFilter){
+        acceptSequentFilters.remove(acceptSequentFilter);
+    }
+    
+    public void acceptFilter(Filter filter){
+        for(IAcceptSequentFilter consumer: acceptSequentFilters){
+            consumer.Apply(filter);
+        }
+    }
+    // ---
 }

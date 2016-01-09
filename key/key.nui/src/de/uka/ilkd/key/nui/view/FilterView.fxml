@@ -60,7 +60,7 @@
       </VBox>
       <HBox alignment="CENTER" prefWidth="199.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <children>
-            <Button fx:id="applyButton" mnemonicParsing="false" text="Apply" />
+            <Button mnemonicParsing="false" onAction="#handleApply" text="Apply" />
             <Button mnemonicParsing="false" onAction="#handleReset" text="Reset">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
