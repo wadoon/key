@@ -42,7 +42,7 @@
                      <children>
                         <Label text="After:" GridPane.rowIndex="3" />
                         <CheckBox fx:id="revertFilter" mnemonicParsing="false" onAction="#hanldeRevertChanged" text="Revert" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                        <TextField fx:id="searchText" alignment="TOP_LEFT" onAction="#handleSearchChanged" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                        <TextField fx:id="searchText" alignment="TOP_LEFT" GridPane.columnIndex="1" GridPane.columnSpan="2" />
                         <Slider fx:id="linesAfter" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <Slider fx:id="linesBefore" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text="Before:" GridPane.rowIndex="2" />

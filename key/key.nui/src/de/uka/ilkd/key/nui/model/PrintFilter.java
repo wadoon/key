@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nui.model;
 
 import java.util.Observable;
 
-public class Filter extends Observable {
+public class PrintFilter extends Observable {
 
     private String name;
     public String getName() {
@@ -53,15 +53,15 @@ public class Filter extends Observable {
         notifyObservers();
     }
 
-    public Filter() {
+    public PrintFilter() {
         revert = false;
         searchString = null;
         before = 2;
         after = 2;
     }
 
-    public Filter Clone() {
-        Filter filter = new Filter();
+    public PrintFilter Clone() {
+        PrintFilter filter = new PrintFilter();
         filter.setName(this.name);
         filter.setSearchString(this.searchString);
         filter.setRevert(this.revert);

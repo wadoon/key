@@ -8,7 +8,7 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.Filter;
+import de.uka.ilkd.key.nui.model.PrintFilter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
@@ -21,7 +21,7 @@ import javafx.scene.control.Alert.AlertType;
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
 public class FilterViewController extends ViewController {
 
-    private Filter currentFilter;
+    private PrintFilter currentFilter;
 
     @FXML
     private TextField searchText;
@@ -44,7 +44,7 @@ public class FilterViewController extends ViewController {
     @FXML
     private CheckBox revertFilter;
 
-    private Map<String, Filter> savedFilters = new HashMap<>();
+    private Map<String, PrintFilter> savedFilters = new HashMap<>();
 
     private void loadCurrentFilter() {
         searchText.setText(currentFilter.getSearchString());
@@ -63,8 +63,9 @@ public class FilterViewController extends ViewController {
             afterNumber.setText(Integer.toString(new_val.intValue()));
             currentFilter.setAfter(new_val.intValue());
         });
+        searchText.textProperty().addListener((o,old_val,new_val) -> currentFilter.setSearchString(new_val));
 
-        currentFilter = new Filter();
+        currentFilter = new PrintFilter();
         loadCurrentFilter();
     }
 
@@ -79,11 +80,6 @@ public class FilterViewController extends ViewController {
             linesBefore.setValue(2);
             linesAfter.setValue(2);
         }
-    }
-
-    @FXML
-    private void handleSearchChanged() {
-        currentFilter.setSearchString(searchText.getText());
     }
 
     // TODO: save filter on disk
@@ -124,11 +120,11 @@ public class FilterViewController extends ViewController {
             // TODO: implement
             // currentfilter needs to be a copy so it can be reset
             filters.getEditor().setText("");
-            currentFilter = new Filter();
+            currentFilter = new PrintFilter();
         }
         else {
             filters.getEditor().setText("");
-            currentFilter = new Filter();
+            currentFilter = new PrintFilter();
         }
         loadCurrentFilter();
     }

@@ -53,7 +53,7 @@ public class Context {
         acceptSequentFilters.remove(acceptSequentFilter);
     }
     
-    public void acceptFilter(Filter filter){
+    public void acceptFilter(PrintFilter filter){
         for(IAcceptSequentFilter consumer: acceptSequentFilters){
             consumer.Apply(filter);
         }

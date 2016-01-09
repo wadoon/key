@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.Filter;
+import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.nui.model.IProofListener;
 import de.uka.ilkd.key.nui.util.IAcceptSequentFilter;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
@@ -280,7 +280,7 @@ public class SequentViewController extends ViewController implements IAcceptSequ
     }
 
     @Override
-    public void Apply(Filter filter) {
+    public void Apply(PrintFilter filter) {
         printer.applyFilter(filter);
     }
 }
