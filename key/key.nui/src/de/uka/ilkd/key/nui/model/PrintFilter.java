@@ -23,13 +23,13 @@ public class PrintFilter extends Observable {
         notifyObservers();
     }
     
-    private boolean revert;
-    public boolean getRevert(){
-        return revert;
+    private boolean invert;
+    public boolean getInvert(){
+        return invert;
     }
-    public void setRevert(boolean value){
-        if(revert == value) return;
-        revert = value;
+    public void setInvert(boolean value){
+        if(invert == value) return;
+        invert = value;
         notifyObservers();
     }
     
@@ -54,7 +54,7 @@ public class PrintFilter extends Observable {
     }
 
     public PrintFilter() {
-        revert = false;
+        invert = false;
         searchString = null;
         before = 2;
         after = 2;
@@ -64,7 +64,7 @@ public class PrintFilter extends Observable {
         PrintFilter filter = new PrintFilter();
         filter.setName(this.name);
         filter.setSearchString(this.searchString);
-        filter.setRevert(this.revert);
+        filter.setInvert(this.invert);
         filter.setAfter(this.after);
         filter.setBefore(this.before);
         return filter;

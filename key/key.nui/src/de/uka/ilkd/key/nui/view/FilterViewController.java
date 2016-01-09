@@ -42,13 +42,13 @@ public class FilterViewController extends ViewController {
     private Label afterNumber;
 
     @FXML
-    private CheckBox revertFilter;
+    private CheckBox invertFilter;
 
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
 
     private void loadCurrentFilter() {
         searchText.setText(currentFilter.getSearchString());
-        revertFilter.setSelected(currentFilter.getRevert());
+        invertFilter.setSelected(currentFilter.getInvert());
         linesBefore.setValue(currentFilter.getBefore());
         linesAfter.setValue(currentFilter.getAfter());
     }
@@ -70,9 +70,9 @@ public class FilterViewController extends ViewController {
     }
 
     @FXML
-    private void hanldeRevertChanged() {
-        currentFilter.setRevert(revertFilter.isSelected());
-        if (revertFilter.isSelected()) {
+    private void hanldeInvertChanged() {
+        currentFilter.setInvert(invertFilter.isSelected());
+        if (invertFilter.isSelected()) {
             linesBefore.setValue(0);
             linesAfter.setValue(0);
         }
