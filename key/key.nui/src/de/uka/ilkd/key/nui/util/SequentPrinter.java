@@ -161,6 +161,14 @@ public class SequentPrinter {
         mouseoverRange = range;
     }
     
+    enum FilterMode{
+        Collapse,
+        Minimize
+    }
+    
+    //TODO: set in usersettings
+    private FilterMode filterMode;
+    
     /**
      * applies minimized or collapsed Stylint to the lines included in the list
      * 
@@ -169,7 +177,7 @@ public class SequentPrinter {
      * @param collapseNotMinimize
      *            true if Style=collpased, false if Style=minimzed
      */
-    public void applyFilter(Filter filter, boolean collapseNotMinimize) {
+    public void applyFilter(Filter filter) {
         ArrayList<Integer> indicesOfLines = SequentFilterer.ApplyFilter(proofString, filter);
         
         // remove old Filter styling
@@ -192,11 +200,14 @@ public class SequentPrinter {
                 // If line is in list apply styles
                 if (i == indicesOfLines.get(linePointer)) {
 
-                    if (collapseNotMinimize) {
-                        collapseLine(styleStart, styleEnd);
-                    }
-                    else {
+                    switch (filterMode) {
+                    case Minimize:
                         minimizeLine(styleStart, styleEnd);
+                        break;
+                    case Collapse:
+                    default:
+                        collapseLine(styleStart, styleEnd);
+                        break;
                     }
                     // Increase Linepointer for the ArrayList entry
                     linePointer++;

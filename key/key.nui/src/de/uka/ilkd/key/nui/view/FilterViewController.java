@@ -2,25 +2,21 @@ package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.Filter;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
 public class FilterViewController extends ViewController {
@@ -35,18 +31,59 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private Slider linesBefore;
-    
+
+    @FXML
+    private Label beforeNumber;
+
     @FXML
     private Slider linesAfter;
-    
+
+    @FXML
+    private Label afterNumber;
+
     @FXML
     private CheckBox revertFilter;
-    
-    @FXML
-    private void handleReset() {
-        filters.getEditor().setText("");
+
+    private Map<String, Filter> savedFilters = new HashMap<>();
+
+    private void loadCurrentFilter() {
+        searchText.setText(currentFilter.getSearchString());
+        revertFilter.setSelected(currentFilter.getRevert());
+        linesBefore.setValue(currentFilter.getBefore());
+        linesAfter.setValue(currentFilter.getAfter());
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
+            beforeNumber.setText(Integer.toString(new_val.intValue()));
+            currentFilter.setBefore(new_val.intValue());
+        });
+        linesAfter.valueProperty().addListener((o, old_val, new_val) -> {
+            afterNumber.setText(Integer.toString(new_val.intValue()));
+            currentFilter.setAfter(new_val.intValue());
+        });
+
         currentFilter = new Filter();
         loadCurrentFilter();
+    }
+
+    @FXML
+    private void hanldeRevertChanged() {
+        currentFilter.setRever(revertFilter.isSelected());
+        if (revertFilter.isSelected()) {
+            linesBefore.setValue(0);
+            linesAfter.setValue(0);
+        }
+        else {
+            linesBefore.setValue(2);
+            linesAfter.setValue(2);
+        }
+    }
+
+    @FXML
+    private void handleSearchChanged() {
+        currentFilter.setSearchString(searchText.getText());
     }
 
     // TODO: save filter on disk
@@ -55,15 +92,17 @@ public class FilterViewController extends ViewController {
     @FXML
     private void handleSaveFilter() {
         String name = filters.getEditor().getText();
-        if (name.equals("") || name.equals(null))
+        if (name.equals("") || name.equals(null)) {
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setContentText("Please choose a name before saving!");
+            alert.showAndWait();
             return;
+        }
 
         if (savedFilters.containsKey(name)) {
             currentFilter = savedFilters.get(name);
-            fillCurrentFilter();
         }
         else {
-            fillCurrentFilter();
             currentFilter.setName(name);
             savedFilters.put(name, currentFilter.Clone());
             filters.getItems().add(currentFilter.getName());
@@ -79,27 +118,23 @@ public class FilterViewController extends ViewController {
         loadCurrentFilter();
     }
 
-    private Map<String, Filter> savedFilters = new HashMap<>();
-
-    private void loadCurrentFilter() {
-        searchText.setText(currentFilter.getSearchString());
+    @FXML
+    private void handleReset() {
+        if (savedFilters.containsValue(currentFilter)) {
+            // TODO: implement
+            // currentfilter needs to be a copy so it can be reset
+            filters.getEditor().setText("");
+            currentFilter = new Filter();
+        }
+        else {
+            filters.getEditor().setText("");
+            currentFilter = new Filter();
+        }
+        loadCurrentFilter();
     }
 
-    private void fillCurrentFilter() {
-        currentFilter.setSearchString(searchText.getText());
-    }
+    @FXML
+    private void handleApply() {
 
-    /*
-     * private void doFilter(String filterstring) { if (!sequentLoaded) return;
-     * if (filterstring.startsWith(".")) printer.addTempCss("filterCss",
-     * String.format(
-     * ".content :not(%s),.content :not(%s) *{display: none !important;}",
-     * filterstring, filterstring)); else printer.addTempCss("filterCss", "");
-     * updateHtml(printer.printSequent(proofString)); }
-     */
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        currentFilter = new Filter();
     }
 }
