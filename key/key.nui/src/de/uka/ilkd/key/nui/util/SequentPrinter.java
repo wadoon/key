@@ -107,6 +107,7 @@ public class SequentPrinter {
 
             }
         }
+        
         // Apply HTML formatting and return
         return toHTML(encodeLessThan(sb.toString()));
     }
@@ -185,10 +186,10 @@ public class SequentPrinter {
 
         if (!indicesOfLines.isEmpty()) {
             // Sort Lines
-            Collections.sort(indicesOfLines);
+            //Collections.sort(indicesOfLines);
             // get line information
             String[] lines = proofString.split("\n");
-
+            
             int styleStart = 0;
             // Pointer at the current entry of the ArrayList
             int linePointer = 0;
@@ -198,7 +199,7 @@ public class SequentPrinter {
                 // Compute Endindex of Line
                 int styleEnd = styleStart + lines[i].length();
                 // If line is in list apply styles
-                if (i == indicesOfLines.get(linePointer)) {
+                if (indicesOfLines.contains(i)) {
 
                     switch (filterMode) {
                     case Minimize:
@@ -285,6 +286,7 @@ public class SequentPrinter {
      */
     private TreeMap<Integer, String[]> putTag(int index, StylePos arrayPos,
             String tag) {
+    	
         String[] mapValue = tagsAtIndex.get(index);
 
         if (mapValue != null) {
