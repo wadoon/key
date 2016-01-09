@@ -85,7 +85,7 @@ public class SequentPrinter {
         for (int index : tagsAtIndex.keySet()) {
 
             // Insert closeTag "<\span>"
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < StylePos.values().length; i++) {
                 insertTag = tagsAtIndex.get(index)[i];
                 if (insertTag != null && insertTag.equals(closingTag)) {
                     sb.insert(index + offset, closingTag);
@@ -96,7 +96,7 @@ public class SequentPrinter {
             }
 
             // insert openTags "<span class=...>"
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < StylePos.values().length; i++) {
                 insertTag = tagsAtIndex.get(index)[i];
                 if (insertTag != null && !insertTag.equals(closingTag)) {
                     sb.insert(index + offset, insertTag);
@@ -215,14 +215,13 @@ public class SequentPrinter {
                 }
                 // If all the entries have been resolved, return
                 if (linePointer == indicesOfLines.size()) {
-                    return;
+                    break;
                 }
                 // Set the start of the next line to the end of the current
                 // line. Adjust +1 for \n char
                 styleStart = styleEnd + 1;
             }
         }
-
     }
 
     /**
@@ -286,7 +285,6 @@ public class SequentPrinter {
      */
     private TreeMap<Integer, String[]> putTag(int index, StylePos arrayPos,
             String tag) {
-    	
         String[] mapValue = tagsAtIndex.get(index);
 
         if (mapValue != null) {
