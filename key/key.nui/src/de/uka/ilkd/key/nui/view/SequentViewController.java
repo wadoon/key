@@ -6,12 +6,12 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.nui.IAcceptSequentFilter;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.Filter;
 import de.uka.ilkd.key.nui.model.IProofListener;
+import de.uka.ilkd.key.nui.util.IAcceptSequentFilter;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.InitialPositionTable;

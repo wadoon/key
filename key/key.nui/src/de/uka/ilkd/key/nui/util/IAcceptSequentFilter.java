@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui;
+package de.uka.ilkd.key.nui.util;
 
 import de.uka.ilkd.key.nui.model.Filter;
 

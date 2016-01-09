@@ -1,6 +1,5 @@
-package de.uka.ilkd.key.nui;
+package de.uka.ilkd.key.nui.model;
 
-import de.uka.ilkd.key.nui.model.ProofManager;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 
 public class Context {

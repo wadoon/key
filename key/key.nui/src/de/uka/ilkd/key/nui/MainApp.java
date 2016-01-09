@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 
+import de.uka.ilkd.key.nui.model.Context;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import javafx.application.Application;

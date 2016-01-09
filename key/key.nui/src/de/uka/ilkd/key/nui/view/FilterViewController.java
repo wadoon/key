@@ -49,11 +49,6 @@ public class FilterViewController extends ViewController {
         loadCurrentFilter();
     }
 
-    @FXML
-    private void handleApply() {
-        fillCurrentFilter();
-    }
-
     // TODO: save filter on disk
     // TODO: clear textbox if value changed
 

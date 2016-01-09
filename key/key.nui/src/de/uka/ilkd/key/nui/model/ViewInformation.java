@@ -122,7 +122,7 @@ public class ViewInformation extends Observable {
         header.setOnDragDetected(event -> {
             Dragboard db = header.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
-            content.putString(""+view.getId());
+            content.putString(Integer.toString(view.getId()));
             db.setContent(content);
             event.consume();
         });

@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.nui.model;
 
-public class Filter {
+import java.util.Observable;
+
+public class Filter extends Observable {
 
     private String name;
     public String getName() {
@@ -8,6 +10,7 @@ public class Filter {
     }
     public void setName(String value) {
         name = value;
+        // no need to notify observer since the name is only for storage
     }
 
     private String searchString;
@@ -15,7 +18,9 @@ public class Filter {
         return searchString;
     }
     public void setSearchString(String value) {
+        if(searchString == value)return;
         searchString = value;
+        notifyObservers();
     }
     
     private boolean revert;
@@ -23,7 +28,9 @@ public class Filter {
         return revert;
     }
     public void setRever(boolean value){
+        if(revert == value) return;
         revert = value;
+        notifyObservers();
     }
     
     private int before;
@@ -31,7 +38,9 @@ public class Filter {
         return before;
     }
     public void setBefore(int value){
+        if(value == before) return;
         before = value;
+        notifyObservers();
     }
     
     private int after;
@@ -39,14 +48,12 @@ public class Filter {
         return after;
     }
     public void setAfter(int value){
+        if(after == value) return;
         after = value;
+        notifyObservers();
     }
 
     public Filter() {
-        reset();
-    }
-
-    public void reset() {
         revert = false;
         searchString = null;
         before = 2;
