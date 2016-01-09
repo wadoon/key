@@ -38,7 +38,7 @@ import javafx.scene.web.WebView;
  * @author Nils Muzzulini
  *
  */
-@KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = false)
+@KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = true)
 public class SequentViewController extends ViewController implements IAcceptSequentFilter {
 
     private boolean sequentLoaded = false;
