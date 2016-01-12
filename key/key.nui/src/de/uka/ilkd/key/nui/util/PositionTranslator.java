@@ -103,10 +103,7 @@ public class PositionTranslator {
             if (filteredLines.contains(result) != filterInverted) {
                 if (filterCollapsed) {
                     continue;
-                } /*
-                   * else { //text.setFont(new Font(font, minimizedSize)); } }
-                   * else { text.setFont(new Font(font, fontSize)); }
-                   */
+                }
             }
             yCoord -= text.getLayoutBounds().getHeight();
 
@@ -217,6 +214,7 @@ public class PositionTranslator {
                         fontSize = Integer.parseInt(matcher.group());
                     }
                 }
+                //Set the Font Size Informotion used in .minimized Style Class
                 else if (inMinimized) {
                     if (line.startsWith("}")) {
                         inMinimized = false;
@@ -242,7 +240,10 @@ public class PositionTranslator {
             br.close();
         }
     }
-
+    /**
+     * apply Filter information on the PositionTranslator.
+     * @param filter the PrintFilter object
+     */
     public void applyFilter(PrintFilter filter) {
         filteredLines = SequentFilterer.ApplyFilter(proofString, filter);
         // XXX

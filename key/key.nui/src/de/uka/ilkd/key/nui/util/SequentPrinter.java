@@ -169,14 +169,10 @@ public class SequentPrinter {
     // TODO: set in usersettings
     private FilterMode filterMode = FilterMode.Minimize;
 
-    /**
-     * applies minimized or collapsed Stylint to the lines included in the list
-     * 
-     * @param indicesOfLines
-     *            an Arraylist of the line numbers, beginning at 0
-     * @param collapseNotMinimize
-     *            true if Style=collpased, false if Style=minimzed
-     */
+   /**
+    * styles the text according to given Filter
+    * @param filter
+    */
     public void applyFilter(PrintFilter filter) {
         ArrayList<Integer> indicesOfLines = SequentFilterer
                 .ApplyFilter(proofString, filter);
@@ -277,8 +273,7 @@ public class SequentPrinter {
      * @param index
      *            index position for the style Tag
      * @param arrayPos
-     *            the arrayPosition. Equals Priority: 0=Syntax < 1=Mouseover <
-     *            2= searchHighlight. Smaller Number equals Higher Priority
+     *            the arrayPosition. Should correspond to a priority value.
      * @param tag
      *            the HTML tag to be inserted.
      * @return the TreeMap with the new HashMap.
@@ -286,14 +281,23 @@ public class SequentPrinter {
     private TreeMap<Integer, String[]> putTag(int index, StylePos arrayPos,
             String tag) {
         String[] mapValue = tagsAtIndex.get(index);
-
+        // If Map Entry already exists
         if (mapValue != null) {
+            // If Array entry is null or shall be cleared (filled with empty
+            // String), fill the array
             if (mapValue[arrayPos.slotPosition] == null || tag.isEmpty()) {
                 mapValue[arrayPos.slotPosition] = tag;
             }
-            mapValue[arrayPos.slotPosition] += tag;
+            else {
+                // If the Array entry is not null, the tag can be appended.
+                // Solves the problem with double consecutive chars
+                // ("wellformed")
+                mapValue[arrayPos.slotPosition] += tag;
+            }
         }
         else {
+            // If the Map Entry does not exist, create new Entry and call itself
+            // again. RECURSION!
             tagsAtIndex.put(index, new String[StylePos.values().length]);
             putTag(index, arrayPos, tag);
         }
@@ -386,8 +390,9 @@ public class SequentPrinter {
         // As a new ProofString means old styling Info is deprecated, Map is
         // cleared.
         tagsAtIndex.clear();
+
         /*
-         * applySyntaxHighlighting();
+         * Stub for SyntaxHighlight applySyntaxHighlighting();
          */
     }
 
