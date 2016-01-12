@@ -107,7 +107,7 @@ public class SequentPrinter {
 
             }
         }
-        
+
         // Apply HTML formatting and return
         return toHTML(encodeLessThan(sb.toString()));
     }
@@ -161,15 +161,14 @@ public class SequentPrinter {
         putTag(range.end(), StylePos.MOUSE, closingTag);
         mouseoverRange = range;
     }
-    
-    enum FilterMode{
-        Collapse,
-        Minimize
+
+    enum FilterMode {
+        Collapse, Minimize
     }
-    
-    //TODO: set in usersettings
+
+    // TODO: set in usersettings
     private FilterMode filterMode = FilterMode.Minimize;
-    
+
     /**
      * applies minimized or collapsed Stylint to the lines included in the list
      * 
@@ -179,17 +178,18 @@ public class SequentPrinter {
      *            true if Style=collpased, false if Style=minimzed
      */
     public void applyFilter(PrintFilter filter) {
-        ArrayList<Integer> indicesOfLines = SequentFilterer.ApplyFilter(proofString, filter);
-        
+        ArrayList<Integer> indicesOfLines = SequentFilterer
+                .ApplyFilter(proofString, filter);
+
         // remove old Filter styling
         removeFilter();
 
         if (!indicesOfLines.isEmpty()) {
             // Sort Lines
-            //Collections.sort(indicesOfLines);
+            // Collections.sort(indicesOfLines);
             // get line information
             String[] lines = proofString.split("\n");
-            
+
             int styleStart = 0;
             // Pointer at the current entry of the ArrayList
             int linePointer = 0;
@@ -264,7 +264,7 @@ public class SequentPrinter {
             for (Iterator<Integer> iterator = filterIndices.iterator(); iterator
                     .hasNext();) {
                 int index = (int) iterator.next();
-                putTag(index, StylePos.FILTER, null);
+                putTag(index, StylePos.FILTER, "");
             }
             filterIndices.clear();
         }
@@ -288,7 +288,10 @@ public class SequentPrinter {
         String[] mapValue = tagsAtIndex.get(index);
 
         if (mapValue != null) {
-            mapValue[arrayPos.slotPosition] = tag;
+            if (mapValue[arrayPos.slotPosition] == null || tag.isEmpty()) {
+                mapValue[arrayPos.slotPosition] = tag;
+            }
+            mapValue[arrayPos.slotPosition] += tag;
         }
         else {
             tagsAtIndex.put(index, new String[StylePos.values().length]);
@@ -303,8 +306,8 @@ public class SequentPrinter {
      */
     public void removeMouseHighlighting() {
         if (mouseoverRange != null) {
-            putTag(mouseoverRange.start(), StylePos.MOUSE, null);
-            putTag(mouseoverRange.end(), StylePos.MOUSE, null);
+            putTag(mouseoverRange.start(), StylePos.MOUSE, "");
+            putTag(mouseoverRange.end(), StylePos.MOUSE, "");
         }
     }
 
@@ -367,7 +370,7 @@ public class SequentPrinter {
             for (Iterator<Integer> iterator = searchIndices.iterator(); iterator
                     .hasNext();) {
                 int index = (int) iterator.next();
-                putTag(index, StylePos.SEARCH, null);
+                putTag(index, StylePos.SEARCH, "");
             }
             searchIndices.clear();
         }
@@ -421,15 +424,15 @@ public class SequentPrinter {
         this.posTable = posTable;
     }
 
-//    private void applySyntaxHighlighting() {
-//        InitialPositionTable initPos = (InitialPositionTable) posTable;
-//        IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(p_s);
-//        for (int i = 0; i < proofString.length(); i++) {
-//            System.out.println(
-//                    initPos.getPosInSequent(i, filter).getPosInOccurrence()
-//                            .constrainedFormula().getClass().getName());
-//        }
-//    }
+    // private void applySyntaxHighlighting() {
+    // InitialPositionTable initPos = (InitialPositionTable) posTable;
+    // IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(p_s);
+    // for (int i = 0; i < proofString.length(); i++) {
+    // System.out.println(
+    // initPos.getPosInSequent(i, filter).getPosInOccurrence()
+    // .constrainedFormula().getClass().getName());
+    // }
+    // }
 
     /**
      * converts the input String to HTML tagged text

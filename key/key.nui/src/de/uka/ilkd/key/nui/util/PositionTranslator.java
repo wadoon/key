@@ -46,7 +46,7 @@ public class PositionTranslator {
     }
 
     public void setProofString(String proofString) {
-    	this.proofString = proofString;
+        this.proofString = proofString;
         strings = proofString.split("\n");
         try {
             readCSS(cssPath);
@@ -103,14 +103,10 @@ public class PositionTranslator {
             if (filteredLines.contains(result) != filterInverted) {
                 if (filterCollapsed) {
                     continue;
-                }/*
-                else {
-                    //text.setFont(new Font(font, minimizedSize));
-                }
-            }
-            else {
-                text.setFont(new Font(font, fontSize));
-            }*/
+                } /*
+                   * else { //text.setFont(new Font(font, minimizedSize)); } }
+                   * else { text.setFont(new Font(font, fontSize)); }
+                   */
             }
             yCoord -= text.getLayoutBounds().getHeight();
 
@@ -142,8 +138,9 @@ public class PositionTranslator {
 
         // Generate Text Object with Font and Size for computing width
         Text text = new Text();
-        //Adjust for minimized Filter
-        if (!filterCollapsed && (filteredLines.contains(line) != filterInverted)) {
+        // Adjust for minimized Filter
+        if (!filterCollapsed
+                && (filteredLines.contains(line) != filterInverted)) {
             text.setFont(new Font(font, minimizedSize));
         }
         else {
@@ -246,11 +243,10 @@ public class PositionTranslator {
         }
     }
 
-    
-    public void applyFilter(PrintFilter filter){
-    	filteredLines = SequentFilterer.ApplyFilter(proofString, filter);
-    	//XXX
-    	filterCollapsed = false;
-    	filterInverted = filter.getInvert(); 
+    public void applyFilter(PrintFilter filter) {
+        filteredLines = SequentFilterer.ApplyFilter(proofString, filter);
+        // XXX
+        filterCollapsed = false;
+        filterInverted = filter.getInvert();
     }
 }
