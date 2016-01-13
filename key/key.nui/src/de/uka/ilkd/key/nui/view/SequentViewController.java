@@ -124,7 +124,7 @@ public class SequentViewController extends ViewController
             // Adjustment: Event.getDelta is absolute amount of pixels,
             // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
             this.scrollPane.setVvalue(this.scrollPane.getVvalue()
-                    - event.getDeltaY() / this.scrollPane.getHeight());
+                    - event.getDeltaY() / 800);
             this.scrollPane.setHvalue(this.scrollPane.getHvalue()
                     - event.getDeltaX() / this.scrollPane.getWidth());
         });
