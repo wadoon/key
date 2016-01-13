@@ -63,8 +63,6 @@ public class JavaProfile extends AbstractProfile {
     public final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
 
-    private OneStepSimplifier oneStepSimpilifier;
-
     protected JavaProfile(String standardRules) {
         super(standardRules);
         setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
