@@ -24,8 +24,10 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
@@ -39,7 +41,8 @@ import javafx.scene.web.WebView;
  *
  */
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = true)
-public class SequentViewController extends ViewController implements IAcceptSequentFilter {
+public class SequentViewController extends ViewController
+        implements IAcceptSequentFilter {
 
     private boolean sequentLoaded = false;
     private SequentPrinter printer;
@@ -53,8 +56,8 @@ public class SequentViewController extends ViewController implements IAcceptSequ
     private IProofListener proofChangeListener = (proofEvent) -> {
         // execute ui update on javafx thread
         Platform.runLater(() -> {
-            showSequent(
-                    getContext().getProofManager().getMediator().getSelectedNode());
+            showSequent(getContext().getProofManager().getMediator()
+                    .getSelectedNode());
         });
     };
     private PositionTranslator posTranslator;
@@ -79,6 +82,9 @@ public class SequentViewController extends ViewController implements IAcceptSequ
 
     @FXML
     private TextField searchBox;
+
+    @FXML
+    private ScrollPane scrollPane;
 
     /**
      * The constructor. The constructor is called before the initialize()
@@ -113,12 +119,21 @@ public class SequentViewController extends ViewController implements IAcceptSequ
                 this.updateView();
             }
         });
+
+        textAreaWebView.setOnScroll(event -> {
+            // Adjustment: Event.getDelta is absolute amount of pixels,
+            // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
+            this.scrollPane.setVvalue(this.scrollPane.getVvalue()
+                    - event.getDeltaY() / this.scrollPane.getHeight());
+            this.scrollPane.setHvalue(this.scrollPane.getHvalue()
+                    - event.getDeltaX() / this.scrollPane.getWidth());
+        });
     }
 
     @Override
     public void initializeAfterLoadingFxml() {
         getContext().getProofManager().addProofListener(proofChangeListener);
-        //XXX see FilterView
+        // XXX see FilterView
         getContext().registerFilterConsumer(this);
     }
 
