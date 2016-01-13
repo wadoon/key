@@ -45,6 +45,7 @@ public class SequentViewController extends ViewController
         implements IAcceptSequentFilter {
 
     private boolean sequentLoaded = false;
+    private boolean sequentChanged = false;
     private SequentPrinter printer;
     private LogicPrinter logicPrinter;
     private InitialPositionTable abstractSyntaxTree;
@@ -123,11 +124,12 @@ public class SequentViewController extends ViewController
         textAreaWebView.setOnScroll(event -> {
             // Adjustment: Event.getDelta is absolute amount of pixels,
             // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
-            this.scrollPane.setVvalue(this.scrollPane.getVvalue()
-                    - event.getDeltaY() / 800);
+            this.scrollPane.setVvalue(
+                    this.scrollPane.getVvalue() - event.getDeltaY() / 800);
             this.scrollPane.setHvalue(this.scrollPane.getHvalue()
                     - event.getDeltaX() / this.scrollPane.getWidth());
         });
+
     }
 
     @Override
@@ -181,6 +183,8 @@ public class SequentViewController extends ViewController
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         printer = new SequentPrinter("resources/css/sequentStyle.css",
                 abstractSyntaxTree);
+
+        sequentChanged = true;
 
         printSequent();
 
@@ -247,6 +251,18 @@ public class SequentViewController extends ViewController
         printer.setProofString(proofString);
 
         posTranslator.setProofString(proofString);
+
+        // Redraw WebArea to use optimal Height. Called here as PosTranslater
+        // needs to now the ProofString.
+        // If-clause added for optimization purposes. Only when the Sequent
+        // itself is changed, the WebArea needs to be redrawn, not with every
+        // styling update
+        if (sequentChanged) {
+            textAreaWebView.setPrefHeight(this.posTranslator.getProofHeight());
+            textAreaWebView.autosize();
+        }
+
+        sequentChanged = false;
 
         sequentLoaded = true;
         updateView();

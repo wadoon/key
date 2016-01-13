@@ -214,7 +214,7 @@ public class PositionTranslator {
                         fontSize = Integer.parseInt(matcher.group());
                     }
                 }
-                //Set the Font Size Informotion used in .minimized Style Class
+                // Set the Font Size Informotion used in .minimized Style Class
                 else if (inMinimized) {
                     if (line.startsWith("}")) {
                         inMinimized = false;
@@ -240,14 +240,37 @@ public class PositionTranslator {
             br.close();
         }
     }
+
     /**
      * apply Filter information on the PositionTranslator.
-     * @param filter the PrintFilter object
+     * 
+     * @param filter
+     *            the PrintFilter object
      */
     public void applyFilter(PrintFilter filter) {
         filteredLines = SequentFilterer.ApplyFilter(proofString, filter);
         // XXX
         filterCollapsed = false;
         filterInverted = filter.getInvert();
+    }
+
+    /**
+     * computes height of the proofstring given to the PositionTranslator, if
+     * drawn with the Font and Size as defined in the CSS
+     * 
+     * @return a height value in px
+     */
+    public double getProofHeight() {
+        // Adjustment for Margin
+        double result = 5;
+
+        Text text = new Text(" ");
+        text.setFont(new Font(font, fontSize));
+
+        // Iterate over all lines to sum up Height
+        for (int i = 0; i < strings.length; i++) {
+            result += text.getLayoutBounds().getHeight();
+        }
+        return result;
     }
 }
