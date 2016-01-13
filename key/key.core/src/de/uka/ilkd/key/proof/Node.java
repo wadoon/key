@@ -262,6 +262,10 @@ public class Node  {
 	return parent==null;
     }
 
+    public Statistics statistics() {
+        return new Statistics(this);
+    }
+
     /**
      *  makes the given node a child of this node.
      */

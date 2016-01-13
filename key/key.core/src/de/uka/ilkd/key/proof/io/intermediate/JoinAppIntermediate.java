@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2016 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -32,7 +32,8 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
     private String joinProc = null;
     private String distinguishingFormula = null;
     private int nrPartners = 0;
-    private ImmutableList<Pair<String, String>> abstractionPredicates;
+    private String abstractionPredicates = null;
+    private String userChoices = null;
     private Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
 
     /**
@@ -74,7 +75,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
             ImmutableList<Name> newNames,
             String distinguishingFormula,
             Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
-            ImmutableList<Pair<String, String>> abstractionPredicates) {
+            String abstractionPredicates, String userChoices) {
         super(ruleName, pos, null, null, newNames);
 
         assert ruleName.equals("JoinRule") : "This was somehow unexpected; are there other join rules than JoinRule?";
@@ -85,6 +86,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
         this.distinguishingFormula = distinguishingFormula;
         this.abstractionPredicates = abstractionPredicates;
         this.predAbstrLatticeType = predAbstrLatticeType;
+        this.userChoices = userChoices;
     }
 
     /**
@@ -129,8 +131,16 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      * @return The abstraction predicates for predicate abstraction; null if
      *         none given.
      */
-    public ImmutableList<Pair<String, String>> getAbstractionPredicates() {
+    public String getAbstractionPredicates() {
         return abstractionPredicates;
+    }
+
+    /**
+     * @return The abstraction predicates for program variables involved in a
+     *         join that are manually chosen by the user.
+     */
+    public String getUserChoices() {
+        return userChoices;
     }
 
 }
