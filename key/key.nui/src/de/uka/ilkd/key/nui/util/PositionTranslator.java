@@ -96,7 +96,7 @@ public class PositionTranslator {
         double yCoord = yCoordinate - 5;
         int result;
 
-        Text text = new Text(" ");
+        Text text = new Text("\\W|QpXgjﬂ&");
         text.setFont(new Font(font, fontSize));
         for (result = 0; result < strings.length; result++) {
 

@@ -169,10 +169,11 @@ public class SequentPrinter {
     // TODO: set in usersettings
     private FilterMode filterMode = FilterMode.Minimize;
 
-   /**
-    * styles the text according to given Filter
-    * @param filter
-    */
+    /**
+     * styles the text according to given Filter
+     * 
+     * @param filter
+     */
     public void applyFilter(PrintFilter filter) {
         ArrayList<Integer> indicesOfLines = SequentFilterer
                 .ApplyFilter(proofString, filter);
