@@ -29,6 +29,8 @@
 					<items>
 						<Button mnemonicParsing="false" onAction="#loadDefaultProof"
 							text="Load Default Proof" />
+						<Button mnemonicParsing="false" onAction="#loadBigProof"
+						   text="Load Big Proof" />
 						<ToggleButton fx:id="searchButton" mnemonicParsing="false"
 							onAction="#toggleSearch" text="Search" />
 						<Separator orientation="VERTICAL">

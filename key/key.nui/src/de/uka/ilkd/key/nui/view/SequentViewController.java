@@ -269,12 +269,20 @@ public class SequentViewController extends ViewController
     }
 
     /**
-     * Loads a default proof and displays the sequent of its root node.
+     * Loads a default closed proof.
      */
     @FXML
     private void loadDefaultProof() {
         getContext().getProofManager()
                 .loadProblem(new File("resources/proofs/gcd.closed.proof"));
+    }
+    
+    /**
+     * Loads a large sample open proof.
+     */
+    @FXML
+    private void loadBigProof() {
+        getContext().getProofManager().loadProblem(new File("resources/SampleProof/sampleProof.proof"));
     }
 
     private void updateHtml(String s) {
