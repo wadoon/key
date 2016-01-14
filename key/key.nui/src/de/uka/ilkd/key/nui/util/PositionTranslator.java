@@ -260,17 +260,14 @@ public class PositionTranslator {
      * 
      * @return a height value in px
      */
-    public double getProofHeight() {
-        // Adjustment for Margin
-        double result = 5;
-
-        Text text = new Text(" ");
-        text.setFont(new Font(font, fontSize));
-
-        // Iterate over all lines to sum up Height
-        for (int i = 0; i < strings.length; i++) {
-            result += text.getLayoutBounds().getHeight();
-        }
-        return result;
-    }
+    /*
+     * public double getProofHeight() { // Adjustment for Margin double result =
+     * 5;
+     * 
+     * Text text = new Text(" "); text.setFont(new Font(font, fontSize));
+     * 
+     * // Iterate over all lines to sum up Height for (int i = 0; i <
+     * strings.length; i++) { result += text.getLayoutBounds().getHeight(); }
+     * return result; }
+     */
 }

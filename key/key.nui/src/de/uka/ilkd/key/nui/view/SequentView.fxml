@@ -21,7 +21,7 @@
 				<ScrollPane fx:id="scrollPane" layoutY="44.0" prefHeight="241.0" prefWidth="500.0"
 					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
 					AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="44.0">
-					<WebView fx:id="textAreaWebView" maxHeight="Infinity"/>
+					<WebView fx:id="textAreaWebView" prefWidth="4000" prefHeight="8000" maxHeight="Infinity"/>
 				</ScrollPane>
 
 				<ToolBar prefHeight="40.0" prefWidth="500.0"

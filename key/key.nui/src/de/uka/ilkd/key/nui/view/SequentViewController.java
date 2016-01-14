@@ -257,12 +257,15 @@ public class SequentViewController extends ViewController
         // If-clause added for optimization purposes. Only when the Sequent
         // itself is changed, the WebArea needs to be redrawn, not with every
         // styling update
-        if (sequentChanged) {
-            textAreaWebView.setPrefHeight(this.posTranslator.getProofHeight());
-            textAreaWebView.autosize();
-        }
+        /*
+         * if (sequentChanged) {
+         * System.out.println(this.posTranslator.getProofHeight());
+         * textAreaWebView.setPrefHeight(this.posTranslator.getProofHeight());
+         * textAreaWebView.autosize(); }
+         *  sequentChanged = false;
+         */
 
-        sequentChanged = false;
+       
 
         sequentLoaded = true;
         updateView();
@@ -276,13 +279,14 @@ public class SequentViewController extends ViewController
         getContext().getProofManager()
                 .loadProblem(new File("resources/proofs/gcd.closed.proof"));
     }
-    
+
     /**
      * Loads a large sample open proof.
      */
     @FXML
     private void loadBigProof() {
-        getContext().getProofManager().loadProblem(new File("resources/SampleProof/sampleProof.proof"));
+        getContext().getProofManager().loadProblem(
+                new File("resources/SampleProof/sampleProof.proof"));
     }
 
     private void updateHtml(String s) {
