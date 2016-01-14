@@ -7,13 +7,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.nui.model.PrintFilter;
+import de.uka.ilkd.key.nui.view.DebugViewController;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 
@@ -109,6 +109,7 @@ public class SequentPrinter {
         }
 
         // Apply HTML formatting and return
+        DebugViewController.PrintOnCurrent(encodeLessThan(sb.toString()));
         return toHTML(encodeLessThan(sb.toString()));
     }
 
@@ -211,9 +212,9 @@ public class SequentPrinter {
                     linePointer++;
                 }
                 // If all the entries have been resolved, return
-                if (linePointer == indicesOfLines.size()) {
-                    break;
-                }
+//                if (linePointer == indicesOfLines.size()) {
+//                    break;
+//                }
                 // Set the start of the next line to the end of the current
                 // line. Adjust +1 for \n char
                 styleStart = styleEnd + 1;
