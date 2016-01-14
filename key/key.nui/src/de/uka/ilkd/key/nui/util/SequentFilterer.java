@@ -9,13 +9,17 @@ import de.uka.ilkd.key.nui.model.PrintFilter;
 public class SequentFilterer {
     public static ArrayList<Integer> ApplyFilter(String proofString,
             PrintFilter filter) {
+        if(filter.getSearchString() == null){
+            return new ArrayList<>();
+        }
+        
         ArrayList<Integer> filterFor = new ArrayList<>();
         String[] lines = proofString.split("\n");
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].contains(filter.getSearchString())) {
                 int index = i;
                 IntStream.range(0, filter.getBefore()).forEach(n -> {
-                    int d = index - (n + 1);
+                    int d = index - filter.getBefore() + n;
                     if (d > 0)
                         filterFor.add(d);
                 });
