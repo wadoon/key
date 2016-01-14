@@ -322,5 +322,6 @@ public class SequentViewController extends ViewController
     public void Apply(PrintFilter filter) {
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);
+        updateView();
     }
 }

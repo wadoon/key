@@ -195,7 +195,7 @@ public class SequentPrinter {
                 // Compute Endindex of Line
                 int styleEnd = styleStart + lines[i].length();
                 // If line is in list apply styles
-                if (indicesOfLines.contains(i) != filter.getInvert()) {
+                if (indicesOfLines.contains(i) == filter.getInvert()) {
 
                     switch (filterMode) {
                     case Minimize:

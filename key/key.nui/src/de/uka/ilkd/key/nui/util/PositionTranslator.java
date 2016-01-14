@@ -99,9 +99,10 @@ public class PositionTranslator {
         Text text = new Text(" ");
         text.setFont(new Font(font, fontSize));
         for (result = 0; result < strings.length; result++) {
+
             // Adjust for filtering
-            if (filteredLines.contains(result) != filterInverted) {
-                if (filterCollapsed) {
+            if (filterCollapsed) {
+                if (filteredLines.contains(result) == filterInverted) {
                     continue;
                 }
             }
