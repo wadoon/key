@@ -127,6 +127,7 @@ public class FilterViewController extends ViewController {
             currentFilter = new PrintFilter();
         }
         loadCurrentFilter();
+        handleApply();
     }
 
     @FXML
