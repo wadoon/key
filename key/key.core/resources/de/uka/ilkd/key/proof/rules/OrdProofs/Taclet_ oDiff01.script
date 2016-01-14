@@ -1,5 +1,0 @@
-rule oSucc;
-
-instantiate hide var=nv with=o_0;
-
-tryclose;
