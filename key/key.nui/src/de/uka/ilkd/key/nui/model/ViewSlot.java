@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.nui.ViewPosition;
 import javafx.scene.Node;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 
@@ -40,6 +41,7 @@ public class ViewSlot {
         tabs.add(view);
         TabPane container =((TabPane)uiPane.getCenter());
         container.getTabs().add(view.getUiTab());
+        container.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
         used = true;
 
         container.getSelectionModel().select(view.getUiTab());
