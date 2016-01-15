@@ -188,7 +188,7 @@ public class SequentPrinter {
             // Iterate over the lines
             for (int i = 0; i < lines.length; i++) {
                 // Compute Endindex of Line
-                int styleEnd = styleStart + lines[i].length();
+                int styleEnd = styleStart + lines[i].length()+1;
                 // If line is in list apply styles
                 if (indicesOfLines.contains(i) == filter.getInvert()) {
 
@@ -210,7 +210,7 @@ public class SequentPrinter {
 //                }
                 // Set the start of the next line to the end of the current
                 // line. Adjust +1 for \n char
-                styleStart = styleEnd + 1;
+                styleStart = styleEnd;
             }
         }
     }

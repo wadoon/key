@@ -54,6 +54,7 @@ public class PositionTranslator {
         catch (IOException e) {
             e.printStackTrace();
         }
+        filteredLines.clear();
     }
 
     /**
@@ -97,13 +98,20 @@ public class PositionTranslator {
         int result;
 
         Text text = new Text("\\W|QpXgjﬂ&");
-        text.setFont(new Font(font, fontSize));
+        
         for (result = 0; result < strings.length; result++) {
 
             // Adjust for filtering
+            //XXX
             if (filterCollapsed) {
                 if (filteredLines.contains(result) == filterInverted) {
                     continue;
+                }
+            }else{
+                if (filteredLines.contains(result)==filterInverted && filteredLines.size()>0){
+                    text.setFont(new Font(font, minimizedSize));
+                }else{
+                    text.setFont(new Font(font, fontSize));
                 }
             }
             yCoord -= text.getLayoutBounds().getHeight();
@@ -137,8 +145,9 @@ public class PositionTranslator {
         // Generate Text Object with Font and Size for computing width
         Text text = new Text();
         // Adjust for minimized Filter
-        if (!filterCollapsed
-                && (filteredLines.contains(line) != filterInverted)) {
+        // XXX
+        if (!filterCollapsed && (filteredLines.contains(line) == filterInverted)
+                && filteredLines.size() > 0) {
             text.setFont(new Font(font, minimizedSize));
         }
         else {
@@ -251,7 +260,18 @@ public class PositionTranslator {
     public void applyFilter(PrintFilter filter) {
         filteredLines = SequentFilterer.ApplyFilter(proofString, filter);
         // XXX
-        filterCollapsed = false;
+        switch (filter.getFilterMode()) {
+        case Minimize:
+            filterCollapsed = false;
+            break;
+        case Collapse:
+            filterCollapsed = true;
+            break;
+        default:
+            filterCollapsed = false;
+            break;
+        }
+        // filterCollapsed = false;
         filterInverted = filter.getInvert();
     }
 
