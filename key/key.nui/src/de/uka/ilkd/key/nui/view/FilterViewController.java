@@ -9,6 +9,7 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.PrintFilter;
+import de.uka.ilkd.key.nui.model.PrintFilter.FilterMode;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
@@ -44,6 +45,9 @@ public class FilterViewController extends ViewController {
     @FXML
     private CheckBox invertFilter;
 
+    @FXML
+    private ComboBox<FilterMode> filterModeBox;
+
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
 
     private void loadCurrentFilter() {
@@ -51,6 +55,7 @@ public class FilterViewController extends ViewController {
         invertFilter.setSelected(currentFilter.getInvert());
         linesBefore.setValue(currentFilter.getBefore());
         linesAfter.setValue(currentFilter.getAfter());
+        filterModeBox.setValue(currentFilter.getFilterMode());
     }
 
     @Override
@@ -63,8 +68,13 @@ public class FilterViewController extends ViewController {
             afterNumber.setText(Integer.toString(new_val.intValue()));
             currentFilter.setAfter(new_val.intValue());
         });
-        searchText.textProperty().addListener((o,old_val,new_val) -> currentFilter.setSearchString(new_val));
-
+        searchText.textProperty().addListener((o, old_val,
+                new_val) -> currentFilter.setSearchString(new_val));
+        filterModeBox.valueProperty().addListener(
+                (o, old_val, new_val) -> currentFilter.setFilterMode(new_val));
+        filterModeBox.getItems().add(FilterMode.Minimize);
+        filterModeBox.getItems().add(FilterMode.Collapse);
+        
         currentFilter = new PrintFilter();
         loadCurrentFilter();
     }
@@ -83,7 +93,6 @@ public class FilterViewController extends ViewController {
     }
 
     // TODO: save filter on disk
-    // TODO: clear textbox if value changed
 
     @FXML
     private void handleSaveFilter() {
@@ -117,7 +126,6 @@ public class FilterViewController extends ViewController {
     @FXML
     private void handleReset() {
         if (savedFilters.containsValue(currentFilter)) {
-            // TODO: implement
             // currentfilter needs to be a copy so it can be reset
             filters.getEditor().setText("");
             currentFilter = new PrintFilter();

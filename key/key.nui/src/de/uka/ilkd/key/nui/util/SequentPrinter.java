@@ -163,13 +163,6 @@ public class SequentPrinter {
         mouseoverRange = range;
     }
 
-    enum FilterMode {
-        Collapse, Minimize
-    }
-
-    // TODO: set in usersettings
-    private FilterMode filterMode = FilterMode.Minimize;
-
     /**
      * styles the text according to given Filter
      * 
@@ -199,7 +192,7 @@ public class SequentPrinter {
                 // If line is in list apply styles
                 if (indicesOfLines.contains(i) == filter.getInvert()) {
 
-                    switch (filterMode) {
+                    switch (filter.getFilterMode()) {
                     case Minimize:
                         minimizeLine(styleStart, styleEnd);
                         break;

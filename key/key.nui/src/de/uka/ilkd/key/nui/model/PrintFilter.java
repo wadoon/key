@@ -52,12 +52,23 @@ public class PrintFilter extends Observable {
         after = value;
         notifyObservers();
     }
+    
+    private FilterMode filterMode;
+    public FilterMode getFilterMode(){
+        return filterMode;
+    }
+    public void setFilterMode(FilterMode value){
+        if(filterMode == value) return;
+        filterMode = value;
+        notifyObservers();
+    }
 
     public PrintFilter() {
         invert = false;
         searchString = null;
         before = 2;
         after = 2;
+        filterMode = FilterMode.Minimize;
     }
 
     public PrintFilter Clone() {
@@ -67,6 +78,11 @@ public class PrintFilter extends Observable {
         filter.setInvert(this.invert);
         filter.setAfter(this.after);
         filter.setBefore(this.before);
+        filter.setFilterMode(this.filterMode);
         return filter;
+    }
+    
+   public enum FilterMode {
+        Collapse, Minimize
     }
 }

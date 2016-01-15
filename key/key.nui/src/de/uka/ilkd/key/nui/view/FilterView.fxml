@@ -49,6 +49,7 @@
                         <Label alignment="TOP_LEFT" text="Search:" />
                         <Label fx:id="beforeNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                         <Label fx:id="afterNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                        <ComboBox fx:id="filterModeBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                      </children>
                      <BorderPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
