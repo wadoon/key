@@ -1,0 +1,5 @@
+select succedent 
+  formula='oleq(osup{Ord nv;}(nv1_2, otimes(f_i, nv)),
+           osup{Ord nv;}(nv1_2, otimes(f_j, nv)))';
+rule osupLocalLess;
+tryclose;
