@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.nui.view.DebugViewController;
+import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 
@@ -372,6 +373,7 @@ public class SequentPrinter {
                 putTag(index, StylePos.SEARCH, "");
             }
             searchIndices.clear();
+            
         }
     }
 
@@ -389,6 +391,9 @@ public class SequentPrinter {
         /*
          * Stub for SyntaxHighlight applySyntaxHighlighting();
          */
+        //InitialPositionTable test =(InitialPositionTable) posTable;
+        //test.pathForPosition(pio, filter)
+        
     }
 
     /**

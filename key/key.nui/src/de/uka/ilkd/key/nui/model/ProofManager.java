@@ -33,6 +33,7 @@ public class ProofManager {
      * @param statusManager
      *            a StatusManager to print status texts to
      */
+    //todo link annot
     public ProofManager(IStatusManager statusManager) {
         this.statusManager = statusManager;
         MediatorUserInterface userInterface = new MediatorUserInterface(statusManager);
