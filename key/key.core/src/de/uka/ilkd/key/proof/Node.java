@@ -65,7 +65,7 @@ public class Node  {
     private boolean              closed              = false;
 
     /** contains non-logical content, used for user feedback */
-    private final NodeInfo             nodeInfo;
+    private NodeInfo             nodeInfo;
 
     private final int                  serialNr;
 
@@ -725,5 +725,9 @@ public class Node  {
             throw new UnsupportedOperationException("Changing the proof tree "
                     + "structure this way is not allowed.");
         }
+    }
+
+    void clearNodeInfo() {
+        this.nodeInfo = new NodeInfo(this);
     }
 }
