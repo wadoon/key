@@ -9,6 +9,7 @@ import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -432,6 +433,7 @@ public class ModelVariable {
    public void setFresh(boolean isFresh) {
       this.isFresh = isFresh;
    }
+   
    
    
    

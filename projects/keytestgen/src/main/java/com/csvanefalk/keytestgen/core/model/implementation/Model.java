@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
  *
  * @author christopher
  */
-public class Model {
+public class Model{
 
     public static final Model EMPTY_MODEL;
 
@@ -222,7 +223,9 @@ public class Model {
         }
         return null;
     }
-
+    
+    
+    
     /**
      * Gets all the {@link ModelVariable} instances defined in this model.
      *
@@ -334,5 +337,19 @@ public class Model {
              mv.setValue(ModelBuilderVisitor.resolvePrimitiveType(mv.getProgramVariable()));
           }
        }       
+    }
+    
+    /*
+     * search and return ModelVariable using name 
+     * */
+    public ModelVariable searchVariableByName(String varName){
+
+        for (final ModelVariable variable : variables) {
+
+            if (variable.getVariableName().equals(varName)) {
+                return variable;
+            }
+        }
+        return null;
     }
 }

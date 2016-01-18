@@ -1283,7 +1283,7 @@ public class TermBuilder {
         return zTerm(""+number);
     }
 
-
+    
     public Term add(Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Term zero = integerLDT.zero();
