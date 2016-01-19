@@ -98,19 +98,22 @@ public class PositionTranslator {
         int result;
 
         Text text = new Text("\\W|QpXgjﬂ&");
-        
+
         for (result = 0; result < strings.length; result++) {
 
             // Adjust for filtering
-            //XXX
+            // XXX
             if (filterCollapsed) {
                 if (filteredLines.contains(result) == filterInverted) {
                     continue;
                 }
-            }else{
-                if (filteredLines.contains(result)==filterInverted && filteredLines.size()>0){
+            }
+            else {
+                if (filteredLines.contains(result) == filterInverted
+                        && filteredLines.size() > 0) {
                     text.setFont(new Font(font, minimizedSize));
-                }else{
+                }
+                else {
                     text.setFont(new Font(font, fontSize));
                 }
             }
@@ -281,14 +284,18 @@ public class PositionTranslator {
      * 
      * @return a height value in px
      */
-    /*
-     * public double getProofHeight() { // Adjustment for Margin double result =
-     * 5;
-     * 
-     * Text text = new Text(" "); text.setFont(new Font(font, fontSize));
-     * 
-     * // Iterate over all lines to sum up Height for (int i = 0; i <
-     * strings.length; i++) { result += text.getLayoutBounds().getHeight(); }
-     * return result; }
-     */
+
+    public double getProofHeight() { // Adjustment for Margin
+        double result = 5;
+
+        Text text = new Text(" ");
+        text.setFont(new Font(font, fontSize));
+
+        // Iterate over all lines to sum up Height
+        for (int i = 0; i < strings.length; i++) {
+            result += text.getLayoutBounds().getHeight();
+        }
+        return result;
+    }
+
 }

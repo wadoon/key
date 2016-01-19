@@ -252,21 +252,6 @@ public class SequentViewController extends ViewController
 
         posTranslator.setProofString(proofString);
 
-        // Redraw WebArea to use optimal Height. Called here as PosTranslater
-        // needs to now the ProofString.
-        // If-clause added for optimization purposes. Only when the Sequent
-        // itself is changed, the WebArea needs to be redrawn, not with every
-        // styling update
-        /*
-         * if (sequentChanged) {
-         * System.out.println(this.posTranslator.getProofHeight());
-         * textAreaWebView.setPrefHeight(this.posTranslator.getProofHeight());
-         * textAreaWebView.autosize(); }
-         *  sequentChanged = false;
-         */
-
-       
-
         sequentLoaded = true;
         updateView();
     }
@@ -319,6 +304,27 @@ public class SequentViewController extends ViewController
     }
 
     private void updateView() {
+        // Redraw WebArea to use optimal Height. Called here as PosTranslater
+        // needs to now the ProofString.
+        // If-clause added for optimization purposes. Only when the Sequent
+        // itself is changed, the WebArea needs to be redrawn, not with every
+        // styling update.
+
+        if (sequentChanged && sequentLoaded) {
+            sequentChanged = false;
+            double newHeight = posTranslator.getProofHeight();
+
+            // JavaFX has MaxHeight ~8500. If bigger, an error might occur.
+            if (newHeight > 8500) {
+                System.out.println("Proof might be too large");
+                textAreaWebView.setPrefHeight(8500);
+            }
+            else {
+                textAreaWebView.setPrefHeight(newHeight);
+            }
+            textAreaWebView.autosize();
+        }
+
         updateHtml(this.printer.printProofString());
     }
 
