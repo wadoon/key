@@ -2119,6 +2119,22 @@ public class TermBuilder {
     }
 
     //-------------------------------------------------------------------------
+    // ordinal  operators
+    //-------------------------------------------------------------------------
+  
+
+    public Term o_0() {
+        return func(services.getTypeConverter().getOrdLDT().getZero());
+    }
+
+	public Term oadd(Term a, Term b) {
+	    return func(services.getTypeConverter().getOrdLDT().getadd(),a,b);
+    }
+
+    // to be continued
+
+
+    //-------------------------------------------------------------------------
     // misc    (moved from key.util.MiscTools)
     //-------------------------------------------------------------------------
 

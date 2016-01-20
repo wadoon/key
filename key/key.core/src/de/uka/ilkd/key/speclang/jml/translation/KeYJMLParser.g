@@ -1772,16 +1772,16 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         | INDEXOF)
          => result = sequence    
 
-//    |   (ORDOMEGA
-//        | ORDONE
-//        | ORDZERO
-//        | ORDADD
-//        | ORDTIMES 
-//        | ORDEXP
-//        | ORDMAX
-//        | ONAT
-//         )
-//         => result = ordinal   
+   |   (ORDOMEGA
+      | ORDONE
+        | ORDZERO
+       | ORDADD
+      | ORDTIMES 
+       | ORDEXP
+       | ORDMAX
+       | ONAT
+        )
+        => result = ordinal   
      
     |   LPAREN result=expression RPAREN
 ;
@@ -1838,32 +1838,34 @@ sequence returns [SLExpression ret = null] throws SLTranslationException
 
 
 
-//ordinal returns [SLExpression ret = null] throws SLTranslationException
-//@init {
-//   ImmutableList<Term> tlist = null;
-//   KeYJavaType typ;
-//   Term t, t2;
-//   Token tk = null;
-//   Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
-//}
+ordinal returns [SLExpression ret = null] throws SLTranslationException
+@init {
+  ImmutableList<Term> tlist = null;
+  KeYJavaType typ;
+   Term t, t2;
+  Token tk = null;
+   Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
+}
+
 //@after { ret = result; }
-//:
-//    ORDOMEGA
-//   {
-//         result = new SLExpression(tb.omega());
-//     }
+:
+//   ORDOMEGA
+//  {
+//        result = new SLExpression(tb.omega());
+//    }
 //  | ORDONE
 //    {
-//      result = new SLExpression(tb.o_1());
+//      ret = new SLExpression(tb.o_1());
 //    }
-//  | ORDZERO
-//    {
-//      result = new SLExpression(tb.o_0());
-//    }
-//  | ORDADD LPAREN e1=expression COMMA e2=expression RPAREN
-//    {
-//      result = new SLExpression(tb.oadd(e1.getTerm(), e2.getTerm()));
-//    }
+//  | 
+    ORDZERO
+    {
+      ret = new SLExpression(tb.o_0());
+    }
+  | ORDADD LPAREN e1=expression COMMA e2=expression RPAREN
+   {
+      ret = new SLExpression(tb.oadd(e1.getTerm(), e2.getTerm()));
+   }
 //  | ORDTIMES LPAREN e1=expression COMMA e2=expression RPAREN
 //    {
 //      result = new SLExpression(tb.otimes(e1.getTerm(), e2.getTerm()));
@@ -1879,8 +1881,8 @@ sequence returns [SLExpression ret = null] throws SLTranslationException
 //  | ONAT LPAREN e1=expression RPAREN
 //    {
 //      result = new SLExpression(tb.onat(e1.getTerm()));
-//    }
-//;
+//   }
+;
 
 mapExpression returns [Token token = null] :
   ( MAP_GET

@@ -77,6 +77,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.PermissionLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.OrdLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -168,6 +169,10 @@ public final class TypeConverter {
 
     public SeqLDT getSeqLDT() {
 	return (SeqLDT) getLDT(SeqLDT.NAME);
+    }
+
+    public OrdLDT getOrdLDT() {
+	return (OrdLDT) getLDT(OrdLDT.NAME);
     }
     
     public MapLDT getMapLDT() {

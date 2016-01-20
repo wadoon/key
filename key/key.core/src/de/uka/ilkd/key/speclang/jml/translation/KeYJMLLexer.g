@@ -120,6 +120,9 @@ lexer grammar KeYJMLLexer;
     ORDOMEGA             : '\\omega' ;     //KeY extension, not official JML
     ORDTIMES             : '\\ord_times' ; //KeY extension, not official JML
     ORDZERO              : '\\o_0';        //KeY extension, not official JML
+    ORDLESS              : '\\ord_less'  ;   //KeY extension, not official JML
+    ORDLEQ               : '\\ord_leq' ;  //KeY extension, not official JML
+    ORDLIM               : '\\ord_lim';  //KeY extension, not official JML
     PERMISSION           : '\\permission';
     PRE                  : '\\pre';
     PRODUCT              : '\\product';
