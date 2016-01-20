@@ -83,6 +83,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
 import de.uka.ilkd.keyabs.abs.ABSAwaitClaimStatement;
 import de.uka.ilkd.keyabs.abs.ABSAwaitStatement;
+import de.uka.ilkd.keyabs.abs.ABSCaseStatement;
 import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSExecutionContext;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
@@ -97,6 +98,7 @@ import de.uka.ilkd.keyabs.abs.ABSTypeReference;
 import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.ABSWhileStatement;
 import de.uka.ilkd.keyabs.abs.CopyAssignment;
+import de.uka.ilkd.keyabs.abs.IABSCaseBranchStatement;
 import de.uka.ilkd.keyabs.abs.IABSMethodLabel;
 import de.uka.ilkd.keyabs.abs.ThisExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
@@ -2149,5 +2151,16 @@ public final class LogicPrinter implements ILogicPrinter {
         }
         layouter.print(")").end();	
     }
+
+	public void printABSCaseStatement(ABSCaseStatement x) throws IOException {
+		layouter.print("case").print(" ");
+		x.getCondition().visit(programPrettyPrinter);
+		layouter.print(" {").brk(1, 2).beginC(2);
+		for (int i = 0; i < x.getBranchCount(); i++) {
+			x.getBranchAt(i).visit(programPrettyPrinter);
+			layouter.brk();
+		}
+		layouter.end().brk(1, -2).print("}");
+	}
 
 }

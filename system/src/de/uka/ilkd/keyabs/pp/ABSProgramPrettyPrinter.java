@@ -381,5 +381,14 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
         }
     }
 
+	@Override
+	public void performActionOnABSCaseStatement(ABSCaseStatement x) {
+		  try {
+	            lp.printABSCaseStatement(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
+
 
 }

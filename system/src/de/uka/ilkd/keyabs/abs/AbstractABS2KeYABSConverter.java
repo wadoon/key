@@ -1,8 +1,46 @@
 package de.uka.ilkd.keyabs.abs;
 
 import java.math.BigInteger;
+import java.util.LinkedList;
 
-import abs.frontend.ast.*;
+import abs.frontend.ast.ASTNode;
+import abs.frontend.ast.AddExp;
+import abs.frontend.ast.AndBoolExp;
+import abs.frontend.ast.AssignStmt;
+import abs.frontend.ast.AsyncCall;
+import abs.frontend.ast.AwaitStmt;
+import abs.frontend.ast.Binary;
+import abs.frontend.ast.Block;
+import abs.frontend.ast.CaseBranchStmt;
+import abs.frontend.ast.CaseStmt;
+import abs.frontend.ast.ClaimGuard;
+import abs.frontend.ast.DataConstructorExp;
+import abs.frontend.ast.EqExp;
+import abs.frontend.ast.ExpGuard;
+import abs.frontend.ast.ExpressionStmt;
+import abs.frontend.ast.FieldUse;
+import abs.frontend.ast.FnApp;
+import abs.frontend.ast.GTEQExp;
+import abs.frontend.ast.GTExp;
+import abs.frontend.ast.GetExp;
+import abs.frontend.ast.IfStmt;
+import abs.frontend.ast.IncompleteAccess;
+import abs.frontend.ast.IntLiteral;
+import abs.frontend.ast.LTEQExp;
+import abs.frontend.ast.LTExp;
+import abs.frontend.ast.List;
+import abs.frontend.ast.MinusExp;
+import abs.frontend.ast.MultExp;
+import abs.frontend.ast.NewExp;
+import abs.frontend.ast.NotEqExp;
+import abs.frontend.ast.NullExp;
+import abs.frontend.ast.OrBoolExp;
+import abs.frontend.ast.PureExp;
+import abs.frontend.ast.ReturnStmt;
+import abs.frontend.ast.ThisExp;
+import abs.frontend.ast.VarDeclStmt;
+import abs.frontend.ast.VarUse;
+import abs.frontend.ast.WhileStmt;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.IServices;
@@ -14,7 +52,22 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.keyabs.abs.expression.*;
+import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
+import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNewExpression;
+import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.logic.sort.programSV.ABSFieldSV;
 
 public abstract class AbstractABS2KeYABSConverter {
@@ -77,7 +130,9 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((ReturnStmt)x);
         } else if (x instanceof NewExp) {
             result = convert((NewExp)x);
-        } 
+        } else if (x instanceof CaseStmt) {
+        	result = convert((CaseStmt)x);
+        }
 
         if (result == null) {
             result = requestConversion(x);
@@ -325,6 +380,17 @@ public abstract class AbstractABS2KeYABSConverter {
         return new ABSNewExpression(className, lookupType(x.getType().getQualifiedName()) , arguments);
     }
 
+    public ABSCaseStatement convert(CaseStmt x) {
+
+    	IABSPureExpression caseExp = (IABSPureExpression) convert(x.getExpr());
+    	LinkedList<IABSCaseBranchStatement> branches = new LinkedList<IABSCaseBranchStatement>();
+
+        for (CaseBranchStmt arg : x.getBranchList()) {
+            branches.add((IABSCaseBranchStatement)convert(arg));
+        }
+        
+        return new ABSCaseStatement(caseExp, branches);
+    }
     
     protected KeYJavaType lookupType(String qualifiedName) {
         return services.getProgramInfo().getKeYJavaType(qualifiedName);

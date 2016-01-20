@@ -421,6 +421,7 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             addChild(x);
         }
     }
+   
 
     @Override
     public void performActionOnABSWhileStatement(ABSWhileStatement x) {
@@ -569,4 +570,23 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         }
     }
 
+    @Override
+    public void performActionOnABSCaseStatement(ABSCaseStatement x) {
+    	  if (hasChanged()) {
+              ExtList children = stack.peek();
+              children.removeFirst();
+              IABSPureExpression newCaseExp = children
+                      .removeFirstOccurrence(IABSPureExpression.class);
+
+              IABSCaseBranchStatement[] newCaseBranches = new IABSCaseBranchStatement[children.size()];
+              for (int i = 0; i < children.size(); i++) {
+            	  newCaseBranches[i] = (IABSCaseBranchStatement) children.get(i);
+              }                           
+          	  addNewChild(new ABSCaseStatement(newCaseExp, newCaseBranches));        	              
+          } else {
+              addChild(x);
+          }
+    }
+
+    
 }

@@ -266,4 +266,9 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
         doDefaultAction(x);
     }
     
+    @Override
+    public void performActionOnABSCaseStatement(ABSCaseStatement x) {
+    	doDefaultAction(x);
+    }
+    
 }
