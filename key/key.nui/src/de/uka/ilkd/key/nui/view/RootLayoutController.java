@@ -16,7 +16,6 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.model.ViewSlot;
-import de.uka.ilkd.key.nui.util.IAcceptSequentFilter;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -24,18 +23,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -58,9 +55,6 @@ public class RootLayoutController extends ViewController
     private static final String STATUSWELCOMETEXT = "\u00a9 Copyright 2001 - 2016 Karlsruhe Institute of Technology, Chalmers University of Technology, and Technische Universitaet Darmstadt \n"
             + "KeY is free Software and comes with ABSOLUTELY NO WARRANTY";
 
-    @FXML
-    private Label statusLabel;
-
     private HashMap<ViewPosition, ViewSlot> viewSlots = new HashMap<>();
     private HashMap<Integer, ViewInformation> allViews = new HashMap<>();
 
@@ -68,41 +62,46 @@ public class RootLayoutController extends ViewController
      * The BorderPane from the Main Window
      */
     @FXML
-    BorderPane mainPane;
+    private BorderPane mainPane;
 
     /**
      * The Splitpane in the BorderPane Center, Root of AnchorPane Positions
      */
     @FXML
-    SplitPane mainSplitPane;
+    private SplitPane mainSplitPane;
 
     /**
      * SplitPanes left and right
      */
     @FXML
-    SplitPane leftPane;
+    private SplitPane leftPane;
     @FXML
-    SplitPane rightPane;
+    private SplitPane rightPane;
 
     /**
      * The AnchorPane Positions
      */
     @FXML
-    BorderPane topLeft;
+    private BorderPane topLeft;
     @FXML
-    BorderPane bottomLeft;
+    private BorderPane bottomLeft;
     @FXML
-    BorderPane center;
+    private BorderPane center;
     @FXML
-    BorderPane topRight;
+    private BorderPane topRight;
     @FXML
-    BorderPane bottomRight;
+    private BorderPane bottomRight;
 
     @FXML
     private MenuBar menuBar;
-
     @FXML
     private Menu helpMenu;
+    @FXML
+    private Accordion accordion;
+    @FXML
+    private ToggleButton settingsButton;
+    @FXML
+    private Label statusLabel;
 
     /**
      * The constructor
@@ -161,8 +160,9 @@ public class RootLayoutController extends ViewController
 
         statusLabel.setGraphic(new ImageView(STATUSLOGO));
         statusLabel.setText(STATUSWELCOMETEXT);
+        toggleSettings();
     }
-
+    
     /**
      * Opens a new Window with About Functionality. View: AboutView.fxml
      * 
@@ -187,6 +187,33 @@ public class RootLayoutController extends ViewController
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Show/hide Settings.
+     */
+    @FXML
+    private void toggleSettings() {
+        accordion.managedProperty().bind(accordion.visibleProperty());
+        accordion.setVisible(settingsButton.isSelected());
+    }
+
+    /**
+     * Loads a default closed proof.
+     */
+    @FXML
+    private void loadDefaultProof() {
+        getContext().getProofManager()
+                .loadProblem(new File("resources/proofs/gcd.closed.proof"));
+    }
+
+    /**
+     * Loads a large sample open proof.
+     */
+    @FXML
+    private void loadBigProof() {
+        getContext().getProofManager().loadProblem(
+                new File("resources/SampleProof/sampleProof.proof"));
     }
 
     /**
