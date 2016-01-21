@@ -53,7 +53,6 @@ public abstract class ViewControllerSwingContent extends ViewController {
     public void initializeAfterLoadingFxml() {
         createSwingContent();
         stackPane.getChildren().add(swingNode);
-        swingNode.setContent(null);
     }
 
     /**
