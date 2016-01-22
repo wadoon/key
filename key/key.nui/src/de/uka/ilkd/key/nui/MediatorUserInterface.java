@@ -34,7 +34,7 @@ public class MediatorUserInterface
         extends AbstractMediatorUserInterfaceControl {
 
     private IStatusManager statusManager;
-    private KeYMediator mediator;
+    private KeYMediator mediator = null;
     private final LinkedList<InteractiveRuleApplicationCompletion> completions = new LinkedList<InteractiveRuleApplicationCompletion>();
 
     public MediatorUserInterface(IStatusManager statusManager) {

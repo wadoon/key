@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.nui.util;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -14,7 +15,6 @@ import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.nui.view.DebugViewController;
-import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 
@@ -110,7 +110,7 @@ public class SequentPrinter {
         }
 
         // Apply HTML formatting and return
-        DebugViewController.PrintOnCurrent(encodeLessThan(sb.toString()));
+        DebugViewController.printOnCurrent(encodeLessThan(sb.toString()));
         return toHTML(encodeLessThan(sb.toString()));
     }
 
@@ -171,7 +171,7 @@ public class SequentPrinter {
      */
     public void applyFilter(PrintFilter filter) {
         ArrayList<Integer> indicesOfLines = SequentFilterer
-                .ApplyFilter(proofString, filter);
+                .applyFilter(proofString, filter);
 
         // remove old Filter styling
         removeFilter();
@@ -340,7 +340,7 @@ public class SequentPrinter {
                         searchIndices.add(matcher.end());
                     }
                 }
-                catch (Exception e) {
+                catch (RuntimeException e) {
                     return;
                 }
 
@@ -404,7 +404,7 @@ public class SequentPrinter {
      * @throws IOException
      */
     private void readCSS(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
         try {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();

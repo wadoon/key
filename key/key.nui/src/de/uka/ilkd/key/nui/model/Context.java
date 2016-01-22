@@ -55,7 +55,7 @@ public class Context {
     
     public void acceptFilter(PrintFilter filter){
         for(IAcceptSequentFilter consumer: acceptSequentFilters){
-            consumer.Apply(filter);
+            consumer.apply(filter);
         }
     }
     // ---

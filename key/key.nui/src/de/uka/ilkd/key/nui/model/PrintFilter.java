@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.model;
 
+import java.util.Objects;
 import java.util.Observable;
 
 public class PrintFilter extends Observable {
@@ -13,12 +14,12 @@ public class PrintFilter extends Observable {
         // no need to notify observer since the name is only for storage
     }
 
-    private String searchString;
+    private String searchString = null;
     public String getSearchString() {
         return searchString;
     }
     public void setSearchString(String value) {
-        if(searchString == value)return;
+        if(Objects.equals(searchString, value))return;
         searchString = value;
         notifyObservers();
     }
@@ -71,7 +72,7 @@ public class PrintFilter extends Observable {
         filterMode = FilterMode.Minimize;
     }
 
-    public PrintFilter Clone() {
+    public PrintFilter cloneFilter() {
         PrintFilter filter = new PrintFilter();
         filter.setName(this.name);
         filter.setSearchString(this.searchString);

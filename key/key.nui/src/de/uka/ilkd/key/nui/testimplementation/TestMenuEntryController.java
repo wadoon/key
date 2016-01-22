@@ -11,8 +11,8 @@ import javafx.fxml.FXML;
 public class TestMenuEntryController extends ViewController {
     
     @FXML
-    private void DoClose(){
-        System.exit(0);
+    private void doClose(){
+        //System.exit(0);
     }
 
     @Override

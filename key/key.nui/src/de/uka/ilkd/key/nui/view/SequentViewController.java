@@ -300,7 +300,7 @@ public class SequentViewController extends ViewController
     }
 
     @Override
-    public void Apply(PrintFilter filter) {
+    public void apply(PrintFilter filter) {
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);
         updateView();

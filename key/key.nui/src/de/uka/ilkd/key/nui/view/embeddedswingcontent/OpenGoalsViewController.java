@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nui.view.embeddedswingcontent;
 import javax.swing.JScrollPane;
 
 import de.uka.ilkd.key.gui.GoalList;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewControllerSwingContent;
 import de.uka.ilkd.key.nui.ViewPosition;
