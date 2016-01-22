@@ -26,7 +26,7 @@ public class DebugViewController extends ViewController {
 
     private static DebugViewController debugViewController;
 
-    public static void PrintOnCurrent(String str) {
+    public static void printOnCurrent(String str) {
         debugViewController.Print(str);
     }
 }
