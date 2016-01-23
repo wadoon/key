@@ -1849,15 +1849,15 @@ ordinal returns [SLExpression ret = null] throws SLTranslationException
 
 //@after { ret = result; }
 :
-//   ORDOMEGA
-//  {
-//        result = new SLExpression(tb.omega());
-//    }
-//  | ORDONE
-//    {
-//      ret = new SLExpression(tb.o_1());
-//    }
-//  | 
+  ORDOMEGA
+  {
+      ret  = new SLExpression(tb.omega());
+    }
+  | ORDONE
+    {
+      ret = new SLExpression(tb.o_1());
+    }
+  | 
     ORDZERO
     {
       ret = new SLExpression(tb.o_0());
@@ -1866,22 +1866,22 @@ ordinal returns [SLExpression ret = null] throws SLTranslationException
    {
       ret = new SLExpression(tb.oadd(e1.getTerm(), e2.getTerm()));
    }
-//  | ORDTIMES LPAREN e1=expression COMMA e2=expression RPAREN
-//    {
-//      result = new SLExpression(tb.otimes(e1.getTerm(), e2.getTerm()));
-//    }
-//  | ORDEXP LPAREN e1=expression COMMA e2=expression RPAREN
-//    {
-//      result = new SLExpression(tb.oexp(e1.getTerm(), e2.getTerm()));
-//    }
-//  | ORDMAX LPAREN e1=expression COMMA e2=expression RPAREN
-//    {
-//      result = new SLExpression(tb.omax(e1.getTerm(), e2.getTerm()));
-//    }
-//  | ONAT LPAREN e1=expression RPAREN
-//    {
-//      result = new SLExpression(tb.onat(e1.getTerm()));
-//   }
+  | ORDTIMES LPAREN e1=expression COMMA e2=expression RPAREN
+    {
+      ret = new SLExpression(tb.otimes(e1.getTerm(), e2.getTerm()));
+    }
+  | ORDEXP LPAREN e1=expression COMMA e2=expression RPAREN
+    {
+      ret = new SLExpression(tb.oexp(e1.getTerm(), e2.getTerm()));
+    }
+  | ORDMAX LPAREN e1=expression COMMA e2=expression RPAREN
+    {
+      ret = new SLExpression(tb.omax(e1.getTerm(), e2.getTerm()));
+    }
+  | ONAT LPAREN e1=expression RPAREN
+    {
+      ret = new SLExpression(tb.onat(e1.getTerm()));
+   }
 ;
 
 mapExpression returns [Token token = null] :
