@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.nui.model;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import de.uka.ilkd.key.nui.ViewPosition;
 
 public class SessionSettings {
 
@@ -12,89 +10,126 @@ public class SessionSettings {
     private static final int MinHeight = 50;
     private static List<Integer> screenResolutionX;
     private static List<Integer> screenResolutionY;
-    
+
     public SessionSettings() {
         screenResolutionX = new LinkedList<Integer>();
-        //TODO
         screenResolutionY = new LinkedList<Integer>();
-        //TODO
+        views = new LinkedList<>();
     }
 
-    private Map<ViewPosition,List<ViewInformation>> views;
-    public void setViews(Map<ViewPosition,List<ViewInformation>> value){
-        views = value;
-    }
-    public Map<ViewPosition, List<ViewInformation>> getViews() {
+    private List<ViewInformation> views;
+
+    public List<ViewInformation> getViews() {
         return views;
     }
 
-    private List<Integer> splitterPositions;
-    public void setSplitterPositions(List<Integer> value){
-        splitterPositions = value;
+    public void setViews(List<ViewInformation> value) {
+        views = value;
     }
-    
-    // 4: left-horizontal,right-horizontal, left-vertical, right-vertical
+
+    private List<Integer> splitterPositions;
+
+    public void setSplitterPositions(int leftVertical, int leftHorizontal,
+            int rightVertical, int rightHorizontal) {
+        splitterPositions = Arrays.asList(leftVertical, leftHorizontal,
+                rightVertical, rightHorizontal);
+    }
+
+    /**
+     * size = 4 : left-vertical, left-horizontal, right-vertical, right-horizontal
+     */
     public List<Integer> getSplitterPositions() {
         return splitterPositions;
     }
 
     private int windowX;
+
     public void setWindowX(int value) {
-        if(value >= 0)
         windowX = value;
-        else if(value > screenResolutionX.get(lastUsedScreen))
-            windowX = screenResolutionX.get(lastUsedScreen);
-        else windowX = 0;
+        CheckXPosition();
     }
+
     public int getWindowX() {
         return windowX;
     }
 
     private int windowY;
-    public void setWindowY(int value){
-        if(value >= 0)
+
+    public void setWindowY(int value) {
         windowY = value;
-        else if(value > screenResolutionY.get(lastUsedScreen))
-            windowY = screenResolutionY.get(lastUsedScreen);
-        else windowY = 0;
+        CheckYPosition();
     }
+
     public int getWindowY() {
         return windowY;
     }
 
     private int windowHeight;
-    public void setWindowHeight(int value){
-        if(value >= 0)
-        windowHeight=value;
-        else windowHeight = MinHeight;
+
+    public void setWindowHeight(int value) {
+        if (value >= MinHeight)
+            windowHeight = value;
+        else
+            windowHeight = MinHeight;
+        CheckYPosition();
     }
+
     public int getWindowHeight() {
         return windowHeight;
     }
 
     private int windowWidth;
-    public void setWindowWidth(int value){
-        if(value >= 50)
-        windowWidth=value;
-        else windowWidth = MinWidth;
+
+    public void setWindowWidth(int value) {
+        if (value >= MinWidth)
+            windowWidth = value;
+        else
+            windowWidth = MinWidth;
+
+        CheckXPosition();
     }
+
     public int getWindowWidth() {
         return windowWidth;
     }
 
     private int lastUsedScreen;
-    public void setLastUsedScreen(int value){
+
+    public void setLastUsedScreen(int value) {
         lastUsedScreen = value;
     }
+
     public int getLastUsedScreen() {
         return lastUsedScreen;
     }
-    
-    public void Save(){
-        
+
+    /**
+     * Keeps the Window visible
+     */
+    private void CheckYPosition() {
+        if (windowY < 0)
+            windowY = 0;
+        else if (windowY > screenResolutionY.get(lastUsedScreen) - windowHeight)
+            windowY = screenResolutionY.get(lastUsedScreen) - windowHeight;
+        // else leave the value as it is
     }
-    
-    public static SessionSettings loadLastSettings(){
+
+    /**
+     * Keeps the Window visible
+     */
+    private void CheckXPosition() {
+        if (windowX < 0)
+            windowX = 0;
+        else if (windowX > screenResolutionX.get(lastUsedScreen) - windowWidth)
+            windowX = screenResolutionX.get(lastUsedScreen) - windowWidth;
+        // else leave the value as it is
+    }
+
+    public void Save() {
+
+    }
+
+    public static SessionSettings loadLastSettings() {
         return null;
     }
 }
