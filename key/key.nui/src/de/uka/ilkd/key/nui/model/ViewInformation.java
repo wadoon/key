@@ -6,7 +6,6 @@ import java.util.Observable;
 
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
@@ -19,7 +18,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 
 public class ViewInformation extends Observable {
 

@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nui.view.embeddedswingcontent;
 import javax.swing.JScrollPane;
 
 import de.uka.ilkd.key.gui.GoalList;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewControllerSwingContent;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -14,7 +13,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
  * @author Nils Muzzulini
  *
  */
-@KeYView(title = "Open Goals", path = "OpenGoalsView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
+@KeYView(title = "Open Goals", path = "OpenGoalsView.fxml", preferredPosition = ViewPosition.TOPLEFT)
 public class OpenGoalsViewController extends ViewControllerSwingContent {
 
     private JScrollPane openGoalsView;

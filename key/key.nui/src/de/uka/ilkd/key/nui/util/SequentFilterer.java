@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 import de.uka.ilkd.key.nui.model.PrintFilter;
 
 public class SequentFilterer {
-    public static ArrayList<Integer> ApplyFilter(String proofString,
+    public static ArrayList<Integer> applyFilter(String proofString,
             PrintFilter filter) {
         if(filter.getSearchString() == null){
             return new ArrayList<>();

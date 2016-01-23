@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
@@ -15,56 +16,72 @@
 
 <BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.RootLayoutController">
 	<top>
-		<MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
-			<menus>
-				<Menu mnemonicParsing="false" text="File">
-					<items>
-						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open" />
-						<MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
-					</items>
-				</Menu>
-				<Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views" />
-				<Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
-					<items>
-						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />
-					</items>
-				</Menu>
-			</menus>
-		</MenuBar>
+      <AnchorPane>
+         <children>
+      		<MenuBar fx:id="menuBar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      			<menus>
+      				<Menu mnemonicParsing="false" text="File">
+      					<items>
+      						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open" />
+      						<MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
+      					</items>
+      				</Menu>
+      				<Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views" />
+      				<Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
+      					<items>
+      						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />
+      					</items>
+      				</Menu>
+      			</menus>
+      		</MenuBar>
+            <ButtonBar buttonMinWidth="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <buttons>
+                <Button mnemonicParsing="false" onAction="#loadDefaultProof" text="Load Default Proof" />
+                  <Button mnemonicParsing="false" onAction="#loadBigProof" text="Load Big Proof" />
+                  <ToggleButton fx:id="settingsButton" mnemonicParsing="false" onAction="#toggleSettings" text="Settings" />
+              </buttons>
+            </ButtonBar>
+         </children>
+      </AnchorPane>
 	</top>
 	<center>
-		<SplitPane fx:id="mainSplitPane" dividerPositions="0.0, 1.0" orientation="HORIZONTAL" prefHeight="400" prefWidth="200" BorderPane.alignment="CENTER">
-			<items>
-				<SplitPane fx:id="leftPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="mainSplitPane" dividerPositions="0.5, 0.5" BorderPane.alignment="CENTER">
+         <items>
+				<SplitPane fx:id="leftPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0">
 					<items>
                   <BorderPane fx:id="topLeft">
                      <center>
                         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-                     </center></BorderPane>
+                     </center>
+                  </BorderPane>
                   <BorderPane fx:id="bottomLeft">
                      <center>
                         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-                     </center></BorderPane>
+                     </center>
+                  </BorderPane>
 					</items>
 				</SplitPane>
-            <BorderPane fx:id="center" BorderPane.alignment="CENTER">
+            <BorderPane fx:id="center">
                <center>
                   <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-               </center></BorderPane>
-				<SplitPane fx:id="rightPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0" BorderPane.alignment="CENTER">
+               </center>
+            </BorderPane>
+				<SplitPane fx:id="rightPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0">
 					<items>
                   <BorderPane fx:id="topRight">
                      <center>
                         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-                     </center></BorderPane>
+                     </center>
+                  </BorderPane>
                   <BorderPane fx:id="bottomRight">
                      <center>
                         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-                     </center></BorderPane>
+                     </center>
+                  </BorderPane>
 					</items>
 				</SplitPane>
-			</items>
-		</SplitPane>
+         </items>
+      </SplitPane>
 	</center>
    <bottom>
       <AnchorPane BorderPane.alignment="CENTER">
@@ -73,4 +90,25 @@
          </children>
       </AnchorPane>
    </bottom>
+   <right>
+      <Accordion fx:id="accordion" minWidth="0.0" BorderPane.alignment="CENTER">
+        <panes>
+          <TitledPane animated="false" text="Style Settings">
+               <content>
+                  <ColorPicker />
+               </content></TitledPane>
+          <TitledPane animated="false" text="Other Settings">
+               <content>
+                  <ButtonBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0">
+                    <buttons>
+                      <Button mnemonicParsing="false" text="Button" />
+                        <Button mnemonicParsing="false" text="Button" />
+                    </buttons>
+                  </ButtonBar>
+               </content>
+          </TitledPane>
+          <TitledPane animated="false" text="untitled 3" />
+        </panes>
+      </Accordion>
+   </right>
 </BorderPane>

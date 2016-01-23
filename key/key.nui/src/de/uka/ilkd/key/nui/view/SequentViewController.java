@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.nui.view;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import javax.annotation.processing.Filer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -24,13 +21,13 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
-import javafx.event.Event;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.TitledPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
@@ -62,28 +59,19 @@ public class SequentViewController extends ViewController
         });
     };
     private PositionTranslator posTranslator;
-
+    
     @FXML
-    private ToggleButton searchButton;
-
-    @FXML
-    private Pane searchParent;
-
+    private TitledPane sequentOptions;
     @FXML
     private CheckBox checkBoxPrettySyntax;
-
     @FXML
     private CheckBox checkBoxUnicode;
-
     @FXML
     private CheckBox checkBoxRegexSearch;
-
     @FXML
     private WebView textAreaWebView;
-
     @FXML
     private TextField searchBox;
-
     @FXML
     private ScrollPane scrollPane;
 
@@ -96,11 +84,20 @@ public class SequentViewController extends ViewController
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        toggleSearch();
         initializeSearchBox();
-        checkBoxPrettySyntax.setDisable(true);
-        checkBoxUnicode.setDisable(true);
-        searchButton.setDisable(true);
+        sequentOptions.setDisable(true);
+        sequentOptions.setExpanded(false);
+        sequentOptions.expandedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (sequentOptions.isExpanded()) {
+                    sequentOptions.setText("Less Options");
+                } else {
+                    sequentOptions.setText("More Options");
+                }
+            }
+        });
+        
         posTranslator = new PositionTranslator(
                 "resources/css/sequentStyle.css");
 
@@ -160,12 +157,6 @@ public class SequentViewController extends ViewController
         });
     }
 
-    @FXML
-    private void toggleSearch() {
-        searchParent.managedProperty().bind(searchParent.visibleProperty());
-        searchParent.setVisible(searchButton.isSelected());
-    }
-
     /**
      * Displays the sequent of the currently selected node in the tree.
      * 
@@ -187,10 +178,8 @@ public class SequentViewController extends ViewController
         sequentChanged = true;
 
         printSequent();
-
-        checkBoxPrettySyntax.setDisable(false);
-        checkBoxUnicode.setDisable(false);
-        searchButton.setDisable(false);
+        
+        sequentOptions.setDisable(false);
     }
 
     /**
@@ -252,41 +241,8 @@ public class SequentViewController extends ViewController
 
         posTranslator.setProofString(proofString);
 
-        // Redraw WebArea to use optimal Height. Called here as PosTranslater
-        // needs to now the ProofString.
-        // If-clause added for optimization purposes. Only when the Sequent
-        // itself is changed, the WebArea needs to be redrawn, not with every
-        // styling update
-        /*
-         * if (sequentChanged) {
-         * System.out.println(this.posTranslator.getProofHeight());
-         * textAreaWebView.setPrefHeight(this.posTranslator.getProofHeight());
-         * textAreaWebView.autosize(); }
-         *  sequentChanged = false;
-         */
-
-       
-
         sequentLoaded = true;
         updateView();
-    }
-
-    /**
-     * Loads a default closed proof.
-     */
-    @FXML
-    private void loadDefaultProof() {
-        getContext().getProofManager()
-                .loadProblem(new File("resources/proofs/gcd.closed.proof"));
-    }
-
-    /**
-     * Loads a large sample open proof.
-     */
-    @FXML
-    private void loadBigProof() {
-        getContext().getProofManager().loadProblem(
-                new File("resources/SampleProof/sampleProof.proof"));
     }
 
     private void updateHtml(String s) {
@@ -319,11 +275,32 @@ public class SequentViewController extends ViewController
     }
 
     private void updateView() {
+        // Redraw WebArea to use optimal Height. Called here as PosTranslater
+        // needs to now the ProofString.
+        // If-clause added for optimization purposes. Only when the Sequent
+        // itself is changed, the WebArea needs to be redrawn, not with every
+        // styling update.
+
+        if (sequentChanged && sequentLoaded) {
+            sequentChanged = false;
+            double newHeight = posTranslator.getProofHeight();
+
+            // JavaFX has MaxHeight ~8500. If bigger, an error might occur.
+            if (newHeight > 8500) {
+                System.out.println("Proof might be too large");
+                textAreaWebView.setPrefHeight(8500);
+            }
+            else {
+                textAreaWebView.setPrefHeight(newHeight);
+            }
+            textAreaWebView.autosize();
+        }
+
         updateHtml(this.printer.printProofString());
     }
 
     @Override
-    public void Apply(PrintFilter filter) {
+    public void apply(PrintFilter filter) {
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);
         updateView();

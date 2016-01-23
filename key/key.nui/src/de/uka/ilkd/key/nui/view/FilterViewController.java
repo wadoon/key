@@ -97,7 +97,7 @@ public class FilterViewController extends ViewController {
     @FXML
     private void handleSaveFilter() {
         String name = filters.getEditor().getText();
-        if (name.equals("") || name.equals(null)) {
+        if (name.isEmpty()) {
             Alert alert = new Alert(AlertType.WARNING);
             alert.setContentText("Please choose a name before saving!");
             alert.showAndWait();
@@ -109,14 +109,14 @@ public class FilterViewController extends ViewController {
         }
         else {
             currentFilter.setName(name);
-            savedFilters.put(name, currentFilter.Clone());
+            savedFilters.put(name, currentFilter.cloneFilter());
             filters.getItems().add(currentFilter.getName());
         }
     }
 
     @FXML
     private void handleFilterSelectionChanged() {
-        if (filters.getValue().equals(null))
+        if (filters.getValue() == null)
             return;
 
         currentFilter = savedFilters.get(filters.getValue());
@@ -125,15 +125,8 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleReset() {
-        if (savedFilters.containsValue(currentFilter)) {
-            // currentfilter needs to be a copy so it can be reset
-            filters.getEditor().setText("");
-            currentFilter = new PrintFilter();
-        }
-        else {
-            filters.getEditor().setText("");
-            currentFilter = new PrintFilter();
-        }
+        filters.getEditor().setText("");
+        currentFilter = new PrintFilter();
         loadCurrentFilter();
         handleApply();
     }

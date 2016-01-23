@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.nui.util;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,19 +99,22 @@ public class PositionTranslator {
         int result;
 
         Text text = new Text("\\W|QpXgjﬂ&");
-        
+
         for (result = 0; result < strings.length; result++) {
 
             // Adjust for filtering
-            //XXX
+            // XXX
             if (filterCollapsed) {
                 if (filteredLines.contains(result) == filterInverted) {
                     continue;
                 }
-            }else{
-                if (filteredLines.contains(result)==filterInverted && filteredLines.size()>0){
+            }
+            else {
+                if (filteredLines.contains(result) == filterInverted
+                        && filteredLines.size() > 0) {
                     text.setFont(new Font(font, minimizedSize));
-                }else{
+                }
+                else {
                     text.setFont(new Font(font, fontSize));
                 }
             }
@@ -202,7 +206,7 @@ public class PositionTranslator {
      * @throws IOException
      */
     private void readCSS(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
         try {
             String line = br.readLine();
 
@@ -258,7 +262,7 @@ public class PositionTranslator {
      *            the PrintFilter object
      */
     public void applyFilter(PrintFilter filter) {
-        filteredLines = SequentFilterer.ApplyFilter(proofString, filter);
+        filteredLines = SequentFilterer.applyFilter(proofString, filter);
         // XXX
         switch (filter.getFilterMode()) {
         case Minimize:
@@ -281,14 +285,18 @@ public class PositionTranslator {
      * 
      * @return a height value in px
      */
-    /*
-     * public double getProofHeight() { // Adjustment for Margin double result =
-     * 5;
-     * 
-     * Text text = new Text(" "); text.setFont(new Font(font, fontSize));
-     * 
-     * // Iterate over all lines to sum up Height for (int i = 0; i <
-     * strings.length; i++) { result += text.getLayoutBounds().getHeight(); }
-     * return result; }
-     */
+
+    public double getProofHeight() { // Adjustment for Margin
+        double result = 5;
+
+        Text text = new Text(" ");
+        text.setFont(new Font(font, fontSize));
+
+        // Iterate over all lines to sum up Height
+        for (int i = 0; i < strings.length; i++) {
+            result += text.getLayoutBounds().getHeight();
+        }
+        return result;
+    }
+
 }

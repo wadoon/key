@@ -20,13 +20,13 @@ public class DebugViewController extends ViewController {
         debugViewController = this;
     }
 
-    public void Print(String str) {
+    public void print(String str) {
         outputText.setText(str);
     }
 
     private static DebugViewController debugViewController;
 
-    public static void PrintOnCurrent(String str) {
-        debugViewController.Print(str);
+    public static void printOnCurrent(String str) {
+        debugViewController.print(str);
     }
 }

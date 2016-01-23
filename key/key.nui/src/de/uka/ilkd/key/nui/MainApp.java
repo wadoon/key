@@ -137,7 +137,7 @@ public class MainApp extends Application {
         if (result.get() == ButtonType.OK) {
             System.out.println(
                     "Where we go from here is a choice I leave to you.");
-            System.exit(0);
+            primaryStage.close();
         }
     }
 
