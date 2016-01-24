@@ -5,7 +5,9 @@ package de.uka.ilkd.key.nui.view;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.nui.model.SessionSettings;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.model.ViewSlot;
 import de.uka.ilkd.key.nui.util.IStatusManager;
@@ -162,7 +165,7 @@ public class RootLayoutController extends ViewController
         statusLabel.setText(STATUSWELCOMETEXT);
         toggleSettings();
     }
-    
+
     /**
      * Opens a new Window with About Functionality. View: AboutView.fxml
      * 
@@ -188,7 +191,7 @@ public class RootLayoutController extends ViewController
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Show/hide Settings.
      */
@@ -330,7 +333,7 @@ public class RootLayoutController extends ViewController
                 otherViewsMenu.getItems().add(item);
             }
         }
-        //TODO: dummy until last opened or config was developed
+        // TODO: dummy until last opened or config was developed
         info.setIsActive(true);
     }
 
@@ -463,5 +466,12 @@ public class RootLayoutController extends ViewController
         }
         throw new IllegalStateException(
                 "Menu " + parentMenu + " was not found");
+    }
+
+    public List<Double> getSplitterPositions() {
+        return Arrays.asList(0.0, 0.0, 0.0, 0.0);
+    }
+
+    public void setSplitterPositions(List<Double> positions) {
     }
 }

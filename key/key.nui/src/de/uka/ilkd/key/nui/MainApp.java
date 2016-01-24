@@ -3,10 +3,12 @@ package de.uka.ilkd.key.nui;
 import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 import org.reflections.Reflections;
 
 import de.uka.ilkd.key.nui.model.Context;
+import de.uka.ilkd.key.nui.model.SessionSettings;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import javafx.application.Application;
@@ -25,7 +27,8 @@ public class MainApp extends Application {
     private BorderPane rootLayout;
     private RootLayoutController rootLayoutController;
     /**
-     * the string specifies the prefix for packages that should be scanned for annotations
+     * the string specifies the prefix for packages that should be scanned for
+     * annotations
      */
     private Reflections reflections = new Reflections("de.uka.ilkd.key");
     private Scene scene;
@@ -40,7 +43,17 @@ public class MainApp extends Application {
         this.primaryStage.getIcons().add(
                 new Image("file:resources/images/key-color-icon-square.png"));
 
+        // TODO: load this from disk
+        SessionSettings settings = SessionSettings.loadLastSettings();
+        if (!settings.getIsCorrupted()) {
+            primaryStage.setX(settings.getWindowX());
+            primaryStage.setY(settings.getWindowY());
+            primaryStage.setWidth(settings.getWindowWidth());
+            primaryStage.setHeight(settings.getWindowHeight());
+        }
+
         initRootLayout();
+        rootLayoutController.setSplitterPositions(settings.getSplitterPositions());
         ctrlPressedHandler();
         closeWindowConfirmHandler();
         scanForViews();
@@ -90,20 +103,20 @@ public class MainApp extends Application {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Listens for ControlDown Event.
      */
     private void ctrlPressedHandler() {
         scene.setOnKeyPressed((value) -> {
-            if (value.isControlDown()) 
-                ctrlPressed = true;  
+            if (value.isControlDown())
+                ctrlPressed = true;
         });
-        scene.setOnKeyReleased((value) -> { 
-            ctrlPressed = false;  
+        scene.setOnKeyReleased((value) -> {
+            ctrlPressed = false;
         });
     }
-    
+
     /**
      * Listens for a Window Close Request and prompts the user to confirm.
      */
@@ -112,7 +125,8 @@ public class MainApp extends Application {
             if (!ctrlPressed) {
                 closeWindowAlert();
                 event.consume();
-            } else {
+            }
+            else {
                 System.exit(0);
             }
         });
@@ -134,11 +148,19 @@ public class MainApp extends Application {
                 new Image("file:resources/images/key-color-icon-square.png"));
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            System.out.println(
-                    "Where we go from here is a choice I leave to you.");
-            primaryStage.close();
-        }
+        if (result.get() != ButtonType.OK)
+            return;
+
+        SessionSettings settings = new SessionSettings();
+        settings.setWindowX(primaryStage.getX());
+        settings.setWindowY(primaryStage.getY());
+        settings.setWindowHeight(primaryStage.getHeight());
+        settings.setWindowWidth(primaryStage.getWidth());
+        settings.setSplitterPositions(
+                rootLayoutController.getSplitterPositions());
+        settings.SaveAsLast();
+        System.out.println("Where we go from here is a choice I leave to you.");
+        primaryStage.close();
     }
 
     private void scanForViews() {
@@ -148,7 +170,8 @@ public class MainApp extends Application {
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
             ViewInformation info = new ViewInformation(annot.title(),
-                    c.getResource(annot.path()), annot.preferredPosition(), annot.hasMenuItem());
+                    c.getResource(annot.path()), annot.preferredPosition(),
+                    annot.hasMenuItem());
             info.addObserver(rootViewObserver);
             rootLayoutController.registerView(info, annot.accelerator());
         }
@@ -173,7 +196,7 @@ public class MainApp extends Application {
         }
         System.out.println("Menus: " + annotated.size());
     }
-    
+
     /**
      * Returns the main stage.
      * 
