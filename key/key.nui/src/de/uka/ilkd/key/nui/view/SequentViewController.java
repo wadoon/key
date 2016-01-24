@@ -21,8 +21,6 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
@@ -87,14 +85,11 @@ public class SequentViewController extends ViewController
         initializeSearchBox();
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
-        sequentOptions.expandedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (sequentOptions.isExpanded()) {
-                    sequentOptions.setText("Less Options");
-                } else {
-                    sequentOptions.setText("More Options");
-                }
+        sequentOptions.expandedProperty().addListener((observable, oldValue, newValue) -> {
+            if (sequentOptions.isExpanded()) {
+                sequentOptions.setText("Less Options");
+            } else {
+                sequentOptions.setText("More Options");
             }
         });
         
@@ -298,7 +293,7 @@ public class SequentViewController extends ViewController
 
         updateHtml(this.printer.printProofString());
     }
-
+    
     @Override
     public void apply(PrintFilter filter) {
         printer.applyFilter(filter);
