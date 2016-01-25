@@ -13,41 +13,57 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ScrollPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.SequentViewController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.uka.ilkd.key.nui.view.SequentViewController">
 	<center>
 		<AnchorPane>
 			<children>
-				<ScrollPane fx:id="scrollPane" layoutY="40.0" prefHeight="245.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-					<WebView fx:id="textAreaWebView" maxHeight="Infinity" prefHeight="8000" prefWidth="4000" />
+				<ScrollPane fx:id="scrollPane" layoutY="40.0" prefHeight="245.0"
+					prefWidth="500.0" AnchorPane.bottomAnchor="0.0"
+					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+					AnchorPane.topAnchor="0.0">
+					<WebView fx:id="textAreaWebView" maxHeight="Infinity"
+						prefHeight="8000" prefWidth="4000" />
 				</ScrollPane>
 			</children>
 		</AnchorPane>
 	</center>
 	<top>
-      <TitledPane fx:id="sequentOptions" text="More Options" BorderPane.alignment="CENTER">
-         <content>
-            <BorderPane>
-               <center>
-      				<HBox>
-      					<children>
-      								<VBox minWidth="150.0" prefHeight="51.0" prefWidth="150.0">
-      									<children>
-      										<CheckBox fx:id="checkBoxPrettySyntax" mnemonicParsing="false" onAction="#usePrettySyntax" selected="true" text="Use Pretty Syntax" />
-      										<CheckBox fx:id="checkBoxUnicode" mnemonicParsing="false" onAction="#useUnicode" text="Enable Unicode" />
-            						<CheckBox fx:id="checkBoxRegexSearch" mnemonicParsing="false" onAction="#useRegex" prefHeight="17.0" prefWidth="270.0" text="Enable Regex Search" />
-      									</children>
-      								</VBox>
-      						<Separator orientation="VERTICAL">
-      							<padding>
-      								<Insets left="5.0" right="5.0" />
-      							</padding>
-      						</Separator>
-      						<TextField fx:id="searchBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-      					</children>
-      				</HBox>
-               </center>
-            </BorderPane>
-         </content>
-      </TitledPane>
+		<TitledPane fx:id="sequentOptions" text="More Options"
+			BorderPane.alignment="CENTER">
+			<content>
+				<BorderPane>
+					<center>
+						<HBox>
+							<children>
+								<VBox minWidth="150.0" prefHeight="51.0" prefWidth="150.0">
+									<children>
+										<CheckBox fx:id="checkBoxPrettySyntax"
+											mnemonicParsing="false" onAction="#usePrettySyntax" selected="true"
+											text="Use Pretty Syntax" />
+										<CheckBox fx:id="checkBoxUnicode" mnemonicParsing="false"
+											onAction="#useUnicode" text="Enable Unicode" />
+										<CheckBox fx:id="checkBoxRegexSearch"
+											mnemonicParsing="false" onAction="#useRegex" prefHeight="17.0"
+											prefWidth="270.0" text="Enable Regex Search" />
+									</children>
+								</VBox>
+								<Separator orientation="VERTICAL">
+									<padding>
+										<Insets left="5.0" right="5.0" />
+									</padding>
+								</Separator>
+								<TextField fx:id="searchBox" maxWidth="1.7976931348623157E308"
+									HBox.hgrow="ALWAYS" />
+							</children>
+						</HBox>
+					</center>
+				</BorderPane>
+			</content>
+		</TitledPane>
 	</top>
+	<bottom> 
+                <TitledPane fx:id="tacletInfo" text="Taclet Info"
+                        BorderPane.alignment="CENTER"></TitledPane>
+        </bottom>
 </BorderPane>
