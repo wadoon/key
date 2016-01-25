@@ -14,7 +14,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
-@KeYView(title = "TacletInfo", path = "TacletInfoView.fxml", preferredPosition = ViewPosition.TOPRIGHT, hasMenuItem = false)
+//@KeYView(title = "TacletInfo", path = "TacletInfoView.fxml", preferredPosition = ViewPosition.TOPRIGHT, hasMenuItem = false)
 public class TacletInfoViewController extends ViewController {
 
 
@@ -41,7 +41,9 @@ public class TacletInfoViewController extends ViewController {
     @Override
     public void initializeAfterLoadingFxml() {
         mediator = getContext().getProofManager().getMediator();
-        getContext().getProofManager().addProofListener(proofChangeListener);
+        
+        //XXX uncomment when using tacletInfo as seperate view rather than a part of SequentView 
+        //getContext().getProofManager().addProofListener(proofChangeListener);
     }
     
     /**

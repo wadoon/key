@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.view;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -28,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.util.Pair;
 
 /**
  * @author Maximilian Li
@@ -41,6 +43,7 @@ public class SequentViewController extends ViewController
 
     private boolean sequentLoaded = false;
     private boolean sequentChanged = false;
+    private TacletInfoViewController tacletInfoVC;
     private SequentPrinter printer;
     private LogicPrinter logicPrinter;
     private InitialPositionTable abstractSyntaxTree;
@@ -53,6 +56,8 @@ public class SequentViewController extends ViewController
         // execute ui update on javafx thread
         Platform.runLater(() -> {
             showSequent(getContext().getProofManager().getMediator()
+                    .getSelectedNode());
+            tacletInfoVC.showTacletInfo(getContext().getProofManager().getMediator()
                     .getSelectedNode());
         });
     };
@@ -72,17 +77,23 @@ public class SequentViewController extends ViewController
     private TextField searchBox;
     @FXML
     private ScrollPane scrollPane;
+    @FXML
+    private TitledPane tacletInfo;
 
     /**
      * The constructor. The constructor is called before the initialize()
      * method.
      */
-    public SequentViewController() {
+    public SequentViewController(){
+        
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeSearchBox();
+        tacletInfo.setDisable(true);
+        tacletInfo.setExpanded(false);
+        
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
         sequentOptions.expandedProperty().addListener((observable, oldValue, newValue) -> {
@@ -129,6 +140,10 @@ public class SequentViewController extends ViewController
         getContext().getProofManager().addProofListener(proofChangeListener);
         // XXX see FilterView
         getContext().registerFilterConsumer(this);
+        
+        Pair <Object, ViewController> p = loadFxmlViewController(getClass().getResource("TacletInfoView.fxml"));
+        tacletInfoVC = (TacletInfoViewController) p.getValue();
+        tacletInfo.setContent((javafx.scene.Node) p.getKey());
     }
 
     // TODO add comments
@@ -169,12 +184,13 @@ public class SequentViewController extends ViewController
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         printer = new SequentPrinter("resources/css/sequentStyle.css",
                 abstractSyntaxTree);
-
+        printer.setSequent(sequent);
         sequentChanged = true;
 
         printSequent();
         
         sequentOptions.setDisable(false);
+        tacletInfo.setDisable(false);
     }
 
     /**
