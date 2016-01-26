@@ -115,7 +115,7 @@ public class SequentViewController extends ViewController
 
         textAreaWebView.setOnMouseMoved(event -> {
             if (sequentLoaded) {
-
+              
                 int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
 
@@ -125,13 +125,14 @@ public class SequentViewController extends ViewController
                 if (event.isAltDown())
                     showTermInfo(abstractSyntaxTree.getPosInSequent(pos,
                             new IdentitySequentPrintFilter(sequent)));
-
             }
         });
+        
         textAreaWebView.setOnMouseExited(event -> {
             if (sequentLoaded) {
                 this.printer.removeMouseHighlighting();
                 this.updateView();
+                getContext().getStatusManager().clearStatus();
             }
         });
 
@@ -158,14 +159,13 @@ public class SequentViewController extends ViewController
                         .substring(tOpClassString.lastIndexOf('.') + 1);
                 // The hash code is displayed here since sometimes terms with
                 // equal string representation are still different.
-                info = operator + ", Sort: " + t.sort() + ", Hash:"
+                info = operator + ", Sort: " + t.sort() + ", Hash: "
                         + t.hashCode();
 
                 info += ProofSaver.posInOccurrence2Proof(sequent, occ);
-                System.out.println(info);
+                getContext().getStatusManager().setStatus(info);
             }
-        }
-        
+        }  
     }
 
     @Override
@@ -193,8 +193,7 @@ public class SequentViewController extends ViewController
                         searchBox.setText(searchBoxLabel);
                 });
 
-        searchBox.setOnKeyReleased((event) -> {
-            // printer.setFreeTextSearch(searchBox.getText());
+        searchBox.setOnKeyReleased(event -> {
             printer.applyFreetextSearch(searchBox.getText());
             updateView();
             event.consume();
@@ -291,36 +290,12 @@ public class SequentViewController extends ViewController
 
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
-
-        // The following code prints the org.w3c.document into the console.
-        // TODO remove if not needed.
-        /*
-         * webEngine.getLoadWorker().stateProperty().addListener( new
-         * ChangeListener<State>() { public void changed(ObservableValue ov,
-         * State oldState, State newState) { if (newState ==
-         * Worker.State.SUCCEEDED) { Document doc = webEngine.getDocument(); try
-         * { Transformer transformer =
-         * TransformerFactory.newInstance().newTransformer();
-         * transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-         * transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-         * transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-         * transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-         * transformer.setOutputProperty(
-         * "{http://xml.apache.org/xslt}indent-amount", "4");
-         * 
-         * transformer.transform(new DOMSource(doc), new StreamResult(new
-         * OutputStreamWriter(System.out, "UTF-8"))); } catch (Exception ex) {
-         * ex.printStackTrace(); } } } });
-         */
-        // int h = (int) webEngine.executeScript("document.body.scrollTop");
         webEngine.loadContent(s);
-
-        // webEngine.executeScript("window.scrollTo(" + 0 + ", " + h + ")");
     }
 
     private void updateView() {
         // Redraw WebArea to use optimal Height. Called here as PosTranslater
-        // needs to now the ProofString.
+        // needs to know the ProofString.
         // If-clause added for optimization purposes. Only when the Sequent
         // itself is changed, the WebArea needs to be redrawn, not with every
         // styling update.

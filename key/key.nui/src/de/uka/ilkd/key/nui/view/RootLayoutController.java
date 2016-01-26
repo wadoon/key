@@ -262,7 +262,6 @@ public class RootLayoutController extends ViewController
         Platform.runLater(() -> {
             statusLabel.setText(status);
         });
-        System.out.println(status);
     }
 
     /**
