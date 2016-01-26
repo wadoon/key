@@ -5,7 +5,6 @@ package de.uka.ilkd.key.nui.view;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,10 +15,10 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.SessionSettings;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.model.ViewSlot;
 import de.uka.ilkd.key.nui.util.IStatusManager;
+import de.uka.ilkd.key.util.KeYConstants;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -55,8 +54,8 @@ public class RootLayoutController extends ViewController
     private static final int MAXMENUENTRIES = 8;
     private static final Image STATUSLOGO = new Image(
             "file:resources/images/key-color-transparent-background.png");
-    private static final String STATUSWELCOMETEXT = "\u00a9 Copyright 2001 - 2016 Karlsruhe Institute of Technology, Chalmers University of Technology, and Technische Universitaet Darmstadt \n"
-            + "KeY is free Software and comes with ABSOLUTELY NO WARRANTY";
+    private static final String STATUSWELCOMETEXT = KeYConstants.COPYRIGHT
+            + "\nKeY is free Software and comes with ABSOLUTELY NO WARRANTY";
 
     private HashMap<ViewPosition, ViewSlot> viewSlots = new HashMap<>();
     private HashMap<Integer, ViewInformation> allViews = new HashMap<>();
