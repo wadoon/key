@@ -115,7 +115,7 @@ public class SequentViewController extends ViewController
 
         textAreaWebView.setOnMouseMoved(event -> {
             if (sequentLoaded) {
-              
+
                 int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
 
@@ -127,7 +127,7 @@ public class SequentViewController extends ViewController
                             new IdentitySequentPrintFilter(sequent)));
             }
         });
-        
+
         textAreaWebView.setOnMouseExited(event -> {
             if (sequentLoaded) {
                 this.printer.removeMouseHighlighting();
@@ -165,7 +165,7 @@ public class SequentViewController extends ViewController
                 info += ProofSaver.posInOccurrence2Proof(sequent, occ);
                 getContext().getStatusManager().setStatus(info);
             }
-        }  
+        }
     }
 
     @Override
@@ -280,6 +280,8 @@ public class SequentViewController extends ViewController
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
+        
+        printer.setPosTable(abstractSyntaxTree);
         printer.setSequent(sequent);
         printer.setProofString(proofString);
 
@@ -303,11 +305,12 @@ public class SequentViewController extends ViewController
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
             double newHeight = posTranslator.getProofHeight();
+            System.out.println(newHeight);
 
-            // JavaFX has MaxHeight ~8500. If bigger, an error might occur.
-            if (newHeight > 8500) {
+            // JavaFX has MaxHeight ~15000. If bigger, an error might occur.
+            if (newHeight > 15000) {
                 System.out.println("Proof might be too large");
-                textAreaWebView.setPrefHeight(8500);
+                textAreaWebView.setPrefHeight(15000);
             }
             else {
                 textAreaWebView.setPrefHeight(newHeight);
