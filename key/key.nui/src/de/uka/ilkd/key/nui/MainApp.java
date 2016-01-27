@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.nui;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.Preferences;
@@ -45,20 +47,23 @@ public class MainApp extends Application {
         this.primaryStage.getIcons().add(
                 new Image("file:resources/images/key-color-icon-square.png"));
 
-        // TODO: load this from disk
         SessionSettings settings = SessionSettings.loadLastSettings();
-        if (!settings.getIsCorrupted()) {
+        boolean useSettings = settings != null && !settings.getIsCorrupted();
+        if (useSettings) {
             primaryStage.setX(settings.getWindowX());
             primaryStage.setY(settings.getWindowY());
             primaryStage.setWidth(settings.getWindowWidth());
             primaryStage.setHeight(settings.getWindowHeight());
         }
-
         initRootLayout();
-        rootLayoutController.setSplitterPositions(settings.getSplitterPositions());
+
+        if (useSettings)
+            rootLayoutController
+                    .setSplitterPositions(settings.getSplitterPositions());
+
         ctrlPressedHandler();
         closeWindowConfirmHandler();
-        scanForViews();
+        scanForViews(useSettings ? settings.getViews() : new HashMap<>());
         scanForMenus();
         primaryStage.show();
     }
@@ -160,22 +165,33 @@ public class MainApp extends Application {
         settings.setWindowWidth(primaryStage.getWidth());
         settings.setSplitterPositions(
                 rootLayoutController.getSplitterPositions());
+        settings.setViews(rootLayoutController.getViewInformations());
         settings.SaveAsLast();
         System.out.println("Where we go from here is a choice I leave to you.");
         primaryStage.close();
     }
 
-    private void scanForViews() {
+    private void scanForViews(Map<String, String> lastViewPositions) {
         ViewObserver rootViewObserver = new ViewObserver(rootLayoutController);
         Set<Class<?>> annotated = reflections
                 .getTypesAnnotatedWith(KeYView.class);
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
-            ViewInformation info = new ViewInformation(annot.title(),
-                    c.getResource(annot.path()), annot.preferredPosition(),
+
+            //TODO: last closed views should be closed again
+            URL fxmlUrl = c.getResource(annot.path());
+            ViewPosition pos = annot.preferredPosition();
+            boolean wasLastShown = lastViewPositions.containsKey(fxmlUrl.getPath());
+            if (wasLastShown) {
+                pos = Enum.valueOf(ViewPosition.class,
+                        lastViewPositions.get(fxmlUrl.getPath()));
+            }
+            ViewInformation info = new ViewInformation(annot.title(), fxmlUrl, pos,
                     annot.hasMenuItem());
             info.addObserver(rootViewObserver);
             rootLayoutController.registerView(info, annot.accelerator());
+            if (wasLastShown)
+                info.setIsActive(true);
         }
         System.out.println("Views: " + annotated.size());
     }

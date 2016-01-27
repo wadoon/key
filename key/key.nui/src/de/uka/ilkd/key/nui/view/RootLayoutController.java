@@ -470,6 +470,10 @@ public class RootLayoutController extends ViewController
         return Arrays.asList(0.0, 0.0, 0.0, 0.0);
     }
 
+    public List<ViewInformation> getViewInformations(){
+        return new LinkedList<ViewInformation>(allViews.values());
+    }
+    
     public void setSplitterPositions(List<Double> positions) {
     }
 }

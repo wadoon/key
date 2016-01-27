@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.nui.model;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 import com.sun.javafx.stage.ScreenHelper.ScreenAccessor;
@@ -16,10 +18,6 @@ public class SessionSettings {
     private static final int MinWidth = 50;
     private static final int MinHeight = 50;
 
-    public SessionSettings() {
-        views = new LinkedList<>();
-    }
-
     private boolean corrupted = false;
 
     /**
@@ -30,14 +28,19 @@ public class SessionSettings {
         return corrupted;
     }
 
-    private List<ViewInformation> views;
+    private Map<String, String> views = new HashMap<>();
 
-    public List<ViewInformation> getViews() {
+    public Map<String, String> getViews() {
         return views;
     }
 
-    public void setViews(List<ViewInformation> value) {
-        views = value;
+    public void setViews(List<ViewInformation> viewInformations) {
+        views = new HashMap<>();
+        for (ViewInformation view : viewInformations) {
+            if (view.getIsActive())
+                views.put(view.getFxmlPath().getPath(),
+                        view.getCurrentPosition().toString());
+        }
     }
 
     private List<Double> splitterPositions;
@@ -146,22 +149,43 @@ public class SessionSettings {
         prefs.putDouble("splitterLH", splitterPositions.get(1));
         prefs.putDouble("splitterRV", splitterPositions.get(2));
         prefs.putDouble("splitterRH", splitterPositions.get(3));
+        StringBuilder viewsString = new StringBuilder();
+        for (String key : views.keySet()) {
+            viewsString.append(key);
+            viewsString.append(",");
+            viewsString.append(views.get(key));
+            viewsString.append(";");
+        }
+        prefs.put("views", viewsString.toString());
     }
 
     public static SessionSettings loadLastSettings() {
-        SessionSettings settings = new SessionSettings();
-
-        Preferences prefs = Preferences
-                .userNodeForPackage(SessionSettings.class);
-        settings.windowHeight = prefs.getDouble("windowHeight", -1);
-        settings.windowWidth = prefs.getDouble("windowWidth", -1);
-        settings.windowX = prefs.getDouble("windowX", -1);
-        settings.windowY = prefs.getDouble("windowY", -1);
-        settings.splitterPositions = Arrays.asList(prefs.getDouble("splitterLV", -1),
-                prefs.getDouble("splitterLH", -1),
-                prefs.getDouble("splitterRV", -1),
-                prefs.getDouble("splitterRH", -1));
-        settings.CheckBounds();
-        return settings;
+        try {
+            SessionSettings settings = new SessionSettings();
+            Preferences prefs = Preferences
+                    .userNodeForPackage(SessionSettings.class);
+            settings.windowHeight = prefs.getDouble("windowHeight", -1);
+            settings.windowWidth = prefs.getDouble("windowWidth", -1);
+            settings.windowX = prefs.getDouble("windowX", -1);
+            settings.windowY = prefs.getDouble("windowY", -1);
+            settings.splitterPositions = Arrays.asList(
+                    prefs.getDouble("splitterLV", -1),
+                    prefs.getDouble("splitterLH", -1),
+                    prefs.getDouble("splitterRV", -1),
+                    prefs.getDouble("splitterRH", -1));
+            settings.CheckBounds();
+            settings.views = new HashMap<String, String>();
+            for (String vinfostr : prefs.get("views", "").split(";")) {
+                if(vinfostr == null || vinfostr.isEmpty())
+                    continue;
+                String[] vinfo = vinfostr.split(",");
+                settings.views.put(vinfo[0], vinfo[1]);
+            }
+            return settings;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 }
