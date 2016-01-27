@@ -8,13 +8,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.nui.view.DebugViewController;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 
@@ -27,14 +34,17 @@ public class SequentPrinter {
     private String proofString;
     private String css;
     private PositionTable posTable;
-
+    private Sequent sequent;
     private boolean useRegex = false;
 
-    private TreeMap<Integer, String[]> tagsAtIndex;
+    private TreeMap<Integer, String[]> openTagsAtIndex;
+    private TreeMap<Integer, String[]> closeTagsAtIndex;
 
     private Range mouseoverRange;
     private ArrayList<Integer> searchIndices;
     private ArrayList<Integer> filterIndices;
+
+    private static HashMap<Class, String> classMap = new HashMap<>();
 
     private final static String closingTag = "</span>";
 
@@ -44,7 +54,7 @@ public class SequentPrinter {
     private final static String filterCollapsedTagOpen = "<span class=\"collapsed\">";
 
     private enum StylePos {
-        SYNTAX(0), MOUSE(1), SEARCH(2), FILTER(3);
+        SYNTAX(3), MOUSE(0), SEARCH(1), FILTER(2);
 
         private int slotPosition;
 
@@ -65,9 +75,86 @@ public class SequentPrinter {
         }
         this.setPosTable(posTable);
 
-        tagsAtIndex = new TreeMap<Integer, String[]>();
+        openTagsAtIndex = new TreeMap<Integer, String[]>();
         searchIndices = new ArrayList<Integer>();
         filterIndices = new ArrayList<Integer>();
+
+        // If no SequentPrinter has been created yet, the ClassMap is empty.
+        // Fill it!
+        if (classMap.size() == 0) {
+            fillClassMap();
+        }
+
+    }
+
+    /**
+     * fills the classMap with each class name and its styleClass tag
+     */
+    private static void fillClassMap() {
+        classMap.put(de.uka.ilkd.key.logic.op.Equality.class,
+                "<span class=\"equality\">");
+        classMap.put(de.uka.ilkd.key.logic.op.Function.class,
+                "<span class=\"function\">");
+        classMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
+                "<span class=\"locationVar\">");
+        classMap.put(de.uka.ilkd.key.logic.op.Junctor.class,
+                "<span class=\"junctor\">");
+        classMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class,
+                "<span class=\"logicVar\">");
+        classMap.put(de.uka.ilkd.key.logic.op.Quantifier.class,
+                "<span class=\"quantifier\">");
+        classMap.put(de.uka.ilkd.key.logic.op.SortDependingFunction.class,
+                "<span class=\"sortDepFunc\">");
+        classMap.put(de.uka.ilkd.key.logic.op.Modality.class,
+                "<span class=\"modality\">");
+        classMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
+                "<span class=\"observerFunc\">");
+        classMap.put(de.uka.ilkd.key.logic.op.AbstractSortedOperator.class,
+                "<span class=\"abstractSortOp\">");
+        classMap.put(de.uka.ilkd.key.logic.op.AbstractSV.class,
+                "<span class=\"abstractSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.AbstractTermTransformer.class,
+                "<span class=\"abstractTermTransf\">");
+        classMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
+                "<span class=\"elemUpdate\">");
+        classMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class,
+                "<span class=\"formulaSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.IfExThenElse.class,
+                "<span class=\"ifExThenElse\">");
+        classMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class,
+                "<span class=\"ifThenElse\">");
+        classMap.put(de.uka.ilkd.key.logic.op.ModalOperatorSV.class,
+                "<span class=\"modalOpSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramConstant.class,
+                "<span class=\"progConst\">");
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class,
+                "<span class=\"progMeth\">");
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class,
+                "<span class=\"progSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class,
+                "<span class=\"progVar\">");
+        classMap.put(de.uka.ilkd.key.logic.op.SchemaVariableFactory.class,
+                "<span class=\"schemaVarFactory\">");
+        classMap.put(de.uka.ilkd.key.logic.op.SkolemTermSV.class,
+                "<span class=\"skolemTermSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.SubstOp.class,
+                "<span class=\"substOp\">");
+        classMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class,
+                "<span class=\"termLabelSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.TermSV.class,
+                "<span class=\"termSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.Transformer.class,
+                "<span class=\"transformer\">");
+        classMap.put(de.uka.ilkd.key.logic.op.UpdateApplication.class,
+                "<span class=\"updateApp\">");
+        classMap.put(de.uka.ilkd.key.logic.op.UpdateJunctor.class,
+                "<span class=\"updateJunc\">");
+        classMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class,
+                "<span class=\"updateSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class,
+                "<span class=\"varSV\">");
+        classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class,
+                "<span class=\"warySubstOp\">");
     }
 
     /**
@@ -83,11 +170,11 @@ public class SequentPrinter {
 
         String insertTag;
         // Iterate over sorted Map
-        for (int index : tagsAtIndex.keySet()) {
+        for (int index : openTagsAtIndex.keySet()) {
 
             // Insert closeTag "<\span>"
             for (int i = 0; i < StylePos.values().length; i++) {
-                insertTag = tagsAtIndex.get(index)[i];
+                insertTag = openTagsAtIndex.get(index)[i];
                 if (insertTag != null && insertTag.equals(closingTag)) {
                     sb.insert(index + offset, closingTag);
 
@@ -98,7 +185,7 @@ public class SequentPrinter {
 
             // insert openTags "<span class=...>"
             for (int i = 0; i < StylePos.values().length; i++) {
-                insertTag = tagsAtIndex.get(index)[i];
+                insertTag = openTagsAtIndex.get(index)[i];
                 if (insertTag != null && !insertTag.equals(closingTag)) {
                     sb.insert(index + offset, insertTag);
 
@@ -177,19 +264,16 @@ public class SequentPrinter {
         removeFilter();
 
         if (!indicesOfLines.isEmpty()) {
-            // Sort Lines
-            // Collections.sort(indicesOfLines);
             // get line information
             String[] lines = proofString.split("\n");
 
             int styleStart = 0;
             // Pointer at the current entry of the ArrayList
-            int linePointer = 0;
 
             // Iterate over the lines
             for (int i = 0; i < lines.length; i++) {
                 // Compute Endindex of Line
-                int styleEnd = styleStart + lines[i].length()+1;
+                int styleEnd = styleStart + lines[i].length() + 1;
                 // If line is in list apply styles
                 if (indicesOfLines.contains(i) == filter.getInvert()) {
 
@@ -202,15 +286,9 @@ public class SequentPrinter {
                         collapseLine(styleStart, styleEnd);
                         break;
                     }
-                    // Increase Linepointer for the ArrayList entry
-                    linePointer++;
+
                 }
-                // If all the entries have been resolved, return
-//                if (linePointer == indicesOfLines.size()) {
-//                    break;
-//                }
-                // Set the start of the next line to the end of the current
-                // line. Adjust +1 for \n char
+
                 styleStart = styleEnd;
             }
         }
@@ -276,7 +354,7 @@ public class SequentPrinter {
      */
     private TreeMap<Integer, String[]> putTag(int index, StylePos arrayPos,
             String tag) {
-        String[] mapValue = tagsAtIndex.get(index);
+        String[] mapValue = openTagsAtIndex.get(index);
         // If Map Entry already exists
         if (mapValue != null) {
             // If Array entry is null or shall be cleared (filled with empty
@@ -294,11 +372,11 @@ public class SequentPrinter {
         else {
             // If the Map Entry does not exist, create new Entry and call itself
             // again. RECURSION!
-            tagsAtIndex.put(index, new String[StylePos.values().length]);
+            openTagsAtIndex.put(index, new String[StylePos.values().length]);
             putTag(index, arrayPos, tag);
         }
 
-        return tagsAtIndex;
+        return openTagsAtIndex;
     }
 
     /**
@@ -373,7 +451,7 @@ public class SequentPrinter {
                 putTag(index, StylePos.SEARCH, "");
             }
             searchIndices.clear();
-            
+
         }
     }
 
@@ -386,14 +464,10 @@ public class SequentPrinter {
 
         // As a new ProofString means old styling Info is deprecated, Map is
         // cleared.
-        tagsAtIndex.clear();
+        openTagsAtIndex.clear();
 
-        /*
-         * Stub for SyntaxHighlight applySyntaxHighlighting();
-         */
-        //InitialPositionTable test =(InitialPositionTable) posTable;
-        //test.pathForPosition(pio, filter)
-        
+        applySyntaxHighlighting();
+
     }
 
     /**
@@ -404,7 +478,8 @@ public class SequentPrinter {
      * @throws IOException
      */
     private void readCSS(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
         try {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
@@ -429,15 +504,93 @@ public class SequentPrinter {
         this.posTable = posTable;
     }
 
-    // private void applySyntaxHighlighting() {
-    // InitialPositionTable initPos = (InitialPositionTable) posTable;
-    // IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(p_s);
-    // for (int i = 0; i < proofString.length(); i++) {
-    // System.out.println(
-    // initPos.getPosInSequent(i, filter).getPosInOccurrence()
-    // .constrainedFormula().getClass().getName());
-    // }
-    // }
+    /**
+     * puts Syntax Styling Info in tagsAtIndex Map
+     */
+    private void applySyntaxHighlighting() {
+
+        InitialPositionTable initPos = (InitialPositionTable) posTable;
+        IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(
+                sequent);
+
+        Class lastClass = null;
+        int lastIndex = 0;
+        boolean openedTag = false;
+
+        // Iterate over String. Insert Tags according to class.
+        for (int i = 0; i < proofString.length(); i++) {
+            PosInSequent pos = initPos.getPosInSequent(i, filter);
+
+            System.out.println(i + " "+ proofString.charAt(i));
+
+            // Close Tag on Whitespace, if it was opened before
+            if (openedTag && (proofString.charAt(i) == ' '
+                    || proofString.charAt(i) == '\n')) {
+
+                System.out.println("CLOSE WHITESPACE");
+
+                putTag(i, StylePos.SYNTAX, closingTag);
+                openedTag = false;
+                lastClass = null;
+            }
+            // Check if there is a Class in AST for this pos
+            else if (pos != null) {
+                PosInOccurrence oc = pos.getPosInOccurrence();
+                if (oc != null && oc.posInTerm() != null) {
+                    Operator op = oc.subTerm().op();
+
+                    // Open First Tag
+                    if (lastClass == null
+                            && classMap.containsKey(op.getClass())) {
+
+                        System.out.println("OPEN NEW TAG");
+
+                        putTag(i, StylePos.SYNTAX, classMap.get(op.getClass()));
+                        openedTag = true;
+                        lastClass = op.getClass();
+                    }
+
+                    // If Class changed, close the existing Tag, open new one
+                    else if (lastClass != null && lastClass != op.getClass()) {
+
+                        System.out.println("CLOSE TAG");
+
+                        putTag(i, StylePos.SYNTAX, closingTag);
+                        openedTag = false;
+                        if (classMap.containsKey(op.getClass())) {
+
+                            System.out.println("OPEN NEW AFTER CLOSE");
+
+                            putTag(i, StylePos.SYNTAX,
+                                    classMap.get(op.getClass()));
+                            openedTag = true;
+                        }
+                        // Syso to let the user know the AST Class is unknown
+                        else {
+                            System.out.println("");
+                            System.out.println(
+                                    "The following Class does not exist in the ClassDictionary");
+                            System.out.println("EXPRESSION: " + op);
+                            System.out.println("CLASS: " + op.getClass());
+                            System.out.println("");
+                        }
+                        lastClass = op.getClass();
+                    }
+                    lastIndex = i;
+                }
+            }
+            // else {
+            // // putTag(i, StylePos.SYNTAX, closingTag);
+            // lastClass = null;
+            // }
+
+        }
+
+        System.out.println("CLOSE LAST TAG");
+        System.out.println("##################");
+        putTag(lastIndex, StylePos.SYNTAX, closingTag);
+
+    }
 
     /**
      * converts the input String to HTML tagged text
@@ -471,5 +624,9 @@ public class SequentPrinter {
     public void setUseRegex(boolean b) {
         useRegex = b;
 
+    }
+
+    public void setSequent(Sequent sequent) {
+        this.sequent = sequent;
     }
 }

@@ -95,7 +95,7 @@ public class PositionTranslator {
      * @return the number of the underlying line
      */
     private int getLine(double yCoordinate) {
-        double yCoord = yCoordinate - 5;
+        double yCoord = yCoordinate - fontSize/2;
         int result;
 
         Text text = new Text("\\W|QpXgjﬂ&");
@@ -287,7 +287,7 @@ public class PositionTranslator {
      */
 
     public double getProofHeight() { // Adjustment for Margin
-        double result = 5;
+        double result = fontSize;
 
         Text text = new Text(" ");
         text.setFont(new Font(font, fontSize));

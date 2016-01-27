@@ -6,7 +6,7 @@ pre{
 	background-color: yellow;
 }
 .mouseover{
-	background-color: B0C4DE;
+	background-color: #B0C4DE;
 }
 .minimized{
 	font-size: 6px;
@@ -15,14 +15,134 @@ pre{
 	display: none;
 }
 
-.forall{
+.equality{
+	color: red;
+}
+
+.function{
+	color: black;
+}
+.locationVar{
 	color: blue;
 	font-weight: bold;
 }
-.arrow{
-	background-color:red;
+.junctor{
+	color: violet;
+	font-weight: bold;
+	font-style: italic;
 }
-.slashed{
-	color:red;
-	background-color:blue;
+.logicVar{
+	color: #2fedff
+}
+.quantifier{
+	font-weight: bold;
+	color: green;
+}
+.sortDepFunc{
+	color: pink;
+}
+.modality{
+	background: red;
+}
+.observerFunc{
+	background-color: green;
+}
+.abstractSortOp{
+	background-color: blue;
+}
+.abstractSV{
+	background-color: grey;
+	color: white;
+}
+.abstractTermTransf{
+	background-color: pink;
+}
+.elemUpdate{
+	color: yellow;
+	font-weight: bold;
+}
+.formulaSV{
+	color: yellow;
+	background-color: grey;
+}
+.ifExThenElse{
+	background-color: green;
+	color: red;
+	font-weight: bold;
+}
+.ifThenElse{
+	background-color: red;
+	color: green;
+	font-weight: bold;
+}
+.modalOpSV{
+	background-color: blue;
+	color: yellow;
+	font-weight: bold;
+}
+.progConst{
+	background-color: black;
+	color: red;
+	font-weight: bold;
+}
+.progMeth{
+	background-color: black;
+	color: green;
+	font-weight: bold;
+}
+.progSV{
+	background-color: black;
+	color: white;
+	font-weight: bold;
+}
+.progVar{
+	background-color: black;
+	color: #2fedff;
+	font-weight: bold;
+}
+.schemaVarFactory{
+	background-color: #003fff;
+	color: red;
+}
+.skolemTermSV{
+	background-color: #003fff;
+	color: pink;
+	font-weight: bold;
+}
+.substOp{
+	background-color: grey;
+	color: red;
+}
+.termLabelSV{
+	background-color: grey;
+	color: green;
+}
+.termSV{
+	background-color: grey;
+	color: blue;
+}
+.transformer{
+	background-color: grey;
+	color: black;
+}
+.updateApp{
+	background-color: pink;
+}
+.updateJunc{
+	background-color: pink;
+	color: green;
+}
+.updateSV{
+	background-color: pink;
+	color: blue;
+	font-weight: bold;
+}
+.varSV{
+	background-color: violet;
+	color: black;
+}
+.warySubstOp{
+	background-color: #2fedff;
+	color: red;
+	font-style: italic;
 }
