@@ -104,8 +104,8 @@ public class SequentPrinter {
     private static void fillClassMap() {
         classMap.put(de.uka.ilkd.key.logic.op.Equality.class,
                 "<span class=\"equality\">");
-        classMap.put(de.uka.ilkd.key.logic.op.Function.class,
-                "<span class=\"function\">");
+//        classMap.put(de.uka.ilkd.key.logic.op.Function.class,
+//                "<span class=\"function\">");
         classMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
                 "<span class=\"locationVar\">");
         classMap.put(de.uka.ilkd.key.logic.op.Junctor.class,
@@ -599,19 +599,22 @@ public class SequentPrinter {
                             putOpenTag(i, StylePos.SYNTAX,
                                     classMap.get(op.getClass()));
                             keySet.add(i);
-
+                            lastClass = op.getClass();
                             openedTag = true;
                         }
                         // Syso to let the user know the AST Class is unknown
                         else {
-                            System.out.println("");
-                            System.out.println(
-                                    "The following Class does not exist in the ClassDictionary");
-                            System.out.println("EXPRESSION: " + op);
-                            System.out.println("CLASS: " + op.getClass());
-                            System.out.println("");
+                            lastClass = null;
+                            openedTag = false;
                         }
-                        lastClass = op.getClass();
+//                            System.out.println("");
+//                            System.out.println(
+//                                    "The following Class does not exist in the ClassDictionary");
+//                            System.out.println("EXPRESSION: " + op);
+//                            System.out.println("CLASS: " + op.getClass());
+//                            System.out.println("");
+//                        }
+
                     }
                 }
             }
