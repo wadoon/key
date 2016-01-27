@@ -127,6 +127,7 @@ public abstract class LDT implements Named {
         ret.put(HeapLDT.NAME, new HeapLDT(s));
         ret.put(PermissionLDT.NAME, new PermissionLDT(s));
         ret.put(SeqLDT.NAME, new SeqLDT(s));
+        ret.put(OrdLDT.NAME, new OrdLDT(s));
         ret.put(FreeLDT.NAME, new FreeLDT(s));
         ret.put(MapLDT.NAME, new MapLDT(s));
         ret.put(FloatLDT.NAME, new FloatLDT(s));

@@ -2124,7 +2124,7 @@ public class TermBuilder {
   
 
     public Term o_0() {
-        return func(services.getTypeConverter().getOrdLDT().getZero());
+       return func(services.getTypeConverter().getOrdLDT().getZero());
     }
 
     public Term o_1() {
