@@ -1774,12 +1774,15 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 
    |   (ORDOMEGA
       | ORDONE
-        | ORDZERO
-       | ORDADD
+      | ORDZERO
+      | ORDADD
       | ORDTIMES 
-       | ORDEXP
-       | ORDMAX
-       | ONAT
+      | ORDEXP
+      | ORDMAX
+      | ONAT
+      | ORDLESS
+      | ORDLEQ
+      | ORDLIM
         )
         => result = ordinal   
      
@@ -1882,7 +1885,20 @@ ordinal returns [SLExpression ret = null] throws SLTranslationException
     {
       ret = new SLExpression(tb.onat(e1.getTerm()));
    }
+  |  ORDLESS  LPAREN e1=expression COMMA e2=expression RPAREN
+    {
+      ret = new SLExpression(tb.olt(e1.getTerm(), e2.getTerm()));
+    }
+  |  ORDLEQ  LPAREN e1=expression COMMA e2=expression RPAREN
+    {
+      ret = new SLExpression(tb.oleq(e1.getTerm(), e2.getTerm()));
+    }
+   | ORDLIM LPAREN e1=expression RPAREN
+     {
+      ret = new SLExpression(tb.lim(e1.getTerm()));
+      }
 ;
+     
 
 mapExpression returns [Token token = null] :
   ( MAP_GET
