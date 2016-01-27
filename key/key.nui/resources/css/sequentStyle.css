@@ -39,7 +39,8 @@ pre{
 	color: green;
 }
 .sortDepFunc{
-	color: pink;
+	color: black;
+	font-weight: bold;
 }
 .modality{
 	background: red;

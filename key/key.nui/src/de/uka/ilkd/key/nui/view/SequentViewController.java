@@ -280,6 +280,7 @@ public class SequentViewController extends ViewController
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
+        printer.setSequent(sequent);
         printer.setProofString(proofString);
 
         posTranslator.setProofString(proofString);
@@ -299,7 +300,6 @@ public class SequentViewController extends ViewController
         // If-clause added for optimization purposes. Only when the Sequent
         // itself is changed, the WebArea needs to be redrawn, not with every
         // styling update.
-
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
             double newHeight = posTranslator.getProofHeight();

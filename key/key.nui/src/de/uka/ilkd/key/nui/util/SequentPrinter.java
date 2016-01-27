@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,12 +37,18 @@ public class SequentPrinter {
     private Sequent sequent;
     private boolean useRegex = false;
 
-    private TreeMap<Integer, String[]> openTagsAtIndex;
-    private TreeMap<Integer, String[]> closeTagsAtIndex;
+    private TreeSet<Integer> keySet = new TreeSet<Integer>();
+
+    private HashMap<Integer, String[]> openTagsAtIndex;
+    private HashMap<Integer, String[]> closeTagsAtIndex;
+
+    private ArrayList<Integer> lessThenList;
 
     private Range mouseoverRange;
-    private ArrayList<Integer> searchIndices;
-    private ArrayList<Integer> filterIndices;
+    private ArrayList<Integer> searchIndicesOpen;
+    private ArrayList<Integer> searchIndicesClose;
+    private ArrayList<Integer> filterIndicesOpen;
+    private ArrayList<Integer> filterIndicesClose;
 
     private static HashMap<Class, String> classMap = new HashMap<>();
 
@@ -75,9 +81,14 @@ public class SequentPrinter {
         }
         this.setPosTable(posTable);
 
-        openTagsAtIndex = new TreeMap<Integer, String[]>();
-        searchIndices = new ArrayList<Integer>();
-        filterIndices = new ArrayList<Integer>();
+        openTagsAtIndex = new HashMap<Integer, String[]>();
+        closeTagsAtIndex = new HashMap<Integer, String[]>();
+
+        lessThenList = new ArrayList<Integer>();
+        searchIndicesOpen = new ArrayList<Integer>();
+        searchIndicesClose = new ArrayList<Integer>();
+        filterIndicesOpen = new ArrayList<Integer>();
+        filterIndicesClose = new ArrayList<Integer>();
 
         // If no SequentPrinter has been created yet, the ClassMap is empty.
         // Fill it!
@@ -169,72 +180,43 @@ public class SequentPrinter {
         StringBuilder sb = new StringBuilder(proofString);
 
         String insertTag;
-        // Iterate over sorted Map
-        for (int index : openTagsAtIndex.keySet()) {
 
-            // Insert closeTag "<\span>"
-            for (int i = 0; i < StylePos.values().length; i++) {
-                insertTag = openTagsAtIndex.get(index)[i];
-                if (insertTag != null && insertTag.equals(closingTag)) {
-                    sb.insert(index + offset, closingTag);
-
-                    // Adjust Offset for following insertions
-                    offset += closingTag.length();
+        for (Integer i : keySet) {
+            // Apply Close Tags first
+            if (closeTagsAtIndex.containsKey(i)) {
+                for (int j = 0; j < StylePos.values().length; j++) {
+                    insertTag = closeTagsAtIndex.get(i)[j];
+                    if (insertTag != null) {
+                        sb.insert(i + offset, insertTag);
+                        offset += insertTag.length();
+                    }
                 }
             }
-
-            // insert openTags "<span class=...>"
-            for (int i = 0; i < StylePos.values().length; i++) {
-                insertTag = openTagsAtIndex.get(index)[i];
-                if (insertTag != null && !insertTag.equals(closingTag)) {
-                    sb.insert(index + offset, insertTag);
-
-                    // Adjust Offset
-                    offset += insertTag.length();
+            // Apply OpenTags
+            if (openTagsAtIndex.containsKey(i)) {
+                for (int j = 0; j < StylePos.values().length; j++) {
+                    insertTag = openTagsAtIndex.get(i)[j];
+                    if (insertTag != null) {
+                        sb.insert(i + offset, insertTag);
+                        offset += insertTag.length();
+                    }
                 }
+            }
+            // HTML Formatting
+            if (lessThenList.contains(i)) {
+                sb.replace(i + offset, i + offset + 1, "&lt;");
+                offset += 3;
+            }
 
+            // Clean KeySet
+            if (!closeTagsAtIndex.containsKey(i)
+                    && !openTagsAtIndex.containsKey(i)
+                    && !lessThenList.contains(i)) {
+                keySet.remove(i);
             }
         }
-
-        // Apply HTML formatting and return
-        DebugViewController.printOnCurrent(encodeLessThan(sb.toString()));
-        return toHTML(encodeLessThan(sb.toString()));
-    }
-
-    /**
-     * replaces all "<" signs of the orig. proofString with "&lt;". This avoids
-     * HTML Tag misinterpretation. "<" Signs from the HTML tags used for styling
-     * are not affected.
-     * 
-     * @param string
-     *            The String in which the < signs shall be replaced
-     * @return a cleaned up string.
-     */
-    private String encodeLessThan(String string) {
-
-        String[] strings = string.split("<");
-        StringBuilder stringBuilder = new StringBuilder();
-
-        // Iterate to i < Length-1, as last String[] part has no following "<"
-        // sign.
-        for (int i = 0; i < strings.length - 1; i++) {
-            stringBuilder.append(strings[i]);
-
-            // Append "<" or "&lt;" depending on the beginning of the following
-            // String[] part
-            if (strings[i + 1].startsWith("span ")
-                    || strings[i + 1].startsWith("/span")) {
-                stringBuilder.append("<");
-            }
-            else {
-                stringBuilder.append("&lt;");
-            }
-
-        }
-        // Append last String[]
-        stringBuilder.append(strings[strings.length - 1]);
-
-        return stringBuilder.toString();
+        DebugViewController.printOnCurrent(sb.toString());
+        return toHTML(sb.toString());
     }
 
     /**
@@ -246,8 +228,12 @@ public class SequentPrinter {
      */
     public void applyMouseHighlighting(Range range) {
         removeMouseHighlighting();
-        putTag(range.start(), StylePos.MOUSE, mouseTagOpen);
-        putTag(range.end(), StylePos.MOUSE, closingTag);
+
+        keySet.add(range.start());
+        keySet.add(range.end());
+
+        putOpenTag(range.start(), StylePos.MOUSE, mouseTagOpen);
+        putCloseTag(range.end(), StylePos.MOUSE, closingTag);
         mouseoverRange = range;
     }
 
@@ -274,9 +260,9 @@ public class SequentPrinter {
             for (int i = 0; i < lines.length; i++) {
                 // Compute Endindex of Line
                 int styleEnd = styleStart + lines[i].length() + 1;
+
                 // If line is in list apply styles
                 if (indicesOfLines.contains(i) == filter.getInvert()) {
-
                     switch (filter.getFilterMode()) {
                     case Minimize:
                         minimizeLine(styleStart, styleEnd);
@@ -286,12 +272,12 @@ public class SequentPrinter {
                         collapseLine(styleStart, styleEnd);
                         break;
                     }
-
                 }
-
                 styleStart = styleEnd;
             }
         }
+        keySet.addAll(filterIndicesOpen);
+        keySet.addAll(filterIndicesClose);
     }
 
     /**
@@ -303,11 +289,11 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void collapseLine(int lineStart, int lineEnd) {
-        putTag(lineStart, StylePos.FILTER, filterCollapsedTagOpen);
-        putTag(lineEnd, StylePos.FILTER, closingTag);
+        putOpenTag(lineStart, StylePos.FILTER, filterCollapsedTagOpen);
+        putCloseTag(lineEnd, StylePos.FILTER, closingTag);
 
-        filterIndices.add(lineStart);
-        filterIndices.add(lineEnd);
+        filterIndicesOpen.add(lineStart);
+        filterIndicesClose.add(lineEnd);
     }
 
     /**
@@ -319,40 +305,35 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void minimizeLine(int lineStart, int lineEnd) {
-        putTag(lineStart, StylePos.FILTER, filterMinimizeTagOpen);
-        putTag(lineEnd, StylePos.FILTER, closingTag);
+        putOpenTag(lineStart, StylePos.FILTER, filterMinimizeTagOpen);
+        putCloseTag(lineEnd, StylePos.FILTER, closingTag);
 
-        filterIndices.add(lineStart);
-        filterIndices.add(lineEnd);
+        filterIndicesOpen.add(lineStart);
+        filterIndicesClose.add(lineEnd);
     }
 
     /**
      * removes all the applied Styling by the filter functions
      */
     private void removeFilter() {
-        if (filterIndices != null) {
-            for (Iterator<Integer> iterator = filterIndices.iterator(); iterator
-                    .hasNext();) {
+        if (filterIndicesOpen != null) {
+            for (Iterator<Integer> iterator = filterIndicesOpen
+                    .iterator(); iterator.hasNext();) {
                 int index = (int) iterator.next();
-                putTag(index, StylePos.FILTER, "");
+                putOpenTag(index, StylePos.FILTER, "");
             }
-            filterIndices.clear();
+            for (Iterator<Integer> iterator = filterIndicesClose
+                    .iterator(); iterator.hasNext();) {
+                int index = (int) iterator.next();
+                putCloseTag(index, StylePos.FILTER, "");
+            }
+
+            filterIndicesOpen.clear();
+            filterIndicesClose.clear();
         }
     }
 
-    /**
-     * inserts the given Tags at the specified position in the TreeMap. This
-     * TreeMap is used to define the stylingTag positions
-     * 
-     * @param index
-     *            index position for the style Tag
-     * @param arrayPos
-     *            the arrayPosition. Should correspond to a priority value.
-     * @param tag
-     *            the HTML tag to be inserted.
-     * @return the TreeMap with the new HashMap.
-     */
-    private TreeMap<Integer, String[]> putTag(int index, StylePos arrayPos,
+    private HashMap<Integer, String[]> putOpenTag(int index, StylePos arrayPos,
             String tag) {
         String[] mapValue = openTagsAtIndex.get(index);
         // If Map Entry already exists
@@ -373,10 +354,37 @@ public class SequentPrinter {
             // If the Map Entry does not exist, create new Entry and call itself
             // again. RECURSION!
             openTagsAtIndex.put(index, new String[StylePos.values().length]);
-            putTag(index, arrayPos, tag);
+            putOpenTag(index, arrayPos, tag);
         }
 
         return openTagsAtIndex;
+    }
+
+    private HashMap<Integer, String[]> putCloseTag(int index, StylePos arrayPos,
+            String tag) {
+        String[] mapValue = closeTagsAtIndex.get(index);
+        // If Map Entry already exists
+        if (mapValue != null) {
+            // If Array entry is null or shall be cleared (filled with empty
+            // String), fill the array
+            if (mapValue[arrayPos.slotPosition] == null || tag.isEmpty()) {
+                mapValue[arrayPos.slotPosition] = tag;
+            }
+            else {
+                // If the Array entry is not null, the tag can be appended.
+                // Solves the problem with double consecutive chars
+                // ("wellformed")
+                mapValue[arrayPos.slotPosition] += tag;
+            }
+        }
+        else {
+            // If the Map Entry does not exist, create new Entry and call itself
+            // again. RECURSION!
+            closeTagsAtIndex.put(index, new String[StylePos.values().length]);
+            putCloseTag(index, arrayPos, tag);
+        }
+
+        return closeTagsAtIndex;
     }
 
     /**
@@ -384,8 +392,12 @@ public class SequentPrinter {
      */
     public void removeMouseHighlighting() {
         if (mouseoverRange != null) {
-            putTag(mouseoverRange.start(), StylePos.MOUSE, "");
-            putTag(mouseoverRange.end(), StylePos.MOUSE, "");
+
+            // keySet.remove(mouseoverRange.start());
+            // keySet.remove(mouseoverRange.end());
+
+            putOpenTag(mouseoverRange.start(), StylePos.MOUSE, "");
+            putCloseTag(mouseoverRange.end(), StylePos.MOUSE, "");
         }
     }
 
@@ -410,12 +422,12 @@ public class SequentPrinter {
                     while (matcher.find()) {
 
                         // Check all occurrences
-                        putTag(matcher.start(), StylePos.SEARCH,
+                        putOpenTag(matcher.start(), StylePos.SEARCH,
                                 highlightedTagOpen);
-                        putTag(matcher.end(), StylePos.SEARCH, closingTag);
+                        putCloseTag(matcher.end(), StylePos.SEARCH, closingTag);
 
-                        searchIndices.add(matcher.start());
-                        searchIndices.add(matcher.end());
+                        searchIndicesOpen.add(matcher.start());
+                        searchIndicesClose.add(matcher.end());
                     }
                 }
                 catch (RuntimeException e) {
@@ -428,15 +440,18 @@ public class SequentPrinter {
                 // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
-                    putTag(i, StylePos.SEARCH, highlightedTagOpen);
-                    putTag(i + searchString.length(), StylePos.SEARCH,
+                    putOpenTag(i, StylePos.SEARCH, highlightedTagOpen);
+                    putCloseTag(i + searchString.length(), StylePos.SEARCH,
                             closingTag);
 
-                    searchIndices.add(i);
-                    searchIndices.add(i + searchString.length());
+                    searchIndicesOpen.add(i);
+                    searchIndicesClose.add(i + searchString.length());
                 }
             }
         }
+
+        keySet.addAll(searchIndicesOpen);
+        keySet.addAll(searchIndicesClose);
     }
 
     /**
@@ -444,13 +459,23 @@ public class SequentPrinter {
      * remove references in Styling TreeMap
      */
     private void removeSearchIndices() {
-        if (searchIndices != null) {
-            for (Iterator<Integer> iterator = searchIndices.iterator(); iterator
-                    .hasNext();) {
+        if (searchIndicesOpen != null) {
+            for (Iterator<Integer> iterator = searchIndicesOpen
+                    .iterator(); iterator.hasNext();) {
                 int index = (int) iterator.next();
-                putTag(index, StylePos.SEARCH, "");
+                putOpenTag(index, StylePos.SEARCH, "");
             }
-            searchIndices.clear();
+            for (Iterator<Integer> iterator = searchIndicesClose
+                    .iterator(); iterator.hasNext();) {
+                int index = (int) iterator.next();
+                putCloseTag(index, StylePos.SEARCH, "");
+            }
+
+            // keySet.removeAll(filterIndicesOpen);
+            // keySet.removeAll(filterIndicesClose);
+
+            searchIndicesOpen.clear();
+            searchIndicesClose.clear();
 
         }
     }
@@ -465,9 +490,21 @@ public class SequentPrinter {
         // As a new ProofString means old styling Info is deprecated, Map is
         // cleared.
         openTagsAtIndex.clear();
+        closeTagsAtIndex.clear();
+        keySet.clear();
 
+        setLessThenIndices(proofString);
         applySyntaxHighlighting();
 
+    }
+
+    private void setLessThenIndices(String string) {
+        // Find indices of all matches. Put in Map. Put in ArrayList for
+        // removal
+        for (int i = -1; (i = proofString.indexOf("<", i + 1)) != -1;) {
+            lessThenList.add(i);
+            keySet.add(i);
+        }
     }
 
     /**
@@ -514,24 +551,22 @@ public class SequentPrinter {
                 sequent);
 
         Class lastClass = null;
-        int lastIndex = 0;
         boolean openedTag = false;
 
         // Iterate over String. Insert Tags according to class.
         for (int i = 0; i < proofString.length(); i++) {
             PosInSequent pos = initPos.getPosInSequent(i, filter);
 
-            System.out.println(i + " "+ proofString.charAt(i));
-
             // Close Tag on Whitespace, if it was opened before
-            if (openedTag && (proofString.charAt(i) == ' '
+            if ((proofString.charAt(i) == ' '
                     || proofString.charAt(i) == '\n')) {
+                if (openedTag) {
+                    putCloseTag(i, StylePos.SYNTAX, closingTag);
+                    keySet.add(i);
 
-                System.out.println("CLOSE WHITESPACE");
-
-                putTag(i, StylePos.SYNTAX, closingTag);
-                openedTag = false;
-                lastClass = null;
+                    openedTag = false;
+                    lastClass = null;
+                }else continue;
             }
             // Check if there is a Class in AST for this pos
             else if (pos != null) {
@@ -543,9 +578,10 @@ public class SequentPrinter {
                     if (lastClass == null
                             && classMap.containsKey(op.getClass())) {
 
-                        System.out.println("OPEN NEW TAG");
+                        putOpenTag(i, StylePos.SYNTAX,
+                                classMap.get(op.getClass()));
+                        keySet.add(i);
 
-                        putTag(i, StylePos.SYNTAX, classMap.get(op.getClass()));
                         openedTag = true;
                         lastClass = op.getClass();
                     }
@@ -553,16 +589,16 @@ public class SequentPrinter {
                     // If Class changed, close the existing Tag, open new one
                     else if (lastClass != null && lastClass != op.getClass()) {
 
-                        System.out.println("CLOSE TAG");
+                        putCloseTag(i, StylePos.SYNTAX, closingTag);
+                        keySet.add(i);
 
-                        putTag(i, StylePos.SYNTAX, closingTag);
                         openedTag = false;
                         if (classMap.containsKey(op.getClass())) {
 
-                            System.out.println("OPEN NEW AFTER CLOSE");
-
-                            putTag(i, StylePos.SYNTAX,
+                            putOpenTag(i, StylePos.SYNTAX,
                                     classMap.get(op.getClass()));
+                            keySet.add(i);
+
                             openedTag = true;
                         }
                         // Syso to let the user know the AST Class is unknown
@@ -576,20 +612,9 @@ public class SequentPrinter {
                         }
                         lastClass = op.getClass();
                     }
-                    lastIndex = i;
                 }
             }
-            // else {
-            // // putTag(i, StylePos.SYNTAX, closingTag);
-            // lastClass = null;
-            // }
-
         }
-
-        System.out.println("CLOSE LAST TAG");
-        System.out.println("##################");
-        putTag(lastIndex, StylePos.SYNTAX, closingTag);
-
     }
 
     /**
