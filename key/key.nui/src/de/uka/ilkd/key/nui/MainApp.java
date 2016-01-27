@@ -16,6 +16,8 @@ import de.uka.ilkd.key.nui.model.SessionSettings;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -42,7 +44,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("KeY Project");
+        this.primaryStage.setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
 
         // Set the application icon.
         this.primaryStage.getIcons().add(

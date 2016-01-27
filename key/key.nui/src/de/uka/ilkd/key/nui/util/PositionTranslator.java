@@ -71,7 +71,7 @@ public class PositionTranslator {
         int line = getLine(event.getY());
 
         // If valid Line
-        if (line != -1) {
+        if (line != -1 && line < strings.length) {
             // Get Position of the Char under MousePointer in this specific Line
             int charPosInLine = getCharIdxInLine(event.getX(), line);
 
@@ -158,6 +158,7 @@ public class PositionTranslator {
         }
 
         // For each char check width
+        
         for (char c : strings[line].toCharArray()) {
             text.setText(String.valueOf(c));
             xCoord -= text.getLayoutBounds().getWidth();
@@ -263,7 +264,6 @@ public class PositionTranslator {
      */
     public void applyFilter(PrintFilter filter) {
         filteredLines = SequentFilterer.applyFilter(proofString, filter);
-        // XXX
         switch (filter.getFilterMode()) {
         case Minimize:
             filterCollapsed = false;
@@ -294,7 +294,7 @@ public class PositionTranslator {
 
         // Iterate over all lines to sum up Height
         for (int i = 0; i < strings.length; i++) {
-            result += Math.ceil(text.getLayoutBounds().getHeight());
+            result += Math.round(text.getLayoutBounds().getHeight());
         }
         return result;
     }
