@@ -95,7 +95,7 @@ public class PositionTranslator {
      * @return the number of the underlying line
      */
     private int getLine(double yCoordinate) {
-        double yCoord = yCoordinate - fontSize/2;
+        double yCoord = yCoordinate - fontSize * 2 / 3;
         int result;
 
         Text text = new Text("\\W|QpXgjﬂ&");
@@ -118,7 +118,7 @@ public class PositionTranslator {
                     text.setFont(new Font(font, fontSize));
                 }
             }
-            yCoord -= text.getLayoutBounds().getHeight();
+            yCoord -= Math.round(text.getLayoutBounds().getHeight());
 
             if (yCoord < 0) {
                 break;
@@ -128,7 +128,6 @@ public class PositionTranslator {
         if (yCoord > 0) {
             return -1;
         }
-
         return result;
     }
 
@@ -206,7 +205,8 @@ public class PositionTranslator {
      * @throws IOException
      */
     private void readCSS(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
         try {
             String line = br.readLine();
 
@@ -294,7 +294,7 @@ public class PositionTranslator {
 
         // Iterate over all lines to sum up Height
         for (int i = 0; i < strings.length; i++) {
-            result += text.getLayoutBounds().getHeight();
+            result += Math.ceil(text.getLayoutBounds().getHeight());
         }
         return result;
     }
