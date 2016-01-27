@@ -280,6 +280,8 @@ public class SequentViewController extends ViewController
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
+        
+        printer.setPosTable(abstractSyntaxTree);
         printer.setSequent(sequent);
         printer.setProofString(proofString);
 

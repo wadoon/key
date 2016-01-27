@@ -489,6 +489,7 @@ public class SequentPrinter {
 
         // As a new ProofString means old styling Info is deprecated, Map is
         // cleared.
+        lessThenList.clear();
         openTagsAtIndex.clear();
         closeTagsAtIndex.clear();
         keySet.clear();
