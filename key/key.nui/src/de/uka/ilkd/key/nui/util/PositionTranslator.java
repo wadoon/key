@@ -264,7 +264,6 @@ public class PositionTranslator {
      */
     public void applyFilter(PrintFilter filter) {
         filteredLines = SequentFilterer.applyFilter(proofString, filter);
-        // XXX
         switch (filter.getFilterMode()) {
         case Minimize:
             filterCollapsed = false;
@@ -295,7 +294,7 @@ public class PositionTranslator {
 
         // Iterate over all lines to sum up Height
         for (int i = 0; i < strings.length; i++) {
-            result += Math.ceil(text.getLayoutBounds().getHeight());
+            result += Math.round(text.getLayoutBounds().getHeight());
         }
         return result;
     }
