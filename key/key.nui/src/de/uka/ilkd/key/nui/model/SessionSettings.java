@@ -9,6 +9,7 @@ import java.util.prefs.Preferences;
 
 import com.sun.javafx.stage.ScreenHelper.ScreenAccessor;
 
+import de.uka.ilkd.key.nui.util.SerializableViewInformation;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
@@ -28,18 +29,16 @@ public class SessionSettings {
         return corrupted;
     }
 
-    private Map<String, String> views = new HashMap<>();
+    private List<SerializableViewInformation> views = new LinkedList<>();
 
-    public Map<String, String> getViews() {
+    public List<SerializableViewInformation> getViews() {
         return views;
     }
 
     public void setViews(List<ViewInformation> viewInformations) {
-        views = new HashMap<>();
+        views = new LinkedList<>();
         for (ViewInformation view : viewInformations) {
-            if (view.getIsActive())
-                views.put(view.getFxmlPath().getPath(),
-                        view.getCurrentPosition().toString());
+                views.add(new SerializableViewInformation(view));
         }
     }
 
@@ -149,14 +148,9 @@ public class SessionSettings {
         prefs.putDouble("splitterLH", splitterPositions.get(1));
         prefs.putDouble("splitterRV", splitterPositions.get(2));
         prefs.putDouble("splitterRH", splitterPositions.get(3));
-        StringBuilder viewsString = new StringBuilder();
-        for (String key : views.keySet()) {
-            viewsString.append(key);
-            viewsString.append(",");
-            viewsString.append(views.get(key));
-            viewsString.append(";");
-        }
-        prefs.put("views", viewsString.toString());
+        StringBuilder viewBuilder = new StringBuilder();
+        views.forEach(sv -> viewBuilder.append(sv.getSerialized() + ";"));
+        prefs.put("views", viewBuilder.toString());
     }
 
     public static SessionSettings loadLastSettings() {
@@ -174,12 +168,11 @@ public class SessionSettings {
                     prefs.getDouble("splitterRV", -1),
                     prefs.getDouble("splitterRH", -1));
             settings.CheckBounds();
-            settings.views = new HashMap<String, String>();
+            settings.views = new LinkedList<>();
             for (String vinfostr : prefs.get("views", "").split(";")) {
-                if(vinfostr == null || vinfostr.isEmpty())
+                if (vinfostr == null || vinfostr.isEmpty())
                     continue;
-                String[] vinfo = vinfostr.split(",");
-                settings.views.put(vinfo[0], vinfo[1]);
+                settings.views.add(new SerializableViewInformation(vinfostr));
             }
             return settings;
         }
