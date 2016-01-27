@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.nui.view;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -14,13 +15,16 @@ import de.uka.ilkd.key.nui.model.IProofListener;
 import de.uka.ilkd.key.nui.util.IAcceptSequentFilter;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -57,12 +61,12 @@ public class SequentViewController extends ViewController
         Platform.runLater(() -> {
             showSequent(getContext().getProofManager().getMediator()
                     .getSelectedNode());
-            tacletInfoVC.showTacletInfo(getContext().getProofManager().getMediator()
-                    .getSelectedNode());
+            tacletInfoVC.showTacletInfo(getContext().getProofManager()
+                    .getMediator().getSelectedNode());
         });
     };
     private PositionTranslator posTranslator;
-    
+
     @FXML
     private TitledPane sequentOptions;
     @FXML
@@ -84,8 +88,8 @@ public class SequentViewController extends ViewController
      * The constructor. The constructor is called before the initialize()
      * method.
      */
-    public SequentViewController(){
-        
+    public SequentViewController() {
+
     }
 
     @Override
@@ -93,34 +97,42 @@ public class SequentViewController extends ViewController
         initializeSearchBox();
         tacletInfo.setDisable(true);
         tacletInfo.setExpanded(false);
-        
+
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
-        sequentOptions.expandedProperty().addListener((observable, oldValue, newValue) -> {
-            if (sequentOptions.isExpanded()) {
-                sequentOptions.setText("Less Options");
-            } else {
-                sequentOptions.setText("More Options");
-            }
-        });
-        
+        sequentOptions.expandedProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    if (sequentOptions.isExpanded()) {
+                        sequentOptions.setText("Less Options");
+                    }
+                    else {
+                        sequentOptions.setText("More Options");
+                    }
+                });
+
         posTranslator = new PositionTranslator(
                 "resources/css/sequentStyle.css");
 
         textAreaWebView.setOnMouseMoved(event -> {
             if (sequentLoaded) {
-
+              
                 int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
 
                 this.printer.applyMouseHighlighting(range);
                 this.updateView();
+
+                if (event.isAltDown())
+                    showTermInfo(abstractSyntaxTree.getPosInSequent(pos,
+                            new IdentitySequentPrintFilter(sequent)));
             }
         });
+        
         textAreaWebView.setOnMouseExited(event -> {
             if (sequentLoaded) {
                 this.printer.removeMouseHighlighting();
                 this.updateView();
+                getContext().getStatusManager().clearStatus();
             }
         });
 
@@ -135,13 +147,35 @@ public class SequentViewController extends ViewController
 
     }
 
+    private void showTermInfo(PosInSequent pos) {
+        String info = null;
+        Term t;
+        if (pos != null) {
+            PosInOccurrence occ = pos.getPosInOccurrence();
+            if (occ != null) {
+                t = occ.subTerm();
+                String tOpClassString = t.op().getClass().toString();
+                String operator = tOpClassString
+                        .substring(tOpClassString.lastIndexOf('.') + 1);
+                // The hash code is displayed here since sometimes terms with
+                // equal string representation are still different.
+                info = operator + ", Sort: " + t.sort() + ", Hash: "
+                        + t.hashCode();
+
+                info += ProofSaver.posInOccurrence2Proof(sequent, occ);
+                getContext().getStatusManager().setStatus(info);
+            }
+        }  
+    }
+
     @Override
     public void initializeAfterLoadingFxml() {
         getContext().getProofManager().addProofListener(proofChangeListener);
         // XXX see FilterView
         getContext().registerFilterConsumer(this);
-        
-        Pair <Object, ViewController> p = loadFxmlViewController(getClass().getResource("TacletInfoView.fxml"));
+
+        Pair<Object, ViewController> p = loadFxmlViewController(
+                getClass().getResource("TacletInfoView.fxml"));
         tacletInfoVC = (TacletInfoViewController) p.getValue();
         tacletInfo.setContent((javafx.scene.Node) p.getKey());
     }
@@ -159,8 +193,7 @@ public class SequentViewController extends ViewController
                         searchBox.setText(searchBoxLabel);
                 });
 
-        searchBox.setOnKeyReleased((event) -> {
-            // printer.setFreeTextSearch(searchBox.getText());
+        searchBox.setOnKeyReleased(event -> {
             printer.applyFreetextSearch(searchBox.getText());
             updateView();
             event.consume();
@@ -184,11 +217,10 @@ public class SequentViewController extends ViewController
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         printer = new SequentPrinter("resources/css/sequentStyle.css",
                 abstractSyntaxTree);
-        printer.setSequent(sequent);
         sequentChanged = true;
 
         printSequent();
-        
+
         sequentOptions.setDisable(false);
         tacletInfo.setDisable(false);
     }
@@ -258,36 +290,12 @@ public class SequentViewController extends ViewController
 
     private void updateHtml(String s) {
         webEngine = textAreaWebView.getEngine();
-
-        // The following code prints the org.w3c.document into the console.
-        // TODO remove if not needed.
-        /*
-         * webEngine.getLoadWorker().stateProperty().addListener( new
-         * ChangeListener<State>() { public void changed(ObservableValue ov,
-         * State oldState, State newState) { if (newState ==
-         * Worker.State.SUCCEEDED) { Document doc = webEngine.getDocument(); try
-         * { Transformer transformer =
-         * TransformerFactory.newInstance().newTransformer();
-         * transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-         * transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-         * transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-         * transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-         * transformer.setOutputProperty(
-         * "{http://xml.apache.org/xslt}indent-amount", "4");
-         * 
-         * transformer.transform(new DOMSource(doc), new StreamResult(new
-         * OutputStreamWriter(System.out, "UTF-8"))); } catch (Exception ex) {
-         * ex.printStackTrace(); } } } });
-         */
-        // int h = (int) webEngine.executeScript("document.body.scrollTop");
         webEngine.loadContent(s);
-
-        // webEngine.executeScript("window.scrollTo(" + 0 + ", " + h + ")");
     }
 
     private void updateView() {
         // Redraw WebArea to use optimal Height. Called here as PosTranslater
-        // needs to now the ProofString.
+        // needs to know the ProofString.
         // If-clause added for optimization purposes. Only when the Sequent
         // itself is changed, the WebArea needs to be redrawn, not with every
         // styling update.
@@ -309,7 +317,7 @@ public class SequentViewController extends ViewController
 
         updateHtml(this.printer.printProofString());
     }
-    
+
     @Override
     public void apply(PrintFilter filter) {
         printer.applyFilter(filter);
