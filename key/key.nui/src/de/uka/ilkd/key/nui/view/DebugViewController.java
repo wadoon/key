@@ -27,6 +27,7 @@ public class DebugViewController extends ViewController {
     private static DebugViewController debugViewController;
 
     public static void printOnCurrent(String str) {
+        //TODO: remove hardcoded reference -> exceptions if DebugView is closed
         debugViewController.print(str);
     }
 }
