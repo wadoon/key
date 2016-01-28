@@ -111,7 +111,7 @@ public class JavaProfile extends AbstractProfile {
 
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
-        set = set.add(DEFAULT);
+        set = set.add(new JavaCardDLStrategy.Factory());
         return set;
     }
 
