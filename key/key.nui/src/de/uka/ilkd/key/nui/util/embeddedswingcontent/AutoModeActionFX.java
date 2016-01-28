@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.model;
+package de.uka.ilkd.key.nui.util.embeddedswingcontent;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -17,6 +17,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.nui.model.Context;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -24,9 +26,13 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 
+/**
+ * Copied mostly from old GUI. Adjusted to use the {@link KeYMediator} of the new GUI.
+ * @author Nils Muzzulini
+ * 
+ * @see AutoModeAction
+ */
 public final class AutoModeActionFX extends AbstractAction {
-    private KeYMediator mediator;
-    private Context context;
 
     private static final KeyStroke START_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
     private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
@@ -38,6 +44,8 @@ public final class AutoModeActionFX extends AbstractAction {
     final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
 
     private Proof associatedProof;
+    private KeYMediator mediator;
+    private Context context;
 
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 
@@ -59,19 +67,15 @@ public final class AutoModeActionFX extends AbstractAction {
             // Check for a closed goal ...
             if ((newGoals.size() == 0) && (!p.closed())) {
                 // No new goals have been generated ...
-                /*
-                 * context.getStatusManager().setStatus("1 goal closed, " +
-                 * p.openGoals().size() + " remaining");
-                 */
+                context.getStatusManager().setStatus("1 goal closed, " +
+                p.openGoals().size() + " remaining");
             }
         }
     };
 
     public AutoModeActionFX(Context context) {
-        assert context != null;
         this.context = context;
         this.mediator = context.getProofManager().getMediator();
-        System.out.println(mediator);
         associatedProof = mediator.getSelectedProof();
         putValue("hideActionText", Boolean.TRUE);
         putValue(NAME, getStartCommand());

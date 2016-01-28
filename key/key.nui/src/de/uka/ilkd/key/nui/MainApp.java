@@ -2,12 +2,9 @@ package de.uka.ilkd.key.nui;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.prefs.Preferences;
 
 import org.reflections.Reflections;
 
@@ -16,7 +13,6 @@ import de.uka.ilkd.key.nui.model.SessionSettings;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
-import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

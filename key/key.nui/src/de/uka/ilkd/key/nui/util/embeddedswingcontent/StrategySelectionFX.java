@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.model;
+package de.uka.ilkd.key.nui.util.embeddedswingcontent;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -35,7 +35,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MaxRuleAppSlider;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;

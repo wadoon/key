@@ -30,6 +30,7 @@ public abstract class ViewController implements Initializable {
         return pair;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T loadFxmlFromContext(URL path) {
         return (T) loadFxmlViewController(path).getKey();
     }

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -24,6 +25,11 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
 /**
  * provides functionallity of UserInterface logic for the KeYMediator
@@ -143,7 +149,21 @@ public class MediatorUserInterface
 
     @Override
     public void notify(NotificationEvent event) {
-        // TODO Auto-generated method stub
+        if (event instanceof ProofClosedNotificationEvent) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Proof closed");
+                alert.setHeaderText("Proved.");
+                alert.setContentText("Statistics:");
+                // Get the Stage.
+                Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+
+                // Add a custom icon.
+                stage.getIcons().add(
+                        new Image("file:resources/images/key-color-icon-square.png"));
+                alert.show();
+            });
+        }
 
     }
 
