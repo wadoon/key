@@ -138,7 +138,7 @@ public class MainApp extends Application {
                 event.consume();
             }
             else {
-                primaryStage.close();
+                saveAndClose();
             }
         });
     }
@@ -162,6 +162,10 @@ public class MainApp extends Application {
         if (result.get() != ButtonType.OK)
             return;
 
+        saveAndClose();
+    }
+    
+    private void saveAndClose() {
         SessionSettings settings = new SessionSettings();
         settings.setWindowX(primaryStage.getX());
         settings.setWindowY(primaryStage.getY());
