@@ -51,6 +51,7 @@ public class SequentPrinter {
     private ArrayList<Integer> filterIndicesClose;
 
     private static HashMap<Class, String> classMap = new HashMap<>();
+    private static HashMap<Class, Boolean> classEnabledMap = new HashMap<>();
 
     private final static String closingTag = "</span>";
 
@@ -102,10 +103,60 @@ public class SequentPrinter {
      * fills the classMap with each class name and its styleClass tag
      */
     private static void fillClassMap() {
+        if (classEnabledMap.size() > 0 && classMap.size() > 0) {
+            return;
+        }
+        //Defines if this AST Class shall be highlighted
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.Equality.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.Function.class, false);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
+                true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.Junctor.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.Quantifier.class, true);
+        classEnabledMap.put(
+                de.uka.ilkd.key.logic.op.SortDependingFunction.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.Modality.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
+                true);
+        classEnabledMap.put(
+                de.uka.ilkd.key.logic.op.AbstractSortedOperator.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.AbstractSV.class, true);
+        classEnabledMap.put(
+                de.uka.ilkd.key.logic.op.AbstractTermTransformer.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
+                true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.IfExThenElse.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.ModalOperatorSV.class,
+                true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramConstant.class,
+                true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class,
+                true);
+        classEnabledMap.put(
+                de.uka.ilkd.key.logic.op.SchemaVariableFactory.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.SkolemTermSV.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.SubstOp.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.TermSV.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.Transformer.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateApplication.class,
+                true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateJunctor.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, true);
+        classEnabledMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, true);
+        
+        
+        //Define Style Span for each Class
         classMap.put(de.uka.ilkd.key.logic.op.Equality.class,
                 "<span class=\"equality\">");
-//        classMap.put(de.uka.ilkd.key.logic.op.Function.class,
-//                "<span class=\"function\">");
+        classMap.put(de.uka.ilkd.key.logic.op.Function.class,
+                "<span class=\"function\">");
         classMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
                 "<span class=\"locationVar\">");
         classMap.put(de.uka.ilkd.key.logic.op.Junctor.class,
@@ -567,7 +618,9 @@ public class SequentPrinter {
 
                     openedTag = false;
                     lastClass = null;
-                }else continue;
+                }
+                else
+                    continue;
             }
             // Check if there is a Class in AST for this pos
             else if (pos != null) {
@@ -576,8 +629,8 @@ public class SequentPrinter {
                     Operator op = oc.subTerm().op();
 
                     // Open First Tag
-                    if (lastClass == null
-                            && classMap.containsKey(op.getClass())) {
+                    if (lastClass == null && classMap.containsKey(op.getClass())
+                            && classEnabledMap.get(op.getClass())) {
 
                         putOpenTag(i, StylePos.SYNTAX,
                                 classMap.get(op.getClass()));
@@ -594,7 +647,8 @@ public class SequentPrinter {
                         keySet.add(i);
 
                         openedTag = false;
-                        if (classMap.containsKey(op.getClass())) {
+                        if (classMap.containsKey(op.getClass())
+                                && classEnabledMap.get(op.getClass())) {
 
                             putOpenTag(i, StylePos.SYNTAX,
                                     classMap.get(op.getClass()));
@@ -606,16 +660,15 @@ public class SequentPrinter {
                         else {
                             lastClass = null;
                             openedTag = false;
+                            System.out.println("");
+                            System.out.println(
+                                    "The following Class does not exist in the ClassDictionary");
+                            System.out.println("EXPRESSION: " + op);
+                            System.out.println("CLASS: " + op.getClass());
+                            System.out.println("");
                         }
-//                            System.out.println("");
-//                            System.out.println(
-//                                    "The following Class does not exist in the ClassDictionary");
-//                            System.out.println("EXPRESSION: " + op);
-//                            System.out.println("CLASS: " + op.getClass());
-//                            System.out.println("");
-//                        }
-
                     }
+
                 }
             }
         }
