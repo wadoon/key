@@ -142,7 +142,7 @@ public class MainApp extends Application {
                 event.consume();
             }
             else {
-                System.exit(0);
+                primaryStage.close();
             }
         });
     }
