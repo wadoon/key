@@ -331,8 +331,6 @@ public class RootLayoutController extends ViewController
                 otherViewsMenu.getItems().add(item);
             }
         }
-        // TODO: dummy until last opened or config was developed
-        info.setIsActive(true);
     }
 
     /**
@@ -466,14 +464,27 @@ public class RootLayoutController extends ViewController
                 "Menu " + parentMenu + " was not found");
     }
 
+    /**
+     * size = 4 : left-vertical, left-horizontal, right-vertical,
+     * right-horizontal
+     */
     public List<Double> getSplitterPositions() {
-        return Arrays.asList(0.0, 0.0, 0.0, 0.0);
+        double[] vertical = mainSplitPane.getDividerPositions();
+        return Arrays.asList(vertical[0], leftPane.getDividerPositions()[0],
+                vertical[1], rightPane.getDividerPositions()[0]);
     }
 
-    public List<ViewInformation> getViewInformations(){
+    public List<ViewInformation> getViewInformations() {
         return new LinkedList<ViewInformation>(allViews.values());
     }
-    
+
+    /**
+     * size = 4 : left-vertical, left-horizontal, right-vertical,
+     * right-horizontal
+     */
     public void setSplitterPositions(List<Double> positions) {
+        mainSplitPane.setDividerPositions(positions.get(0),positions.get(2));
+        leftPane.setDividerPositions(positions.get(1));
+        rightPane.setDividerPositions(positions.get(3));
     }
 }

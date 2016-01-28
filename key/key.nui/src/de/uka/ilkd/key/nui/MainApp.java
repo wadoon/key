@@ -64,15 +64,16 @@ public class MainApp extends Application {
         }
         initRootLayout();
 
-        if (useSettings)
-            rootLayoutController
-                    .setSplitterPositions(settings.getSplitterPositions());
-
         ctrlPressedHandler();
         closeWindowConfirmHandler();
         scanForViews(useSettings ? viewmap : new HashMap<>());
         scanForMenus();
+
         primaryStage.show();
+        
+        if (useSettings)
+            rootLayoutController
+                    .setSplitterPositions(settings.getSplitterPositions());
     }
 
     /**
@@ -199,6 +200,8 @@ public class MainApp extends Application {
             rootLayoutController.registerView(info, annot.accelerator());
             if (sv != null)
                 info.setIsActive(sv.getIsActibe());
+            else
+                info.setIsActive(true);
         }
         System.out.println("Views: " + annotated.size());
     }
