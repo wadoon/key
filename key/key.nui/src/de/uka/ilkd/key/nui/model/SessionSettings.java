@@ -19,14 +19,14 @@ public class SessionSettings {
     private static final int MinWidth = 50;
     private static final int MinHeight = 50;
 
-    private boolean corrupted = false;
+    private boolean boundsCorrupted = false;
 
     /**
      * Returns true if the set position does not fit on any screen and the
      * default bounds should be used.
      */
-    public boolean getIsCorrupted() {
-        return corrupted;
+    public boolean getBoundsIsCorrupted() {
+        return boundsCorrupted;
     }
 
     private List<SerializableViewInformation> views = new LinkedList<>();
@@ -125,17 +125,17 @@ public class SessionSettings {
             for (Screen s : containers) {
                 if (s.getVisualBounds().contains(windowX, windowY, windowWidth,
                         windowHeight))
-                    corrupted = false;
+                    boundsCorrupted = false;
                 return;
             }
             // if no screen contained the bounds, use default (= set corrupted)
-            corrupted = true;
+            boundsCorrupted = true;
         }
-        corrupted = true;
+        boundsCorrupted = true;
     }
 
     public void SaveAsLast() {
-        if (corrupted)
+        if (boundsCorrupted)
             return;
 
         Preferences prefs = Preferences

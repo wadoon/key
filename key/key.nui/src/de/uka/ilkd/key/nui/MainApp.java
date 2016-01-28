@@ -40,20 +40,23 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.primaryStage.setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
+        this.primaryStage.setTitle(
+                KeYResourceManager.getManager().getUserInterfaceTitle());
 
         // Set the application icon.
         this.primaryStage.getIcons().add(
                 new Image("file:resources/images/key-color-icon-square.png"));
 
         SessionSettings settings = SessionSettings.loadLastSettings();
-        boolean useSettings = settings != null && !settings.getIsCorrupted();
+        boolean useBoundsSettings = settings != null && !settings.getBoundsIsCorrupted();
         Map<String, SerializableViewInformation> viewmap = new HashMap<>();
-        if (useSettings) {
+        if (useBoundsSettings) {
             primaryStage.setX(settings.getWindowX());
             primaryStage.setY(settings.getWindowY());
             primaryStage.setWidth(settings.getWindowWidth());
             primaryStage.setHeight(settings.getWindowHeight());
+        }
+        if (settings != null) {
             for (SerializableViewInformation sv : settings.getViews()) {
                 viewmap.put(sv.getFxmlUrl(), sv);
             }
@@ -62,14 +65,15 @@ public class MainApp extends Application {
 
         ctrlPressedHandler();
         closeWindowConfirmHandler();
-        scanForViews(useSettings ? viewmap : new HashMap<>());
+        scanForViews(useBoundsSettings ? viewmap : new HashMap<>());
         scanForMenus();
 
         primaryStage.show();
-        
-        if (useSettings)
+
+        if (useBoundsSettings){
             rootLayoutController
                     .setSplitterPositions(settings.getSplitterPositions());
+        }
     }
 
     /**
@@ -164,7 +168,7 @@ public class MainApp extends Application {
 
         saveAndClose();
     }
-    
+
     private void saveAndClose() {
         SessionSettings settings = new SessionSettings();
         settings.setWindowX(primaryStage.getX());
@@ -190,7 +194,8 @@ public class MainApp extends Application {
             URL fxmlUrl = c.getResource(annot.path());
             ViewPosition pos = annot.preferredPosition();
             SerializableViewInformation sv = lastViewPositions
-                    .containsKey(fxmlUrl.getPath()) ? lastViewPositions.get(fxmlUrl.getPath()) : null;
+                    .containsKey(fxmlUrl.getPath())
+                            ? lastViewPositions.get(fxmlUrl.getPath()) : null;
             if (sv != null) {
                 pos = sv.getViewPosition();
             }
