@@ -38,6 +38,8 @@
               <buttons>
                 <Button mnemonicParsing="false" onAction="#loadDefaultProof" text="Load Default Proof" />
                   <Button mnemonicParsing="false" onAction="#loadBigProof" text="Load Big Proof" />
+                  <Button mnemonicParsing="false" onAction="#loadSolvableProof" text="Load Solvable" />
+                  <Button mnemonicParsing="false" onAction="#loadUnsolvableProof" text="Load Unsolvable" />
                   <ToggleButton fx:id="settingsButton" mnemonicParsing="false" onAction="#toggleSettings" text="Settings" />
               </buttons>
             </ButtonBar>

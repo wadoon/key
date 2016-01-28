@@ -217,6 +217,24 @@ public class RootLayoutController extends ViewController
         getContext().getProofManager().loadProblem(
                 new File("resources/SampleProof/sampleProof.proof"));
     }
+    
+    /**
+     * Loads an open solvable proof.
+     */
+    @FXML
+    private void loadSolvableProof() {
+        getContext().getProofManager().loadProblem(
+                new File("resources/proofs/IndistinguishablePathConditions.proof"));
+    }
+    
+    /**
+     * Loads an open unsolvable proof.
+     */
+    @FXML
+    private void loadUnsolvableProof() {
+        getContext().getProofManager().loadProblem(
+                new File("resources/proofs/IndistinguishablePathConditions.twoJoins.proof"));
+    }
 
     /**
      * Closes the program on Click
