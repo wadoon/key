@@ -56,6 +56,7 @@ public class MainApp extends Application {
             primaryStage.setWidth(settings.getWindowWidth());
             primaryStage.setHeight(settings.getWindowHeight());
         }
+        else System.out.println("Gui bound settings are corrupted - using default");
         if (settings != null) {
             for (SerializableViewInformation sv : settings.getViews()) {
                 viewmap.put(sv.getFxmlUrl(), sv);
