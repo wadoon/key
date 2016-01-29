@@ -653,15 +653,17 @@ public class SequentPrinter {
                             openedTag = true;
                         }
                         // Syso to let the user know the AST Class is unknown
-                        else if (!classMap.containsKey(op.getClass())) {
+                        else {
                             lastClass = null;
                             openedTag = false;
-                            System.out.println("");
-                            System.out.println(
-                                    "The following Class does not exist in the ClassDictionary");
-                            System.out.println("EXPRESSION: " + op);
-                            System.out.println("CLASS: " + op.getClass());
-                            System.out.println("");
+                            if (!classMap.containsKey(op.getClass())) {
+                                System.out.println("");
+                                System.out.println(
+                                        "The following Class does not exist in the ClassDictionary");
+                                System.out.println("EXPRESSION: " + op);
+                                System.out.println("CLASS: " + op.getClass());
+                                System.out.println("");
+                            }
                         }
                     }
 
