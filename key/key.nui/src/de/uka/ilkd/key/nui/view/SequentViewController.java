@@ -311,10 +311,10 @@ public class SequentViewController extends ViewController
             double newHeight = posTranslator.getProofHeight();
             System.out.println(newHeight);
             
-            // JavaFX 8 has MaxHeight ~10000. If bigger, an error will occur. Shall be patched in JDK9
-            if (newHeight > 10000) {
+            // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur. Shall be patched in JDK9
+            if (newHeight > 8192) {
                 System.out.println("Proof might be too large with Size "+newHeight);
-                textAreaWebView.setPrefHeight(10000);
+                textAreaWebView.setPrefHeight(8192);
             }
             else {
                 textAreaWebView.setPrefHeight(newHeight);

@@ -653,7 +653,7 @@ public class SequentPrinter {
                             openedTag = true;
                         }
                         // Syso to let the user know the AST Class is unknown
-                        else {
+                        else if (!classMap.containsKey(op.getClass())) {
                             lastClass = null;
                             openedTag = false;
                             System.out.println("");
