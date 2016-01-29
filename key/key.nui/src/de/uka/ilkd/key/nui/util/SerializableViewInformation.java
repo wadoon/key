@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui.util;
 
+import java.security.InvalidParameterException;
+
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 
@@ -32,6 +34,8 @@ public class SerializableViewInformation {
     
     public SerializableViewInformation(String data){
         String[] dataArr = data.split(",");
+        if(dataArr.length!=3)
+            throw new InvalidParameterException("data was invalid");
         fxmlUrl = dataArr[0];
         viewPosition = Enum.valueOf(ViewPosition.class, dataArr[1]);
         isactive = Boolean.parseBoolean(dataArr[2]);
