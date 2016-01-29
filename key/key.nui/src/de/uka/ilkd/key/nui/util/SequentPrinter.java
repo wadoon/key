@@ -106,7 +106,7 @@ public class SequentPrinter {
         if (classEnabledMap.size() > 0 && classMap.size() > 0) {
             return;
         }
-        //Defines if this AST Class shall be highlighted
+        // Defines if this AST Class shall be highlighted
         classEnabledMap.put(de.uka.ilkd.key.logic.op.Equality.class, true);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.Function.class, false);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
@@ -150,9 +150,8 @@ public class SequentPrinter {
         classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, true);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, true);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, true);
-        
-        
-        //Define Style Span for each Class
+
+        // Define Style Span for each Class
         classMap.put(de.uka.ilkd.key.logic.op.Equality.class,
                 "<span class=\"equality\">");
         classMap.put(de.uka.ilkd.key.logic.op.Function.class,
@@ -299,33 +298,30 @@ public class SequentPrinter {
 
         // remove old Filter styling
         removeFilter();
+        // get line information
+        String[] lines = proofString.split("\n");
 
-        if (!indicesOfLines.isEmpty()) {
-            // get line information
-            String[] lines = proofString.split("\n");
+        int styleStart = 0;
+        // Pointer at the current entry of the ArrayList
 
-            int styleStart = 0;
-            // Pointer at the current entry of the ArrayList
+        // Iterate over the lines
+        for (int i = 0; i < lines.length; i++) {
+            // Compute Endindex of Line
+            int styleEnd = styleStart + lines[i].length() + 1;
 
-            // Iterate over the lines
-            for (int i = 0; i < lines.length; i++) {
-                // Compute Endindex of Line
-                int styleEnd = styleStart + lines[i].length() + 1;
-
-                // If line is in list apply styles
-                if (indicesOfLines.contains(i) == filter.getInvert()) {
-                    switch (filter.getFilterMode()) {
-                    case Minimize:
-                        minimizeLine(styleStart, styleEnd);
-                        break;
-                    case Collapse:
-                    default:
-                        collapseLine(styleStart, styleEnd);
-                        break;
-                    }
+            // If line is in list apply styles
+            if (indicesOfLines.contains(i) == filter.getInvert()) {
+                switch (filter.getFilterMode()) {
+                case Minimize:
+                    minimizeLine(styleStart, styleEnd);
+                    break;
+                case Collapse:
+                default:
+                    collapseLine(styleStart, styleEnd);
+                    break;
                 }
-                styleStart = styleEnd;
             }
+            styleStart = styleEnd;
         }
         keySet.addAll(filterIndicesOpen);
         keySet.addAll(filterIndicesClose);

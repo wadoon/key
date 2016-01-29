@@ -2,7 +2,6 @@ package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -56,11 +55,16 @@ public class SequentViewController extends ViewController
     private NotationInfo notationInfo = new NotationInfo();
     private Services services;
     private Sequent sequent;
+    private PrintFilter lastFilter = null;
     private IProofListener proofChangeListener = (proofEvent) -> {
         // execute ui update on javafx thread
         Platform.runLater(() -> {
             showSequent(getContext().getProofManager().getMediator()
                     .getSelectedNode());
+            if(lastFilter != null){
+                apply(lastFilter);
+                updateView();
+            }
             tacletInfoVC.showTacletInfo(getContext().getProofManager()
                     .getMediator().getSelectedNode());
         });
@@ -320,9 +324,10 @@ public class SequentViewController extends ViewController
 
         updateHtml(this.printer.printProofString());
     }
-
+    
     @Override
     public void apply(PrintFilter filter) {
+        lastFilter = filter;
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);
         updateView();
