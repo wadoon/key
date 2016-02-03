@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.nui.view.DebugViewController;
+import de.uka.ilkd.key.nui.viewmediation.DebugViewProxy;
 import de.uka.ilkd.key.nui.viewmediation.ViewDereferer;
 import de.uka.ilkd.key.nui.viewmediation.ViewDerefererSlim;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -268,11 +269,13 @@ public class SequentPrinter {
             }
         }
         // TOCHECK Method 1
-       /* ViewDereferer.ExecuteMethodOnView(DebugViewProxy.class,
-               proxy -> proxy.print(sb.toString())); */
+        ViewDereferer.ExecuteMethodOnView(DebugViewProxy.class,
+                proxy -> proxy.print(sb.toString()));
         // TOCHECK Method 2
-        /*ViewDerefererSlim.ExecuteMethodOnView(DebugViewController.class,
-                proxy -> proxy.print(sb.toString())); */
+        /*
+         * ViewDerefererSlim.ExecuteMethodOnView(DebugViewController.class,
+         * proxy -> proxy.print(sb.toString()));
+         */
 
         return toHTML(sb.toString());
     }
