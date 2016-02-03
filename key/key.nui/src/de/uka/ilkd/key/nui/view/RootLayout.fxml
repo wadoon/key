@@ -34,7 +34,7 @@
       				</Menu>
       			</menus>
       		</MenuBar>
-            <ButtonBar buttonMinWidth="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <ButtonBar fx:id="debugButtons" buttonMinWidth="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <buttons>
                 <Button mnemonicParsing="false" onAction="#loadDefaultProof" text="Load Default Proof" />
                   <Button mnemonicParsing="false" onAction="#loadBigProof" text="Load Big Proof" />

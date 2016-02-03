@@ -26,6 +26,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -104,6 +105,8 @@ public class RootLayoutController extends ViewController
     private ToggleButton settingsButton;
     @FXML
     private Label statusLabel;
+    @FXML
+    private ButtonBar debugButtons;
 
     /**
      * The constructor
@@ -162,7 +165,13 @@ public class RootLayoutController extends ViewController
 
         statusLabel.setGraphic(new ImageView(STATUSLOGO));
         statusLabel.setText(STATUSWELCOMETEXT);
+        
         toggleSettings();
+        
+        if (!MainApp.isDebugView) {
+            debugButtons.setOpacity(0);
+            debugButtons.setDisable(true);
+        }
     }
 
     /**
@@ -253,7 +262,7 @@ public class RootLayoutController extends ViewController
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
         fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("Proofs", "*.proof"),
+                new ExtensionFilter("Proofs or Java Files", "*.proof", "*.java"),
                 new ExtensionFilter("All Files", "*.*"));
         // TODO reset initial directory to "../" (changed for faster access to
         // proofs for testing purposes)
