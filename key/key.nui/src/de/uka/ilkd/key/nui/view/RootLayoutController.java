@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -107,6 +108,8 @@ public class RootLayoutController extends ViewController
     private Label statusLabel;
     @FXML
     private ButtonBar debugButtons;
+    @FXML
+    private CheckMenuItem debugMode;
 
     /**
      * The constructor
@@ -171,6 +174,7 @@ public class RootLayoutController extends ViewController
         if (!MainApp.isDebugView) {
             debugButtons.setOpacity(0);
             debugButtons.setDisable(true);
+            debugMode.setSelected(false);
         }
     }
 
@@ -245,6 +249,17 @@ public class RootLayoutController extends ViewController
                 new File("resources/proofs/IndistinguishablePathConditions.twoJoins.proof"));
     }
 
+    @FXML
+    private void handleDebugMode() {
+        if (debugMode.isSelected()) {
+            debugButtons.setOpacity(100.00);
+            debugButtons.setDisable(false);
+        } else {
+            debugButtons.setOpacity(0);
+            debugButtons.setDisable(true);
+        }
+    }
+    
     /**
      * Closes the program on Click
      */

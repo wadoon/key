@@ -29,6 +29,7 @@
       				<Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views" />
       				<Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
       					<items>
+                        <CheckMenuItem fx:id="debugMode" mnemonicParsing="false" onAction="#handleDebugMode" selected="true" text="Debug Mode" />
       						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />
       					</items>
       				</Menu>
