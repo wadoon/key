@@ -135,7 +135,6 @@ import de.uka.ilkd.key.util.MiscTools;
  * sequent.
  */
 public class JavaCardDLStrategy extends AbstractFeatureStrategy {
-
     private final RuleSetDispatchFeature costComputationDispatcher;
     private final Feature costComputationF;
     private final RuleSetDispatchFeature approvalDispatcher;
@@ -710,7 +709,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         not(or(PrimitiveHeapTermFeature.create(heapLDT),
                                 AnonHeapTermFeature.INSTANCE))),
                         ifZero(applyTF(FocusFormulaProjection.INSTANCE,
-                                ff.update), longConst(-4200), longConst(-1900)),
+                                ff.update), longConst(-4200), longConst(Integer.getInteger("cost.pull_out_select", -1900))),
                         NonDuplicateAppModPositionFeature.INSTANCE));
         bindRuleSet(d, "apply_select_eq",
         // replace non-simplified select by the skolem constant
@@ -1195,7 +1194,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                         longConst(1000)),
                                                 // standard costs
                                                 countOccurrencesInSeq,
-                                                longConst(100)),
+                                                longConst(Integer.getInteger("cost.cut_direct", 100))),
                                         // check for cuts below quantifiers
                                         SumFeature
                                                 .createSum(new Feature[] {
@@ -1385,7 +1384,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 "cnf_setComm",
                 add(SetsSmallerThanFeature.create(instOf("commRight"),
                         instOf("commLeft"), locSetLDT),
-                        NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
+                        NotInScopeOfModalityFeature.INSTANCE, longConst(-800))); //-150, -500
 
         bindRuleSet(d, "elimQuantifier", -1000);
         bindRuleSet(d, "elimQuantifierWithCast", 50);
@@ -1560,7 +1559,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             forEach(varInst,
                                     HeuristicInstantiation.INSTANCE,
                                     add(instantiate("t", varInst),
-                                            branchPrediction, longConst(10))) }));
+                                            branchPrediction, longConst(Integer.getInteger("cost.gamma", 10)))) }));
             final TermBuffer splitInst = new TermBuffer();
 
             bindRuleSet(d, "triggered", SumFeature.createSum(new Feature[] {
@@ -1631,12 +1630,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // integers; cross-multiplication + case distinctions for nonlinear
         // inequalities
 
-        bindRuleSet(d, "inEqSimp_expand", -4400);
-        bindRuleSet(d, "inEqSimp_directInEquations", -2900);
-        bindRuleSet(d, "inEqSimp_propagation", -2400);
-        bindRuleSet(d, "inEqSimp_pullOutGcd", -2150);
-        bindRuleSet(d, "inEqSimp_saturate", -1900);
-        bindRuleSet(d, "inEqSimp_forNormalisation", -1100);
+        bindRuleSet(d, "inEqSimp_expand", Integer.getInteger("cost.inEqSimp_expand", -4400));
+        bindRuleSet(d, "inEqSimp_directInEquations", Integer.getInteger("cost.inEqSimp_directInEquations", -2900));
+        bindRuleSet(d, "inEqSimp_propagation", Integer.getInteger("cost.inEqSimp_propagation", -2400));
+        bindRuleSet(d, "inEqSimp_pullOutGcd", Integer.getInteger("cost.inEqSimp_pullOutGcd", -2150));
+        bindRuleSet(d, "inEqSimp_saturate", Integer.getInteger("cost.inEqSimp_saturate", -1900));
+        bindRuleSet(d, "inEqSimp_forNormalisation", Integer.getInteger("cost.inEqSimp_forNormalisation", -1100));
         bindRuleSet(d, "inEqSimp_special_nonLin", -1400);
 
         if (arithNonLinInferences())
@@ -2584,7 +2583,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
             setupDefOpsExpandMod(d);
 
-            bindRuleSet(d, "defOps_expandRanges", -8000);
+            bindRuleSet(d, "defOps_expandRanges", Integer.getInteger("cost.defOps_expandRanges", -8000));
             bindRuleSet(d, "defOps_expandJNumericOp", -500);
             bindRuleSet(d, "defOps_modHomoEq", -5000);
         }
