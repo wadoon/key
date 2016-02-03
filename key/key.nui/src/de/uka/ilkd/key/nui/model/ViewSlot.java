@@ -37,6 +37,7 @@ public class ViewSlot {
     
     public void addTab(ViewInformation view){
         tabs.add(view);
+        view.setIsActive(true);
         TabPane container =((TabPane)uiPane.getCenter());
         container.getTabs().add(view.getUiTab());
         container.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);

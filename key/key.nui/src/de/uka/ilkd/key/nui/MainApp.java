@@ -48,7 +48,8 @@ public class MainApp extends Application {
                 new Image("file:resources/images/key-color-icon-square.png"));
 
         SessionSettings settings = SessionSettings.loadLastSettings();
-        boolean useBoundsSettings = settings != null && !settings.getBoundsIsCorrupted();
+        boolean useBoundsSettings = settings != null
+                && !settings.getBoundsIsCorrupted();
         Map<String, SerializableViewInformation> viewmap = new HashMap<>();
         if (useBoundsSettings) {
             primaryStage.setX(settings.getWindowX());
@@ -56,7 +57,9 @@ public class MainApp extends Application {
             primaryStage.setWidth(settings.getWindowWidth());
             primaryStage.setHeight(settings.getWindowHeight());
         }
-        else System.out.println("Gui bound settings are corrupted - using default");
+        else
+            System.out.println(
+                    "Gui bound settings are corrupted - using default");
         if (settings != null) {
             for (SerializableViewInformation sv : settings.getViews()) {
                 viewmap.put(sv.getFxmlUrl(), sv);
@@ -71,7 +74,7 @@ public class MainApp extends Application {
 
         primaryStage.show();
 
-        if (useBoundsSettings){
+        if (useBoundsSettings) {
             rootLayoutController
                     .setSplitterPositions(settings.getSplitterPositions());
         }
