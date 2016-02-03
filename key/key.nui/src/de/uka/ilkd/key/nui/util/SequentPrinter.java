@@ -56,15 +56,17 @@ public class SequentPrinter {
     private static HashMap<Class, String> classMap = new HashMap<>();
     private static HashMap<Class, Boolean> classEnabledMap = new HashMap<>();
 
+    private final static String openTagBegin = "<span class=\"";
+    private final static String openTagEnd = "\">";
     private final static String closingTag = "</span>";
 
-    private final static String mouseTagOpen = "<span class=\"mouseover\">";
-    private final static String highlightedTagOpen = "<span class=\"highlighted\">";
-    private final static String filterMinimizeTagOpen = "<span class=\"minimized\">";
-    private final static String filterCollapsedTagOpen = "<span class=\"collapsed\">";
+    private final static String mouseTag = "mouseover";
+    private final static String highlightedTag = "highlighted";
+    private final static String filterMinimizeTag = "minimized";
+    private final static String filterCollapsedTag = "collapsed";
 
     private enum StylePos {
-        SYNTAX(3), MOUSE(0), SEARCH(1), FILTER(2);
+        SYNTAX(3), MOUSE(0), SEARCH(2), FILTER(1);
 
         private int slotPosition;
 
@@ -155,70 +157,51 @@ public class SequentPrinter {
         classEnabledMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, true);
 
         // Define Style Span for each Class
-        classMap.put(de.uka.ilkd.key.logic.op.Equality.class,
-                "<span class=\"equality\">");
-        classMap.put(de.uka.ilkd.key.logic.op.Function.class,
-                "<span class=\"function\">");
+        classMap.put(de.uka.ilkd.key.logic.op.Equality.class, "equality");
+        classMap.put(de.uka.ilkd.key.logic.op.Function.class, "function");
         classMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
-                "<span class=\"locationVar\">");
-        classMap.put(de.uka.ilkd.key.logic.op.Junctor.class,
-                "<span class=\"junctor\">");
-        classMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class,
-                "<span class=\"logicVar\">");
-        classMap.put(de.uka.ilkd.key.logic.op.Quantifier.class,
-                "<span class=\"quantifier\">");
+                "locationVar");
+        classMap.put(de.uka.ilkd.key.logic.op.Junctor.class, "junctor");
+        classMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class, "logicVar");
+        classMap.put(de.uka.ilkd.key.logic.op.Quantifier.class, "quantifier");
         classMap.put(de.uka.ilkd.key.logic.op.SortDependingFunction.class,
-                "<span class=\"sortDepFunc\">");
-        classMap.put(de.uka.ilkd.key.logic.op.Modality.class,
-                "<span class=\"modality\">");
+                "sortDepFunc");
+        classMap.put(de.uka.ilkd.key.logic.op.Modality.class, "modality");
         classMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
-                "<span class=\"observerFunc\">");
+                "observerFunc");
         classMap.put(de.uka.ilkd.key.logic.op.AbstractSortedOperator.class,
-                "<span class=\"abstractSortOp\">");
-        classMap.put(de.uka.ilkd.key.logic.op.AbstractSV.class,
-                "<span class=\"abstractSV\">");
+                "abstractSortOp");
+        classMap.put(de.uka.ilkd.key.logic.op.AbstractSV.class, "abstractSV");
         classMap.put(de.uka.ilkd.key.logic.op.AbstractTermTransformer.class,
-                "<span class=\"abstractTermTransf\">");
+                "abstractTermTransf");
         classMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
-                "<span class=\"elemUpdate\">");
-        classMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class,
-                "<span class=\"formulaSV\">");
+                "elemUpdate");
+        classMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, "formulaSV");
         classMap.put(de.uka.ilkd.key.logic.op.IfExThenElse.class,
-                "<span class=\"ifExThenElse\">");
-        classMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class,
-                "<span class=\"ifThenElse\">");
+                "ifExThenElse");
+        classMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class, "ifThenElse");
         classMap.put(de.uka.ilkd.key.logic.op.ModalOperatorSV.class,
-                "<span class=\"modalOpSV\">");
+                "modalOpSV");
         classMap.put(de.uka.ilkd.key.logic.op.ProgramConstant.class,
-                "<span class=\"progConst\">");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class,
-                "<span class=\"progMeth\">");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class,
-                "<span class=\"progSV\">");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class,
-                "<span class=\"progVar\">");
+                "progConst");
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class, "progMeth");
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class, "progSV");
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class, "progVar");
         classMap.put(de.uka.ilkd.key.logic.op.SchemaVariableFactory.class,
-                "<span class=\"schemaVarFactory\">");
+                "schemaVarFactory");
         classMap.put(de.uka.ilkd.key.logic.op.SkolemTermSV.class,
-                "<span class=\"skolemTermSV\">");
-        classMap.put(de.uka.ilkd.key.logic.op.SubstOp.class,
-                "<span class=\"substOp\">");
-        classMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class,
-                "<span class=\"termLabelSV\">");
-        classMap.put(de.uka.ilkd.key.logic.op.TermSV.class,
-                "<span class=\"termSV\">");
-        classMap.put(de.uka.ilkd.key.logic.op.Transformer.class,
-                "<span class=\"transformer\">");
+                "skolemTermSV");
+        classMap.put(de.uka.ilkd.key.logic.op.SubstOp.class, "substOp");
+        classMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class, "termLabelSV");
+        classMap.put(de.uka.ilkd.key.logic.op.TermSV.class, "termSV");
+        classMap.put(de.uka.ilkd.key.logic.op.Transformer.class, "transformer");
         classMap.put(de.uka.ilkd.key.logic.op.UpdateApplication.class,
-                "<span class=\"updateApp\">");
+                "updateApp");
         classMap.put(de.uka.ilkd.key.logic.op.UpdateJunctor.class,
-                "<span class=\"updateJunc\">");
-        classMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class,
-                "<span class=\"updateSV\">");
-        classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class,
-                "<span class=\"varSV\">");
-        classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class,
-                "<span class=\"warySubstOp\">");
+                "updateJunc");
+        classMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, "updateSV");
+        classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, "varSV");
+        classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, "warySubstOp");
     }
 
     /**
@@ -293,7 +276,7 @@ public class SequentPrinter {
         keySet.add(range.start());
         keySet.add(range.end());
 
-        putOpenTag(range.start(), StylePos.MOUSE, mouseTagOpen);
+        putOpenTag(range.start(), StylePos.MOUSE, mouseTag);
         putCloseTag(range.end(), StylePos.MOUSE, closingTag);
         mouseoverRange = range;
     }
@@ -319,7 +302,7 @@ public class SequentPrinter {
         for (int i = 0; i < lines.length; i++) {
             // Compute Endindex of Line
             int styleEnd = styleStart + lines[i].length() + 1;
-
+            
             // If line is in list apply styles
             if (indicesOfLines.contains(i) == filter.getInvert()) {
                 switch (filter.getFilterMode()) {
@@ -347,7 +330,7 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void collapseLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER, filterCollapsedTagOpen);
+        putOpenTag(lineStart, StylePos.FILTER, filterCollapsedTag);
         putCloseTag(lineEnd, StylePos.FILTER, closingTag);
 
         filterIndicesOpen.add(lineStart);
@@ -363,7 +346,7 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void minimizeLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER, filterMinimizeTagOpen);
+        putOpenTag(lineStart, StylePos.FILTER, filterMinimizeTag);
         putCloseTag(lineEnd, StylePos.FILTER, closingTag);
 
         filterIndicesOpen.add(lineStart);
@@ -391,9 +374,9 @@ public class SequentPrinter {
         }
     }
 
-    private HashMap<Integer, String[]> putOpenTag(int index, StylePos arrayPos,
-            String tag) {
-        String[] mapValue = openTagsAtIndex.get(index);
+    private void putTag(int index, StylePos arrayPos, String tag,
+            HashMap<Integer, String[]> map) {
+        String[] mapValue = map.get(index);
         // If Map Entry already exists
         if (mapValue != null) {
             // If Array entry is null or shall be cleared (filled with empty
@@ -411,8 +394,19 @@ public class SequentPrinter {
         else {
             // If the Map Entry does not exist, create new Entry and call itself
             // again. RECURSION!
-            openTagsAtIndex.put(index, new String[StylePos.values().length]);
-            putOpenTag(index, arrayPos, tag);
+            map.put(index, new String[StylePos.values().length]);
+            putTag(index, arrayPos, tag, map);
+        }
+    }
+
+    private HashMap<Integer, String[]> putOpenTag(int index, StylePos arrayPos,
+            String tag) {
+        if (tag.isEmpty()) {
+            putTag(index, arrayPos, tag, openTagsAtIndex);
+        }
+        else {
+            putTag(index, arrayPos, openTagBegin.concat(tag).concat(openTagEnd),
+                    openTagsAtIndex);
         }
 
         return openTagsAtIndex;
@@ -420,28 +414,7 @@ public class SequentPrinter {
 
     private HashMap<Integer, String[]> putCloseTag(int index, StylePos arrayPos,
             String tag) {
-        String[] mapValue = closeTagsAtIndex.get(index);
-        // If Map Entry already exists
-        if (mapValue != null) {
-            // If Array entry is null or shall be cleared (filled with empty
-            // String), fill the array
-            if (mapValue[arrayPos.slotPosition] == null || tag.isEmpty()) {
-                mapValue[arrayPos.slotPosition] = tag;
-            }
-            else {
-                // If the Array entry is not null, the tag can be appended.
-                // Solves the problem with double consecutive chars
-                // ("wellformed")
-                mapValue[arrayPos.slotPosition] += tag;
-            }
-        }
-        else {
-            // If the Map Entry does not exist, create new Entry and call itself
-            // again. RECURSION!
-            closeTagsAtIndex.put(index, new String[StylePos.values().length]);
-            putCloseTag(index, arrayPos, tag);
-        }
-
+        putTag(index, arrayPos, tag, closeTagsAtIndex);
         return closeTagsAtIndex;
     }
 
@@ -481,7 +454,7 @@ public class SequentPrinter {
 
                         // Check all occurrences
                         putOpenTag(matcher.start(), StylePos.SEARCH,
-                                highlightedTagOpen);
+                                highlightedTag);
                         putCloseTag(matcher.end(), StylePos.SEARCH, closingTag);
 
                         searchIndicesOpen.add(matcher.start());
@@ -498,7 +471,7 @@ public class SequentPrinter {
                 // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
-                    putOpenTag(i, StylePos.SEARCH, highlightedTagOpen);
+                    putOpenTag(i, StylePos.SEARCH, highlightedTag);
                     putCloseTag(i + searchString.length(), StylePos.SEARCH,
                             closingTag);
 

@@ -30,7 +30,7 @@ public class DebugViewController extends ViewController
     private DebugViewProxy proxy;
 
     public void print(String str) {
-        outputText.setText(str);
+        outputText.setText(str.replace("\n", "\\n\n"));
     }
 
     //TOCHECK Method 1
