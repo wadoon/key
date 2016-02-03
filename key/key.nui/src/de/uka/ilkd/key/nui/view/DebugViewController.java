@@ -21,7 +21,7 @@ public class DebugViewController extends ViewController {
     }
 
     public void print(String str) {
-        outputText.setText(str);
+        outputText.setText(str.replace("\n", "\\n\n"));
     }
 
     private static DebugViewController debugViewController;
