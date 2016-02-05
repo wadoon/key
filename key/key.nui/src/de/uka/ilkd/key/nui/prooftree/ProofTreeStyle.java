@@ -11,7 +11,7 @@ package de.uka.ilkd.key.nui.prooftree;
 public final class ProofTreeStyle {
     
     /** CSS filename for the proof tree. */
-    public static final String CSS_FILE  = "treeView.css";
+    public static final String CSS_FILE  = "treeView_light.css";
     
     /* Name of CSS classes - see file treeView.css at resources folder */
     

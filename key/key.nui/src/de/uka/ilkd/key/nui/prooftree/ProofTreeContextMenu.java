@@ -91,16 +91,51 @@ public class ProofTreeContextMenu extends ContextMenu {
     	// clear current entries
     	getItems().clear();
     	
+    	addDummyEntry("Apply Strategy", null);
+    	addDummyEntry("Prune Proof", null);
+    	addSeparator();
+    	
+    	
+    	
     	// add appropriate entries
         addMenuItemExpandAll();
         addMenuItemExpandBelow();
+        addDummyEntry("Expand Goals Only", null);
         addMenuItemCollapseAll();
         addMenuItemCollapseBelow();
+        addDummyEntry("Collapse Other Branches", null);
+        addSeparator();
+        
+        addDummyEntry("Previous Sibling", null);
+        addDummyEntry("Next Sibling", null);
+        
+        
         
         addSeparator();
         
+        
+        addDummyEntry("Hide Intermediate Proof steps", null);
+        addDummyEntry("Hide Non-interactive Proof steps", null);
+        addDummyEntry("Hide Closed Subtrees", null);
+        
         addMenuItemSearch();
+        
+        addSeparator();
+        addDummyEntry("Set All Goals Below to Interactive", null);
+        addDummyEntry("Set All Goals Below to Automatic", null);
+        addSeparator();
+        addDummyEntry("Show Subtree Statistic", null);
     }
+	
+	private void addDummyEntry(String lbl, String icon) {
+	    final MenuItem mi = new MenuItem(lbl);
+	    
+	    if(icon!=null)
+	        mi.setGraphic(icf.getImage(icon));
+	    
+        getItems().add(mi);
+        
+	}
     
     /**
      * Adds a separator to the context menu.

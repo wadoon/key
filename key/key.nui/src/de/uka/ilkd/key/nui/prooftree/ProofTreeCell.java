@@ -172,6 +172,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 
         // reset label and icon
         label = new Label(item.getLabel() + " ");
+        label.getStyleClass().add("proof_tree_cell_label");
         icon = null;
 
         // set decoration (style, icon)
