@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Observable;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,11 +18,9 @@ import java.util.regex.Pattern;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.nui.model.Context;
 import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.nui.view.DebugViewController;
-import de.uka.ilkd.key.nui.viewmediation.DebugViewProxy;
-import de.uka.ilkd.key.nui.viewmediation.ViewDereferer;
-import de.uka.ilkd.key.nui.viewmediation.ViewDerefererSlim;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -75,10 +74,12 @@ public class SequentPrinter {
         }
     }
 
+    private Context context;
+    
     /**
      * 
      */
-    public SequentPrinter(String cssPath, PositionTable posTable) {
+    public SequentPrinter(String cssPath, PositionTable posTable,Context context) {
         try {
             readCSS(cssPath);
         }
@@ -87,6 +88,7 @@ public class SequentPrinter {
         }
         this.setPosTable(posTable);
 
+        this.context = context;
         openTagsAtIndex = new HashMap<Integer, String[]>();
         closeTagsAtIndex = new HashMap<Integer, String[]>();
 
@@ -251,16 +253,10 @@ public class SequentPrinter {
                 keySet.remove(i);
             }
         }
-        // TOCHECK Method 1
-        ViewDereferer.ExecuteMethodOnView(DebugViewProxy.class,
-                proxy -> proxy.print(sb.toString()));
-        // TOCHECK Method 2
-        /*
-         * ViewDerefererSlim.ExecuteMethodOnView(DebugViewController.class,
-         * proxy -> proxy.print(sb.toString()));
-         */
-
-        return toHTML(sb.toString());
+        
+        String html = sb.toString();
+        context.setSequentHtml(html);
+        return toHTML(html);
     }
 
     /**

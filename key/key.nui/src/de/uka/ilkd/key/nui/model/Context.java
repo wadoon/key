@@ -1,62 +1,80 @@
 package de.uka.ilkd.key.nui.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import de.uka.ilkd.key.nui.util.IAcceptSequentFilter;
-import de.uka.ilkd.key.nui.util.IStatusManager;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.nui.MediatorUserInterface;
+import de.uka.ilkd.key.nui.StatusManager;
+import de.uka.ilkd.key.nui.util.CsEvent;
 
 public class Context {
 
-    private ProofManager proofManager = null;
+    private KeYMediator mediator = null;
 
     /**
-     * Lazy loaded proofManager
-     * @return the current or a new proofManager
+     * Lazy loaded KeyMediator
+     * 
+     * @return the current or a new KeYMediator
      */
-    public ProofManager getProofManager() {
-        if (proofManager == null){
-            proofManager = new ProofManager(status);
+    public KeYMediator getKeYMediator() {
+        if (mediator == null) {
+            MediatorUserInterface userInterface = new MediatorUserInterface(
+                    statusManager);
+            mediator = new KeYMediator(userInterface);
+            userInterface.setMediator(mediator);
         }
-        return proofManager;
+        return mediator;
     }
 
-    private IStatusManager status = null;
+    private StatusManager statusManager = null;
 
     /**
-     * Returns an Object of Type IStatusManager that supports printing status texts.
+     * Lazy loaded StatusManager
+     * 
      * @return
      */
-    public IStatusManager getStatusManager() {
-        return status;
+    public StatusManager getStatusManager() {
+        if (statusManager == null)
+            statusManager = new StatusManager();
+        return statusManager;
     }
-    
-    /**
-     * sets the StatusManager for this context. Use with caution. This doesn't update 
-     * the references to the StatusManager of this context that have been set before.
-     * @param value probably an UI component that supports printing a status.
-     */
-    public void setStatusManager(IStatusManager value){
-        status = value;
+
+    private CsEvent<PrintFilter> filterChangedEvent = new CsEvent<>();
+
+    public CsEvent<PrintFilter> getFilterChangedEvent() {
+        return filterChangedEvent;
     }
-    
+
+    private PrintFilter currentPrintFilter = null;
+
+    public void setCurrentPrintFilter(PrintFilter filter) {
+        if (filter == currentPrintFilter)
+            return;
+        currentPrintFilter = filter;
+        filterChangedEvent.fire(filter);
+    }
+
+    public PrintFilter getCurrentPrintFilter() {
+        return currentPrintFilter;
+    }
+
+    private CsEvent<String> sequentHtmlChangedEvent = new CsEvent<>();
+
+    public CsEvent<String> getSequentHtmlChangedEvent() {
+        return sequentHtmlChangedEvent;
+    }
+
+    private String sequentHtml;
+
+    public void setSequentHtml(String value) {
+        if (value == sequentHtml)
+            return;
+        sequentHtml = value;
+        sequentHtmlChangedEvent.fire(value);
+    }
+
+    public String getSequentHtml() {
+        return sequentHtml;
+    }
+
     public Context() {
     }
-    
-    //XXX ulgy workaround ---
-    private List<IAcceptSequentFilter> acceptSequentFilters = new LinkedList<>();
-    public void registerFilterConsumer(IAcceptSequentFilter acceptSequentFilter){
-        acceptSequentFilters.add(acceptSequentFilter);
-    }
-    
-    public void unregisterFilterConsumer(IAcceptSequentFilter acceptSequentFilter){
-        acceptSequentFilters.remove(acceptSequentFilter);
-    }
-    
-    public void acceptFilter(PrintFilter filter){
-        for(IAcceptSequentFilter consumer: acceptSequentFilters){
-            consumer.apply(filter);
-        }
-    }
-    // ---
 }

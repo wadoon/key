@@ -18,7 +18,6 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.model.ViewSlot;
-import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.util.KeYConstants;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -50,8 +49,7 @@ import javafx.stage.Stage;
  * @author Benedikt Gross
  * @author Nils Muzzulini
  */
-public class RootLayoutController extends ViewController
-        implements IStatusManager {
+public class RootLayoutController extends ViewController {
 
     private static final int MAXMENUENTRIES = 8;
     private static final Image STATUSLOGO = new Image(
@@ -168,15 +166,21 @@ public class RootLayoutController extends ViewController
 
         statusLabel.setGraphic(new ImageView(STATUSLOGO));
         statusLabel.setText(STATUSWELCOMETEXT);
-        
+
         toggleSettings();
-        
+
         if (!MainApp.isDebugView) {
             debugButtons.setOpacity(0);
             debugButtons.setDisable(true);
             debugMode.setSelected(false);
         }
     }
+
+    @Override
+    public void initializeAfterLoadingFxml() {
+        getContext().getStatusManager().getStatusUpdatedEvent()
+                .addHandler(this::setStatus);
+    };
 
     /**
      * Opens a new Window with About Functionality. View: AboutView.fxml
@@ -218,7 +222,7 @@ public class RootLayoutController extends ViewController
      */
     @FXML
     private void loadDefaultProof() {
-        getContext().getProofManager()
+        getContext().getKeYMediator().getUI()
                 .loadProblem(new File("resources/proofs/gcd.closed.proof"));
     }
 
@@ -227,26 +231,26 @@ public class RootLayoutController extends ViewController
      */
     @FXML
     private void loadBigProof() {
-        getContext().getProofManager().loadProblem(
+        getContext().getKeYMediator().getUI().loadProblem(
                 new File("resources/SampleProof/sampleProof.proof"));
     }
-    
+
     /**
      * Loads an open solvable proof.
      */
     @FXML
     private void loadSolvableProof() {
-        getContext().getProofManager().loadProblem(
-                new File("resources/proofs/IndistinguishablePathConditions.proof"));
+        getContext().getKeYMediator().getUI().loadProblem(new File(
+                "resources/proofs/IndistinguishablePathConditions.proof"));
     }
-    
+
     /**
      * Loads an open unsolvable proof.
      */
     @FXML
     private void loadUnsolvableProof() {
-        getContext().getProofManager().loadProblem(
-                new File("resources/proofs/IndistinguishablePathConditions.twoJoins.proof"));
+        getContext().getKeYMediator().getUI().loadProblem(new File(
+                "resources/proofs/IndistinguishablePathConditions.twoJoins.proof"));
     }
 
     @FXML
@@ -254,12 +258,13 @@ public class RootLayoutController extends ViewController
         if (debugMode.isSelected()) {
             debugButtons.setOpacity(100.00);
             debugButtons.setDisable(false);
-        } else {
+        }
+        else {
             debugButtons.setOpacity(0);
             debugButtons.setDisable(true);
         }
     }
-    
+
     /**
      * Closes the program on Click
      */
@@ -276,9 +281,11 @@ public class RootLayoutController extends ViewController
         setStatus("Loading Proof...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
-        fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("Proofs or Java Files", "*.proof", "*.java"),
-                new ExtensionFilter("All Files", "*.*"));
+        fileChooser
+                .getExtensionFilters().addAll(
+                        new ExtensionFilter("Proofs or Java Files", "*.proof",
+                                "*.java"),
+                        new ExtensionFilter("All Files", "*.*"));
         // TODO reset initial directory to "../" (changed for faster access to
         // proofs for testing purposes)
         fileChooser.setInitialDirectory(
@@ -290,27 +297,14 @@ public class RootLayoutController extends ViewController
             setStatus("No File Selected");
             return;
         }
-        getContext().getProofManager().loadProblem(file);
+        getContext().getKeYMediator().getUI().loadProblem(file);
     }
 
-    /**
-     * Set a status in the status bar.
-     * 
-     * @param status
-     *            Status to be set.
-     */
-    public void setStatus(String status) {
+    private void setStatus(String status) {
         // execute ui update on javafx thread
         Platform.runLater(() -> {
             statusLabel.setText(status);
         });
-    }
-
-    /**
-     * Sets status text to empty string.
-     */
-    public void clearStatus() {
-        setStatus("");
     }
 
     @FXML
@@ -525,7 +519,7 @@ public class RootLayoutController extends ViewController
      * right-horizontal
      */
     public void setSplitterPositions(List<Double> positions) {
-        mainSplitPane.setDividerPositions(positions.get(0),positions.get(2));
+        mainSplitPane.setDividerPositions(positions.get(0), positions.get(2));
         leftPane.setDividerPositions(positions.get(1));
         rightPane.setDividerPositions(positions.get(3));
     }

@@ -16,7 +16,7 @@ public class TreeViewController extends ViewControllerSwingContent {
 
     @Override
     public void createSwingContent() {
-        ProofTreeView proofTreeView = new ProofTreeView(getContext().getProofManager().getMediator());
+        ProofTreeView proofTreeView = new ProofTreeView(getContext().getKeYMediator());
         getSwingNode().setContent(proofTreeView);
     }
 }

@@ -7,10 +7,6 @@ import java.util.Observable;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
-import de.uka.ilkd.key.nui.viewmediation.DereferedViewProxy;
-import de.uka.ilkd.key.nui.viewmediation.ViewDereferer;
-import de.uka.ilkd.key.nui.viewmediation.ViewDerefererSlim;
-import de.uka.ilkd.key.nui.viewmediation.ViewProxyProvider;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -78,22 +74,6 @@ public class ViewInformation extends Observable {
         isActive = value;
         this.setChanged();
         this.notifyObservers(true);
-        // XXX
-        if (controller instanceof ViewProxyProvider) {
-            DereferedViewProxy proxy = ((ViewProxyProvider) controller)
-                    .getProxy();
-            if (isActive)
-                ViewDereferer.attachActionObject(proxy);
-            else
-                ViewDereferer.detachActionObject(proxy);
-        }
-        //TODO method 2
-        if (controller != null) {
-            if (isActive)
-                ViewDerefererSlim.attachActionObject(controller);
-            else
-                ViewDerefererSlim.detachActionObject(controller);
-        }
     }
 
     private ViewPosition preferedPosition;

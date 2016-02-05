@@ -13,7 +13,7 @@ public class StrategyViewController extends ViewControllerSwingContent {
     public void createSwingContent() {
         AutoModeActionFX autoModeAction = new AutoModeActionFX(getContext());
         final StrategySelectionFX strategySelectionFX = new StrategySelectionFX(autoModeAction);
-        strategySelectionFX.setMediator(getContext().getProofManager().getMediator());
+        strategySelectionFX.setMediator(getContext().getKeYMediator());
 
         getSwingNode().setContent(strategySelectionFX);
     }

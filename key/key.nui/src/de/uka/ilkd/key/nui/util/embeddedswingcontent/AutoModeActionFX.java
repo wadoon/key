@@ -75,7 +75,7 @@ public final class AutoModeActionFX extends AbstractAction {
 
     public AutoModeActionFX(Context context) {
         this.context = context;
-        this.mediator = context.getProofManager().getMediator();
+        this.mediator = context.getKeYMediator();
         associatedProof = mediator.getSelectedProof();
         putValue("hideActionText", Boolean.TRUE);
         putValue(NAME, getStartCommand());
@@ -89,7 +89,7 @@ public final class AutoModeActionFX extends AbstractAction {
             associatedProof.addProofTreeListener(ptl);
         }
 
-        context.getProofManager().getMediator().addKeYSelectionListener(new KeYSelectionListener() {
+        context.getKeYMediator().addKeYSelectionListener(new KeYSelectionListener() {
             /** focused node has changed */
             public void selectedNodeChanged(KeYSelectionEvent e) {
             }
@@ -115,7 +115,7 @@ public final class AutoModeActionFX extends AbstractAction {
         // This method delegates the request only to the UserInterfaceControl
         // which implements the functionality.
         // No functionality is allowed in this method body!
-        context.getProofManager().getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
+        context.getKeYMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
 
             /**
              * invoked if automatic execution has started
@@ -164,8 +164,8 @@ public final class AutoModeActionFX extends AbstractAction {
         // (very fast), the glasspane won't be quick
         // enough to catch the second event. Therefore
         // we make a second check (which is a %%%HACK)
-        if (!context.getProofManager().getMediator().isInAutoMode()) {
-            KeYMediator r = context.getProofManager().getMediator();
+        if (!context.getKeYMediator().isInAutoMode()) {
+            KeYMediator r = context.getKeYMediator();
             Proof proof = r.getSelectedProof();
             if (r.getUI().getProofControl().isAutoModeSupported(proof)) {
                 // This method delegates the request only to the
@@ -180,7 +180,7 @@ public final class AutoModeActionFX extends AbstractAction {
             // This method delegates the request only to the
             // UserInterfaceControl which implements the functionality.
             // No functionality is allowed in this method body!
-            context.getProofManager().getMediator().getUI().getProofControl().stopAndWaitAutoMode();
+            context.getKeYMediator().getUI().getProofControl().stopAndWaitAutoMode();
         }
     }
 

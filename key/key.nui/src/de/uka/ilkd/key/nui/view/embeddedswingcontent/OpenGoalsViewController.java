@@ -23,7 +23,7 @@ public class OpenGoalsViewController extends ViewControllerSwingContent {
         // set openGoalsView
         openGoalsView = new JScrollPane();
         // GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
-        GoalList goalList = new GoalList(getContext().getProofManager().getMediator());
+        GoalList goalList = new GoalList(getContext().getKeYMediator());
         openGoalsView.setViewportView(goalList);
 
         getSwingNode().setContent(openGoalsView);
