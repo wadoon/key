@@ -111,14 +111,16 @@ public class ViewInformation extends Observable {
      */
     private Tab createTab(ViewInformation view, Node node,ViewController parent) {
         Tab t = new Tab();
-        Label title = new Label(view.getTitle());
-        BorderPane header = new BorderPane();
-        header.setCenter(title);
-        t.setGraphic(header);
+        String title = view.getTitle();
+        //t.setText(title);
+        Label titleLabel = new Label(title);
+        //BorderPane header = new BorderPane();
+        //header.setCenter(titleLabel);
+        t.setGraphic(titleLabel);
         t.setContent(node);
 
-        header.setOnDragDetected(event -> {
-            Dragboard db = header.startDragAndDrop(TransferMode.MOVE);
+        titleLabel.setOnDragDetected(event -> {
+            Dragboard db = titleLabel.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
             content.putString(Integer.toString(view.getId()));
             db.setContent(content);
@@ -129,9 +131,9 @@ public class ViewInformation extends Observable {
             view.setIsActive(false);
         });
 
-        header.setOnMouseClicked(event -> {
+        titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(view,parent).show(title, Side.TOP, event.getX(),
+                loadViewContextMenu(view,parent).show(titleLabel, Side.TOP, event.getX(),
                         event.getY());
         });
 
