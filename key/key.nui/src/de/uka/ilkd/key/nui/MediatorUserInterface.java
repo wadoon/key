@@ -11,7 +11,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
-import de.uka.ilkd.key.nui.util.IStatusManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
@@ -39,11 +38,11 @@ import javafx.stage.Stage;
 public class MediatorUserInterface
         extends AbstractMediatorUserInterfaceControl {
 
-    private IStatusManager statusManager;
+    private StatusManager statusManager;
     private KeYMediator mediator = null;
     private final LinkedList<InteractiveRuleApplicationCompletion> completions = new LinkedList<InteractiveRuleApplicationCompletion>();
 
-    public MediatorUserInterface(IStatusManager statusManager) {
+    public MediatorUserInterface(StatusManager statusManager) {
         this.statusManager = statusManager;
     }
 

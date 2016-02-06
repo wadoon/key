@@ -182,7 +182,7 @@ public class TacletMenuController extends ViewController {
     
     @Override
     public void initializeAfterLoadingFxml() {
-        mediator = getContext().getProofManager().getMediator();
+        mediator = getContext().getKeYMediator();
     };
 
     @FXML

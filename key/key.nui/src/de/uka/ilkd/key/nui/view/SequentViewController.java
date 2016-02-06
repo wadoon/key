@@ -7,6 +7,8 @@ import java.util.ResourceBundle;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -15,8 +17,6 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.PrintFilter;
-import de.uka.ilkd.key.nui.model.IProofListener;
-import de.uka.ilkd.key.nui.util.IAcceptSequentFilter;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.nui.view.menu.TacletMenuController;
@@ -54,8 +54,7 @@ import javafx.util.Pair;
  *
  */
 @KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = true)
-public class SequentViewController extends ViewController
-        implements IAcceptSequentFilter {
+public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
     private boolean sequentChanged = false;
@@ -68,14 +67,25 @@ public class SequentViewController extends ViewController
     private NotationInfo notationInfo = new NotationInfo();
     private Services services;
     private Sequent sequent;
-    private IProofListener proofChangeListener = (proofEvent) -> {
-        // execute ui update on javafx thread
-        Platform.runLater(() -> {
-            showSequent(getContext().getProofManager().getMediator()
-                    .getSelectedNode());
-            tacletInfoVC.showTacletInfo(getContext().getProofManager()
-                    .getMediator().getSelectedNode());
-        });
+    private PrintFilter lastFilter = null;
+    private KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
+        @Override
+        public void selectedProofChanged(KeYSelectionEvent e) {
+        }
+
+        @Override
+        public void selectedNodeChanged(KeYSelectionEvent e) {
+            // execute ui update on javafx thread
+            Platform.runLater(() -> {
+                showSequent(getContext().getKeYMediator().getSelectedNode());
+                if (lastFilter != null) {
+                    apply(lastFilter);
+                    updateView();
+                }
+                tacletInfoVC.showTacletInfo(
+                        getContext().getKeYMediator().getSelectedNode());
+            });
+        }
     };
     private PositionTranslator posTranslator;
 
@@ -164,7 +174,7 @@ public class SequentViewController extends ViewController
                     
                     
                     
-                    KeYMediator mediator = getContext().getProofManager().getMediator();
+                    KeYMediator mediator = getContext().getKeYMediator();
                     MediatorProofControl c = mediator.getUI().getProofControl();
                     int pos = posTranslator.getCharIdxUnderPointer(event);
                     PosInOccurrence occ = abstractSyntaxTree.getPosInSequent(pos, new IdentitySequentPrintFilter(sequent)).getPosInOccurrence();
@@ -225,9 +235,8 @@ public class SequentViewController extends ViewController
 
     @Override
     public void initializeAfterLoadingFxml() {
-        getContext().getProofManager().addProofListener(proofChangeListener);
-        // XXX see FilterView
-        getContext().registerFilterConsumer(this);
+        getContext().getKeYMediator().addKeYSelectionListener(proofChangeListener);
+        getContext().getFilterChangedEvent().addHandler(this::apply);
 
         Pair<Object, ViewController> p = loadFxmlViewController(
                 getClass().getResource("TacletInfoView.fxml"));
@@ -262,8 +271,7 @@ public class SequentViewController extends ViewController
      *            The selected node.
      */
     private void showSequent(Node node) {
-        Proof proof = getContext().getProofManager().getMediator()
-                .getSelectedProof();
+        Proof proof = getContext().getKeYMediator().getSelectedProof();
         services = proof.getServices();
         sequent = node.sequent();
 
@@ -271,7 +279,7 @@ public class SequentViewController extends ViewController
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         printer = new SequentPrinter("resources/css/sequentStyle.css",
-                abstractSyntaxTree);
+                abstractSyntaxTree, getContext());
         sequentChanged = true;
 
         printSequent();
@@ -335,7 +343,7 @@ public class SequentViewController extends ViewController
     private void printSequent() {
         logicPrinter.printSequent(sequent);
         proofString = logicPrinter.toString();
-        
+
         printer.setPosTable(abstractSyntaxTree);
         printer.setSequent(sequent);
         printer.setProofString(proofString);
@@ -361,11 +369,13 @@ public class SequentViewController extends ViewController
             sequentChanged = false;
             double newHeight = posTranslator.getProofHeight();
             System.out.println(newHeight);
-            
-            // JavaFX 8 has MaxHeight ~10000. If bigger, an error will occur. Shall be patched in JDK9
-            if (newHeight > 10000) {
-                System.out.println("Proof might be too large with Size "+newHeight);
-                textAreaWebView.setPrefHeight(10000);
+
+            // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
+            // Shall be patched in JDK9
+            if (newHeight > 8192) {
+                System.out.println(
+                        "Proof might be too large with Size " + newHeight);
+                textAreaWebView.setPrefHeight(8192);
             }
             else {
                 textAreaWebView.setPrefHeight(newHeight);
@@ -376,8 +386,8 @@ public class SequentViewController extends ViewController
         updateHtml(this.printer.printProofString());
     }
 
-    @Override
-    public void apply(PrintFilter filter) {
+    private void apply(PrintFilter filter) {
+        lastFilter = filter;
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);
         updateView();

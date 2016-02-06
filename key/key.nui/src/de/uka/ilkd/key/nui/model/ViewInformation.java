@@ -18,19 +18,22 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Pair;
 
 public class ViewInformation extends Observable {
 
     private int id;
-    public int getId(){
+
+    public int getId() {
         return id;
     }
-    
+
     private static int nextId = 0;
-    private static int getNextId(){
+
+    private static int getNextId() {
         return nextId++;
     }
-    
+
     public ViewInformation(String title, URL pathToFxml,
             ViewPosition preferedPosition, boolean hasMenuItem) {
         fxmlPath = pathToFxml;
@@ -42,11 +45,11 @@ public class ViewInformation extends Observable {
     }
 
     private boolean hasMenuItem;
-    
+
     public boolean hasMenuItem() {
         return hasMenuItem;
     }
-    
+
     private URL fxmlPath;
 
     public URL getFxmlPath() {
@@ -92,16 +95,22 @@ public class ViewInformation extends Observable {
         this.setChanged();
         this.notifyObservers(false);
     }
-    
+
     private Tab uiTab = null;
-    public Tab getUiTab(){
+
+    public Tab getUiTab() {
         return uiTab;
     }
-    
-    public void loadUiTab(ViewController parent){
-        uiTab = createTab(this, parent.loadFxmlFromContext(getFxmlPath()),parent);   
+
+    private ViewController controller;
+
+    public void loadUiTab(ViewController parent) {
+        Pair<Object, ViewController> pair = parent
+                .loadFxmlViewController(getFxmlPath());
+        uiTab = createTab((Node) pair.getKey(), parent);
+        controller = pair.getValue();
     }
-    
+
     /**
      * 
      * @param title
@@ -109,9 +118,9 @@ public class ViewInformation extends Observable {
      * @return a tab with content node and title as lable, also drag
      *         functionality
      */
-    private Tab createTab(ViewInformation view, Node node,ViewController parent) {
+    private Tab createTab(Node node, ViewController parent) {
         Tab t = new Tab();
-        String title = view.getTitle();
+        String title = getTitle();
         //t.setText(title);
         Label titleLabel = new Label(title);
         //BorderPane header = new BorderPane();
@@ -122,25 +131,26 @@ public class ViewInformation extends Observable {
         titleLabel.setOnDragDetected(event -> {
             Dragboard db = titleLabel.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
-            content.putString(Integer.toString(view.getId()));
+            content.putString(Integer.toString(this.getId()));
             db.setContent(content);
             event.consume();
         });
 
         t.setOnCloseRequest(event -> {
-            view.setIsActive(false);
+            this.setIsActive(false);
         });
 
         titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(view,parent).show(titleLabel, Side.TOP, event.getX(),
+
+                loadViewContextMenu(parent).show(titleLabel, Side.TOP, event.getX(),
                         event.getY());
         });
 
         return t;
     }
-    
-    private ContextMenu loadViewContextMenu(ViewInformation view,ViewController parent) {
+
+    private ContextMenu loadViewContextMenu(ViewController parent) {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(ViewContextMenuController.class
                 .getResource("ViewContextMenu.fxml"));
@@ -157,7 +167,7 @@ public class ViewInformation extends Observable {
         // Give the controller access to the main app.
         ViewContextMenuController controller = loader.getController();
         controller.setMainApp(parent.getMainApp(), parent.getContext());
-        controller.setParentView(view);
+        controller.setParentView(this);
         content.setOnShowing((event) -> {
             // select current position
         });

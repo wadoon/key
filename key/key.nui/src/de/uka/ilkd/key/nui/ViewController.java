@@ -48,4 +48,18 @@ public abstract class ViewController implements Initializable {
      */
     public void initializeAfterLoadingFxml() {
     }
+    
+    /**
+     * Virtual method, called when an already loaded view is closed by the user
+     */
+    public void viewSuspended(){
+        
+    }
+    
+    /**
+     * Virtual method, called when an already loaded view that was suspenden is opened again.
+     */
+    public void viewReactivated(){
+        
+    }
 }

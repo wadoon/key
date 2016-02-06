@@ -7,17 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
-import com.sun.javafx.stage.ScreenHelper.ScreenAccessor;
-
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
+import javafx.stage.Stage;
 
 public class SessionSettings {
 
-    private static final int MinWidth = 50;
-    private static final int MinHeight = 50;
+    private static final int MinWidth = 300;
+    private static final int MinHeight = 200;
 
     private boolean boundsCorrupted = false;
 
@@ -38,7 +37,7 @@ public class SessionSettings {
     public void setViews(List<ViewInformation> viewInformations) {
         views = new LinkedList<>();
         for (ViewInformation view : viewInformations) {
-                views.add(new SerializableViewInformation(view));
+            views.add(new SerializableViewInformation(view));
         }
     }
 
@@ -67,7 +66,7 @@ public class SessionSettings {
 
     public void setWindowX(double value) {
         windowX = value;
-        CheckBounds();
+        // CheckBounds();
     }
 
     public double getWindowX() {
@@ -78,7 +77,7 @@ public class SessionSettings {
 
     public void setWindowY(double value) {
         windowY = value;
-        CheckBounds();
+        // CheckBounds();
     }
 
     public double getWindowY() {
@@ -92,7 +91,7 @@ public class SessionSettings {
             windowHeight = value;
         else
             windowHeight = MinHeight;
-        CheckBounds();
+        // CheckBounds();
     }
 
     public double getWindowHeight() {
@@ -107,7 +106,7 @@ public class SessionSettings {
         else
             windowWidth = MinWidth;
 
-        CheckBounds();
+        // CheckBounds();
     }
 
     public double getWindowWidth() {
@@ -118,23 +117,31 @@ public class SessionSettings {
      * Keeps the Window visible
      */
     private void CheckBounds() {
-        // get screens for x and y position
+        // workaround for JavaFx malfunction that causes x and y to be slightly
+        // negative
+        if (windowX < 0)
+            windowX = 0;
+        if (windowY < 0)
+            windowY = 0;
+
+        // get screens for x and y position (regardless of size)
         List<Screen> containers = Screen.getScreensForRectangle(windowX,
                 windowY, 1, 1);
         if (containers.size() > 0) {
             for (Screen s : containers) {
-                if (s.getVisualBounds().contains(windowX, windowY, windowWidth,
-                        windowHeight))
+                // make sure 75% of the window is on the screen
+                if (s.getBounds().contains(windowX, windowY, windowWidth * 0.75,
+                        windowHeight * 0.75)) {
                     boundsCorrupted = false;
-                return;
+                    return;
+                }
             }
-            // if no screen contained the bounds, use default (= set corrupted)
-            boundsCorrupted = true;
         }
         boundsCorrupted = true;
     }
 
     public void SaveAsLast() {
+        CheckBounds();
         if (boundsCorrupted)
             return;
 
@@ -178,6 +185,8 @@ public class SessionSettings {
         }
         catch (Exception ex) {
             ex.printStackTrace();
+            System.out.println(
+                    "Error while loading Gui Settings - using defaults");
             return null;
         }
     }

@@ -133,7 +133,6 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleApply() {
-        // XXX not the best approach
-        getContext().acceptFilter(currentFilter);
+        getContext().setCurrentPrintFilter(currentFilter);
     }
 }

@@ -17,17 +17,26 @@ public class DebugViewController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        debugViewController = this;
+
     }
 
-    public void print(String str) {
-        outputText.setText(str);
+    @Override
+    public void initializeAfterLoadingFxml() {
+        getContext().getSequentHtmlChangedEvent().addHandler(this::print);
+    };
+
+    private void print(String str) {
+        outputText.setText(str.replace("\n", "\\n\n"));
     }
 
-    private static DebugViewController debugViewController;
-
-    public static void printOnCurrent(String str) {
-        //TODO: remove hardcoded reference -> exceptions if DebugView is closed
-        debugViewController.print(str);
+    @Override
+    public void viewSuspended() {
+        getContext().getSequentHtmlChangedEvent().removeListener(this::print);
     }
+
+    @Override
+    public void viewReactivated() {
+        getContext().getSequentHtmlChangedEvent().addHandler(this::print);
+    }
+    //TODO: call this 2 methods in ViewInformation on setIsActive or something like that
 }
