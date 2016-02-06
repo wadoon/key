@@ -14,36 +14,26 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
-//@KeYView(title = "TacletInfo", path = "TacletInfoView.fxml", preferredPosition = ViewPosition.TOPRIGHT, hasMenuItem = false)
+/**
+ * @author Victor Schuemmer
+ *
+ */
 public class TacletInfoViewController extends ViewController {
 
 
     private KeYMediator mediator;
-    private Node node;
-    private TacletInfoPrinter printer;
     @FXML
     private TextArea outputText;
-    
-    private IProofListener proofChangeListener = (proofEvent) -> {
-        // execute ui update on javafx thread
-        Platform.runLater(() -> {
-            showTacletInfo();
-        });
-    };
     
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         outputText.setEditable(false);
         outputText.setDisable(true);
-        printer = new TacletInfoPrinter();
     }
     
     @Override
     public void initializeAfterLoadingFxml() {
-        mediator = getContext().getProofManager().getMediator();
-        
-        //XXX uncomment when using tacletInfo as seperate view rather than a part of SequentView 
-        //getContext().getProofManager().addProofListener(proofChangeListener);
+        mediator = getContext().getProofManager().getMediator();    
     }
     
     /**
@@ -52,7 +42,7 @@ public class TacletInfoViewController extends ViewController {
      */
     public void showTacletInfo(Node node){
         outputText.setDisable(false);
-        outputText.setText(printer.printTacletInfo(mediator, node));
+        outputText.setText(TacletInfoPrinter.printTacletInfo(mediator, node));
     };
     
     /**

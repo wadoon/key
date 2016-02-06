@@ -63,8 +63,8 @@ public class MainApp extends Application {
         }
         initRootLayout();
 
-        ctrlPressedHandler();
-        closeWindowConfirmHandler();
+        setCtrlPressedHandler();
+        setCloseWindowConfirmHandler();
         scanForViews(useBoundsSettings ? viewmap : new HashMap<>());
         scanForMenus();
 
@@ -122,7 +122,7 @@ public class MainApp extends Application {
     /**
      * Listens for ControlDown Event.
      */
-    private void ctrlPressedHandler() {
+    private void setCtrlPressedHandler() {
         scene.setOnKeyPressed((value) -> {
             if (value.isControlDown())
                 ctrlPressed = true;
@@ -134,8 +134,9 @@ public class MainApp extends Application {
 
     /**
      * Listens for a Window Close Request and prompts the user to confirm.
+     * Skips the dialog if ctrl is pressed while closing.
      */
-    private void closeWindowConfirmHandler() {
+    private void setCloseWindowConfirmHandler() {
         scene.getWindow().setOnCloseRequest((event) -> {
             if (!ctrlPressed) {
                 closeWindowAlert();
@@ -169,6 +170,9 @@ public class MainApp extends Application {
         saveAndClose();
     }
 
+    /**
+     * Saves window settings and closes the main stage.
+     */
     private void saveAndClose() {
         SessionSettings settings = new SessionSettings();
         settings.setWindowX(primaryStage.getX());
