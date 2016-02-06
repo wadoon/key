@@ -1,8 +1,12 @@
 package de.uka.ilkd.key.nui.view;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.key_project.util.collection.ImmutableList;
+
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -15,6 +19,8 @@ import de.uka.ilkd.key.nui.model.IProofListener;
 import de.uka.ilkd.key.nui.util.IAcceptSequentFilter;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
+import de.uka.ilkd.key.nui.view.menu.TacletMenuController;
+import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -25,12 +31,18 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.ui.MediatorProofControl;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Side;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.MouseButton;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Pair;
@@ -136,6 +148,49 @@ public class SequentViewController extends ViewController
             }
         });
 
+        textAreaWebView.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                //XXX loading context menus should get static method in KeyFXMLLoader
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(ViewContextMenuController.class
+                        .getResource("TacletMenu.fxml"));
+                ContextMenu content;
+                try {
+                    content = loader.load();
+                    // Give the controller access to the main app.
+                    TacletMenuController controller = loader.getController();
+                    controller.setMainApp(this.getMainApp(), this.getContext());
+                    
+                    
+                    
+                    
+                    KeYMediator mediator = getContext().getProofManager().getMediator();
+                    MediatorProofControl c = mediator.getUI().getProofControl();
+                    int pos = posTranslator.getCharIdxUnderPointer(event);
+                    PosInOccurrence occ = abstractSyntaxTree.getPosInSequent(pos, new IdentitySequentPrintFilter(sequent)).getPosInOccurrence();
+                    System.out.println(mediator.getSelectedGoal());
+                    final ImmutableList<BuiltInRule> builtInRules = c.getBuiltInRule(mediator.getSelectedGoal(), occ);
+                    controller.init(c.getFindTaclet(mediator.getSelectedGoal(), occ),
+                            c.getRewriteTaclet(mediator.getSelectedGoal(), occ),
+                            c.getNoFindTaclet(mediator.getSelectedGoal()),
+                            builtInRules, abstractSyntaxTree.getPosInSequent(pos, new IdentitySequentPrintFilter(sequent)));
+                    
+                    
+                    
+                    //controller.setParentView(view);
+                    content.setOnShowing((evt) -> {
+                        // select current position
+                    });
+                    content.show(textAreaWebView, Side.BOTTOM, event.getX(),
+                            event.getY());
+                }
+                catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        });
+        
         textAreaWebView.setOnScroll(event -> {
             // Adjustment: Event.getDelta is absolute amount of pixels,
             // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
