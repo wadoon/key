@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Observable;
+import java.util.Stack;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.nui.model.Context;
 import de.uka.ilkd.key.nui.model.PrintFilter;
-import de.uka.ilkd.key.nui.view.DebugViewController;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -41,16 +40,17 @@ public class SequentPrinter {
 
     private TreeSet<Integer> keySet = new TreeSet<Integer>();
 
-    private HashMap<Integer, String[]> openTagsAtIndex;
-    private HashMap<Integer, String[]> closeTagsAtIndex;
+    private HashMap<Integer, String[]> openTagsAtIndex = new HashMap<Integer, String[]>();;
+    private HashMap<Integer, String[]> closeTagsAtIndex = new HashMap<Integer, String[]>();;
 
-    private ArrayList<Integer> lessThenList;
+    private ArrayList<Integer> lessThenList = new ArrayList<Integer>();
 
-    private Range mouseoverRange;
-    private ArrayList<Integer> searchIndicesOpen;
-    private ArrayList<Integer> searchIndicesClose;
-    private ArrayList<Integer> filterIndicesOpen;
-    private ArrayList<Integer> filterIndicesClose;
+    private ArrayList<Integer> mouseIndicesOpen = new ArrayList<Integer>();
+    private ArrayList<Integer> mouseIndicesClose = new ArrayList<Integer>();
+    private ArrayList<Integer> searchIndicesOpen = new ArrayList<Integer>();
+    private ArrayList<Integer> searchIndicesClose = new ArrayList<Integer>();
+    private ArrayList<Integer> filterIndicesOpen = new ArrayList<Integer>();
+    private ArrayList<Integer> filterIndicesClose = new ArrayList<Integer>();
 
     private static HashMap<Class, String> classMap = new HashMap<>();
     private static HashMap<Class, Boolean> classEnabledMap = new HashMap<>();
@@ -75,11 +75,12 @@ public class SequentPrinter {
     }
 
     private Context context;
-    
+
     /**
      * 
      */
-    public SequentPrinter(String cssPath, PositionTable posTable,Context context) {
+    public SequentPrinter(String cssPath, PositionTable posTable,
+            Context context) {
         try {
             readCSS(cssPath);
         }
@@ -89,14 +90,6 @@ public class SequentPrinter {
         this.setPosTable(posTable);
 
         this.context = context;
-        openTagsAtIndex = new HashMap<Integer, String[]>();
-        closeTagsAtIndex = new HashMap<Integer, String[]>();
-
-        lessThenList = new ArrayList<Integer>();
-        searchIndicesOpen = new ArrayList<Integer>();
-        searchIndicesClose = new ArrayList<Integer>();
-        filterIndicesOpen = new ArrayList<Integer>();
-        filterIndicesClose = new ArrayList<Integer>();
 
         // If no SequentPrinter has been created yet, the ClassMap is empty.
         // Fill it!
@@ -253,7 +246,7 @@ public class SequentPrinter {
                 keySet.remove(i);
             }
         }
-        
+
         String html = sb.toString();
         context.setSequentHtml(html);
         return toHTML(html);
@@ -272,9 +265,60 @@ public class SequentPrinter {
         keySet.add(range.start());
         keySet.add(range.end());
 
+        String[] openTagArray;
+        String[] closeTagArray;
+        Stack<String> tagStack = new Stack<>();
+
+        // Check for Overlap inbetween Start and End
+        for (int i = range.start(); i <= range.end(); i++) {
+
+            if (openTagsAtIndex.containsKey(i)
+                    || closeTagsAtIndex.containsKey(i)) {
+
+                openTagArray = openTagsAtIndex.get(i);
+                closeTagArray = closeTagsAtIndex.get(i);
+
+                for (int j = 0; j < StylePos.values().length; j++) {
+                    // If closingTag, pop() the last Opened, or resolve
+                    if (closeTagArray != null && closeTagArray[j] != null
+                            && !closeTagArray[j].isEmpty()
+                            && i > range.start()) {
+                        if (tagStack.size() == 0) {
+                            putCloseTag(i, StylePos.MOUSE, closingTag);
+                            putOpenTag(i, StylePos.MOUSE, mouseTag);
+                            mouseIndicesOpen.add(i);
+                            mouseIndicesClose.add(i);
+                        }
+                        else {
+                            tagStack.pop();
+                        }
+                    }
+                    // If openTag, push it on the stack
+                    if (openTagArray != null && openTagArray[j] != null
+                            && !openTagArray[j].isEmpty() && i < range.end()) {
+                        tagStack.push(openTagArray[j]);
+                    }
+                }
+            }
+        }
+
+        // Insert the MouseOverTags themselves
         putOpenTag(range.start(), StylePos.MOUSE, mouseTag);
+        mouseIndicesOpen.add(range.start());
+
         putCloseTag(range.end(), StylePos.MOUSE, closingTag);
-        mouseoverRange = range;
+        mouseIndicesClose.add(range.end());
+
+        // If there is an opened Tag inside the range after mouse is closed,
+        // resolve the overlap by closing it and opening it again on the outside
+        // of the mouseover
+        if (tagStack.size() > 0) {
+            System.out.println("LAST CLOSE & OPEN");
+            putCloseTag(range.end(), StylePos.MOUSE, closingTag);
+            putTag(range.end(), StylePos.MOUSE, tagStack.pop(),
+                    openTagsAtIndex);
+            mouseIndicesOpen.add(range.end());
+        }
     }
 
     /**
@@ -298,7 +342,7 @@ public class SequentPrinter {
         for (int i = 0; i < lines.length; i++) {
             // Compute Endindex of Line
             int styleEnd = styleStart + lines[i].length() + 1;
-            
+
             // If line is in list apply styles
             if (indicesOfLines.contains(i) == filter.getInvert()) {
                 switch (filter.getFilterMode()) {
@@ -370,6 +414,19 @@ public class SequentPrinter {
         }
     }
 
+    /**
+     * inserts the tag into the given HashMap. Use only if you are sure you know
+     * what to do
+     * 
+     * @param index
+     *            position inside the proofstring
+     * @param arrayPos
+     *            the StylePosition
+     * @param tag
+     *            the tag itself.
+     * @param map
+     *            the map to be inserted into
+     */
     private void putTag(int index, StylePos arrayPos, String tag,
             HashMap<Integer, String[]> map) {
         String[] mapValue = map.get(index);
@@ -395,6 +452,17 @@ public class SequentPrinter {
         }
     }
 
+    /**
+     * to be used to add an opening <span...> tag. Calls {@link putTag}
+     * 
+     * @param index
+     *            position inside the proofstring
+     * @param arrayPos
+     *            the StylePosition
+     * @param tag
+     *            the opening tag const or empty String
+     * @return the HashMap with all the openTag indices
+     */
     private HashMap<Integer, String[]> putOpenTag(int index, StylePos arrayPos,
             String tag) {
         if (tag.isEmpty()) {
@@ -408,6 +476,17 @@ public class SequentPrinter {
         return openTagsAtIndex;
     }
 
+    /**
+     * to be used to add a closing </span> tag. Calls {@link putTag}
+     * 
+     * @param index
+     *            position inside the proofstring
+     * @param arrayPos
+     *            the StylePosition
+     * @param tag
+     *            the closingTag const or empty String
+     * @return the HashMap with all the closeTag indices
+     */
     private HashMap<Integer, String[]> putCloseTag(int index, StylePos arrayPos,
             String tag) {
         putTag(index, arrayPos, tag, closeTagsAtIndex);
@@ -418,13 +497,21 @@ public class SequentPrinter {
      * removes all the Mouseover Highlighting currently applied.
      */
     public void removeMouseHighlighting() {
-        if (mouseoverRange != null) {
+        if (mouseIndicesClose != null) {
+            for (Iterator<Integer> iterator = mouseIndicesOpen
+                    .iterator(); iterator.hasNext();) {
+                int index = (int) iterator.next();
+                putOpenTag(index, StylePos.MOUSE, "");
+            }
+            for (Iterator<Integer> iterator = mouseIndicesClose
+                    .iterator(); iterator.hasNext();) {
+                int index = (int) iterator.next();
+                putCloseTag(index, StylePos.MOUSE, "");
+            }
 
-            // keySet.remove(mouseoverRange.start());
-            // keySet.remove(mouseoverRange.end());
+            mouseIndicesOpen.clear();
+            mouseIndicesClose.clear();
 
-            putOpenTag(mouseoverRange.start(), StylePos.MOUSE, "");
-            putCloseTag(mouseoverRange.end(), StylePos.MOUSE, "");
         }
     }
 
@@ -526,6 +613,13 @@ public class SequentPrinter {
 
     }
 
+    /**
+     * adds the Indices of all the "<" signs inside the given String for
+     * Escaping
+     * 
+     * @param string
+     *            the string to be escaped
+     */
     private void setLessThenIndices(String string) {
         // Find indices of all matches. Put in Map. Put in ArrayList for
         // removal
