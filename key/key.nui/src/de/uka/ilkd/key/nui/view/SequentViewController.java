@@ -19,6 +19,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
+import de.uka.ilkd.key.nui.util.TermInfoPrinter;
 import de.uka.ilkd.key.nui.view.menu.TacletMenuController;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -58,7 +60,6 @@ public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
     private boolean sequentChanged = false;
-    private TacletInfoViewController tacletInfoVC;
     private SequentPrinter printer;
     private LogicPrinter logicPrinter;
     private InitialPositionTable abstractSyntaxTree;
@@ -82,7 +83,7 @@ public class SequentViewController extends ViewController {
                     apply(lastFilter);
                     updateView();
                 }
-                tacletInfoVC.showTacletInfo(
+                tacletInfoViewController.showTacletInfo(
                         getContext().getKeYMediator().getSelectedNode());
             });
         }
@@ -98,13 +99,16 @@ public class SequentViewController extends ViewController {
     @FXML
     private CheckBox checkBoxRegexSearch;
     @FXML
-    private WebView textAreaWebView;
+    private WebView textArea;
     @FXML
     private TextField searchBox;
     @FXML
     private ScrollPane scrollPane;
     @FXML
     private TitledPane tacletInfo;
+    @FXML
+    private TacletInfoViewController tacletInfoViewController;
+    private ContextMenu tacletMenu;
 
     /**
      * The constructor. The constructor is called before the initialize()
@@ -135,7 +139,7 @@ public class SequentViewController extends ViewController {
         posTranslator = new PositionTranslator(
                 "resources/css/sequentStyle.css");
 
-        textAreaWebView.setOnMouseMoved(event -> {
+        textArea.setOnMouseMoved(event -> {
             if (sequentLoaded) {
 
                 int pos = posTranslator.getCharIdxUnderPointer(event);
@@ -145,12 +149,15 @@ public class SequentViewController extends ViewController {
                 this.updateView();
 
                 if (event.isAltDown())
-                    showTermInfo(abstractSyntaxTree.getPosInSequent(pos,
-                            new IdentitySequentPrintFilter(sequent)));
+                    getContext().getStatusManager()
+                            .setStatus(TermInfoPrinter.printTermInfo(sequent,
+                                    (abstractSyntaxTree.getPosInSequent(pos,
+                                            new IdentitySequentPrintFilter(
+                                                    sequent)))));
             }
         });
 
-        textAreaWebView.setOnMouseExited(event -> {
+        textArea.setOnMouseExited(event -> {
             if (sequentLoaded) {
                 this.printer.removeMouseHighlighting();
                 this.updateView();
@@ -158,41 +165,41 @@ public class SequentViewController extends ViewController {
             }
         });
 
-        textAreaWebView.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                //XXX loading context menus should get static method in KeyFXMLLoader
+        textArea.setOnMouseClicked(event -> {
+            if (sequentLoaded && event.getButton() == MouseButton.PRIMARY) {
+                if (tacletMenu != null)
+                    tacletMenu.hide();
+
+                // XXX loading context menus should get static method in
+
                 FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(ViewContextMenuController.class
+                loader.setLocation(TacletMenuController.class
                         .getResource("TacletMenu.fxml"));
-                ContextMenu content;
                 try {
-                    content = loader.load();
+                    tacletMenu = loader.load();
                     // Give the controller access to the main app.
                     TacletMenuController controller = loader.getController();
                     controller.setMainApp(this.getMainApp(), this.getContext());
-                    
-                    
-                    
-                    
+
                     KeYMediator mediator = getContext().getKeYMediator();
-                    MediatorProofControl c = mediator.getUI().getProofControl();
-                    int pos = posTranslator.getCharIdxUnderPointer(event);
-                    PosInOccurrence occ = abstractSyntaxTree.getPosInSequent(pos, new IdentitySequentPrintFilter(sequent)).getPosInOccurrence();
-                    System.out.println(mediator.getSelectedGoal());
-                    final ImmutableList<BuiltInRule> builtInRules = c.getBuiltInRule(mediator.getSelectedGoal(), occ);
-                    controller.init(c.getFindTaclet(mediator.getSelectedGoal(), occ),
-                            c.getRewriteTaclet(mediator.getSelectedGoal(), occ),
-                            c.getNoFindTaclet(mediator.getSelectedGoal()),
-                            builtInRules, abstractSyntaxTree.getPosInSequent(pos, new IdentitySequentPrintFilter(sequent)));
-                    
-                    
-                    
-                    //controller.setParentView(view);
-                    content.setOnShowing((evt) -> {
-                        // select current position
-                    });
-                    content.show(textAreaWebView, Side.BOTTOM, event.getX(),
-                            event.getY());
+
+                    Goal goal = mediator.getSelectedGoal();
+                    if (goal != null) {
+                        MediatorProofControl c = mediator.getUI()
+                                .getProofControl();
+                        int idx = posTranslator.getCharIdxUnderPointer(event);
+                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(
+                                idx, new IdentitySequentPrintFilter(sequent));
+                        PosInOccurrence occ = pos.getPosInOccurrence();
+                        final ImmutableList<BuiltInRule> builtInRules = c
+                                .getBuiltInRule(goal, occ);
+                        controller.init(c.getFindTaclet(goal, occ),
+                                c.getRewriteTaclet(goal, occ),
+                                c.getNoFindTaclet(goal), builtInRules, pos);
+
+                        tacletMenu.show(textArea, Side.TOP, event.getX(),
+                                event.getY());
+                    }
                 }
                 catch (IOException e) {
                     // TODO Auto-generated catch block
@@ -200,8 +207,8 @@ public class SequentViewController extends ViewController {
                 }
             }
         });
-        
-        textAreaWebView.setOnScroll(event -> {
+
+        textArea.setOnScroll(event -> {
             // Adjustment: Event.getDelta is absolute amount of pixels,
             // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
             this.scrollPane.setVvalue(
@@ -212,36 +219,13 @@ public class SequentViewController extends ViewController {
 
     }
 
-    private void showTermInfo(PosInSequent pos) {
-        String info = null;
-        Term t;
-        if (pos != null) {
-            PosInOccurrence occ = pos.getPosInOccurrence();
-            if (occ != null) {
-                t = occ.subTerm();
-                String tOpClassString = t.op().getClass().toString();
-                String operator = tOpClassString
-                        .substring(tOpClassString.lastIndexOf('.') + 1);
-                // The hash code is displayed here since sometimes terms with
-                // equal string representation are still different.
-                info = operator + ", Sort: " + t.sort() + ", Hash: "
-                        + t.hashCode();
-
-                info += ProofSaver.posInOccurrence2Proof(sequent, occ);
-                getContext().getStatusManager().setStatus(info);
-            }
-        }
-    }
-
     @Override
     public void initializeAfterLoadingFxml() {
-        getContext().getKeYMediator().addKeYSelectionListener(proofChangeListener);
+        getContext().getKeYMediator()
+                .addKeYSelectionListener(proofChangeListener);
         getContext().getFilterChangedEvent().addHandler(this::apply);
-
-        Pair<Object, ViewController> p = loadFxmlViewController(
-                getClass().getResource("TacletInfoView.fxml"));
-        tacletInfoVC = (TacletInfoViewController) p.getValue();
-        tacletInfo.setContent((javafx.scene.Node) p.getKey());
+        
+        tacletInfoViewController.setMainApp(getMainApp(), getContext());
     }
 
     // TODO add comments
@@ -355,7 +339,7 @@ public class SequentViewController extends ViewController {
     }
 
     private void updateHtml(String s) {
-        webEngine = textAreaWebView.getEngine();
+        webEngine = textArea.getEngine();
         webEngine.loadContent(s);
     }
 
@@ -375,12 +359,12 @@ public class SequentViewController extends ViewController {
             if (newHeight > 8192) {
                 System.out.println(
                         "Proof might be too large with Size " + newHeight);
-                textAreaWebView.setPrefHeight(8192);
+                textArea.setPrefHeight(8192);
             }
             else {
-                textAreaWebView.setPrefHeight(newHeight);
+                textArea.setPrefHeight(newHeight);
             }
-            textAreaWebView.autosize();
+            textArea.autosize();
         }
 
         updateHtml(this.printer.printProofString());

@@ -5,29 +5,35 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
 
 <ContextMenu fx:id="rootMenu" xmlns="http://javafx.com/javafx/8.0.40"
 	xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.menu.TacletMenuController">
 	<items>
-		<MenuItem mnemonicParsing="false" fx:id="noRules" text="No rules applicable."></MenuItem>
-		
-		<Menu fx:id="moreRules" visible="false" text="More rules"></Menu>
-		
-		<SeparatorMenuItem></SeparatorMenuItem>
-		
+		<MenuItem mnemonicParsing="false" fx:id="noRules" visible="false"
+			text="No rules applicable." />
+
+		<Menu fx:id="moreRules" visible="false" text="More rules" />
+
+		<SeparatorMenuItem />
+
 		<MenuItem mnemonicParsing="false" onAction="#handleFocussedRuleApplication"
-			text="Apply rules automatically here"></MenuItem>
-			
-		<SeparatorMenuItem></SeparatorMenuItem>
-	        
-		<MenuItem mnemonicParsing="false" fx:id="createAbbr" onAction="#handleCreateAbbriviation"
-			text="Create abbriviation"></MenuItem>
-		<MenuItem mnemonicParsing="false" fx:id="enableAbbr" visible="false" onAction="#handleEnableAbbriviation"
-			text="Enable abbriviation"></MenuItem>
-		<MenuItem mnemonicParsing="false" fx:id="disableAbbr" visible="false" onAction="#handleDisableAbbriviation"
-			text="Disable abbriviation"></MenuItem>
-		<MenuItem mnemonicParsing="false" fx:id="changeAbbr" visible="false" onAction="#handleChangeAbbriviation"
-			text="Change abbriviation"></MenuItem>
+			text="Apply rules automatically here" />
+
+                <fx:include fx:id="proofMacroMenu" source="ProofMacroMenu.fxml" />
+		
+		<SeparatorMenuItem />
+
+		<MenuItem mnemonicParsing="false" fx:id="copyToClipboard"
+			onAction="#handleCopyToClipboard" text="Copy to clipboard" />
+		<MenuItem mnemonicParsing="false" fx:id="createAbbr"
+			onAction="#handleCreateAbbriviation" text="Create abbriviation" />
+		<MenuItem mnemonicParsing="false" fx:id="enableAbbr" visible="false"
+			onAction="#handleEnableAbbriviation" text="Enable abbriviation" />
+		<MenuItem mnemonicParsing="false" fx:id="disableAbbr"
+			visible="false" onAction="#handleDisableAbbriviation" text="Disable abbriviation" />
+		<MenuItem mnemonicParsing="false" fx:id="changeAbbr" visible="false"
+			onAction="#handleChangeAbbriviation" text="Change abbriviation" />
 
 	</items>
 </ContextMenu>

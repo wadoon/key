@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.nodeviews.TacletMenu.TacletAppComparator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -28,6 +29,14 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
+/**
+ * 
+ * Copied from TacletMenu and adapted to JavaFX style.
+ * This is NOT a menu anymore but a controller. There is a field
+ * rootMenu to access the actual menu.
+ * @see de.uka.ilkd.key.gui.nodeviews.TacletMenu original TacletMenu  
+ * @author Victor Schuemmer
+ */
 public class TacletMenuController extends ViewController {
     
     private static final Set<Name> CLUTTER_RULESETS = new LinkedHashSet<Name>();
@@ -73,6 +82,8 @@ public class TacletMenuController extends ViewController {
     @FXML 
     private Menu moreRules;
     @FXML
+    private MenuItem copyToClipboard;
+    @FXML
     private MenuItem createAbbr;
     @FXML
     private MenuItem enableAbbr;
@@ -80,6 +91,8 @@ public class TacletMenuController extends ViewController {
     private MenuItem disableAbbr;
     @FXML
     private MenuItem changeAbbr;
+    @FXML
+    private ProofMacroMenuController proofMacroMenuController;
     
     
     public void init(ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
@@ -88,6 +101,7 @@ public class TacletMenuController extends ViewController {
         comp = new TacletAppComparator();
         createTacletMenu(removeRewrites(findList).prepend(rewriteList),
                 noFindList, builtInList);
+        proofMacroMenuController.init(mediator, pos.getPosInOccurrence());
     }
     
     /** removes RewriteTaclet from list
@@ -130,6 +144,39 @@ public class TacletMenuController extends ViewController {
     }
     
     private void createMenuItems(ImmutableList<TacletApp> taclets){
+        
+        /*
+         * final InsertHiddenTacletMenuItem insHiddenItem =
+            new InsertHiddenTacletMenuItem(MainWindow.getInstance(),
+                    mediator.getNotationInfo(), mediator.getServices());
+
+        final InsertionTacletBrowserMenuItem insSystemInvItem =
+            new InsertSystemInvariantTacletMenuItem(MainWindow.getInstance(),
+                    mediator.getNotationInfo(), mediator.getServices());
+
+
+        for (final TacletApp app : taclets) {
+            final Taclet taclet = app.taclet();
+
+            if (insHiddenItem.isResponsible(taclet)) {
+                insHiddenItem.add(app);
+            } else if (insSystemInvItem.isResponsible(taclet)) {
+                insSystemInvItem.add(app);
+            }
+    }
+
+        if (insHiddenItem.getAppSize() > 0) {
+            add(insHiddenItem);
+            insHiddenItem.addActionListener(control);
+        }
+
+        if (insSystemInvItem.getAppSize() > 0) {
+            add(insSystemInvItem);
+            insSystemInvItem.addActionListener(control);
+        }
+
+         */
+        int idx = 0;
         for (final TacletApp app : taclets) {
             final Taclet taclet = app.taclet();
             
@@ -139,8 +186,13 @@ public class TacletMenuController extends ViewController {
 
             //if (! insHiddenItem.isResponsible(taclet) &&
             //    !insSystemInvItem.isResponsible(taclet)) {
-                //TODO add control
-                final MenuItem item = new MenuItem();
+                
+                final MenuItem item = new MenuItem(taclet.displayName());
+                item.setOnAction(event -> {
+                    Goal goal = mediator.getSelectedGoal();
+                    mediator.getUI().getProofControl().selectedTaclet(taclet, goal, pos.getPosInOccurrence());
+                });
+                
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {
                     if (CLUTTER_RULESETS.contains(rs.name())) rareRule = true;
@@ -149,12 +201,14 @@ public class TacletMenuController extends ViewController {
 
                 if (rareRule)
                     moreRules.getItems().add(item);
-                else rootMenu.getItems().add(item);
+                else rootMenu.getItems().add(idx++,item);
             //}
         }
         if (moreRules.getItems().size() > 0)
             moreRules.setVisible(true);
     }
+    
+    
     
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds, TacletAppComparator comp) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
