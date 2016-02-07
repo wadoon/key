@@ -15,7 +15,10 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.nui.model.Context;
@@ -25,6 +28,11 @@ import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * @author Maximilian Li
@@ -55,17 +63,20 @@ public class SequentPrinter {
     private static HashMap<Class, String> classMap = new HashMap<>();
     private static HashMap<Class, Boolean> classEnabledMap = new HashMap<>();
 
-    private final static String openTagBegin = "<span class=\"";
-    private final static String openTagEnd = "\">";
-    private final static String closingTag = "</span>";
+    private final static String OPEN_TAG_BEGIN = "<span class=\"";
+    private final static String OPEN_TAG_END = "\">";
+    private final static String CLOSING_TAG = "</span>";
 
-    private final static String mouseTag = "mouseover";
-    private final static String highlightedTag = "highlighted";
-    private final static String filterMinimizeTag = "minimized";
-    private final static String filterCollapsedTag = "collapsed";
+    private final static String MOUSE_TAG = "mouseover";
+    private final static String HIGHLIGHTED_TAG = "highlighted";
+    private final static String FILTER_MINIMIZED_TAG = "minimized";
+    private final static String FILTER_COLLAPSED_TAG = "collapsed";
+    private final static String RULE_APP_TAG = "ruleApp";
+    private final static String IF_INST_TAG = "ifInst";
+    private final static String IF_FORMULA_TAG = "ifFormula";
 
     private enum StylePos {
-        SYNTAX(3), MOUSE(0), SEARCH(2), FILTER(1);
+        SYNTAX(4), MOUSE(0), SEARCH(2), FILTER(1), RULEAPP(3);
 
         private int slotPosition;
 
@@ -252,6 +263,59 @@ public class SequentPrinter {
         return toHTML(html);
     }
 
+    private Range getHighlightRange(PosInOccurrence pos) {
+        ImmutableList<Integer> path = ((InitialPositionTable) posTable)
+                .pathForPosition(pos, new IdentitySequentPrintFilter(sequent));
+        return ((InitialPositionTable) posTable).rangeForPath(path);
+    }
+
+    public void applyRuleAppHighlighting(RuleApp app) {
+        if (app.posInOccurrence() != null) {
+            Range r = getHighlightRange(app.posInOccurrence());
+            putOpenTag(r.start(), StylePos.RULEAPP, RULE_APP_TAG);
+        }
+
+        if (app instanceof TacletApp) {
+            highlightIfFormulas((TacletApp) app);
+        }
+        else if (app instanceof IBuiltInRuleApp) {
+            highlightIfInsts((IBuiltInRuleApp) app);
+        }
+    }
+
+    /**
+     * @param tapp
+     *            The taclet app for which the if formulae should be
+     *            highlighted.
+     * @throws BadLocationException
+     */
+    private void highlightIfFormulas(TacletApp tapp) {
+        final ImmutableList<IfFormulaInstantiation> ifs = tapp
+                .ifFormulaInstantiations();
+        if (ifs == null) {
+            return;
+        }
+        for (final IfFormulaInstantiation inst2 : ifs) {
+            if (!(inst2 instanceof IfFormulaInstSeq)) {
+                continue;
+            }
+            final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
+            final PosInOccurrence pos = new PosInOccurrence(
+                    inst.getConstrainedFormula(), PosInTerm.getTopLevel(),
+                    inst.inAntec());
+            Range r = getHighlightRange(pos);
+            putOpenTag(r.start(), StylePos.RULEAPP, IF_FORMULA_TAG);
+        }
+    }
+
+    private void highlightIfInsts(IBuiltInRuleApp bapp) {
+        final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
+        for (PosInOccurrence pio : ifs) {
+            Range r = getHighlightRange(pio);
+            putOpenTag(r.start(), StylePos.RULEAPP, IF_INST_TAG);
+        }
+    }
+
     /**
      * applies mouseoverHighlighting for the given range
      * 
@@ -284,8 +348,8 @@ public class SequentPrinter {
                             && !closeTagArray[j].isEmpty()
                             && i > range.start()) {
                         if (tagStack.size() == 0) {
-                            putCloseTag(i, StylePos.MOUSE, closingTag);
-                            putOpenTag(i, StylePos.MOUSE, mouseTag);
+                            putCloseTag(i, StylePos.MOUSE, CLOSING_TAG);
+                            putOpenTag(i, StylePos.MOUSE, MOUSE_TAG);
                             mouseIndicesOpen.add(i);
                             mouseIndicesClose.add(i);
                         }
@@ -303,10 +367,10 @@ public class SequentPrinter {
         }
 
         // Insert the MouseOverTags themselves
-        putOpenTag(range.start(), StylePos.MOUSE, mouseTag);
+        putOpenTag(range.start(), StylePos.MOUSE, MOUSE_TAG);
         mouseIndicesOpen.add(range.start());
 
-        putCloseTag(range.end(), StylePos.MOUSE, closingTag);
+        putCloseTag(range.end(), StylePos.MOUSE, CLOSING_TAG);
         mouseIndicesClose.add(range.end());
 
         // If there is an opened Tag inside the range after mouse is closed,
@@ -314,7 +378,7 @@ public class SequentPrinter {
         // of the mouseover
         if (tagStack.size() > 0) {
             System.out.println("LAST CLOSE & OPEN");
-            putCloseTag(range.end(), StylePos.MOUSE, closingTag);
+            putCloseTag(range.end(), StylePos.MOUSE, CLOSING_TAG);
             putTag(range.end(), StylePos.MOUSE, tagStack.pop(),
                     openTagsAtIndex);
             mouseIndicesOpen.add(range.end());
@@ -370,8 +434,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void collapseLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER, filterCollapsedTag);
-        putCloseTag(lineEnd, StylePos.FILTER, closingTag);
+        putOpenTag(lineStart, StylePos.FILTER, FILTER_COLLAPSED_TAG);
+        putCloseTag(lineEnd, StylePos.FILTER, CLOSING_TAG);
 
         filterIndicesOpen.add(lineStart);
         filterIndicesClose.add(lineEnd);
@@ -386,8 +450,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void minimizeLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER, filterMinimizeTag);
-        putCloseTag(lineEnd, StylePos.FILTER, closingTag);
+        putOpenTag(lineStart, StylePos.FILTER, FILTER_MINIMIZED_TAG);
+        putCloseTag(lineEnd, StylePos.FILTER, CLOSING_TAG);
 
         filterIndicesOpen.add(lineStart);
         filterIndicesClose.add(lineEnd);
@@ -469,7 +533,8 @@ public class SequentPrinter {
             putTag(index, arrayPos, tag, openTagsAtIndex);
         }
         else {
-            putTag(index, arrayPos, openTagBegin.concat(tag).concat(openTagEnd),
+            putTag(index, arrayPos,
+                    OPEN_TAG_BEGIN.concat(tag).concat(OPEN_TAG_END),
                     openTagsAtIndex);
         }
 
@@ -537,8 +602,9 @@ public class SequentPrinter {
 
                         // Check all occurrences
                         putOpenTag(matcher.start(), StylePos.SEARCH,
-                                highlightedTag);
-                        putCloseTag(matcher.end(), StylePos.SEARCH, closingTag);
+                                HIGHLIGHTED_TAG);
+                        putCloseTag(matcher.end(), StylePos.SEARCH,
+                                CLOSING_TAG);
 
                         searchIndicesOpen.add(matcher.start());
                         searchIndicesClose.add(matcher.end());
@@ -554,9 +620,9 @@ public class SequentPrinter {
                 // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
-                    putOpenTag(i, StylePos.SEARCH, highlightedTag);
+                    putOpenTag(i, StylePos.SEARCH, HIGHLIGHTED_TAG);
                     putCloseTag(i + searchString.length(), StylePos.SEARCH,
-                            closingTag);
+                            CLOSING_TAG);
 
                     searchIndicesOpen.add(i);
                     searchIndicesClose.add(i + searchString.length());
@@ -683,7 +749,7 @@ public class SequentPrinter {
             if ((proofString.charAt(i) == ' '
                     || proofString.charAt(i) == '\n')) {
                 if (openedTag) {
-                    putCloseTag(i, StylePos.SYNTAX, closingTag);
+                    putCloseTag(i, StylePos.SYNTAX, CLOSING_TAG);
                     keySet.add(i);
 
                     openedTag = false;
@@ -713,7 +779,7 @@ public class SequentPrinter {
                     // If Class changed, close the existing Tag, open new one
                     else if (lastClass != null && lastClass != op.getClass()) {
 
-                        putCloseTag(i, StylePos.SYNTAX, closingTag);
+                        putCloseTag(i, StylePos.SYNTAX, CLOSING_TAG);
                         keySet.add(i);
 
                         openedTag = false;

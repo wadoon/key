@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -85,6 +86,12 @@ public class SequentViewController extends ViewController {
                 }
                 tacletInfoViewController.showTacletInfo(
                         getContext().getKeYMediator().getSelectedNode());
+                
+                RuleApp app = getContext().getKeYMediator().getSelectedNode().getAppliedRuleApp();
+                if (app != null) {
+                    printer.applyRuleAppHighlighting(app);
+                    updateView();
+                }
             });
         }
     };

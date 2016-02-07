@@ -14,7 +14,15 @@ pre{
 .collapsed{
 	display: none;
 }
-
+.ruleApp{
+        background-color: #2ECC71;
+}
+.ifInst {
+        background-color: #2ECC71;
+}
+.ifFormula {
+        background-color: #2ECC71;
+}
 .equality{
 	color: red;
 }
@@ -43,7 +51,6 @@ pre{
 	font-weight: bold;
 }
 .modality{
-	background: red;
 }
 .observerFunc{
 	background-color: green;
@@ -72,7 +79,6 @@ pre{
 	font-weight: bold;
 }
 .ifThenElse{
-	background-color: red;
 	color: green;
 	font-weight: bold;
 }
