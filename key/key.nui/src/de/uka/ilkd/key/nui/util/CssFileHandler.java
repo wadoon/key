@@ -43,7 +43,7 @@ public class CssFileHandler {
      * @throws IOException
      */
     public void loadCssFile(URL url) throws IOException {
-        css = IOUtil.readFrom(url);
+        css += IOUtil.readFrom(url) + "\n";
     }
 
     /**
@@ -52,11 +52,20 @@ public class CssFileHandler {
      * @throws IOException
      */
     public void writeCssFile(URL url) throws IOException {
+        
         File file = new File(IOUtil.toURI(url));
         FileOutputStream fop = new FileOutputStream(file);
         IOUtil.writeTo(fop, css);
     }
 
+    /**
+     * Adds a rule to the css. Does NOT automatically add it to parsedRules.
+     * @param rule
+     */
+    public void addCssRule(CssRule rule) {
+        css += rule.toString();
+    }
+    
     /**
      * @return the css content string
      */
@@ -145,7 +154,7 @@ public class CssFileHandler {
             case VALUE: {
                 switch (c) {
                 case ';': {
-                    rule.addPropertyValuePair(property, value);
+                    rule.putPropertyValuePair(property, value);
                     property = "";
                     value = "";
                     state = State.PROPERTY;
