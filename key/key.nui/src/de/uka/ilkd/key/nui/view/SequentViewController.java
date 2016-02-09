@@ -78,6 +78,9 @@ public class SequentViewController extends ViewController {
             // execute ui update on javafx thread
             Platform.runLater(() -> {
                 showSequent(getContext().getKeYMediator().getSelectedNode());
+                usePrettySyntax();
+                useUnicode();
+                useRegex();
                 if (lastFilter != null) {
                     apply(lastFilter);
                     updateView();
