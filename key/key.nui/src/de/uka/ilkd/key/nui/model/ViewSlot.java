@@ -13,50 +13,66 @@ public class ViewSlot {
     private List<ViewInformation> tabs = new LinkedList<>();
     private BorderPane uiPane;
     private boolean used = false;
+    private boolean pastUsed = false;
     private ViewPosition position;
-    
-    public List<ViewInformation> getTabs(){
+
+    public List<ViewInformation> getTabs() {
         return tabs;
     }
-    public BorderPane getUiPane(){
+
+    public BorderPane getUiPane() {
         return uiPane;
     }
-    public boolean getUsed(){
+
+    public boolean getUsed() {
         return used;
     }
-    
-    public ViewSlot(ViewPosition position,BorderPane pane){
+
+    public boolean getPastUsed() {
+        return pastUsed;
+    }
+
+    public ViewSlot(ViewPosition position, BorderPane pane) {
         this.position = position;
         uiPane = pane;
         currentRegisterer.accept(pane.getCenter());
     }
-    
-    public ViewPosition getViewPosition(){
+
+    public ViewPosition getViewPosition() {
         return position;
     }
-    
-    public void addTab(ViewInformation view){
+
+    public void addTab(ViewInformation view) {
         tabs.add(view);
         view.setIsActive(true);
-        TabPane container =((TabPane)uiPane.getCenter());
+        TabPane container = ((TabPane) uiPane.getCenter());
         container.getTabs().add(view.getUiTab());
         container.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
+        pastUsed = used;
         used = true;
 
         container.getSelectionModel().select(view.getUiTab());
     }
-    
-    public void removeTab(ViewInformation view){
-        if(!((TabPane)uiPane.getCenter()).getTabs().contains(view.getUiTab()))
+
+    public void removeTab(ViewInformation view) {
+        if (!((TabPane) uiPane.getCenter()).getTabs().contains(view.getUiTab()))
             System.out.println("NOOOOO!");
-        ((TabPane)uiPane.getCenter()).getTabs().remove(view.getUiTab());
+        ((TabPane) uiPane.getCenter()).getTabs().remove(view.getUiTab());
         tabs.remove(view);
-        if(tabs.size() == 0)
+        if (tabs.size() == 0) {
+            pastUsed = used;
             used = false;
+        }
     }
-    
+
+    public void updatePastUsed() {
+        pastUsed = used;
+    }
+
     private static java.util.function.Consumer<Node> currentRegisterer;
-    public static void setRegisterDrag(java.util.function.Consumer<Node> registerer){
+
+    public static void setRegisterDrag(
+            java.util.function.Consumer<Node> registerer) {
         currentRegisterer = registerer;
     }
 }

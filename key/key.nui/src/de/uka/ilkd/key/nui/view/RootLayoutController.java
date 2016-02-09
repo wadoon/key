@@ -242,16 +242,17 @@ public class RootLayoutController extends ViewController {
         getContext().getKeYMediator().getUI()
                 .loadProblem(new File("resources/proofs/testSplit.key"));
     }
-    
+
     /**
-     * Loads a simple key file to test model search vs basic arithmetic treatment.
+     * Loads a simple key file to test model search vs basic arithmetic
+     * treatment.
      */
     @FXML
     private void loadModelSearchVsBasicTest() {
-        getContext().getKeYMediator().getUI()
-                .loadProblem(new File("resources/proofs/testModelSearchVsBasic.key"));
+        getContext().getKeYMediator().getUI().loadProblem(
+                new File("resources/proofs/testModelSearchVsBasic.key"));
     }
-    
+
     /**
      * Loads an open solvable proof.
      */
@@ -298,11 +299,10 @@ public class RootLayoutController extends ViewController {
         setStatus("Loading Proof...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
-        fileChooser
-                .getExtensionFilters().addAll(
-                        new ExtensionFilter("Proofs, KeY or Java Files", "*.proof",
-                                "*.key", "*.java"),
-                        new ExtensionFilter("All Files", "*.*"));
+        fileChooser.getExtensionFilters()
+                .addAll(new ExtensionFilter("Proofs, KeY or Java Files",
+                        "*.proof", "*.key", "*.java"),
+                new ExtensionFilter("All Files", "*.*"));
         // TODO reset initial directory to "../" (changed for faster access to
         // proofs for testing purposes)
         fileChooser.setInitialDirectory(
@@ -409,6 +409,7 @@ public class RootLayoutController extends ViewController {
             for (ViewInformation info : slot.getTabs()) {
                 if (info == view) {
                     slot.removeTab(view);
+                    updateViewUsed(slot);
                     break loop;
                 }
             }
@@ -416,8 +417,25 @@ public class RootLayoutController extends ViewController {
         resize();
     }
 
+    /**
+     * updates the field "pastUsed" for all ViewSlots EXCEPT the argument.
+     * Necessary for resizing
+     * 
+     * @param slot
+     *            the only slot NOT to be updated by this function. This slot is
+     *            updated by it's private add/remove Tab methods!!
+     */
+    private void updateViewUsed(ViewSlot slot) {
+        for (ViewSlot loopSlot : viewSlots.values()) {
+            if (loopSlot != slot) {
+                loopSlot.updatePastUsed();
+            }
+        }
+    }
+
     private void setPosition(ViewInformation view, ViewPosition position) {
         viewSlots.get(position).addTab(view);
+        updateViewUsed(viewSlots.get(position));
         resize();
     }
 
@@ -463,36 +481,97 @@ public class RootLayoutController extends ViewController {
      * redone, as it currently is kind of a hack.
      */
     public void resize() {
-        mainSplitPane.setDividerPositions(0.0, 1.0);
-        if (viewSlots.get(ViewPosition.TOPLEFT).getUsed()) {
-            if (viewSlots.get(ViewPosition.BOTTOMLEFT).getUsed()) {
-                leftPane.setDividerPositions(0.5);
-                mainSplitPane.setDividerPosition(0, 0.3);
-            }
-            else {
-                leftPane.setDividerPositions(1.0);
-                mainSplitPane.setDividerPosition(0, 0.3);
-            }
-        }
-        else if (viewSlots.get(ViewPosition.BOTTOMLEFT).getUsed()) {
-            leftPane.setDividerPositions(0.0);
-            mainSplitPane.setDividerPosition(0, 0.3);
-        }
+        ViewSlot topLeft = viewSlots.get(ViewPosition.TOPLEFT);
+        ViewSlot bottomLeft = viewSlots.get(ViewPosition.BOTTOMLEFT);
+        ViewSlot topRight = viewSlots.get(ViewPosition.TOPRIGHT);
+        ViewSlot bottomRight = viewSlots.get(ViewPosition.BOTTOMRIGHT);
+        double[] dividerPositions = mainSplitPane.getDividerPositions();
 
-        if (viewSlots.get(ViewPosition.TOPRIGHT).getUsed()) {
-            if (viewSlots.get(ViewPosition.BOTTOMRIGHT).getUsed()) {
-                rightPane.setDividerPositions(0.5);
-                mainSplitPane.setDividerPosition(1, 0.7);
+        // If topLeft has changed
+        if (topLeft.getUsed() != topLeft.getPastUsed()) {
+            if (!bottomLeft.getUsed()) {
+                if (topLeft.getUsed()) {
+                    mainSplitPane.setDividerPosition(0, 0.3);
+                    leftPane.setDividerPositions(1.0);
+                }
+                else {
+                    mainSplitPane.setDividerPosition(0, 0.0);
+                }
             }
             else {
-                rightPane.setDividerPositions(1.0);
-                mainSplitPane.setDividerPosition(1, 0.7);
+                if (topLeft.getUsed()) {
+                    leftPane.setDividerPositions(0.5);
+                }
+                else {
+                    leftPane.setDividerPositions(0.0);
+                }
             }
+            return;
         }
-        else if (viewSlots.get(ViewPosition.BOTTOMRIGHT).getUsed()) {
-            rightPane.setDividerPositions(0.0);
-            mainSplitPane.setDividerPosition(1, 0.7);
+        // If bottomLeft has changed
+        if (bottomLeft.getUsed() != bottomLeft.getPastUsed()) {
+            if (!topLeft.getUsed()) {
+                if (bottomLeft.getUsed()) {
+                    mainSplitPane.setDividerPosition(0, 0.3);
+                    leftPane.setDividerPositions(0.0);
+                }
+                else {
+                    mainSplitPane.setDividerPosition(0, 0.0);
+                }
+            }
+            else {
+                if (bottomLeft.getUsed()) {
+                    leftPane.setDividerPositions(0.5);
+                }
+                else {
+                    leftPane.setDividerPositions(1.0);
+                }
+            }
+            return;
         }
+        // If topRight has changed
+        if (topRight.getUsed() != topRight.getPastUsed()) {
+            if (!bottomRight.getUsed()) {
+                if (topRight.getUsed()) {
+                    mainSplitPane.setDividerPosition(1, 0.7);
+                    rightPane.setDividerPositions(1.0);
+                }
+                else {
+                    mainSplitPane.setDividerPosition(1, 1.0);
+                }
+            }
+            else {
+                if (topRight.getUsed()) {
+                    rightPane.setDividerPositions(0.5);
+                }
+                else {
+                    rightPane.setDividerPositions(0.0);
+                }
+            }
+            return;
+        }
+        // If bottomRight has changed
+        if (bottomRight.getUsed() != bottomRight.getPastUsed()) {
+            if (!topRight.getUsed()) {
+                if (bottomRight.getUsed()) {
+                    mainSplitPane.setDividerPosition(1, 0.7);
+                    rightPane.setDividerPositions(0.0);
+                }
+                else {
+                    mainSplitPane.setDividerPosition(1, 1.0);
+                }
+            }
+            else {
+                if (bottomRight.getUsed()) {
+                    rightPane.setDividerPositions(0.5);
+                }
+                else {
+                    rightPane.setDividerPositions(1.0);
+                }
+            }
+            return;
+        }
+        mainSplitPane.setDividerPositions(dividerPositions);
     }
 
     /**
