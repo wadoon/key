@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -8,10 +9,9 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.proof.Proof;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -22,13 +22,16 @@ public class ProofBrowserViewController extends ViewController {
     @FXML
     private TreeView<String> tableView;
 
-    private TreeItem<String> rootItem = new TreeItem<String> ("Proofs");
-    private int count = 0;
+    private final static TreeItem<String> PROOF_BROWSER_ROOT_NODE = new TreeItem<String> ("Proofs");
+    private Proof proof;
+    
+    private HashMap<String, Proof> listOfProofs = new HashMap<String, Proof>();
     
     private KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
         @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
-            addProofToBrowser(e.toString());
+        public void selectedProofChanged(KeYSelectionEvent event) {
+            proof = event.getSource().getSelectedProof();
+            addProofToBrowser();
         }
 
         @Override
@@ -38,8 +41,8 @@ public class ProofBrowserViewController extends ViewController {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        rootItem.setExpanded(true);
-        tableView.setRoot(rootItem);
+        PROOF_BROWSER_ROOT_NODE.setExpanded(true);
+        tableView.setRoot(PROOF_BROWSER_ROOT_NODE);
         tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<String>>() {
             @Override
             public void changed(
@@ -47,6 +50,10 @@ public class ProofBrowserViewController extends ViewController {
                     TreeItem<String> old_val, TreeItem<String> new_val) {
                 TreeItem<String> selectedItem = new_val;
                 System.out.println("Selected tree item : " + selectedItem.getValue());
+                
+                /*if (hm.containsKey(selectedItem.getValue())) {
+                    System.out.println(hm.get(selectedItem.getValue()));
+                }*/
             }
         });
     }
@@ -56,35 +63,27 @@ public class ProofBrowserViewController extends ViewController {
         getContext().getKeYMediator().addKeYSelectionListener(proofChangeListener);
     }
     
-    public void addProofToBrowser(String s) {
-        for (TreeItem<String> treeItem : rootItem.getChildren()) {
-            if (treeItem.getValue().equals(s)) {
+    public void addProofToBrowser() {
+        String proofName = proof.name().toString();
+        for (TreeItem<String> treeItem : PROOF_BROWSER_ROOT_NODE.getChildren()) {
+            if (treeItem.getValue().equals(proofName)) {
                 return;
             }
         }
 
-        TreeItem<String> newProof = new TreeItem<String>(s);
-        rootItem.getChildren().add(newProof);
+        listOfProofs.put(proofName, proof);
+        TreeItem<String> newProof = new TreeItem<String>(proofName);
+        PROOF_BROWSER_ROOT_NODE.getChildren().add(newProof);
         tableView.getSelectionModel().select(newProof);
     }
     
-    public void deleteProofFromBrowser() {
+    @FXML
+    public void removeProofFromBrowser() {
         int i = tableView.getSelectionModel().getSelectedIndex() - 1;
         if (i < 0) {
             return;
         }
-        rootItem.getChildren().remove(i);
+        listOfProofs.remove(tableView.getSelectionModel().getSelectedItem().getValue());
+        PROOF_BROWSER_ROOT_NODE.getChildren().remove(i);
     }
-    
-    @FXML
-    private void clickMe() {
-        addProofToBrowser("test " + count);
-        count++;
-    }
-    
-    @FXML
-    private void delete() {
-        deleteProofFromBrowser();
-    }
-
 }
