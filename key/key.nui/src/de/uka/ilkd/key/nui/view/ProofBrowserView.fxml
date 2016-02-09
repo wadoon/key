@@ -7,9 +7,9 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.ProofBrowserViewController">
    <center>
-      <TreeView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <TreeView fx:id="proofBrowserTreeView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
    <bottom>
-      <Button mnemonicParsing="false" onAction="#removeProofFromBrowser" text="Remove selected proof" BorderPane.alignment="CENTER" />
+      <Button mnemonicParsing="false" onAction="#discardProof" text="Discard selected proof" BorderPane.alignment="CENTER" />
    </bottom>
 </BorderPane>
