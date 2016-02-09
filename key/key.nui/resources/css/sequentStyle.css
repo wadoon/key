@@ -8,6 +8,9 @@ pre{
 .mouseover{
 	background-color: #B0C4DE;
 }
+.filterSelection{
+   background-color: #ff6666;
+}
 .minimized{
 	font-size: 6px;
 }

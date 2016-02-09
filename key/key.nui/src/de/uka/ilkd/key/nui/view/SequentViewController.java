@@ -12,7 +12,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.PrintFilter;
+import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -31,6 +32,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Pair;
@@ -155,6 +157,7 @@ public class SequentViewController extends ViewController {
                     - event.getDeltaX() / this.scrollPane.getWidth());
         });
 
+        textAreaWebView.setOnMouseClicked(this::handleWebViewClicked);
     }
 
     private void showTermInfo(PosInSequent pos) {
@@ -180,8 +183,11 @@ public class SequentViewController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
-        getContext().getKeYMediator().addKeYSelectionListener(proofChangeListener);
+        getContext().getKeYMediator()
+                .addKeYSelectionListener(proofChangeListener);
         getContext().getFilterChangedEvent().addHandler(this::apply);
+        getContext().getSelectModeActivateEvent()
+                .addHandler(this::selectModeActivated);
 
         Pair<Object, ViewController> p = loadFxmlViewController(
                 getClass().getResource("TacletInfoView.fxml"));
@@ -336,5 +342,26 @@ public class SequentViewController extends ViewController {
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);
         updateView();
+    }
+
+    boolean selectionModeIsActive = false;
+    private void selectModeActivated(SelectModeEventArgs eventArgs) {
+        printer.startSelectionMode();
+        selectionModeIsActive = true;
+    }
+
+    private void handleWebViewClicked(MouseEvent event) {
+        if (sequentLoaded && selectionModeIsActive) {
+            int pos = posTranslator.getCharIdxUnderPointer(event);
+            Range range = this.abstractSyntaxTree.rangeForIndex(pos);
+
+            this.printer.applySelection(range);
+            this.updateView();
+            /*
+             * if (event.isAltDown())
+             * showTermInfo(abstractSyntaxTree.getPosInSequent(pos, new
+             * IdentitySequentPrintFilter(sequent)));
+             */
+        }
     }
 }

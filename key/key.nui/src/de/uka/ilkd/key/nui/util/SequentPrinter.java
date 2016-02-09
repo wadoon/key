@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Observable;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -18,8 +20,9 @@ import java.util.regex.Pattern;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.SequentFilterer;
 import de.uka.ilkd.key.nui.model.Context;
-import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.nui.view.DebugViewController;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
@@ -63,9 +66,10 @@ public class SequentPrinter {
     private final static String highlightedTag = "highlighted";
     private final static String filterMinimizeTag = "minimized";
     private final static String filterCollapsedTag = "collapsed";
+    private final static String selectionTag = "filterSelection";
 
     private enum StylePos {
-        SYNTAX(3), MOUSE(0), SEARCH(2), FILTER(1);
+        SELECTION(4), SYNTAX(3), MOUSE(0), SEARCH(2), FILTER(1);
 
         private int slotPosition;
 
@@ -75,11 +79,12 @@ public class SequentPrinter {
     }
 
     private Context context;
-    
+
     /**
      * 
      */
-    public SequentPrinter(String cssPath, PositionTable posTable,Context context) {
+    public SequentPrinter(String cssPath, PositionTable posTable,
+            Context context) {
         try {
             readCSS(cssPath);
         }
@@ -253,7 +258,7 @@ public class SequentPrinter {
                 keySet.remove(i);
             }
         }
-        
+
         String html = sb.toString();
         context.setSequentHtml(html);
         return toHTML(html);
@@ -298,10 +303,10 @@ public class SequentPrinter {
         for (int i = 0; i < lines.length; i++) {
             // Compute Endindex of Line
             int styleEnd = styleStart + lines[i].length() + 1;
-            
+
             // If line is in list apply styles
-            if (indicesOfLines.contains(i) == filter.getInvert()) {
-                switch (filter.getFilterMode()) {
+            if (indicesOfLines.contains(i)) {
+                switch (filter.getFilterLayout()) {
                 case Minimize:
                     minimizeLine(styleStart, styleEnd);
                     break;
@@ -688,5 +693,50 @@ public class SequentPrinter {
 
     public void setSequent(Sequent sequent) {
         this.sequent = sequent;
+    }
+
+    boolean selectionModeActive = false;
+    List<Range> selections = new LinkedList<>();
+
+    public void applySelection(Range range) {
+        if (!selectionModeActive)
+            return;
+
+        // if already selected -> deselect
+        for (Range r : selections) {
+            if (r.start() == range.start() && r.end() == range.end()) {
+                removeSelection(r);
+                selections.remove(r);
+                return;
+            }
+        }
+
+        keySet.add(range.start());
+        keySet.add(range.end());
+
+        putOpenTag(range.start(), StylePos.SELECTION, selectionTag);
+        putCloseTag(range.end(), StylePos.SELECTION, closingTag);
+        selections.add(range);
+    }
+
+    private void removeSelection(Range range) {
+        putOpenTag(range.start(), StylePos.SELECTION, "");
+        putCloseTag(range.end(), StylePos.SELECTION, "");
+    }
+
+    public void startSelectionMode() {
+        selectionModeActive = true;
+    }
+
+    public void finishSelectionMode() {
+        for (Range range : selections)
+            removeSelection(range);
+
+        // get text under ranges
+        // add OR to filter
+
+        // discard old ranges
+        selections = new LinkedList<>();
+        selectionModeActive = false;
     }
 }

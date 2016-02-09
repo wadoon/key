@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="219.0" prefWidth="219.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.filter.FilterViewController">
+   <children>
+      <VBox AnchorPane.bottomAnchor="54.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox />
+            <BorderPane>
+               <center>
+                  <VBox>
+                     <BorderPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </BorderPane.margin>
+                     <children>
+                        <GridPane fx:id="userCriteria">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                              <TextField fx:id="searchText" alignment="TOP_LEFT" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                              <Label alignment="TOP_LEFT" text="Search:" />
+                              <ComboBox fx:id="filterModeBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                           </children>
+                        </GridPane>
+                        <BorderPane fx:id="selectionCriteria" prefHeight="50.0" style="-fx-background-color: #ff6666;">
+                           <center>
+                              <Label text="User Selection" />
+                           </center>
+                        </BorderPane>
+                        <GridPane>
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="61.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="146.0" minWidth="10.0" prefWidth="128.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="10.0" prefWidth="31.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="After:" GridPane.rowIndex="1" />
+                              <Slider fx:id="linesAfter" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Slider fx:id="linesBefore" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" />
+                              <Label text="Before:" />
+                              <Label fx:id="beforeNumber" text="Label" GridPane.columnIndex="2" />
+                              <Label fx:id="afterNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <ToggleButton fx:id="selectionFilterToggle" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" text="ArrowIcon" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                           </children>
+                        </GridPane>
+                     </children>
+                  </VBox>
+               </center>
+            </BorderPane>
+         </children>
+      </VBox>
+      <HBox alignment="CENTER" prefWidth="199.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#handleApply" text="Apply" />
+            <Button mnemonicParsing="false" onAction="#handleReset" text="Reset">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
