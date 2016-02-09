@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.view;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -12,16 +13,15 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.PrintFilter;
+import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.nui.util.TermInfoPrinter;
 import de.uka.ilkd.key.nui.view.menu.TacletMenuController;
-import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -32,7 +32,6 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
@@ -48,7 +47,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.util.Pair;
 
 /**
  * @author Maximilian Li
@@ -86,8 +84,9 @@ public class SequentViewController extends ViewController {
                 }
                 tacletInfoViewController.showTacletInfo(
                         getContext().getKeYMediator().getSelectedNode());
-                
-                RuleApp app = getContext().getKeYMediator().getSelectedNode().getAppliedRuleApp();
+
+                RuleApp app = getContext().getKeYMediator().getSelectedNode()
+                        .getAppliedRuleApp();
                 if (app != null) {
                     printer.applyRuleAppHighlighting(app);
                     updateView();
@@ -96,6 +95,7 @@ public class SequentViewController extends ViewController {
         }
     };
     private PositionTranslator posTranslator;
+    private CssFileHandler cssFileHandler;
 
     @FXML
     private TitledPane sequentOptions;
@@ -142,9 +142,17 @@ public class SequentViewController extends ViewController {
                         sequentOptions.setText("More Options");
                     }
                 });
+        try {
+            cssFileHandler = new CssFileHandler(
+                    new File("resources/css/sequentStyle.css"));
+        }
+        catch (Exception e) {
+            System.err.println("Could not load CSS. No beauty for you!");
+        }
+        
 
         posTranslator = new PositionTranslator(
-                "resources/css/sequentStyle.css");
+                cssFileHandler);
 
         textArea.setOnMouseMoved(event -> {
             if (sequentLoaded) {
@@ -155,12 +163,13 @@ public class SequentViewController extends ViewController {
                 this.printer.applyMouseHighlighting(range);
                 this.updateView();
 
-                if (event.isAltDown())
+                if (event.isAltDown()) {
                     getContext().getStatusManager()
                             .setStatus(TermInfoPrinter.printTermInfo(sequent,
                                     (abstractSyntaxTree.getPosInSequent(pos,
                                             new IdentitySequentPrintFilter(
                                                     sequent)))));
+                }
             }
         });
 
@@ -231,7 +240,7 @@ public class SequentViewController extends ViewController {
         getContext().getKeYMediator()
                 .addKeYSelectionListener(proofChangeListener);
         getContext().getFilterChangedEvent().addHandler(this::apply);
-        
+
         tacletInfoViewController.setMainApp(getMainApp(), getContext());
     }
 
@@ -269,7 +278,7 @@ public class SequentViewController extends ViewController {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printer = new SequentPrinter("resources/css/sequentStyle.css",
+        printer = new SequentPrinter(cssFileHandler,
                 abstractSyntaxTree, getContext());
         sequentChanged = true;
 

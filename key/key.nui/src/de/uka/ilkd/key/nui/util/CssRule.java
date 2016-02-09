@@ -106,6 +106,5 @@ public class CssRule {
         propertyValuePairs.forEach((k,v) -> {sb.append("\t").append(k).append(": ").append(v).append("\n");});
         sb.append("}\n");
         return sb.toString();
-    }
-    
+    }    
 }

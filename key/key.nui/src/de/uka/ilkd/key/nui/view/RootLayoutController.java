@@ -486,6 +486,8 @@ public class RootLayoutController extends ViewController {
         ViewSlot topRight = viewSlots.get(ViewPosition.TOPRIGHT);
         ViewSlot bottomRight = viewSlots.get(ViewPosition.BOTTOMRIGHT);
         double[] dividerPositions = mainSplitPane.getDividerPositions();
+        double leftDivider = leftPane.getDividerPositions()[0];
+        double rightDivider = rightPane.getDividerPositions()[0];
 
         // If topLeft has changed
         if (topLeft.getUsed() != topLeft.getPastUsed()) {
@@ -572,6 +574,8 @@ public class RootLayoutController extends ViewController {
             return;
         }
         mainSplitPane.setDividerPositions(dividerPositions);
+        leftPane.setDividerPositions(leftDivider);
+        rightPane.setDividerPositions(rightDivider);
     }
 
     /**

@@ -4,9 +4,11 @@
 package de.uka.ilkd.key.nui.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,20 +62,7 @@ public class SequentPrinter {
     private ArrayList<Integer> filterIndicesOpen = new ArrayList<Integer>();
     private ArrayList<Integer> filterIndicesClose = new ArrayList<Integer>();
 
-    private static HashMap<Class, String> classMap = new HashMap<>();
-    private static HashMap<Class, Boolean> classEnabledMap = new HashMap<>();
-
-    private final static String OPEN_TAG_BEGIN = "<span class=\"";
-    private final static String OPEN_TAG_END = "\">";
-    private final static String CLOSING_TAG = "</span>";
-
-    private final static String MOUSE_TAG = "mouseover";
-    private final static String HIGHLIGHTED_TAG = "highlighted";
-    private final static String FILTER_MINIMIZED_TAG = "minimized";
-    private final static String FILTER_COLLAPSED_TAG = "collapsed";
-    private final static String RULE_APP_TAG = "ruleApp";
-    private final static String IF_INST_TAG = "ifInst";
-    private final static String IF_FORMULA_TAG = "ifFormula";
+    
 
     private enum StylePos {
         SYNTAX(4), MOUSE(0), SEARCH(2), FILTER(1), RULEAPP(3);
@@ -90,125 +79,16 @@ public class SequentPrinter {
     /**
      * 
      */
-    public SequentPrinter(String cssPath, PositionTable posTable,
+    public SequentPrinter(CssFileHandler cssFileHandler, PositionTable posTable,
             Context context) {
-        try {
-            readCSS(cssPath);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        css = cssFileHandler.getCss();
         this.setPosTable(posTable);
 
         this.context = context;
 
-        // If no SequentPrinter has been created yet, the ClassMap is empty.
-        // Fill it!
-        if (classMap.size() == 0) {
-            fillClassMap();
-        }
-
     }
 
-    /**
-     * fills the classMap with each class name and its styleClass tag
-     */
-    private static void fillClassMap() {
-        if (classEnabledMap.size() > 0 && classMap.size() > 0) {
-            return;
-        }
-        // Defines if this AST Class shall be highlighted
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Equality.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Function.class, false);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Junctor.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Quantifier.class, true);
-        classEnabledMap.put(
-                de.uka.ilkd.key.logic.op.SortDependingFunction.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Modality.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
-                true);
-        classEnabledMap.put(
-                de.uka.ilkd.key.logic.op.AbstractSortedOperator.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.AbstractSV.class, true);
-        classEnabledMap.put(
-                de.uka.ilkd.key.logic.op.AbstractTermTransformer.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.IfExThenElse.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ModalOperatorSV.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramConstant.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class,
-                true);
-        classEnabledMap.put(
-                de.uka.ilkd.key.logic.op.SchemaVariableFactory.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.SkolemTermSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.SubstOp.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.TermSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Transformer.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateApplication.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateJunctor.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, true);
-
-        // Define Style Span for each Class
-        classMap.put(de.uka.ilkd.key.logic.op.Equality.class, "equality");
-        classMap.put(de.uka.ilkd.key.logic.op.Function.class, "function");
-        classMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
-                "locationVar");
-        classMap.put(de.uka.ilkd.key.logic.op.Junctor.class, "junctor");
-        classMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class, "logicVar");
-        classMap.put(de.uka.ilkd.key.logic.op.Quantifier.class, "quantifier");
-        classMap.put(de.uka.ilkd.key.logic.op.SortDependingFunction.class,
-                "sortDepFunc");
-        classMap.put(de.uka.ilkd.key.logic.op.Modality.class, "modality");
-        classMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
-                "observerFunc");
-        classMap.put(de.uka.ilkd.key.logic.op.AbstractSortedOperator.class,
-                "abstractSortOp");
-        classMap.put(de.uka.ilkd.key.logic.op.AbstractSV.class, "abstractSV");
-        classMap.put(de.uka.ilkd.key.logic.op.AbstractTermTransformer.class,
-                "abstractTermTransf");
-        classMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
-                "elemUpdate");
-        classMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, "formulaSV");
-        classMap.put(de.uka.ilkd.key.logic.op.IfExThenElse.class,
-                "ifExThenElse");
-        classMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class, "ifThenElse");
-        classMap.put(de.uka.ilkd.key.logic.op.ModalOperatorSV.class,
-                "modalOpSV");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramConstant.class,
-                "progConst");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class, "progMeth");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class, "progSV");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class, "progVar");
-        classMap.put(de.uka.ilkd.key.logic.op.SchemaVariableFactory.class,
-                "schemaVarFactory");
-        classMap.put(de.uka.ilkd.key.logic.op.SkolemTermSV.class,
-                "skolemTermSV");
-        classMap.put(de.uka.ilkd.key.logic.op.SubstOp.class, "substOp");
-        classMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class, "termLabelSV");
-        classMap.put(de.uka.ilkd.key.logic.op.TermSV.class, "termSV");
-        classMap.put(de.uka.ilkd.key.logic.op.Transformer.class, "transformer");
-        classMap.put(de.uka.ilkd.key.logic.op.UpdateApplication.class,
-                "updateApp");
-        classMap.put(de.uka.ilkd.key.logic.op.UpdateJunctor.class,
-                "updateJunc");
-        classMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, "updateSV");
-        classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, "varSV");
-        classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, "warySubstOp");
-    }
+    
 
     /**
      * prints a Sequent as HTML with styling
@@ -272,8 +152,8 @@ public class SequentPrinter {
     public void applyRuleAppHighlighting(RuleApp app) {
         if (app.posInOccurrence() != null) {
             Range r = getHighlightRange(app.posInOccurrence());
-            putOpenTag(r.start(), StylePos.RULEAPP, RULE_APP_TAG);
-            putCloseTag(r.end(), StylePos.RULEAPP, CLOSING_TAG);
+            putOpenTag(r.start(), StylePos.RULEAPP, NUIConstants.RULE_APP_TAG);
+            putCloseTag(r.end(), StylePos.RULEAPP, NUIConstants.CLOSING_TAG);
             keySet.add(r.start());
             keySet.add(r.end());
         }
@@ -307,8 +187,8 @@ public class SequentPrinter {
                     inst.getConstrainedFormula(), PosInTerm.getTopLevel(),
                     inst.inAntec());
             Range r = getHighlightRange(pos);
-            putOpenTag(r.start(), StylePos.RULEAPP, IF_FORMULA_TAG);
-            putCloseTag(r.end(), StylePos.RULEAPP, CLOSING_TAG);
+            putOpenTag(r.start(), StylePos.RULEAPP, NUIConstants.IF_FORMULA_TAG);
+            putCloseTag(r.end(), StylePos.RULEAPP, NUIConstants.CLOSING_TAG);
             keySet.add(r.start());
             keySet.add(r.end());
         }
@@ -318,8 +198,8 @@ public class SequentPrinter {
         final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
         for (PosInOccurrence pio : ifs) {
             Range r = getHighlightRange(pio);
-            putOpenTag(r.start(), StylePos.RULEAPP, IF_INST_TAG);
-            putCloseTag(r.end(), StylePos.RULEAPP, CLOSING_TAG);
+            putOpenTag(r.start(), StylePos.RULEAPP, NUIConstants.IF_INST_TAG);
+            putCloseTag(r.end(), StylePos.RULEAPP, NUIConstants.CLOSING_TAG);
             keySet.add(r.start());
             keySet.add(r.end());
         }
@@ -357,8 +237,8 @@ public class SequentPrinter {
                             && !closeTagArray[j].isEmpty()
                             && i > range.start()) {
                         if (tagStack.size() == 0) {
-                            putCloseTag(i, StylePos.MOUSE, CLOSING_TAG);
-                            putOpenTag(i, StylePos.MOUSE, MOUSE_TAG);
+                            putCloseTag(i, StylePos.MOUSE, NUIConstants.CLOSING_TAG);
+                            putOpenTag(i, StylePos.MOUSE, NUIConstants.MOUSE_TAG);
                             mouseIndicesOpen.add(i);
                             mouseIndicesClose.add(i);
                         }
@@ -376,18 +256,17 @@ public class SequentPrinter {
         }
 
         // Insert the MouseOverTags themselves
-        putOpenTag(range.start(), StylePos.MOUSE, MOUSE_TAG);
+        putOpenTag(range.start(), StylePos.MOUSE, NUIConstants.MOUSE_TAG);
         mouseIndicesOpen.add(range.start());
 
-        putCloseTag(range.end(), StylePos.MOUSE, CLOSING_TAG);
+        putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
         mouseIndicesClose.add(range.end());
 
         // If there is an opened Tag inside the range after mouse is closed,
         // resolve the overlap by closing it and opening it again on the outside
         // of the mouseover
         if (tagStack.size() > 0) {
-            System.out.println("LAST CLOSE & OPEN");
-            putCloseTag(range.end(), StylePos.MOUSE, CLOSING_TAG);
+            putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
             putTag(range.end(), StylePos.MOUSE, tagStack.pop(),
                     openTagsAtIndex);
             mouseIndicesOpen.add(range.end());
@@ -443,8 +322,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void collapseLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER, FILTER_COLLAPSED_TAG);
-        putCloseTag(lineEnd, StylePos.FILTER, CLOSING_TAG);
+        putOpenTag(lineStart, StylePos.FILTER, NUIConstants.FILTER_COLLAPSED_TAG);
+        putCloseTag(lineEnd, StylePos.FILTER, NUIConstants.CLOSING_TAG);
 
         filterIndicesOpen.add(lineStart);
         filterIndicesClose.add(lineEnd);
@@ -459,8 +338,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void minimizeLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER, FILTER_MINIMIZED_TAG);
-        putCloseTag(lineEnd, StylePos.FILTER, CLOSING_TAG);
+        putOpenTag(lineStart, StylePos.FILTER, NUIConstants.FILTER_MINIMIZED_TAG);
+        putCloseTag(lineEnd, StylePos.FILTER, NUIConstants.CLOSING_TAG);
 
         filterIndicesOpen.add(lineStart);
         filterIndicesClose.add(lineEnd);
@@ -543,7 +422,7 @@ public class SequentPrinter {
         }
         else {
             putTag(index, arrayPos,
-                    OPEN_TAG_BEGIN.concat(tag).concat(OPEN_TAG_END),
+                    NUIConstants.OPEN_TAG_BEGIN.concat(tag).concat(NUIConstants.OPEN_TAG_END),
                     openTagsAtIndex);
         }
 
@@ -611,9 +490,9 @@ public class SequentPrinter {
 
                         // Check all occurrences
                         putOpenTag(matcher.start(), StylePos.SEARCH,
-                                HIGHLIGHTED_TAG);
+                                NUIConstants.HIGHLIGHTED_TAG);
                         putCloseTag(matcher.end(), StylePos.SEARCH,
-                                CLOSING_TAG);
+                                NUIConstants.CLOSING_TAG);
 
                         searchIndicesOpen.add(matcher.start());
                         searchIndicesClose.add(matcher.end());
@@ -629,9 +508,9 @@ public class SequentPrinter {
                 // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
-                    putOpenTag(i, StylePos.SEARCH, HIGHLIGHTED_TAG);
+                    putOpenTag(i, StylePos.SEARCH, NUIConstants.HIGHLIGHTED_TAG);
                     putCloseTag(i + searchString.length(), StylePos.SEARCH,
-                            CLOSING_TAG);
+                            NUIConstants.CLOSING_TAG);
 
                     searchIndicesOpen.add(i);
                     searchIndicesClose.add(i + searchString.length());
@@ -704,31 +583,6 @@ public class SequentPrinter {
         }
     }
 
-    /**
-     * reads the CSS information for HTML Styling
-     * 
-     * @param fileName
-     *            path to the CSS file
-     * @throws IOException
-     */
-    private void readCSS(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                sb.append(line);
-                sb.append("\n");
-                line = br.readLine();
-            }
-            this.css = sb.toString();
-        }
-        finally {
-            br.close();
-        }
-    }
 
     /**
      * @param posTable
@@ -758,7 +612,7 @@ public class SequentPrinter {
             if ((proofString.charAt(i) == ' '
                     || proofString.charAt(i) == '\n')) {
                 if (openedTag) {
-                    putCloseTag(i, StylePos.SYNTAX, CLOSING_TAG);
+                    putCloseTag(i, StylePos.SYNTAX, NUIConstants.CLOSING_TAG);
                     keySet.add(i);
 
                     openedTag = false;
@@ -774,11 +628,11 @@ public class SequentPrinter {
                     Operator op = oc.subTerm().op();
 
                     // Open First Tag
-                    if (lastClass == null && classMap.containsKey(op.getClass())
-                            && classEnabledMap.get(op.getClass())) {
+                    if (lastClass == null && NUIConstants.getClassCssMap().containsKey(op.getClass())
+                            && NUIConstants.getClassEnabledMap().get(op.getClass())) {
 
                         putOpenTag(i, StylePos.SYNTAX,
-                                classMap.get(op.getClass()));
+                                NUIConstants.getClassCssMap().get(op.getClass()));
                         keySet.add(i);
 
                         openedTag = true;
@@ -788,15 +642,15 @@ public class SequentPrinter {
                     // If Class changed, close the existing Tag, open new one
                     else if (lastClass != null && lastClass != op.getClass()) {
 
-                        putCloseTag(i, StylePos.SYNTAX, CLOSING_TAG);
+                        putCloseTag(i, StylePos.SYNTAX, NUIConstants.CLOSING_TAG);
                         keySet.add(i);
 
                         openedTag = false;
-                        if (classMap.containsKey(op.getClass())
-                                && classEnabledMap.get(op.getClass())) {
+                        if (NUIConstants.getClassCssMap().containsKey(op.getClass())
+                                && NUIConstants.getClassEnabledMap().get(op.getClass())) {
 
                             putOpenTag(i, StylePos.SYNTAX,
-                                    classMap.get(op.getClass()));
+                                    NUIConstants.getClassCssMap().get(op.getClass()));
                             keySet.add(i);
                             lastClass = op.getClass();
                             openedTag = true;
@@ -805,7 +659,7 @@ public class SequentPrinter {
                         else {
                             lastClass = null;
                             openedTag = false;
-                            if (!classMap.containsKey(op.getClass())) {
+                            if (!NUIConstants.getClassCssMap().containsKey(op.getClass())) {
                                 System.out.println("");
                                 System.out.println(
                                         "The following Class does not exist in the ClassDictionary");

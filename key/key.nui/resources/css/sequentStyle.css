@@ -1,5 +1,5 @@
 pre{
-	font-family: "Courier New", Courier, monospace;
+	font-family: Courier New;
 	font-size: 16px;
 }
 .highlighted{
@@ -15,13 +15,13 @@ pre{
 	display: none;
 }
 .ruleApp{
-        background-color: #2ECC71;
+        background-color: #B3FD53;
 }
 .ifInst {
-        background-color: #2ECC71;
+        background-color: #B3FD53;
 }
 .ifFormula {
-        background-color: #2ECC71;
+        background-color: #B3FD53;
 }
 .equality{
 	color: red;
@@ -51,6 +51,7 @@ pre{
 	font-weight: bold;
 }
 .modality{
+	font-weight: bold;
 }
 .observerFunc{
 	background-color: green;

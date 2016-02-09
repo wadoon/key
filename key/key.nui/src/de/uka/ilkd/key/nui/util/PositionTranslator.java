@@ -22,7 +22,6 @@ import javafx.scene.text.Text;
  */
 public class PositionTranslator {
     private String[] strings;
-    private String cssPath;
     private String proofString;
     private String font;
     private int fontSize;
@@ -30,31 +29,19 @@ public class PositionTranslator {
     private boolean filterCollapsed = false;
     private boolean filterInverted = false;
     private ArrayList<Integer> filteredLines = new ArrayList<Integer>();
+    private CssFileHandler cssHandler;
 
     /**
      * 
      */
-    public PositionTranslator(String cssPath) {
-        try {
-            readCSS(cssPath);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            this.cssPath = cssPath;
-        }
+    public PositionTranslator(CssFileHandler cssFileHandler) {
+        cssHandler = cssFileHandler;
+        this.readCSS();
     }
 
     public void setProofString(String proofString) {
         this.proofString = proofString;
         strings = proofString.split("\n");
-        try {
-            readCSS(cssPath);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
         filteredLines.clear();
     }
 
@@ -158,7 +145,7 @@ public class PositionTranslator {
         }
 
         // For each char check width
-        
+
         for (char c : strings[line].toCharArray()) {
             text.setText(String.valueOf(c));
             xCoord -= text.getLayoutBounds().getWidth();
@@ -205,55 +192,22 @@ public class PositionTranslator {
      *            path to the CSS file
      * @throws IOException
      */
-    private void readCSS(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
-        try {
-            String line = br.readLine();
+    private void readCSS() {
+        CssRule pre = cssHandler.getRule("pre");
+        CssRule minimized = cssHandler
+                .getRule("." + NUIConstants.FILTER_MINIMIZED_TAG);
 
-            boolean inPre = false;
-            boolean inMinimized = false;
-            while (line != null) {
-                // Set the Font Style and Family Information used in <Pre> Block
-                if (inPre) {
-                    if (line.startsWith("}")) {
-                        inPre = false;
-                    }
-                    else if (line.contains("font-family")) {
-                        font = line.split("\"")[1];
-                    }
-                    else if (line.contains("font-size")) {
-                        Pattern pattern = Pattern.compile("[0-9]+");
-                        Matcher matcher = pattern.matcher(line);
-                        matcher.find();
-                        fontSize = Integer.parseInt(matcher.group());
-                    }
-                }
-                // Set the Font Size Informotion used in .minimized Style Class
-                else if (inMinimized) {
-                    if (line.startsWith("}")) {
-                        inMinimized = false;
-                    }
-                    else if (line.contains("font-size")) {
-                        Pattern pattern = Pattern.compile("[0-9]+");
-                        Matcher matcher = pattern.matcher(line);
-                        matcher.find();
-                        minimizedSize = Integer.parseInt(matcher.group());
-                    }
-                }
-                else if (line.startsWith("pre{")) {
-                    inPre = true;
-                }
-                else if (line.startsWith(".minimized{")) {
-                    inMinimized = true;
-                }
+        font = pre.getValue("font-family");
+        String fontSizeValue = pre.getValue("font-size");
 
-                line = br.readLine();
-            }
-        }
-        finally {
-            br.close();
-        }
+        // FontSize Value ends with "..px"
+        fontSize = Integer.parseInt(
+                fontSizeValue.substring(0, fontSizeValue.length() - 2));
+
+        fontSizeValue = minimized.getValue("font-size");
+
+        minimizedSize = Integer.parseInt(
+                fontSizeValue.substring(0, fontSizeValue.length() - 2));
     }
 
     /**
