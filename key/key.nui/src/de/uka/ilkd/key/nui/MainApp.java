@@ -104,11 +104,12 @@ public class MainApp extends Application {
                         ((RootLayoutController) loader.getController())
                                 .resize();
                     });
-            /*
-             * scene.heightProperty().addListener((observableValue,
-             * oldSceneHeight, newSceneHeight) -> { ((RootLayoutController)
-             * loader.getController()).resize(); });
-             */
+
+            scene.heightProperty().addListener(
+                    (observableValue, oldSceneHeight, newSceneHeight) -> {
+                        ((RootLayoutController) loader.getController())
+                                .resize();
+                    });
 
             primaryStage.setScene(scene);
 
@@ -136,8 +137,8 @@ public class MainApp extends Application {
     }
 
     /**
-     * Listens for a Window Close Request and prompts the user to confirm.
-     * Skips the dialog if ctrl is pressed while closing.
+     * Listens for a Window Close Request and prompts the user to confirm. Skips
+     * the dialog if ctrl is pressed while closing.
      */
     private void setCloseWindowConfirmHandler() {
         scene.getWindow().setOnCloseRequest((event) -> {
