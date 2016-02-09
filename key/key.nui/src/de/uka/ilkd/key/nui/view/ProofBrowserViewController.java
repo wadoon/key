@@ -18,7 +18,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
 /**
- * Adds a {@link Proof} Browser {@link ViewController}.
+ * Adds a {@link Proof} Browser {@link ViewController} to collect all loaded
+ * {@link Proof}s in one place to be able to switch between them.
  * 
  * @author Nils Muzzulini
  * @version 1.0
