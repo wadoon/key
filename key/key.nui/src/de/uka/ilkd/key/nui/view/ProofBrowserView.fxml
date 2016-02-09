@@ -10,6 +10,6 @@
       <TreeView fx:id="proofBrowserTreeView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
    <bottom>
-      <Button mnemonicParsing="false" onAction="#discardProof" text="Discard selected proof" BorderPane.alignment="CENTER" />
+      <Button mnemonicParsing="false" onAction="#discardSelectedProof" text="Discard selected proof" BorderPane.alignment="CENTER" />
    </bottom>
 </BorderPane>

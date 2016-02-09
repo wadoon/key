@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -16,6 +17,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
+/**
+ * Adds a {@link Proof} Browser {@link ViewController}.
+ * 
+ * @author Nils Muzzulini
+ * @version 1.0
+ */
 @KeYView(title = "Proofs", path = "ProofBrowserView.fxml", preferredPosition = ViewPosition.BOTTOMRIGHT)
 public class ProofBrowserViewController extends ViewController {
 
@@ -66,8 +73,17 @@ public class ProofBrowserViewController extends ViewController {
         getContext().getKeYMediator().addKeYSelectionListener(proofChangeListener);
     }
 
+    /**
+     * Adds a {@link Proof} to the Browser {@link TreeView}. Also adds an entry
+     * to the {@link HashMap} of Proofs where the key is the {@link Name} of the
+     * {@link Proof} and the corresponding value is the {@link Proof} itself.
+     */
     private void addProofToBrowser() {
         String proofName = proof.name().toString();
+
+        // TODO this does not allow duplicates. it is needed because
+        // selectedProofChanged fires 4 times!!! Need to find out why and if
+        // that can be changed
         for (TreeItem<String> treeItem : PROOF_BROWSER_ROOT_NODE.getChildren()) {
             if (treeItem.getValue().equals(proofName)) {
                 return;
@@ -80,8 +96,12 @@ public class ProofBrowserViewController extends ViewController {
         proofBrowserTreeView.getSelectionModel().select(newProof);
     }
 
+    /**
+     * Removes the selected {@link Proof} from the Browser {@link TreeView}.
+     * Also removes the corresponding entry in the {@link HashMap} of Proofs.
+     */
     @FXML
-    private void discardProof() {
+    private void discardSelectedProof() {
         int i = proofBrowserTreeView.getSelectionModel().getSelectedIndex() - 1;
         if (i < 0) {
             return;

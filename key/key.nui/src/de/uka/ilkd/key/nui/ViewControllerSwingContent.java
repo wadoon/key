@@ -45,10 +45,16 @@ public abstract class ViewControllerSwingContent extends ViewController {
         return swingNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initializeAfterLoadingFxml() {
         createSwingContent();
