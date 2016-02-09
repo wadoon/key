@@ -273,6 +273,9 @@ public class SequentPrinter {
         if (app.posInOccurrence() != null) {
             Range r = getHighlightRange(app.posInOccurrence());
             putOpenTag(r.start(), StylePos.RULEAPP, RULE_APP_TAG);
+            putCloseTag(r.end(), StylePos.RULEAPP, CLOSING_TAG);
+            keySet.add(r.start());
+            keySet.add(r.end());
         }
 
         if (app instanceof TacletApp) {
@@ -305,6 +308,9 @@ public class SequentPrinter {
                     inst.inAntec());
             Range r = getHighlightRange(pos);
             putOpenTag(r.start(), StylePos.RULEAPP, IF_FORMULA_TAG);
+            putCloseTag(r.end(), StylePos.RULEAPP, CLOSING_TAG);
+            keySet.add(r.start());
+            keySet.add(r.end());
         }
     }
 
@@ -313,6 +319,9 @@ public class SequentPrinter {
         for (PosInOccurrence pio : ifs) {
             Range r = getHighlightRange(pio);
             putOpenTag(r.start(), StylePos.RULEAPP, IF_INST_TAG);
+            putCloseTag(r.end(), StylePos.RULEAPP, CLOSING_TAG);
+            keySet.add(r.start());
+            keySet.add(r.end());
         }
     }
 
