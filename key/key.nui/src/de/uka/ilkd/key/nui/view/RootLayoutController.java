@@ -236,6 +236,24 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
+     * Loads a simple key file to test proof splitting.
+     */
+    @FXML
+    private void loadProofSplitTest() {
+        getContext().getKeYMediator().getUI()
+                .loadProblem(new File("resources/proofs/testSplit.key"));
+    }
+    
+    /**
+     * Loads a simple key file to test model search vs basic arithmetic treatment.
+     */
+    @FXML
+    private void loadModelSearchVsBasicTest() {
+        getContext().getKeYMediator().getUI()
+                .loadProblem(new File("resources/proofs/testModelSearchVsBasic.key"));
+    }
+    
+    /**
      * Loads an open solvable proof.
      */
     @FXML

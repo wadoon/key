@@ -41,6 +41,8 @@
                   <Button mnemonicParsing="false" onAction="#loadBigProof" text="Load Big Proof" />
                   <Button mnemonicParsing="false" onAction="#loadSolvableProof" text="Load Solvable" />
                   <Button mnemonicParsing="false" onAction="#loadUnsolvableProof" text="Load Unsolvable" />
+                  <Button mnemonicParsing="false" onAction="#loadProofSplitTest" text="Split Test" />
+                  <Button mnemonicParsing="false" onAction="#loadModelSearchVsBasicTest" text="ModelSearch vs Basic" />
                   <ToggleButton fx:id="settingsButton" mnemonicParsing="false" onAction="#toggleSettings" text="Settings" />
               </buttons>
             </ButtonBar>
