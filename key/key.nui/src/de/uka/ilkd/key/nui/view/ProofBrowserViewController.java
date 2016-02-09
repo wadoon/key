@@ -81,6 +81,7 @@ public class ProofBrowserViewController extends ViewController {
      */
     private void addProofToBrowser() {
         String proofName = proof.name().toString();
+        listOfProofs.put(proofName, proof);
 
         // TODO this does not allow duplicates. it is needed because
         // selectedProofChanged fires 4 times!!! Need to find out why and if
@@ -90,8 +91,7 @@ public class ProofBrowserViewController extends ViewController {
                 return;
             }
         }
-
-        listOfProofs.put(proofName, proof);
+        
         TreeItem<String> newProof = new TreeItem<String>(proofName);
         PROOF_BROWSER_ROOT_NODE.getChildren().add(newProof);
         proofBrowserTreeView.getSelectionModel().select(newProof);
