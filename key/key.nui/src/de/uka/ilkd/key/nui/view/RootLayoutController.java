@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -301,8 +300,8 @@ public class RootLayoutController extends ViewController {
         fileChooser.setTitle("Select a proof to load");
         fileChooser
                 .getExtensionFilters().addAll(
-                        new ExtensionFilter("Proofs or Java Files", "*.proof",
-                                "*.java"),
+                        new ExtensionFilter("Proofs, KeY or Java Files", "*.proof",
+                                "*.key", "*.java"),
                         new ExtensionFilter("All Files", "*.*"));
         // TODO reset initial directory to "../" (changed for faster access to
         // proofs for testing purposes)
