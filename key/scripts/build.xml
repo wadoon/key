@@ -34,7 +34,7 @@
 		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 	</target>
 
-	<target name="deployAll">
+	<target name="deployAll" depends="compileAllTests">
 		<!-- Update GIT revision s-->
 		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
 			<arg value="rev-parse"/>
@@ -55,6 +55,7 @@
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+                <ant antfile="${key.dir}/key.core.test/build.xml" target="deploy" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<!-- Deploy license -->
 		<copy todir="${key.dir}/deployment">
 			<fileset file="${key.dir}/LICENSE.TXT"/>
