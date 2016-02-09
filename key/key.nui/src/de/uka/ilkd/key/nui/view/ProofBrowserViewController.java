@@ -59,7 +59,10 @@ public class ProofBrowserViewController extends ViewController {
                     public void changed(ObservableValue<? extends TreeItem<String>> observable,
                             TreeItem<String> old_val, TreeItem<String> new_val) {
                         TreeItem<String> selectedItem = new_val;
-
+                        
+                        if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE)) {
+                            return;
+                        }
                         Proof p = listOfProofs.get(selectedItem.getValue());
                         getContext().getKeYMediator().setProof(p);
                     }
@@ -88,6 +91,7 @@ public class ProofBrowserViewController extends ViewController {
         // that can be changed
         for (TreeItem<String> treeItem : PROOF_BROWSER_ROOT_NODE.getChildren()) {
             if (treeItem.getValue().equals(proofName)) {
+                proofBrowserTreeView.getSelectionModel().select(treeItem);
                 return;
             }
         }
