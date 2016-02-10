@@ -83,7 +83,7 @@ public class PrintFilter {
 
     public PrintFilter() {
         isUserCriteria = true;
-        criteria = null;
+        criteria = new CriterionEmpty<Pair<Integer,String>>();
         before = 2;
         after = 2;
         filterLayout = FilterLayout.Minimize;

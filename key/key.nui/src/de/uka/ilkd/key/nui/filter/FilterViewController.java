@@ -16,6 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -61,6 +62,12 @@ public class FilterViewController extends ViewController {
     @FXML
     private ToggleButton selectionFilterToggle;
 
+    @FXML
+    private RadioButton userRadio;
+
+    @FXML
+    private RadioButton selectionRadio;
+
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
     private String searchValue;
     private boolean invert;
@@ -87,10 +94,10 @@ public class FilterViewController extends ViewController {
             }
 
             invertFilter.setSelected(invert);
-            toggleIsUserCriteria(true);
+            userRadio.setSelected(true);
         }
         else {
-            toggleIsUserCriteria(false);
+            selectionRadio.setSelected(true);
         }
 
         linesBefore.setValue(currentFilter.getBefore());
@@ -104,6 +111,10 @@ public class FilterViewController extends ViewController {
         selectionCriteria.managedProperty()
                 .bind(selectionCriteria.visibleProperty());
         userCriteria.managedProperty().bind(userCriteria.visibleProperty());
+
+        selectionCriteria.visibleProperty()
+                .bind(selectionRadio.selectedProperty());
+        userCriteria.visibleProperty().bind(userRadio.selectedProperty());
 
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
             beforeNumber.setText(Integer.toString(new_val.intValue()));
@@ -174,6 +185,8 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleApply() {
+        if (filterSelection != null)
+            finishSelection();
         updateCurrentFilter();
         getContext().setCurrentPrintFilter(currentFilter);
     }
@@ -182,22 +195,23 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleSelectionFilterToggled() {
-
         if (selectionFilterToggle.isSelected()) {
+            // reset old filter to make selection more easily
+            getContext().setCurrentPrintFilter(new PrintFilter());
             filterSelection = new FilterSelection();
             currentFilter.setIsUserCriteria(false);
             getContext().activateSelectMode(filterSelection);
         }
         else {
-            filterSelection.getSelectionModeFinishedEvent()
-                    .fire(EmptyEventArgs.get());
-            currentFilter.setCriteria(filterSelection.getCriteria());
+            finishSelection();
         }
     }
 
-    private void toggleIsUserCriteria(boolean value) {
-        userCriteria.setVisible(value);
-        selectionCriteria.setVisible(!value);
+    private void finishSelection() {
+        filterSelection.getSelectionModeFinishedEvent()
+                .fire(EmptyEventArgs.get());
+        currentFilter.setCriteria(filterSelection.getCriteria());
+        filterSelection = null;
     }
 
     private void updateCurrentFilter() {

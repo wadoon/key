@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="219.0" prefWidth="219.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.filter.FilterViewController">
+<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="318.0" prefWidth="221.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.filter.FilterViewController">
    <children>
       <VBox AnchorPane.bottomAnchor="54.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -19,6 +19,18 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </BorderPane.margin>
                      <children>
+                        <RadioButton fx:id="userRadio" mnemonicParsing="false" text="Custom">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="filterMode" />
+                           </toggleGroup>
+                           <VBox.margin>
+                              <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                           </VBox.margin>
+                        </RadioButton>
+                        <RadioButton fx:id="selectionRadio" mnemonicParsing="false" text="Selection" toggleGroup="$filterMode">
+                           <VBox.margin>
+                              <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                           </VBox.margin></RadioButton>
                         <GridPane fx:id="userCriteria">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -35,10 +47,16 @@
                               <Label alignment="TOP_LEFT" text="Search:" />
                               <ComboBox fx:id="filterModeBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            </children>
+                           <VBox.margin>
+                              <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                           </VBox.margin>
                         </GridPane>
                         <BorderPane fx:id="selectionCriteria" prefHeight="50.0" style="-fx-background-color: #ff6666;">
+                           <VBox.margin>
+                              <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                           </VBox.margin>
                            <center>
-                              <Label text="User Selection" />
+                              <ToggleButton fx:id="selectionFilterToggle" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" text="ArrowIcon" BorderPane.alignment="CENTER" />
                            </center>
                         </BorderPane>
                         <GridPane>
@@ -59,7 +77,6 @@
                               <Label text="Before:" />
                               <Label fx:id="beforeNumber" text="Label" GridPane.columnIndex="2" />
                               <Label fx:id="afterNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <ToggleButton fx:id="selectionFilterToggle" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" text="ArrowIcon" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
                      </children>
