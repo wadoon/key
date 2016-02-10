@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
@@ -118,6 +119,14 @@ public abstract class ForkedTestFileRunner implements Serializable {
           command.addAll(Arrays.asList("-Xdebug", "-Xnoagent",
                   "-Djava.compiler=NONE", "-Xrunjdwp:transport=dt_socket,server=y,suspend=" +
                           suspend + ",address=" + port));
+      }
+
+      Enumeration<?> en = System.getProperties().keys();
+      while(en.hasMoreElements()) {
+          String key = en.nextElement().toString();
+          if(key.startsWith("cost.")) {
+              command.add("-D" + key + "=" + System.getProperty(key));
+          }
       }
 
       command.add(ForkedTestFileRunner.class.getName());
