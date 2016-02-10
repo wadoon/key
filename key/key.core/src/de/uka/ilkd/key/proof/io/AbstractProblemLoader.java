@@ -30,7 +30,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
-import recoder.service.DefaultImplicitElementInfo;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
@@ -283,7 +282,7 @@ public abstract class AbstractProblemLoader {
                  OneStepSimplifier.refreshOSS(proof);
                     result = replayProof(proof);
                 }
-                                      
+                
                 // this message is propagated to the top level in console mode
                 return; // Everything fine
             } catch (Throwable t) {
@@ -541,11 +540,15 @@ public abstract class AbstractProblemLoader {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
         ReplayResult result;
         try {
-        	assert envInput instanceof KeYUserProblemFile;
+        	    assert envInput instanceof KeYUserProblemFile;
         	    
                 parser = new IntermediatePresentationProofFileParser(proof);
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
                 parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
+                
+               
+                // Parser is no longer needed, set it to null to free memory.
+                parser = null;
                 
                 // For loading, we generally turn on one step simplification to be
                 // able to load proofs that used it even if the user has currently
@@ -559,7 +562,7 @@ public abstract class AbstractProblemLoader {
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
 
         } catch (Exception e) {
-        	if (parser == null || parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
+        	if (parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
         	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
         		// this exception was something unexpected
         		errors.add(e);

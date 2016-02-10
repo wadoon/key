@@ -50,7 +50,7 @@ public class TacletAppIntermediate extends AppIntermediate {
             Pair<Integer, PosInTerm> posInfo, LinkedList<String> insts,
             ImmutableList<String> ifSeqFormulaList, ImmutableList<String> ifDirectFormulaList,
             ImmutableList<Name> newNames) {
-        this.tacletName = tacletName;
+        this.tacletName = tacletName.intern();
         this.posInfo = posInfo;
         this.insts = insts;
         this.ifSeqFormulaList = ifSeqFormulaList;

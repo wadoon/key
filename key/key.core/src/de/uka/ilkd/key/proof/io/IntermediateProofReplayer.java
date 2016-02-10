@@ -248,6 +248,11 @@ public class IntermediateProofReplayer {
                                     currInterm.getChildren();
 
                             addChildren(children, intermChildren);
+                        
+                            // Children are no longer needed, set them to null
+                            // to free memory.
+                            currInterm.setChildren(null);
+                        
                         }
                         catch (Exception e) {
                             skipBranch = 1;
