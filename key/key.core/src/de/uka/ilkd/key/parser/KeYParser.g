@@ -4625,6 +4625,8 @@ oneJavaSource returns [String s = null]
   |  
      SLASH { b.append("/"); }
   |  
+     PLUS { b.append("+"); }
+  |  
      COLON {b.append(":");}
   |
      BACKSLASH {b.append("\\");}
