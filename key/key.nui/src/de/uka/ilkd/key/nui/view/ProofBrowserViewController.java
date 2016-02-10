@@ -29,7 +29,7 @@ public class ProofBrowserViewController extends ViewController {
 
     private final static TreeItem<String> PROOF_BROWSER_ROOT_NODE = new TreeItem<String>("Proofs");
     private HashMap<String, Proof> listOfProofs = new HashMap<String, Proof>();
-    private Proof proof;
+    private Proof proof = null;
 
     @FXML
     private TreeView<String> proofBrowserTreeView;
@@ -59,7 +59,7 @@ public class ProofBrowserViewController extends ViewController {
                     public void changed(ObservableValue<? extends TreeItem<String>> observable,
                             TreeItem<String> old_val, TreeItem<String> new_val) {
                         TreeItem<String> selectedItem = new_val;
-                        
+
                         if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE)) {
                             return;
                         }
@@ -95,7 +95,7 @@ public class ProofBrowserViewController extends ViewController {
                 return;
             }
         }
-        
+
         TreeItem<String> newProof = new TreeItem<String>(proofName);
         PROOF_BROWSER_ROOT_NODE.getChildren().add(newProof);
         proofBrowserTreeView.getSelectionModel().select(newProof);
