@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
+import java.nio.file.DirectoryStream.Filter;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -12,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
@@ -345,9 +347,18 @@ public class SequentViewController extends ViewController {
     }
 
     boolean selectionModeIsActive = false;
+    private FilterSelection filterSelection;
+
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
-        printer.startSelectionMode();
+        filterSelection = eventArgs.getFilterSelection();
         selectionModeIsActive = true;
+    }
+
+    public void finishSelectionMode() {
+        for (Range range : filterSelection.getSelection())
+            this.printer.removeSelection(range);
+        
+        filterSelection.createCriteria(proofString);
     }
 
     private void handleWebViewClicked(MouseEvent event) {
@@ -355,7 +366,12 @@ public class SequentViewController extends ViewController {
             int pos = posTranslator.getCharIdxUnderPointer(event);
             Range range = this.abstractSyntaxTree.rangeForIndex(pos);
 
-            this.printer.applySelection(range);
+            if (filterSelection.tryAddRange(range)) {
+                this.printer.applySelection(range);
+            }
+            else {
+                this.printer.removeSelection(range);
+            }
             this.updateView();
             /*
              * if (event.isAltDown())

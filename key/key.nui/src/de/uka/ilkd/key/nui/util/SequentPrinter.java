@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.SequentFilterer;
 import de.uka.ilkd.key.nui.model.Context;
@@ -69,7 +70,7 @@ public class SequentPrinter {
     private final static String selectionTag = "filterSelection";
 
     private enum StylePos {
-        SELECTION(4), SYNTAX(3), MOUSE(0), SEARCH(2), FILTER(1);
+        SELECTION(1), SYNTAX(3), MOUSE(0), SEARCH(2), FILTER(1);
 
         private int slotPosition;
 
@@ -305,7 +306,7 @@ public class SequentPrinter {
             int styleEnd = styleStart + lines[i].length() + 1;
 
             // If line is in list apply styles
-            if (indicesOfLines.contains(i)) {
+            if (!indicesOfLines.contains(i)) {
                 switch (filter.getFilterLayout()) {
                 case Minimize:
                     minimizeLine(styleStart, styleEnd);
@@ -695,48 +696,16 @@ public class SequentPrinter {
         this.sequent = sequent;
     }
 
-    boolean selectionModeActive = false;
-    List<Range> selections = new LinkedList<>();
-
     public void applySelection(Range range) {
-        if (!selectionModeActive)
-            return;
-
-        // if already selected -> deselect
-        for (Range r : selections) {
-            if (r.start() == range.start() && r.end() == range.end()) {
-                removeSelection(r);
-                selections.remove(r);
-                return;
-            }
-        }
-
         keySet.add(range.start());
         keySet.add(range.end());
 
         putOpenTag(range.start(), StylePos.SELECTION, selectionTag);
         putCloseTag(range.end(), StylePos.SELECTION, closingTag);
-        selections.add(range);
     }
 
-    private void removeSelection(Range range) {
+    public void removeSelection(Range range) {
         putOpenTag(range.start(), StylePos.SELECTION, "");
         putCloseTag(range.end(), StylePos.SELECTION, "");
-    }
-
-    public void startSelectionMode() {
-        selectionModeActive = true;
-    }
-
-    public void finishSelectionMode() {
-        for (Range range : selections)
-            removeSelection(range);
-
-        // get text under ranges
-        // add OR to filter
-
-        // discard old ranges
-        selections = new LinkedList<>();
-        selectionModeActive = false;
     }
 }

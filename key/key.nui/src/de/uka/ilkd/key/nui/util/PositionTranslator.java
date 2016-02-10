@@ -105,12 +105,12 @@ public class PositionTranslator {
             // Adjust for filtering
             // XXX
             if (filterCollapsed) {
-                if (filteredLines.contains(result)) {
+                if (!filteredLines.contains(result)) {
                     continue;
                 }
             }
             else {
-                if (filteredLines.contains(result)
+                if (!filteredLines.contains(result)
                         && filteredLines.size() > 0) {
                     text.setFont(new Font(font, minimizedSize));
                 }
@@ -149,7 +149,7 @@ public class PositionTranslator {
         Text text = new Text();
         // Adjust for minimized Filter
         // XXX
-        if (!filterCollapsed && (filteredLines.contains(line))
+        if (!filterCollapsed && !filteredLines.contains(line)
                 && filteredLines.size() > 0) {
             text.setFont(new Font(font, minimizedSize));
         }

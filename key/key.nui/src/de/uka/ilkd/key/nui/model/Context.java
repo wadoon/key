@@ -53,8 +53,6 @@ public class Context {
     private PrintFilter currentPrintFilter = null;
 
     public void setCurrentPrintFilter(PrintFilter filter) {
-        if (filter == currentPrintFilter)
-            return;
         currentPrintFilter = filter;
         filterChangedEvent.fire(filter);
     }

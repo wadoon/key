@@ -31,8 +31,8 @@ public class FilterViewController extends ViewController {
     @FXML
     private TextField searchText;
 
-    @FXML
-    private ComboBox<String> filters;
+  //  @FXML
+   // private ComboBox<String> filters;
 
     @FXML
     private Slider linesBefore;
@@ -142,21 +142,14 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleSaveFilter() {
-        String name = filters.getEditor().getText();
+     /*   String name = filters.getEditor().getText();
         if (name.isEmpty()) {
             Alert alert = new Alert(AlertType.WARNING);
             alert.setContentText("Please choose a name before saving!");
             alert.showAndWait();
             return;
         }
-        if (currentFilter.getIsUserCriteria()) {
-            if (invert)
-                currentFilter.setCriteria(new NotCriteria<>(
-                        new CriterionContainsString(searchValue)));
-            else
-                currentFilter
-                        .setCriteria(new CriterionContainsString(searchValue));
-        }
+        updateCurrentFilter();
 
         if (savedFilters.containsKey(name)) {
             currentFilter = savedFilters.get(name);
@@ -165,21 +158,20 @@ public class FilterViewController extends ViewController {
             currentFilter.setName(name);
             savedFilters.put(name, currentFilter.cloneFilter());
             filters.getItems().add(currentFilter.getName());
-        }
+        }*/
     }
 
     @FXML
     private void handleFilterSelectionChanged() {
-        if (filters.getValue() == null)
+      /*  if (filters.getValue() == null)
             return;
 
         currentFilter = savedFilters.get(filters.getValue());
-        loadCurrentFilter();
+        loadCurrentFilter();*/
     }
 
     @FXML
     private void handleReset() {
-        filters.getEditor().setText("");
         currentFilter = new PrintFilter();
         loadCurrentFilter();
         handleApply();
@@ -187,6 +179,7 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleApply() {
+        updateCurrentFilter();
         getContext().setCurrentPrintFilter(currentFilter);
     }
 
@@ -198,7 +191,7 @@ public class FilterViewController extends ViewController {
         }
         else {
             currentFilter.setIsUserCriteria(true);
-            // TODO: add cancel event to event args
+            // TODO: finish selection mode event to eventargs
         }
     }
 
@@ -210,5 +203,16 @@ public class FilterViewController extends ViewController {
     private void selectionModeCallback(
             Criteria<Pair<Integer, String>> criteria) {
         currentFilter.setCriteria(criteria);
+    }
+    
+    private void updateCurrentFilter(){
+        if (currentFilter.getIsUserCriteria()) {
+            if (invert)
+                currentFilter.setCriteria(new NotCriteria<>(
+                        new CriterionContainsString(searchValue)));
+            else
+                currentFilter
+                        .setCriteria(new CriterionContainsString(searchValue));
+        }
     }
 }
