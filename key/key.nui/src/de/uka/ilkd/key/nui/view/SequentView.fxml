@@ -22,7 +22,7 @@
 					prefWidth="500.0" AnchorPane.bottomAnchor="0.0"
 					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
 					AnchorPane.topAnchor="0.0">
-					<WebView fx:id="textAreaWebView" maxHeight="Infinity"
+					<WebView fx:id="textArea" maxHeight="Infinity"
 						prefHeight="8000" prefWidth="4000" />
 				</ScrollPane>
 			</children>
@@ -64,6 +64,8 @@
 	</top>
 	<bottom> 
                 <TitledPane fx:id="tacletInfo" text="Taclet Info"
-                        BorderPane.alignment="CENTER"></TitledPane>
+                        BorderPane.alignment="CENTER">
+                        <fx:include fx:id="tacletInfoView" source="TacletInfoView.fxml" />
+                </TitledPane>
         </bottom>
 </BorderPane>

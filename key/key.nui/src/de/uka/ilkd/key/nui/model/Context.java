@@ -72,7 +72,7 @@ public class Context {
     private String sequentHtml;
 
     public void setSequentHtml(String value) {
-        if (value == sequentHtml)
+        if (value.equals(sequentHtml))
             return;
         sequentHtml = value;
         sequentHtmlChangedEvent.fire(value);

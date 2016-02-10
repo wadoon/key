@@ -16,18 +16,21 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.NewDependingOn;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
+/**
+ * Printer class for generating Strings containing information about applied rules.
+ * Methods copied from {@link InnerNodeView} with minor adaptions. 
+ * @author Victor Schuemmer
+ */
 public class TacletInfoPrinter {
     
     /**
      * Creates a String containing information about applied rules on the given node.
-     * Mostly taken from {@link InnerNodeView}
      * @param mediator {@link KeYMediator}
      * @param node {@link Node}
      * @return String containing information about applied rules on the given node.
@@ -78,9 +81,9 @@ public class TacletInfoPrinter {
             schemaVars = schemaVars.add(nvc.getSchemaVariable());
         }
 
-        for (final NewDependingOn ndo : t.varsNewDependingOn()) {
-            schemaVars = schemaVars.add(ndo.first());
-        }
+//        for (final NewDependingOn ndo : t.varsNewDependingOn()) {
+//            schemaVars = schemaVars.add(ndo.first());
+//        }
 
         if (!schemaVars.isEmpty()) {
             out.append("\\schemaVariables {\n");
