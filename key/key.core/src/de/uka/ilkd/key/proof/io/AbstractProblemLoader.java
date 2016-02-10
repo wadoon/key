@@ -545,7 +545,6 @@ public abstract class AbstractProblemLoader {
                 parser = new IntermediatePresentationProofFileParser(proof);
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
                 parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
-                
                
                 // Parser is no longer needed, set it to null to free memory.
                 parser = null;

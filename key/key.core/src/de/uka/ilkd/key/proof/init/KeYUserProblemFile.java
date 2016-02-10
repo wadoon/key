@@ -245,8 +245,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         } finally {
             lastParser = null;
         }
-        
-        
     }
         
     
