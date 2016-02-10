@@ -730,8 +730,4 @@ public class Node  {
                     + "structure this way is not allowed.");
         }
     }
-
-    void clearNodeInfo() {
-        this.nodeInfo = new NodeInfo(this);
-    }
 }
