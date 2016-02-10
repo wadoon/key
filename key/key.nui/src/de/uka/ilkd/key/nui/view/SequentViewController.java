@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.nui.filter.EmptyEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
@@ -351,14 +352,16 @@ public class SequentViewController extends ViewController {
 
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
         filterSelection = eventArgs.getFilterSelection();
+        filterSelection.getSelectionModeFinishedEvent()
+                .addHandler(this::finishSelectionMode);
         selectionModeIsActive = true;
     }
 
-    public void finishSelectionMode() {
+    public void finishSelectionMode(EmptyEventArgs args) {
         for (Range range : filterSelection.getSelection())
             this.printer.removeSelection(range);
-        
         filterSelection.createCriteria(proofString);
+        updateView();
     }
 
     private void handleWebViewClicked(MouseEvent event) {

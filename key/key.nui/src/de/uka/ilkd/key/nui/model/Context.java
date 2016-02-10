@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.model;
 
+import java.nio.file.DirectoryStream.Filter;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -7,6 +8,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.StatusManager;
 import de.uka.ilkd.key.nui.filter.Criteria;
+import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.util.CsEvent;
@@ -79,16 +81,17 @@ public class Context {
     public String getSequentHtml() {
         return sequentHtml;
     }
-    
+
     private CsEvent<SelectModeEventArgs> selectModeActivatedEvent = new CsEvent<>();
-    public CsEvent<SelectModeEventArgs> getSelectModeActivateEvent(){
+
+    public CsEvent<SelectModeEventArgs> getSelectModeActivateEvent() {
         return selectModeActivatedEvent;
     }
-    
-    public void activateSelectMode(Consumer<Criteria<Pair<Integer, String>>> callback){
-        selectModeActivatedEvent.fire(new SelectModeEventArgs(callback));
+
+    public void activateSelectMode(FilterSelection filterSelection) {
+        selectModeActivatedEvent.fire(new SelectModeEventArgs(filterSelection));
     }
-    
+
     public Context() {
     }
 }

@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 public class CsEvent<T> {
     private List<Consumer<T>> listeners = new LinkedList<>();
+    
     public void addHandler(Consumer<T> handler){
         listeners.add(handler);
     }
