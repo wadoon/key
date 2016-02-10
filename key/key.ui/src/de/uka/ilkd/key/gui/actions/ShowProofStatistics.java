@@ -61,7 +61,33 @@ public class ShowProofStatistics extends MainWindowAction {
                             + "for a proof you have to load one first"));
         }
         else {
+            String stats = getHTMLStatisticsMessage(proof);
 
+            JEditorPane contentPane = new JEditorPane("text/html", stats);
+            contentPane.setEditable(false);
+            contentPane.setBorder(BorderFactory.createEmptyBorder());
+            contentPane.setCaretPosition(0);
+            contentPane.setBackground(MainWindow.getInstance().getBackground());
+            contentPane.setSize(new Dimension(10, 360));
+            contentPane.setPreferredSize(new Dimension(contentPane.getPreferredSize().width + 15, 360));
+            
+            JScrollPane scrollPane = new JScrollPane(contentPane);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
+            
+            Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
+            if (myFont != null) {
+                contentPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+                contentPane.setFont(myFont);
+            } else {
+                Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
+            }
+            
+            JOptionPane.showMessageDialog(mainWindow, scrollPane,
+                    "Proof Statistics", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public static String getHTMLStatisticsMessage(Proof proof) {
             final int openGoals = proof.openGoals().size();
             String stats = "<html><head>"
                     + "<style type=\"text/css\">"
@@ -76,7 +102,7 @@ public class ShowProofStatistics extends MainWindowAction {
                                 + (openGoals > 1 ? "s." : ".") + "</strong>";
             }
             else {
-                stats += "<strong>Closed.</strong>";
+            stats += "<strong>Proved.</strong>";
             }
 
             stats += "<br/><br/><table>";
@@ -122,7 +148,7 @@ public class ShowProofStatistics extends MainWindowAction {
                                         return cmpRes;
                                     }
                                 });
-                sortedEntries.addAll(s.interactiveAppsDetails.entrySet());
+            sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
                 for (Map.Entry<String, Integer> entry : sortedEntries) {
                     stats +=
@@ -133,28 +159,6 @@ public class ShowProofStatistics extends MainWindowAction {
 
             stats += "</table></body></html>";
 
-            JEditorPane contentPane = new JEditorPane("text/html", stats);
-            contentPane.setEditable(false);
-            contentPane.setBorder(BorderFactory.createEmptyBorder());
-            contentPane.setCaretPosition(0);
-            contentPane.setBackground(MainWindow.getInstance().getBackground());
-            contentPane.setSize(new Dimension(10, 500));
-            contentPane.setPreferredSize(new Dimension(contentPane.getPreferredSize().width + 15, 500));
-            
-            JScrollPane scrollPane = new JScrollPane(contentPane);
-            scrollPane.setBorder(BorderFactory.createEmptyBorder());
-            
-            Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
-            if (myFont != null) {
-                contentPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-                contentPane.setFont(myFont);
-            } else {
-                Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
+        return stats;
             }
-            
-            JOptionPane.showMessageDialog(mainWindow, scrollPane,
-                    "Proof Statistics", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
 }

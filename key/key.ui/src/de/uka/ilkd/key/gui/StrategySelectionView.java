@@ -61,9 +61,11 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
+import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -135,6 +137,12 @@ public final class StrategySelectionView extends JPanel {
      * {@link #DEFINITION}.
      */
     private StrategySelectionComponents components;
+
+    /**
+     * Stores whether a chosen predef setting has been changed;
+     * in this case, the default button should be activated again.
+     */
+    private boolean predefChanged = true;
 
     public StrategySelectionView(AutoModeAction autoModeAction) {
         layoutPane(autoModeAction);
@@ -407,6 +415,7 @@ public final class StrategySelectionView extends JPanel {
         result.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                predefChanged = true;
                 StrategyProperties props = getProperties();
                 updateStrategySettings(mediator.getSelectedProof()
                         .getActiveStrategy().name().toString(), props);
@@ -460,70 +469,68 @@ public final class StrategySelectionView extends JPanel {
     }
 
     private JPanel createDefaultPanel(StrategySelectionComponents components) {
-        final JPanel panel = new JPanel(new FlowLayout());
+        final JPanel panel = new JPanel();
+
+        final JButton defaultButton = new JButton("Choose Predef");
+        components.setDefaultButton(defaultButton);
+
+        final String[] existingPredefs =
+                new String[1 + DEFINITION.getFurtherDefaults().size()];
+
+        existingPredefs[0] = "Defaults";
+
+        int i = 1;
+        for (Triple<String, Integer, IDefaultStrategyPropertiesFactory> furtherDefault : DEFINITION
+                .getFurtherDefaults()) {
+            existingPredefs[i] = furtherDefault.first;
+            i++;
+        }
 
         final JComboBox<String> strategyPredefSettingsCmb =
-                new JComboBox<String>(new String[] { "Defaults",
-                        "Defaults with arith.", "TimSort Standards",
-                        "Simplification" });
+                new JComboBox<String>(existingPredefs);
         strategyPredefSettingsCmb.setSelectedIndex(0);
+        components.setPredefsChoiceCmb(strategyPredefSettingsCmb);
 
-        final JButton setPredefBtn = new JButton("Choose Predef");
-        components.setDefaultButton(setPredefBtn);
-
-        setPredefBtn.addActionListener(new ActionListener() {
+        defaultButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                StrategyProperties newProps = null;
                 int newMaxSteps = 0;
+                StrategyProperties newProps = null;
 
-                switch (strategyPredefSettingsCmb.getSelectedIndex()) {
-                case 0: // DEFAULT
+                final int selIndex =
+                        strategyPredefSettingsCmb.getSelectedIndex();
+                if (selIndex == 0) {
                     newMaxSteps = DEFINITION.getDefaultMaxRuleApplications();
                     newProps =
                             DEFINITION.getDefaultPropertiesFactory()
                                     .createDefaultStrategyProperties();
-                    break;
-
-                case 1:
-                    newMaxSteps = DEFINITION.getDefaultMaxRuleApplications();
-                    newProps =
-                            DEFINITION.getDefaultPropertiesFactory()
-                                    .createDefaultStrategyProperties();
-                    newProps.setProperty(
-                            StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-                    break;
-
-                case 2: // TimSort
-                    newMaxSteps = 7000;
-                    newProps = createTimSortDefaultStrategyProperties();
-                    break;
-
-                case 3: // SIMPLIFICATION
-                    newMaxSteps = 5000;
-                    newProps = createSimplificationDefaultStrategyProperties();
-                    break;
                 }
+                else {
+                    Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
+                            DEFINITION.getFurtherDefaults().get(selIndex - 1);
+                    newMaxSteps = chosenDefault.second;
+                    newProps =
+                            chosenDefault.third
+                                    .createDefaultStrategyProperties();
+                }
+
+                predefChanged = false;
 
                 mediator.getSelectedProof().getSettings().getStrategySettings()
                         .setMaxSteps(newMaxSteps);
                 updateStrategySettings(JAVACARDDL_STRATEGY_NAME, newProps);
                 refresh(mediator.getSelectedProof());
-
-                setPredefBtn.setEnabled(false);
             }
         });
 
         strategyPredefSettingsCmb.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                setPredefBtn.setEnabled(true);
-                setPredefBtn.getActionListeners()[0].actionPerformed(null);
+                defaultButton.getActionListeners()[0].actionPerformed(null);
             }
         });
 
         panel.add(strategyPredefSettingsCmb);
-        panel.add(setPredefBtn);
+        panel.add(defaultButton);
 
         return panel;
     }
@@ -569,19 +576,11 @@ public final class StrategySelectionView extends JPanel {
 
     private void refreshDefaultButton() {
         if (mediator.getSelectedProof() != null) {
-            boolean defaultMaxRules =
-                    components.getMaxRuleAppSlider() == null
-                            || components.getMaxRuleAppSlider().getPos() == DEFINITION
-                                    .getDefaultMaxRuleApplications();
-            boolean defaultProperties =
-                    getProperties().equals(
-                            DEFINITION.getDefaultPropertiesFactory()
-                                    .createDefaultStrategyProperties());
-            components.getDefaultButton().setEnabled(
-                    !defaultMaxRules || !defaultProperties);
+            components.getDefaultButton().setEnabled(predefChanged);
         }
         else {
             components.getDefaultButton().setEnabled(false);
+            components.getStrategyPredefSettingsCmb().setEnabled(false);
         }
     }
 
@@ -597,6 +596,7 @@ public final class StrategySelectionView extends JPanel {
             components.getMaxRuleAppSlider().setEnabled(enable);
         }
         components.getDefaultButton().setEnabled(enable);
+        components.getStrategyPredefSettingsCmb().setEnabled(enable);
         for (Entry<String, List<JRadioButton>> entry : components
                 .getPropertyButtons().entrySet()) {
             for (JRadioButton button : entry.getValue()) {
@@ -624,87 +624,6 @@ public final class StrategySelectionView extends JPanel {
                 .getDefaultStrategyFactory().create(proof, properties) : proof
                 .getServices().getProfile().getDefaultStrategyFactory()
                 .create(proof, properties);
-    }
-
-    /**
-     * @return The default strategy options for TimSort.
-     */
-    private StrategyProperties createSimplificationDefaultStrategyProperties() {
-        final StrategyProperties newProps =
-                DEFINITION.getDefaultPropertiesFactory()
-                        .createDefaultStrategyProperties();
-
-        newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-                StrategyProperties.SPLITTING_OFF);
-
-        newProps.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-                StrategyProperties.LOOP_NONE);
-
-        newProps.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-                StrategyProperties.BLOCK_NONE);
-
-        newProps.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                StrategyProperties.METHOD_NONE);
-
-        newProps.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-                StrategyProperties.DEP_OFF);
-
-        newProps.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-                StrategyProperties.QUERY_OFF);
-
-        newProps.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY,
-                StrategyProperties.QUERYAXIOM_OFF);
-
-        newProps.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                StrategyProperties.NON_LIN_ARITH_NONE);
-
-        newProps.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                StrategyProperties.QUANTIFIERS_NONE);
-
-        newProps.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-                StrategyProperties.CLASS_AXIOM_OFF);
-        return newProps;
-    }
-
-    /**
-     * @return The default strategy options for simplification.
-     */
-    private StrategyProperties createTimSortDefaultStrategyProperties() {
-        final StrategyProperties newProps =
-                DEFINITION.getDefaultPropertiesFactory()
-                        .createDefaultStrategyProperties();
-
-        newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-                StrategyProperties.SPLITTING_DELAYED);
-
-        newProps.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-                StrategyProperties.LOOP_NONE);
-
-        newProps.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-                StrategyProperties.BLOCK_CONTRACT);
-
-        newProps.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                StrategyProperties.METHOD_CONTRACT);
-
-        newProps.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-                StrategyProperties.DEP_ON);
-
-        newProps.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-                StrategyProperties.QUERY_ON);
-
-        newProps.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-
-        newProps.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-
-        newProps.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-                StrategyProperties.CLASS_AXIOM_DELAYED);
-
-        newProps.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1),
-                StrategyProperties.USER_TACLETS_LOW);
-
-        return newProps;
     }
 
     /**
@@ -783,6 +702,11 @@ public final class StrategySelectionView extends JPanel {
         private JButton defaultButton;
 
         /**
+         * The {@link JComboBox} for choosing a predefined value set.
+         */
+        private JComboBox<String> strategyPredefSettingsCmb;
+
+        /**
          * Returns the {@link MaxRuleAppSlider} in which the maximal number of
          * steps is edited.
          * 
@@ -843,6 +767,13 @@ public final class StrategySelectionView extends JPanel {
         }
 
         /**
+         * @return The {@link JComboBox} for choosing a predefined value set.
+         */
+        public JComboBox<String> getStrategyPredefSettingsCmb() {
+            return strategyPredefSettingsCmb;
+        }
+
+        /**
          * Sets the {@link JButton} which restores default values.
          * 
          * @param defaultButton
@@ -850,6 +781,17 @@ public final class StrategySelectionView extends JPanel {
          */
         public void setDefaultButton(JButton defaultButton) {
             this.defaultButton = defaultButton;
+        }
+
+        /**
+         * Sets the {@link JComboBox} for choosing a predefined value set.
+         * 
+         * @param strategyPredefSettingsCmb
+         *            The {@link JComboBox} for choosing a predefined value set.
+         */
+        public void setPredefsChoiceCmb(
+                JComboBox<String> strategyPredefSettingsCmb) {
+            this.strategyPredefSettingsCmb = strategyPredefSettingsCmb;
         }
 
         /**

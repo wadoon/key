@@ -152,6 +152,10 @@ public class Node  {
         cachedName = null;
     }
 
+    void clearNodeInfo() {
+        this.nodeInfo = new NodeInfo(this);
+    }
+
     public NameRecorder getNameRecorder() {
         return nameRecorder;
     }
