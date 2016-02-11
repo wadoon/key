@@ -96,7 +96,7 @@ public class MainApp extends Application {
 
             // Show the scene containing the root layout.
             scene = new Scene(rootLayout);
-            scene.getStylesheets().add("file:resources/css/TestTheme.css");
+            scene.getStylesheets().add("file:resources/css/themes/DefaultTheme.css");
 
             rootLayout.prefHeightProperty().bind(scene.heightProperty());
 
