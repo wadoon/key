@@ -19,8 +19,9 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.SequentFilterer;
 import de.uka.ilkd.key.nui.model.Context;
-import de.uka.ilkd.key.nui.model.PrintFilter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -59,7 +60,7 @@ public class SequentPrinter {
     private ArrayList<Integer> filterIndicesClose = new ArrayList<Integer>();
 
     private enum StylePos {
-        SYNTAX(4), MOUSE(0), SEARCH(2), FILTER(1), RULEAPP(3);
+        SYNTAX(4), MOUSE(0), SEARCH(2), FILTER(1), RULEAPP(3),SELECTION(1);
 
         private int slotPosition;
 
@@ -297,8 +298,8 @@ public class SequentPrinter {
             int styleEnd = styleStart + lines[i].length() + 1;
 
             // If line is in list apply styles
-            if (indicesOfLines.contains(i) == filter.getInvert()) {
-                switch (filter.getFilterMode()) {
+            if (!indicesOfLines.contains(i)) {
+                switch (filter.getFilterLayout()) {
                 case Minimize:
                     minimizeLine(styleStart, styleEnd);
                     break;
@@ -709,5 +710,18 @@ public class SequentPrinter {
 
     public void setSequent(Sequent sequent) {
         this.sequent = sequent;
+    }
+
+    public void applySelection(Range range) {
+        keySet.add(range.start());
+        keySet.add(range.end());
+
+        putOpenTag(range.start(), StylePos.SELECTION, NUIConstants.SELECTION_TAG);
+        putCloseTag(range.end(), StylePos.SELECTION, NUIConstants.CLOSING_TAG);
+    }
+
+    public void removeSelection(Range range) {
+        putOpenTag(range.start(), StylePos.SELECTION, "");
+        putCloseTag(range.end(), StylePos.SELECTION, "");
     }
 }

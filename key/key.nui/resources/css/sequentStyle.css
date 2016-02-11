@@ -18,6 +18,9 @@ pre {
 	font-weight: inherit;
 	font-style: inherit;
 }
+.filterSelection{
+   background-color: #ff6666;
+}
 .minimized {
 	background-color: inherit;
 	color: inherit;

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.view;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.DirectoryStream.Filter;
 import java.util.ResourceBundle;
 
 import org.key_project.util.collection.ImmutableList;
@@ -15,7 +16,11 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.PrintFilter;
+import de.uka.ilkd.key.nui.filter.EmptyEventArgs;
+import de.uka.ilkd.key.nui.filter.FilterSelection;
+import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
+import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.nui.util.TermInfoPrinter;
@@ -42,6 +47,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -222,6 +228,7 @@ public class SequentViewController extends ViewController {
                     - event.getDeltaX() / this.scrollPane.getWidth());
         });
 
+        textArea.setOnMouseClicked(this::handleWebViewClicked);
     }
 
     @Override
@@ -229,6 +236,8 @@ public class SequentViewController extends ViewController {
         getContext().getKeYMediator()
                 .addKeYSelectionListener(proofChangeListener);
         getContext().getFilterChangedEvent().addHandler(this::apply);
+        getContext().getSelectModeActivateEvent()
+                .addHandler(this::selectModeActivated);
 
         posTranslator = new PositionTranslator(
                 getContext().getCssFileHandler());
@@ -378,9 +387,48 @@ public class SequentViewController extends ViewController {
     }
 
     private void apply(PrintFilter filter) {
+        if (!sequentLoaded)
+            return;
         lastFilter = filter;
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);
         updateView();
+    }
+
+    boolean selectionModeIsActive = false;
+    private FilterSelection filterSelection;
+
+    private void selectModeActivated(SelectModeEventArgs eventArgs) {
+        filterSelection = eventArgs.getFilterSelection();
+        filterSelection.getSelectionModeFinishedEvent()
+                .addHandler(this::finishSelectionMode);
+        selectionModeIsActive = true;
+    }
+
+    public void finishSelectionMode(EmptyEventArgs args) {
+        for (Range range : filterSelection.getSelection())
+            this.printer.removeSelection(range);
+        filterSelection.createCriteria(proofString);
+        updateView();
+    }
+
+    private void handleWebViewClicked(MouseEvent event) {
+        if (sequentLoaded && selectionModeIsActive) {
+            int pos = posTranslator.getCharIdxUnderPointer(event);
+            Range range = this.abstractSyntaxTree.rangeForIndex(pos);
+
+            if (filterSelection.tryAddRange(range)) {
+                this.printer.applySelection(range);
+            }
+            else {
+                this.printer.removeSelection(range);
+            }
+            this.updateView();
+            /*
+             * if (event.isAltDown())
+             * showTermInfo(abstractSyntaxTree.getPosInSequent(pos, new
+             * IdentitySequentPrintFilter(sequent)));
+             */
+        }
     }
 }

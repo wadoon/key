@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.nui.model.PrintFilter;
+import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.SequentFilterer;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -27,7 +28,6 @@ public class PositionTranslator {
     private int fontSize;
     private int minimizedSize;
     private boolean filterCollapsed = false;
-    private boolean filterInverted = false;
     private ArrayList<Integer> filteredLines = new ArrayList<Integer>();
     private CssFileHandler cssHandler;
 
@@ -92,12 +92,12 @@ public class PositionTranslator {
             // Adjust for filtering
             // XXX
             if (filterCollapsed) {
-                if (filteredLines.contains(result) == filterInverted) {
+                if (!filteredLines.contains(result)) {
                     continue;
                 }
             }
             else {
-                if (filteredLines.contains(result) == filterInverted
+                if (!filteredLines.contains(result)
                         && filteredLines.size() > 0) {
                     text.setFont(new Font(font, minimizedSize));
                 }
@@ -136,7 +136,7 @@ public class PositionTranslator {
         Text text = new Text();
         // Adjust for minimized Filter
         // XXX
-        if (!filterCollapsed && (filteredLines.contains(line) == filterInverted)
+        if (!filterCollapsed && !filteredLines.contains(line)
                 && filteredLines.size() > 0) {
             text.setFont(new Font(font, minimizedSize));
         }
@@ -218,7 +218,7 @@ public class PositionTranslator {
      */
     public void applyFilter(PrintFilter filter) {
         filteredLines = SequentFilterer.applyFilter(proofString, filter);
-        switch (filter.getFilterMode()) {
+        switch (filter.getFilterLayout()) {
         case Minimize:
             filterCollapsed = false;
             break;
@@ -230,7 +230,6 @@ public class PositionTranslator {
             break;
         }
         // filterCollapsed = false;
-        filterInverted = filter.getInvert();
     }
 
     /**

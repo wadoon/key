@@ -1,9 +1,18 @@
 package de.uka.ilkd.key.nui.model;
 
+import java.nio.file.DirectoryStream.Filter;
+import java.util.List;
+import java.util.function.Consumer;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.StatusManager;
+import de.uka.ilkd.key.nui.filter.Criteria;
+import de.uka.ilkd.key.nui.filter.FilterSelection;
+import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.util.CsEvent;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 
@@ -48,8 +57,6 @@ public class Context {
     private PrintFilter currentPrintFilter = null;
 
     public void setCurrentPrintFilter(PrintFilter filter) {
-        if (filter == currentPrintFilter)
-            return;
         currentPrintFilter = filter;
         filterChangedEvent.fire(filter);
     }
@@ -87,6 +94,16 @@ public class Context {
             System.err.println("Could not load CSS. No beauty for you!");
         }
         return cssFileHandler;
+    }
+
+    private CsEvent<SelectModeEventArgs> selectModeActivatedEvent = new CsEvent<>();
+
+    public CsEvent<SelectModeEventArgs> getSelectModeActivateEvent() {
+        return selectModeActivatedEvent;
+    }
+
+    public void activateSelectMode(FilterSelection filterSelection) {
+        selectModeActivatedEvent.fire(new SelectModeEventArgs(filterSelection));
     }
 
     public Context() {
