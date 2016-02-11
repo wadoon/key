@@ -105,7 +105,7 @@
                <VBox >
                		<ButtonBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0">
                			<buttons>
-               				<Button text="Sequent Styler CSS" onAction="#handleCssStylerAction" />
+               				<Button text="Sequent CSS Styler" onAction="#handleSequentCssStylerAction" />
                			</buttons>
                		</ButtonBar>
                   	<ColorPicker />

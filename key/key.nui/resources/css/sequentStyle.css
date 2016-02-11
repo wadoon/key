@@ -7,6 +7,240 @@ pre {
 	font-style: normal;
 }
 .highlighted {
+	background-color: red;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.mouseover {
+	background-color: #B0C4DE;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.minimized {
+	background-color: inherit;
+	color: inherit;
+	font-weight: inherit;
+	font-size: 6px;
+	font-style: inherit;
+}
+.collapsed {
+	display: none;
+}
+.ruleApp {
+	background-color: #B3FD53;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.ifInst {
+	background-color: #B3FD53;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.ifFormula {
+	background-color: #B3FD53;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.equality {
+	background-color: inherit;
+	color: red;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.function {
+	background-color: inherit;
+	color: black;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.locationVar {
+	background-color: inherit;
+	color: blue;
+	font-weight: bold;
+	font-style: inherit;
+}
+.junctor {
+	background-color: inherit;
+	color: blue;
+	font-weight: bold;
+	font-style: italic;
+}
+.logicVar {
+	background-color: inherit;
+	color: green;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.sortDepFunc {
+	background-color: inherit;
+	color: black;
+	font-weight: bold;
+	font-style: inherit;
+}
+.modality {
+	background-color: inherit;
+	color: inherit;
+	font-weight: bold;
+	font-style: inherit;
+}
+.observerFunc {
+	background-color: green;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.abstractSortOp {
+	background-color: blue;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.abstractSV {
+	background-color: grey;
+	color: white;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.abstractTermTransf {
+	background-color: pink;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.elemUpdate {
+	background-color: inherit;
+	color: yellow;
+	font-weight: bold;
+	font-style: inherit;
+}
+.formulaSV {
+	background-color: grey;
+	color: yellow;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.ifExThenElse {
+	background-color: green;
+	color: red;
+	font-weight: bold;
+	font-style: inherit;
+}
+.ifThenElse {
+	background-color: inherit;
+	color: green;
+	font-weight: bold;
+	font-style: inherit;
+}
+.modalOpSV {
+	background-color: blue;
+	color: yellow;
+	font-weight: bold;
+	font-style: inherit;
+}
+.progConst {
+	background-color: black;
+	color: red;
+	font-weight: bold;
+	font-style: inherit;
+}
+.progMeth {
+	background-color: black;
+	color: green;
+	font-weight: bold;
+	font-style: inherit;
+}
+.progSV {
+	background-color: black;
+	color: white;
+	font-weight: bold;
+	font-style: inherit;
+}
+.progVar {
+	background-color: black;
+	color: #2fedff;
+	font-weight: bold;
+	font-style: inherit;
+}
+.schemaVarFactory {
+	background-color: #003fff;
+	color: red;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.skolemTermSV {
+	background-color: #003fff;
+	color: pink;
+	font-weight: bold;
+	font-style: inherit;
+}
+.substOp {
+	background-color: grey;
+	color: red;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.termLabelSV {
+	background-color: grey;
+	color: green;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.termSV {
+	background-color: grey;
+	color: blue;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.transformer {
+	background-color: grey;
+	color: black;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.updateApp {
+	background-color: pink;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.updateJunc {
+	background-color: pink;
+	color: green;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.updateSV {
+	background-color: pink;
+	color: blue;
+	font-weight: bold;
+	font-style: inherit;
+}
+.varSV {
+	background-color: violet;
+	color: black;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.warySubstOp {
+	background-color: #2fedff;
+	color: red;
+	font-weight: inherit;
+	font-style: italic;
+}
+pre {
+	background-color: white;
+	color: black;
+	font-weight: normal;
+	font-size: 16px;
+	font-family: Courier New;
+	font-style: normal;
+}
+.highlighted {
 	background-color: yellow;
 	color: inherit;
 	font-weight: inherit;

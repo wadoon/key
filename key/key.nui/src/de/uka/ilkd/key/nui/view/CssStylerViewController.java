@@ -6,8 +6,8 @@ package de.uka.ilkd.key.nui.view;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.TreeMap;
 
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
@@ -18,7 +18,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -115,7 +119,8 @@ public class CssStylerViewController extends ViewController {
             updatePreview();
         });
     }
-    private void updateTable(){
+
+    private void updateTable() {
         table.setItems(FXCollections.observableArrayList(
                 ((Map) ruleMap.get(selected).getPropertyValuePairs())
                         .entrySet()));
@@ -132,6 +137,33 @@ public class CssStylerViewController extends ViewController {
 
     @FXML
     private void handleCancel() {
+        if (apply.disabledProperty().get() == false) {
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Exit");
+            alert.setHeaderText("Do you want to save your changes?");
+            alert.setContentText("Unsaved changes will be lost upon exit");
+
+            ButtonType saveExit = new ButtonType("Save and Exit");
+            ButtonType resetExit = new ButtonType("Exit without Saving");
+            ButtonType cancel = new ButtonType("Cancel",
+                    ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(saveExit, resetExit, cancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == saveExit) {
+                handleApply();
+                alert.close();
+            }
+            else if (result.get() == resetExit) {
+                handleReset();
+                alert.close();
+            }
+            else {
+                alert.close();
+                return;
+            }
+        }
         stage.close();
     }
 

@@ -631,10 +631,10 @@ public class RootLayoutController extends ViewController {
     }
     
     @FXML
-    private void handleCssStylerAction(){          
+    private void handleSequentCssStylerAction(){          
 
             Stage stage = new Stage();
-            stage.setTitle("CSS Styler");
+            stage.setTitle("Sequent CSS Styler");
             Pair<Object,Object> p =  KeyFxmlLoader.loadFxml(MainApp.class.getResource("view/CssStylerView.fxml"));
             stage.setScene(new Scene((BorderPane) p.getKey()));
             stage.show();
