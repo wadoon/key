@@ -152,16 +152,7 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void hanldeInvertChanged() {
-        if (invertFilter.isSelected()) {
-            invert = true;
-            linesBefore.setValue(0);
-            linesAfter.setValue(0);
-        }
-        else {
-            invert = false;
-            linesBefore.setValue(2);
-            linesAfter.setValue(2);
-        }
+        invert = invertFilter.isSelected();
     }
 
     // TODO: save filter on disk
@@ -200,8 +191,10 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleApply() {
-        if (filterSelection != null)
+        if (filterSelection != null) {
+            selectionFilterToggle.setSelected(false);
             finishSelection();
+        }
         updateCurrentFilter();
         getContext().setCurrentPrintFilter(currentFilter);
     }
@@ -219,6 +212,8 @@ public class FilterViewController extends ViewController {
         }
         else {
             finishSelection();
+            updateCurrentFilter();
+            getContext().setCurrentPrintFilter(currentFilter);
         }
     }
 
@@ -231,12 +226,18 @@ public class FilterViewController extends ViewController {
 
     private void updateCurrentFilter() {
         if (currentFilter.getIsUserCriteria()) {
-            if (invert)
-                currentFilter.setCriteria(new NotCriteria<>(
-                        new CriterionContainsString(searchValue)));
-            else
-                currentFilter
-                        .setCriteria(new CriterionContainsString(searchValue));
+            currentFilter.setCriteria(new CriterionContainsString(searchValue));
+        } // else
+
+        if (currentFilter.getAfter() != 0 || currentFilter.getBefore() != 0) {
+            currentFilter.setCriteria(new CriterionRange(
+                    currentFilter.getBefore(), currentFilter.getAfter(),
+                    currentFilter.getCriteria()));
         }
+
+        // apply invert as last
+        if (invert)
+            currentFilter.setCriteria(
+                    new NotCriteria<>(currentFilter.getCriteria()));
     }
 }

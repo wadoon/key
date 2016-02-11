@@ -21,6 +21,7 @@ public class PrintFilter {
         // no need to notify observer since the name is only for storage
     }
 
+    // TODO remove criteria from print filter, pass the generated criteria to the printer
     private Criteria<Pair<Integer, String>> criteria;
 
     public void setCriteria(Criteria<Pair<Integer, String>> value) {
