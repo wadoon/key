@@ -113,7 +113,7 @@ public class CssStylerViewController extends ViewController {
                 .observableArrayList(ruleMap.keySet());
 
         listView.setItems(ruleList);
-        listView.setOnMouseClicked(e -> {
+        listView.getSelectionModel().selectedItemProperty().addListener(e -> {
             selected = listView.getSelectionModel().getSelectedItem();
             updateTable();
             updatePreview();
