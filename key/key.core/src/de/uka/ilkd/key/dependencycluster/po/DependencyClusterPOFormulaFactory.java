@@ -146,8 +146,12 @@ public class DependencyClusterPOFormulaFactory {
         return tb.and(tb.equals(ifVars.c1.pre.self, contract.getSelf()), tb.equals(ifVars.c1.pre.self, ifVars.c2.pre.self));
     }
     
+    public Term selfIsActiveComp() {
+        return tb.equals(contract.getSelf(), tb.getActiveComponent());
+    }
+    
     public Term assumptions() {
-        return tb.and(wellformedHistories(), cooperationalEquivalence(), selfAtPreEquality(), callEventEquivalence(), preStateEquivalence());
+        return tb.and(wellformedHistories(), cooperationalEquivalence(), selfAtPreEquality(), selfIsActiveComp(), callEventEquivalence(), preStateEquivalence());
     }
     
     public Term preStateEquivalence() {
