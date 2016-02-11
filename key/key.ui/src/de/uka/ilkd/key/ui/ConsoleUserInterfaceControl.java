@@ -122,7 +122,8 @@ public class ConsoleUserInterfaceControl extends
     
                 for (Pair<String, String> x : stats.getSummary()) {
                     if ("".equals(x.second)) {
-                        sb.append(x.first);
+                        sb.append("\n").append(x.first)
+                                .append("\n-----------------").append("\n\n");
                     }
                     else {
                         sb.append(x.first).append(": ").append(x.second)
