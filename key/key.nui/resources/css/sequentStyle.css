@@ -1,159 +1,237 @@
-pre{
-	font-family: Courier New;
+pre {
+	background-color: white;
+	color: black;
+	font-weight: normal;
 	font-size: 16px;
+	font-family: Courier New;
+	font-style: normal;
 }
-.highlighted{
-	background-color: yellow;
+.highlighted {
+	background-color: red;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.mouseover{
+.mouseover {
 	background-color: #B0C4DE;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
 .filterSelection{
    background-color: #ff6666;
 }
-.minimized{
+.minimized {
+	background-color: inherit;
+	color: inherit;
+	font-weight: inherit;
 	font-size: 6px;
+	font-style: inherit;
 }
-.collapsed{
+.collapsed {
 	display: none;
 }
-.ruleApp{
-        background-color: #B3FD53;
+.ruleApp {
+	background-color: #B3FD53;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
 .ifInst {
-        background-color: #B3FD53;
+	background-color: #B3FD53;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
 .ifFormula {
-        background-color: #B3FD53;
+	background-color: #B3FD53;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.equality{
+.equality {
+	background-color: inherit;
 	color: red;
+	font-weight: inherit;
+	font-style: inherit;
 }
-
-.function{
+.function {
+	background-color: inherit;
 	color: black;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.locationVar{
+.locationVar {
+	background-color: inherit;
 	color: blue;
 	font-weight: bold;
+	font-style: inherit;
 }
-.junctor{
-	color: violet;
+.junctor {
+	background-color: inherit;
+	color: blue;
 	font-weight: bold;
 	font-style: italic;
 }
-.logicVar{
-	color: #2fedff
-}
-.quantifier{
-	font-weight: bold;
+.logicVar {
+	background-color: inherit;
 	color: green;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.sortDepFunc{
+.sortDepFunc {
+	background-color: inherit;
 	color: black;
 	font-weight: bold;
+	font-style: inherit;
 }
-.modality{
+.modality {
+	background-color: inherit;
+	color: inherit;
 	font-weight: bold;
+	font-style: inherit;
 }
-.observerFunc{
+.observerFunc {
 	background-color: green;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.abstractSortOp{
+.abstractSortOp {
 	background-color: blue;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.abstractSV{
+.abstractSV {
 	background-color: grey;
 	color: white;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.abstractTermTransf{
+.abstractTermTransf {
 	background-color: pink;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.elemUpdate{
+.elemUpdate {
+	background-color: inherit;
 	color: yellow;
 	font-weight: bold;
+	font-style: inherit;
 }
-.formulaSV{
-	color: yellow;
+.formulaSV {
 	background-color: grey;
+	color: yellow;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.ifExThenElse{
+.ifExThenElse {
 	background-color: green;
 	color: red;
 	font-weight: bold;
+	font-style: inherit;
 }
-.ifThenElse{
+.ifThenElse {
+	background-color: inherit;
 	color: green;
 	font-weight: bold;
+	font-style: inherit;
 }
-.modalOpSV{
+.modalOpSV {
 	background-color: blue;
 	color: yellow;
 	font-weight: bold;
+	font-style: inherit;
 }
-.progConst{
+.progConst {
 	background-color: black;
 	color: red;
 	font-weight: bold;
+	font-style: inherit;
 }
-.progMeth{
+.progMeth {
 	background-color: black;
 	color: green;
 	font-weight: bold;
+	font-style: inherit;
 }
-.progSV{
+.progSV {
 	background-color: black;
 	color: white;
 	font-weight: bold;
+	font-style: inherit;
 }
-.progVar{
+.progVar {
 	background-color: black;
 	color: #2fedff;
 	font-weight: bold;
+	font-style: inherit;
 }
-.schemaVarFactory{
+.schemaVarFactory {
 	background-color: #003fff;
 	color: red;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.skolemTermSV{
+.skolemTermSV {
 	background-color: #003fff;
 	color: pink;
 	font-weight: bold;
+	font-style: inherit;
 }
-.substOp{
+.substOp {
 	background-color: grey;
 	color: red;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.termLabelSV{
+.termLabelSV {
 	background-color: grey;
 	color: green;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.termSV{
+.termSV {
 	background-color: grey;
 	color: blue;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.transformer{
+.transformer {
 	background-color: grey;
 	color: black;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.updateApp{
+.updateApp {
 	background-color: pink;
+	color: inherit;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.updateJunc{
+.updateJunc {
 	background-color: pink;
 	color: green;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.updateSV{
+.updateSV {
 	background-color: pink;
 	color: blue;
 	font-weight: bold;
+	font-style: inherit;
 }
-.varSV{
+.varSV {
 	background-color: violet;
 	color: black;
+	font-weight: inherit;
+	font-style: inherit;
 }
-.warySubstOp{
+.warySubstOp {
 	background-color: #2fedff;
 	color: red;
+	font-weight: inherit;
 	font-style: italic;
 }

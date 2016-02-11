@@ -32,6 +32,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * @author Maximilian Li
@@ -52,8 +53,7 @@ public class SequentPrinter {
 
     private ArrayList<Integer> lessThenList = new ArrayList<Integer>();
 
-    private ArrayList<Integer> mouseIndicesOpen = new ArrayList<Integer>();
-    private ArrayList<Integer> mouseIndicesClose = new ArrayList<Integer>();
+    private Range mouseRange;
     private ArrayList<Integer> searchIndicesOpen = new ArrayList<Integer>();
     private ArrayList<Integer> searchIndicesClose = new ArrayList<Integer>();
     private ArrayList<Integer> filterIndicesOpen = new ArrayList<Integer>();
@@ -74,16 +74,13 @@ public class SequentPrinter {
     /**
      * 
      */
-    public SequentPrinter(CssFileHandler cssFileHandler, PositionTable posTable,
-            Context context) {
-        css = cssFileHandler.getCss();
+    public SequentPrinter(String css, PositionTable posTable, Context context) {
+        this.css = css;
         this.setPosTable(posTable);
 
         this.context = context;
 
     }
-
-    
 
     /**
      * prints a Sequent as HTML with styling
@@ -95,6 +92,7 @@ public class SequentPrinter {
     public String printProofString() {
         int offset = 0;
         StringBuilder sb = new StringBuilder(proofString);
+        Stack<Pair<Integer, String>> tagStack = new Stack<>();
 
         String insertTag;
 
@@ -103,9 +101,23 @@ public class SequentPrinter {
             if (closeTagsAtIndex.containsKey(i)) {
                 for (int j = 0; j < StylePos.values().length; j++) {
                     insertTag = closeTagsAtIndex.get(i)[j];
-                    if (insertTag != null) {
+                    if (insertTag != null && !insertTag.isEmpty()) {
+                        Stack<Pair<Integer, String>> saveTagStack = new Stack<>();
+                        while (tagStack.peek().first != j) {
+                            sb.insert(i + offset, insertTag);
+                            offset += insertTag.length();
+                            saveTagStack.push(tagStack.pop());
+                        }
+
                         sb.insert(i + offset, insertTag);
                         offset += insertTag.length();
+                        tagStack.pop();
+
+                        while (saveTagStack.size() > 0) {
+                            sb.insert(i + offset, saveTagStack.peek().second);
+                            offset += saveTagStack.peek().second.length();
+                            tagStack.push(saveTagStack.pop());
+                        }
                     }
                 }
             }
@@ -113,7 +125,9 @@ public class SequentPrinter {
             if (openTagsAtIndex.containsKey(i)) {
                 for (int j = 0; j < StylePos.values().length; j++) {
                     insertTag = openTagsAtIndex.get(i)[j];
-                    if (insertTag != null) {
+                    if (insertTag != null && !insertTag.isEmpty()) {
+                        tagStack.push(new Pair<Integer, String>(j, insertTag));
+
                         sb.insert(i + offset, insertTag);
                         offset += insertTag.length();
                     }
@@ -135,7 +149,9 @@ public class SequentPrinter {
 
         String html = sb.toString();
         context.setSequentHtml(html);
-        return toHTML(html);
+        return
+
+        toHTML(html);
     }
 
     private Range getHighlightRange(PosInOccurrence pos) {
@@ -182,7 +198,8 @@ public class SequentPrinter {
                     inst.getConstrainedFormula(), PosInTerm.getTopLevel(),
                     inst.inAntec());
             Range r = getHighlightRange(pos);
-            putOpenTag(r.start(), StylePos.RULEAPP, NUIConstants.IF_FORMULA_TAG);
+            putOpenTag(r.start(), StylePos.RULEAPP,
+                    NUIConstants.IF_FORMULA_TAG);
             putCloseTag(r.end(), StylePos.RULEAPP, NUIConstants.CLOSING_TAG);
             keySet.add(r.start());
             keySet.add(r.end());
@@ -213,59 +230,49 @@ public class SequentPrinter {
         keySet.add(range.start());
         keySet.add(range.end());
 
-        String[] openTagArray;
-        String[] closeTagArray;
-        Stack<String> tagStack = new Stack<>();
-
-        // Check for Overlap inbetween Start and End
-        for (int i = range.start(); i <= range.end(); i++) {
-
-            if (openTagsAtIndex.containsKey(i)
-                    || closeTagsAtIndex.containsKey(i)) {
-
-                openTagArray = openTagsAtIndex.get(i);
-                closeTagArray = closeTagsAtIndex.get(i);
-
-                for (int j = 0; j < StylePos.values().length; j++) {
-                    // If closingTag, pop() the last Opened, or resolve
-                    if (closeTagArray != null && closeTagArray[j] != null
-                            && !closeTagArray[j].isEmpty()
-                            && i > range.start()) {
-                        if (tagStack.size() == 0) {
-                            putCloseTag(i, StylePos.MOUSE, NUIConstants.CLOSING_TAG);
-                            putOpenTag(i, StylePos.MOUSE, NUIConstants.MOUSE_TAG);
-                            mouseIndicesOpen.add(i);
-                            mouseIndicesClose.add(i);
-                        }
-                        else {
-                            tagStack.pop();
-                        }
-                    }
-                    // If openTag, push it on the stack
-                    if (openTagArray != null && openTagArray[j] != null
-                            && !openTagArray[j].isEmpty() && i < range.end()) {
-                        tagStack.push(openTagArray[j]);
-                    }
-                }
-            }
-        }
-
-        // Insert the MouseOverTags themselves
         putOpenTag(range.start(), StylePos.MOUSE, NUIConstants.MOUSE_TAG);
-        mouseIndicesOpen.add(range.start());
-
         putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
-        mouseIndicesClose.add(range.end());
 
-        // If there is an opened Tag inside the range after mouse is closed,
-        // resolve the overlap by closing it and opening it again on the outside
-        // of the mouseover
-        if (tagStack.size() > 0) {
-            putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
-            putTag(range.end(), StylePos.MOUSE, tagStack.pop(),
-                    openTagsAtIndex);
-            mouseIndicesOpen.add(range.end());
-        }
+        mouseRange = range;
+
+        /*
+         * String[] openTagArray; String[] closeTagArray; Stack<String> tagStack
+         * = new Stack<>();
+         * 
+         * // Check for Overlap inbetween Start and End for (int i =
+         * range.start(); i <= range.end(); i++) {
+         * 
+         * if (openTagsAtIndex.containsKey(i) ||
+         * closeTagsAtIndex.containsKey(i)) {
+         * 
+         * openTagArray = openTagsAtIndex.get(i); closeTagArray =
+         * closeTagsAtIndex.get(i);
+         * 
+         * for (int j = 0; j < StylePos.values().length; j++) { // If
+         * closingTag, pop() the last Opened, or resolve if (closeTagArray !=
+         * null && closeTagArray[j] != null && !closeTagArray[j].isEmpty() && i
+         * > range.start()) { if (tagStack.size() == 0) { putCloseTag(i,
+         * StylePos.MOUSE, NUIConstants.CLOSING_TAG); putOpenTag(i,
+         * StylePos.MOUSE, NUIConstants.MOUSE_TAG); mouseIndicesOpen.add(i);
+         * mouseIndicesClose.add(i); } else { tagStack.pop(); } } // If openTag,
+         * push it on the stack if (openTagArray != null && openTagArray[j] !=
+         * null && !openTagArray[j].isEmpty() && i < range.end()) {
+         * tagStack.push(openTagArray[j]); } } } }
+         * 
+         * // Insert the MouseOverTags themselves putOpenTag(range.start(),
+         * StylePos.MOUSE, NUIConstants.MOUSE_TAG);
+         * mouseIndicesOpen.add(range.start());
+         * 
+         * putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
+         * mouseIndicesClose.add(range.end());
+         * 
+         * // If there is an opened Tag inside the range after mouse is closed,
+         * // resolve the overlap by closing it and opening it again on the
+         * outside // of the mouseover if (tagStack.size() > 0) {
+         * putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
+         * putTag(range.end(), StylePos.MOUSE, tagStack.pop(), openTagsAtIndex);
+         * mouseIndicesOpen.add(range.end()); }
+         */
     }
 
     /**
@@ -317,7 +324,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void collapseLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER, NUIConstants.FILTER_COLLAPSED_TAG);
+        putOpenTag(lineStart, StylePos.FILTER,
+                NUIConstants.FILTER_COLLAPSED_TAG);
         putCloseTag(lineEnd, StylePos.FILTER, NUIConstants.CLOSING_TAG);
 
         filterIndicesOpen.add(lineStart);
@@ -333,7 +341,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void minimizeLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER, NUIConstants.FILTER_MINIMIZED_TAG);
+        putOpenTag(lineStart, StylePos.FILTER,
+                NUIConstants.FILTER_MINIMIZED_TAG);
         putCloseTag(lineEnd, StylePos.FILTER, NUIConstants.CLOSING_TAG);
 
         filterIndicesOpen.add(lineStart);
@@ -416,9 +425,8 @@ public class SequentPrinter {
             putTag(index, arrayPos, tag, openTagsAtIndex);
         }
         else {
-            putTag(index, arrayPos,
-                    NUIConstants.OPEN_TAG_BEGIN.concat(tag).concat(NUIConstants.OPEN_TAG_END),
-                    openTagsAtIndex);
+            putTag(index, arrayPos, NUIConstants.OPEN_TAG_BEGIN.concat(tag)
+                    .concat(NUIConstants.OPEN_TAG_END), openTagsAtIndex);
         }
 
         return openTagsAtIndex;
@@ -445,21 +453,10 @@ public class SequentPrinter {
      * removes all the Mouseover Highlighting currently applied.
      */
     public void removeMouseHighlighting() {
-        if (mouseIndicesClose != null) {
-            for (Iterator<Integer> iterator = mouseIndicesOpen
-                    .iterator(); iterator.hasNext();) {
-                int index = (int) iterator.next();
-                putOpenTag(index, StylePos.MOUSE, "");
-            }
-            for (Iterator<Integer> iterator = mouseIndicesClose
-                    .iterator(); iterator.hasNext();) {
-                int index = (int) iterator.next();
-                putCloseTag(index, StylePos.MOUSE, "");
-            }
-
-            mouseIndicesOpen.clear();
-            mouseIndicesClose.clear();
-
+        if (mouseRange != null) {
+            putOpenTag(mouseRange.start(), StylePos.MOUSE, "");
+            putCloseTag(mouseRange.end(), StylePos.MOUSE, "");
+            mouseRange = null;
         }
     }
 
@@ -503,7 +500,8 @@ public class SequentPrinter {
                 // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
-                    putOpenTag(i, StylePos.SEARCH, NUIConstants.HIGHLIGHTED_TAG);
+                    putOpenTag(i, StylePos.SEARCH,
+                            NUIConstants.HIGHLIGHTED_TAG);
                     putCloseTag(i + searchString.length(), StylePos.SEARCH,
                             NUIConstants.CLOSING_TAG);
 
@@ -578,7 +576,6 @@ public class SequentPrinter {
         }
     }
 
-
     /**
      * @param posTable
      *            the posTable to set
@@ -623,11 +620,14 @@ public class SequentPrinter {
                     Operator op = oc.subTerm().op();
 
                     // Open First Tag
-                    if (lastClass == null && NUIConstants.getClassCssMap().containsKey(op.getClass())
-                            && NUIConstants.getClassEnabledMap().get(op.getClass())) {
+                    if (lastClass == null
+                            && NUIConstants.getClassCssMap()
+                                    .containsKey(op.getClass())
+                            && NUIConstants.getClassEnabledMap()
+                                    .get(op.getClass())) {
 
-                        putOpenTag(i, StylePos.SYNTAX,
-                                NUIConstants.getClassCssMap().get(op.getClass()));
+                        putOpenTag(i, StylePos.SYNTAX, NUIConstants
+                                .getClassCssMap().get(op.getClass()));
                         keySet.add(i);
 
                         openedTag = true;
@@ -637,15 +637,18 @@ public class SequentPrinter {
                     // If Class changed, close the existing Tag, open new one
                     else if (lastClass != null && lastClass != op.getClass()) {
 
-                        putCloseTag(i, StylePos.SYNTAX, NUIConstants.CLOSING_TAG);
+                        putCloseTag(i, StylePos.SYNTAX,
+                                NUIConstants.CLOSING_TAG);
                         keySet.add(i);
 
                         openedTag = false;
-                        if (NUIConstants.getClassCssMap().containsKey(op.getClass())
-                                && NUIConstants.getClassEnabledMap().get(op.getClass())) {
+                        if (NUIConstants.getClassCssMap()
+                                .containsKey(op.getClass())
+                                && NUIConstants.getClassEnabledMap()
+                                        .get(op.getClass())) {
 
-                            putOpenTag(i, StylePos.SYNTAX,
-                                    NUIConstants.getClassCssMap().get(op.getClass()));
+                            putOpenTag(i, StylePos.SYNTAX, NUIConstants
+                                    .getClassCssMap().get(op.getClass()));
                             keySet.add(i);
                             lastClass = op.getClass();
                             openedTag = true;
@@ -654,7 +657,8 @@ public class SequentPrinter {
                         else {
                             lastClass = null;
                             openedTag = false;
-                            if (!NUIConstants.getClassCssMap().containsKey(op.getClass())) {
+                            if (!NUIConstants.getClassCssMap()
+                                    .containsKey(op.getClass())) {
                                 System.out.println("");
                                 System.out.println(
                                         "The following Class does not exist in the ClassDictionary");
@@ -684,7 +688,7 @@ public class SequentPrinter {
         sb.append(css);
         sb.append("</style>");
         sb.append("</head><body>");
-        sb.append("<pre class=\"content\">");
+        sb.append("<pre>");
 
         sb.append(s);
 

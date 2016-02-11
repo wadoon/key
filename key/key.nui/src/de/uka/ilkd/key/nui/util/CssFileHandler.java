@@ -13,6 +13,7 @@ public class CssFileHandler {
 
     private ArrayList<CssRule> parsedRules;
     private String css;
+    private String path;
 
     private enum State {
         COMMENT, SELECTOR, PROPERTY, VALUE;
@@ -30,49 +31,66 @@ public class CssFileHandler {
     /**
      * Constructs a CssFileHandler.
      * 
-     * @param url
+     * @param path
      *            path to the css file
      * @throws IOException
      */
-    public CssFileHandler(URL url) throws IOException {
+    public CssFileHandler(String path) throws IOException {
         this();
-        loadCssFile(url);
-    }
-
-    public CssFileHandler(File file) throws IOException {
-        this();
-        loadCssFile(file);
+        loadCssFile(path);
     }
 
     /**
      * Loads a css file.
      * 
-     * @param url
+     * @param path
      *            path to the css file
      * @throws IOException
      */
-    public void loadCssFile(URL url) throws IOException {
-        css = IOUtil.readFrom(url) + "\n";
-        parse();
-    }
-
-    public void loadCssFile(File file) throws IOException {
-        css = IOUtil.readFrom(file) + "\n";
+    public void loadCssFile(String path) throws IOException {
+        css = IOUtil.readFrom(new File(path)) + "\n";
+        this.path = path;
         parse();
     }
 
     /**
      * Writes to css file
      * 
-     * @param url
+     * @param path
      *            path to the css file
      * @throws IOException
      */
-    public void writeCssFile(URL url) throws IOException {
+    public void writeCssFile(String path) throws IOException {
 
-        File file = new File(IOUtil.toURI(url));
+        File file = new File(path);
         FileOutputStream fop = new FileOutputStream(file);
+
+        css = parsedRulestoString();
+
         IOUtil.writeTo(fop, css);
+    }
+
+    /**
+     * 
+     * @return a String representation of the parsed and possibly changed Rules.
+     *         These are not written into the file.
+     */
+    public String parsedRulestoString() {
+        StringBuilder result = new StringBuilder();
+        for (CssRule rule : parsedRules) {
+            result.append(rule.toString());
+        }
+        return result.toString();
+    }
+
+    /**
+     * writes the currently parsed and possibly rules into the opened CSS file.
+     * These changes cannot be reverted
+     * 
+     * @throws IOException
+     */
+    public void writeCssFile() throws IOException {
+        writeCssFile(path);
     }
 
     /**
@@ -82,6 +100,19 @@ public class CssFileHandler {
      */
     public void addCssRule(CssRule rule) {
         css += rule.toString();
+    }
+
+    /**
+     * reads the css file again. Usefull to "forget" made changes, that have not
+     * been written yet.
+     */
+    public void reset() {
+        try {
+            loadCssFile(path);
+        }
+        catch (Exception e) {
+            System.err.println("Could not read CSS File");
+        }
     }
 
     /**
@@ -100,10 +131,18 @@ public class CssFileHandler {
     public List<CssRule> getParsedRules() {
         return parsedRules;
     }
-    
-    public CssRule getRule(String selector){
-        for(CssRule rule : parsedRules){
-            if (rule.getSelectors().contains(selector)){
+
+    /**
+     * gets the complete rule from the parsedRule memory, if it contains the
+     * given selector
+     * 
+     * @param selector
+     *            the selector to be searched for
+     * @return the CssRule which contains the selector
+     */
+    public CssRule getRule(String selector) {
+        for (CssRule rule : parsedRules) {
+            if (rule.getSelectors().contains(selector)) {
                 return rule;
             }
         }
@@ -126,8 +165,8 @@ public class CssFileHandler {
         String property = "";
         String value = "";
         State state = State.SELECTOR;
-        //String css = removeSpacing(this.css);
-        
+        // String css = removeSpacing(this.css);
+
         for (int i = 0; i < css.length() - 1; i++) {
             char c = css.charAt(i);
             if (c == '/' && css.charAt(i + 1) == '*') {

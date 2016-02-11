@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nui.view;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.DirectoryStream.Filter;
@@ -103,7 +102,6 @@ public class SequentViewController extends ViewController {
         }
     };
     private PositionTranslator posTranslator;
-    private CssFileHandler cssFileHandler;
 
     @FXML
     private TitledPane sequentOptions;
@@ -150,17 +148,6 @@ public class SequentViewController extends ViewController {
                         sequentOptions.setText("More Options");
                     }
                 });
-        try {
-            cssFileHandler = new CssFileHandler(
-                    new File("resources/css/sequentStyle.css"));
-        }
-        catch (Exception e) {
-            System.err.println("Could not load CSS. No beauty for you!");
-        }
-        
-
-        posTranslator = new PositionTranslator(
-                cssFileHandler);
 
         textArea.setOnMouseMoved(event -> {
             if (sequentLoaded) {
@@ -252,6 +239,9 @@ public class SequentViewController extends ViewController {
         getContext().getSelectModeActivateEvent()
                 .addHandler(this::selectModeActivated);
 
+        posTranslator = new PositionTranslator(
+                getContext().getCssFileHandler());
+
         tacletInfoViewController.setMainApp(getMainApp(), getContext());
     }
 
@@ -289,7 +279,7 @@ public class SequentViewController extends ViewController {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printer = new SequentPrinter(cssFileHandler,
+        printer = new SequentPrinter(getContext().getCssFileHandler().getCss(),
                 abstractSyntaxTree, getContext());
         sequentChanged = true;
 
@@ -379,7 +369,6 @@ public class SequentViewController extends ViewController {
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
             double newHeight = posTranslator.getProofHeight();
-            System.out.println(newHeight);
 
             // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
             // Shall be patched in JDK9
