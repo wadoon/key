@@ -13,6 +13,7 @@ public class CssFileHandler {
 
     private ArrayList<CssRule> parsedRules;
     private String css;
+    private String path;
 
     private enum State {
         COMMENT, SELECTOR, PROPERTY, VALUE;
@@ -30,49 +31,50 @@ public class CssFileHandler {
     /**
      * Constructs a CssFileHandler.
      * 
-     * @param url
+     * @param path
      *            path to the css file
      * @throws IOException
      */
-    public CssFileHandler(URL url) throws IOException {
+    public CssFileHandler(String path) throws IOException {
         this();
-        loadCssFile(url);
-    }
-
-    public CssFileHandler(File file) throws IOException {
-        this();
-        loadCssFile(file);
+        loadCssFile(path);
     }
 
     /**
      * Loads a css file.
      * 
-     * @param url
+     * @param path
      *            path to the css file
      * @throws IOException
      */
-    public void loadCssFile(URL url) throws IOException {
-        css = IOUtil.readFrom(url) + "\n";
-        parse();
-    }
-
-    public void loadCssFile(File file) throws IOException {
-        css = IOUtil.readFrom(file) + "\n";
+    public void loadCssFile(String path) throws IOException {
+        css = IOUtil.readFrom(new File(path)) + "\n";
+        this.path = path;
         parse();
     }
 
     /**
      * Writes to css file
      * 
-     * @param url
+     * @param path
      *            path to the css file
      * @throws IOException
      */
-    public void writeCssFile(URL url) throws IOException {
+    public void writeCssFile(String path) throws IOException {
 
-        File file = new File(IOUtil.toURI(url));
+        File file = new File(path);
         FileOutputStream fop = new FileOutputStream(file);
+        
+        css = "";
+        for(CssRule rule: parsedRules){
+            addCssRule(rule);
+        }
+        
         IOUtil.writeTo(fop, css);
+    }
+    
+    public void writeCssFile() throws IOException{
+        writeCssFile(path);
     }
 
     /**
@@ -82,6 +84,15 @@ public class CssFileHandler {
      */
     public void addCssRule(CssRule rule) {
         css += rule.toString();
+    }
+    
+    public void reset(){
+        try {
+            loadCssFile(path);
+        }
+        catch (Exception e) {
+            System.err.println("Could not read CSS File");
+        }        
     }
 
     /**

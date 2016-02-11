@@ -97,14 +97,19 @@ public class CssRule {
     
     @Override
     public String toString() {
+        StringBuilder sb = new StringBuilder(selectorsAsString());
+        sb.append(" {\n");
+        propertyValuePairs.forEach((k,v) -> {sb.append("\t").append(k).append(": ").append(v).append(";\n");});
+        sb.append("}\n");
+        return sb.toString();
+    }
+    
+    public String selectorsAsString(){
         StringBuilder sb = new StringBuilder();
         sb.append(selectors.get(0));
         for (int i = 1; i < selectors.size(); i++) {
             sb.append(", ").append(selectors.get(i));
         }
-        sb.append(" {\n");
-        propertyValuePairs.forEach((k,v) -> {sb.append("\t").append(k).append(": ").append(v).append("\n");});
-        sb.append("}\n");
         return sb.toString();
-    }    
+    }
 }

@@ -26,6 +26,8 @@ public final class NUIConstants {
     public final static String RULE_APP_TAG = "ruleApp";
     public final static String IF_INST_TAG = "ifInst";
     public final static String IF_FORMULA_TAG = "ifFormula";
+    
+    public final static String DEFAULT_STYLE_CSS = "resources/css/sequentStyle.css";
 
     /**
      * 

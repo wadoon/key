@@ -75,9 +75,9 @@ public class SequentPrinter {
     /**
      * 
      */
-    public SequentPrinter(CssFileHandler cssFileHandler, PositionTable posTable,
+    public SequentPrinter(String css, PositionTable posTable,
             Context context) {
-        css = cssFileHandler.getCss();
+        this.css = css;
         this.setPosTable(posTable);
 
         this.context = context;

@@ -98,7 +98,6 @@ public class SequentViewController extends ViewController {
         }
     };
     private PositionTranslator posTranslator;
-    private CssFileHandler cssFileHandler;
 
     @FXML
     private TitledPane sequentOptions;
@@ -145,17 +144,6 @@ public class SequentViewController extends ViewController {
                         sequentOptions.setText("More Options");
                     }
                 });
-        try {
-            cssFileHandler = new CssFileHandler(
-                    new File("resources/css/sequentStyle.css"));
-        }
-        catch (Exception e) {
-            System.err.println("Could not load CSS. No beauty for you!");
-        }
-        
-
-        posTranslator = new PositionTranslator(
-                cssFileHandler);
 
         textArea.setOnMouseMoved(event -> {
             if (sequentLoaded) {
@@ -243,6 +231,9 @@ public class SequentViewController extends ViewController {
         getContext().getKeYMediator()
                 .addKeYSelectionListener(proofChangeListener);
         getContext().getFilterChangedEvent().addHandler(this::apply);
+        
+        posTranslator = new PositionTranslator(
+                getContext().getCssFileHandler());
 
         tacletInfoViewController.setMainApp(getMainApp(), getContext());
     }
@@ -281,7 +272,7 @@ public class SequentViewController extends ViewController {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printer = new SequentPrinter(cssFileHandler,
+        printer = new SequentPrinter(getContext().getCssFileHandler().getCss(),
                 abstractSyntaxTree, getContext());
         sequentChanged = true;
 

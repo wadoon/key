@@ -1,9 +1,13 @@
 package de.uka.ilkd.key.nui.model;
 
+import java.io.File;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.StatusManager;
 import de.uka.ilkd.key.nui.util.CsEvent;
+import de.uka.ilkd.key.nui.util.CssFileHandler;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 
 public class Context {
 
@@ -73,6 +77,18 @@ public class Context {
 
     public String getSequentHtml() {
         return sequentHtml;
+    }
+    
+    private CssFileHandler cssFileHandler;
+    
+    public CssFileHandler getCssFileHandler(){
+        if (cssFileHandler == null) try {
+            cssFileHandler = new CssFileHandler(NUIConstants.DEFAULT_STYLE_CSS);  
+        }
+        catch (Exception e) {
+            System.err.println("Could not load CSS. No beauty for you!");
+        }
+        return cssFileHandler;
     }
 
     public Context() {
