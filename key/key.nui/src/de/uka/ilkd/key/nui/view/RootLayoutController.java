@@ -17,7 +17,9 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.model.ViewSlot;
+import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.util.KeYConstants;
+import javafx.util.Pair;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,6 +27,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
@@ -107,6 +110,9 @@ public class RootLayoutController extends ViewController {
     private ButtonBar debugButtons;
     @FXML
     private CheckMenuItem debugMode;
+    
+    @FXML
+    private Button cssStyler;
 
     /**
      * The constructor
@@ -622,5 +628,18 @@ public class RootLayoutController extends ViewController {
         mainSplitPane.setDividerPositions(positions.get(0), positions.get(2));
         leftPane.setDividerPositions(positions.get(1));
         rightPane.setDividerPositions(positions.get(3));
+    }
+    
+    @FXML
+    private void handleCssStylerAction(){          
+
+            Stage stage = new Stage();
+            stage.setTitle("CSS Styler");
+            Pair<Object,Object> p =  KeyFxmlLoader.loadFxml(MainApp.class.getResource("view/CssStylerView.fxml"));
+            stage.setScene(new Scene((BorderPane) p.getKey()));
+            stage.show();
+            ((CssStylerViewController) p.getValue()).setMainApp(this.getMainApp(), this.getContext());
+            ((CssStylerViewController) p.getValue()).setStage(stage);
+            
     }
 }

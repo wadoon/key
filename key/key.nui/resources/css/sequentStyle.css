@@ -1,155 +1,150 @@
-pre{
+pre {
+	font-size: 20px;
 	font-family: Courier New;
-	font-size: 16px;
 }
-.highlighted{
+.highlighted {
 	background-color: yellow;
 }
-.mouseover{
+.mouseover {
 	background-color: #B0C4DE;
 }
-.minimized{
+.minimized {
 	font-size: 6px;
 }
-.collapsed{
+.collapsed {
 	display: none;
 }
-.ruleApp{
-        background-color: #B3FD53;
+.ruleApp {
+	background-color: #B3FD53;
 }
 .ifInst {
-        background-color: #B3FD53;
+	background-color: #B3FD53;
 }
 .ifFormula {
-        background-color: #B3FD53;
+	background-color: #B3FD53;
 }
-.equality{
+.equality {
 	color: red;
 }
-
-.function{
+.function {
 	color: black;
 }
-.locationVar{
+.locationVar {
 	color: blue;
 	font-weight: bold;
 }
-.junctor{
+.junctor {
 	color: violet;
 	font-weight: bold;
 	font-style: italic;
 }
-.logicVar{
-	color: #2fedff
-}
-.quantifier{
-	font-weight: bold;
+.logicVar {
 	color: green;
 }
-.sortDepFunc{
+.sortDepFunc {
 	color: black;
 	font-weight: bold;
 }
-.modality{
+.modality {
 	font-weight: bold;
 }
-.observerFunc{
+.observerFunc {
 	background-color: green;
 }
-.abstractSortOp{
+.abstractSortOp {
 	background-color: blue;
 }
-.abstractSV{
+.abstractSV {
 	background-color: grey;
 	color: white;
 }
-.abstractTermTransf{
+.abstractTermTransf {
 	background-color: pink;
 }
-.elemUpdate{
+.elemUpdate {
 	color: yellow;
 	font-weight: bold;
 }
-.formulaSV{
-	color: yellow;
+.formulaSV {
 	background-color: grey;
+	color: yellow;
 }
-.ifExThenElse{
+.ifExThenElse {
 	background-color: green;
 	color: red;
 	font-weight: bold;
 }
-.ifThenElse{
+.ifThenElse {
 	color: green;
 	font-weight: bold;
 }
-.modalOpSV{
+.modalOpSV {
 	background-color: blue;
 	color: yellow;
 	font-weight: bold;
 }
-.progConst{
+.progConst {
 	background-color: black;
 	color: red;
 	font-weight: bold;
 }
-.progMeth{
+.progMeth {
 	background-color: black;
 	color: green;
 	font-weight: bold;
 }
-.progSV{
+.progSV {
 	background-color: black;
 	color: white;
 	font-weight: bold;
 }
-.progVar{
+.progVar {
 	background-color: black;
 	color: #2fedff;
 	font-weight: bold;
 }
-.schemaVarFactory{
+.schemaVarFactory {
 	background-color: #003fff;
 	color: red;
 }
-.skolemTermSV{
+.skolemTermSV {
 	background-color: #003fff;
 	color: pink;
 	font-weight: bold;
 }
-.substOp{
+.substOp {
 	background-color: grey;
 	color: red;
 }
-.termLabelSV{
+.termLabelSV {
 	background-color: grey;
 	color: green;
 }
-.termSV{
+.termSV {
 	background-color: grey;
 	color: blue;
 }
-.transformer{
+.transformer {
 	background-color: grey;
 	color: black;
 }
-.updateApp{
+.updateApp {
 	background-color: pink;
 }
-.updateJunc{
+.updateJunc {
 	background-color: pink;
 	color: green;
 }
-.updateSV{
+.updateSV {
 	background-color: pink;
 	color: blue;
 	font-weight: bold;
 }
-.varSV{
+.varSV {
 	background-color: violet;
 	color: black;
 }
-.warySubstOp{
+.warySubstOp {
 	background-color: #2fedff;
 	color: red;
 	font-style: italic;

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableView?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="de.uka.ilkd.key.nui.view.CssStylerViewController">
+	<left>
+		<ListView fx:id="listView" />
+	</left>
+   <center>
+      <VBox prefHeight="400.0" prefWidth="350.0" BorderPane.alignment="CENTER">
+         <children>
+            <TableView fx:id="table" prefHeight="369.0" prefWidth="159.0" editable="true">
+               <columns>
+                  <TableColumn fx:id="propertyColumn" prefWidth="138.0" text="Property" editable="false"/>
+                  <TableColumn fx:id="valueColumn" prefWidth="211.0" text="Value" editable="true"/>
+               </columns>
+            </TableView>
+            <HBox alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="497.0" spacing="20.0">
+               <children>
+                  <Button fx:id="apply" mnemonicParsing="false" disable="true" text="Apply" onAction="#handleApply"/>
+                  <Button fx:id="reset" mnemonicParsing="false" disable="true" text="Reset" onAction="#handleReset"/>
+                  <Button cancelButton="true" mnemonicParsing="false" text="Cancel" onAction="#handleCancel"/>
+               </children>
+               <VBox.margin>
+                  <Insets right="20.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>
