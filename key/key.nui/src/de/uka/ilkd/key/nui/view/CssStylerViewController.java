@@ -185,9 +185,9 @@ public class CssStylerViewController extends ViewController {
         cssFileHandler.reset();
         initializeList();
 
-        // TODO: Update the List and Table
         updateTable();
         updatePreview();
+        
         apply.setDisable(true);
         reset.setDisable(true);
     }

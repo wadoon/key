@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.nui.model;
 
-import java.io.File;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.StatusManager;

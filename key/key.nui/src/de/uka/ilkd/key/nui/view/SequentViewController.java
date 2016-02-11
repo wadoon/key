@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nui.view;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,7 +16,6 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.PrintFilter;
-import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.nui.util.TermInfoPrinter;
@@ -231,7 +229,7 @@ public class SequentViewController extends ViewController {
         getContext().getKeYMediator()
                 .addKeYSelectionListener(proofChangeListener);
         getContext().getFilterChangedEvent().addHandler(this::apply);
-        
+
         posTranslator = new PositionTranslator(
                 getContext().getCssFileHandler());
 
@@ -362,7 +360,6 @@ public class SequentViewController extends ViewController {
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
             double newHeight = posTranslator.getProofHeight();
-            System.out.println(newHeight);
 
             // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
             // Shall be patched in JDK9

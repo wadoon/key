@@ -64,22 +64,32 @@ public class CssFileHandler {
 
         File file = new File(path);
         FileOutputStream fop = new FileOutputStream(file);
-        
+
         css = parsedRulestoString();
-        
-        
+
         IOUtil.writeTo(fop, css);
     }
-    
-    public String parsedRulestoString(){
+
+    /**
+     * 
+     * @return a String representation of the parsed and possibly changed Rules.
+     *         These are not written into the file.
+     */
+    public String parsedRulestoString() {
         StringBuilder result = new StringBuilder();
-        for(CssRule rule: parsedRules){
+        for (CssRule rule : parsedRules) {
             result.append(rule.toString());
         }
         return result.toString();
     }
-    
-    public void writeCssFile() throws IOException{
+
+    /**
+     * writes the currently parsed and possibly rules into the opened CSS file.
+     * These changes cannot be reverted
+     * 
+     * @throws IOException
+     */
+    public void writeCssFile() throws IOException {
         writeCssFile(path);
     }
 
@@ -91,14 +101,18 @@ public class CssFileHandler {
     public void addCssRule(CssRule rule) {
         css += rule.toString();
     }
-    
-    public void reset(){
+
+    /**
+     * reads the css file again. Usefull to "forget" made changes, that have not
+     * been written yet.
+     */
+    public void reset() {
         try {
             loadCssFile(path);
         }
         catch (Exception e) {
             System.err.println("Could not read CSS File");
-        }        
+        }
     }
 
     /**
@@ -117,10 +131,18 @@ public class CssFileHandler {
     public List<CssRule> getParsedRules() {
         return parsedRules;
     }
-    
-    public CssRule getRule(String selector){
-        for(CssRule rule : parsedRules){
-            if (rule.getSelectors().contains(selector)){
+
+    /**
+     * gets the complete rule from the parsedRule memory, if it contains the
+     * given selector
+     * 
+     * @param selector
+     *            the selector to be searched for
+     * @return the CssRule which contains the selector
+     */
+    public CssRule getRule(String selector) {
+        for (CssRule rule : parsedRules) {
+            if (rule.getSelectors().contains(selector)) {
                 return rule;
             }
         }
@@ -143,8 +165,8 @@ public class CssFileHandler {
         String property = "";
         String value = "";
         State state = State.SELECTOR;
-        //String css = removeSpacing(this.css);
-        
+        // String css = removeSpacing(this.css);
+
         for (int i = 0; i < css.length() - 1; i++) {
             char c = css.charAt(i);
             if (c == '/' && css.charAt(i + 1) == '*') {
