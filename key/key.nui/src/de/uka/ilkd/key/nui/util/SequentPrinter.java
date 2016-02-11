@@ -685,7 +685,7 @@ public class SequentPrinter {
         sb.append(css);
         sb.append("</style>");
         sb.append("</head><body>");
-        sb.append("<pre class=\"content\">");
+        sb.append("<pre>");
 
         sb.append(s);
 

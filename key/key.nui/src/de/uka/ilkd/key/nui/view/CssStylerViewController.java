@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.CssRule;
+import de.uka.ilkd.key.nui.util.PreviewPrinter;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -22,6 +23,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -35,6 +37,7 @@ public class CssStylerViewController extends ViewController {
     private Stage stage;
     private String selected;
     private CssFileHandler cssFileHandler;
+    private PreviewPrinter previewPrinter = new PreviewPrinter();
 
     @FXML
     private ListView<String> listView;
@@ -48,6 +51,8 @@ public class CssStylerViewController extends ViewController {
     private Button apply;
     @FXML
     private Button reset;
+    @FXML
+    private WebView previewWeb;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -57,7 +62,7 @@ public class CssStylerViewController extends ViewController {
     @Override
     public void initializeAfterLoadingFxml() {
         cssFileHandler = getContext().getCssFileHandler();
-        
+
         initializeList();
 
         propertyColumn.setCellValueFactory(
@@ -91,10 +96,11 @@ public class CssStylerViewController extends ViewController {
                     .put(e.getRowValue().getKey(), e.getNewValue());
             apply.setDisable(false);
             reset.setDisable(false);
+            this.updatePreview();
         });
     }
-    
-    private void initializeList(){
+
+    private void initializeList() {
         for (CssRule rule : cssFileHandler.getParsedRules()) {
             ruleMap.put(rule.selectorsAsString(), rule);
         }
@@ -105,10 +111,19 @@ public class CssStylerViewController extends ViewController {
         listView.setItems(ruleList);
         listView.setOnMouseClicked(e -> {
             selected = listView.getSelectionModel().getSelectedItem();
-            table.setItems(FXCollections.observableArrayList(
-                    ((Map) ruleMap.get(selected).getPropertyValuePairs())
-                            .entrySet()));
+            updateTable();
+            updatePreview();
         });
+    }
+    private void updateTable(){
+        table.setItems(FXCollections.observableArrayList(
+                ((Map) ruleMap.get(selected).getPropertyValuePairs())
+                        .entrySet()));
+    }
+
+    private void updatePreview() {
+        previewWeb.getEngine().loadContent(previewPrinter
+                .printPreview(cssFileHandler.parsedRulestoString(), selected));
     }
 
     public void setStage(Stage stage) {
@@ -119,28 +134,28 @@ public class CssStylerViewController extends ViewController {
     private void handleCancel() {
         stage.close();
     }
-    
+
     @FXML
-    private void handleApply(){
+    private void handleApply() {
         try {
             cssFileHandler.writeCssFile();
         }
         catch (Exception e) {
             System.err.println("Could not write CSS File");
         }
-        
-        
+
         apply.setDisable(true);
         reset.setDisable(true);
     }
-    
+
     @FXML
-    private void handleReset(){
+    private void handleReset() {
         cssFileHandler.reset();
         initializeList();
-        
-        //TODO: Update the List and Table
-        
+
+        // TODO: Update the List and Table
+        updateTable();
+        updatePreview();
         apply.setDisable(true);
         reset.setDisable(true);
     }

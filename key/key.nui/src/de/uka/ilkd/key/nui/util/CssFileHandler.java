@@ -65,12 +65,18 @@ public class CssFileHandler {
         File file = new File(path);
         FileOutputStream fop = new FileOutputStream(file);
         
-        css = "";
-        for(CssRule rule: parsedRules){
-            addCssRule(rule);
-        }
+        css = parsedRulestoString();
+        
         
         IOUtil.writeTo(fop, css);
+    }
+    
+    public String parsedRulestoString(){
+        String result = "";
+        for(CssRule rule: parsedRules){
+            result += rule.toString();
+        }
+        return result;
     }
     
     public void writeCssFile() throws IOException{
