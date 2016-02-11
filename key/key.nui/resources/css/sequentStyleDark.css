@@ -1,13 +1,13 @@
 pre {
-	background-color: white;
-	color: black;
+	background-color: rgb(50,50,50);
+	color: white;
 	font-weight: normal;
 	font-size: 16px;
 	font-family: Courier New;
 	font-style: normal;
 }
 .highlighted {
-	background-color: yellow;
+	background-color: red;
 	color: inherit;
 	font-weight: inherit;
 	font-style: inherit;
@@ -18,9 +18,9 @@ pre {
 	font-weight: inherit;
 	font-style: inherit;
 }
-.filterSelection {
-	background-color: #ff6666;
-	color: inherit;
+.filterSelection{
+  background-color: #ff6666;
+  color: inherit;
 	font-weight: inherit;
 	font-style: inherit;
 }
