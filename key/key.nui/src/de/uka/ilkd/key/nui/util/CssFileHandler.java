@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nui.util;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class CssFileHandler {
     private String path;
 
     private enum State {
-        COMMENT, SELECTOR, PROPERTY, VALUE;
+        SELECTOR, PROPERTY, VALUE;
     }
 
     /**
@@ -149,11 +148,6 @@ public class CssFileHandler {
         return null;
     }
 
-    private String removeSpacing(String str) {
-        return str.replace("\n", "").replace("\r", "").replace("\t", "")
-                .replace(" ", "");
-    }
-
     /**
      * Parses the loaded css and returns the rules.
      * 
@@ -165,19 +159,22 @@ public class CssFileHandler {
         String property = "";
         String value = "";
         State state = State.SELECTOR;
-        // String css = removeSpacing(this.css);
+        boolean inComment = false;
 
         for (int i = 0; i < css.length() - 1; i++) {
             char c = css.charAt(i);
             if (c == '/' && css.charAt(i + 1) == '*') {
-                // state = State.COMMENT;
+                inComment = true;
+            }
+
+            if (inComment) {
+                if (c == '/' && css.charAt(i - 1) == '*')
+                    inComment = false;
+                else
+                    continue;
             }
 
             switch (state) {
-            case COMMENT: {
-                // TODO implement comment handle
-                break;
-            }
             case SELECTOR: {
                 switch (c) {
                 case '{': {
@@ -187,9 +184,10 @@ public class CssFileHandler {
                     break;
                 }
                 case ',': {
-                    // TODO catch leading comma
-                    // if (selector.equals(""))
-                    rule.addSelector(selector.trim());
+                    if (selector.equals(""))
+                        System.err.println("Leading comma in selectors ignored.");
+                    else
+                        rule.addSelector(selector.trim());
                     selector = "";
                 }
                 default:
@@ -204,11 +202,10 @@ public class CssFileHandler {
                     break;
                 }
                 case ';': {
-                    // TODO catch
+                    System.err.println("Semicolon in property ignored.");
                     break;
                 }
                 case '}': {
-
                     parsedRules.add(rule);
                     rule = new CssRule();
                     state = State.SELECTOR;
@@ -228,12 +225,8 @@ public class CssFileHandler {
                     state = State.PROPERTY;
                     break;
                 }
-                case ',': {
-                    // TODO catch
-                    break;
-                }
                 case '}': {
-                    // TODO catch
+                    System.err.println("Bracket in value ignored.");
                     break;
                 }
                 default:
