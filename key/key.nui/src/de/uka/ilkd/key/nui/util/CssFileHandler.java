@@ -72,11 +72,11 @@ public class CssFileHandler {
     }
     
     public String parsedRulestoString(){
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for(CssRule rule: parsedRules){
-            result += rule.toString();
+            result.append(rule.toString());
         }
-        return result;
+        return result.toString();
     }
     
     public void writeCssFile() throws IOException{
