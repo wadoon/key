@@ -110,7 +110,7 @@ public class RootLayoutController extends ViewController {
     private ButtonBar debugButtons;
     @FXML
     private CheckMenuItem debugMode;
-    
+
     @FXML
     private Button cssStyler;
 
@@ -629,17 +629,18 @@ public class RootLayoutController extends ViewController {
         leftPane.setDividerPositions(positions.get(1));
         rightPane.setDividerPositions(positions.get(3));
     }
-    
-    @FXML
-    private void handleSequentCssStylerAction(){          
 
-            Stage stage = new Stage();
-            stage.setTitle("Sequent CSS Styler");
-            Pair<Object,Object> p =  KeyFxmlLoader.loadFxml(MainApp.class.getResource("view/CssStylerView.fxml"));
-            stage.setScene(new Scene((BorderPane) p.getKey()));
-            stage.show();
-            ((CssStylerViewController) p.getValue()).setMainApp(this.getMainApp(), this.getContext());
-            ((CssStylerViewController) p.getValue()).setStage(stage);
-            
+    @FXML
+    private void handleSequentCssStylerAction() {
+
+        Stage stage = new Stage();
+        stage.setTitle("Sequent CSS Styler");
+        Pair<Object, Object> p = KeyFxmlLoader
+                .loadFxml(MainApp.class.getResource("view/CssStylerView.fxml"));
+        stage.setScene(new Scene((BorderPane) p.getKey()));
+        stage.show();
+        ((CssStylerViewController) p.getValue()).setMainApp(this.getMainApp(),
+                this.getContext());
+        ((CssStylerViewController) p.getValue()).setStage(stage);
     }
 }
