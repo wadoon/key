@@ -1,0 +1,18 @@
+.root {
+    -fx-base: rgb(50.0, 50.0, 50.0);
+    -fx-background: rgb(50.0, 50.0, 50.0);
+    -fx-control-inner-background:  rgb(50.0, 50.0, 50.0);
+}
+.split-pane *.split-pane-divider {
+	-fx-padding: 0.0 0.1em 0.0 0.1em;
+    -fx-border-color: transparent;
+    -fx-box-border: transparent #BBBBBB;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0.0, 0.0 1.0 0.0 1.0;
+}
+.web-view{
+	-fx-background-color: rgb(50.0, 50.0, 50.0);
+	-fx-base: rgb(50.0, 50.0, 50.0);
+    -fx-background: rgb(50.0, 50.0, 50.0);
+    -fx-control-inner-background:  rgb(50.0, 50.0, 50.0);
+} 
