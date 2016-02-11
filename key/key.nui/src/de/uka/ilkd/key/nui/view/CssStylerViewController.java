@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
@@ -30,7 +31,7 @@ import javafx.util.Callback;
  *
  */
 public class CssStylerViewController extends ViewController {
-    private TreeMap<String, CssRule> ruleMap = new TreeMap<>();
+    private LinkedHashMap<String, CssRule> ruleMap = new LinkedHashMap<>();
     private Stage stage;
     private String selected;
     private CssFileHandler cssFileHandler;
