@@ -387,6 +387,8 @@ public class SequentViewController extends ViewController {
     }
 
     private void apply(PrintFilter filter) {
+        if (!sequentLoaded)
+            return;
         lastFilter = filter;
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);

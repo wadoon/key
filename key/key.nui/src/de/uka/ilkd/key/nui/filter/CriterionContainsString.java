@@ -11,6 +11,8 @@ public class CriterionContainsString
     private String searchText;
 
     public CriterionContainsString(String searchText) {
+        if(searchText == null)
+            throw new IllegalArgumentException("searchText");
         this.searchText = searchText;
     }
 
@@ -22,7 +24,7 @@ public class CriterionContainsString
     public List<Pair<Integer, String>> meetCriteria(List<Pair<Integer, String>> entities) {
         List<Pair<Integer, String>> list = new LinkedList<>();
         for (Pair<Integer, String> pair : entities) {
-            if (pair.second.contains(searchText)) {
+            if (pair.second != null && pair.second.contains(searchText)) {
                 list.add(pair);
             }
         }

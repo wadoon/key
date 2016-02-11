@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
+import com.google.common.util.concurrent.Service.Listener;
+
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -21,6 +25,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -54,12 +59,6 @@ public class FilterViewController extends ViewController {
     private ComboBox<FilterLayout> filterModeBox;
 
     @FXML
-    private GridPane userCriteria;
-
-    @FXML
-    private BorderPane selectionCriteria;
-
-    @FXML
     private ToggleButton selectionFilterToggle;
 
     @FXML
@@ -68,8 +67,11 @@ public class FilterViewController extends ViewController {
     @FXML
     private RadioButton selectionRadio;
 
+    @FXML
+    private Button applyButton;
+
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
-    private String searchValue;
+    private String searchValue = "";
     private boolean invert;
 
     private void loadCurrentFilter() {
@@ -107,14 +109,10 @@ public class FilterViewController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // bind to hide if visiblity is changed
-        selectionCriteria.managedProperty()
-                .bind(selectionCriteria.visibleProperty());
-        userCriteria.managedProperty().bind(userCriteria.visibleProperty());
-
-        selectionCriteria.visibleProperty()
-                .bind(selectionRadio.selectedProperty());
-        userCriteria.visibleProperty().bind(userRadio.selectedProperty());
+        searchText.disableProperty().bind(selectionRadio.selectedProperty());
+        selectionFilterToggle.disableProperty()
+                .bind(userRadio.selectedProperty());
+        applyButton.setDisable(true);
 
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
             beforeNumber.setText(Integer.toString(new_val.intValue()));
@@ -134,6 +132,23 @@ public class FilterViewController extends ViewController {
         currentFilter = new PrintFilter();
         loadCurrentFilter();
     }
+
+    @Override
+    public void initializeAfterLoadingFxml() {
+        getContext().getKeYMediator()
+                .addKeYSelectionListener(new KeYSelectionListener() {
+                    @Override
+                    public void selectedProofChanged(KeYSelectionEvent e) {
+                        if (getContext().getKeYMediator()
+                                .getSelectedProof() != null)
+                            applyButton.setDisable(false);
+                    }
+
+                    @Override
+                    public void selectedNodeChanged(KeYSelectionEvent e) {
+                    }
+                });
+    };
 
     @FXML
     private void hanldeInvertChanged() {
