@@ -15,6 +15,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.MenuItem?>
 
 <BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.RootLayoutController">
 	<top>
@@ -26,6 +27,11 @@
       					<items>
       						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open" />
       						<MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
+      					</items>
+      				</Menu>
+      				<Menu mnemonicParsing="false" text="Edit">
+      					<items>
+      						<MenuItem mnemonicParsing="false" onAction="#handleSequentCssStylerAction" text="Sequent CSS Styler" />
       					</items>
       				</Menu>
       				<Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views" />

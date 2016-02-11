@@ -19,7 +19,6 @@ import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.model.ViewSlot;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.util.KeYConstants;
-import javafx.util.Pair;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -43,7 +42,9 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 /**
  * @author Maximilian Li
@@ -635,6 +636,12 @@ public class RootLayoutController extends ViewController {
 
         Stage stage = new Stage();
         stage.setTitle("Sequent CSS Styler");
+        stage.getIcons().add(getMainApp().getPrimaryStage().getIcons().get(0));
+        
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(getMainApp().getPrimaryStage().getScene().getWindow());
+        
+
         Pair<Object, Object> p = KeyFxmlLoader
                 .loadFxml(MainApp.class.getResource("view/CssStylerView.fxml"));
         stage.setScene(new Scene((BorderPane) p.getKey()));

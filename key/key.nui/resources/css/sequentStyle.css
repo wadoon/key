@@ -7,7 +7,7 @@ pre {
 	font-style: normal;
 }
 .highlighted {
-	background-color: red;
+	background-color: yellow;
 	color: inherit;
 	font-weight: inherit;
 	font-style: inherit;
@@ -18,9 +18,9 @@ pre {
 	font-weight: inherit;
 	font-style: inherit;
 }
-.filterSelection{
-  background-color: #ff6666;
-  color: inherit;
+.filterSelection {
+	background-color: #ff6666;
+	color: inherit;
 	font-weight: inherit;
 	font-style: inherit;
 }
