@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 import com.google.common.util.concurrent.Service.Listener;
 
+import antlr.debug.Event;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.KeYView;
@@ -112,6 +113,12 @@ public class FilterViewController extends ViewController {
         searchText.disableProperty().bind(selectionRadio.selectedProperty());
         selectionFilterToggle.disableProperty()
                 .bind(userRadio.selectedProperty());
+        userRadio.selectedProperty().addListener(event -> {
+            if (filterSelection != null) {
+                selectionFilterToggle.setSelected(false);
+                finishSelection();
+            }
+        });
         applyButton.setDisable(true);
 
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
@@ -209,6 +216,7 @@ public class FilterViewController extends ViewController {
             filterSelection = new FilterSelection();
             currentFilter.setIsUserCriteria(false);
             getContext().activateSelectMode(filterSelection);
+            selectionFilterToggle.setStyle("-fx-background-color: #ff6666;");
         }
         else {
             finishSelection();
@@ -222,6 +230,8 @@ public class FilterViewController extends ViewController {
                 .fire(EmptyEventArgs.get());
         currentFilter.setCriteria(filterSelection.getCriteria());
         filterSelection = null;
+
+        selectionFilterToggle.setStyle("-fx-background-color: lightgrey;");
     }
 
     private void updateCurrentFilter() {

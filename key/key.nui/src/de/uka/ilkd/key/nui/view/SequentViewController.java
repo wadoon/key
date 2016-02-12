@@ -367,6 +367,7 @@ public class SequentViewController extends ViewController {
             this.printer.removeSelection(range);
         filterSelection.createCriteria(proofString);
         updateView();
+        selectionModeIsActive = false;
     }
 
     private void handleWebViewClicked(MouseEvent event) {
