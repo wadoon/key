@@ -191,9 +191,7 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleReset() {
-        currentFilter = new PrintFilter();
-        loadCurrentFilter();
-        handleApply();
+        getContext().setCurrentPrintFilter(new PrintFilter());
     }
 
     @FXML
