@@ -118,6 +118,7 @@ public class FilterViewController extends ViewController {
                 selectionFilterToggle.setSelected(false);
                 finishSelection();
             }
+            currentFilter.setIsUserCriteria(true);
         });
         applyButton.setDisable(true);
 
