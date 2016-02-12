@@ -281,8 +281,7 @@ public class SequentPrinter {
      * @param filter
      */
     public void applyFilter(PrintFilter filter) {
-        ArrayList<Integer> indicesOfLines = SequentFilterer
-                .applyFilter(proofString, filter);
+        ArrayList<Integer> indicesOfLines = filter.apply(proofString);
 
         // remove old Filter styling
         removeFilter();

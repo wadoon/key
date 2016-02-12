@@ -71,36 +71,16 @@ public class FilterViewController extends ViewController {
     private Button applyButton;
 
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
-    private String searchValue = "";
-    private boolean invert;
 
     private void loadCurrentFilter() {
         if (currentFilter.getIsUserCriteria()) {
-            Criteria<?> criteria = currentFilter.getCriteria();
-            if (criteria instanceof NotCriteria<?>) {
-                invert = true;
-                searchText.setText(
-                        ((CriterionContainsString) ((NotCriteria<?>) criteria)
-                                .getChildCriteria()).getSearchString());
-            }
-            else {
-                invert = false;
-                if (criteria instanceof CriterionContainsString) {
-                    searchText.setText(((CriterionContainsString) criteria)
-                            .getSearchString());
-                }
-                else {
-                    // this happens if upgraded from version without criteria
-                    searchText.setText("");
-                }
-            }
-
-            invertFilter.setSelected(invert);
+            searchText.setText(currentFilter.getSearchText());
             userRadio.setSelected(true);
         }
         else {
             selectionRadio.setSelected(true);
         }
+        invertFilter.setSelected(currentFilter.getInvert());
 
         linesBefore.setValue(currentFilter.getBefore());
         linesAfter.setValue(currentFilter.getAfter());
@@ -123,7 +103,7 @@ public class FilterViewController extends ViewController {
             currentFilter.setAfter(new_val.intValue());
         });
         searchText.textProperty()
-                .addListener((o, old_val, new_val) -> searchValue = new_val);
+                .addListener((o, old_val, new_val) -> currentFilter.setSearchText(new_val));
         filterModeBox.valueProperty().addListener((o, old_val,
                 new_val) -> currentFilter.setFilterLayout(new_val));
         filterModeBox.getItems().add(FilterLayout.Minimize);
@@ -152,7 +132,7 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void hanldeInvertChanged() {
-        invert = invertFilter.isSelected();
+        currentFilter.setInvert(invertFilter.isSelected());
     }
 
     // TODO: save filter on disk
@@ -195,7 +175,6 @@ public class FilterViewController extends ViewController {
             selectionFilterToggle.setSelected(false);
             finishSelection();
         }
-        updateCurrentFilter();
         getContext().setCurrentPrintFilter(currentFilter);
     }
 
@@ -212,7 +191,6 @@ public class FilterViewController extends ViewController {
         }
         else {
             finishSelection();
-            updateCurrentFilter();
             getContext().setCurrentPrintFilter(currentFilter);
         }
     }
@@ -220,24 +198,7 @@ public class FilterViewController extends ViewController {
     private void finishSelection() {
         filterSelection.getSelectionModeFinishedEvent()
                 .fire(EmptyEventArgs.get());
-        currentFilter.setCriteria(filterSelection.getCriteria());
+        currentFilter.setSelectionCriteria(filterSelection.getCriteria());
         filterSelection = null;
-    }
-
-    private void updateCurrentFilter() {
-        if (currentFilter.getIsUserCriteria()) {
-            currentFilter.setCriteria(new CriterionContainsString(searchValue));
-        } // else
-
-        if (currentFilter.getAfter() != 0 || currentFilter.getBefore() != 0) {
-            currentFilter.setCriteria(new CriterionRange(
-                    currentFilter.getBefore(), currentFilter.getAfter(),
-                    currentFilter.getCriteria()));
-        }
-
-        // apply invert as last
-        if (invert)
-            currentFilter.setCriteria(
-                    new NotCriteria<>(currentFilter.getCriteria()));
     }
 }

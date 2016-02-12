@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.nui.filter;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Observable;
-
-import javax.lang.model.element.Parameterizable;
 
 import de.uka.ilkd.key.util.Pair;
 
@@ -21,17 +19,26 @@ public class PrintFilter {
         // no need to notify observer since the name is only for storage
     }
 
-    // TODO remove criteria from print filter, pass the generated criteria to the printer
-    private Criteria<Pair<Integer, String>> criteria;
+    private String searchText;
 
-    public void setCriteria(Criteria<Pair<Integer, String>> value) {
-        if (value == criteria)
-            return;
-        criteria = value;
+    public void setSearchText(String value) {
+        searchText = value;
     }
 
-    public Criteria<Pair<Integer, String>> getCriteria() {
-        return criteria;
+    public String getSearchText() {
+        return searchText;
+    }
+
+    private Criteria<Pair<Integer, String>> selectionCriteria;
+
+    public void setSelectionCriteria(Criteria<Pair<Integer, String>> value) {
+        if (value == selectionCriteria)
+            return;
+        selectionCriteria = value;
+    }
+
+    public Criteria<Pair<Integer, String>> getSelectionCriteria() {
+        return selectionCriteria;
     }
 
     private boolean isUserCriteria;
@@ -70,6 +77,16 @@ public class PrintFilter {
         after = value;
     }
 
+    private boolean invert;
+
+    public void setInvert(boolean value) {
+        invert = value;
+    }
+
+    public boolean getInvert() {
+        return invert;
+    }
+
     private FilterLayout filterLayout;
 
     public FilterLayout getFilterLayout() {
@@ -84,7 +101,7 @@ public class PrintFilter {
 
     public PrintFilter() {
         isUserCriteria = true;
-        criteria = new CriterionEmpty<Pair<Integer,String>>();
+        selectionCriteria = null;
         before = 2;
         after = 2;
         filterLayout = FilterLayout.Minimize;
@@ -93,8 +110,10 @@ public class PrintFilter {
     public PrintFilter cloneFilter() {
         PrintFilter filter = new PrintFilter();
         filter.setName(this.name);
-        filter.setCriteria(this.criteria);
+        filter.setSelectionCriteria(this.selectionCriteria);
         filter.setIsUserCriteria(this.isUserCriteria);
+        filter.setSearchText(this.searchText);
+        filter.setInvert(this.invert);
         filter.setAfter(this.after);
         filter.setBefore(this.before);
         filter.setFilterLayout(this.filterLayout);
@@ -103,5 +122,9 @@ public class PrintFilter {
 
     public enum FilterLayout {
         Collapse, Minimize
+    }
+    
+    public ArrayList<Integer> apply(String proofString){
+        return SequentFilterer.applyFilter(proofString,this);
     }
 }

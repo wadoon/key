@@ -217,7 +217,7 @@ public class PositionTranslator {
      *            the PrintFilter object
      */
     public void applyFilter(PrintFilter filter) {
-        filteredLines = SequentFilterer.applyFilter(proofString, filter);
+        filteredLines = filter.apply(proofString);
         switch (filter.getFilterLayout()) {
         case Minimize:
             filterCollapsed = false;
