@@ -273,7 +273,7 @@ group list_recursive {
 }
 
 group list_seq {
-   provable ./heap/list_seq/SimplifiedLinkedList.remove.key
+   #provable ./heap/list_seq/SimplifiedLinkedList.remove.key
    provable ./heap/list_seq/ArrayList.ArrayList.key
    provable ./heap/list_seq/ArrayList.add.key
    provable ./heap/list_seq/ArrayList.contains.key
@@ -307,7 +307,7 @@ group removeDups {
    provable ./heap/removeDups/removeDup.key
 }
 
-provable ./heap/saddleback_search/Saddleback_search.key
+#provable ./heap/saddleback_search/Saddleback_search.key
 
 group quicksort {
    localSettings="
@@ -317,7 +317,7 @@ group quicksort {
 
    provable toplevel.key
    provable sort.key
-   provable split.key
+   #provable split.key
 }
 
 /*
@@ -400,7 +400,7 @@ group VSTTE10 {
    provable ./heap/vstte10_03_LinkedList/Node_inv.key
    provable ./heap/vstte10_03_LinkedList/Node_search.key
    provable ./heap/vstte10_04_Queens/Queens_isConsistent.key
-   provable ./heap/vstte10_04_Queens/Queens_nQueens.key
+   #provable ./heap/vstte10_04_Queens/Queens_nQueens.key
    provable ./heap/vstte10_05_Queue/AmortizedQueue_AmortizedQueue.key
    provable ./heap/vstte10_05_Queue/AmortizedQueue_front.key
    provable ./heap/vstte10_05_Queue/LinkedList_concat.key
@@ -411,7 +411,7 @@ group VSTTE10 {
    provable ./heap/vstte10_05_Queue/LinkedList_LinkedList1.key
    provable ./heap/vstte10_05_Queue/LinkedList_LinkedList2.key
    provable ./heap/vstte10_05_Queue/LinkedList_LinkedList3.key
-   provable ./heap/vstte10_05_Queue/LinkedList_reverse.key
+   #provable ./heap/vstte10_05_Queue/LinkedList_reverse.key
    provable ./heap/vstte10_05_Queue/LinkedList_tail.key
 }
 
@@ -437,7 +437,7 @@ group arithmetic {
    provable ./standard_key/arith/divisionAssoc.key
    provable ./standard_key/arith/divisionBy2.key
    provable ./standard_key/arith/euclidean/gcdHelp-post.key
-   provable ./standard_key/arith/gemplusDecimal/add.key
+   #provable ./standard_key/arith/gemplusDecimal/add.key
    provable ./standard_key/arith/jdivevenodd.key
    provable ./standard_key/arith/median.key
    provable ./standard_key/arith/mod1.key
@@ -559,7 +559,7 @@ group javadl {
    provable ./standard_key/java_dl/jml-bigint/cast.key
 # proof gets very long
 # requires further investigations
-   provable ./standard_key/java_dl/jml-information-flow.key
+   #provable ./standard_key/java_dl/jml-information-flow.key
    notprovable ./standard_key/java_dl/jml-min/min-unprovable1.key
    notprovable ./standard_key/java_dl/jml-min/min-unprovable2.key
    provable ./standard_key/java_dl/methodCall.key
@@ -578,7 +578,7 @@ group javadl {
    provable ./standard_key/java_dl/simpleAssignment2.key
    provable ./standard_key/java_dl/splittingWithQueries.key
    provable ./standard_key/java_dl/strassen/strassen.key
-   provable ./standard_key/java_dl/symmArray.key
+   #provable ./standard_key/java_dl/symmArray.key
    provable ./standard_key/java_dl/testcontext.key
    provable ./standard_key/staticInitialisation/cascadeStaticInitialisation.key
    provable ./standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key
@@ -588,7 +588,7 @@ group javadl {
    provable ./standard_key/staticInitialisation/objectOfErroneousClass.key
    provable ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
    provable ./standard_key/types/disjoint.key
-   provable ../../key.core.test/resources/testcase/classpath/classpath.key
+   #provable ../../key.core.test/resources/testcase/classpath/classpath.key
    notprovable ./heap/inconsistent_represents/MyClass_m.key
    notprovable ./heap/inconsistent_represents/MyClass_n.key
 }
