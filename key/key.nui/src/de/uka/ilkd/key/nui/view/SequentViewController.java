@@ -2,7 +2,6 @@ package de.uka.ilkd.key.nui.view;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.DirectoryStream.Filter;
 import java.util.ResourceBundle;
 
 import org.key_project.util.collection.ImmutableList;
@@ -20,7 +19,6 @@ import de.uka.ilkd.key.nui.filter.EmptyEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
-import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
 import de.uka.ilkd.key.nui.util.TermInfoPrinter;
@@ -48,6 +46,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -139,15 +140,25 @@ public class SequentViewController extends ViewController {
 
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
-        sequentOptions.expandedProperty()
-                .addListener((observable, oldValue, newValue) -> {
-                    if (sequentOptions.isExpanded()) {
-                        sequentOptions.setText("Less Options");
-                    }
-                    else {
-                        sequentOptions.setText("More Options");
-                    }
-                });
+        sequentOptions.expandedProperty().addListener((observable, oldValue, newValue) -> {
+            if (sequentOptions.isExpanded()) {
+                sequentOptions.setText("Less Options");
+            }
+            else {
+                sequentOptions.setText("More Options");
+            }
+        });
+        sequentOptions.disabledProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println(oldValue);
+            sequentOptions.getScene().getAccelerators()
+                    .put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), new Runnable() {
+
+                @Override
+                public void run() {
+                    sequentOptions.setExpanded(!sequentOptions.isExpanded());
+                }
+            });
+        });
 
         textArea.setOnMouseMoved(event -> {
             if (sequentLoaded) {
