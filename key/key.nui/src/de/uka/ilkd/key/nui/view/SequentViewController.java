@@ -176,48 +176,7 @@ public class SequentViewController extends ViewController {
             }
         });
 
-        textArea.setOnMouseClicked(event -> {
-            if (sequentLoaded && event.getButton() == MouseButton.PRIMARY) {
-                if (tacletMenu != null)
-                    tacletMenu.hide();
-
-                // XXX loading context menus should get static method in
-
-                FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(TacletMenuController.class
-                        .getResource("TacletMenu.fxml"));
-                try {
-                    tacletMenu = loader.load();
-                    // Give the controller access to the main app.
-                    TacletMenuController controller = loader.getController();
-                    controller.setMainApp(this.getMainApp(), this.getContext());
-
-                    KeYMediator mediator = getContext().getKeYMediator();
-
-                    Goal goal = mediator.getSelectedGoal();
-                    if (goal != null) {
-                        MediatorProofControl c = mediator.getUI()
-                                .getProofControl();
-                        int idx = posTranslator.getCharIdxUnderPointer(event);
-                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(
-                                idx, new IdentitySequentPrintFilter(sequent));
-                        PosInOccurrence occ = pos.getPosInOccurrence();
-                        final ImmutableList<BuiltInRule> builtInRules = c
-                                .getBuiltInRule(goal, occ);
-                        controller.init(c.getFindTaclet(goal, occ),
-                                c.getRewriteTaclet(goal, occ),
-                                c.getNoFindTaclet(goal), builtInRules, pos);
-
-                        tacletMenu.show(textArea, Side.TOP, event.getX(),
-                                event.getY());
-                    }
-                }
-                catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        });
+        textArea.setOnMouseClicked(this::handleWebViewClicked);
 
         textArea.setOnScroll(event -> {
             // Adjustment: Event.getDelta is absolute amount of pixels,
@@ -227,8 +186,6 @@ public class SequentViewController extends ViewController {
             this.scrollPane.setHvalue(this.scrollPane.getHvalue()
                     - event.getDeltaX() / this.scrollPane.getWidth());
         });
-
-        textArea.setOnMouseClicked(this::handleWebViewClicked);
     }
 
     @Override
@@ -413,7 +370,10 @@ public class SequentViewController extends ViewController {
     }
 
     private void handleWebViewClicked(MouseEvent event) {
-        if (sequentLoaded && selectionModeIsActive) {
+        if (!sequentLoaded || event.getButton() != MouseButton.PRIMARY)
+            return;
+
+        if (selectionModeIsActive) {
             int pos = posTranslator.getCharIdxUnderPointer(event);
             Range range = this.abstractSyntaxTree.rangeForIndex(pos);
 
@@ -429,6 +389,45 @@ public class SequentViewController extends ViewController {
              * showTermInfo(abstractSyntaxTree.getPosInSequent(pos, new
              * IdentitySequentPrintFilter(sequent)));
              */
+        }
+        else {
+            if (tacletMenu != null)
+                tacletMenu.hide();
+
+            // XXX loading context menus should get static method in
+
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(
+                    TacletMenuController.class.getResource("TacletMenu.fxml"));
+            try {
+                tacletMenu = loader.load();
+                // Give the controller access to the main app.
+                TacletMenuController controller = loader.getController();
+                controller.setMainApp(this.getMainApp(), this.getContext());
+
+                KeYMediator mediator = getContext().getKeYMediator();
+
+                Goal goal = mediator.getSelectedGoal();
+                if (goal != null) {
+                    MediatorProofControl c = mediator.getUI().getProofControl();
+                    int idx = posTranslator.getCharIdxUnderPointer(event);
+                    PosInSequent pos = abstractSyntaxTree.getPosInSequent(idx,
+                            new IdentitySequentPrintFilter(sequent));
+                    PosInOccurrence occ = pos.getPosInOccurrence();
+                    final ImmutableList<BuiltInRule> builtInRules = c
+                            .getBuiltInRule(goal, occ);
+                    controller.init(c.getFindTaclet(goal, occ),
+                            c.getRewriteTaclet(goal, occ),
+                            c.getNoFindTaclet(goal), builtInRules, pos);
+
+                    tacletMenu.show(textArea, Side.TOP, event.getX(),
+                            event.getY());
+                }
+            }
+            catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 }
