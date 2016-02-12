@@ -16,8 +16,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.io.File;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
 import org.key_project.util.java.IOUtil;
@@ -34,7 +33,8 @@ public class KeYFileChooser {
                             f.isDirectory()
                             || f.toString().endsWith(".java")
                             || f.toString().endsWith(".key") 
-                            || f.toString().endsWith(".proof");
+                            || f.toString().endsWith(".proof")
+                            || f.toString().endsWith(".proof.gz");
         }
 
         public String getDescription() {
@@ -44,12 +44,15 @@ public class KeYFileChooser {
     private static KeYFileChooser INSTANCE;
 
     private final JFileChooser fileChooser;
-    
-
+    private final JCheckBox compressionCheckBox = new JCheckBox("Compress");
 
     private boolean saveDialog;
 
     private File resetFile = null;
+
+    public boolean useCompression() {
+        return compressionCheckBox.isSelected();
+    }
 
     private KeYFileChooser(File initDir) {
         fileChooser = new JFileChooser(initDir) {
@@ -92,15 +95,12 @@ public class KeYFileChooser {
 
     private void setSaveDialog(boolean b) {
         saveDialog = b;
+        fileChooser.setAccessory(b ? compressionCheckBox : null);
         fileChooser.setFileSelectionMode(b 
                         ? JFileChooser.FILES_ONLY 
                                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
     
-    public boolean showSaveDialog(Component parent) {
-        return showSaveDialog(parent, null, null);
-    }
-
     /**
      * Show a file dialog for saving a file.
      * The dialog will provide a naming suggestion.
