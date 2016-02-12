@@ -59,8 +59,10 @@ public class SequentPrinter {
     private ArrayList<Integer> filterIndicesOpen = new ArrayList<Integer>();
     private ArrayList<Integer> filterIndicesClose = new ArrayList<Integer>();
 
+    // Use Unique values in incremental order. Value Correspond to
+    // ArrayPosition. Higher Value = Higher Priority.
     private enum StylePos {
-        SYNTAX(4), MOUSE(0), SEARCH(2), FILTER(1), RULEAPP(3),SELECTION(1);
+        MOUSE(0), FILTER(1), SELECTION(2), RULEAPP(3), SEARCH(4), SYNTAX(5);
 
         private int slotPosition;
 
@@ -93,19 +95,22 @@ public class SequentPrinter {
         int offset = 0;
         StringBuilder sb = new StringBuilder(proofString);
         Stack<Pair<Integer, String>> tagStack = new Stack<>();
+        Stack<Pair<Integer, String>> saveTagStack = new Stack<>();
 
         String insertTag;
 
         for (Integer i : keySet) {
             // Apply Close Tags first
             if (closeTagsAtIndex.containsKey(i)) {
-                for (int j = 0; j < StylePos.values().length; j++) {
+                for (int j = StylePos.values().length - 1; j >= 0; j--) {
                     insertTag = closeTagsAtIndex.get(i)[j];
                     if (insertTag != null && !insertTag.isEmpty()) {
-                        Stack<Pair<Integer, String>> saveTagStack = new Stack<>();
-                        while (tagStack.peek().first != j) {
-                            sb.insert(i + offset, insertTag);
-                            offset += insertTag.length();
+
+                        // Check for possible Overlap
+                        while (!tagStack.isEmpty()
+                                && tagStack.peek().first != j) {
+                            sb.insert(i + offset, NUIConstants.CLOSING_TAG);
+                            offset += NUIConstants.CLOSING_TAG.length();
                             saveTagStack.push(tagStack.pop());
                         }
 
@@ -126,10 +131,25 @@ public class SequentPrinter {
                 for (int j = 0; j < StylePos.values().length; j++) {
                     insertTag = openTagsAtIndex.get(i)[j];
                     if (insertTag != null && !insertTag.isEmpty()) {
+
+                        // Correctly Prioritze even inside other spans
+                        while (!tagStack.isEmpty()
+                                && tagStack.peek().first > j) {
+                            sb.insert(i + offset, NUIConstants.CLOSING_TAG);
+                            offset += NUIConstants.CLOSING_TAG.length();
+                            saveTagStack.push(tagStack.pop());
+                        }
+
                         tagStack.push(new Pair<Integer, String>(j, insertTag));
 
                         sb.insert(i + offset, insertTag);
                         offset += insertTag.length();
+
+                        while (saveTagStack.size() > 0) {
+                            sb.insert(i + offset, saveTagStack.peek().second);
+                            offset += saveTagStack.peek().second.length();
+                            tagStack.push(saveTagStack.pop());
+                        }
                     }
                 }
             }
@@ -716,7 +736,8 @@ public class SequentPrinter {
         keySet.add(range.start());
         keySet.add(range.end());
 
-        putOpenTag(range.start(), StylePos.SELECTION, NUIConstants.SELECTION_TAG);
+        putOpenTag(range.start(), StylePos.SELECTION,
+                NUIConstants.SELECTION_TAG);
         putCloseTag(range.end(), StylePos.SELECTION, NUIConstants.CLOSING_TAG);
     }
 
