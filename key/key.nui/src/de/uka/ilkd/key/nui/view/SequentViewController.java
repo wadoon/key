@@ -83,22 +83,24 @@ public class SequentViewController extends ViewController {
             // execute ui update on javafx thread
             Platform.runLater(() -> {
                 showSequent(getContext().getKeYMediator().getSelectedNode());
-                usePrettySyntax();
-                useUnicode();
+                notationInfo.refresh(services,
+                        checkBoxPrettySyntax.isSelected(),
+                        checkBoxUnicode.isSelected());
                 useRegex();
-                if (lastFilter != null) {
-                    apply(lastFilter);
-                    updateView();
-                }
                 tacletInfoViewController.showTacletInfo(
                         getContext().getKeYMediator().getSelectedNode());
 
                 RuleApp app = getContext().getKeYMediator().getSelectedNode()
                         .getAppliedRuleApp();
+                
+                printSequent();
+                if (lastFilter != null) {
+                    apply(lastFilter);
+                }
                 if (app != null) {
                     printer.applyRuleAppHighlighting(app);
-                    updateView();
                 }
+                updateView();
             });
         }
     };
@@ -140,25 +142,30 @@ public class SequentViewController extends ViewController {
 
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
-        sequentOptions.expandedProperty().addListener((observable, oldValue, newValue) -> {
-            if (sequentOptions.isExpanded()) {
-                sequentOptions.setText("Less Options");
-            }
-            else {
-                sequentOptions.setText("More Options");
-            }
-        });
-        sequentOptions.disabledProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println(oldValue);
-            sequentOptions.getScene().getAccelerators()
-                    .put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), new Runnable() {
+        sequentOptions.expandedProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    if (sequentOptions.isExpanded()) {
+                        sequentOptions.setText("Less Options");
+                    }
+                    else {
+                        sequentOptions.setText("More Options");
+                    }
+                });
+        sequentOptions.disabledProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    System.out.println(oldValue);
+                    sequentOptions.getScene().getAccelerators()
+                            .put(new KeyCodeCombination(KeyCode.F,
+                                    KeyCombination.CONTROL_DOWN),
+                            new Runnable() {
 
-                @Override
-                public void run() {
-                    sequentOptions.setExpanded(!sequentOptions.isExpanded());
-                }
-            });
-        });
+                        @Override
+                        public void run() {
+                            sequentOptions
+                                    .setExpanded(!sequentOptions.isExpanded());
+                        }
+                    });
+                });
 
         textArea.setOnMouseMoved(event -> {
             if (sequentLoaded) {
@@ -203,7 +210,10 @@ public class SequentViewController extends ViewController {
     public void initializeAfterLoadingFxml() {
         getContext().getKeYMediator()
                 .addKeYSelectionListener(proofChangeListener);
-        getContext().getFilterChangedEvent().addHandler(this::apply);
+        getContext().getFilterChangedEvent().addHandler(pfilter -> {
+            apply(pfilter);
+            updateView();
+        });
         getContext().getSelectModeActivateEvent()
                 .addHandler(this::selectModeActivated);
 
@@ -251,8 +261,6 @@ public class SequentViewController extends ViewController {
                 abstractSyntaxTree, getContext());
         sequentChanged = true;
 
-        printSequent();
-
         sequentOptions.setDisable(false);
         tacletInfo.setDisable(false);
     }
@@ -269,14 +277,13 @@ public class SequentViewController extends ViewController {
             notationInfo.refresh(services, false, false);
             checkBoxUnicode.setSelected(false);
             checkBoxUnicode.setDisable(true);
-            printSequent();
-            return;
         }
         else {
             notationInfo.refresh(services, true, false);
             checkBoxUnicode.setDisable(false);
-            printSequent();
         }
+        printSequent();
+        updateView();
     }
 
     /**
@@ -287,15 +294,9 @@ public class SequentViewController extends ViewController {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        if (!checkBoxUnicode.isSelected()) {
-            notationInfo.refresh(services, true, false);
-            printSequent();
-            return;
-        }
-        else {
-            notationInfo.refresh(services, true, true);
-            printSequent();
-        }
+        notationInfo.refresh(services, true, checkBoxUnicode.isSelected());
+        printSequent();
+        updateView();
     }
 
     /**
@@ -318,9 +319,7 @@ public class SequentViewController extends ViewController {
         printer.setProofString(proofString);
 
         posTranslator.setProofString(proofString);
-
         sequentLoaded = true;
-        updateView();
     }
 
     private void updateHtml(String s) {
@@ -360,7 +359,6 @@ public class SequentViewController extends ViewController {
         lastFilter = filter;
         printer.applyFilter(filter);
         posTranslator.applyFilter(filter);
-        updateView();
     }
 
     boolean selectionModeIsActive = false;
