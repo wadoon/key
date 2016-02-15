@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.nui.filter;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Observable;
-
-import javax.lang.model.element.Parameterizable;
-
 import de.uka.ilkd.key.util.Pair;
 
 public class PrintFilter {
@@ -21,7 +15,8 @@ public class PrintFilter {
         // no need to notify observer since the name is only for storage
     }
 
-    // TODO remove criteria from print filter, pass the generated criteria to the printer
+    // TODO remove criteria from print filter, pass the generated criteria to
+    // the printer
     private Criteria<Pair<Integer, String>> criteria;
 
     public void setCriteria(Criteria<Pair<Integer, String>> value) {
@@ -32,6 +27,18 @@ public class PrintFilter {
 
     public Criteria<Pair<Integer, String>> getCriteria() {
         return criteria;
+    }
+
+    private Criteria<Pair<Integer, String>> selectionCriteria;
+
+    public void setSelectionCriteria(Criteria<Pair<Integer, String>> value) {
+        if (value == selectionCriteria)
+            return;
+        selectionCriteria = value;
+    }
+
+    public Criteria<Pair<Integer, String>> getSelectionCriteria() {
+        return selectionCriteria;
     }
 
     private boolean isUserCriteria;
@@ -84,7 +91,7 @@ public class PrintFilter {
 
     public PrintFilter() {
         isUserCriteria = true;
-        criteria = new CriterionEmpty<Pair<Integer,String>>();
+        criteria = new CriterionEmpty<Pair<Integer, String>>();
         before = 2;
         after = 2;
         filterLayout = FilterLayout.Minimize;

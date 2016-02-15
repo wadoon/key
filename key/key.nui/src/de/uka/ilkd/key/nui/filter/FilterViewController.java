@@ -71,8 +71,19 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private Button applyButton;
-    
-    @SuppressFBWarnings(justification="Not used in code right now", value="URF_UNREAD_FIELD") //TODO remove suppress warning and remove variable "savedFilters" if not needed anymore
+
+    @SuppressFBWarnings(justification = "Not used in code right now", value = "URF_UNREAD_FIELD") // TODO
+                                                                                                  // remove
+                                                                                                  // suppress
+                                                                                                  // warning
+                                                                                                  // and
+                                                                                                  // remove
+                                                                                                  // variable
+                                                                                                  // "savedFilters"
+                                                                                                  // if
+                                                                                                  // not
+                                                                                                  // needed
+                                                                                                  // anymore
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
     private String searchValue = "";
     private boolean invert;
@@ -229,7 +240,11 @@ public class FilterViewController extends ViewController {
     private void finishSelection() {
         filterSelection.getSelectionModeFinishedEvent()
                 .fire(EmptyEventArgs.get());
-        currentFilter.setCriteria(filterSelection.getCriteria());
+        Criteria<Pair<Integer, String>> criteria = filterSelection
+                .getCriteria();
+        if (criteria == null)
+            criteria = new CriterionEmpty<>();
+        currentFilter.setSelectionCriteria(criteria);
         filterSelection = null;
 
         selectionFilterToggle.setStyle("-fx-background-color: lightgrey;");
@@ -238,7 +253,10 @@ public class FilterViewController extends ViewController {
     private void updateCurrentFilter() {
         if (currentFilter.getIsUserCriteria()) {
             currentFilter.setCriteria(new CriterionContainsString(searchValue));
-        } // else
+        }
+        else {
+            currentFilter.setCriteria(currentFilter.getSelectionCriteria());
+        }
 
         if (currentFilter.getAfter() != 0 || currentFilter.getBefore() != 0) {
             currentFilter.setCriteria(new CriterionRange(
