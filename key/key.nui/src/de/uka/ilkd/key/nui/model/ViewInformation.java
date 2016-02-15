@@ -102,11 +102,11 @@ public class ViewInformation extends Observable {
     }
 
     private ViewController controller;
-    
+
     public ViewController getController() {
         return controller;
     }
-    
+
     public void loadUiTab(ViewController parent) {
         Pair<Object, ViewController> pair = parent
                 .loadFxmlViewController(getFxmlPath());
@@ -124,14 +124,16 @@ public class ViewInformation extends Observable {
     private Tab createTab(Node node, ViewController parent) {
         Tab t = new Tab();
         String title = getTitle();
-        //t.setText(title);
+        // t.setText(title);
         Label titleLabel = new Label(title);
-        //BorderPane header = new BorderPane();
-        //header.setCenter(titleLabel);
+        // BorderPane header = new BorderPane();
+        // header.setCenter(titleLabel);
         t.setGraphic(titleLabel);
         t.setContent(node);
 
         titleLabel.setOnDragDetected(event -> {
+            if (event.getButton() != MouseButton.PRIMARY)
+                return;
             Dragboard db = titleLabel.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
             content.putString(Integer.toString(this.getId()));
@@ -146,8 +148,8 @@ public class ViewInformation extends Observable {
         titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
 
-                loadViewContextMenu(parent).show(titleLabel, Side.TOP, event.getX(),
-                        event.getY());
+                loadViewContextMenu(parent).show(titleLabel, Side.TOP,
+                        event.getX(), event.getY());
         });
 
         return t;
