@@ -33,7 +33,7 @@ public class CriterionRange implements Criteria<Pair<Integer, String>> {
             int index = lineInfo.first;
             IntStream.range(0, before).forEach(n -> {
                 int d = index - before + n;
-                if (d > 0)
+                if (d >= 0)
                     filterFor.add(d);
             });
             // add the element itself
