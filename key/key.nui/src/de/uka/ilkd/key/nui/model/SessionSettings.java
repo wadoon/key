@@ -116,7 +116,7 @@ public class SessionSettings {
     /**
      * Keeps the Window visible
      */
-    private void CheckBounds() {
+    private void checkBounds() {
         // workaround for JavaFx malfunction that causes x and y to be slightly
         // negative
         if (windowX < 0)
@@ -140,8 +140,8 @@ public class SessionSettings {
         boundsCorrupted = true;
     }
 
-    public void SaveAsLast() {
-        CheckBounds();
+    public void saveAsLast() {
+        checkBounds();
         if (boundsCorrupted)
             return;
 
@@ -174,7 +174,7 @@ public class SessionSettings {
                     prefs.getDouble("splitterLH", -1),
                     prefs.getDouble("splitterRV", -1),
                     prefs.getDouble("splitterRH", -1));
-            settings.CheckBounds();
+            settings.checkBounds();
             settings.views = new LinkedList<>();
             for (String vinfostr : prefs.get("views", "").split(";")) {
                 if (vinfostr == null || vinfostr.isEmpty())

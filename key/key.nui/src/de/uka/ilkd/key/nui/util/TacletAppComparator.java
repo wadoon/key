@@ -20,6 +20,7 @@ import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+// TODO Findbugs wants this class to also implement Serializable. discuss with team.
 public class TacletAppComparator implements Comparator<TacletApp> {
 
     private static int countFormulaSV(TacletSchemaVariableCollector c) {

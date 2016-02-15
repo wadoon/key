@@ -175,6 +175,9 @@ public class SequentPrinter {
     }
 
     private Range getHighlightRange(PosInOccurrence pos) {
+        if (!(posTable instanceof InitialPositionTable)) {
+            throw new AssertionError("Unexpected type (should be InitialPositionTable: " + posTable);
+        }
         ImmutableList<Integer> path = ((InitialPositionTable) posTable)
                 .pathForPosition(pos, new IdentitySequentPrintFilter(sequent));
         return ((InitialPositionTable) posTable).rangeForPath(path);
@@ -608,11 +611,16 @@ public class SequentPrinter {
      * puts Syntax Styling Info in tagsAtIndex Map
      */
     private void applySyntaxHighlighting() {
-
+        
+        if (!(posTable instanceof InitialPositionTable)) {
+            throw new AssertionError("Unexpected type (should be InitialPositionTable: " + posTable);
+        }
         InitialPositionTable initPos = (InitialPositionTable) posTable;
+        
         IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(
                 sequent);
 
+        //TODO References to generic type Class<T> should be parameterized
         Class lastClass = null;
         boolean openedTag = false;
 

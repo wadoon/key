@@ -187,7 +187,7 @@ public class MainApp extends Application {
         settings.setSplitterPositions(
                 rootLayoutController.getSplitterPositions());
         settings.setViews(rootLayoutController.getViewInformations());
-        settings.SaveAsLast();
+        settings.saveAsLast();
         System.out.println("Where we go from here is a choice I leave to you.");
         primaryStage.close();
     }
