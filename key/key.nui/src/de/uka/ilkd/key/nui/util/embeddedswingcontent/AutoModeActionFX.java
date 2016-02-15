@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Copied mostly from old GUI. Adjusted to use the {@link KeYMediator} of the new GUI.
@@ -43,10 +44,14 @@ public final class AutoModeActionFX extends AbstractAction {
     final Icon startLogo = IconFactory.autoModeStartLogo(MainWindow.TOOLBAR_ICON_SIZE);
     final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
 
+    @SuppressFBWarnings(justification="No bug", value="SE_BAD_FIELD")
     private Proof associatedProof;
+    @SuppressFBWarnings(justification="No bug", value="SE_BAD_FIELD")
     private KeYMediator mediator;
+    @SuppressFBWarnings(justification="No bug", value="SE_BAD_FIELD")
     private Context context;
 
+    @SuppressFBWarnings(justification="No bug", value="SE_BAD_FIELD")
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 
         public void proofStructureChanged(ProofTreeEvent e) {

@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 import com.google.common.util.concurrent.Service.Listener;
 
+import antlr.debug.Event;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.KeYView;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.util.Pair;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
@@ -70,6 +72,18 @@ public class FilterViewController extends ViewController {
     @FXML
     private Button applyButton;
 
+    @SuppressFBWarnings(justification = "Not used in code right now", value = "URF_UNREAD_FIELD") // TODO
+                                                                                                  // remove
+                                                                                                  // suppress
+                                                                                                  // warning
+                                                                                                  // and
+                                                                                                  // remove
+                                                                                                  // variable
+                                                                                                  // "savedFilters"
+                                                                                                  // if
+                                                                                                  // not
+                                                                                                  // needed
+                                                                                                  // anymore
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
 
     private void loadCurrentFilter() {
@@ -92,6 +106,13 @@ public class FilterViewController extends ViewController {
         searchText.disableProperty().bind(selectionRadio.selectedProperty());
         selectionFilterToggle.disableProperty()
                 .bind(userRadio.selectedProperty());
+        userRadio.selectedProperty().addListener(event -> {
+            if (filterSelection != null) {
+                selectionFilterToggle.setSelected(false);
+                finishSelection();
+            }
+            currentFilter.setIsUserCriteria(true);
+        });
         applyButton.setDisable(true);
 
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
@@ -102,8 +123,8 @@ public class FilterViewController extends ViewController {
             afterNumber.setText(Integer.toString(new_val.intValue()));
             currentFilter.setAfter(new_val.intValue());
         });
-        searchText.textProperty()
-                .addListener((o, old_val, new_val) -> currentFilter.setSearchText(new_val));
+        searchText.textProperty().addListener(
+                (o, old_val, new_val) -> currentFilter.setSearchText(new_val));
         filterModeBox.valueProperty().addListener((o, old_val,
                 new_val) -> currentFilter.setFilterLayout(new_val));
         filterModeBox.getItems().add(FilterLayout.Minimize);
@@ -164,9 +185,9 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleReset() {
-        currentFilter = new PrintFilter();
-        loadCurrentFilter();
-        handleApply();
+        getContext().setCurrentFilterCriteria(
+                new CriterionEmpty<Pair<Integer, String>>(),
+                currentFilter.getFilterLayout());
     }
 
     @FXML
@@ -175,7 +196,8 @@ public class FilterViewController extends ViewController {
             selectionFilterToggle.setSelected(false);
             finishSelection();
         }
-        getContext().setCurrentPrintFilter(currentFilter);
+        getContext().setCurrentFilterCriteria(currentFilter.createCriteria(),
+                currentFilter.getFilterLayout());
     }
 
     private FilterSelection filterSelection;
@@ -184,21 +206,32 @@ public class FilterViewController extends ViewController {
     private void handleSelectionFilterToggled() {
         if (selectionFilterToggle.isSelected()) {
             // reset old filter to make selection more easily
-            getContext().setCurrentPrintFilter(new PrintFilter());
+            getContext().setCurrentFilterCriteria(
+                    new CriterionEmpty<Pair<Integer, String>>(),
+                    currentFilter.getFilterLayout());
             filterSelection = new FilterSelection();
             currentFilter.setIsUserCriteria(false);
             getContext().activateSelectMode(filterSelection);
+            selectionFilterToggle.setStyle("-fx-background-color: #ff6666;");
         }
         else {
             finishSelection();
-            getContext().setCurrentPrintFilter(currentFilter);
+            getContext().setCurrentFilterCriteria(
+                    currentFilter.createCriteria(),
+                    currentFilter.getFilterLayout());
         }
     }
 
     private void finishSelection() {
         filterSelection.getSelectionModeFinishedEvent()
                 .fire(EmptyEventArgs.get());
-        currentFilter.setSelectionCriteria(filterSelection.getCriteria());
+        Criteria<Pair<Integer, String>> criteria = filterSelection
+                .getCriteria();
+        if (criteria == null)
+            criteria = new CriterionEmpty<>();
+        currentFilter.setSelectionCriteria(criteria);
         filterSelection = null;
+
+        selectionFilterToggle.setStyle("-fx-background-color: lightgrey;");
     }
 }

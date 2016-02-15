@@ -21,7 +21,7 @@ import javafx.scene.control.TextArea;
  */
 public class TacletInfoViewController extends ViewController {
 
-    private KeYMediator mediator;
+    private KeYMediator mediator = null;
     @FXML
     private TextArea outputText;
 

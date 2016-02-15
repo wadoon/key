@@ -8,8 +8,10 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.StatusManager;
 import de.uka.ilkd.key.nui.filter.Criteria;
+import de.uka.ilkd.key.nui.filter.FilterChangedEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.util.CsEvent;
 import de.uka.ilkd.key.util.Pair;
@@ -48,21 +50,27 @@ public class Context {
         return statusManager;
     }
 
-    private CsEvent<PrintFilter> filterChangedEvent = new CsEvent<>();
+    private CsEvent<FilterChangedEventArgs> filterChangedEvent = new CsEvent<>();
 
-    public CsEvent<PrintFilter> getFilterChangedEvent() {
+    public CsEvent<FilterChangedEventArgs> getFilterChangedEvent() {
         return filterChangedEvent;
     }
 
-    private PrintFilter currentPrintFilter = null;
+    private Criteria<Pair<Integer,String>> currentFilterCriteria = null;
+    private FilterLayout currentFilterLayout;
 
-    public void setCurrentPrintFilter(PrintFilter filter) {
-        currentPrintFilter = filter;
-        filterChangedEvent.fire(filter);
+    public void setCurrentFilterCriteria(Criteria<Pair<Integer,String>> criteria, FilterLayout layout) {
+        currentFilterCriteria = criteria;
+        currentFilterLayout = layout;
+        filterChangedEvent.fire(new FilterChangedEventArgs(layout,criteria));
     }
 
-    public PrintFilter getCurrentPrintFilter() {
-        return currentPrintFilter;
+    public Criteria<Pair<Integer,String>> getCurrentPrintFilter() {
+        return currentFilterCriteria;
+    }
+    
+    public FilterLayout getCurrentFilterLayout(){
+        return currentFilterLayout;
     }
 
     private CsEvent<String> sequentHtmlChangedEvent = new CsEvent<>();

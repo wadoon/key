@@ -17,7 +17,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 
 public class ViewInformation extends Observable {
@@ -103,7 +102,11 @@ public class ViewInformation extends Observable {
     }
 
     private ViewController controller;
-
+    
+    public ViewController getController() {
+        return controller;
+    }
+    
     public void loadUiTab(ViewController parent) {
         Pair<Object, ViewController> pair = parent
                 .loadFxmlViewController(getFxmlPath());

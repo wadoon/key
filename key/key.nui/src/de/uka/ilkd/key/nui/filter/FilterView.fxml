@@ -38,7 +38,7 @@
                                  </toggleGroup>
                               </RadioButton>
                               <RadioButton fx:id="selectionRadio" mnemonicParsing="false" text="Selection" toggleGroup="$filterMode" GridPane.rowIndex="1" />
-                              <ToggleButton fx:id="selectionFilterToggle" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" prefHeight="30.0" prefWidth="160.0" text="ArrowIcon" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <ToggleButton fx:id="selectionFilterToggle" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" prefHeight="30.0" prefWidth="160.0" text="(Mouse Icon)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />

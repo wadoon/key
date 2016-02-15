@@ -38,7 +38,7 @@ import javafx.util.Callback;
  */
 public class CssStylerViewController extends ViewController {
     private LinkedHashMap<String, CssRule> ruleMap = new LinkedHashMap<>();
-    private Stage stage;
+    private Stage stage = null;
     private String selected;
     private CssFileHandler cssFileHandler;
     private PreviewPrinter previewPrinter = new PreviewPrinter();
@@ -70,6 +70,7 @@ public class CssStylerViewController extends ViewController {
         initializeList();
 
         propertyColumn.setCellValueFactory(
+                //TODO Findbugs wants this to be refactored into a named static inner class. discuss with team
                 new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
 
                     @Override
@@ -83,6 +84,7 @@ public class CssStylerViewController extends ViewController {
                 });
         valueColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         valueColumn.setCellValueFactory(
+                //TODO Findbugs wants this to be refactored into a named static inner class. discuss with team
                 new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
 
                     @Override

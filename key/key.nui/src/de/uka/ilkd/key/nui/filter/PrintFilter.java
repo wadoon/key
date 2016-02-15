@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.nui.filter;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import de.uka.ilkd.key.util.Pair;
 
 public class PrintFilter {
@@ -18,6 +14,7 @@ public class PrintFilter {
         name = value;
         // no need to notify observer since the name is only for storage
     }
+
 
     private String searchText;
 
@@ -101,7 +98,7 @@ public class PrintFilter {
 
     public PrintFilter() {
         isUserCriteria = true;
-        selectionCriteria = null;
+        selectionCriteria = new CriterionEmpty<Pair<Integer, String>>();
         before = 2;
         after = 2;
         filterLayout = FilterLayout.Minimize;
@@ -124,7 +121,22 @@ public class PrintFilter {
         Collapse, Minimize
     }
     
-    public ArrayList<Integer> apply(String proofString){
-        return SequentFilterer.applyFilter(proofString,this);
+    public Criteria<Pair<Integer, String>> createCriteria() {
+        Criteria<Pair<Integer, String>> criteria;
+        if (this.getIsUserCriteria())
+            criteria = new CriterionContainsString(this.getSearchText());
+        else
+            criteria = this.getSelectionCriteria();
+
+        if (this.getBefore() != 0 || this.getAfter() != 0) {
+            criteria = new CriterionRange(this.getBefore(), this.getAfter(),
+                    criteria);
+        }
+
+        // apply invert as last
+        if (this.getInvert())
+            criteria = new NotCriteria<>(criteria);
+
+        return criteria;
     }
 }

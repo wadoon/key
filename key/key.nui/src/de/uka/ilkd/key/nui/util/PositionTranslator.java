@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.filter.SequentFilterer;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
@@ -82,7 +83,7 @@ public class PositionTranslator {
      * @return the number of the underlying line
      */
     private int getLine(double yCoordinate) {
-        double yCoord = yCoordinate - fontSize * 2 / 3;
+        double yCoord = yCoordinate - fontSize * 2.0 / 3.0;
         int result;
 
         Text text = new Text("\\W|QpXgj�&");
@@ -216,9 +217,9 @@ public class PositionTranslator {
      * @param filter
      *            the PrintFilter object
      */
-    public void applyFilter(PrintFilter filter) {
-        filteredLines = filter.apply(proofString);
-        switch (filter.getFilterLayout()) {
+    public void applyFilter(ArrayList<Integer> lines,FilterLayout layout) {
+        filteredLines = lines;
+        switch (layout) {
         case Minimize:
             filterCollapsed = false;
             break;
