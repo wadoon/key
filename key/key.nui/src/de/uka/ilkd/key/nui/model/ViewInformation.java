@@ -17,7 +17,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 
 public class ViewInformation extends Observable {
@@ -102,10 +101,8 @@ public class ViewInformation extends Observable {
         return uiTab;
     }
 
-    // TODO the following line is useless. "controller" never gets used. can it be removed?
-    //private ViewController controller;
-
-    //XXX probably unwanted
+    private ViewController controller;
+    
     public ViewController getController() {
         return controller;
     }
@@ -114,8 +111,7 @@ public class ViewInformation extends Observable {
         Pair<Object, ViewController> pair = parent
                 .loadFxmlViewController(getFxmlPath());
         uiTab = createTab((Node) pair.getKey(), parent);
-        // TODO the following line is useless. "controller" never gets used again. can it be removed?
-        //controller = pair.getValue();
+        controller = pair.getValue();
     }
 
     /**
