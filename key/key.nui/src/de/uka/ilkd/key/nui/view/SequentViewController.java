@@ -7,14 +7,10 @@ import java.util.ResourceBundle;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
-import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.filter.EmptyEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
@@ -36,7 +32,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
@@ -45,11 +40,11 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
@@ -59,7 +54,6 @@ import javafx.scene.web.WebView;
  * @author Nils Muzzulini
  *
  */
-@KeYView(title = "Sequent", path = "SequentView.fxml", preferredPosition = ViewPosition.CENTER, hasMenuItem = true)
 public class SequentViewController extends ViewController {
 
     private boolean sequentLoaded = false;
@@ -73,37 +67,7 @@ public class SequentViewController extends ViewController {
     private Services services;
     private Sequent sequent;
     private PrintFilter lastFilter = null;
-    private KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
-        @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
-        }
 
-        @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-            // execute ui update on javafx thread
-            Platform.runLater(() -> {
-                showSequent(getContext().getKeYMediator().getSelectedNode());
-                notationInfo.refresh(services,
-                        checkBoxPrettySyntax.isSelected(),
-                        checkBoxUnicode.isSelected());
-                useRegex();
-                tacletInfoViewController.showTacletInfo(
-                        getContext().getKeYMediator().getSelectedNode());
-
-                RuleApp app = getContext().getKeYMediator().getSelectedNode()
-                        .getAppliedRuleApp();
-                
-                printSequent();
-                if (lastFilter != null) {
-                    apply(lastFilter);
-                }
-                if (app != null) {
-                    printer.applyRuleAppHighlighting(app);
-                }
-                updateView();
-            });
-        }
-    };
     private PositionTranslator posTranslator;
 
     @FXML
@@ -131,7 +95,23 @@ public class SequentViewController extends ViewController {
      * method.
      */
     public SequentViewController() {
+    }
 
+    public void loadProofToView(Node node) {
+        showSequent(node);
+        tacletInfoViewController.showTacletInfo(node);
+        notationInfo.refresh(services, checkBoxPrettySyntax.isSelected(),
+                checkBoxUnicode.isSelected());
+        useRegex();
+        printSequent();
+        RuleApp app = node.getAppliedRuleApp();
+        if (lastFilter != null) {
+            apply(lastFilter);
+        }
+        if (app != null) {
+            printer.applyRuleAppHighlighting(app);
+        }
+        updateView();
     }
 
     @Override
@@ -153,17 +133,13 @@ public class SequentViewController extends ViewController {
                 });
         sequentOptions.disabledProperty()
                 .addListener((observable, oldValue, newValue) -> {
-                    System.out.println(oldValue);
-                    sequentOptions.getScene().getAccelerators()
-                            .put(new KeyCodeCombination(KeyCode.F,
-                                    KeyCombination.CONTROL_DOWN),
-                            new Runnable() {
-
-                        @Override
-                        public void run() {
-                            sequentOptions
-                                    .setExpanded(!sequentOptions.isExpanded());
-                        }
+                    sequentOptions.getScene()
+                            .getAccelerators().put(
+                                    new KeyCodeCombination(KeyCode.F,
+                                            KeyCombination.CONTROL_DOWN),
+                                    () -> {
+                        sequentOptions
+                                .setExpanded(!sequentOptions.isExpanded());
                     });
                 });
 
@@ -208,8 +184,6 @@ public class SequentViewController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
-        getContext().getKeYMediator()
-                .addKeYSelectionListener(proofChangeListener);
         getContext().getFilterChangedEvent().addHandler(pfilter -> {
             apply(pfilter);
             updateView();

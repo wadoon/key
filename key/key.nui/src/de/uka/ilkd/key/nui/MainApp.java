@@ -124,6 +124,10 @@ public class MainApp extends Application {
         }
     }
 
+    public RootLayoutController getRootLayoutController() {
+        return rootLayoutController;
+    }
+    
     /**
      * Listens for ControlDown Event.
      */

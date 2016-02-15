@@ -104,6 +104,11 @@ public class ViewInformation extends Observable {
 
     private ViewController controller;
 
+    //XXX probably unwanted
+    public ViewController getController() {
+        return controller;
+    }
+    
     public void loadUiTab(ViewController parent) {
         Pair<Object, ViewController> pair = parent
                 .loadFxmlViewController(getFxmlPath());
