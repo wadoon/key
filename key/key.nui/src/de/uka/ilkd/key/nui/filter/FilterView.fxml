@@ -32,7 +32,7 @@
                           </rowConstraints>
                            <children>
                               <TextField fx:id="searchText" alignment="TOP_LEFT" GridPane.columnIndex="1" />
-                              <RadioButton fx:id="userRadio" mnemonicParsing="false" text="Search">
+                              <RadioButton fx:id="userRadio" mnemonicParsing="false" text="Text">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="filterMode" />
                                  </toggleGroup>
@@ -54,16 +54,18 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Label text="After:" GridPane.rowIndex="2" />
+                              <Label text="Lines after:" GridPane.rowIndex="2" />
                               <Slider fx:id="linesAfter" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <Slider fx:id="linesBefore" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label text="Before:" GridPane.rowIndex="1" />
+                              <Label text="Lines before:" GridPane.rowIndex="1" />
                               <Label fx:id="beforeNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                               <Label fx:id="afterNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert" GridPane.columnSpan="2" />
-                              <ComboBox fx:id="filterModeBox" prefHeight="25.0" prefWidth="163.0" GridPane.columnIndex="1" />
+                              <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert Filter" GridPane.columnSpan="2" />
+                              <ComboBox fx:id="filterModeBox" prefHeight="25.0" prefWidth="163.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="Layout:" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                      </children>
