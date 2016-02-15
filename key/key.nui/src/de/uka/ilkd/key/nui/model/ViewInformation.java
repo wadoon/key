@@ -102,7 +102,8 @@ public class ViewInformation extends Observable {
         return uiTab;
     }
 
-    private ViewController controller;
+    // TODO the following line is useless. "controller" never gets used. can it be removed?
+    //private ViewController controller;
 
     //XXX probably unwanted
     public ViewController getController() {
@@ -113,7 +114,8 @@ public class ViewInformation extends Observable {
         Pair<Object, ViewController> pair = parent
                 .loadFxmlViewController(getFxmlPath());
         uiTab = createTab((Node) pair.getKey(), parent);
-        controller = pair.getValue();
+        // TODO the following line is useless. "controller" never gets used again. can it be removed?
+        //controller = pair.getValue();
     }
 
     /**

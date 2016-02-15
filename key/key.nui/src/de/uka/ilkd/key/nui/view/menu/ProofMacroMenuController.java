@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.proof.Node;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -44,7 +45,8 @@ public class ProofMacroMenuController extends ViewController {
     /**
      * The number of defined macros.
      */
-    private int numberOfMacros;
+    // TODO the following line is useless. "numberOfMacros" never gets used. can it be removed?
+    //private int numberOfMacros;
     
 
     public void init(KeYMediator mediator, PosInOccurrence posInOcc) {
@@ -52,7 +54,8 @@ public class ProofMacroMenuController extends ViewController {
         // Store the submenus in this map.
         Map<String, Menu> submenus = new HashMap<String, Menu>();
 
-        int count = 0;
+        // TODO the following line is useless. "numberOfMacros" and "count" never get used. can they be removed?
+        //int count = 0;
         Node node = mediator.getSelectedNode();
         for (ProofMacro macro : REGISTERED_MACROS) {
 
@@ -86,7 +89,8 @@ public class ProofMacroMenuController extends ViewController {
                 }
 
                 submenu.getItems().add(menuItem);
-                count++;
+                // TODO the following line is useless. "numberOfMacros" and "count" never get used. can they be removed?
+                //count++;
             }
         }
         
@@ -97,7 +101,9 @@ public class ProofMacroMenuController extends ViewController {
         */
         
         // TODO mediator.enableWhenProofLoaded(this);
-        this.numberOfMacros = count;
+        
+        // TODO the following line is useless. "numberOfMacros" never gets used again. can it be removed?
+        //this.numberOfMacros = count;
 
     }
 
@@ -107,11 +113,13 @@ public class ProofMacroMenuController extends ViewController {
 
         MenuItem menuItem = new MenuItem(macro.getName());
         //TODO menuItem.setToolTipText(macro.getDescription());
-        final KeyStroke macroKey = KeyStrokeManager.get(macro);
         
-        if (macroKey != null && posInOcc == null) { // currently only for global macro applications
+        //TODO the following line is useless. "macroKey" doesn't get used yet. can it be removed?
+        //final KeyStroke macroKey = KeyStrokeManager.get(macro);
+        
+        //if (macroKey != null && posInOcc == null) { // currently only for global macro applications
             //TODO menuItem.setAccelerator(macroKey);
-        }
+        //}
         menuItem.setOnAction(e -> {
             if (mediator.isInAutoMode()) {
                 return;

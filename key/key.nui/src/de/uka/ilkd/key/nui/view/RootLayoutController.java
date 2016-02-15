@@ -62,6 +62,7 @@ public class RootLayoutController extends ViewController {
 
     private HashMap<ViewPosition, ViewSlot> viewSlots = new HashMap<>();
     private HashMap<Integer, ViewInformation> allViews = new HashMap<>();
+    private File file;
 
     /**
      * The BorderPane from the Main Window
@@ -310,12 +311,18 @@ public class RootLayoutController extends ViewController {
                 .addAll(new ExtensionFilter("Proofs, KeY or Java Files",
                         "*.proof", "*.key", "*.java"),
                 new ExtensionFilter("All Files", "*.*"));
-        // TODO reset initial directory to "../" (changed for faster access to
-        // proofs for testing purposes)
-        fileChooser.setInitialDirectory(
-                new File("../key.core.test/resources/testcase/join"));
+        
+        if (file != null) {
+            File existDirectory = file.getParentFile();
+            fileChooser.setInitialDirectory(existDirectory);
+        } else {
+            // TODO reset initial directory to "../" (changed for faster access to
+            // proofs for testing purposes)
+            fileChooser.setInitialDirectory(
+                    new File("../key.core.test/resources/testcase/join"));
+        }
 
-        File file = fileChooser.showOpenDialog(new Stage());
+        file = fileChooser.showOpenDialog(null);
 
         if (file == null) {
             setStatus("No File Selected");

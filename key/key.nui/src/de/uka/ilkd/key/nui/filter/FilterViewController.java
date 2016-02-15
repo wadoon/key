@@ -16,6 +16,7 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.util.Pair;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
@@ -70,7 +71,8 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private Button applyButton;
-
+    
+    @SuppressFBWarnings(justification="Not used in code right now", value="URF_UNREAD_FIELD") //TODO remove suppress warning and remove variable "savedFilters" if not needed anymore
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
     private String searchValue = "";
     private boolean invert;

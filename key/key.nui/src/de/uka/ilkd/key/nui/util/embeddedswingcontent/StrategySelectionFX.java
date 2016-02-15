@@ -47,6 +47,7 @@ import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
 * <p>
@@ -93,6 +94,7 @@ private static final String JAVACARDDL_STRATEGY_NAME = FACTORY.name().toString()
 /**
  * Observe changes on {@link #mediator}.
  */
+@SuppressFBWarnings(justification="No bug", value="SE_BAD_FIELD")
 private final KeYSelectionListener mediatorListener = new KeYSelectionListener() {
    public void selectedNodeChanged(KeYSelectionEvent e) {
    }
@@ -105,11 +107,13 @@ private final KeYSelectionListener mediatorListener = new KeYSelectionListener()
 /**
  * The {@link KeYMediator} which provides the active proof.
  */
+@SuppressFBWarnings(justification="No bug", value="SE_BAD_FIELD")
 private KeYMediator mediator;
 
 /**
  * Allows access to shown UI controls generated according to {@link #DEFINITION}.
  */
+@SuppressFBWarnings(justification="No bug", value="SE_BAD_FIELD")
 private StrategySelectionComponents components;
 
 public StrategySelectionFX(AutoModeActionFX autoModeAction) {

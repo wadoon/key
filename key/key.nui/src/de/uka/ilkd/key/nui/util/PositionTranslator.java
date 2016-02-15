@@ -82,7 +82,7 @@ public class PositionTranslator {
      * @return the number of the underlying line
      */
     private int getLine(double yCoordinate) {
-        double yCoord = yCoordinate - fontSize * 2 / 3;
+        double yCoord = yCoordinate - fontSize * 2.0 / 3.0;
         int result;
 
         Text text = new Text("\\W|QpXgj�&");
