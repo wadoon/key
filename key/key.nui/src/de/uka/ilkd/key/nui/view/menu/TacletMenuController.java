@@ -19,6 +19,7 @@ import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -31,14 +32,15 @@ import javafx.scene.control.MenuItem;
 
 /**
  * 
- * Copied from TacletMenu and adapted to JavaFX style.
- * This is NOT a menu anymore but a controller. There is a field
- * rootMenu to access the actual menu.
- * @see de.uka.ilkd.key.gui.nodeviews.TacletMenu original TacletMenu  
+ * Copied from TacletMenu and adapted to JavaFX style. This is NOT a menu
+ * anymore but a controller. There is a field rootMenu to access the actual
+ * menu.
+ * 
+ * @see de.uka.ilkd.key.gui.nodeviews.TacletMenu original TacletMenu
  * @author Victor Schuemmer
  */
 public class TacletMenuController extends ViewController {
-    
+
     private static final Set<Name> CLUTTER_RULESETS = new LinkedHashSet<Name>();
 
     static {
@@ -47,6 +49,7 @@ public class TacletMenuController extends ViewController {
         CLUTTER_RULESETS.add(new Name("pullOutQuantifierAll"));
         CLUTTER_RULESETS.add(new Name("pullOutQuantifierEx"));
     }
+
     private static final Set<Name> CLUTTER_RULES = new LinkedHashSet<Name>();
 
     static {
@@ -63,8 +66,7 @@ public class TacletMenuController extends ViewController {
         CLUTTER_RULES.add(new Name("less_is_total"));
         CLUTTER_RULES.add(new Name("less_zero_is_total"));
         CLUTTER_RULES.add(new Name("applyEqReverse"));
-        
-        
+
         // the following are used for drag'n'drop interactions
         CLUTTER_RULES.add(new Name("eqTermCut"));
         CLUTTER_RULES.add(new Name("instAll"));
@@ -74,12 +76,12 @@ public class TacletMenuController extends ViewController {
     private PosInSequent pos;
     private KeYMediator mediator;
     private TacletAppComparator comp;
-    
+
     @FXML
     private ContextMenu rootMenu;
     @FXML
     private MenuItem noRules;
-    @FXML 
+    @FXML
     private Menu moreRules;
     @FXML
     private MenuItem copyToClipboard;
@@ -93,147 +95,144 @@ public class TacletMenuController extends ViewController {
     private MenuItem changeAbbr;
     @FXML
     private ProofMacroMenuController proofMacroMenuController;
-    
-    
-    public void init(ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
-            ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
+
+    public void init(ImmutableList<TacletApp> findList,
+            ImmutableList<TacletApp> rewriteList,
+            ImmutableList<TacletApp> noFindList,
+            ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
         this.pos = pos;
         comp = new TacletAppComparator();
         createTacletMenu(removeRewrites(findList).prepend(rewriteList),
                 noFindList, builtInList);
         proofMacroMenuController.init(mediator, pos.getPosInOccurrence());
     }
-    
-    /** removes RewriteTaclet from list
-     * @param list the IList<Taclet> from where the RewriteTaclet are
-     * removed
+
+    /**
+     * removes RewriteTaclet from list
+     * 
+     * @param list
+     *            the IList<Taclet> from where the RewriteTaclet are removed
      * @return list without RewriteTaclets
      */
-    private static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+    private static ImmutableList<TacletApp> removeRewrites(
+            ImmutableList<TacletApp> list) {
+        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
         Iterator<TacletApp> it = list.iterator();
-    
-        while(it.hasNext()) {
+
+        while (it.hasNext()) {
             TacletApp tacletApp = it.next();
-            Taclet taclet=tacletApp.taclet();
-            result = (taclet instanceof RewriteTaclet ? result :
-                  result.prepend(tacletApp));
+            Taclet taclet = tacletApp.taclet();
+            result = (taclet instanceof RewriteTaclet ? result
+                    : result.prepend(tacletApp));
         }
         return result;
     }
 
     /** creates the menu by adding all sub-menus and items */
     private void createTacletMenu(ImmutableList<TacletApp> find,
-                  ImmutableList<TacletApp> noFind,
-                  ImmutableList<BuiltInRule> builtInList) {
-
+            ImmutableList<TacletApp> noFind,
+            ImmutableList<BuiltInRule> builtInList) {
 
         ImmutableList<TacletApp> toAdd = sort(find, comp);
-        boolean rulesAvailable =  find.size() > 0;
+        boolean rulesAvailable = find.size() > 0;
 
         if (pos != null && pos.isSequent()) {
             rulesAvailable |= noFind.size() > 0;
             toAdd = toAdd.prepend(noFind);
         }
-        
+
         if (rulesAvailable) {
             createMenuItems(toAdd);
-        } else {
+        }
+        else {
             noRules.setVisible(true);
         }
     }
-    
-    private void createMenuItems(ImmutableList<TacletApp> taclets){
-        
+
+    private void createMenuItems(ImmutableList<TacletApp> taclets) {
+
         /*
-         * final InsertHiddenTacletMenuItem insHiddenItem =
-            new InsertHiddenTacletMenuItem(MainWindow.getInstance(),
-                    mediator.getNotationInfo(), mediator.getServices());
-
-        final InsertionTacletBrowserMenuItem insSystemInvItem =
-            new InsertSystemInvariantTacletMenuItem(MainWindow.getInstance(),
-                    mediator.getNotationInfo(), mediator.getServices());
-
-
-        for (final TacletApp app : taclets) {
-            final Taclet taclet = app.taclet();
-
-            if (insHiddenItem.isResponsible(taclet)) {
-                insHiddenItem.add(app);
-            } else if (insSystemInvItem.isResponsible(taclet)) {
-                insSystemInvItem.add(app);
-            }
-    }
-
-        if (insHiddenItem.getAppSize() > 0) {
-            add(insHiddenItem);
-            insHiddenItem.addActionListener(control);
-        }
-
-        if (insSystemInvItem.getAppSize() > 0) {
-            add(insSystemInvItem);
-            insSystemInvItem.addActionListener(control);
-        }
-
+         * final InsertHiddenTacletMenuItem insHiddenItem = new
+         * InsertHiddenTacletMenuItem(MainWindow.getInstance(),
+         * mediator.getNotationInfo(), mediator.getServices());
+         * 
+         * final InsertionTacletBrowserMenuItem insSystemInvItem = new
+         * InsertSystemInvariantTacletMenuItem(MainWindow.getInstance(),
+         * mediator.getNotationInfo(), mediator.getServices());
+         * 
+         * 
+         * for (final TacletApp app : taclets) { final Taclet taclet =
+         * app.taclet();
+         * 
+         * if (insHiddenItem.isResponsible(taclet)) { insHiddenItem.add(app); }
+         * else if (insSystemInvItem.isResponsible(taclet)) {
+         * insSystemInvItem.add(app); } }
+         * 
+         * if (insHiddenItem.getAppSize() > 0) { add(insHiddenItem);
+         * insHiddenItem.addActionListener(control); }
+         * 
+         * if (insSystemInvItem.getAppSize() > 0) { add(insSystemInvItem);
+         * insSystemInvItem.addActionListener(control); }
+         * 
          */
         int idx = 0;
         for (final TacletApp app : taclets) {
             final Taclet taclet = app.taclet();
-            
-            if(!mediator.getFilterForInteractiveProving().filter(taclet)){
+
+            if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
                 continue;
             }
 
-            //if (! insHiddenItem.isResponsible(taclet) &&
-            //    !insSystemInvItem.isResponsible(taclet)) {
-                
-                final MenuItem item = new MenuItem(taclet.displayName());
-                item.setOnAction(event -> {
-                    Goal goal = mediator.getSelectedGoal();
-                    mediator.getUI().getProofControl().selectedTaclet(taclet, goal, pos.getPosInOccurrence());
-                });
-                
-                boolean rareRule = false;
-                for (RuleSet rs : taclet.getRuleSets()) {
-                    if (CLUTTER_RULESETS.contains(rs.name())) rareRule = true;
-                }
-                if (CLUTTER_RULES.contains(taclet.name())) rareRule = true;
+            final MenuItem item = new MenuItem(taclet.displayName());
+            item.setOnAction(event -> {
+                Goal goal = mediator.getSelectedGoal();
+                mediator.getUI().getProofControl().selectedTaclet(taclet, goal,
+                        pos.getPosInOccurrence());
+            });
+            // TODO add tooltip
 
-                if (rareRule)
-                    moreRules.getItems().add(item);
-                else rootMenu.getItems().add(idx++,item);
-            //}
+            boolean rareRule = false;
+            for (RuleSet rs : taclet.getRuleSets()) {
+                if (CLUTTER_RULESETS.contains(rs.name()))
+                    rareRule = true;
+            }
+            if (CLUTTER_RULES.contains(taclet.name()))
+                rareRule = true;
+
+            if (rareRule)
+                moreRules.getItems().add(item);
+            else
+                rootMenu.getItems().add(idx++, item);
+            // }
         }
         if (moreRules.getItems().size() > 0)
             moreRules.setVisible(true);
     }
-    
-    
-    
-    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds, TacletAppComparator comp) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-    
+
+    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
+            TacletAppComparator comp) {
+        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
+
         List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
-    
+
         for (final TacletApp app : finds) {
             list.add(app);
         }
-    
+
         Collections.sort(list, comp);
-    
+
         for (final TacletApp app : list) {
             result = result.prepend(app);
         }
-    
+
         return result;
     }
-    
-    
+
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
 
     }
-    
+
     @Override
     public void initializeAfterLoadingFxml() {
         mediator = getContext().getKeYMediator();
@@ -244,30 +243,30 @@ public class TacletMenuController extends ViewController {
         mediator.getUI().getProofControl().startFocussedAutoMode(
                 pos.getPosInOccurrence(), mediator.getSelectedGoal());
     }
-    
-    @FXML 
+
+    @FXML
     private void handleCopyToClipboard(ActionEvent event) {
-        //TODO implement
+        // TODO implement
     }
-    
-    @FXML 
+
+    @FXML
     private void handleCreateAbbriviation(ActionEvent event) {
-        //TODO implement
+        // TODO implement
     }
-    
-    @FXML 
+
+    @FXML
     private void handleEnableAbbriviation(ActionEvent event) {
-        //TODO implement
+        // TODO implement
     }
-    
-    @FXML 
+
+    @FXML
     private void handleDisableAbbriviation(ActionEvent event) {
-        //TODO implement
+        // TODO implement
     }
-    
-    @FXML 
+
+    @FXML
     private void handleChangeAbbriviation(ActionEvent event) {
-        //TODO implement
+        // TODO implement
     }
-    
+
 }
