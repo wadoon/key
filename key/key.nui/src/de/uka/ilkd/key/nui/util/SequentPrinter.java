@@ -19,9 +19,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
-import de.uka.ilkd.key.nui.filter.SequentFilterer;
 import de.uka.ilkd.key.nui.model.Context;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
@@ -49,8 +47,12 @@ public class SequentPrinter {
 
     private TreeSet<Integer> keySet = new TreeSet<Integer>();
 
-    private HashMap<Integer, String[]> openTagsAtIndex = new HashMap<Integer, String[]>();;
-    private HashMap<Integer, String[]> closeTagsAtIndex = new HashMap<Integer, String[]>();;
+    // HashMap maps Index in ProofString to Styling Info Array
+    // Array holds Styling Info separated for every Styling Case.
+    // Array Slots Defined in StylePos Enum
+    // ArrayList inside of Array: List of all Tags
+    private HashMap<Integer, ArrayList<String>[]> openTagsAtIndex = new HashMap<Integer, ArrayList<String>[]>();;
+    private HashMap<Integer, ArrayList<String>[]> closeTagsAtIndex = new HashMap<Integer, ArrayList<String>[]>();;
 
     private ArrayList<Integer> lessThenList = new ArrayList<Integer>();
 
@@ -98,31 +100,38 @@ public class SequentPrinter {
         Stack<Pair<Integer, String>> tagStack = new Stack<>();
         Stack<Pair<Integer, String>> saveTagStack = new Stack<>();
 
-        String insertTag;
+        ArrayList<String> insertTagList;
 
         for (Integer i : keySet) {
             // Apply Close Tags first
             if (closeTagsAtIndex.containsKey(i)) {
                 for (int j = StylePos.values().length - 1; j >= 0; j--) {
-                    insertTag = closeTagsAtIndex.get(i)[j];
-                    if (insertTag != null && !insertTag.isEmpty()) {
+                    insertTagList = closeTagsAtIndex.get(i)[j];
+                    if (insertTagList != null) {
+                        for (String insertTag : insertTagList) {
+                            if (insertTag != null && !insertTag.isEmpty()) {
 
-                        // Check for possible Overlap
-                        while (!tagStack.isEmpty()
-                                && tagStack.peek().first != j) {
-                            sb.insert(i + offset, NUIConstants.CLOSING_TAG);
-                            offset += NUIConstants.CLOSING_TAG.length();
-                            saveTagStack.push(tagStack.pop());
-                        }
+                                // Check for possible Overlap
+                                while (!tagStack.isEmpty()
+                                        && tagStack.peek().first != j) {
+                                    sb.insert(i + offset,
+                                            NUIConstants.CLOSING_TAG);
+                                    offset += NUIConstants.CLOSING_TAG.length();
+                                    saveTagStack.push(tagStack.pop());
+                                }
 
-                        sb.insert(i + offset, insertTag);
-                        offset += insertTag.length();
-                        tagStack.pop();
+                                sb.insert(i + offset, insertTag);
+                                offset += insertTag.length();
+                                tagStack.pop();
 
-                        while (saveTagStack.size() > 0) {
-                            sb.insert(i + offset, saveTagStack.peek().second);
-                            offset += saveTagStack.peek().second.length();
-                            tagStack.push(saveTagStack.pop());
+                                while (saveTagStack.size() > 0) {
+                                    sb.insert(i + offset,
+                                            saveTagStack.peek().second);
+                                    offset += saveTagStack.peek().second
+                                            .length();
+                                    tagStack.push(saveTagStack.pop());
+                                }
+                            }
                         }
                     }
                 }
@@ -130,26 +139,34 @@ public class SequentPrinter {
             // Apply OpenTags
             if (openTagsAtIndex.containsKey(i)) {
                 for (int j = 0; j < StylePos.values().length; j++) {
-                    insertTag = openTagsAtIndex.get(i)[j];
-                    if (insertTag != null && !insertTag.isEmpty()) {
+                    insertTagList = openTagsAtIndex.get(i)[j];
+                    if (insertTagList != null) {
+                        for (String insertTag : insertTagList) {
+                            if (insertTag != null && !insertTag.isEmpty()) {
 
-                        // Correctly Prioritze even inside other spans
-                        while (!tagStack.isEmpty()
-                                && tagStack.peek().first > j) {
-                            sb.insert(i + offset, NUIConstants.CLOSING_TAG);
-                            offset += NUIConstants.CLOSING_TAG.length();
-                            saveTagStack.push(tagStack.pop());
-                        }
+                                // Correctly Prioritze even inside other spans
+                                while (!tagStack.isEmpty()
+                                        && tagStack.peek().first > j) {
+                                    sb.insert(i + offset,
+                                            NUIConstants.CLOSING_TAG);
+                                    offset += NUIConstants.CLOSING_TAG.length();
+                                    saveTagStack.push(tagStack.pop());
+                                }
 
-                        tagStack.push(new Pair<Integer, String>(j, insertTag));
+                                tagStack.push(new Pair<Integer, String>(j,
+                                        insertTag));
 
-                        sb.insert(i + offset, insertTag);
-                        offset += insertTag.length();
+                                sb.insert(i + offset, insertTag);
+                                offset += insertTag.length();
 
-                        while (saveTagStack.size() > 0) {
-                            sb.insert(i + offset, saveTagStack.peek().second);
-                            offset += saveTagStack.peek().second.length();
-                            tagStack.push(saveTagStack.pop());
+                                while (saveTagStack.size() > 0) {
+                                    sb.insert(i + offset,
+                                            saveTagStack.peek().second);
+                                    offset += saveTagStack.peek().second
+                                            .length();
+                                    tagStack.push(saveTagStack.pop());
+                                }
+                            }
                         }
                     }
                 }
@@ -177,7 +194,9 @@ public class SequentPrinter {
 
     private Range getHighlightRange(PosInOccurrence pos) {
         if (!(posTable instanceof InitialPositionTable)) {
-            throw new AssertionError("Unexpected type (should be InitialPositionTable: " + posTable);
+            throw new AssertionError(
+                    "Unexpected type (should be InitialPositionTable: "
+                            + posTable);
         }
         ImmutableList<Integer> path = ((InitialPositionTable) posTable)
                 .pathForPosition(pos, new IdentitySequentPrintFilter(sequent));
@@ -304,7 +323,8 @@ public class SequentPrinter {
      * 
      * @param filter
      */
-    public void applyFilter(ArrayList<Integer> indicesOfLines,FilterLayout layout){
+    public void applyFilter(ArrayList<Integer> indicesOfLines,
+            FilterLayout layout) {
         // remove old Filter styling
         removeFilter();
         // get line information
@@ -405,26 +425,35 @@ public class SequentPrinter {
      *            the map to be inserted into
      */
     private void putTag(int index, StylePos arrayPos, String tag,
-            HashMap<Integer, String[]> map) {
-        String[] mapValue = map.get(index);
+            HashMap<Integer, ArrayList<String>[]> map) {
+        ArrayList<String>[] mapValue = map.get(index);
         // If Map Entry already exists
         if (mapValue != null) {
-            // If Array entry is null or shall be cleared (filled with empty
-            // String), fill the array
-            if (mapValue[arrayPos.slotPosition] == null || tag.isEmpty()) {
-                mapValue[arrayPos.slotPosition] = tag;
+            // ArrayList<String> tagList = mapValue[arrayPos.slotPosition];
+            // If Array entry is null make ArrayList and add tag
+            if (mapValue[arrayPos.slotPosition] == null) {
+                mapValue[arrayPos.slotPosition] = new ArrayList<>();
+                mapValue[arrayPos.slotPosition].add(tag);
             }
             else {
-                // If the Array entry is not null, the tag can be appended.
-                // Solves the problem with double consecutive chars
-                // ("wellformed")
-                mapValue[arrayPos.slotPosition] += tag;
+                // If Tag is empty, one entry shall be removed
+                if (tag.isEmpty()) {
+                    mapValue[arrayPos.slotPosition]
+                            .remove(mapValue[arrayPos.slotPosition].size() - 1);
+                }
+                else {
+                    // If the Array entry is not null, the tag can be appended.
+                    // Solves the problem with double consecutive chars
+                    // ("wellformed")
+                    mapValue[arrayPos.slotPosition].add(tag);
+                }
+
             }
         }
         else {
             // If the Map Entry does not exist, create new Entry and call itself
             // again. RECURSION!
-            map.put(index, new String[StylePos.values().length]);
+            map.put(index, new ArrayList[StylePos.values().length]);
             putTag(index, arrayPos, tag, map);
         }
     }
@@ -440,8 +469,8 @@ public class SequentPrinter {
      *            the opening tag const or empty String
      * @return the HashMap with all the openTag indices
      */
-    private HashMap<Integer, String[]> putOpenTag(int index, StylePos arrayPos,
-            String tag) {
+    private HashMap<Integer, ArrayList<String>[]> putOpenTag(int index,
+            StylePos arrayPos, String tag) {
         if (tag.isEmpty()) {
             putTag(index, arrayPos, tag, openTagsAtIndex);
         }
@@ -464,8 +493,8 @@ public class SequentPrinter {
      *            the closingTag const or empty String
      * @return the HashMap with all the closeTag indices
      */
-    private HashMap<Integer, String[]> putCloseTag(int index, StylePos arrayPos,
-            String tag) {
+    private HashMap<Integer, ArrayList<String>[]> putCloseTag(int index,
+            StylePos arrayPos, String tag) {
         putTag(index, arrayPos, tag, closeTagsAtIndex);
         return closeTagsAtIndex;
     }
@@ -609,16 +638,18 @@ public class SequentPrinter {
      * puts Syntax Styling Info in tagsAtIndex Map
      */
     private void applySyntaxHighlighting() {
-        
+
         if (!(posTable instanceof InitialPositionTable)) {
-            throw new AssertionError("Unexpected type (should be InitialPositionTable: " + posTable);
+            throw new AssertionError(
+                    "Unexpected type (should be InitialPositionTable: "
+                            + posTable);
         }
         InitialPositionTable initPos = (InitialPositionTable) posTable;
-        
+
         IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(
                 sequent);
 
-        //TODO References to generic type Class<T> should be parameterized
+        // TODO References to generic type Class<T> should be parameterized
         Class lastClass = null;
         boolean openedTag = false;
 
