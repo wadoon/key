@@ -408,8 +408,8 @@ public class SequentViewController extends ViewController {
                             c.getRewriteTaclet(goal, occ),
                             c.getNoFindTaclet(goal), builtInRules, pos);
 
-                    tacletMenu.show(textArea, Side.TOP, event.getX(),
-                            event.getY());
+                    tacletMenu.show(textArea, event.getScreenX(), event.getScreenY());
+                    
                 }
             }
             catch (IOException e) {
