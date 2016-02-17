@@ -146,8 +146,23 @@ public class SequentViewController extends ViewController {
                     });
                 });
 
-        textArea.setOnMouseMoved(event -> {
-            if (sequentLoaded) {
+        textArea.setOnMouseClicked(this::handleWebViewClicked);
+
+        textArea.setOnScroll(event -> {
+            // Adjustment: Event.getDelta is absolute amount of pixels,
+            // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
+            this.scrollPane.setVvalue(
+                    this.scrollPane.getVvalue() - event.getDeltaY() / 800);
+            this.scrollPane.setHvalue(this.scrollPane.getHvalue()
+                    - event.getDeltaX() / this.scrollPane.getWidth());
+        });
+    }
+
+    //XXX kind of a hack
+    private void enableMouseOver(boolean enable) {
+
+        if (enable) {
+            textArea.setOnMouseMoved(event -> {
 
                 int pos = posTranslator.getCharIdxUnderPointer(event);
                 Range range = this.abstractSyntaxTree.rangeForIndex(pos);
@@ -162,27 +177,20 @@ public class SequentViewController extends ViewController {
                                             new IdentitySequentPrintFilter(
                                                     sequent)))));
                 }
-            }
-        });
+            });
 
-        textArea.setOnMouseExited(event -> {
-            if (sequentLoaded) {
+            textArea.setOnMouseExited(event -> {
                 this.printer.removeMouseHighlighting();
                 this.updateView();
                 getContext().getStatusManager().clearStatus();
-            }
-        });
-
-        textArea.setOnMouseClicked(this::handleWebViewClicked);
-
-        textArea.setOnScroll(event -> {
-            // Adjustment: Event.getDelta is absolute amount of pixels,
-            // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
-            this.scrollPane.setVvalue(
-                    this.scrollPane.getVvalue() - event.getDeltaY() / 800);
-            this.scrollPane.setHvalue(this.scrollPane.getHvalue()
-                    - event.getDeltaX() / this.scrollPane.getWidth());
-        });
+            });
+        }
+        else {
+            textArea.setOnMouseMoved(event -> {
+            });
+            textArea.setOnMouseExited(event -> {
+            });
+        }
     }
 
     @Override
@@ -296,7 +304,10 @@ public class SequentViewController extends ViewController {
         printer.setProofString(proofString);
 
         posTranslator.setProofString(proofString);
-        sequentLoaded = true;
+        if (!sequentLoaded) {
+            sequentLoaded = true;
+            enableMouseOver(true);
+        }
     }
 
     private void updateHtml(String s) {
@@ -334,9 +345,10 @@ public class SequentViewController extends ViewController {
         if (!sequentLoaded)
             return;
         lastFilter = args;
-        ArrayList<Integer> lines = SequentFilterer.applyFilter(proofString, args.getCriteria());
-        printer.applyFilter(lines,args.getLayout());
-        posTranslator.applyFilter(lines,args.getLayout());
+        ArrayList<Integer> lines = SequentFilterer.applyFilter(proofString,
+                args.getCriteria());
+        printer.applyFilter(lines, args.getLayout());
+        posTranslator.applyFilter(lines, args.getLayout());
     }
 
     boolean selectionModeIsActive = false;
@@ -393,6 +405,11 @@ public class SequentViewController extends ViewController {
                 TacletMenuController controller = loader.getController();
                 controller.setMainApp(this.getMainApp(), this.getContext());
 
+                enableMouseOver(false);
+                tacletMenu.setOnHiding(evt -> {
+                    enableMouseOver(true);
+                });
+
                 KeYMediator mediator = getContext().getKeYMediator();
 
                 Goal goal = mediator.getSelectedGoal();
@@ -408,8 +425,9 @@ public class SequentViewController extends ViewController {
                             c.getRewriteTaclet(goal, occ),
                             c.getNoFindTaclet(goal), builtInRules, pos);
 
-                    tacletMenu.show(textArea, event.getScreenX(), event.getScreenY());
-                    
+                    tacletMenu.show(textArea, event.getScreenX(),
+                            event.getScreenY());
+
                 }
             }
             catch (IOException e) {
