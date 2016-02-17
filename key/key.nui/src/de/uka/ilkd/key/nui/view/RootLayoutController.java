@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.ViewObserver;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.model.ViewSlot;
@@ -656,5 +657,25 @@ public class RootLayoutController extends ViewController {
         ((CssStylerViewController) p.getValue()).setMainApp(this.getMainApp(),
                 this.getContext());
         ((CssStylerViewController) p.getValue()).setStage(stage);
+    }
+    
+    @FXML
+    private void openInNew() {
+        de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator().getSelectedNode();
+        
+        ViewInformation info = new ViewInformation(node.serialNr() + ": " + node.name(), SequentViewController.class.getResource("SequentView.fxml"),
+                ViewPosition.CENTER, false);
+        
+        //if moved to other menu outside of RootLayoutController, swap the following lines
+        //info.addObserver(new ViewObserver(getMainApp().getRootLayoutController()));
+        //getMainApp().getRootLayoutController().registerView(info, "");
+        info.addObserver(new ViewObserver(this));
+        this.registerView(info, "");
+        
+        info.setIsActive(true);
+        
+        Platform.runLater(() -> {
+            ((SequentViewController)info.getController()).loadProofToView(node);
+        });
     }
 }

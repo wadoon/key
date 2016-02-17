@@ -32,6 +32,7 @@
       				<Menu mnemonicParsing="false" text="Edit">
       					<items>
       						<MenuItem mnemonicParsing="false" onAction="#handleSequentCssStylerAction" text="Sequent CSS Styler" />
+      						<MenuItem mnemonicParsing="false" onAction="#openInNew" text="Open Node in new Sequent"  />
       					</items>
       				</Menu>
       				<Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views" />
