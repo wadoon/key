@@ -162,37 +162,38 @@ public class SequentViewController extends ViewController {
     private void enableMouseOver(boolean enable) {
 
         if (enable) {
-            textArea.setOnMouseMoved(event -> {
-
-                int pos = posTranslator.getCharIdxUnderPointer(event);
-                Range range = this.abstractSyntaxTree.rangeForIndex(pos);
-
-                this.printer.applyMouseHighlighting(range);
-                this.updateView();
-
-                if (event.isAltDown()) {
-                    getContext().getStatusManager()
-                            .setStatus(TermInfoPrinter.printTermInfo(sequent,
-                                    (abstractSyntaxTree.getPosInSequent(pos,
-                                            new IdentitySequentPrintFilter(
-                                                    sequent)))));
-                }
-            });
-
-            textArea.setOnMouseExited(event -> {
-                this.printer.removeMouseHighlighting();
-                this.updateView();
-                getContext().getStatusManager().clearStatus();
-            });
+            textArea.setOnMouseMoved(this::handleTextAreaMouseMoved);
+            textArea.setOnMouseExited(this::handleTextAreaMouseClicked);
         }
         else {
-            textArea.setOnMouseMoved(event -> {
-            });
-            textArea.setOnMouseExited(event -> {
-            });
+            textArea.setOnMouseMoved(null);
+            textArea.setOnMouseExited(null);
         }
     }
 
+    private void handleTextAreaMouseMoved(MouseEvent event) {
+    
+        int pos = posTranslator.getCharIdxUnderPointer(event);
+        Range range = this.abstractSyntaxTree.rangeForIndex(pos);
+
+        this.printer.applyMouseHighlighting(range);
+        this.updateView();
+
+        if (event.isAltDown()) {
+            getContext().getStatusManager()
+                    .setStatus(TermInfoPrinter.printTermInfo(sequent,
+                            (abstractSyntaxTree.getPosInSequent(pos,
+                                    new IdentitySequentPrintFilter(
+                                            sequent)))));
+        }
+    }
+    
+    private void handleTextAreaMouseClicked(MouseEvent event) {
+        this.printer.removeMouseHighlighting();
+        this.updateView();
+        getContext().getStatusManager().clearStatus();
+    }
+    
     @Override
     public void initializeAfterLoadingFxml() {
         getContext().getFilterChangedEvent().addHandler(eventArgs -> {
