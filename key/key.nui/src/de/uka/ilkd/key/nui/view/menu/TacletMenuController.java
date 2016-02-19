@@ -16,6 +16,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu.TacletAppComparator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.view.SequentViewController;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -29,6 +30,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 /**
  * 
@@ -76,6 +79,7 @@ public class TacletMenuController extends ViewController {
     private PosInSequent pos;
     private KeYMediator mediator;
     private TacletAppComparator comp;
+    private SequentViewController parentController;
 
     @FXML
     private ContextMenu rootMenu;
@@ -99,8 +103,10 @@ public class TacletMenuController extends ViewController {
     public void init(ImmutableList<TacletApp> findList,
             ImmutableList<TacletApp> rewriteList,
             ImmutableList<TacletApp> noFindList,
-            ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
+            ImmutableList<BuiltInRule> builtInList, PosInSequent pos,
+            ViewController parentController) {
         this.pos = pos;
+        this.parentController = (SequentViewController) parentController;
         comp = new TacletAppComparator();
         createTacletMenu(removeRewrites(findList).prepend(rewriteList),
                 noFindList, builtInList);
@@ -246,7 +252,11 @@ public class TacletMenuController extends ViewController {
 
     @FXML
     private void handleCopyToClipboard(ActionEvent event) {
-        // TODO implement
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString(parentController.getProofString()
+                .substring(pos.getBounds().start(), pos.getBounds().end()));
+        clipboard.setContent(content);
     }
 
     @FXML

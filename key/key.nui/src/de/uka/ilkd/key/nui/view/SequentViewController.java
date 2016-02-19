@@ -117,6 +117,10 @@ public class SequentViewController extends ViewController {
         updateView();
     }
 
+    public String getProofString() {
+        return proofString;
+    }
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeSearchBox();
@@ -424,7 +428,7 @@ public class SequentViewController extends ViewController {
                             .getBuiltInRule(goal, occ);
                     controller.init(c.getFindTaclet(goal, occ),
                             c.getRewriteTaclet(goal, occ),
-                            c.getNoFindTaclet(goal), builtInRules, pos);
+                            c.getNoFindTaclet(goal), builtInRules, pos, this);
 
                     tacletMenu.show(textArea, event.getScreenX(),
                             event.getScreenY());
