@@ -75,6 +75,7 @@ lexer grammar KeYJMLLexer;
     EVERYTHING           : '\\everything';
     EXCEPTION            : '\\exception';
     EXISTS               : '\\exists';
+    FIRST                : '\\first';
     FORALL               : '\\forall';
     FREE                 : '\\free';  //KeY extension, not official JML
     FRESH                : '\\fresh';

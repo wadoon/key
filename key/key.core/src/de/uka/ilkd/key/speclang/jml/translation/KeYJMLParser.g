@@ -1681,6 +1681,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 	    addIgnoreWarning("\\lblpos",lblpos);
 	}
 	|   INDEX { result = translator.translate(JMLTranslator.JMLKeyWord.INDEX, services); }
+   |   FIRST { result = translator.translate(JMLTranslator.JMLKeyWord.FIRST, services); }
 	|   VALUES { result = translator.translate(JMLTranslator.JMLKeyWord.VALUES, services); }
     |   STRING_EQUAL LPAREN e1=expression COMMA e2=expression RPAREN
         {

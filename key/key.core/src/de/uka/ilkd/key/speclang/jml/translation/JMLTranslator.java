@@ -160,6 +160,7 @@ public final class JMLTranslator {
         EQUIVALENCE ("<==>"),
         ANTIVALENCE ("<=!=>"),
         EQ ("=="),
+        FIRST ("\\first"),
         NEQ ("!="),
         NOT_MOD ("\\not_modified"),
         VALUES ("\\values"),
@@ -1695,6 +1696,17 @@ public final class JMLTranslator {
             }
         });
 
+        // keyword for do-while loops
+        translationMethods.put(JMLKeyWord.FIRST, new JMLTranslationMethod(){
+
+            @Override
+            public SLExpression translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                checkParameters(params, Services.class);
+                final KeYJavaType t = ((Services)params[0]).getJavaInfo()
+                           .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+                return new SLExpression(tb.first(),t);
+            }});
 
         // keywords in loop specifications of enhanced for loops
 

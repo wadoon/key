@@ -42,7 +42,8 @@ public final class BooleanLDT extends LDT {
     private final Term term_bool_true;
     private final Function bool_false;
     private final Term term_bool_false;
-    
+    private final Function first;
+
     
     //-------------------------------------------------------------------------
     //constructors
@@ -55,6 +56,7 @@ public final class BooleanLDT extends LDT {
 	term_bool_true  = services.getTermBuilder().func(bool_true);
 	bool_false      = addFunction(services, "FALSE");
 	term_bool_false = services.getTermBuilder().func(bool_false);
+	first = addFunction(services, "first");
     }
     
     
@@ -163,5 +165,11 @@ public final class BooleanLDT extends LDT {
 	    assert false : "BooleanLDT: Cannot get Java type for term: " + t;
 	    return null;
 	}
+    }
+
+    
+    // Place holder used in JML specifications to refer to the firt loop iteration
+    public Function getFirst() {
+       return first;
     }
 }

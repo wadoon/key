@@ -1337,6 +1337,9 @@ public class TermBuilder {
         return func(services.getTypeConverter().getIntegerLDT().getIndex());
     }
 
+    public Term first(){
+        return func(services.getTypeConverter().getBooleanLDT().getFirst());
+    }
 
 
     //-------------------------------------------------------------------------
