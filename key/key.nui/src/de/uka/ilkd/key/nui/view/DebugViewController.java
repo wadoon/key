@@ -31,7 +31,7 @@ public class DebugViewController extends ViewController {
 
     @Override
     public void viewSuspended() {
-        getContext().getSequentHtmlChangedEvent().removeListener(this::print);
+        getContext().getSequentHtmlChangedEvent().removeHandler(this::print);
     }
 
     @Override

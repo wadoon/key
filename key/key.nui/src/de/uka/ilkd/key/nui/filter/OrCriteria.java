@@ -2,6 +2,12 @@ package de.uka.ilkd.key.nui.filter;
 
 import java.util.List;
 
+/**
+ * A generic criteria that is equivalent to a union operation
+ * @author Benedikt Gross
+ *
+ * @param <E>
+ */
 public class OrCriteria<E> implements Criteria<E>
 {
    private Criteria<E> _criteria;

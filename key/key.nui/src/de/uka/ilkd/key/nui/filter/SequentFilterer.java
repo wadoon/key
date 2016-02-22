@@ -7,9 +7,13 @@ import java.util.List;
 import de.uka.ilkd.key.util.Pair;
 
 public class SequentFilterer {
-    
+
+    /**
+     * Applies a criteria to the proofString and returns all lines, that should
+     * be displayed to the user after filtering.
+     */
     public static ArrayList<Integer> applyFilter(String proofString,
-            Criteria<Pair<Integer,String>> filterCriteria) {
+            Criteria<Pair<Integer, String>> filterCriteria) {
         if (filterCriteria == null) {
             throw new IllegalArgumentException("filterCriteria");
         }

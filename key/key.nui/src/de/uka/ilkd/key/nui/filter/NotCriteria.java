@@ -2,13 +2,19 @@ package de.uka.ilkd.key.nui.filter;
 
 import java.util.List;
 
+/**
+ * A generic criteria that meets the exact opposite of the child criteria
+ * @author Benedikt Gross
+ *
+ * @param <E>
+ */
 public class NotCriteria<E> implements Criteria<E>
 {
    private Criteria<E> criteria;
 
-   public NotCriteria(Criteria<E> x)
+   public NotCriteria(Criteria<E> childCriteria)
    {
-      criteria = x;
+      criteria = childCriteria;
    }
 
    public Criteria<E> getChildCriteria(){
