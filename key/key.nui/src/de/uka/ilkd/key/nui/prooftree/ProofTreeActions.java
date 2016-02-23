@@ -108,4 +108,10 @@ public final class ProofTreeActions {
 		final int index = treeItem.getParent().getChildren().indexOf(treeItem);
 		treeItem.getParent().getChildren().set(index, treeItem);
 	}
+	
+	public static void toggleHideClosed() {
+	    final TreeViewController controller = ComponentFactory.getInstance()
+	               .getController(TreeViewController.NAME);
+	    controller.fh.toggleFilterHideClosed();
+	}
 }

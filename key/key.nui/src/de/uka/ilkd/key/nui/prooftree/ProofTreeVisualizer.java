@@ -3,7 +3,9 @@ package de.uka.ilkd.key.nui.prooftree;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
+import de.uka.ilkd.key.nui.prooftree.filter.HideNonInteractive;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -70,13 +72,16 @@ public class ProofTreeVisualizer {
 	    }
 
 	    // create fx root node
-	    final TreeItem<NUINode> rootNode = new TreeItem<NUINode>(root);
+	    final ProofTreeItem rootNode = new ProofTreeItem(root);
 
 	    // convert the NUITree to a FXTree 
 	    convertNUITreeToFXTree(root, rootNode);
 
 	    // define the root of the tree
 	    proofTreeView.setRoot(rootNode);
+	    
+	    
+	    rootNode.setFilterPredicate(new HideNonInteractive());
 	}
 
 	/**
@@ -92,16 +97,6 @@ public class ProofTreeVisualizer {
 	        visualizeProofTree(nuiRoot);
 	    }
 	}
-	
-	/*public void visualizeFilteredProofTree() {
-	    NUINode st = FilteringHandler.getMatchedSubtree(nuiRoot, "LINKED");
-	    if(st != null) {
-	        visualizeProofTree((NUIBranchNode) st);
-	    }
-	    else {
-	        System.out.println("Fehler");
-	    }
-	}*/
 
 	/**
 	 * loads a proof tree by converting it to a NUITree which 
@@ -280,14 +275,15 @@ public class ProofTreeVisualizer {
 	 * 
 	 */
 	private void convertNUITreeToFXTree(final NUIBranchNode nuiNode, 
-			final TreeItem<NUINode> fxTreeNode) {
+			final ProofTreeItem fxTreeNode) {
 
 		// Convert child nodes recursively into TreeItem<Label> objects
 		for (final NUINode child : nuiNode.getChildren()) {
 
-			final TreeItem<NUINode> fxNode = new TreeItem<NUINode>(child);
-			fxTreeNode.getChildren().add(fxNode);
-
+			final ProofTreeItem fxNode = new ProofTreeItem(child);
+			//fxTreeNode.getChildren().add(fxNode);
+			fxTreeNode.addChild(fxNode);
+			
 			// if child is of type branch node -> add children recursively
 			if (child instanceof NUIBranchNode) {
 				final NUIBranchNode childBranch = (NUIBranchNode) child;

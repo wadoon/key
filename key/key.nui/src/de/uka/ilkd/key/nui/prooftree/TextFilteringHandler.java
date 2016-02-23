@@ -19,7 +19,7 @@ import javafx.scene.layout.VBox;
  * @version 1.0
  *
  */
-public class FilteringHandler {
+public class TextFilteringHandler {
     
     /**
      * The visualizer used for displaying the filtered tree.
@@ -57,7 +57,7 @@ public class FilteringHandler {
      * @param ptv the proofTreeVisualizer
      * @param mainVBox the VBox containing the proof tree
      */
-    public FilteringHandler(final ProofTreeVisualizer ptv, final VBox mainVBox, final IconFactory icf) {
+    public TextFilteringHandler(final ProofTreeVisualizer ptv, final VBox mainVBox, final IconFactory icf) {
 
         this.ptVisualizer = ptv;
         this.mainVBox = mainVBox;

@@ -1,11 +1,17 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.IconFactory;
+import de.uka.ilkd.key.nui.controller.TreeViewController;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCombination;
 
 /**
  * This class represents a context menu used for proof tree items.
@@ -106,6 +112,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         
         addMenuItemSearch();
         addMenuItemFilter();
+        addMenuItemHides();
     }
     
     /**
@@ -163,6 +170,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     	getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
     	mISearch.setOnAction(aEvt -> ProofTreeActions.openSearchView());
+    	mISearch.setAccelerator(KeyCombination.keyCombination("Ctrl+F"));
     }
     
 
@@ -174,6 +182,41 @@ public class ProofTreeContextMenu extends ContextMenu {
         getItems().add(miFilter);
         miFilter.setGraphic(icf.getImage(IconFactory.FILTER));
         miFilter.setOnAction(aEvt -> ProofTreeActions.openFilterView());
+    }
+    
+    /**
+     * Adds the entry 'Filter' to the context menu.
+     */
+    private void addMenuItemHides() {
+        CheckMenuItem cmi = new CheckMenuItem("Hide closed");
+        //cmi.setSelected(true);
+        cmi.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            public void changed(ObservableValue ov,
+            Boolean old_val, Boolean new_val) {
+                final TreeViewController controller = ComponentFactory.getInstance()
+                        .getController(TreeViewController.NAME);
+                if(new_val == controller.fh.getFilterStatus(FilteringHandler.HIDE_CLOSED))
+                    return;
+                
+                // else
+                
+                controller.fh.toggleFilterHideClosed();
+                System.out.println("CHANGED from "+old_val+" to "+new_val+" while "+
+                        controller.fh.getFilterStatus(FilteringHandler.HIDE_CLOSED) );
+            }
+        });
+        
+        final TreeViewController controller = ComponentFactory.getInstance()
+                .getController(TreeViewController.NAME);
+        cmi.setSelected(controller.fh.getFilterStatus(FilteringHandler.HIDE_CLOSED));
+        
+        
+        getItems().add(cmi);
+        
+        
+        
+        //miFilter.setGraphic(icf.getImage(IconFactory.FILTER));
+        //miFilter.setOnAction(aEvt -> ProofTreeActions.openFilterView());
     }
 
 }

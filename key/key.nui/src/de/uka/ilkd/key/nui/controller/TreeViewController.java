@@ -12,6 +12,7 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
+import de.uka.ilkd.key.nui.prooftree.TextFilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
@@ -71,7 +72,7 @@ public class TreeViewController implements Initializable {
      * The proofTree view of the GUI.
      */
     @FXML
-    private TreeView<NUINode> proofTreeView;
+    public TreeView<NUINode> proofTreeView;
 
     /**
      * The handler that is responsible for managing searches.
@@ -83,7 +84,10 @@ public class TreeViewController implements Initializable {
      * The handler that is responsible for filtering the tree.
      * It is only present if a filtering process was started.
      */
-    private FilteringHandler filteringHandler = null;
+    private TextFilteringHandler filteringHandler = null;
+    
+    //TODO
+    public FilteringHandler fh = null;
 
     /**
      * The visualizer for displaying a proof tree.
@@ -130,6 +134,9 @@ public class TreeViewController implements Initializable {
             Platform.runLater(() -> registerTreeCell(cell));
             return cell;
         });
+        
+        //TODO
+        fh = new FilteringHandler();
 
         // Create a new tree visualizer instance for processing the conversion
         // de.uka.ilkd.key.proof.Node -->
@@ -241,7 +248,7 @@ public class TreeViewController implements Initializable {
      */
     public final void openFilterView() {
         if (filteringHandler == null) {
-            filteringHandler = new FilteringHandler(visualizer, mainVBox, icf);
+            filteringHandler = new TextFilteringHandler(visualizer, mainVBox, icf);
         }
         else {
             filteringHandler.openFilteringPane();
