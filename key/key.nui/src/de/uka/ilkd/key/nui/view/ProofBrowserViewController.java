@@ -16,6 +16,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -37,6 +38,9 @@ public class ProofBrowserViewController extends ViewController {
     private HashMap<String, Proof> listOfProofs = new HashMap<String, Proof>();
     private Proof proof = null;
     private Node proofIcon;
+    
+    @FXML
+    private Button discardProofButton;
 
     @FXML
     private TreeView<String> proofBrowserTreeView;
@@ -67,8 +71,10 @@ public class ProofBrowserViewController extends ViewController {
             TreeItem<String> selectedItem = new_val;
 
             if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE) || !selectedItem.isLeaf()) {
+                discardProofButton.setDisable(true);
                 return;
             }
+            //discardProofButton.setDisable(false);
             Proof p = listOfProofs.get(selectedItem.getValue());
             getContext().getKeYMediator().setProof(p);
         }
