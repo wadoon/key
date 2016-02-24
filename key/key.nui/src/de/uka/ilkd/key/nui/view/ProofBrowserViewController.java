@@ -11,11 +11,15 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.proof.Proof;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * Adds a {@link Proof} Browser {@link ViewController} to collect all loaded
@@ -27,22 +31,46 @@ import javafx.scene.control.TreeView;
 @KeYView(title = "Proofs", path = "ProofBrowserView.fxml", preferredPosition = ViewPosition.BOTTOMRIGHT)
 public class ProofBrowserViewController extends ViewController {
 
+    private final static Image CLOSED_PROOF_IMAGE = new Image("file:resources/images/keyproved.gif");
+    private final static Image OPEN_PROOF_IMAGE = new Image("file:resources/images/ekey-mono.gif");
     private final static TreeItem<String> PROOF_BROWSER_ROOT_NODE = new TreeItem<String>("Proofs");
     private HashMap<String, Proof> listOfProofs = new HashMap<String, Proof>();
     private Proof proof = null;
+    private Node proofIcon;
 
     @FXML
     private TreeView<String> proofBrowserTreeView;
 
+    // Listens for Proof or Node changes.
     private KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
         @Override
         public void selectedProofChanged(KeYSelectionEvent event) {
             proof = event.getSource().getSelectedProof();
-            addProofToBrowser();
+            addProofToBrowser(proof);
         }
 
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent event) {
+            Platform.runLater(() -> {
+                if (proof.closed()) {
+                    updateImage();
+                }
+            });
+        }
+    };
+
+    // Selection Listener that sets the selected Proof in the Mediator.
+    private ChangeListener<TreeItem<String>> browserSelectionListener = new ChangeListener<TreeItem<String>>() {
+        @Override
+        public void changed(ObservableValue<? extends TreeItem<String>> observable, TreeItem<String> old_val,
+                TreeItem<String> new_val) {
+            TreeItem<String> selectedItem = new_val;
+
+            if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE) || !selectedItem.isLeaf()) {
+                return;
+            }
+            Proof p = listOfProofs.get(selectedItem.getValue());
+            getContext().getKeYMediator().setProof(p);
         }
     };
 
@@ -51,22 +79,12 @@ public class ProofBrowserViewController extends ViewController {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        PROOF_BROWSER_ROOT_NODE.setExpanded(true);
         proofBrowserTreeView.setRoot(PROOF_BROWSER_ROOT_NODE);
-        proofBrowserTreeView.getSelectionModel().selectedItemProperty()
-                .addListener(new ChangeListener<TreeItem<String>>() {
-                    @Override
-                    public void changed(ObservableValue<? extends TreeItem<String>> observable,
-                            TreeItem<String> old_val, TreeItem<String> new_val) {
-                        TreeItem<String> selectedItem = new_val;
 
-                        if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE)) {
-                            return;
-                        }
-                        Proof p = listOfProofs.get(selectedItem.getValue());
-                        getContext().getKeYMediator().setProof(p);
-                    }
-                });
+        // Attach the selection listener to the Proof Browser tree view.
+        Platform.runLater(() -> {
+            proofBrowserTreeView.getSelectionModel().selectedItemProperty().addListener(browserSelectionListener);
+        });
     }
 
     /**
@@ -78,26 +96,66 @@ public class ProofBrowserViewController extends ViewController {
     }
 
     /**
+     * Changes the Image once a proof was closed.
+     */
+    private void updateImage() {
+        proofIcon = new ImageView(CLOSED_PROOF_IMAGE);
+        proofBrowserTreeView.getSelectionModel().getSelectedItem().setGraphic(proofIcon);
+    }
+
+    /**
      * Adds a {@link Proof} to the Browser {@link TreeView}. Also adds an entry
      * to the {@link HashMap} of Proofs where the key is the {@link Name} of the
      * {@link Proof} and the corresponding value is the {@link Proof} itself.
+     * 
+     * @param proof
+     *            The {@link Proof} to be added to the Proof Browser.
      */
-    private void addProofToBrowser() {
+    private void addProofToBrowser(Proof proof) {
         String proofName = proof.name().toString();
         listOfProofs.put(proofName, proof);
 
-        // TODO this does not allow duplicates. it is needed because
-        // selectedProofChanged fires 4 times!!! Need to find out why and if
-        // that can be changed
-        for (TreeItem<String> treeItem : PROOF_BROWSER_ROOT_NODE.getChildren()) {
-            if (treeItem.getValue().equals(proofName)) {
-                proofBrowserTreeView.getSelectionModel().select(treeItem);
-                return;
+        if (proof.closed()) {
+            proofIcon = new ImageView(CLOSED_PROOF_IMAGE);
+        }
+        else {
+            proofIcon = new ImageView(OPEN_PROOF_IMAGE);
+        }
+
+        TreeItem<String> newProof = new TreeItem<String>(proofName, proofIcon);
+        boolean found = false;
+
+        for (TreeItem<String> environmentNode : PROOF_BROWSER_ROOT_NODE.getChildren()) {
+
+            // TODO the following for-loop does not allow duplicates. It checks
+            // whether an Environment node already contains the proof to be
+            // added. If that is the case the method returns. It is needed
+            // because selectedProofChanged fires 4 times!!! Need to find out
+            // why and if that can be changed. The most recently opened proof is
+            // added to the browser.
+            for (TreeItem<String> treeItem : environmentNode.getChildren()) {
+                if (treeItem.getValue().equals(proofName)) {
+                    proofBrowserTreeView.getSelectionModel().select(treeItem);
+                    Platform.runLater(() -> {
+                        treeItem.setGraphic(proofIcon);
+                    });
+                    return;
+                }
+            }
+
+            if (environmentNode.getValue().contentEquals(proof.getEnv().toString())) {
+                environmentNode.getChildren().add(newProof);
+                found = true;
+                break;
             }
         }
 
-        TreeItem<String> newProof = new TreeItem<String>(proofName);
-        PROOF_BROWSER_ROOT_NODE.getChildren().add(newProof);
+        if (!found) {
+            TreeItem<String> newEnvironmentNode = new TreeItem<String>(proof.getEnv().toString());
+            PROOF_BROWSER_ROOT_NODE.getChildren().add(newEnvironmentNode);
+            newEnvironmentNode.getChildren().add(newProof);
+        }
+
         proofBrowserTreeView.getSelectionModel().select(newProof);
     }
 
