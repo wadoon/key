@@ -12,6 +12,7 @@ import de.uka.ilkd.key.nui.model.Context;
 import de.uka.ilkd.key.nui.model.SessionSettings;
 import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
+import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
@@ -22,11 +23,14 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 public class MainApp extends Application {
 
     public static boolean isDebugView = false;
+    private static final String ICON_PATH = "file:resources/images/key-color-icon-square.png";
     private Stage primaryStage;
     private BorderPane rootLayout;
     private RootLayoutController rootLayoutController;
@@ -46,7 +50,7 @@ public class MainApp extends Application {
 
         // Set the application icon.
         this.primaryStage.getIcons().add(
-                new Image("file:resources/images/key-color-icon-square.png"));
+                new Image(ICON_PATH));
 
         SessionSettings settings = SessionSettings.loadLastSettings();
         boolean useBoundsSettings = settings != null
@@ -128,6 +132,23 @@ public class MainApp extends Application {
         return rootLayoutController;
     }
     
+    public void openNewWindow(String title, String fxmlPath) {
+        Stage stage = new Stage();
+        stage.setTitle(title);
+        stage.getIcons().add(new Image(ICON_PATH));
+        
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(scene.getWindow());
+
+        Pair<Object, Object> p = KeyFxmlLoader
+                .loadFxml(MainApp.class.getResource(fxmlPath));
+        stage.setScene(new Scene((BorderPane) p.getKey()));
+        stage.show();
+        ((ViewController) p.getValue()).setMainApp(this,
+                rootLayoutController.getContext());
+        ((ViewController) p.getValue()).setStage(stage);
+    }
+    
     /**
      * Listens for ControlDown Event.
      */
@@ -170,7 +191,7 @@ public class MainApp extends Application {
 
         // Add a custom icon.
         stage.getIcons().add(
-                new Image("file:resources/images/key-color-icon-square.png"));
+                new Image(ICON_PATH));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() != ButtonType.OK)
