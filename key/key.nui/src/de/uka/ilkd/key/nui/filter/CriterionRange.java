@@ -8,12 +8,25 @@ import java.util.stream.IntStream;
 
 import de.uka.ilkd.key.util.Pair;
 
+/**
+ * A criteria that adds X entities before and X entities after all entities left
+ * over by its child criteria.
+ * 
+ * @author Benedikt Gross
+ *
+ */
 public class CriterionRange implements Criteria<Pair<Integer, String>> {
 
     private int before;
     private int after;
     private Criteria<Pair<Integer, String>> criteria;
 
+    /**
+     * Instantiates a new range criterion
+     * @param before How many entities before a match should be added.
+     * @param after How many entities after a match should be added.
+     * @param criteria A distinct and ordered entity list
+     */
     public CriterionRange(int before, int after,
             Criteria<Pair<Integer, String>> criteria) {
         this.before = before;

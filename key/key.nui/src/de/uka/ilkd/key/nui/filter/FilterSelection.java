@@ -4,17 +4,31 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.nui.util.CsEvent;
+import de.uka.ilkd.key.nui.util.EmptyEventArgs;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
 
+/**
+ * This class provides all information and logic for one triggered filter
+ * selection operation.
+ * 
+ * @author Benedikt Gross
+ *
+ */
 public class FilterSelection {
 
     private List<Range> selections = new LinkedList<>();
 
-    public FilterSelection(){
-        
+    public FilterSelection() {
+
     }
-    
+
+    /**
+     * Add a range to the selection, if it was not already selected.
+     * 
+     * @param range
+     * @return
+     */
     public boolean tryAddRange(Range range) {
         // if already selected -> deselect
         for (Range r : selections) {
@@ -28,10 +42,21 @@ public class FilterSelection {
         return true;
     }
 
+    /**
+     * 
+     * @return all selections
+     */
     public List<Range> getSelection() {
         return selections;
     }
 
+    /**
+     * Creates a criteria that represents all selections combined by OrCriteria
+     * and saves it in this instance. The created criteria can be accessed via
+     * getCriteria().
+     * 
+     * @param proofString
+     */
     public void createCriteria(String proofString) {
         // get text under ranges
         // add OR to filter
@@ -56,12 +81,21 @@ public class FilterSelection {
 
     private Criteria<Pair<Integer, String>> criteria = null;
 
+    /**
+     * Returns the criteria created by a previous call to createCriteria().
+     * If createCriteria was not called before null is returned.
+     * @return
+     */
     public Criteria<Pair<Integer, String>> getCriteria() {
         return criteria;
     }
 
     private CsEvent<EmptyEventArgs> selectionModeFinishedEvent = new CsEvent<>();
 
+    /**
+     * An event that is raised if the user aborts or closes the selection "mode".
+     * @return
+     */
     public CsEvent<EmptyEventArgs> getSelectionModeFinishedEvent() {
         return selectionModeFinishedEvent;
     }

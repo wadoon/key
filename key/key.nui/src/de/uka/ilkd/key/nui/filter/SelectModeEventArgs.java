@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.nui.filter;
 
+/**
+ * Provides information for a triggered selection "mode"
+ * @author Benedikt Gross
+ *
+ */
 public class SelectModeEventArgs {
     private FilterSelection filterSelection;
 
