@@ -29,21 +29,7 @@ public final class NUIConstants {
     public final static String SELECTION_TAG = "filterSelection";
     public final static String DEFAULT_STYLE_CSS = "resources/css/sequentStyle.css";
 
-    /**
-     * 
-     */
-    public NUIConstants() {
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
-     * fills the classMap with each class name and its styleClass tag
-     */
-
-    public static HashMap<Class, Boolean> getClassEnabledMap() {
-        if (classEnabledMap.size() > 0) {
-            return classEnabledMap;
-        }
+    static {
         // Defines if this AST Class shall be highlighted
         classEnabledMap.put(de.uka.ilkd.key.logic.op.Equality.class, true);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.Function.class, false);
@@ -89,13 +75,6 @@ public final class NUIConstants {
         classEnabledMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, true);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, true);
 
-        return classEnabledMap;
-    }
-
-    public static HashMap<Class, String> getClassCssMap() {
-        if (classMap.size() > 0) {
-            return classMap;
-        }
         // Define Style Span for each Class
         classMap.put(de.uka.ilkd.key.logic.op.Equality.class, "equality");
         classMap.put(de.uka.ilkd.key.logic.op.Function.class, "function");
@@ -142,7 +121,24 @@ public final class NUIConstants {
         classMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, "updateSV");
         classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, "varSV");
         classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, "warySubstOp");
+    }
 
+    /**
+     * 
+     */
+    public NUIConstants() {
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * fills the classMap with each class name and its styleClass tag
+     */
+
+    public static HashMap<Class, Boolean> getClassEnabledMap() {
+        return classEnabledMap;
+    }
+
+    public static HashMap<Class, String> getClassCssMap() {
         return classMap;
     }
 
