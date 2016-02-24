@@ -13,7 +13,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
  * @author Nils Muzzulini
  *
  */
-@KeYView(title = "Open Goals", path = "OpenGoalsView.fxml", preferredPosition = ViewPosition.TOPLEFT)
+@KeYView(title = "Open Goals", path = "OpenGoalsView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
 public class OpenGoalsViewController extends ViewControllerSwingContent {
 
     private JScrollPane openGoalsView;
