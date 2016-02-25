@@ -12,28 +12,17 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class FilterChangedEventArgs {
 
-    private Criteria<Pair<Integer, String>> criteria;
-    private FilterLayout layout;
+    private PrintFilter filter;
 
-    public FilterChangedEventArgs(FilterLayout layout,
-            Criteria<Pair<Integer, String>> criteria) {
-        this.layout = layout;
-        this.criteria = criteria;
+    public FilterChangedEventArgs(PrintFilter filter) {
+        this.filter = filter;
     }
 
     /**
-     * The full criteria of the new filter.
+     * The new filter
      * @return
      */
-    public Criteria<Pair<Integer, String>> getCriteria() {
-        return criteria;
-    }
-
-    /**
-     * The Layout of the new filter
-     * @return
-     */
-    public FilterLayout getLayout() {
-        return layout;
+    public PrintFilter getFilter() {
+        return filter;
     }
 }

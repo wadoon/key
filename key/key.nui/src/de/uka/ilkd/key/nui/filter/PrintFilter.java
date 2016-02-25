@@ -2,48 +2,87 @@ package de.uka.ilkd.key.nui.filter;
 
 import de.uka.ilkd.key.util.Pair;
 
+/**
+ * A class that handles all information needed to create a criteria for
+ * sequent-filtering and also stores information related to the layout of
+ * filtered lines.
+ * 
+ * @author Benedikt Gross
+ *
+ */
 public class PrintFilter {
 
     private String name;
 
+    /**
+     * Name used to save this filter.
+     * 
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Name used to save this filter.
+     * 
+     * @return
+     */
     public void setName(String value) {
         name = value;
         // no need to notify observer since the name is only for storage
     }
 
-
     private String searchText;
 
+    /**
+     * The text that should be filtered for.
+     */
     public void setSearchText(String value) {
         searchText = value;
     }
 
+    /**
+     * The text that should be filtered for.
+     * 
+     * @return
+     */
     public String getSearchText() {
         return searchText;
     }
 
     private Criteria<Pair<Integer, String>> selectionCriteria;
 
+    /**
+     * A criteria representing a selection on the sequent.
+     */
     public void setSelectionCriteria(Criteria<Pair<Integer, String>> value) {
         if (value == selectionCriteria)
             return;
         selectionCriteria = value;
     }
 
+    /**
+     * A criteria representing a selection on the sequent.
+     */
     public Criteria<Pair<Integer, String>> getSelectionCriteria() {
         return selectionCriteria;
     }
 
     private boolean isUserCriteria;
 
+    /**
+     * A value that indicates if a selection is used, or a search text with
+     * custom data.
+     */
     public boolean getIsUserCriteria() {
         return isUserCriteria;
     }
 
+    /**
+     * A value that indicates if a selection is used, or a search text with
+     * custom data.
+     */
     public void setIsUserCriteria(boolean value) {
         if (isUserCriteria == value)
             return;
@@ -76,12 +115,34 @@ public class PrintFilter {
 
     private boolean invert;
 
+    /**
+     * Indicates whether the filter should be inverted.
+     */
     public void setInvert(boolean value) {
         invert = value;
     }
 
+    /**
+     * Indicates whether the filter should be inverted.
+     */
     public boolean getInvert() {
         return invert;
+    }
+
+    private boolean useAstScope;
+
+    /**
+     * Indicates whether before/after should apply to lines or ast elements.
+     */
+    public void setUseAstScope(boolean value) {
+        useAstScope = value;
+    }
+
+    /**
+     * Indicates whether before/after should apply to lines or ast elements.
+     */
+    public boolean getUseAstScope() {
+        return useAstScope;
     }
 
     private FilterLayout filterLayout;
@@ -114,29 +175,11 @@ public class PrintFilter {
         filter.setAfter(this.after);
         filter.setBefore(this.before);
         filter.setFilterLayout(this.filterLayout);
+        filter.setUseAstScope(this.useAstScope);
         return filter;
     }
 
     public enum FilterLayout {
         Collapse, Minimize
-    }
-    
-    public Criteria<Pair<Integer, String>> createCriteria() {
-        Criteria<Pair<Integer, String>> criteria;
-        if (this.getIsUserCriteria())
-            criteria = new CriterionContainsString(this.getSearchText());
-        else
-            criteria = this.getSelectionCriteria();
-
-        if (this.getBefore() != 0 || this.getAfter() != 0) {
-            criteria = new CriterionRange(this.getBefore(), this.getAfter(),
-                    criteria);
-        }
-
-        // apply invert as last
-        if (this.getInvert())
-            criteria = new NotCriteria<>(criteria);
-
-        return criteria;
     }
 }

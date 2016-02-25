@@ -12,11 +12,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.filter.Criteria;
+import de.uka.ilkd.key.nui.filter.CriterionContainsString;
+import de.uka.ilkd.key.nui.filter.CriterionEmpty;
+import de.uka.ilkd.key.nui.filter.CriterionRange;
+import de.uka.ilkd.key.nui.filter.CriterionAstScope;
 import de.uka.ilkd.key.nui.filter.FilterChangedEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
+import de.uka.ilkd.key.nui.filter.NotCriteria;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.filter.SequentFilterer;
+import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.util.EmptyEventArgs;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
@@ -35,6 +42,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
+import de.uka.ilkd.key.util.Pair;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
@@ -120,7 +128,7 @@ public class SequentViewController extends ViewController {
     public String getProofString() {
         return proofString;
     }
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeSearchBox();
@@ -162,7 +170,7 @@ public class SequentViewController extends ViewController {
         });
     }
 
-    //XXX kind of a hack
+    // XXX kind of a hack
     private void enableMouseOver(boolean enable) {
 
         if (enable) {
@@ -176,7 +184,7 @@ public class SequentViewController extends ViewController {
     }
 
     private void handleTextAreaMouseMoved(MouseEvent event) {
-    
+
         int pos = posTranslator.getCharIdxUnderPointer(event);
         Range range = this.abstractSyntaxTree.rangeForIndex(pos);
 
@@ -187,17 +195,16 @@ public class SequentViewController extends ViewController {
             getContext().getStatusManager()
                     .setStatus(TermInfoPrinter.printTermInfo(sequent,
                             (abstractSyntaxTree.getPosInSequent(pos,
-                                    new IdentitySequentPrintFilter(
-                                            sequent)))));
+                                    new IdentitySequentPrintFilter(sequent)))));
         }
     }
-    
+
     private void handleTextAreaMouseClicked(MouseEvent event) {
         this.printer.removeMouseHighlighting();
         this.updateView();
         getContext().getStatusManager().clearStatus();
     }
-    
+
     @Override
     public void initializeAfterLoadingFxml() {
         getContext().getFilterChangedEvent().addHandler(eventArgs -> {
@@ -350,10 +357,22 @@ public class SequentViewController extends ViewController {
         if (!sequentLoaded)
             return;
         lastFilter = args;
-        ArrayList<Integer> lines = SequentFilterer.applyFilter(proofString,
-                args.getCriteria());
-        printer.applyFilter(lines, args.getLayout());
-        posTranslator.applyFilter(lines, args.getLayout());
+        if (args != null) {
+            ArrayList<Integer> lines = SequentFilterer.applyFilter(proofString,
+                    compileCriteria(args.getFilter()));
+            printer.applyFilter(lines, args.getFilter().getFilterLayout());
+            posTranslator.applyFilter(lines,
+                    args.getFilter().getFilterLayout());
+        }
+        else {
+
+            ArrayList<Integer> lines = SequentFilterer.applyFilter(proofString,
+                    new CriterionEmpty<>());
+            // filter layout does not matter here, but can't be acquired from
+            // filter
+            printer.applyFilter(lines, FilterLayout.Minimize);
+            posTranslator.applyFilter(lines, FilterLayout.Minimize);
+        }
     }
 
     boolean selectionModeIsActive = false;
@@ -440,5 +459,33 @@ public class SequentViewController extends ViewController {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Creates a criteria for filtering the sequent from all information that is
+     * stored in this object.
+     */
+    private Criteria<Pair<Integer, String>> compileCriteria(
+            PrintFilter filter) {
+        Criteria<Pair<Integer, String>> criteria;
+        if (filter.getIsUserCriteria())
+            criteria = new CriterionContainsString(filter.getSearchText());
+        else
+            criteria = filter.getSelectionCriteria();
+
+        if (filter.getBefore() != 0 || filter.getAfter() != 0) {
+            criteria = new CriterionRange(filter.getBefore(), filter.getAfter(),
+                    criteria);
+        }
+
+        // apply invert as last
+        if (filter.getInvert())
+            criteria = new NotCriteria<>(criteria);
+
+        if (filter.getUseAstScope())
+            criteria = new CriterionAstScope(criteria, abstractSyntaxTree,
+                    new IdentitySequentPrintFilter(sequent));
+
+        return criteria;
     }
 }

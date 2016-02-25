@@ -75,7 +75,7 @@ public class FilterViewController extends ViewController {
 
     // Note: used in code that is disabled right now.
     @SuppressFBWarnings(justification = "Not used in code right now", value = "URF_UNREAD_FIELD")
-    
+
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
 
     private void loadCurrentFilter() {
@@ -177,9 +177,7 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleReset() {
-        getContext().setCurrentFilterCriteria(
-                new CriterionEmpty<Pair<Integer, String>>(),
-                currentFilter.getFilterLayout());
+        getContext().setCurrentFilter(null);
     }
 
     @FXML
@@ -188,8 +186,7 @@ public class FilterViewController extends ViewController {
             selectionFilterToggle.setSelected(false);
             finishSelection();
         }
-        getContext().setCurrentFilterCriteria(currentFilter.createCriteria(),
-                currentFilter.getFilterLayout());
+        getContext().setCurrentFilter(currentFilter);
     }
 
     private FilterSelection filterSelection;
@@ -198,9 +195,7 @@ public class FilterViewController extends ViewController {
     private void handleSelectionFilterToggled() {
         if (selectionFilterToggle.isSelected()) {
             // reset old filter to make selection more easily
-            getContext().setCurrentFilterCriteria(
-                    new CriterionEmpty<Pair<Integer, String>>(),
-                    currentFilter.getFilterLayout());
+            getContext().setCurrentFilter(null);
             filterSelection = new FilterSelection();
             currentFilter.setIsUserCriteria(false);
             getContext().activateSelectMode(filterSelection);
@@ -208,9 +203,7 @@ public class FilterViewController extends ViewController {
         }
         else {
             finishSelection();
-            getContext().setCurrentFilterCriteria(
-                    currentFilter.createCriteria(),
-                    currentFilter.getFilterLayout());
+            getContext().setCurrentFilter(currentFilter);
         }
     }
 
