@@ -158,6 +158,7 @@ public class ClassTree extends JTree {
     private static DefaultMutableTreeNode getChildByTarget(
 	    				     DefaultMutableTreeNode parentNode,
 	    				     IObserverFunction target) {
+    	if(parentNode == null) return null;
         int numChildren = parentNode.getChildCount();
         for(int i = 0; i < numChildren; i++) {
             DefaultMutableTreeNode childNode 
@@ -370,15 +371,21 @@ public class ClassTree extends JTree {
            String[] segments = rootType.getFullName().split("\\.");
            for (String segment : segments) {
               node = searchNode(node, segment);
-              pathVector.add(node);
+              if(node !=null){
+            	  pathVector.add(node);
+              }
            }
         }
         // extend tree path to inner classes
         while (typesIter.hasNext()) {
            KeYJavaType innerType = typesIter.next();
            node = searchNode(node, innerType.getName());
-           pathVector.add(node);
+           if(node != null){
+        	   pathVector.add(node);
+           }
         }
+        
+        
         TreePath path = new TreePath(pathVector.toArray());
         TreePath incompletePath = null;
         
@@ -405,6 +412,9 @@ public class ClassTree extends JTree {
      * @return The first found {@link DefaultMutableTreeNode} with the given text or {@code null} if no {@link DefaultMutableTreeNode} was found.
      */
     protected DefaultMutableTreeNode searchNode(DefaultMutableTreeNode parent, String text) {
+    	if(parent ==null){
+    		return null;
+    	}
        for (int i = 0; i < parent.getChildCount(); i++) {
           DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parent.getChildAt(i);
           Entry e = (Entry) childNode.getUserObject();

@@ -17,7 +17,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
 // public String(byte[] arg0, int arg1, int arg2, java.lang.String arg3) throws java.io.UnsupportedEncodingException;
 // public String(byte[] arg0, int arg1, int arg2, java.nio.charset.Charset arg3);
 // public String(byte[] arg0, java.lang.String arg1) throws java.io.UnsupportedEncodingException;
-// public String(byte[] arg0, java.nio.charset.Charset arg1);
+   public String(byte[] arg0, java.nio.charset.Charset arg1);
    public String(byte[] arg0, int arg1, int arg2);
    public String(byte[] arg0);
 // public String(java.lang.StringBuffer arg0);
@@ -32,7 +32,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public void getChars(int arg0, int arg1, char[] arg2, int arg3);
    public void getBytes(int arg0, int arg1, byte[] arg2, int arg3);
 // public byte[] getBytes(java.lang.String arg0) throws java.io.UnsupportedEncodingException;
-// public byte[] getBytes(java.nio.charset.Charset arg0);
+   public byte[] getBytes(java.nio.charset.Charset arg0);
    public byte[] getBytes();
    public boolean equals(java.lang.Object arg0);
 // public boolean contentEquals(java.lang.StringBuffer arg0);

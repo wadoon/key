@@ -134,7 +134,7 @@ public class RIFLTransformer {
         origSourcePath = getBaseDirPath(origSourcePath);
         final String[] path = origSourcePath.split(File.separator);
         final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
-        return origSourcePath + File.separator + dirName + "_RIFL" + File.separator;
+        return origSourcePath + File.separator + "RIFL" + File.separator;
     }
 
     private static String getBaseDirPath(String origSourcePath) {
