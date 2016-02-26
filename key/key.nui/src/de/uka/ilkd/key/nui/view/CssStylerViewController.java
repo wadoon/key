@@ -176,6 +176,13 @@ public class CssStylerViewController extends ViewController {
                 propertyLabel = "Font Size in px:";
                 valueNode = new TextField(
                         value.substring(0, value.length() - 2));
+                ((TextField) valueNode).setOnAction(event -> {
+                    propertyValuePairMap.put(property,
+                            ((TextField) valueNode).getText());
+                    updatePreview();
+                    apply.setDisable(false);
+                    reset.setDisable(false);
+                });
                 break;
             case "font-family":
                 propertyLabel = "Font:";
@@ -208,6 +215,13 @@ public class CssStylerViewController extends ViewController {
             default:
                 propertyLabel = property;
                 valueNode = new TextField(value);
+                ((TextField) valueNode).setOnAction(event -> {
+                    propertyValuePairMap.put(property,
+                            ((TextField) valueNode).getText());
+                    updatePreview();
+                    apply.setDisable(false);
+                    reset.setDisable(false);
+                });
                 break;
             }
 
@@ -234,6 +248,8 @@ public class CssStylerViewController extends ViewController {
                     propertyValuePairMap.put(property,
                             masterRules.get(property));
                     updatePreview();
+                    apply.setDisable(false);
+                    reset.setDisable(false);
                 }
                 valueNode.setDisable(cbxInherited.isSelected());
             });
