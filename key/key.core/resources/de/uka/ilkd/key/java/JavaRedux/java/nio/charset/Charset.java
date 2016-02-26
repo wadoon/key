@@ -1,9 +1,10 @@
 package java.nio.charset;
 
-
-public abstract class Charset extends Object implements Comparable
+/**
+ * Exists only for proving MixServer of sElect
+ */
+public abstract class Charset extends java.lang.Object implements java.lang.Comparable
 {
-
-public static Charset forName(String charsetName);
-
+	public static Charset forName(String charsetName);
 }
+
