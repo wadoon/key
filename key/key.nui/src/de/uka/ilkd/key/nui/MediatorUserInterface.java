@@ -33,6 +33,7 @@ import javafx.stage.Stage;
 /**
  * provides functionallity of UserInterface logic for the KeYMediator
  * @author Benedikt Gross
+ * @author Nils Muzzulini
  *
  */
 public class MediatorUserInterface
@@ -159,7 +160,7 @@ public class MediatorUserInterface
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Proof closed");
                 alert.setHeaderText("Proved.");
-                alert.setContentText("Statistics:");
+                alert.setContentText(getMediator().getSelectedProof().getStatistics().toString());
                 // Get the Stage.
                 Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 
