@@ -71,6 +71,8 @@ public class CssStylerViewController extends ViewController {
     @FXML
     private Button reset;
     @FXML
+    private Button resetDefault;
+    @FXML
     private WebView previewWeb;
     @FXML
     private GridPane propValGrid;
@@ -324,6 +326,7 @@ public class CssStylerViewController extends ViewController {
         }
         catch (Exception e) {
             System.err.println("Could not write CSS File");
+            e.printStackTrace();
         }
 
         apply.setDisable(true);
@@ -335,8 +338,14 @@ public class CssStylerViewController extends ViewController {
         cssFileHandler.reset();
         initializeList();
 
-        // updateTable();
-        // updatePreview();
+        apply.setDisable(true);
+        reset.setDisable(true);
+    }
+    
+    @FXML
+    private void handleResetDefault() {
+        cssFileHandler.resetDefault();
+        initializeList();
 
         apply.setDisable(true);
         reset.setDisable(true);

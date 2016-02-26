@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,16 +58,17 @@ public class CssFileHandler {
      * 
      * @param path
      *            path to the css file
+     * 
      * @throws IOException
      */
     public void writeCssFile(String path) throws IOException {
 
-        File file = new File(path);
-        FileOutputStream fop = new FileOutputStream(file);
+        String csss = parsedRulestoString();
 
-        css = parsedRulestoString();
-
-        IOUtil.writeTo(fop, css);
+        FileWriter fw = new FileWriter(path, false);
+        fw.write("/*We recommend to only change this file using the KeY CSS Styler */ \n");
+        fw.write(csss);
+        fw.close();
     }
 
     /**
@@ -106,12 +108,32 @@ public class CssFileHandler {
      * been written yet.
      */
     public void reset() {
+        parsedRules.clear();
         try {
             loadCssFile(path);
         }
         catch (Exception e) {
             System.err.println("Could not read CSS File");
+            e.printStackTrace();
         }
+    }
+
+    /**
+     * writes the CSSFile according to DEFAULT_CSS in NUIConstants
+     */
+    public void resetDefault() {
+        String tmpPath = path;
+        parsedRules.clear();
+        try {
+            loadCssFile(NUIConstants.CSS_RESET_TO_DEFAULT_PATH);
+            writeCssFile(tmpPath);
+            path = tmpPath;
+        }
+        catch (Exception e) {
+            System.err.println("Could not Reset CSS to Default");
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -165,13 +187,13 @@ public class CssFileHandler {
             char c = css.charAt(i);
             if (c == '/' && css.charAt(i + 1) == '*') {
                 inComment = true;
+                continue;
             }
 
             if (inComment) {
                 if (c == '/' && css.charAt(i - 1) == '*')
                     inComment = false;
-                else
-                    continue;
+                continue;
             }
 
             switch (state) {
@@ -185,7 +207,8 @@ public class CssFileHandler {
                 }
                 case ',': {
                     if (selector.equals(""))
-                        System.err.println("Leading comma in selectors ignored.");
+                        System.err
+                                .println("Leading comma in selectors ignored.");
                     else
                         rule.addSelector(selector.trim());
                     selector = "";

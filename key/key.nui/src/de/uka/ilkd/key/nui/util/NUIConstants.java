@@ -28,6 +28,7 @@ public final class NUIConstants {
     public final static String IF_FORMULA_TAG = "ifFormula";
     public final static String SELECTION_TAG = "filterSelection";
     public final static String DEFAULT_STYLE_CSS = "resources/css/sequentStyle.css";
+    public final static String CSS_RESET_TO_DEFAULT_PATH = "resources/css/sequentStyleDefault.css";
 
     static {
         // Defines if this AST Class shall be highlighted

@@ -45,6 +45,7 @@
                <children>
                   <Button fx:id="apply" disable="true" mnemonicParsing="false" onAction="#handleApply" text="Apply" />
                   <Button fx:id="reset" disable="true" mnemonicParsing="false" onAction="#handleReset" text="Reset" />
+                  <Button fx:id="resetDefault" disable="false" mnemonicParsing="false" onAction="#handleResetDefault" text="Reset to Default" />
                   <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
                </children>
                <VBox.margin>
