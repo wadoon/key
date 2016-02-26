@@ -33,6 +33,7 @@ import javafx.stage.Stage;
 /**
  * provides functionallity of UserInterface logic for the KeYMediator
  * @author Benedikt Gross
+ * @author Nils Muzzulini
  *
  */
 public class MediatorUserInterface
@@ -41,16 +42,21 @@ public class MediatorUserInterface
     private StatusManager statusManager;
     private KeYMediator mediator = null;
     private final LinkedList<InteractiveRuleApplicationCompletion> completions = new LinkedList<InteractiveRuleApplicationCompletion>();
+    private MainApp mainApp;
 
-    public MediatorUserInterface(StatusManager statusManager) {
+    public MediatorUserInterface(StatusManager statusManager, MainApp mainApp) {
         this.statusManager = statusManager;
+        this.mainApp = mainApp;
     }
 
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models,
             Goal goal) {
-        // TODO Auto-generated method stub
-
+        // models have to be passed via context, as the TacletInstantiationViewController
+        // constructor can not be used. There is no need to pass the goal anymore,
+        // as the controller can get it directly from the KeYMediator.
+        mainApp.getRootLayoutController().getContext().setCurrentModels(models);
+        mainApp.openNewWindow("Taclet Instantiation", "view/TacletInstantiationView.fxml");
     }
 
     @Override
@@ -73,6 +79,7 @@ public class MediatorUserInterface
     @Override
     public boolean selectProofObligation(InitConfig initConfig) {
         // TODO Auto-generated method stub
+        System.out.println("selectProofObligation");
         return false;
     }
 
@@ -153,7 +160,7 @@ public class MediatorUserInterface
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Proof closed");
                 alert.setHeaderText("Proved.");
-                alert.setContentText("Statistics:");
+                alert.setContentText(getMediator().getSelectedProof().getStatistics().toString());
                 // Get the Stage.
                 Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 

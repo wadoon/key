@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity"
+	minHeight="-Infinity" minWidth="-Infinity" prefHeight="610.0"
+	prefWidth="650.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.uka.ilkd.key.nui.view.TacletInstantiationViewController">
+	<children>
+		<SplitPane dividerPositions="0.3, 0.75"
+			orientation="VERTICAL" prefHeight="565.0" prefWidth="650.0">
+			<items>
+				<AnchorPane prefHeight="140.0" prefWidth="640.0">
+					<children>
+						<HBox prefHeight="25.0" prefWidth="640.0">
+							<children>
+								<Label style="-fx-font-weight: bold;" text="Selected Taclet:">
+									<HBox.margin>
+										<Insets left="10.0" top="5.0" />
+									</HBox.margin>
+								</Label>
+								<Label fx:id="selectedTacletLabel" style="-fx-font-weight: bold;">
+									<HBox.margin>
+										<Insets left="10.0" top="5.0" />
+									</HBox.margin>
+								</Label>
+							</children>
+						</HBox>
+						<TextArea fx:id="selectedTaclet" editable="false"
+							layoutY="30.0" prefHeight="110.0" prefWidth="640.0"
+							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
+							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0" />
+					</children>
+				</AnchorPane>
+				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0"
+					prefWidth="160.0">
+					<children>
+						<TabPane fx:id="instantiationsTabPane" prefHeight="240.0"
+							prefWidth="650.0" tabClosingPolicy="UNAVAILABLE"
+							AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+							AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+						</TabPane>
+					</children>
+				</AnchorPane>
+				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0"
+					prefWidth="160.0">
+					<children>
+						<SplitPane dividerPositions="0.5" prefHeight="160.0"
+							prefWidth="650.0" AnchorPane.bottomAnchor="0.0"
+							AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+							AnchorPane.topAnchor="0.0">
+							<items>
+								<AnchorPane prefHeight="170.0" prefWidth="315.0">
+									<children>
+										<TextArea fx:id="programVariables" editable="false"
+											layoutX="5.0" layoutY="35.0" AnchorPane.bottomAnchor="5.0"
+											AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+											AnchorPane.topAnchor="35.0" />
+										<Label layoutX="10.0" layoutY="10.0" style="-fx-font-weight: bold;"
+											text="Sequent Program Variables" />
+									</children>
+								</AnchorPane>
+								<AnchorPane prefHeight="170.0" prefWidth="650.0">
+									<children>
+										<TextArea fx:id="inputValidation" editable="false"
+											layoutY="35.0" prefHeight="135.0" prefWidth="315.0"
+											AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
+											AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0" />
+										<Label layoutX="10.0" layoutY="10.0" style="-fx-font-weight: bold;"
+											text="Input Validation Result" />
+									</children>
+								</AnchorPane>
+							</items>
+						</SplitPane>
+					</children>
+				</AnchorPane>
+			</items>
+		</SplitPane>
+		<HBox prefHeight="47.0" prefWidth="214.0"
+			AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+			<children>
+				<Button mnemonicParsing="false" onAction="#handleApply" text="Apply">
+					<HBox.margin>
+						<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+					</HBox.margin>
+					<padding>
+						<Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+					</padding>
+				</Button>
+				<Button mnemonicParsing="false" onAction="#handleClose"
+					text="Cancel">
+					<HBox.margin>
+						<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+					</HBox.margin>
+					<padding>
+						<Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+					</padding>
+				</Button>
+			</children>
+		</HBox>
+	</children>
+</AnchorPane>

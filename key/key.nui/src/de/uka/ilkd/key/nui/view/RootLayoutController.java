@@ -641,22 +641,7 @@ public class RootLayoutController extends ViewController {
 
     @FXML
     private void handleSequentCssStylerAction() {
-
-        Stage stage = new Stage();
-        stage.setTitle("Sequent CSS Styler");
-        stage.getIcons().add(getMainApp().getPrimaryStage().getIcons().get(0));
-        
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(getMainApp().getPrimaryStage().getScene().getWindow());
-        
-
-        Pair<Object, Object> p = KeyFxmlLoader
-                .loadFxml(MainApp.class.getResource("view/CssStylerView.fxml"));
-        stage.setScene(new Scene((BorderPane) p.getKey()));
-        stage.show();
-        ((CssStylerViewController) p.getValue()).setMainApp(this.getMainApp(),
-                this.getContext());
-        ((CssStylerViewController) p.getValue()).setStage(stage);
+        getMainApp().openNewWindow("Sequent CSS Styler", "view/CssStylerView.fxml");
     }
     
     @FXML

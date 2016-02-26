@@ -5,6 +5,7 @@ import java.net.URL;
 import de.uka.ilkd.key.nui.model.Context;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import javafx.fxml.Initializable;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 
 /**
@@ -17,6 +18,7 @@ public abstract class ViewController implements Initializable {
 
     private Context context;
     private MainApp mainApp;
+    private Stage stage;
 
     public void setMainApp(MainApp mainApp, Context context) {
         this.mainApp = mainApp;
@@ -42,6 +44,15 @@ public abstract class ViewController implements Initializable {
     public Context getContext() {
         return context;
     }
+    
+    public Stage getStage() {
+        return stage;
+    }
+    
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+    
     /**
      * Virtual method to be implemented if needed. This function is called after
      * the FXML is loaded.
