@@ -107,6 +107,10 @@ public class CssStylerViewController extends ViewController {
     }
 
     private void updateTable() {
+        if (selected == null) {
+            return;
+        }
+
         propValGrid.getChildren().clear();
 
         HashMap<String, String> propertyValuePairMap = ruleMap.get(selected)
@@ -136,6 +140,8 @@ public class CssStylerViewController extends ViewController {
                                     (int) (c.getGreen() * 255),
                                     (int) (c.getBlue() * 255)));
                     updatePreview();
+                    apply.setDisable(false);
+                    reset.setDisable(false);
                 });
                 break;
             case "color":
@@ -150,6 +156,8 @@ public class CssStylerViewController extends ViewController {
                                     (int) (c.getGreen() * 255),
                                     (int) (c.getBlue() * 255)));
                     updatePreview();
+                    apply.setDisable(false);
+                    reset.setDisable(false);
                 });
                 break;
             case "font-weight":
@@ -160,6 +168,8 @@ public class CssStylerViewController extends ViewController {
                     propertyValuePairMap.put(property,
                             ((ComboBox<String>) valueNode).getValue());
                     updatePreview();
+                    apply.setDisable(false);
+                    reset.setDisable(false);
                 });
                 break;
             case "font-size":
@@ -175,6 +185,8 @@ public class CssStylerViewController extends ViewController {
                     propertyValuePairMap.put(property,
                             ((ComboBox<String>) valueNode).getValue());
                     updatePreview();
+                    apply.setDisable(false);
+                    reset.setDisable(false);
                 });
                 break;
             case "font-style":
@@ -185,6 +197,8 @@ public class CssStylerViewController extends ViewController {
                     propertyValuePairMap.put(property,
                             ((ComboBox<String>) valueNode).getValue());
                     updatePreview();
+                    apply.setDisable(false);
+                    reset.setDisable(false);
                 });
                 break;
             case "display":
@@ -238,16 +252,17 @@ public class CssStylerViewController extends ViewController {
     }
 
     private Color convertToColor(String colorStr) {
-        return new Color(Integer.valueOf(colorStr.substring(1, 3), 16) / 255,
-                Integer.valueOf(colorStr.substring(3, 5), 16) / 255,
-                Integer.valueOf(colorStr.substring(5, 7), 16) / 255, 1.0);
+        return new Color(Integer.valueOf(colorStr.substring(1, 3), 16) / 255.0,
+                Integer.valueOf(colorStr.substring(3, 5), 16) / 255.0,
+                Integer.valueOf(colorStr.substring(5, 7), 16) / 255.0, 1.0);
     }
 
     private void updatePreview() {
+        if (selected == null) {
+            return;
+        }
         previewWeb.getEngine().loadContent(previewPrinter
                 .printPreview(cssFileHandler.parsedRulestoString(), selected));
-        apply.setDisable(false);
-        reset.setDisable(false);
     }
 
     public void setStage(Stage stage) {
@@ -298,14 +313,14 @@ public class CssStylerViewController extends ViewController {
         apply.setDisable(true);
         reset.setDisable(true);
     }
-    //XXX BUG when calling Reset();
+
     @FXML
     private void handleReset() {
         cssFileHandler.reset();
         initializeList();
 
-        updateTable();
-        updatePreview();
+        // updateTable();
+        // updatePreview();
 
         apply.setDisable(true);
         reset.setDisable(true);
