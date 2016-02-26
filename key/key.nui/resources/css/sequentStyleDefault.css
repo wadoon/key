@@ -1,4 +1,4 @@
-/* This is the Default CSS Template. Changes cannot be reverted using KeY */
+/*We recommend to only change this file using the KeY CSS Styler */ 
 pre {
 	background-color: #FFFFFF;
 	color: #000000;
@@ -42,13 +42,13 @@ pre {
 	font-style: inherit;
 }
 .ifInst {
-	background-color: #B3FD53;
+	background-color: #ccffcc;
 	color: inherit;
 	font-weight: inherit;
 	font-style: inherit;
 }
 .ifFormula {
-	background-color: #B3FD53;
+	background-color: #ccffcc;
 	color: inherit;
 	font-weight: inherit;
 	font-style: inherit;
@@ -80,6 +80,12 @@ pre {
 .logicVar {
 	background-color: inherit;
 	color: #008000;
+	font-weight: inherit;
+	font-style: inherit;
+}
+.quantifier{
+	background-color: inherit;
+	color: #ff3300;
 	font-weight: inherit;
 	font-style: inherit;
 }

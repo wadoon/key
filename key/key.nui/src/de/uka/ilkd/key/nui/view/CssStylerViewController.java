@@ -91,7 +91,15 @@ public class CssStylerViewController extends ViewController {
 
     private void initializeList() {
         for (CssRule rule : cssFileHandler.getParsedRules()) {
-            ruleMap.put(rule.selectorsAsString(), rule);
+            String ruleDescription = NUIConstants.getClassDescriptionMap()
+                    .get(rule.selectorsAsString());
+            
+            if (ruleDescription != null){
+                ruleMap.put(ruleDescription, rule);
+            }else{
+                ruleMap.put(rule.selectorsAsString(), rule);
+            }
+
             if (rule.selectorsAsString().equals("pre")) {
                 masterRules = rule.getPropertyValuePairs();
             }
@@ -341,7 +349,7 @@ public class CssStylerViewController extends ViewController {
         apply.setDisable(true);
         reset.setDisable(true);
     }
-    
+
     @FXML
     private void handleResetDefault() {
         cssFileHandler.resetDefault();
