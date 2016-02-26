@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.nui.filter;
 
-import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
-import de.uka.ilkd.key.util.Pair;
-
 /**
  * EventArgs that contain all important information that should be revealed to
  * any listener.
@@ -20,6 +17,7 @@ public class FilterChangedEventArgs {
 
     /**
      * The new filter
+     * 
      * @return
      */
     public PrintFilter getFilter() {

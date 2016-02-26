@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.filter;
 
-import de.uka.ilkd.key.util.Pair;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A class that handles all information needed to create a criteria for
@@ -51,22 +52,22 @@ public class PrintFilter {
         return searchText;
     }
 
-    private Criteria<Pair<Integer, String>> selectionCriteria;
+    private List<String> selections;
 
     /**
      * A criteria representing a selection on the sequent.
      */
-    public void setSelectionCriteria(Criteria<Pair<Integer, String>> value) {
-        if (value == selectionCriteria)
+    public void setSelections(List<String> value) {
+        if (value == selections)
             return;
-        selectionCriteria = value;
+        selections = value;
     }
 
     /**
      * A criteria representing a selection on the sequent.
      */
-    public Criteria<Pair<Integer, String>> getSelectionCriteria() {
-        return selectionCriteria;
+    public List<String> getSelections() {
+        return selections;
     }
 
     private boolean isUserCriteria;
@@ -159,7 +160,7 @@ public class PrintFilter {
 
     public PrintFilter() {
         isUserCriteria = true;
-        selectionCriteria = new CriterionEmpty<Pair<Integer, String>>();
+        selections = new LinkedList<>();
         before = 2;
         after = 2;
         filterLayout = FilterLayout.Minimize;
@@ -168,7 +169,7 @@ public class PrintFilter {
     public PrintFilter cloneFilter() {
         PrintFilter filter = new PrintFilter();
         filter.setName(this.name);
-        filter.setSelectionCriteria(this.selectionCriteria);
+        filter.setSelections(this.selections);
         filter.setIsUserCriteria(this.isUserCriteria);
         filter.setSearchText(this.searchText);
         filter.setInvert(this.invert);
