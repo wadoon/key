@@ -17,6 +17,7 @@ import de.uka.ilkd.key.nui.util.SerializableViewInformation;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -120,7 +121,7 @@ public class MainApp extends Application {
 
             // Give the controller access to the main app.
             RootLayoutController controller = loader.getController();
-            controller.setMainApp(this, new Context());
+            controller.setMainApp(this, new Context(this));
             rootLayoutController = controller;
         }
         catch (Exception e) {
@@ -142,8 +143,11 @@ public class MainApp extends Application {
 
         Pair<Object, Object> p = KeyFxmlLoader
                 .loadFxml(MainApp.class.getResource(fxmlPath));
-        stage.setScene(new Scene((BorderPane) p.getKey()));
+        stage.setScene(new Scene((Parent) p.getKey()));
         stage.show();
+        
+        stage.getScene().getStylesheets().addAll(scene.getStylesheets());
+        
         ((ViewController) p.getValue()).setMainApp(this,
                 rootLayoutController.getContext());
         ((ViewController) p.getValue()).setStage(stage);
