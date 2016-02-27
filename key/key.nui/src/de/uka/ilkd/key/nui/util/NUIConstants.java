@@ -155,7 +155,7 @@ public final class NUIConstants {
         classDescriptionMap.put(".progConst", "Program Constants");
         classDescriptionMap.put(".progMeth", "Program Method");
         classDescriptionMap.put(".progSV", "Program SV");
-        classDescriptionMap.put(".progVar", "program Variable");
+        classDescriptionMap.put(".progVar", "Program Variable");
         classDescriptionMap.put(".schemaVarFactory", "Schema Variable Factory");
         classDescriptionMap.put(".skolemTermSV", "Skolem Term SV");
         classDescriptionMap.put(".substOp", "Substitution Operator");
