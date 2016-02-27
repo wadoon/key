@@ -3,9 +3,11 @@ package de.uka.ilkd.key.nui.filter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -15,58 +17,54 @@ import de.uka.ilkd.key.util.Pair;
  * @author Benedikt Gross
  *
  */
-public class CriterionRange implements Criteria<Pair<Integer, String>> {
+public class CriterionRange implements Criteria<Integer> {
 
     private int before;
     private int after;
-    private Criteria<Pair<Integer, String>> criteria;
+    private Criteria<Integer> criteria;
+    private String[] originalLines;
 
     /**
      * Instantiates a new range criterion
-     * @param before How many entities before a match should be added.
-     * @param after How many entities after a match should be added.
-     * @param criteria A distinct and ordered entity list
+     * @param criteria
+     *            A distinct and ordered entity list
+     * @param before
+     *            How many entities before a match should be added.
+     * @param after
+     *            How many entities after a match should be added.
      */
-    public CriterionRange(int before, int after,
-            Criteria<Pair<Integer, String>> criteria) {
+    public CriterionRange(Criteria<Integer> criteria, int before, int after,
+            String[] originalLines) {
         this.before = before;
         this.after = after;
         this.criteria = criteria;
+        this.originalLines = originalLines;
     }
 
     @Override
-    public List<Pair<Integer, String>> meetCriteria(
-            List<Pair<Integer, String>> entities) {
-        List<Pair<Integer, String>> childlist = criteria.meetCriteria(entities);
-        List<Pair<Integer, String>> filtered = new LinkedList<Pair<Integer, String>>();
+    public List<Integer> meetCriteria(List<Integer> lines) {
+        List<Integer> childlist = criteria.meetCriteria(lines);
 
         // get X before and after
         ArrayList<Integer> filterFor = new ArrayList<>();
-        for (Pair<Integer, String> lineInfo : childlist) {
-            int index = lineInfo.first;
+        for (Integer lineIndex : childlist) {
+            // TODO optimize
             IntStream.range(0, before).forEach(n -> {
-                int d = index - before + n;
-                if (d >= 0)
+                int d = lineIndex - before + n;
+                if (d > 0)
                     filterFor.add(d);
             });
             // add the element itself
-            filterFor.add(lineInfo.first);
+            filterFor.add(lineIndex);
             IntStream.range(0, after).forEach(n -> {
-                int d = index + (n + 1);
-                if (d < entities.size())
+                int d = lineIndex + (n + 1);
+                if (d < originalLines.length)
                     filterFor.add(d);
             });
         }
 
         // remove double entries
-        for (Integer i : filterFor.stream().distinct()
-                .collect(Collectors.toList())) {
-            for (Pair<Integer, String> pair : entities) {
-                if (pair.first.equals(i))
-                    filtered.add(pair);
-            }
-        }
-        return filtered;
+        return filterFor.stream().distinct().collect(Collectors.toList());
     }
 
 }

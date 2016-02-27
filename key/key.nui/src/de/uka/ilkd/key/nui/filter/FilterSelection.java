@@ -57,43 +57,36 @@ public class FilterSelection {
      * 
      * @param proofString
      */
-    public void createCriteria(String proofString) {
+    public void resolveSelection(String proofString) {
         // get text under ranges
-        // add OR to filter
-        Criteria<Pair<Integer, String>> criteria = null;
-        boolean first = true;
+        List<String> list = new LinkedList<>();
 
         for (Range range : selections) {
             String searchString = proofString.substring(range.start(),
                     range.end());
-            if (first) {
-                criteria = new CriterionContainsString(searchString);
-                first = false;
-            }
-            else {
-                criteria = new OrCriteria<>(criteria,
-                        new CriterionContainsString(searchString));
-            }
+            list.add(searchString);
         }
-
-        this.criteria = criteria;
+        this.resolvedSelection = list;
     }
 
-    private Criteria<Pair<Integer, String>> criteria = null;
+    private List<String> resolvedSelection;
 
     /**
-     * Returns the criteria created by a previous call to createCriteria().
-     * If createCriteria was not called before null is returned.
+     * Returns the criteria created by a previous call to createCriteria(). If
+     * createCriteria was not called before null is returned.
+     * 
      * @return
      */
-    public Criteria<Pair<Integer, String>> getCriteria() {
-        return criteria;
+    public List<String> getResolvedSelection() {
+        return resolvedSelection;
     }
 
     private CsEvent<EmptyEventArgs> selectionModeFinishedEvent = new CsEvent<>();
 
     /**
-     * An event that is raised if the user aborts or closes the selection "mode".
+     * An event that is raised if the user aborts or closes the selection
+     * "mode".
+     * 
      * @return
      */
     public CsEvent<EmptyEventArgs> getSelectionModeFinishedEvent() {
