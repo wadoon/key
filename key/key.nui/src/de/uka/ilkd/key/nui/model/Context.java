@@ -1,27 +1,23 @@
 package de.uka.ilkd.key.nui.model;
 
-import java.nio.file.DirectoryStream.Filter;
-import java.util.List;
-import java.util.function.Consumer;
-
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.StatusManager;
-import de.uka.ilkd.key.nui.filter.Criteria;
 import de.uka.ilkd.key.nui.filter.FilterChangedEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
-import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.util.CsEvent;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 
 public class Context {
 
     private KeYMediator mediator = null;
-
+    private MainApp mainApp;
+    
     /**
      * Lazy loaded KeyMediator
      * 
@@ -30,7 +26,7 @@ public class Context {
     public KeYMediator getKeYMediator() {
         if (mediator == null) {
             MediatorUserInterface userInterface = new MediatorUserInterface(
-                    statusManager);
+                    statusManager, mainApp);
             mediator = new KeYMediator(userInterface);
             userInterface.setMediator(mediator);
         }
@@ -56,21 +52,15 @@ public class Context {
         return filterChangedEvent;
     }
 
-    private Criteria<Pair<Integer,String>> currentFilterCriteria = null;
-    private FilterLayout currentFilterLayout;
+    private PrintFilter currentPrintFilter;
 
-    public void setCurrentFilterCriteria(Criteria<Pair<Integer,String>> criteria, FilterLayout layout) {
-        currentFilterCriteria = criteria;
-        currentFilterLayout = layout;
-        filterChangedEvent.fire(new FilterChangedEventArgs(layout,criteria));
+    public void setCurrentFilter(PrintFilter filter) {
+        currentPrintFilter = filter;
+        filterChangedEvent.fire(new FilterChangedEventArgs(currentPrintFilter));
     }
 
-    public Criteria<Pair<Integer,String>> getCurrentPrintFilter() {
-        return currentFilterCriteria;
-    }
-    
-    public FilterLayout getCurrentFilterLayout(){
-        return currentFilterLayout;
+    public PrintFilter getCurrentPrintFilter() {
+        return currentPrintFilter;
     }
 
     private CsEvent<String> sequentHtmlChangedEvent = new CsEvent<>();
@@ -91,16 +81,18 @@ public class Context {
     public String getSequentHtml() {
         return sequentHtml;
     }
-    
+
     private CssFileHandler cssFileHandler;
-    
-    public CssFileHandler getCssFileHandler(){
-        if (cssFileHandler == null) try {
-            cssFileHandler = new CssFileHandler(NUIConstants.DEFAULT_STYLE_CSS);  
-        }
-        catch (Exception e) {
-            System.err.println("Could not load CSS. No beauty for you!");
-        }
+
+    public CssFileHandler getCssFileHandler() {
+        if (cssFileHandler == null)
+            try {
+                cssFileHandler = new CssFileHandler(
+                        NUIConstants.DEFAULT_STYLE_CSS);
+            }
+            catch (Exception e) {
+                System.err.println("Could not load CSS. No beauty for you!");
+            }
         return cssFileHandler;
     }
 
@@ -114,6 +106,16 @@ public class Context {
         selectModeActivatedEvent.fire(new SelectModeEventArgs(filterSelection));
     }
 
-    public Context() {
+    public Context(MainApp mainApp) {
+        this.mainApp = mainApp;
+    }
+
+    private TacletInstantiationModel[] models;
+    
+    public void setCurrentModels(TacletInstantiationModel[] models) {
+       this.models = models;
+    }
+    public TacletInstantiationModel[] getCurrentModels() {
+        return models;
     }
 }

@@ -40,7 +40,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
@@ -50,7 +49,6 @@ import javafx.util.Callback;
  */
 public class CssStylerViewController extends ViewController {
     private LinkedHashMap<String, CssRule> ruleMap = new LinkedHashMap<>();
-    private Stage stage = null;
     private String selected;
     private CssFileHandler cssFileHandler;
     private PreviewPrinter previewPrinter = new PreviewPrinter();
@@ -291,10 +289,6 @@ public class CssStylerViewController extends ViewController {
                 .printPreview(cssFileHandler.parsedRulestoString(), selected));
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
     @FXML
     private void handleCancel() {
         if (apply.disabledProperty().get() == false) {
@@ -324,7 +318,7 @@ public class CssStylerViewController extends ViewController {
                 return;
             }
         }
-        stage.close();
+        getStage().close();
     }
 
     @FXML

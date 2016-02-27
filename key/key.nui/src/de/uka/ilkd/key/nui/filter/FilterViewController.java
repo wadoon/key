@@ -2,13 +2,9 @@ package de.uka.ilkd.key.nui.filter;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
-
-import com.google.common.util.concurrent.Service.Listener;
-
-import antlr.debug.Event;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.KeYView;
@@ -19,7 +15,6 @@ import de.uka.ilkd.key.nui.util.EmptyEventArgs;
 import de.uka.ilkd.key.util.Pair;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -27,10 +22,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
 public class FilterViewController extends ViewController {
@@ -73,9 +65,12 @@ public class FilterViewController extends ViewController {
     @FXML
     private Button applyButton;
 
+    @FXML
+    private CheckBox useAstScope;
+
     // Note: used in code that is disabled right now.
     @SuppressFBWarnings(justification = "Not used in code right now", value = "URF_UNREAD_FIELD")
-    
+
     private Map<String, PrintFilter> savedFilters = new HashMap<>();
 
     private void loadCurrentFilter() {
@@ -91,6 +86,7 @@ public class FilterViewController extends ViewController {
         linesBefore.setValue(currentFilter.getBefore());
         linesAfter.setValue(currentFilter.getAfter());
         filterModeBox.setValue(currentFilter.getFilterLayout());
+        useAstScope.setSelected(currentFilter.getUseAstScope());
     }
 
     @Override
@@ -121,6 +117,9 @@ public class FilterViewController extends ViewController {
                 new_val) -> currentFilter.setFilterLayout(new_val));
         filterModeBox.getItems().add(FilterLayout.Minimize);
         filterModeBox.getItems().add(FilterLayout.Collapse);
+
+        useAstScope.selectedProperty().addListener(
+                (o, old_val, new_val) -> currentFilter.setUseAstScope(new_val));
 
         currentFilter = new PrintFilter();
         loadCurrentFilter();
@@ -177,9 +176,7 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private void handleReset() {
-        getContext().setCurrentFilterCriteria(
-                new CriterionEmpty<Pair<Integer, String>>(),
-                currentFilter.getFilterLayout());
+        getContext().setCurrentFilter(null);
     }
 
     @FXML
@@ -188,8 +185,7 @@ public class FilterViewController extends ViewController {
             selectionFilterToggle.setSelected(false);
             finishSelection();
         }
-        getContext().setCurrentFilterCriteria(currentFilter.createCriteria(),
-                currentFilter.getFilterLayout());
+        getContext().setCurrentFilter(currentFilter);
     }
 
     private FilterSelection filterSelection;
@@ -198,9 +194,7 @@ public class FilterViewController extends ViewController {
     private void handleSelectionFilterToggled() {
         if (selectionFilterToggle.isSelected()) {
             // reset old filter to make selection more easily
-            getContext().setCurrentFilterCriteria(
-                    new CriterionEmpty<Pair<Integer, String>>(),
-                    currentFilter.getFilterLayout());
+            getContext().setCurrentFilter(null);
             filterSelection = new FilterSelection();
             currentFilter.setIsUserCriteria(false);
             getContext().activateSelectMode(filterSelection);
@@ -208,20 +202,15 @@ public class FilterViewController extends ViewController {
         }
         else {
             finishSelection();
-            getContext().setCurrentFilterCriteria(
-                    currentFilter.createCriteria(),
-                    currentFilter.getFilterLayout());
+            getContext().setCurrentFilter(currentFilter);
         }
     }
 
     private void finishSelection() {
         filterSelection.getSelectionModeFinishedEvent()
                 .fire(EmptyEventArgs.get());
-        Criteria<Pair<Integer, String>> criteria = filterSelection
-                .getCriteria();
-        if (criteria == null)
-            criteria = new CriterionEmpty<>();
-        currentFilter.setSelectionCriteria(criteria);
+        List<String> resolvedSelection = filterSelection.getResolvedSelection();
+        currentFilter.setSelections(resolvedSelection);
         filterSelection = null;
 
         selectionFilterToggle.setStyle("-fx-background-color: lightgrey;");
