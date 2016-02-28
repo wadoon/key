@@ -112,80 +112,79 @@ public class CssStylerViewController extends ViewController {
             switch (rule.selectorsAsString()) {
             case "pre":
                 masterRules = rule.getPropertyValuePairs();
-            case ".highlighted":
-            case ".mouseover":
+            case "." + NUIConstants.HIGHLIGHTED_TAG:
+            case "." + NUIConstants.MOUSE_TAG:
                 // General Settings
                 rootItem.getChildren().get(0).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-            case ".filterSelection":
-            case ".minimized":
-            case ".collapsed":
+            case "." + NUIConstants.FILTER_SELECTION_TAG:
+            case "." + NUIConstants.FILTER_MINIMIZED_TAG:
+            case "." + NUIConstants.FILTER_COLLAPSED_TAG:
                 // Filter Settings
                 rootItem.getChildren().get(1).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-            case ".ruleApp":
-            case ".ifInst":
-            case ".ifFormula":
+            case "." + NUIConstants.RULE_APP_TAG:
+            case "." + NUIConstants.IF_INST_TAG:
+            case "." + NUIConstants.IF_FORMULA_TAG:
                 // Rule Application
                 rootItem.getChildren().get(2).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-            case ".elemUpdate":
-            case ".equality":
-            case ".junctor":
-            case ".substOp":
-            case ".warySubstOp":
+            case "." + NUIConstants.ELEMUPDATE_TAG:
+            case "." + NUIConstants.EQUALITY_TAG:
+            case "." + NUIConstants.JUNCTOR_TAG:
+            case "." + NUIConstants.SUBSTOP_TAG:
+            case "." + NUIConstants.WARYSUBSTOP_TAG:
                 // Operator
                 rootItem.getChildren().get(3).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-
-            case ".logicVar":
-            case ".observerFunc":
-            case ".quantifier":
+            case "." + NUIConstants.LOGICVAR_TAG:
+            case "." + NUIConstants.OBSERVERFUNC_TAG:
+            case "." + NUIConstants.QUANTIFIER_TAG:
                 // Logic Terms
                 rootItem.getChildren().get(4).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-            case ".function":
-            case ".sortDepFunc":
-            case ".transformer":
-            case ".varSV":
+            case "." + NUIConstants.FUNCTION_TAG:
+            case "." + NUIConstants.SORTDEPFUNC_TAG:
+            case "." + NUIConstants.TRANSFORMER_TAG:
+            case "." + NUIConstants.VARSV_TAG:
                 // Function Terms
                 rootItem.getChildren().get(5).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-            case ".modality":
-            case ".modalOpSV":
-            case ".locationVar":
-            case ".progConst":
-            case ".progMeth":
-            case ".progSV":
-            case ".progVar":
+            case "." + NUIConstants.MODALITY_TAG:
+            case "." + NUIConstants.MODALOPSV_TAG:
+            case "." + NUIConstants.LOCATIONVAR_TAG:
+            case "." + NUIConstants.PROGCONST_TAG:
+            case "." + NUIConstants.PROGMETH_TAG:
+            case "." + NUIConstants.PROGSV_TAG:
+            case "." + NUIConstants.PROGVAR_TAG:
                 // Java Styling
                 rootItem.getChildren().get(6).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-            case ".ifExThenElse":
-            case ".ifThenElse":
+            case "." + NUIConstants.IFEXTHENELSE_TAG:
+            case "." + NUIConstants.IFTHENELSE_TAG:
                 // Cond. Operator
                 rootItem.getChildren().get(7).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-            case ".updateApp":
-            case ".updateJunc":
-            case ".updateSV":
+            case "." + NUIConstants.UPDATEAPP_TAG:
+            case "." + NUIConstants.UPDATEJUNC_TAG:
+            case "." + NUIConstants.UPDATESV_TAG:
                 // Update Terms
                 rootItem.getChildren().get(8).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
-            case ".formulaSV":
-            case ".schemaVarFactory":
-            case ".termLabelSV":
-            case ".termSV":
-            case ".skolemTermSV":
+            case "." + NUIConstants.FORMULASV_TAG:
+            case "." + NUIConstants.SCHEMAVARFACTORY_TAG:
+            case "." + NUIConstants.TERMLABELSV_TAG:
+            case "." + NUIConstants.TERMSV_TAG:
+            case "." + NUIConstants.SKOLEMTERMSV_TAG:
                 // Schema Variable
                 rootItem.getChildren().get(9).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
@@ -239,51 +238,30 @@ public class CssStylerViewController extends ViewController {
             switch (property) {
             case "background-color":
                 propertyLabel = "Background Color:";
-                valueNode = new ColorPicker(convertToColor(value));
-                ((ColorPicker) valueNode).setOnAction(event -> {
-                    colorPickerHandle(((ColorPicker) valueNode), property);
-                });
+                valueNode = makeColorPicker(value, property);
                 break;
             case "color":
                 propertyLabel = "Font Color:";
-                valueNode = new ColorPicker(convertToColor(value));
-                ((ColorPicker) valueNode).setOnAction(event -> {
-                    colorPickerHandle(((ColorPicker) valueNode), property);
-                });
+                valueNode = makeColorPicker(value, property);
                 break;
             case "font-weight":
                 propertyLabel = "Boldness:";
-                valueNode = new ComboBox<>(fontWeight);
-                ((ComboBox<String>) valueNode).setValue(value);
-                ((ComboBox<String>) valueNode).setOnAction(event -> {
-                    comboBoxHandle(((ComboBox<String>) valueNode), property);
-                });
+                valueNode = makeComboBox(fontWeight, value, property);
                 break;
             case "font-size":
                 propertyLabel = "Font Size in px:";
 
                 // Length -2 because "px" suffix in CSS
-                valueNode = new TextField(
-                        value.substring(0, value.length() - 2));
-                ((TextField) valueNode).setOnAction(event -> {
-                    textFieldHandle(((TextField) valueNode), property);
-                });
+                valueNode = makeTextField(
+                        value.substring(0, value.length() - 2), property);
                 break;
             case "font-family":
                 propertyLabel = "Font:";
-                valueNode = new ComboBox<>(fontFamily);
-                ((ComboBox<String>) valueNode).setValue(value);
-                ((ComboBox<String>) valueNode).setOnAction(event -> {
-                    comboBoxHandle(((ComboBox<String>) valueNode), property);
-                });
+                valueNode = makeComboBox(fontFamily, value, property);
                 break;
             case "font-style":
                 propertyLabel = "Italics:";
-                valueNode = new ComboBox<>(fontStyle);
-                ((ComboBox<String>) valueNode).setValue(value);
-                ((ComboBox<String>) valueNode).setOnAction(event -> {
-                    comboBoxHandle(((ComboBox<String>) valueNode), property);
-                });
+                valueNode = makeComboBox(fontStyle, value, property);
                 break;
             case "display":
                 propertyLabel = "Do not edit this rule!";
@@ -291,13 +269,10 @@ public class CssStylerViewController extends ViewController {
                 break;
             default:
                 propertyLabel = property;
-                valueNode = new TextField(value);
-                ((TextField) valueNode).setOnAction(event -> {
-                    textFieldHandle(((TextField) valueNode), property);
-                });
+                valueNode = makeTextField(value, property);
                 break;
             }
-
+            //Logic for CSS Inheritance Handling
             CheckBox cbxInherited = new CheckBox("Inherited");
             cbxInherited.setSelected(false);
             cbxInherited.setOnAction(event -> {
@@ -343,55 +318,54 @@ public class CssStylerViewController extends ViewController {
         }
     }
 
-    /**
-     * ActionHandler for TextField Controls in regard to CSS
-     * 
-     * @param tf
-     *            textfield on which the event occurred
-     * @param property
-     *            the CSS property displayed by the textfield
-     */
-    private void textFieldHandle(TextField tf, String property) {
-        ruleMap.get(selected).putPropertyValuePair(property, tf.getText());
-        updatePreview();
-        apply.setDisable(false);
-        reset.setDisable(false);
+    private Node makeTextField(String value, String property) {
+        TextField tf = new TextField(value);
+        tf.setOnAction(event -> {
+            ruleMap.get(selected).putPropertyValuePair(property, tf.getText());
+            updatePreview();
+            apply.setDisable(false);
+            reset.setDisable(false);
+        });
+
+        return tf;
     }
 
-    /**
-     * ActionHandler for ComboBox Controls in regard to CSS
-     * 
-     * @param cb
-     *            combobox on which the event occurred
-     * @param property
-     * @param property
-     *            the CSS property displayed by the combobox
-     */
-    private void comboBoxHandle(ComboBox<String> cb, String property) {
-        ruleMap.get(selected).putPropertyValuePair(property, cb.getValue());
-        updatePreview();
-        apply.setDisable(false);
-        reset.setDisable(false);
+    private Node makeComboBox(ObservableList<String> comboList, String value,
+            String property) {
+        ComboBox<String> cb = new ComboBox<>(comboList);
+        cb.setValue(value);
+        cb.setOnAction(event -> {
+            ruleMap.get(selected).putPropertyValuePair(property, cb.getValue());
+            updatePreview();
+            apply.setDisable(false);
+            reset.setDisable(false);
+        });
+        return cb;
     }
 
-    /**
-     * ActionHandler for ColorPicker Controls in regard to CSS
-     * 
-     * @param cp
-     *            colorpicker on which the event occurred
-     * @param property
-     * @param property
-     *            the CSS property displayed by the colorpicker
-     */
-    private void colorPickerHandle(ColorPicker cp, String property) {
-        Color c = cp.getValue();
+    private Node makeColorPicker(String value, String property) {
+        Node node;
+        try {
+            ColorPicker cp = new ColorPicker(convertToColor(value));
+            cp.setOnAction(event -> {
+                Color c = cp.getValue();
 
-        ruleMap.get(selected).putPropertyValuePair(property,
-                String.format("#%02X%02X%02X", (int) (c.getRed() * 255),
-                        (int) (c.getGreen() * 255), (int) (c.getBlue() * 255)));
-        updatePreview();
-        apply.setDisable(false);
-        reset.setDisable(false);
+                ruleMap.get(selected).putPropertyValuePair(property,
+                        String.format("#%02X%02X%02X", (int) (c.getRed() * 255),
+                                (int) (c.getGreen() * 255),
+                                (int) (c.getBlue() * 255)));
+                updatePreview();
+                apply.setDisable(false);
+                reset.setDisable(false);
+            });
+            node = cp;
+        }
+        catch (Exception e) {
+            System.err.println("Could not read Color. Using TextField");
+            node = makeTextField(value, property);
+        }
+        
+        return node;
     }
 
     /**

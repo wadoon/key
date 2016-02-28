@@ -5,6 +5,9 @@ package de.uka.ilkd.key.nui.util;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.nui.filter.FilterSelection;
+import de.uka.ilkd.key.speclang.BlockContract.Terms;
+
 /**
  * @author Maximilian Li
  * @author Victor Schuemmer
@@ -20,14 +23,46 @@ public final class NUIConstants {
     public final static String OPEN_TAG_END = "\">";
     public final static String CLOSING_TAG = "</span>";
 
+    public final static String MASTER_TAG = "pre";
     public final static String MOUSE_TAG = "mouseover";
     public final static String HIGHLIGHTED_TAG = "highlighted";
+    public final static String FILTER_SELECTION_TAG = "filterSelection";
     public final static String FILTER_MINIMIZED_TAG = "minimized";
     public final static String FILTER_COLLAPSED_TAG = "collapsed";
     public final static String RULE_APP_TAG = "ruleApp";
     public final static String IF_INST_TAG = "ifInst";
     public final static String IF_FORMULA_TAG = "ifFormula";
-    public final static String SELECTION_TAG = "filterSelection";
+
+    public final static String EQUALITY_TAG = "equality";
+    public final static String FUNCTION_TAG = "function";
+    public final static String LOCATIONVAR_TAG = "locationVar";
+    public final static String JUNCTOR_TAG = "junctor";
+    public final static String LOGICVAR_TAG = "logicVar";
+    public final static String QUANTIFIER_TAG = "quantifier";
+    public final static String SORTDEPFUNC_TAG = "sortDepFunc";
+    public final static String MODALITY_TAG = "modality";
+    public final static String OBSERVERFUNC_TAG = "observerFunc";
+    public final static String ELEMUPDATE_TAG = "elemUpdate";
+    public final static String FORMULASV_TAG = "formulaSV";
+    public final static String IFEXTHENELSE_TAG = "ifExThenElse";
+    public final static String IFTHENELSE_TAG = "ifThenElse";
+    public final static String MODALOPSV_TAG = "modalOpSV";
+    public final static String PROGCONST_TAG = "progConst";
+    public final static String PROGMETH_TAG = "progMeth";
+    public final static String PROGSV_TAG = "progSV";
+    public final static String PROGVAR_TAG = "progVar";
+    public final static String SCHEMAVARFACTORY_TAG = "schemaVarFactory";
+    public final static String SKOLEMTERMSV_TAG = "skolemTermSV";
+    public final static String SUBSTOP_TAG = "substOp";
+    public final static String TERMLABELSV_TAG = "termLabelSV";
+    public final static String TERMSV_TAG = "termSV";
+    public final static String TRANSFORMER_TAG = "transformer";
+    public final static String UPDATEAPP_TAG = "updateApp";
+    public final static String UPDATEJUNC_TAG = "updateJunc";
+    public final static String UPDATESV_TAG = "updateSV";
+    public final static String VARSV_TAG = "varSV";
+    public final static String WARYSUBSTOP_TAG = "warySubstOp";
+
     public final static String DEFAULT_STYLE_CSS = "resources/css/sequentStyle.css";
     public final static String CSS_RESET_TO_DEFAULT_PATH = "resources/css/sequentStyleDefault.css";
 
@@ -73,85 +108,100 @@ public final class NUIConstants {
         classEnabledMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, true);
 
         // Define Style Span for each Class
-        classMap.put(de.uka.ilkd.key.logic.op.Equality.class, "equality");
-        classMap.put(de.uka.ilkd.key.logic.op.Function.class, "function");
+        classMap.put(de.uka.ilkd.key.logic.op.Equality.class, EQUALITY_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.Function.class, FUNCTION_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
-                "locationVar");
-        classMap.put(de.uka.ilkd.key.logic.op.Junctor.class, "junctor");
-        classMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class, "logicVar");
-        classMap.put(de.uka.ilkd.key.logic.op.Quantifier.class, "quantifier");
+                LOCATIONVAR_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.Junctor.class, JUNCTOR_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class,
+                LOCATIONVAR_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.Quantifier.class, QUANTIFIER_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.SortDependingFunction.class,
-                "sortDepFunc");
-        classMap.put(de.uka.ilkd.key.logic.op.Modality.class, "modality");
+                SORTDEPFUNC_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.Modality.class, MODALITY_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
-                "observerFunc");
+                OBSERVERFUNC_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
-                "elemUpdate");
-        classMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, "formulaSV");
+                ELEMUPDATE_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, FORMULASV_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.IfExThenElse.class,
-                "ifExThenElse");
-        classMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class, "ifThenElse");
+                IFEXTHENELSE_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class, IFTHENELSE_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.ModalOperatorSV.class,
-                "modalOpSV");
+                MODALOPSV_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.ProgramConstant.class,
-                "progConst");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class, "progMeth");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class, "progSV");
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class, "progVar");
+                PROGCONST_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class,
+                PROGMETH_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class, PROGSV_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class,
+                PROGVAR_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.SchemaVariableFactory.class,
-                "schemaVarFactory");
+                SCHEMAVARFACTORY_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.SkolemTermSV.class,
-                "skolemTermSV");
-        classMap.put(de.uka.ilkd.key.logic.op.SubstOp.class, "substOp");
-        classMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class, "termLabelSV");
-        classMap.put(de.uka.ilkd.key.logic.op.TermSV.class, "termSV");
-        classMap.put(de.uka.ilkd.key.logic.op.Transformer.class, "transformer");
+                SKOLEMTERMSV_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.SubstOp.class, SUBSTOP_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class,
+                TERMLABELSV_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.TermSV.class, TERMSV_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.Transformer.class,
+                TRANSFORMER_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.UpdateApplication.class,
-                "updateApp");
+                UPDATEAPP_TAG);
         classMap.put(de.uka.ilkd.key.logic.op.UpdateJunctor.class,
-                "updateJunc");
-        classMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, "updateSV");
-        classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, "varSV");
-        classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, "warySubstOp");
+                UPDATEJUNC_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, UPDATESV_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, VARSV_TAG);
+        classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class,
+                WARYSUBSTOP_TAG);
 
-        classDescriptionMap.put("pre", "Basic Appearance");
-        classDescriptionMap.put(".highlighted", "Search Highlighting");
-        classDescriptionMap.put(".mouseover", "Mouseover Highlighting");
-        classDescriptionMap.put(".filterSelection",
+        classDescriptionMap.put(MASTER_TAG, "Basic Appearance");
+        classDescriptionMap.put("." + HIGHLIGHTED_TAG, "Search Highlighting");
+        classDescriptionMap.put("." + MOUSE_TAG, "Mouseover Highlighting");
+        classDescriptionMap.put("." + FILTER_SELECTION_TAG,
                 "Filter Mouse Selection Highlighing");
-        classDescriptionMap.put(".minimized", "Filter: Minimization");
-        classDescriptionMap.put(".collapsed", "Filter: Hidden");
-        classDescriptionMap.put(".ruleApp", "Last Applied Rule");
-        classDescriptionMap.put(".ifInst", "Applied Rule Branch 1");
-        classDescriptionMap.put(".ifFormula", "Applied Rule Branch 2");
-        classDescriptionMap.put(".equality", "Equality Term");
-        classDescriptionMap.put(".function", "Function Term");
-        classDescriptionMap.put(".locationVar", "Location Variable");
-        classDescriptionMap.put(".junctor", "Junctor");
-        classDescriptionMap.put(".logicVar", "Logic Variable");
-        classDescriptionMap.put(".quantifier", "Quantifier");
-        classDescriptionMap.put(".sortDepFunc", "Sort Depending Function");
-        classDescriptionMap.put(".modality", "Modality Term");
-        classDescriptionMap.put(".observerFunc", "Oberserver Function");
-        classDescriptionMap.put(".elemUpdate", "Elementary Updater");
-        classDescriptionMap.put(".formulaSV", "Formula Schema Variable");
-        classDescriptionMap.put(".ifExThenElse", "If Ex then Else... Term");
-        classDescriptionMap.put(".ifThenElse", "If then Else... Term");
-        classDescriptionMap.put(".modalOpSV", "Modal Operator Schema Variable");
-        classDescriptionMap.put(".progConst", "Program Constants");
-        classDescriptionMap.put(".progMeth", "Program Method");
-        classDescriptionMap.put(".progSV", "Program Schema Variable");
-        classDescriptionMap.put(".progVar", "Program Variable");
-        classDescriptionMap.put(".schemaVarFactory", "Schema Variable Factory");
-        classDescriptionMap.put(".skolemTermSV", "Skolem Term Schema Variable");
-        classDescriptionMap.put(".substOp", "Substitution Operator");
-        classDescriptionMap.put(".termLabelSV", "Term Label Schema Variable");
-        classDescriptionMap.put(".transformer", "Transformer");
-        classDescriptionMap.put(".updateApp", "Update Application");
-        classDescriptionMap.put(".updateJunc", "Update Junctor");
-        classDescriptionMap.put(".updateSV", "Update Schema Variable");
-        classDescriptionMap.put(".varSV", "Variable Schema Variable");
-        classDescriptionMap.put(".warySubstOp", "Wary Substition Operator");
+        classDescriptionMap.put("." + FILTER_MINIMIZED_TAG,
+                "Filter: Minimization");
+        classDescriptionMap.put("." + FILTER_COLLAPSED_TAG, "Filter: Hidden");
+        classDescriptionMap.put("." + RULE_APP_TAG, "Last Applied Rule");
+        classDescriptionMap.put("." + IF_INST_TAG, "Applied Rule Branch 1");
+        classDescriptionMap.put("." + IF_FORMULA_TAG, "Applied Rule Branch 2");
+        classDescriptionMap.put("." + EQUALITY_TAG, "Equality Term");
+        classDescriptionMap.put("." + FUNCTION_TAG, "Function Term");
+        classDescriptionMap.put("." + LOCATIONVAR_TAG, "Location Variable");
+        classDescriptionMap.put("." + JUNCTOR_TAG, "Junctor");
+        classDescriptionMap.put("." + LOGICVAR_TAG, "Logic Variable");
+        classDescriptionMap.put("." + QUANTIFIER_TAG, "Quantifier");
+        classDescriptionMap.put("." + SORTDEPFUNC_TAG,
+                "Sort Depending Function");
+        classDescriptionMap.put("." + MODALITY_TAG, "Modality Term");
+        classDescriptionMap.put("." + OBSERVERFUNC_TAG, "Oberserver Function");
+        classDescriptionMap.put("." + ELEMUPDATE_TAG, "Elementary Updater");
+        classDescriptionMap.put("." + FORMULASV_TAG, "Formula Schema Variable");
+        classDescriptionMap.put("." + IFEXTHENELSE_TAG,
+                "If Ex then Else... Term");
+        classDescriptionMap.put("." + IFTHENELSE_TAG, "If then Else... Term");
+        classDescriptionMap.put("." + MODALOPSV_TAG,
+                "Modal Operator Schema Variable");
+        classDescriptionMap.put("." + PROGCONST_TAG, "Program Constants");
+        classDescriptionMap.put("." + PROGMETH_TAG, "Program Method");
+        classDescriptionMap.put("." + PROGSV_TAG, "Program Schema Variable");
+        classDescriptionMap.put("." + PROGVAR_TAG, "Program Variable");
+        classDescriptionMap.put("." + SCHEMAVARFACTORY_TAG,
+                "Schema Variable Factory");
+        classDescriptionMap.put("." + SKOLEMTERMSV_TAG,
+                "Skolem Term Schema Variable");
+        classDescriptionMap.put("." + SUBSTOP_TAG, "Substitution Operator");
+        classDescriptionMap.put("." + TERMLABELSV_TAG,
+                "Term Label Schema Variable");
+        classDescriptionMap.put("." + TERMSV_TAG, "Term Schema Variable");
+        classDescriptionMap.put("." + TRANSFORMER_TAG, "Transformer");
+        classDescriptionMap.put("." + UPDATEAPP_TAG, "Update Application");
+        classDescriptionMap.put("." + UPDATEJUNC_TAG, "Update Junctor");
+        classDescriptionMap.put("." + UPDATESV_TAG, "Update Schema Variable");
+        classDescriptionMap.put("." + VARSV_TAG, "Variable Schema Variable");
+        classDescriptionMap.put("." + WARYSUBSTOP_TAG,
+                "Wary Substition Operator");
 
     }
 
