@@ -334,7 +334,8 @@ public class CssStylerViewController extends ViewController {
 
             propValGrid.add(new Label(propertyLabel), 0, gridRow);
             propValGrid.add(valueNode, 1, gridRow);
-            if (!(selected.equals("pre") || selected
+            String selector = ruleMap.get(selected).selectorsAsString();
+            if (!(selector.equals("pre") || selector
                     .equals("." + NUIConstants.FILTER_COLLAPSED_TAG))) {
                 propValGrid.add(cbxInherited, 2, gridRow);
             }
