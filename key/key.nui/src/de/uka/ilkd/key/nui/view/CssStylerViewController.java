@@ -55,7 +55,7 @@ public class CssStylerViewController extends ViewController {
                     "Comic Sans", "Times New Roman");
 
     @FXML
-    private TreeView<String> listView;
+    private TreeView<String> treeView;
     @FXML
     private Button apply;
     @FXML
@@ -76,12 +76,17 @@ public class CssStylerViewController extends ViewController {
     public void initializeAfterLoadingFxml() {
         cssFileHandler = getContext().getCssFileHandler();
 
-        initializeList();
+        initializeTree();
     }
 
-    private void initializeList() {
+    /**
+     * initializes the TreeView
+     */
+    private void initializeTree() {
+        // Root for Tree
         TreeItem<String> rootItem = new TreeItem<String>(
                 "Sequent Style Settings");
+        // SetUp Categories
         rootItem.getChildren().add(new TreeItem<String>("General Settings"));
         rootItem.getChildren().add(new TreeItem<String>("Filter Settings"));
         rootItem.getChildren().add(new TreeItem<String>("Rule Application"));
@@ -95,6 +100,7 @@ public class CssStylerViewController extends ViewController {
         rootItem.getChildren().add(new TreeItem<String>("Schema Variables"));
         rootItem.getChildren().add(new TreeItem<String>("Other Settings"));
 
+        // For every rule: get Description from Constants and Sort into Tree
         for (CssRule rule : cssFileHandler.getParsedRules()) {
             String ruleDescription = NUIConstants.getClassDescriptionMap()
                     .get(rule.selectorsAsString());
@@ -147,7 +153,7 @@ public class CssStylerViewController extends ViewController {
             case ".sortDepFunc":
             case ".transformer":
             case ".varSV":
-                //Function Terms
+                // Function Terms
                 rootItem.getChildren().get(5).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
@@ -158,20 +164,20 @@ public class CssStylerViewController extends ViewController {
             case ".progMeth":
             case ".progSV":
             case ".progVar":
-                //Java Styling
+                // Java Styling
                 rootItem.getChildren().get(6).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
             case ".ifExThenElse":
             case ".ifThenElse":
-                //Cond. Operator
+                // Cond. Operator
                 rootItem.getChildren().get(7).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
             case ".updateApp":
             case ".updateJunc":
             case ".updateSV":
-                //Update Terms
+                // Update Terms
                 rootItem.getChildren().get(8).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
@@ -180,30 +186,34 @@ public class CssStylerViewController extends ViewController {
             case ".termLabelSV":
             case ".termSV":
             case ".skolemTermSV":
-                //Schema Variable
+                // Schema Variable
                 rootItem.getChildren().get(9).getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
             default:
-                //Default: Other
+                // Default: Other
                 rootItem.getChildren().get(rootItem.getChildren().size() - 1)
                         .getChildren()
                         .add(new TreeItem<String>(ruleDescription));
                 break;
             }
-            ruleMap.put(ruleDescription, rule);
+            setRule(rule);
         }
 
-        listView.setRoot(rootItem);
-        listView.getSelectionModel().selectedItemProperty().addListener(e -> {
-            selected = listView.getSelectionModel().getSelectedItem()
+        treeView.setRoot(rootItem);
+
+        treeView.getSelectionModel().selectedItemProperty().addListener(e -> {
+            selected = treeView.getSelectionModel().getSelectedItem()
                     .getValue();
-            updateTable();
+            updateGrid();
             updatePreview();
         });
     }
 
-    private void updateTable() {
+    /**
+     * update the Grid with the controls associated with CSS Property
+     */
+    private void updateGrid() {
         if (selected == null || !ruleMap.containsKey(selected)) {
             return;
         }
@@ -212,13 +222,15 @@ public class CssStylerViewController extends ViewController {
 
         HashMap<String, String> propertyValuePairMap = ruleMap.get(selected)
                 .getPropertyValuePairs();
-        int i = 0;
+
+        int gridRow = 0;
         for (String property : propertyValuePairMap.keySet()) {
             String value = propertyValuePairMap.get(property);
             String propertyLabel;
             Node valueNode;
             boolean inherited = false;
 
+            // necessary to have info about inherited values
             if (value.equals("inherit")) {
                 value = masterRules.get(property);
                 inherited = true;
@@ -229,32 +241,14 @@ public class CssStylerViewController extends ViewController {
                 propertyLabel = "Background Color:";
                 valueNode = new ColorPicker(convertToColor(value));
                 ((ColorPicker) valueNode).setOnAction(event -> {
-                    Color c = ((ColorPicker) valueNode).getValue();
-
-                    propertyValuePairMap.put(property,
-                            String.format("#%02X%02X%02X",
-                                    (int) (c.getRed() * 255),
-                                    (int) (c.getGreen() * 255),
-                                    (int) (c.getBlue() * 255)));
-                    updatePreview();
-                    apply.setDisable(false);
-                    reset.setDisable(false);
+                    colorPickerHandle(((ColorPicker) valueNode), property);
                 });
                 break;
             case "color":
                 propertyLabel = "Font Color:";
                 valueNode = new ColorPicker(convertToColor(value));
                 ((ColorPicker) valueNode).setOnAction(event -> {
-                    Color c = ((ColorPicker) valueNode).getValue();
-
-                    propertyValuePairMap.put(property,
-                            String.format("#%02X%02X%02X",
-                                    (int) (c.getRed() * 255),
-                                    (int) (c.getGreen() * 255),
-                                    (int) (c.getBlue() * 255)));
-                    updatePreview();
-                    apply.setDisable(false);
-                    reset.setDisable(false);
+                    colorPickerHandle(((ColorPicker) valueNode), property);
                 });
                 break;
             case "font-weight":
@@ -262,23 +256,17 @@ public class CssStylerViewController extends ViewController {
                 valueNode = new ComboBox<>(fontWeight);
                 ((ComboBox<String>) valueNode).setValue(value);
                 ((ComboBox<String>) valueNode).setOnAction(event -> {
-                    propertyValuePairMap.put(property,
-                            ((ComboBox<String>) valueNode).getValue());
-                    updatePreview();
-                    apply.setDisable(false);
-                    reset.setDisable(false);
+                    comboBoxHandle(((ComboBox<String>) valueNode), property);
                 });
                 break;
             case "font-size":
                 propertyLabel = "Font Size in px:";
+
+                // Length -2 because "px" suffix in CSS
                 valueNode = new TextField(
                         value.substring(0, value.length() - 2));
                 ((TextField) valueNode).setOnAction(event -> {
-                    propertyValuePairMap.put(property,
-                            ((TextField) valueNode).getText());
-                    updatePreview();
-                    apply.setDisable(false);
-                    reset.setDisable(false);
+                    textFieldHandle(((TextField) valueNode), property);
                 });
                 break;
             case "font-family":
@@ -286,11 +274,7 @@ public class CssStylerViewController extends ViewController {
                 valueNode = new ComboBox<>(fontFamily);
                 ((ComboBox<String>) valueNode).setValue(value);
                 ((ComboBox<String>) valueNode).setOnAction(event -> {
-                    propertyValuePairMap.put(property,
-                            ((ComboBox<String>) valueNode).getValue());
-                    updatePreview();
-                    apply.setDisable(false);
-                    reset.setDisable(false);
+                    comboBoxHandle(((ComboBox<String>) valueNode), property);
                 });
                 break;
             case "font-style":
@@ -298,11 +282,7 @@ public class CssStylerViewController extends ViewController {
                 valueNode = new ComboBox<>(fontStyle);
                 ((ComboBox<String>) valueNode).setValue(value);
                 ((ComboBox<String>) valueNode).setOnAction(event -> {
-                    propertyValuePairMap.put(property,
-                            ((ComboBox<String>) valueNode).getValue());
-                    updatePreview();
-                    apply.setDisable(false);
-                    reset.setDisable(false);
+                    comboBoxHandle(((ComboBox<String>) valueNode), property);
                 });
                 break;
             case "display":
@@ -313,11 +293,7 @@ public class CssStylerViewController extends ViewController {
                 propertyLabel = property;
                 valueNode = new TextField(value);
                 ((TextField) valueNode).setOnAction(event -> {
-                    propertyValuePairMap.put(property,
-                            ((TextField) valueNode).getText());
-                    updatePreview();
-                    apply.setDisable(false);
-                    reset.setDisable(false);
+                    textFieldHandle(((TextField) valueNode), property);
                 });
                 break;
             }
@@ -350,26 +326,89 @@ public class CssStylerViewController extends ViewController {
                 }
                 valueNode.setDisable(cbxInherited.isSelected());
             });
+
             if (inherited) {
                 valueNode.setDisable(true);
                 cbxInherited.setSelected(true);
             }
-            propValGrid.add(new Label(propertyLabel), 0, i);
-            propValGrid.add(valueNode, 1, i);
+
+            propValGrid.add(new Label(propertyLabel), 0, gridRow);
+            propValGrid.add(valueNode, 1, gridRow);
             if (!(selected.equals("pre") || selected
                     .equals("." + NUIConstants.FILTER_COLLAPSED_TAG))) {
-                propValGrid.add(cbxInherited, 2, i);
+                propValGrid.add(cbxInherited, 2, gridRow);
             }
-            i++;
+            gridRow++;
         }
     }
 
+    /**
+     * ActionHandler for TextField Controls in regard to CSS
+     * 
+     * @param tf
+     *            textfield on which the event occurred
+     * @param property
+     *            the CSS property displayed by the textfield
+     */
+    private void textFieldHandle(TextField tf, String property) {
+        ruleMap.get(selected).putPropertyValuePair(property, tf.getText());
+        updatePreview();
+        apply.setDisable(false);
+        reset.setDisable(false);
+    }
+
+    /**
+     * ActionHandler for ComboBox Controls in regard to CSS
+     * 
+     * @param cb
+     *            combobox on which the event occurred
+     * @param property
+     * @param property
+     *            the CSS property displayed by the combobox
+     */
+    private void comboBoxHandle(ComboBox<String> cb, String property) {
+        ruleMap.get(selected).putPropertyValuePair(property, cb.getValue());
+        updatePreview();
+        apply.setDisable(false);
+        reset.setDisable(false);
+    }
+
+    /**
+     * ActionHandler for ColorPicker Controls in regard to CSS
+     * 
+     * @param cp
+     *            colorpicker on which the event occurred
+     * @param property
+     * @param property
+     *            the CSS property displayed by the colorpicker
+     */
+    private void colorPickerHandle(ColorPicker cp, String property) {
+        Color c = cp.getValue();
+
+        ruleMap.get(selected).putPropertyValuePair(property,
+                String.format("#%02X%02X%02X", (int) (c.getRed() * 255),
+                        (int) (c.getGreen() * 255), (int) (c.getBlue() * 255)));
+        updatePreview();
+        apply.setDisable(false);
+        reset.setDisable(false);
+    }
+
+    /**
+     * converts a hexstring with prefixed # into a Color Object
+     * 
+     * @param colorStr
+     *            the string
+     * @return a Color Object
+     */
     private Color convertToColor(String colorStr) {
         return new Color(Integer.valueOf(colorStr.substring(1, 3), 16) / 255.0,
                 Integer.valueOf(colorStr.substring(3, 5), 16) / 255.0,
                 Integer.valueOf(colorStr.substring(5, 7), 16) / 255.0, 1.0);
     }
 
+    /**
+     * updates the previewWeb component using the currently selected CSS class
+     */
     private void updatePreview() {
         if (selected == null || !ruleMap.containsKey(selected)) {
             return;
@@ -424,20 +463,21 @@ public class CssStylerViewController extends ViewController {
         reset.setDisable(true);
     }
 
-    private void resetRules() {
-        for (CssRule rule : cssFileHandler.getParsedRules()) {
-            String ruleDescription = NUIConstants.getClassDescriptionMap()
-                    .get(rule.selectorsAsString());
+    /**
+     * sets the ruleInformation used by the grid
+     */
+    private void setRule(CssRule rule) {
+        String ruleDescription = NUIConstants.getClassDescriptionMap()
+                .get(rule.selectorsAsString());
 
-            if (ruleDescription == null) {
-                ruleDescription = rule.selectorsAsString();
-            }
-            if (rule.selectorsAsString().equals("pre")) {
-                masterRules = rule.getPropertyValuePairs();
-            }
-
-            ruleMap.put(ruleDescription, rule);
+        if (ruleDescription == null) {
+            ruleDescription = rule.selectorsAsString();
         }
+        if (rule.selectorsAsString().equals("pre")) {
+            masterRules = rule.getPropertyValuePairs();
+        }
+
+        ruleMap.put(ruleDescription, rule);
     }
 
     @FXML
@@ -446,9 +486,14 @@ public class CssStylerViewController extends ViewController {
         resetUI();
     }
 
+    /**
+     * resets the complete UI
+     */
     private void resetUI() {
-        resetRules();
-        updateTable();
+        for (CssRule rule : cssFileHandler.getParsedRules()) {
+            setRule(rule);
+        }
+        updateGrid();
         updatePreview();
         apply.setDisable(true);
         reset.setDisable(true);
