@@ -1,18 +1,11 @@
 package de.uka.ilkd.key.nui.filter;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.util.Pair;
 
 public class SequentFilterer {
 
@@ -21,15 +14,12 @@ public class SequentFilterer {
      * be displayed to the user after filtering.
      */
     public static List<Integer> applyFilter(String proofString,
-            PrintFilter filter, InitialPositionTable positionTable,
-            IdentitySequentPrintFilter identitySequentFilter) {
+            PrintFilter filter, InitialPositionTable positionTable) {
         String[] lines = proofString.split("\n");
-
-        return compileCriteria(filter, positionTable, identitySequentFilter,
-                lines)
-                        // pass list with all indices
-                        .meetCriteria(IntStream.range(0, lines.length).boxed()
-                                .collect(Collectors.toList()));
+        return compileCriteria(filter, positionTable, lines)
+                // pass list with all indices
+                .meetCriteria(IntStream.range(0, lines.length).boxed()
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -37,9 +27,7 @@ public class SequentFilterer {
      * stored in this object.
      */
     private static Criteria<Integer> compileCriteria(PrintFilter filter,
-            InitialPositionTable positionTable,
-            IdentitySequentPrintFilter identitySequentFilter,
-            String[] originalLines) {
+            InitialPositionTable positionTable, String[] originalLines) {
 
         Criteria<Integer> criteria;
 
@@ -55,7 +43,8 @@ public class SequentFilterer {
             criteria = compileSelectionCriteria(filter.getSelections(),
                     originalLines);
 
-        //X: it may be better to apply this after invert, depends on user experience
+        // X: it may be better to apply this after invert, depends on user
+        // experience
         if (!filter.getUseAstScope())
             if (filter.getBefore() != 0 || filter.getAfter() != 0) {
                 criteria = new CriterionRange(criteria, filter.getBefore(),
@@ -68,7 +57,7 @@ public class SequentFilterer {
 
         if (filter.getUseAstScope())
             criteria = new CriterionAstScope(criteria, positionTable,
-                    identitySequentFilter, originalLines);
+                    originalLines);
 
         return criteria;
     }

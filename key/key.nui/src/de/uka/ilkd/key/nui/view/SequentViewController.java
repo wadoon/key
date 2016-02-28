@@ -360,9 +360,9 @@ public class SequentViewController extends ViewController {
             return;
         lastFilter = args;
 
-        ArrayList<Integer> lines = new ArrayList<Integer>(SequentFilterer
-                .applyFilter(proofString, args.getFilter(), abstractSyntaxTree,
-                        new IdentitySequentPrintFilter(sequent)));
+        ArrayList<Integer> lines = new ArrayList<Integer>(
+                SequentFilterer.applyFilter(proofString, args.getFilter(),
+                        abstractSyntaxTree));
 
         if (args.getFilter() != null) {
             printer.applyFilter(lines, args.getFilter().getFilterLayout());

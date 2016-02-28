@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -21,16 +22,12 @@ public class CriterionAstScope implements Criteria<Integer> {
 
     private Criteria<Integer> criteria;
     private InitialPositionTable positionTable;
-    private IdentitySequentPrintFilter identitySequentFilter;
     private String[] originalLines;
 
     public CriterionAstScope(Criteria<Integer> criteria,
-            InitialPositionTable positionTable,
-            IdentitySequentPrintFilter identitySequentFilter,
-            String[] originalLines) {
+            InitialPositionTable positionTable, String[] originalLines) {
         this.criteria = criteria;
         this.positionTable = positionTable;
-        this.identitySequentFilter = identitySequentFilter;
         this.originalLines = originalLines;
     }
 
@@ -45,33 +42,24 @@ public class CriterionAstScope implements Criteria<Integer> {
         // hit
 
         List<Pair<Integer, Integer>> ranges = getRanges(lines);
-
-        charIndex = 0;
-        lineIndex = 0;
         for (Pair<Integer, Integer> range : ranges) {
 
-            /*
-             * resolve line position to char index to get the underlying subTerm
-             * then get bounds of this subTerm then resolve this char index pack
-             * to a line position
-             */
-
-            // add previous subTerm bounds
-            PosInSequent previous = positionTable.getPosInSequent(
-                    getCharIndex(range.first, entities), identitySequentFilter);
+            // add previous subTerm bounds, use the first non-white character of
+            // the first line of this range as charIndex
+            Range previous = positionTable
+                    .rangeForIndex(getCharIndex(range.first)
+                            + getFirstNonWhitespace(range.first));
             lines.addAll(
-                    IntStream
-                            .range(getLineIndex(previous.getBounds().start()),
-                                    range.first)
+                    IntStream.range(getLineIndex(previous.start()), range.first)
                             .boxed().collect(Collectors.toList()));
 
-            // add following subTerm bounds
-            PosInSequent following = positionTable.getPosInSequent(
-                    getCharIndex(range.second, entities),
-                    identitySequentFilter);
+            // add following subTerm bounds, use last character of the last line
+            // of this range as charIndex
+            Range following = positionTable
+                    .rangeForIndex(getCharIndex(range.second)
+                            + originalLines[range.second].length() - 1);
             lines.addAll(IntStream
-                    .range(range.second,
-                            getLineIndex(following.getBounds().end()))
+                    .range(range.second + 1, getLineIndex(following.end()))
                     .boxed().collect(Collectors.toList()));
         }
 
@@ -85,34 +73,33 @@ public class CriterionAstScope implements Criteria<Integer> {
         int idx = 0;
         for (int line = 0; line < originalLines.length; line++) {
             idx += originalLines[line].length();
-            if (idx >= currentChar)
+            if (idx > currentChar)
                 return line;
         }
         return -1;
     }
 
-    // used in getCharIndex
-    int charIndex = 0;
-    int lineIndex = 0;
-
-    // XXX performance dude ..
-    private int getCharIndex(int currentLine, List<Integer> entities) {
-        // advance charIndex until current line is reached
-        while (lineIndex < entities.size()) {
-            if (entities.get(lineIndex) == currentLine) {
-                String string = originalLines[lineIndex];
-                // get first non-whitespace
-                for (int i = 0; i < string.length(); i++) {
-                    if (!Character.isSpaceChar(string.charAt(i)))
-                        break;
-                    charIndex++;
-                }
-                break;
+    private int getFirstNonWhitespace(int lineIndex) {
+        for (int notwhite = 0; notwhite < originalLines[lineIndex]
+                .length(); notwhite++) {
+            if (!Character
+                    .isSpaceChar(originalLines[lineIndex].charAt(notwhite))) {
+                // return the first non-whitespace char of this line
+                return notwhite;
             }
-            charIndex += originalLines[lineIndex].length();
-            lineIndex++;
         }
-        return charIndex;
+        return 0;
+    }
+
+    private int getCharIndex(int lineIndex) {
+        int charIndex = 0;
+        for (int i = 0; i < originalLines.length; i++) {
+            if (i == lineIndex) {
+                return charIndex;
+            }
+            charIndex += originalLines[i].length();
+        }
+        return -1;
     }
 
     private List<Pair<Integer, Integer>> getRanges(List<Integer> lines) {
