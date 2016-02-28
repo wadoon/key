@@ -3,29 +3,17 @@ package de.uka.ilkd.key.nui.view;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nui.ViewController;
-import de.uka.ilkd.key.nui.filter.Criteria;
-import de.uka.ilkd.key.nui.filter.CriterionContainsString;
-import de.uka.ilkd.key.nui.filter.CriterionEmpty;
-import de.uka.ilkd.key.nui.filter.CriterionRange;
-import de.uka.ilkd.key.nui.filter.CriterionAstScope;
 import de.uka.ilkd.key.nui.filter.FilterChangedEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
-import de.uka.ilkd.key.nui.filter.NotCriteria;
-import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.filter.SequentFilterer;
-import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.util.EmptyEventArgs;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.util.SequentPrinter;
@@ -41,13 +29,9 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.ui.MediatorProofControl;
-import de.uka.ilkd.key.util.Pair;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Side;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
@@ -419,48 +403,47 @@ public class SequentViewController extends ViewController {
         else {
             if (tacletMenu != null)
                 tacletMenu.hide();
+            else {
+                try {
+                    // XXX loader stuff should be moved
+                    // XXX menu should only be loaded once
 
-            // XXX loading context menus should get static method in
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(TacletMenuController.class
+                            .getResource("TacletMenu.fxml"));
 
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(
-                    TacletMenuController.class.getResource("TacletMenu.fxml"));
-            try {
-                tacletMenu = loader.load();
-                // Give the controller access to the main app.
-                TacletMenuController controller = loader.getController();
-                controller.setMainApp(this.getMainApp(), this.getContext());
+                    KeYMediator mediator = getContext().getKeYMediator();
 
-                enableMouseOver(false);
-                tacletMenu.setOnHiding(evt -> {
-                    enableMouseOver(true);
-                });
+                    Goal goal = mediator.getSelectedGoal();
+                    if (goal != null) {
 
-                KeYMediator mediator = getContext().getKeYMediator();
+                        tacletMenu = loader.load();
+                        // Give the controller access to the main app.
+                        TacletMenuController controller = loader
+                                .getController();
+                        controller.setMainApp(this.getMainApp(),
+                                this.getContext());
 
-                Goal goal = mediator.getSelectedGoal();
-                if (goal != null) {
-                    MediatorProofControl c = mediator.getUI().getProofControl();
-                    int idx = posTranslator.getCharIdxUnderPointer(event);
-                    PosInSequent pos = abstractSyntaxTree.getPosInSequent(idx,
-                            new IdentitySequentPrintFilter(sequent));
-                    PosInOccurrence occ = pos.getPosInOccurrence();
-                    final ImmutableList<BuiltInRule> builtInRules = c
-                            .getBuiltInRule(goal, occ);
-                    controller.init(c.getFindTaclet(goal, occ),
-                            c.getRewriteTaclet(goal, occ),
-                            c.getNoFindTaclet(goal), builtInRules, pos, this);
+                        int idx = posTranslator.getCharIdxUnderPointer(event);
+                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(
+                                idx, new IdentitySequentPrintFilter(sequent));
 
-                    tacletMenu.show(textArea, event.getScreenX(),
-                            event.getScreenY());
+                        controller.init(pos, this);
 
+                        tacletMenu.show(textArea, event.getScreenX(),
+                                event.getScreenY());
+
+                        enableMouseOver(false);
+                        tacletMenu.setOnHiding(evt -> {
+                            enableMouseOver(true);
+                            tacletMenu = null;
+                        });
+                    }
                 }
-            }
-            catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                catch (IOException e) {
+                    System.err.print("Could not load TacletMenu.fxml");
+                }
             }
         }
     }
-
 }

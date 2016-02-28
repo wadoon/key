@@ -4,34 +4,47 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import javax.swing.JScrollPane;
+import java.util.function.Function;
 
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.InstantiationFileHandler;
+import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.InstantiationProposerCollection;
+import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.pp.StringBackend;
-import javafx.embed.swing.SwingNode;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.AnchorPane;
+import javafx.util.Callback;
 
 public class TacletInstantiationViewController extends ViewController {
 
@@ -54,11 +67,7 @@ public class TacletInstantiationViewController extends ViewController {
     private TacletInstantiationModel[] models;
     private Goal goal;
 
-    private TacletInstantiationDataTable[] dataTable;
-
-    public void init(TacletInstantiationModel[] models, Goal goal) {
-        this.models = models;
-    }
+    private InstantiationProposerCollection instantiationProposers;
 
     private void initProgramVariables() {
         ImmutableList<Named> vars = models[0].programVariables().elements();
@@ -92,43 +101,86 @@ public class TacletInstantiationViewController extends ViewController {
         inputValidation.setText(models[current()].getStatusString());
     }
 
-    @SuppressWarnings("static-access")
+    @SuppressWarnings({ "static-access", "unchecked" })
     private void initInstantiationsTabPane() {
         for (int i = 0; i < models.length; i++) {
             Tab tab = new Tab("Alt " + i);
 
-            /*
-             * TableView table = new TableView(); AnchorPane content = new
-             * AnchorPane(table);
-             * 
-             * content.setBottomAnchor(table, 5.0); content.setTopAnchor(table,
-             * 5.0); content.setLeftAnchor(table, 5.0);
-             * content.setRightAnchor(table, 5.0);
-             * 
-             * tab.setContent(content);
-             */
+            TableView<TacletInstantiationRowModel> table = new TableView<TacletInstantiationRowModel>();
+            AnchorPane content = new AnchorPane(table);
+            content.setBottomAnchor(table, 5.0);
+            content.setTopAnchor(table, 5.0);
+            content.setLeftAnchor(table, 5.0);
+            content.setRightAnchor(table, 5.0);
 
-            // XXX as a model only delivers a swing table and no actual data,
-            // as for now the only possibility is to embed the old JTable.
-            // This will however not render properly.
-            SwingNode swingNode = new SwingNode();
-            dataTable[i] = new TacletInstantiationDataTable(this, i);
-            dataTable[i].setRowHeight(48);
-            JScrollPane tablePane = new JScrollPane(dataTable[i]);
-            // adaptSizes(dataTable[i]);
-
-            if (models[i] != null) {
-                dataTable[i].setModel(models[i].tableModel());
-                dataTable[i].getColumn(dataTable[i].getColumnName(0))
-                        .setHeaderValue("Variable");
-                dataTable[i].getColumn(dataTable[i].getColumnName(1))
-                        .setHeaderValue("Instantiation");
-            }
-            swingNode.setContent(dataTable[i]);
-            tab.setContent(swingNode);
+            tab.setContent(content);
             instantiationsTabPane.getTabs().add(tab);
 
+            ObservableList<TacletInstantiationRowModel> tableModel = FXCollections
+                    .observableArrayList();
+
+            TacletFindModel tfm = models[i].tableModel();
+            for (int j = 0; j < tfm.getRowCount(); j++) {
+                tableModel.add(new TacletInstantiationRowModel(
+                        (SchemaVariable) tfm.getValueAt(j, 0),
+                        (String) tfm.getValueAt(j, 1), j,
+                        j > 0 ));//tfm.getNoEditRow()));
+            }
+
+            TableColumn<TacletInstantiationRowModel, Number> rowNrColumn = createCol(
+                    "Variable", TacletInstantiationRowModel::rowNumberProperty);
+            rowNrColumn.setPrefWidth(10.0);
+            TableColumn<TacletInstantiationRowModel, SchemaVariable> variableColumn = createCol(
+                    "Variable", TacletInstantiationRowModel::variableProperty);
+            TableColumn<TacletInstantiationRowModel, String> instantiationColumn = createCol(
+                    "Instantiation",
+                    TacletInstantiationRowModel::instantiationProperty);
+            int modelNr = i;
+            instantiationColumn.setOnEditCommit(evt -> {
+                TacletInstantiationRowModel rowModel = evt.getRowValue();
+                rowModel.setInstantiation(evt.getNewValue());
+                if (modelNr == current()) {
+                    models[modelNr].tableModel().setValueAt(
+                            rowModel.getInstantiation(),
+                            evt.getRowValue().getRowNumber(), 1);
+                    setStatus(getModels()[modelNr].getStatusString());
+                }
+            });
+
+            Callback<TableColumn<TacletInstantiationRowModel, String>, TableCell<TacletInstantiationRowModel, String>> defaultTextFieldCellFactory = TextFieldTableCell
+                    .<TacletInstantiationRowModel> forTableColumn();
+
+            instantiationColumn.setCellFactory(cellData -> {
+                TableCell<TacletInstantiationRowModel, String> cell = defaultTextFieldCellFactory
+                        .call(cellData);
+                cell.itemProperty().addListener((obs, oldValue, newValue) -> {
+                    TableRow<TacletInstantiationRowModel> row = cell
+                            .getTableRow();
+                    if (row == null) {
+                        cell.setEditable(false);
+                    }
+                    else {
+                        TacletInstantiationRowModel rowModel = row.getItem();
+                        if (rowModel == null) {
+                            cell.setEditable(false);
+                        }
+                        else {
+                            cell.setEditable(rowModel.isEditable());
+                            if (rowModel.isEditable())
+                                cell.setStyle("-fx-border-color: red");
+                        }
+                    }
+                });
+                return cell;
+            });
+
+            table.setEditable(true);
+            table.getColumns().addAll(variableColumn, instantiationColumn);
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            table.setItems(tableModel);
+
             if (!models[i].application().taclet().ifSequent().isEmpty()) {
+                // TODO implement TacletIfSelectionDialog
 
                 // TacletIfSelectionDialog ifSelection = new
                 // TacletIfSelectionDialog(models[i], this);
@@ -138,19 +190,12 @@ public class TacletInstantiationViewController extends ViewController {
         }
     }
 
-    private void pushAllInputToModel() {
-        pushAllInputToModel(current());
-    }
-
-    void pushAllInputToModel(int i) {
-        /*
-         * if (dataTable[i].hasIfSelectionPanel()) {
-         * dataTable[i].getIfSelectionPanel().pushAllInputToModel(); }
-         */
-        if (dataTable[i].isEditing()) {
-            dataTable[i].getCellEditor().stopCellEditing();
-        }
-
+    private <S, T> TableColumn<S, T> createCol(String title,
+            Function<S, ObservableValue<T>> property) {
+        TableColumn<S, T> col = new TableColumn<>(title);
+        col.setCellValueFactory(
+                cellData -> property.apply(cellData.getValue()));
+        return col;
     }
 
     void setStatus(String s) {
@@ -170,7 +215,6 @@ public class TacletInstantiationViewController extends ViewController {
     @FXML
     void handleApply(ActionEvent event) {
         try {
-            pushAllInputToModel();
             TacletApp app = models[current()].createTacletApp();
             if (app == null) {
                 Alert alert = new Alert(AlertType.ERROR);
@@ -200,7 +244,7 @@ public class TacletInstantiationViewController extends ViewController {
     }
 
     @FXML
-    void handleClose(ActionEvent event) {
+    void handleClose(Event event) {
         mediator.freeModalAccess(this);
         getStage().close();
     }
@@ -218,22 +262,20 @@ public class TacletInstantiationViewController extends ViewController {
         goal = mediator.getSelectedGoal();
         models = getContext().getCurrentModels();
 
-        // XXX see above
-        dataTable = new TacletInstantiationDataTable[models.length];
-
         for (TacletInstantiationModel aModel : models) {
             aModel.prepareUnmatchedInstantiation();
         }
+
+        instantiationProposers = new InstantiationProposerCollection();
+        instantiationProposers.add(mediator.getServices().getVariableNamer());
+        instantiationProposers.add(VariableNameProposer.DEFAULT);
 
         initProgramVariables();
         initTaclet();
         initInputValidation();
         initInstantiationsTabPane();
 
-    }
-
-    public boolean checkAfterEachInput() {
-        // TODO Auto-generated method stub
-        return false;
+        getStage().getScene().getWindow().setOnCloseRequest(this::handleClose);
+        
     }
 }

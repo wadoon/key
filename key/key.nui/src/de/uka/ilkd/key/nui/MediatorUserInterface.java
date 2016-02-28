@@ -56,7 +56,7 @@ public class MediatorUserInterface
         // constructor can not be used. There is no need to pass the goal anymore,
         // as the controller can get it directly from the KeYMediator.
         mainApp.getRootLayoutController().getContext().setCurrentModels(models);
-        mainApp.openNewWindow("Taclet Instantiation", "view/TacletInstantiationView.fxml");
+        mainApp.openNewWindow("Taclet Instantiation", "view/TacletInstantiationView.fxml", true);
     }
 
     @Override

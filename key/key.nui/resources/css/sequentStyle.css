@@ -107,24 +107,6 @@ pre {
 	font-weight: inherit;
 	font-style: inherit;
 }
-.abstractSortOp {
-	background-color: #0000FF;
-	color: inherit;
-	font-weight: inherit;
-	font-style: inherit;
-}
-.abstractSV {
-	background-color: #808080;
-	color: #FFFFFF;
-	font-weight: inherit;
-	font-style: inherit;
-}
-.abstractTermTransf {
-	background-color: #FF00FF;
-	color: inherit;
-	font-weight: inherit;
-	font-style: inherit;
-}
 .elemUpdate {
 	background-color: inherit;
 	color: #FFFF00;

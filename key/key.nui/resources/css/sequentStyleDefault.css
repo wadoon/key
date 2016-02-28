@@ -83,7 +83,7 @@ pre {
 	font-weight: inherit;
 	font-style: inherit;
 }
-.quantifier{
+.quantifier {
 	background-color: inherit;
 	color: #ff3300;
 	font-weight: inherit;
@@ -103,24 +103,6 @@ pre {
 }
 .observerFunc {
 	background-color: #008000;
-	color: inherit;
-	font-weight: inherit;
-	font-style: inherit;
-}
-.abstractSortOp {
-	background-color: #0000FF;
-	color: inherit;
-	font-weight: inherit;
-	font-style: inherit;
-}
-.abstractSV {
-	background-color: #808080;
-	color: #FFFFFF;
-	font-weight: inherit;
-	font-style: inherit;
-}
-.abstractTermTransf {
-	background-color: #FF00FF;
 	color: inherit;
 	font-weight: inherit;
 	font-style: inherit;
@@ -245,3 +227,4 @@ pre {
 	font-weight: inherit;
 	font-style: italic;
 }
+

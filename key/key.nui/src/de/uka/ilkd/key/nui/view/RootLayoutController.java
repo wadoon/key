@@ -641,7 +641,7 @@ public class RootLayoutController extends ViewController {
 
     @FXML
     private void handleSequentCssStylerAction() {
-        getMainApp().openNewWindow("Sequent CSS Styler", "view/CssStylerView.fxml");
+        getMainApp().openNewWindow("Sequent CSS Styler", "view/CssStylerView.fxml", true);
     }
     
     @FXML

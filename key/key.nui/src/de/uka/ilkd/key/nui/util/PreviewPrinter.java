@@ -18,8 +18,9 @@ public class PreviewPrinter {
 
     }
     
-    public String printPreview(String css, String rule){
+    public String printPreview(String css, CssRule rule){
         StringBuilder sb = new StringBuilder();
+        String selector = rule.selectorsAsString();
         sb.append("<head>");
         
         sb.append("<style>");
@@ -30,7 +31,7 @@ public class PreviewPrinter {
         sb.append("<pre>");
         
         sb.append(NUIConstants.OPEN_TAG_BEGIN);
-        sb.append(rule.substring(1, rule.length()));
+        sb.append(selector.substring(1, selector.length()));
         sb.append(NUIConstants.OPEN_TAG_END);
         
         sb.append(PREVIEW_TEXT);
