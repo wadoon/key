@@ -124,7 +124,7 @@ public class TacletInstantiationViewController extends ViewController {
                 tableModel.add(new TacletInstantiationRowModel(
                         (SchemaVariable) tfm.getValueAt(j, 0),
                         (String) tfm.getValueAt(j, 1), j,
-                        j > tfm.getNoEditRow()));
+                        j > 0 ));//tfm.getNoEditRow()));
             }
 
             TableColumn<TacletInstantiationRowModel, Number> rowNrColumn = createCol(
