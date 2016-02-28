@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui.model;
 
+import java.util.List;
+
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.MainApp;
@@ -12,6 +14,8 @@ import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.util.CsEvent;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.NUIConstants;
+import de.uka.ilkd.key.nui.view.menu.TacletMenuItem;
+import javafx.collections.ObservableList;
 
 public class Context {
 
@@ -117,5 +121,15 @@ public class Context {
     }
     public TacletInstantiationModel[] getCurrentModels() {
         return models;
+    }
+    
+    private ObservableList<TacletMenuItem> hiddenTacletMenuItems;
+    
+    public void setCurrentHiddenTacletMenuItems(ObservableList<TacletMenuItem> hiddenItems) {
+        this.hiddenTacletMenuItems = hiddenItems;
+    }
+    
+    public ObservableList<TacletMenuItem> getCurrentHiddenTacletMenuItems() {
+        return hiddenTacletMenuItems;
     }
 }
