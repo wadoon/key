@@ -83,7 +83,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
 
             List<TacletSetMatchTask> forks = new ArrayList<>();
 
-            for (int lower = 0; lower<toMatch.length; lower+=partitionSize) {
+            for (int lower = 0; lower<toMatch.length; lower += partitionSize) {
                 int upper = lower + partitionSize;
                 upper = upper <= toMatch.length ? upper : toMatch.length;
                 forks.add(new TacletSetMatchTask(toMatch, lower, upper, pos, p_filter, services));

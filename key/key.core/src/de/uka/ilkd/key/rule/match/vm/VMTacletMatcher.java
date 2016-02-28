@@ -76,10 +76,10 @@ public class VMTacletMatcher implements TacletMatcher {
      * @param taclet the Taclet matched by this matcher
      */
     public VMTacletMatcher(Taclet taclet) {
-        varconditions = taclet.getVariableConditions();
+        varconditions  = taclet.getVariableConditions();
         assumesSequent = taclet.ifSequent();
-        boundVars = taclet.getBoundVariables();
-        varsNotFreeIn = taclet.varsNotFreeIn();
+        boundVars      = taclet.getBoundVariables();
+        varsNotFreeIn  = taclet.varsNotFreeIn();
 
         if (taclet instanceof FindTaclet) {
             findExp = ((FindTaclet) taclet).find();

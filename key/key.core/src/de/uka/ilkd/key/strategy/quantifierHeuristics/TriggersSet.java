@@ -108,11 +108,7 @@ public class TriggersSet {
     private void initTriggers(Services services) {
         final QuantifiableVariable var =
                 allTerm.varsBoundHere(0).get(0);
-        final Iterator<Term> it =
-                TriggerUtils.iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm),
-                Junctor.AND);
-        while (it.hasNext()) {
-            final Term clause = it.next();
+        for (final Term clause : TriggerUtils.setByOperator(TriggerUtils.discardQuantifiers(allTerm), Junctor.AND)) {
             // a trigger should contain the first variable of allTerm
             if (clause.freeVars().contains(var)) {
                 ClauseTrigger ct = new ClauseTrigger(clause);
@@ -198,10 +194,7 @@ public class TriggersSet {
          * those elements. 
          */
         public void createTriggers(Services services) {
-            final Iterator<Term> it =
-                    TriggerUtils.iteratorByOperator(clause, Junctor.OR);
-            while (it.hasNext()) {
-                final Term oriTerm = it.next();
+           for (final Term oriTerm : TriggerUtils.setByOperator(clause, Junctor.OR)) {
                 for (Term term : expandIfThenElse(oriTerm, services)) {
                     Term t = term;
                     if (t.op() == Junctor.NOT) {
@@ -387,12 +380,11 @@ public class TriggersSet {
         private Set<ImmutableSet<Trigger>> setMultiTriggers(Iterator<Trigger> ts) {
             Set<ImmutableSet<Trigger>> res = new LinkedHashSet<ImmutableSet<Trigger>>();
             if (ts.hasNext()) {
-        	final Trigger trigger = ts.next();
-        	ImmutableSet<Trigger> tsi = DefaultImmutableSet.<Trigger>nil().add(trigger);
-        	res.add(tsi);
-        	Set<ImmutableSet<Trigger>> nextTriggers = setMultiTriggers(ts);
+                final Trigger trigger = ts.next();
+                ImmutableSet<Trigger> tsi = DefaultImmutableSet.<Trigger>nil().add(trigger);
+                res.add(tsi);
+                Set<ImmutableSet<Trigger>> nextTriggers = setMultiTriggers(ts);
 
-        	res.addAll(nextTriggers);
                 for (ImmutableSet<Trigger> nextTrigger : nextTriggers) {
                     ImmutableSet<Trigger> next = nextTrigger;
                     next = next.add(trigger);

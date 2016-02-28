@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -37,21 +38,32 @@ class TriggerUtils {
         return t;
     }
     
-    /**
-     * @return set of terms that are that the term splite d through the operator
-     *         <code>op</code>
-     */
-    public static Iterator<Term> iteratorByOperator(Term term, Operator op) {
-        return setByOperator ( term, op ).iterator ();
+    public static Term discardDoubleNegation(Term pro) {
+        boolean negated = false;
+        Term result;
+        do {
+            if (negated) {
+                result = pro.sub(0);
+                negated = false;
+            } else {
+                result = pro;
+                negated = true;
+            }
+        } while (pro.arity() > 0 && ( pro = pro.sub(0) ).op() == Junctor.NOT);
+        return result;
     }
-
-    public static ImmutableSet<Term> setByOperator(Term term, Operator op) {
-        if ( term.op () == op )
-            return setByOperator ( term.sub ( 0 ), op )
-                   .union ( setByOperator ( term.sub ( 1 ), op ) );
-        return DefaultImmutableSet.<Term>nil().add ( term );
+    
+    public static Set<Term> setByOperator(Term term, Operator op) {
+        Set<Term> result;
+        if ( term.op () == op ) {
+            result = setByOperator ( term.sub ( 0 ), op );
+            result.addAll ( setByOperator ( term.sub ( 1 ), op ) );
+        } else {
+            result = new HashSet<>();
+            result.add ( term );
+        }
+        return result;
     }
-
 
     /**
      * 
@@ -74,4 +86,6 @@ class TriggerUtils {
         final Operator op = res.op ();
         return op == Junctor.TRUE || op == Junctor.FALSE;
     }
+
+  
 }

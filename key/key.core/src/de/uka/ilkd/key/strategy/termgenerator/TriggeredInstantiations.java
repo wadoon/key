@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -59,7 +60,7 @@ public class TriggeredInstantiations implements TermGenerator {
     
     private Sequent last = Sequent.EMPTY_SEQUENT;
     private Set<Term> lastCandidates = new HashSet<Term>();
-    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
+    private Set<Term> lastAxioms = new HashSet<>();
     
     private boolean checkConditions;
 
@@ -84,16 +85,17 @@ public class TriggeredInstantiations implements TermGenerator {
 
             final Set<Term> terms;
             final Set<Term> axiomSet;
-            ImmutableSet<Term> axioms = DefaultImmutableSet.<Term>nil();
+            Set<Term> axioms;
  
             
             final Sequent seq = goal.sequent();
             if (seq != last) {
+                axioms = new HashSet<Term>();
                 terms = new HashSet<Term>();
                 axiomSet = new HashSet<Term>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
                 for (Term axiom : axiomSet) {
-                    axioms = axioms.add(axiom);
+                    axioms.add(axiom);
                 }
 
                 synchronized (this) {
@@ -180,7 +182,7 @@ public class TriggeredInstantiations implements TermGenerator {
         }
     }
 
-    private boolean isAvoidConditionProvable(Term cond, ImmutableSet<Term> axioms,
+    private boolean isAvoidConditionProvable(Term cond, Set<Term> axioms,
             Services services) {
         
         long cost = PredictCostProver.computerInstanceCost(
@@ -191,7 +193,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
     private HashSet<Term> computeInstances(Services services,
             final Term comprehension, final Metavariable mv,
-            final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms, TacletApp app) {
+            final Term trigger, Set<Term> terms, Set<Term> axioms, TacletApp app) {
 
         final HashSet<Term> instances = new HashSet<Term>();
         final HashSet<Term> alreadyChecked = new HashSet<Term>();

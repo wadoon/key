@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -47,8 +49,7 @@ class Instantiation {
     * Literals occurring in the sequent at hand. This is used for branch
     * prediction
     */
-   private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet
-         .<Term> nil();
+   private Set<Term> assumedLiterals = new HashSet<Term>();
 
    /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();
@@ -61,7 +62,7 @@ class Instantiation {
       matrix = TriggerUtils.discardQuantifiers(allterm);
       /* Terms bound in every formula on <code>goal</code> */
       triggersSet = TriggersSet.create(allterm, services);
-      assumedLiterals = initAssertLiterals(seq, services);
+      initAssertLiterals(seq, services);
       addInstances(sequentToTerms(seq), services);
    }
 
@@ -159,21 +160,20 @@ class Instantiation {
     * @return all literals in antesequent, and all negation of literal in
     *         succedent
     */
-   private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
-      ImmutableSet<Term> assertLits = DefaultImmutableSet.<Term> nil();
+   private void initAssertLiterals(Sequent seq, TermServices services) {
+      assumedLiterals = new HashSet<>();
       for (final SequentFormula cf : seq.antecedent()) {
          final Term atom = cf.formula();
          final Operator op = atom.op();
          if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
-            assertLits = assertLits.add(atom);
+             assumedLiterals.add(atom);
       }
       for (final SequentFormula cf : seq.succedent()) {
          final Term atom = cf.formula();
          final Operator op = atom.op();
          if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
-            assertLits = assertLits.add(services.getTermBuilder().not(atom));
+             assumedLiterals.add(services.getTermBuilder().not(atom));
       }
-      return assertLits;
    }
 
    /**

@@ -353,8 +353,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
 				    Services        services) {
-        NoPosTacletApp result = matchFind(pos, services, null);
-	return result;
+	return  matchFind(pos, services, null);
     }
 
 
