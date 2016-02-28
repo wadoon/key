@@ -6,7 +6,6 @@ package de.uka.ilkd.key.nui.view;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -15,8 +14,6 @@ import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.CssRule;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.util.PreviewPrinter;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -30,17 +27,12 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
-import javafx.util.Callback;
 
 /**
  * @author Maximilian Li
@@ -63,7 +55,7 @@ public class CssStylerViewController extends ViewController {
                     "Comic Sans", "Times New Roman");
 
     @FXML
-    private ListView<String> listView;
+    private TreeView<String> listView;
     @FXML
     private Button apply;
     @FXML
@@ -88,34 +80,131 @@ public class CssStylerViewController extends ViewController {
     }
 
     private void initializeList() {
+        TreeItem<String> rootItem = new TreeItem<String>(
+                "Sequent Style Settings");
+        rootItem.getChildren().add(new TreeItem<String>("General Settings"));
+        rootItem.getChildren().add(new TreeItem<String>("Filter Settings"));
+        rootItem.getChildren().add(new TreeItem<String>("Rule Application"));
+        rootItem.getChildren().add(new TreeItem<String>("Operators"));
+        rootItem.getChildren().add(new TreeItem<String>("Logic Terms"));
+        rootItem.getChildren().add(new TreeItem<String>("Function Terms"));
+        rootItem.getChildren().add(new TreeItem<String>("Java Styling"));
+        rootItem.getChildren()
+                .add(new TreeItem<String>("Conditional Operators"));
+        rootItem.getChildren().add(new TreeItem<String>("Updater"));
+        rootItem.getChildren().add(new TreeItem<String>("Schema Variables"));
+        rootItem.getChildren().add(new TreeItem<String>("Other Settings"));
+
         for (CssRule rule : cssFileHandler.getParsedRules()) {
             String ruleDescription = NUIConstants.getClassDescriptionMap()
                     .get(rule.selectorsAsString());
-            
-            if (ruleDescription != null){
-                ruleMap.put(ruleDescription, rule);
-            }else{
-                ruleMap.put(rule.selectorsAsString(), rule);
+
+            if (ruleDescription == null) {
+                ruleDescription = rule.selectorsAsString();
             }
 
-            if (rule.selectorsAsString().equals("pre")) {
+            switch (rule.selectorsAsString()) {
+            case "pre":
                 masterRules = rule.getPropertyValuePairs();
+            case ".highlighted":
+            case ".mouseover":
+                // General Settings
+                rootItem.getChildren().get(0).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            case ".filterSelection":
+            case ".minimized":
+            case ".collapsed":
+                // Filter Settings
+                rootItem.getChildren().get(1).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            case ".ruleApp":
+            case ".ifInst":
+            case ".ifFormula":
+                // Rule Application
+                rootItem.getChildren().get(2).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            case ".elemUpdate":
+            case ".equality":
+            case ".junctor":
+            case ".substOp":
+            case ".warySubstOp":
+                // Operator
+                rootItem.getChildren().get(3).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+
+            case ".logicVar":
+            case ".observerFunc":
+            case ".quantifier":
+                // Logic Terms
+                rootItem.getChildren().get(4).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            case ".function":
+            case ".sortDepFunc":
+            case ".transformer":
+            case ".varSV":
+                //Function Terms
+                rootItem.getChildren().get(5).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            case ".modality":
+            case ".modalOpSV":
+            case ".locationVar":
+            case ".progConst":
+            case ".progMeth":
+            case ".progSV":
+            case ".progVar":
+                //Java Styling
+                rootItem.getChildren().get(6).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            case ".ifExThenElse":
+            case ".ifThenElse":
+                //Cond. Operator
+                rootItem.getChildren().get(7).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            case ".updateApp":
+            case ".updateJunc":
+            case ".updateSV":
+                //Update Terms
+                rootItem.getChildren().get(8).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            case ".formulaSV":
+            case ".schemaVarFactory":
+            case ".termLabelSV":
+            case ".termSV":
+            case ".skolemTermSV":
+                //Schema Variable
+                rootItem.getChildren().get(9).getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
+            default:
+                //Default: Other
+                rootItem.getChildren().get(rootItem.getChildren().size() - 1)
+                        .getChildren()
+                        .add(new TreeItem<String>(ruleDescription));
+                break;
             }
+            ruleMap.put(ruleDescription, rule);
         }
 
-        ObservableList<String> ruleList = FXCollections
-                .observableArrayList(ruleMap.keySet());
-
-        listView.setItems(ruleList);
+        listView.setRoot(rootItem);
         listView.getSelectionModel().selectedItemProperty().addListener(e -> {
-            selected = listView.getSelectionModel().getSelectedItem();
+            selected = listView.getSelectionModel().getSelectedItem()
+                    .getValue();
             updateTable();
             updatePreview();
         });
     }
 
     private void updateTable() {
-        if (selected == null) {
+        if (selected == null || !ruleMap.containsKey(selected)) {
             return;
         }
 
@@ -282,11 +371,11 @@ public class CssStylerViewController extends ViewController {
     }
 
     private void updatePreview() {
-        if (selected == null) {
+        if (selected == null || !ruleMap.containsKey(selected)) {
             return;
         }
-        previewWeb.getEngine().loadContent(previewPrinter
-                .printPreview(cssFileHandler.parsedRulestoString(), selected));
+        previewWeb.getEngine().loadContent(previewPrinter.printPreview(
+                cssFileHandler.parsedRulestoString(), ruleMap.get(selected)));
     }
 
     @FXML
@@ -335,11 +424,32 @@ public class CssStylerViewController extends ViewController {
         reset.setDisable(true);
     }
 
+    private void resetRules() {
+        for (CssRule rule : cssFileHandler.getParsedRules()) {
+            String ruleDescription = NUIConstants.getClassDescriptionMap()
+                    .get(rule.selectorsAsString());
+
+            if (ruleDescription == null) {
+                ruleDescription = rule.selectorsAsString();
+            }
+            if (rule.selectorsAsString().equals("pre")) {
+                masterRules = rule.getPropertyValuePairs();
+            }
+
+            ruleMap.put(ruleDescription, rule);
+        }
+    }
+
     @FXML
     private void handleReset() {
         cssFileHandler.reset();
-        initializeList();
+        resetUI();
+    }
 
+    private void resetUI() {
+        resetRules();
+        updateTable();
+        updatePreview();
         apply.setDisable(true);
         reset.setDisable(true);
     }
@@ -347,10 +457,7 @@ public class CssStylerViewController extends ViewController {
     @FXML
     private void handleResetDefault() {
         cssFileHandler.resetDefault();
-        initializeList();
-
-        apply.setDisable(true);
-        reset.setDisable(true);
+        resetUI();
     }
 
 }

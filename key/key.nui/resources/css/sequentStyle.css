@@ -4,7 +4,7 @@ pre {
 	color: #000000;
 	font-weight: normal;
 	font-size: 16px;
-	font-family: Courier New;
+	font-family: Liberation Mono;
 	font-style: normal;
 }
 .highlighted {
@@ -103,24 +103,6 @@ pre {
 }
 .observerFunc {
 	background-color: #008000;
-	color: inherit;
-	font-weight: inherit;
-	font-style: inherit;
-}
-.abstractSortOp {
-	background-color: #0000FF;
-	color: inherit;
-	font-weight: inherit;
-	font-style: inherit;
-}
-.abstractSV {
-	background-color: #808080;
-	color: #FFFFFF;
-	font-weight: inherit;
-	font-style: inherit;
-}
-.abstractTermTransf {
-	background-color: #FF00FF;
 	color: inherit;
 	font-weight: inherit;
 	font-style: inherit;

@@ -45,11 +45,6 @@ public final class NUIConstants {
         classEnabledMap.put(de.uka.ilkd.key.logic.op.Modality.class, true);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
                 true);
-        classEnabledMap.put(
-                de.uka.ilkd.key.logic.op.AbstractSortedOperator.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.AbstractSV.class, true);
-        classEnabledMap.put(
-                de.uka.ilkd.key.logic.op.AbstractTermTransformer.class, true);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
                 true);
         classEnabledMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, true);
@@ -90,11 +85,6 @@ public final class NUIConstants {
         classMap.put(de.uka.ilkd.key.logic.op.Modality.class, "modality");
         classMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
                 "observerFunc");
-        classMap.put(de.uka.ilkd.key.logic.op.AbstractSortedOperator.class,
-                "abstractSortOp");
-        classMap.put(de.uka.ilkd.key.logic.op.AbstractSV.class, "abstractSV");
-        classMap.put(de.uka.ilkd.key.logic.op.AbstractTermTransformer.class,
-                "abstractTermTransf");
         classMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
                 "elemUpdate");
         classMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, "formulaSV");
@@ -124,7 +114,7 @@ public final class NUIConstants {
         classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, "varSV");
         classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, "warySubstOp");
 
-        classDescriptionMap.put("pre", "General");
+        classDescriptionMap.put("pre", "Basic Appearance");
         classDescriptionMap.put(".highlighted", "Search Highlighting");
         classDescriptionMap.put(".mouseover", "Mouseover Highlighting");
         classDescriptionMap.put(".filterSelection",
@@ -143,28 +133,24 @@ public final class NUIConstants {
         classDescriptionMap.put(".sortDepFunc", "Sort Depending Function");
         classDescriptionMap.put(".modality", "Modality Term");
         classDescriptionMap.put(".observerFunc", "Oberserver Function");
-        classDescriptionMap.put(".abstractSortOp", "Abstract Sorted Operator");
-        classDescriptionMap.put(".abstractSV", "Abstract SV");
-        classDescriptionMap.put(".abstractTermTransf",
-                "Abstract Term Transformer");
         classDescriptionMap.put(".elemUpdate", "Elementary Updater");
-        classDescriptionMap.put(".formulaSV", "Formula SV");
+        classDescriptionMap.put(".formulaSV", "Formula Schema Variable");
         classDescriptionMap.put(".ifExThenElse", "If Ex then Else... Term");
         classDescriptionMap.put(".ifThenElse", "If then Else... Term");
-        classDescriptionMap.put(".modalOpSV", "Modal Operator SV");
+        classDescriptionMap.put(".modalOpSV", "Modal Operator Schema Variable");
         classDescriptionMap.put(".progConst", "Program Constants");
         classDescriptionMap.put(".progMeth", "Program Method");
-        classDescriptionMap.put(".progSV", "Program SV");
-        classDescriptionMap.put(".progVar", "program Variable");
+        classDescriptionMap.put(".progSV", "Program Schema Variable");
+        classDescriptionMap.put(".progVar", "Program Variable");
         classDescriptionMap.put(".schemaVarFactory", "Schema Variable Factory");
-        classDescriptionMap.put(".skolemTermSV", "Skolem Term SV");
+        classDescriptionMap.put(".skolemTermSV", "Skolem Term Schema Variable");
         classDescriptionMap.put(".substOp", "Substitution Operator");
-        classDescriptionMap.put(".termLabelSV", "Term Label SV");
+        classDescriptionMap.put(".termLabelSV", "Term Label Schema Variable");
         classDescriptionMap.put(".transformer", "Transformer");
         classDescriptionMap.put(".updateApp", "Update Application");
         classDescriptionMap.put(".updateJunc", "Update Junctor");
-        classDescriptionMap.put(".updateSV", "Update SV");
-        classDescriptionMap.put(".varSV", "Variable SV");
+        classDescriptionMap.put(".updateSV", "Update Schema Variable");
+        classDescriptionMap.put(".varSV", "Variable Schema Variable");
         classDescriptionMap.put(".warySubstOp", "Wary Substition Operator");
 
     }
@@ -183,8 +169,8 @@ public final class NUIConstants {
     public static HashMap<Class, String> getClassCssMap() {
         return classMap;
     }
-    
-    public static HashMap<String, String> getClassDescriptionMap(){
+
+    public static HashMap<String, String> getClassDescriptionMap() {
         return classDescriptionMap;
     }
 
