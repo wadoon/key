@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 
 public class SequentFilterer {
@@ -36,12 +35,20 @@ public class SequentFilterer {
             return criteria;
         }
 
-        if (filter.getIsUserCriteria())
-            criteria = new CriterionContainsString(filter.getSearchText(),
-                    originalLines);
-        else
-            criteria = compileSelectionCriteria(filter.getSelections(),
-                    originalLines);
+        if (filter.getIsUserCriteria()) {
+            if (filter.getSearchText() == null)
+                criteria = new CriterionEmpty<>();
+            else
+                criteria = new CriterionContainsString(filter.getSearchText(),
+                        originalLines);
+        }
+        else {
+            if (filter.getSelections().size() == 0)
+                criteria = new CriterionEmpty<>();
+            else
+                criteria = compileSelectionCriteria(filter.getSelections(),
+                        originalLines);
+        }
 
         // X: it may be better to apply this after invert, depends on user
         // experience
