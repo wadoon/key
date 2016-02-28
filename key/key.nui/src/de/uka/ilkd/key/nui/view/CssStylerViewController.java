@@ -110,7 +110,7 @@ public class CssStylerViewController extends ViewController {
             }
 
             switch (rule.selectorsAsString()) {
-            case "pre":
+            case NUIConstants.MASTER_TAG:
                 masterRules = rule.getPropertyValuePairs();
             case "." + NUIConstants.HIGHLIGHTED_TAG:
             case "." + NUIConstants.MOUSE_TAG:
@@ -272,7 +272,7 @@ public class CssStylerViewController extends ViewController {
                 valueNode = makeTextField(value, property);
                 break;
             }
-            //Logic for CSS Inheritance Handling
+            // Logic for CSS Inheritance Handling
             CheckBox cbxInherited = new CheckBox("Inherited");
             cbxInherited.setSelected(false);
             cbxInherited.setOnAction(event -> {
@@ -310,7 +310,7 @@ public class CssStylerViewController extends ViewController {
             propValGrid.add(new Label(propertyLabel), 0, gridRow);
             propValGrid.add(valueNode, 1, gridRow);
             String selector = ruleMap.get(selected).selectorsAsString();
-            if (!(selector.equals("pre") || selector
+            if (!(selector.equals(NUIConstants.MASTER_TAG) || selector
                     .equals("." + NUIConstants.FILTER_COLLAPSED_TAG))) {
                 propValGrid.add(cbxInherited, 2, gridRow);
             }
@@ -364,7 +364,7 @@ public class CssStylerViewController extends ViewController {
             System.err.println("Could not read Color. Using TextField");
             node = makeTextField(value, property);
         }
-        
+
         return node;
     }
 
@@ -448,7 +448,7 @@ public class CssStylerViewController extends ViewController {
         if (ruleDescription == null) {
             ruleDescription = rule.selectorsAsString();
         }
-        if (rule.selectorsAsString().equals("pre")) {
+        if (rule.selectorsAsString().equals(NUIConstants.MASTER_TAG)) {
             masterRules = rule.getPropertyValuePairs();
         }
 
