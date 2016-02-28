@@ -15,6 +15,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu.TacletAppComparator;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.view.SequentViewController;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.ui.MediatorProofControl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
@@ -100,16 +102,20 @@ public class TacletMenuController extends ViewController {
     @FXML
     private ProofMacroMenuController proofMacroMenuController;
 
-    public void init(ImmutableList<TacletApp> findList,
-            ImmutableList<TacletApp> rewriteList,
-            ImmutableList<TacletApp> noFindList,
-            ImmutableList<BuiltInRule> builtInList, PosInSequent pos,
+    public void init(PosInSequent pos,
             ViewController parentController) {
         this.pos = pos;
         this.parentController = (SequentViewController) parentController;
-        comp = new TacletAppComparator();
-        createTacletMenu(removeRewrites(findList).prepend(rewriteList),
-                noFindList, builtInList);
+        
+        MediatorProofControl c = mediator.getUI()
+                .getProofControl();
+        Goal goal = mediator.getSelectedGoal();
+        PosInOccurrence occ = pos.getPosInOccurrence();
+        
+        final ImmutableList<BuiltInRule> builtInRules = c
+                .getBuiltInRule(goal, occ);
+        createTacletMenu(removeRewrites(c.getFindTaclet(goal, occ)).prepend(c.getRewriteTaclet(goal, occ)),
+                c.getNoFindTaclet(goal), builtInRules);
         proofMacroMenuController.init(mediator, pos.getPosInOccurrence());
     }
 
@@ -242,6 +248,7 @@ public class TacletMenuController extends ViewController {
     @Override
     public void initializeAfterLoadingFxml() {
         mediator = getContext().getKeYMediator();
+        comp = new TacletAppComparator();
     };
 
     @FXML
