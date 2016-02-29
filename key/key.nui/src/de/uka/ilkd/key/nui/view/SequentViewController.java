@@ -240,7 +240,7 @@ public class SequentViewController extends ViewController {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printer = new SequentPrinter(getContext().getCssFileHandler().getCss(),
+        printer = new SequentPrinter(getContext().getCssFileHandler(),
                 abstractSyntaxTree, getContext());
         sequentChanged = true;
 

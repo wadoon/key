@@ -8,8 +8,10 @@ package de.uka.ilkd.key.nui.util;
  *
  */
 public class PreviewPrinter {
-    private final static String PREVIEW_TEXT = "This is a preview:\n"
-            + "Lorem ipsum sit doloret...";
+    private final static String PREVIEW_TEXT = "This is a preview text\n"
+            + "It shows you how elemts in this class will be styled. \n"
+            + "Use the controls to change certain settings. \n"
+            + "All changes can be reverted by the 'Reset to Default' button.";
 
     /**
      * 

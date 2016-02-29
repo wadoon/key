@@ -40,7 +40,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class SequentPrinter {
     private String proofString;
-    private String css;
+    private CssFileHandler cssFileHandler;
     private PositionTable posTable;
     private Sequent sequent;
     private boolean useRegex = false;
@@ -61,6 +61,7 @@ public class SequentPrinter {
     private ArrayList<Integer> searchIndicesClose = new ArrayList<Integer>();
     private ArrayList<Integer> filterIndicesOpen = new ArrayList<Integer>();
     private ArrayList<Integer> filterIndicesClose = new ArrayList<Integer>();
+    private ArrayList<Integer> filterCollapseIndicator = new ArrayList<Integer>();
 
     // Use Unique values in incremental order. Value Correspond to
     // ArrayPosition. Higher Value = Higher Priority.
@@ -79,8 +80,8 @@ public class SequentPrinter {
     /**
      * 
      */
-    public SequentPrinter(String css, PositionTable posTable, Context context) {
-        this.css = css;
+    public SequentPrinter(CssFileHandler cssFileHandler, PositionTable posTable, Context context) {
+        this.cssFileHandler = cssFileHandler;
         this.setPosTable(posTable);
 
         this.context = context;
@@ -170,6 +171,10 @@ public class SequentPrinter {
                         }
                     }
                 }
+            }
+            if (filterCollapseIndicator.contains(i)) {
+                sb.insert(i + offset, "...\n");
+                offset += 4;
             }
             // HTML Formatting
             if (lessThenList.contains(i)) {
@@ -277,45 +282,6 @@ public class SequentPrinter {
         putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
 
         mouseRange = range;
-
-        /*
-         * String[] openTagArray; String[] closeTagArray; Stack<String> tagStack
-         * = new Stack<>();
-         * 
-         * // Check for Overlap inbetween Start and End for (int i =
-         * range.start(); i <= range.end(); i++) {
-         * 
-         * if (openTagsAtIndex.containsKey(i) ||
-         * closeTagsAtIndex.containsKey(i)) {
-         * 
-         * openTagArray = openTagsAtIndex.get(i); closeTagArray =
-         * closeTagsAtIndex.get(i);
-         * 
-         * for (int j = 0; j < StylePos.values().length; j++) { // If
-         * closingTag, pop() the last Opened, or resolve if (closeTagArray !=
-         * null && closeTagArray[j] != null && !closeTagArray[j].isEmpty() && i
-         * > range.start()) { if (tagStack.size() == 0) { putCloseTag(i,
-         * StylePos.MOUSE, NUIConstants.CLOSING_TAG); putOpenTag(i,
-         * StylePos.MOUSE, NUIConstants.MOUSE_TAG); mouseIndicesOpen.add(i);
-         * mouseIndicesClose.add(i); } else { tagStack.pop(); } } // If openTag,
-         * push it on the stack if (openTagArray != null && openTagArray[j] !=
-         * null && !openTagArray[j].isEmpty() && i < range.end()) {
-         * tagStack.push(openTagArray[j]); } } } }
-         * 
-         * // Insert the MouseOverTags themselves putOpenTag(range.start(),
-         * StylePos.MOUSE, NUIConstants.MOUSE_TAG);
-         * mouseIndicesOpen.add(range.start());
-         * 
-         * putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
-         * mouseIndicesClose.add(range.end());
-         * 
-         * // If there is an opened Tag inside the range after mouse is closed,
-         * // resolve the overlap by closing it and opening it again on the
-         * outside // of the mouseover if (tagStack.size() > 0) {
-         * putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
-         * putTag(range.end(), StylePos.MOUSE, tagStack.pop(), openTagsAtIndex);
-         * mouseIndicesOpen.add(range.end()); }
-         */
     }
 
     /**
@@ -345,6 +311,12 @@ public class SequentPrinter {
                     minimizeLine(styleStart, styleEnd);
                     break;
                 case Collapse:
+                    // Add collapsed indicator if collapsed Block ends, or the
+                    // last line is reached
+                    if (indicesOfLines.contains(i + 1)
+                            || i == lines.length - 1) {
+                        filterCollapseIndicator.add(styleEnd);
+                    }
                 default:
                     collapseLine(styleStart, styleEnd);
                     break;
@@ -408,6 +380,7 @@ public class SequentPrinter {
 
             filterIndicesOpen.clear();
             filterIndicesClose.clear();
+            filterCollapseIndicator.clear();
         }
     }
 
@@ -742,7 +715,7 @@ public class SequentPrinter {
         StringBuilder sb = new StringBuilder();
         sb.append("<head>");
         sb.append("<style>");
-        sb.append(css);
+        sb.append(cssFileHandler.getCss());
         sb.append("</style>");
         sb.append("</head><body>");
         sb.append("<pre>");

@@ -3,17 +3,9 @@
  */
 package de.uka.ilkd.key.nui.util;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
-import de.uka.ilkd.key.nui.filter.SequentFilterer;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -31,6 +23,8 @@ public class PositionTranslator {
     private boolean filterCollapsed = false;
     private ArrayList<Integer> filteredLines = new ArrayList<Integer>();
     private CssFileHandler cssHandler;
+    private static Font normalFont;
+    private static Font minimizedFont;
 
     /**
      * 
@@ -55,6 +49,7 @@ public class PositionTranslator {
      *         proofstring.
      */
     public int getCharIdxUnderPointer(MouseEvent event) {
+        this.readCSS();
         // Compute Line
         int line = getLine(event.getY());
 
@@ -87,6 +82,8 @@ public class PositionTranslator {
         int result;
 
         Text text = new Text("\\W|QpXgj�&");
+        text.setFont(normalFont);
+        int collapsedLinesAdjustment = 0;
 
         for (result = 0; result < strings.length; result++) {
 
@@ -94,16 +91,20 @@ public class PositionTranslator {
             // XXX
             if (filterCollapsed) {
                 if (!filteredLines.contains(result)) {
+                    if (filteredLines.contains(result + 1)) {
+                        yCoord -= Math
+                                .round(text.getLayoutBounds().getHeight());
+                    }
                     continue;
                 }
             }
             else {
                 if (!filteredLines.contains(result)
                         && filteredLines.size() > 0) {
-                    text.setFont(new Font(font, minimizedSize));
+                    text.setFont(minimizedFont);
                 }
                 else {
-                    text.setFont(new Font(font, fontSize));
+                    text.setFont(normalFont);
                 }
             }
             yCoord -= Math.round(text.getLayoutBounds().getHeight());
@@ -112,8 +113,9 @@ public class PositionTranslator {
                 break;
             }
         }
-
-        if (yCoord > 0) {
+        result -= collapsedLinesAdjustment;
+        if (yCoord > 0 || (filterCollapsed && filteredLines.size() > 0
+                && !filteredLines.contains(result))) {
             return -1;
         }
         return result;
@@ -139,10 +141,10 @@ public class PositionTranslator {
         // XXX
         if (!filterCollapsed && !filteredLines.contains(line)
                 && filteredLines.size() > 0) {
-            text.setFont(new Font(font, minimizedSize));
+            text.setFont(minimizedFont);
         }
         else {
-            text.setFont(new Font(font, fontSize));
+            text.setFont(normalFont);
         }
 
         // For each char check width
@@ -209,6 +211,9 @@ public class PositionTranslator {
 
         minimizedSize = Integer.parseInt(
                 fontSizeValue.substring(0, fontSizeValue.length() - 2));
+
+        normalFont = new Font(font, fontSize);
+        minimizedFont = new Font(font, minimizedSize);
     }
 
     /**
@@ -217,7 +222,7 @@ public class PositionTranslator {
      * @param filter
      *            the PrintFilter object
      */
-    public void applyFilter(ArrayList<Integer> lines,FilterLayout layout) {
+    public void applyFilter(ArrayList<Integer> lines, FilterLayout layout) {
         filteredLines = lines;
         switch (layout) {
         case Minimize:
@@ -241,6 +246,7 @@ public class PositionTranslator {
      */
 
     public double getProofHeight() { // Adjustment for Margin
+        this.readCSS();
         double result = fontSize;
 
         Text text = new Text(" ");

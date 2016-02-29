@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.CssRule;
@@ -253,7 +252,7 @@ public class CssStylerViewController extends ViewController {
 
                 // Length -2 because "px" suffix in CSS
                 valueNode = makeTextField(
-                        value.substring(0, value.length() - 2), property);
+                        value.substring(0, value.length() - 2), property, true);
                 break;
             case "font-family":
                 propertyLabel = "Font:";
@@ -296,8 +295,7 @@ public class CssStylerViewController extends ViewController {
                     propertyValuePairMap.put(property,
                             masterRules.get(property));
                     updatePreview();
-                    apply.setDisable(false);
-                    reset.setDisable(false);
+                    enableControls();
                 }
                 valueNode.setDisable(cbxInherited.isSelected());
             });
@@ -318,18 +316,62 @@ public class CssStylerViewController extends ViewController {
         }
     }
 
+    /**
+     * makes a TextField control for the Grid
+     * 
+     * @param value
+     *            the initial Value
+     * @param property
+     *            the property to be represented by this node
+     * @return a Textfield "bound" to the Css Property
+     */
     private Node makeTextField(String value, String property) {
+        return makeTextField(value, property, false);
+    }
+
+    /**
+     * makes a TextField control for the Grid
+     * 
+     * @param value
+     *            the initial Value
+     * @param property
+     *            the property to be represented by this node
+     * @param fontSize,
+     *            a boolean indicating if this control represents the property
+     *            "fontSize". If true, handles "-px" suffix for font size
+     * @return a Textfield "bound" to the Css Property
+     */
+    private Node makeTextField(String value, String property,
+            boolean fontSize) {
         TextField tf = new TextField(value);
         tf.setOnAction(event -> {
-            ruleMap.get(selected).putPropertyValuePair(property, tf.getText());
+            if (fontSize) {
+                ruleMap.get(selected).putPropertyValuePair(property,
+                        tf.getText() + "px");
+            }
+            else {
+                ruleMap.get(selected).putPropertyValuePair(property,
+                        tf.getText());
+            }
+
             updatePreview();
-            apply.setDisable(false);
-            reset.setDisable(false);
+            enableControls();
         });
 
         return tf;
     }
 
+    /**
+     * makes a ComboBox control for the Grid
+     * 
+     * @param comboList
+     *            the list containing all the options for this comboBox
+     * @param value
+     *            the initial Value
+     * @param property
+     *            the property to be represented by this node
+     * @return a ComboBox "bound" to the Css Property
+     */
     private Node makeComboBox(ObservableList<String> comboList, String value,
             String property) {
         ComboBox<String> cb = new ComboBox<>(comboList);
@@ -337,12 +379,22 @@ public class CssStylerViewController extends ViewController {
         cb.setOnAction(event -> {
             ruleMap.get(selected).putPropertyValuePair(property, cb.getValue());
             updatePreview();
-            apply.setDisable(false);
-            reset.setDisable(false);
+            enableControls();
         });
         return cb;
     }
 
+    /**
+     * makes a ColorPicker control, if the Color can be parsed, and a TextArea
+     * if else
+     * 
+     * @param value
+     *            the initial value
+     * @param property
+     *            the property to be represented by this node
+     * @return a ColorPicker if the initial value can be parsed as a Color, a
+     *         TextArea if else. This node is then "bound" to the Css Property
+     */
     private Node makeColorPicker(String value, String property) {
         Node node;
         try {
@@ -355,8 +407,7 @@ public class CssStylerViewController extends ViewController {
                                 (int) (c.getGreen() * 255),
                                 (int) (c.getBlue() * 255)));
                 updatePreview();
-                apply.setDisable(false);
-                reset.setDisable(false);
+                enableControls();
             });
             node = cp;
         }
@@ -462,6 +513,15 @@ public class CssStylerViewController extends ViewController {
     }
 
     /**
+     * enables all the buttons in the Bar
+     */
+    private void enableControls() {
+        apply.setDisable(false);
+        reset.setDisable(false);
+        resetDefault.setDisable(false);
+    }
+
+    /**
      * resets the complete UI
      */
     private void resetUI() {
@@ -470,6 +530,7 @@ public class CssStylerViewController extends ViewController {
         }
         updateGrid();
         updatePreview();
+        resetDefault.setDisable(true);
         apply.setDisable(true);
         reset.setDisable(true);
     }
