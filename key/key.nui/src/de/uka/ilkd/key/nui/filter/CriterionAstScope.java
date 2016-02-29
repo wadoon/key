@@ -48,7 +48,7 @@ public class CriterionAstScope implements Criterion<Integer> {
             // the first line of this range as charIndex
             Range previous = positionTable
                     .rangeForIndex(getCharIndex(range.first)
-                            + getFirstNonWhitespace(range.first) +1);
+                            + getFirstNonWhitespace(range.first));
             lines.addAll(
                     IntStream.range(getLineIndex(previous.start()), range.first)
                             .boxed().collect(Collectors.toList()));
@@ -59,7 +59,7 @@ public class CriterionAstScope implements Criterion<Integer> {
                     .rangeForIndex(getCharIndex(range.second)
                             + originalLines[range.second].length() - 1);
             lines.addAll(IntStream
-                    .range(range.second + 1, getLineIndex(following.end()))
+                    .range(range.second + 1, getLineIndex(following.end()) + 1)
                     .boxed().collect(Collectors.toList()));
         }
 
@@ -72,7 +72,8 @@ public class CriterionAstScope implements Criterion<Integer> {
     private int getLineIndex(int currentChar) {
         int idx = 0;
         for (int line = 0; line < originalLines.length; line++) {
-            idx += originalLines[line].length();
+            // add + 1 to count for the line-break at the end (thanks to max)
+            idx += originalLines[line].length() + 1;
             if (idx > currentChar)
                 return line;
         }
@@ -80,10 +81,9 @@ public class CriterionAstScope implements Criterion<Integer> {
     }
 
     private int getFirstNonWhitespace(int lineIndex) {
-        for (int notwhite = 0; notwhite < originalLines[lineIndex]
-                .length(); notwhite++) {
-            if (!Character
-                    .isSpaceChar(originalLines[lineIndex].charAt(notwhite))) {
+        String line = originalLines[lineIndex];
+        for (int notwhite = 0; notwhite < line.length(); notwhite++) {
+            if (!Character.isSpaceChar(line.charAt(notwhite))) {
                 // return the first non-whitespace char of this line
                 return notwhite;
             }
@@ -97,7 +97,8 @@ public class CriterionAstScope implements Criterion<Integer> {
             if (i == lineIndex) {
                 return charIndex;
             }
-            charIndex += originalLines[i].length();
+            // add + 1 to count for the line-break at the end (thanks to max)
+            charIndex += originalLines[i].length() + 1;
         }
         return -1;
     }
