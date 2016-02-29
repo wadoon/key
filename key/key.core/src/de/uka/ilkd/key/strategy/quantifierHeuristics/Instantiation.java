@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -49,7 +48,7 @@ class Instantiation {
     * Literals occurring in the sequent at hand. This is used for branch
     * prediction
     */
-   private Set<Term> assumedLiterals = new HashSet<Term>();
+   private HashSet<Term> assumedLiterals = new HashSet<Term>();
 
    /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();

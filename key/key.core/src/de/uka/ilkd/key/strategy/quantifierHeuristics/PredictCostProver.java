@@ -58,8 +58,16 @@ public class PredictCostProver {
 	    // non-ground substitutions not supported yet
 	    return -1;
 	} else {
+	    Set<Term> assertions;
+	    if (assertList instanceof HashSet) {
+	        assertions = (Set<Term>) ((HashSet) assertList).clone();
+	    } else {
+	        assertions = new HashSet<Term>();
+	        assertions.addAll(assertList);
+	    }
+	        
 	    final PredictCostProver prover = new PredictCostProver(sub
-		.applyWithoutCasts(matrix, services), assertList, services);
+		.applyWithoutCasts(matrix, services), assertions, services);
 	    return prover.cost();
 	}
     }
@@ -156,7 +164,6 @@ public class PredictCostProver {
             return res;
         }
         
-        
         for (Term t : assertLits) {
             res = provedByAnother(problem, t);
             if (TriggerUtils.isTrueOrFalse(res)) {
@@ -172,10 +179,6 @@ public class PredictCostProver {
     // end
 
     // cost computation
-    /** do two step refinement and return the cost */
-    private long cost() {
-	return firstRefine();
-    }
 
     /**
      * refine every clause, by assume assertList are true and if a clause's cost
@@ -185,7 +188,7 @@ public class PredictCostProver {
      * clause is refined to a situation that only one literal is left, the
      * literal will be add to assertLiterals.
      */
-    private long firstRefine() {
+    private long cost() {
         long cost = 1;
         boolean assertChanged = false;
         final Set<Clause> res = new LinkedHashSet<Clause>();
@@ -214,26 +217,10 @@ public class PredictCostProver {
         return cost;
     }
 
-    /** A sat() procedure with back searching */
-    /*
-     * private long secondRefineX(SetOf<Term> assertLits, Map cache, Object[]
-     * cls, int index) { long cost = 1; for ( int i = index; i < cls.length; i++
-     * ) { Clause c = (Clause)cls[i]; final SetOf<Term> ls = c.refine (
-     * assertLits, cache ); if ( ls.contains ( falseT ) ) return 0; if (
-     * ls.contains ( trueT ) ) return secondRefine ( assertLits, cache, cls, i +
-     * 1 ); final Iterator<Term> it = ls.iterator (); while ( it.hasNext () ) {
-     * SetOf<Term> nextLits = SetAsListOf.<Term>nil().union ( assertLits );
-     * nextLits = nextLits.add ( it.next () ); final Map nextCache = new HashMap
-     * (); nextCache.putAll ( cache ); long nextCost = secondRefine ( nextLits,
-     * nextCache, cls, i + 1 ); cost = cost + nextCost;
-     * 
-     * } } return cost; }
-     */
-
     private class Clause {
 
 	/** all literals contains in this clause */
-	public Set<Term> literals = new HashSet<>();
+	public Set<Term> literals;
 
 	
 	public Clause(Set<Term> lits) {

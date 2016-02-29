@@ -13,26 +13,17 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -46,11 +37,7 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 
 public class TriggeredInstantiations implements TermGenerator {
 
