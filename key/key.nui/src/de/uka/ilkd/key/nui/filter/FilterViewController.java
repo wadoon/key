@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 import java.util.ResourceBundle;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -22,6 +23,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.GridPane;
 import javafx.scene.control.Button;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
@@ -66,7 +68,13 @@ public class FilterViewController extends ViewController {
     private Button applyButton;
 
     @FXML
-    private CheckBox useAstScope;
+    private RadioButton useAstScope;
+
+    @FXML
+    private RadioButton useTextScope;
+
+    @FXML
+    private GridPane resultRangeText;
 
     // Note: used in code that is disabled right now.
     @SuppressFBWarnings(justification = "Not used in code right now", value = "URF_UNREAD_FIELD")
@@ -102,6 +110,9 @@ public class FilterViewController extends ViewController {
             currentFilter.setIsUserCriteria(true);
         });
         applyButton.setDisable(true);
+        useTextScope.selectedProperty().addListener(
+                o -> resultRangeText.setDisable(useAstScope.isSelected()));
+        useTextScope.setSelected(true);
 
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
             beforeNumber.setText(Integer.toString(new_val.intValue()));

@@ -7,11 +7,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="254.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.filter.FilterViewController">
+<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="264.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.filter.FilterViewController">
    <children>
-      <VBox AnchorPane.bottomAnchor="54.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox AnchorPane.bottomAnchor="37.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox />
             <BorderPane>
                <center>
                   <VBox>
@@ -19,6 +18,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </BorderPane.margin>
                      <children>
+                        <Label text="Mode:" />
                         <GridPane>
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="78.0" />
@@ -44,32 +44,56 @@
                               <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                            </VBox.margin>
                         </GridPane>
-                        <GridPane>
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="79.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="165.0" minWidth="10.0" prefWidth="156.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="10.0" prefWidth="28.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
+                        <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert Filter">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="30.0" top="5.0" />
+                           </VBox.margin></CheckBox>
+                        <Label text="Result expansion:" />
+                        <VBox>
                            <children>
-                              <Label text="Lines after:" GridPane.rowIndex="2" />
-                              <Slider fx:id="linesAfter" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <Slider fx:id="linesBefore" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label text="Lines before:" GridPane.rowIndex="1" />
-                              <Label fx:id="beforeNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <Label fx:id="afterNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert Filter" GridPane.columnSpan="2" />
-                              <ComboBox fx:id="filterModeBox" prefHeight="25.0" prefWidth="163.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <Label text="Layout:" GridPane.rowIndex="3" />
-                              <CheckBox fx:id="useAstScope" mnemonicParsing="false" text="Use AST instead of lines" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                              <RadioButton fx:id="useTextScope" mnemonicParsing="false" text="Use text lines">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="resultRange" />
+                                 </toggleGroup>
+                              </RadioButton>
+                              <GridPane fx:id="resultRangeText">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="47.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="174.0" minWidth="10.0" prefWidth="166.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="10.0" prefWidth="32.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="After:" GridPane.rowIndex="1" />
+                                    <Slider fx:id="linesAfter" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Slider fx:id="linesBefore" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" />
+                                    <Label text="Before:" />
+                                    <Label fx:id="beforeNumber" text="Label" GridPane.columnIndex="2" />
+                                    <Label fx:id="afterNumber" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="25.0" />
+                                 </padding>
+                              </GridPane>
+                              <RadioButton fx:id="useAstScope" mnemonicParsing="false" text="Use term scope" toggleGroup="$resultRange" />
                            </children>
-                        </GridPane>
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                        </VBox>
+                        <HBox>
+                           <children>
+                              <Label text="Layout:">
+                                 <HBox.margin>
+                                    <Insets right="45.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ComboBox fx:id="filterModeBox" prefHeight="25.0" prefWidth="163.0" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </center>
