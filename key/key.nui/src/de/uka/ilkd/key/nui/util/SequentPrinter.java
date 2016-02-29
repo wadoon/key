@@ -774,7 +774,7 @@ public class SequentPrinter {
         keySet.add(range.end());
 
         putOpenTag(range.start(), StylePos.SELECTION,
-                NUIConstants.SELECTION_TAG);
+                NUIConstants.FILTER_SELECTION_TAG);
         putCloseTag(range.end(), StylePos.SELECTION, NUIConstants.CLOSING_TAG);
     }
 

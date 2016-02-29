@@ -133,7 +133,7 @@ public class MainApp extends Application {
         return rootLayoutController;
     }
     
-    public void openNewWindow(String title, String fxmlPath) {
+    public void openNewWindow(String title, String fxmlPath, boolean resizable) {
         Stage stage = new Stage();
         stage.setTitle(title);
         stage.getIcons().add(new Image(ICON_PATH));
@@ -147,10 +147,11 @@ public class MainApp extends Application {
         stage.show();
         
         stage.getScene().getStylesheets().addAll(scene.getStylesheets());
-        
+        stage.setResizable(resizable);
+
+        ((ViewController) p.getValue()).setStage(stage);
         ((ViewController) p.getValue()).setMainApp(this,
                 rootLayoutController.getContext());
-        ((ViewController) p.getValue()).setStage(stage);
     }
     
     /**

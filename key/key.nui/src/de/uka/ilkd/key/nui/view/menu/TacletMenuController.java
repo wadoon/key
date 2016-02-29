@@ -15,16 +15,17 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu.TacletAppComparator;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.view.SequentViewController;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.ui.MediatorProofControl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
@@ -88,6 +89,10 @@ public class TacletMenuController extends ViewController {
     @FXML
     private Menu moreRules;
     @FXML
+    private Menu insertHidden;
+    @FXML
+    private InsertHiddenMenuController insertHiddenController;
+    @FXML
     private MenuItem copyToClipboard;
     @FXML
     private MenuItem createAbbr;
@@ -100,17 +105,23 @@ public class TacletMenuController extends ViewController {
     @FXML
     private ProofMacroMenuController proofMacroMenuController;
 
-    public void init(ImmutableList<TacletApp> findList,
-            ImmutableList<TacletApp> rewriteList,
-            ImmutableList<TacletApp> noFindList,
-            ImmutableList<BuiltInRule> builtInList, PosInSequent pos,
-            ViewController parentController) {
+    public void init(PosInSequent pos, ViewController parentController) {
         this.pos = pos;
         this.parentController = (SequentViewController) parentController;
-        comp = new TacletAppComparator();
-        createTacletMenu(removeRewrites(findList).prepend(rewriteList),
-                noFindList, builtInList);
-        proofMacroMenuController.init(mediator, pos.getPosInOccurrence());
+
+        if (pos != null) {
+            MediatorProofControl c = mediator.getUI().getProofControl();
+            Goal goal = mediator.getSelectedGoal();
+            PosInOccurrence occ = pos.getPosInOccurrence();
+
+            final ImmutableList<BuiltInRule> builtInRules = c
+                    .getBuiltInRule(goal, occ);
+            createTacletMenu(
+                    removeRewrites(c.getFindTaclet(goal, occ))
+                            .prepend(c.getRewriteTaclet(goal, occ)),
+                    c.getNoFindTaclet(goal), builtInRules);
+            proofMacroMenuController.init(mediator, pos.getPosInOccurrence());
+        }
     }
 
     /**
@@ -156,31 +167,6 @@ public class TacletMenuController extends ViewController {
     }
 
     private void createMenuItems(ImmutableList<TacletApp> taclets) {
-
-        /*
-         * final InsertHiddenTacletMenuItem insHiddenItem = new
-         * InsertHiddenTacletMenuItem(MainWindow.getInstance(),
-         * mediator.getNotationInfo(), mediator.getServices());
-         * 
-         * final InsertionTacletBrowserMenuItem insSystemInvItem = new
-         * InsertSystemInvariantTacletMenuItem(MainWindow.getInstance(),
-         * mediator.getNotationInfo(), mediator.getServices());
-         * 
-         * 
-         * for (final TacletApp app : taclets) { final Taclet taclet =
-         * app.taclet();
-         * 
-         * if (insHiddenItem.isResponsible(taclet)) { insHiddenItem.add(app); }
-         * else if (insSystemInvItem.isResponsible(taclet)) {
-         * insSystemInvItem.add(app); } }
-         * 
-         * if (insHiddenItem.getAppSize() > 0) { add(insHiddenItem);
-         * insHiddenItem.addActionListener(control); }
-         * 
-         * if (insSystemInvItem.getAppSize() > 0) { add(insSystemInvItem);
-         * insSystemInvItem.addActionListener(control); }
-         * 
-         */
         int idx = 0;
         for (final TacletApp app : taclets) {
             final Taclet taclet = app.taclet();
@@ -189,30 +175,33 @@ public class TacletMenuController extends ViewController {
                 continue;
             }
 
-            final MenuItem item = new MenuItem(taclet.displayName());
-            item.setOnAction(event -> {
-                Goal goal = mediator.getSelectedGoal();
-                mediator.getUI().getProofControl().selectedTaclet(taclet, goal,
-                        pos.getPosInOccurrence());
-            });
-            // TODO add tooltip
+            final TacletMenuItem item = new TacletMenuItem(app,
+                    mediator.getNotationInfo(), mediator.getServices());
+            item.setOnAction(this::handleRuleApplication);
 
-            boolean rareRule = false;
-            for (RuleSet rs : taclet.getRuleSets()) {
-                if (CLUTTER_RULESETS.contains(rs.name()))
-                    rareRule = true;
+            if (insertHiddenController.isResponsible(item)) {
+                insertHiddenController.add(item);
             }
-            if (CLUTTER_RULES.contains(taclet.name()))
-                rareRule = true;
+            else {
+                boolean rareRule = false;
+                for (RuleSet rs : taclet.getRuleSets()) {
+                    if (CLUTTER_RULESETS.contains(rs.name()))
+                        rareRule = true;
+                }
+                if (CLUTTER_RULES.contains(taclet.name()))
+                    rareRule = true;
 
-            if (rareRule)
-                moreRules.getItems().add(item);
-            else
-                rootMenu.getItems().add(idx++, item);
-            // }
+                if (rareRule)
+                    moreRules.getItems().add(item);
+                else
+                    rootMenu.getItems().add(idx++, item);
+            }
         }
         if (moreRules.getItems().size() > 0)
             moreRules.setVisible(true);
+        if (!insertHiddenController.isEmpty())
+            insertHiddenController.setVisible(true);
+
     }
 
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
@@ -242,7 +231,16 @@ public class TacletMenuController extends ViewController {
     @Override
     public void initializeAfterLoadingFxml() {
         mediator = getContext().getKeYMediator();
+        comp = new TacletAppComparator();
+        insertHiddenController.setMainApp(getMainApp(), getContext());
     };
+
+    public void handleRuleApplication(ActionEvent event) {
+        Goal goal = mediator.getSelectedGoal();
+        mediator.getUI().getProofControl().selectedTaclet(
+                ((TacletMenuItem) event.getSource()).getTaclet(), goal,
+                pos.getPosInOccurrence());
+    }
 
     @FXML
     private void handleFocussedRuleApplication(ActionEvent event) {

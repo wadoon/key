@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity"
+	minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0"
+	prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.uka.ilkd.key.nui.view.InsertionBrowserViewController">
+	<children>
+		<HBox prefHeight="100.0" prefWidth="200.0"
+			AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+			AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+			<children>
+				<AnchorPane prefHeight="200.0" prefWidth="200.0">
+					<children>
+						<ListView fx:id="itemList" prefHeight="200.0" prefWidth="200.0"
+							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
+							AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
+					</children>
+				</AnchorPane>
+				<AnchorPane prefHeight="400.0" prefWidth="400.0">
+					<children>
+						<TextArea fx:id="preview" editable="false" prefHeight="350.0"
+							prefWidth="401.0" AnchorPane.bottomAnchor="50.0"
+							AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+							AnchorPane.topAnchor="5.0" />
+						<HBox alignment="CENTER_RIGHT" layoutX="54.0" layoutY="294.0"
+							prefHeight="50.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0"
+							AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+							<children>
+								<Button mnemonicParsing="false" onAction="#handleApply"
+									text="Apply">
+									<HBox.margin>
+										<Insets left="10.0" right="10.0" />
+									</HBox.margin>
+									<padding>
+										<Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+									</padding>
+								</Button>
+								<Button mnemonicParsing="false" onAction="#handleClose"
+									text="Cancel">
+									<HBox.margin>
+										<Insets left="10.0" right="10.0" />
+									</HBox.margin>
+									<padding>
+										<Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+									</padding>
+								</Button>
+							</children>
+						</HBox>
+					</children>
+				</AnchorPane>
+			</children>
+		</HBox>
+	</children>
+</AnchorPane>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+
+<Menu fx:id="rootMenu" xmlns="http://javafx.com/javafx/8.0.40"
+        xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.menu.InsertHiddenMenuController"
+        text="Insert Hidden">
+        <MenuItem onAction="#handleOpenDialog" text="Open Dialog" />
+        <SeparatorMenuItem />
+</Menu>

@@ -5,3 +5,10 @@
    -fx-background-color: transparent;
    -fx-background-insets: 0.0, 0.0 1.0 0.0 1.0;
 }
+
+/* ScrollPane background is always gray, even when color is set in code.
+ * This is the only way to change its color, but it will affect ALL ScrollPanes.
+ */
+.scroll-pane > .viewport {
+   -fx-background-color: white;
+}

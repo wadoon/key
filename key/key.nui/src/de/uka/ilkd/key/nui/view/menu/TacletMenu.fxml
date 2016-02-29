@@ -13,6 +13,7 @@
 		<MenuItem mnemonicParsing="false" fx:id="noRules" visible="false"
 			text="No rules applicable." />
 
+                <fx:include fx:id="insertHidden" visible="false" source="InsertHiddenMenu.fxml" />
 		<Menu fx:id="moreRules" visible="false" text="More rules" />
 
 		<SeparatorMenuItem />
