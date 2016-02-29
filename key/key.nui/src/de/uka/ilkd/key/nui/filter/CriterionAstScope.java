@@ -49,17 +49,22 @@ public class CriterionAstScope implements Criterion<Integer> {
             Range previous = positionTable
                     .rangeForIndex(getCharIndex(range.first)
                             + getFirstNonWhitespace(range.first));
-            lines.addAll(
-                    IntStream.range(getLineIndex(previous.start()), range.first)
-                            .boxed().collect(Collectors.toList()));
+            lines.addAll(IntStream
+                    .range(getLineIndex(previous.start()),
+                            getLineIndex(previous.end()) + 1)
+                    .boxed().collect(Collectors.toList()));
 
             // add following subTerm bounds, use last character of the last line
             // of this range as charIndex
             Range following = positionTable
                     .rangeForIndex(getCharIndex(range.second)
-                            + originalLines[range.second].length() - 1);
+                            // decrease char index by two to get rid of
+                            // line-break and last continuing character (e.g. a
+                            // comma)
+                            + originalLines[range.second].length() - 2);
             lines.addAll(IntStream
-                    .range(range.second + 1, getLineIndex(following.end()) + 1)
+                    .range(getLineIndex(following.start()),
+                            getLineIndex(following.end()) + 1)
                     .boxed().collect(Collectors.toList()));
         }
 
