@@ -63,11 +63,11 @@ public class CssFileHandler {
      */
     public void writeCssFile(String path) throws IOException {
 
-        String csss = parsedRulestoString();
+        css = parsedRulestoString();
 
         FileWriter fw = new FileWriter(path, false);
         fw.write("/*We recommend to only change this file using the KeY CSS Styler */ \n");
-        fw.write(csss);
+        fw.write(css);
         fw.close();
     }
 
