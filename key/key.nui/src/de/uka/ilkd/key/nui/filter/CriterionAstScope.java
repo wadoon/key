@@ -47,24 +47,31 @@ public class CriterionAstScope implements Criterion<Integer> {
             // add previous subTerm bounds, use the first non-white character of
             // the first line of this range as charIndex
             Range previous = positionTable
-                    .rangeForIndex(getCharIndex(range.first)
-                            + getFirstNonWhitespace(range.first));
+                    .rangeForIndex(LineToPrintedProofPosition
+                            .getCharIndex(range.first, originalLines)
+                            + LineToPrintedProofPosition.getFirstNonWhitespace(
+                                    originalLines[range.first]));
             lines.addAll(IntStream
-                    .range(getLineIndex(previous.start()),
-                            getLineIndex(previous.end()) + 1)
+                    .range(LineToPrintedProofPosition
+                            .getLineIndex(previous.start(), originalLines),
+                    LineToPrintedProofPosition.getLineIndex(previous.end(),
+                            originalLines) + 1)
                     .boxed().collect(Collectors.toList()));
 
             // add following subTerm bounds, use last character of the last line
             // of this range as charIndex
             Range following = positionTable
-                    .rangeForIndex(getCharIndex(range.second)
+                    .rangeForIndex(LineToPrintedProofPosition
+                            .getCharIndex(range.second, originalLines)
                             // decrease char index by two to get rid of
                             // line-break and last continuing character (e.g. a
                             // comma)
                             + originalLines[range.second].length() - 2);
             lines.addAll(IntStream
-                    .range(getLineIndex(following.start()),
-                            getLineIndex(following.end()) + 1)
+                    .range(LineToPrintedProofPosition
+                            .getLineIndex(following.start(), originalLines),
+                    LineToPrintedProofPosition.getLineIndex(following.end(),
+                            originalLines) + 1)
                     .boxed().collect(Collectors.toList()));
         }
 
@@ -72,40 +79,6 @@ public class CriterionAstScope implements Criterion<Integer> {
         List<Integer> distinctLines = lines.stream().distinct()
                 .collect(Collectors.toList());
         return distinctLines;
-    }
-
-    private int getLineIndex(int currentChar) {
-        int idx = 0;
-        for (int line = 0; line < originalLines.length; line++) {
-            // add + 1 to count for the line-break at the end (thanks to max)
-            idx += originalLines[line].length() + 1;
-            if (idx > currentChar)
-                return line;
-        }
-        return -1;
-    }
-
-    private int getFirstNonWhitespace(int lineIndex) {
-        String line = originalLines[lineIndex];
-        for (int notwhite = 0; notwhite < line.length(); notwhite++) {
-            if (!Character.isSpaceChar(line.charAt(notwhite))) {
-                // return the first non-whitespace char of this line
-                return notwhite;
-            }
-        }
-        return 0;
-    }
-
-    private int getCharIndex(int lineIndex) {
-        int charIndex = 0;
-        for (int i = 0; i < originalLines.length; i++) {
-            if (i == lineIndex) {
-                return charIndex;
-            }
-            // add + 1 to count for the line-break at the end (thanks to max)
-            charIndex += originalLines[i].length() + 1;
-        }
-        return -1;
     }
 
     private List<Pair<Integer, Integer>> getRanges(List<Integer> lines) {

@@ -15,7 +15,7 @@ public class SequentFilterer {
     public static List<Integer> applyFilter(String proofString,
             PrintFilter filter, InitialPositionTable positionTable) {
         String[] lines = proofString.split("\n");
-        return compileCriteria(filter, positionTable, lines)
+        return compileCriteria(filter, positionTable, lines, proofString)
                 // pass list with all indices
                 .meetCriteria(IntStream.range(0, lines.length).boxed()
                         .collect(Collectors.toList()));
@@ -26,7 +26,8 @@ public class SequentFilterer {
      * stored in this object.
      */
     private static Criterion<Integer> compileCriteria(PrintFilter filter,
-            InitialPositionTable positionTable, String[] originalLines) {
+            InitialPositionTable positionTable, String[] originalLines,
+            String proofString) {
 
         Criterion<Integer> criteria;
 
@@ -40,14 +41,14 @@ public class SequentFilterer {
                 criteria = new CriterionEmpty<>();
             else
                 criteria = new CriterionContainsString(filter.getSearchText(),
-                        originalLines);
+                        originalLines, proofString);
         }
         else {
             if (filter.getSelections().size() == 0)
                 criteria = new CriterionEmpty<>();
             else
                 criteria = compileSelectionCriteria(filter.getSelections(),
-                        originalLines);
+                        originalLines, proofString);
         }
 
         // X: it may be better to apply this after invert, depends on user
@@ -58,30 +59,33 @@ public class SequentFilterer {
                         filter.getAfter(), originalLines);
             }
 
-        // apply invert as last
-        if (filter.getInvert())
-            criteria = new NotCriterion<>(criteria);
-
+        // X: it may be better to apply this after invert, depends on user
+        // experience
         if (filter.getUseAstScope())
             criteria = new CriterionAstScope(criteria, positionTable,
                     originalLines);
+
+        // apply invert as last
+        if (filter.getInvert())
+            criteria = new NotCriterion<>(criteria);
 
         return criteria;
     }
 
     private static Criterion<Integer> compileSelectionCriteria(
-            List<String> selections, String[] originalLines) {
+            List<String> selections, String[] originalLines,
+            String proofString) {
         Criterion<Integer> criteria;
         if (selections == null || selections.size() == 0) {
             criteria = new CriterionEmpty<Integer>();
             return criteria;
         }
 
-        criteria = new CriterionContainsString(selections.get(0),
-                originalLines);
+        criteria = new CriterionContainsString(selections.get(0), originalLines,
+                proofString);
         for (int i = 1; i < selections.size(); i++) {
             criteria = new OrCriterion<>(new CriterionContainsString(
-                    selections.get(i), originalLines), criteria);
+                    selections.get(i), originalLines, proofString), criteria);
         }
 
         return criteria;
