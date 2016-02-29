@@ -11,7 +11,7 @@ import de.uka.ilkd.key.util.Pair;
  * 
  * @author Benedikt Gross
  */
-public class CriterionContainsString implements Criteria<Integer> {
+public class CriterionContainsString implements Criterion<Integer> {
 
     private String searchText;
     private String[] originalLines;

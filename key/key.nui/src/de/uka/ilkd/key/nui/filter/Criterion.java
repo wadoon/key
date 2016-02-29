@@ -9,6 +9,6 @@ import java.util.List;
  *
  * @param <E>
  */
-public interface Criteria<E> {
+public interface Criterion<E> {
     List<E> meetCriteria(List<E> entities);
 }

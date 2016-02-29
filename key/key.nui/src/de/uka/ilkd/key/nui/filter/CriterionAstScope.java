@@ -18,13 +18,13 @@ import de.uka.ilkd.key.util.Pair;
  * @author Benedikt Gross
  *
  */
-public class CriterionAstScope implements Criteria<Integer> {
+public class CriterionAstScope implements Criterion<Integer> {
 
-    private Criteria<Integer> criteria;
+    private Criterion<Integer> criteria;
     private InitialPositionTable positionTable;
     private String[] originalLines;
 
-    public CriterionAstScope(Criteria<Integer> criteria,
+    public CriterionAstScope(Criterion<Integer> criteria,
             InitialPositionTable positionTable, String[] originalLines) {
         this.criteria = criteria;
         this.positionTable = positionTable;
@@ -48,7 +48,7 @@ public class CriterionAstScope implements Criteria<Integer> {
             // the first line of this range as charIndex
             Range previous = positionTable
                     .rangeForIndex(getCharIndex(range.first)
-                            + getFirstNonWhitespace(range.first));
+                            + getFirstNonWhitespace(range.first) +1);
             lines.addAll(
                     IntStream.range(getLineIndex(previous.start()), range.first)
                             .boxed().collect(Collectors.toList()));

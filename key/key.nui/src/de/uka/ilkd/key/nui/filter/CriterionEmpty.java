@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @param <T>
  */
-public class CriterionEmpty<T> implements Criteria<T> {
+public class CriterionEmpty<T> implements Criterion<T> {
 
     @Override
     public List<T> meetCriteria(List<T> entities) {

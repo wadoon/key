@@ -8,16 +8,16 @@ import java.util.List;
  *
  * @param <E>
  */
-public class NotCriteria<E> implements Criteria<E>
+public class NotCriterion<E> implements Criterion<E>
 {
-   private Criteria<E> criteria;
+   private Criterion<E> criteria;
 
-   public NotCriteria(Criteria<E> childCriteria)
+   public NotCriterion(Criterion<E> childCriteria)
    {
       criteria = childCriteria;
    }
 
-   public Criteria<E> getChildCriteria(){
+   public Criterion<E> getChildCriteria(){
        return criteria;
    }
    

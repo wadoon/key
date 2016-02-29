@@ -8,12 +8,12 @@ import java.util.List;
  *
  * @param <E>
  */
-public class OrCriteria<E> implements Criteria<E>
+public class OrCriterion<E> implements Criterion<E>
 {
-   private Criteria<E> _criteria;
-   private Criteria<E> _otherCriteria;
+   private Criterion<E> _criteria;
+   private Criterion<E> _otherCriteria;
 
-   public OrCriteria(Criteria<E> criteria, Criteria<E> otherCriteria)
+   public OrCriterion(Criterion<E> criteria, Criterion<E> otherCriteria)
    {
       _criteria = criteria;
       _otherCriteria = otherCriteria;

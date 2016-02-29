@@ -17,11 +17,11 @@ import de.uka.ilkd.key.util.Pair;
  * @author Benedikt Gross
  *
  */
-public class CriterionRange implements Criteria<Integer> {
+public class CriterionRange implements Criterion<Integer> {
 
     private int before;
     private int after;
-    private Criteria<Integer> criteria;
+    private Criterion<Integer> criteria;
     private String[] originalLines;
 
     /**
@@ -33,7 +33,7 @@ public class CriterionRange implements Criteria<Integer> {
      * @param after
      *            How many entities after a match should be added.
      */
-    public CriterionRange(Criteria<Integer> criteria, int before, int after,
+    public CriterionRange(Criterion<Integer> criteria, int before, int after,
             String[] originalLines) {
         this.before = before;
         this.after = after;

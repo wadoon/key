@@ -9,11 +9,11 @@ import java.util.List;
  *
  * @param <E>
  */
-public class AndCriteria<E> implements Criteria<E> {
-    private Criteria<E> _criteria;
-    private Criteria<E> _otherCriteria;
+public class AndCriterion<E> implements Criterion<E> {
+    private Criterion<E> _criteria;
+    private Criterion<E> _otherCriteria;
 
-    public AndCriteria(Criteria<E> criteria, Criteria<E> otherCriteria) {
+    public AndCriterion(Criterion<E> criteria, Criterion<E> otherCriteria) {
         _criteria = criteria;
         _otherCriteria = otherCriteria;
     }

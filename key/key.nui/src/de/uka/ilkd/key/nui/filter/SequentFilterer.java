@@ -25,10 +25,10 @@ public class SequentFilterer {
      * Creates a criteria for filtering the sequent from all information that is
      * stored in this object.
      */
-    private static Criteria<Integer> compileCriteria(PrintFilter filter,
+    private static Criterion<Integer> compileCriteria(PrintFilter filter,
             InitialPositionTable positionTable, String[] originalLines) {
 
-        Criteria<Integer> criteria;
+        Criterion<Integer> criteria;
 
         if (filter == null) {
             criteria = new CriterionEmpty<>();
@@ -60,7 +60,7 @@ public class SequentFilterer {
 
         // apply invert as last
         if (filter.getInvert())
-            criteria = new NotCriteria<>(criteria);
+            criteria = new NotCriterion<>(criteria);
 
         if (filter.getUseAstScope())
             criteria = new CriterionAstScope(criteria, positionTable,
@@ -69,9 +69,9 @@ public class SequentFilterer {
         return criteria;
     }
 
-    private static Criteria<Integer> compileSelectionCriteria(
+    private static Criterion<Integer> compileSelectionCriteria(
             List<String> selections, String[] originalLines) {
-        Criteria<Integer> criteria;
+        Criterion<Integer> criteria;
         if (selections == null || selections.size() == 0) {
             criteria = new CriterionEmpty<Integer>();
             return criteria;
@@ -80,7 +80,7 @@ public class SequentFilterer {
         criteria = new CriterionContainsString(selections.get(0),
                 originalLines);
         for (int i = 1; i < selections.size(); i++) {
-            criteria = new OrCriteria<>(new CriterionContainsString(
+            criteria = new OrCriterion<>(new CriterionContainsString(
                     selections.get(i), originalLines), criteria);
         }
 
