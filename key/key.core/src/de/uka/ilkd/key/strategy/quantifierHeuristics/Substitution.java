@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.ClashFreeSubst;
@@ -99,24 +100,15 @@ public class Substitution {
     public Term applyWithoutCasts(Term t, TermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
-        final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
-        while ( it.hasNext () ) {
-            final QuantifiableVariable var = it.next ();
-            Term instance = getSubstitutedTerm( var );
-            
-            try {
-                t = applySubst ( var, instance, t, services );
-            } catch (TermCreationException e) {
-                final Sort quantifiedVarSort = var.sort ();                
-                if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
-                    final Function quantifiedVarSortCast =
-                        quantifiedVarSort.getCastSymbol (services);
-                    instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
-                    t = applySubst ( var, instance, t, services );
-                } else {
-                    throw e;
-                }
-            }        
+        for (final ImmutableMapEntry<QuantifiableVariable, Term> entry : varMap) {
+            final QuantifiableVariable var = entry.key();
+            Term instance = getSubstitutedTerm( var );            
+            if ( !instance.sort ().extendsTrans ( var.sort() ) ) { // might not happen anymore
+                final Function quantifiedVarSortCast =
+                        var.sort().getCastSymbol (services);
+                instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
+            }
+            t = applySubst ( var, instance, t, services );
         }
         return t;
     }
