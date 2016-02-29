@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -52,17 +51,17 @@ public class PredictCostProver {
     }
 
     public static long computerInstanceCost(Substitution sub, Term matrix,
-	    Set<Term> assertList, Services services) {
+            LinkedHashSet<Term> assertList, Services services) {
 
 	if (!sub.isGround()) {
 	    // non-ground substitutions not supported yet
 	    return -1;
 	} else {
 	    Set<Term> assertions;
-	    if (assertList instanceof HashSet) {
-	        assertions = (Set<Term>) ((HashSet) assertList).clone();
+	    if (assertList instanceof LinkedHashSet) {
+	        assertions = (Set<Term>) ((LinkedHashSet) assertList).clone();
 	    } else {
-	        assertions = new HashSet<Term>();
+	        assertions = new LinkedHashSet<Term>();
 	        assertions.addAll(assertList);
 	    }
 	        
@@ -258,7 +257,7 @@ public class PredictCostProver {
 	 * return literals that can't be removed by refining
 	 */
 	public void refine(final Set<? extends Term> assertLits) {
-	    final Set<Term> res = new HashSet<>();
+	    final Set<Term> res = new LinkedHashSet<>();
 	    for (final Term lit : literals) {
 	        final Operator op = proveLiteral(lit, assertLits).op();
 	        if (op == Junctor.TRUE) {

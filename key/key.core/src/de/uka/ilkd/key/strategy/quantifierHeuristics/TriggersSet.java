@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -29,14 +24,7 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 
 /**
  * This class is used to select and store <code>Trigger</code>s 
@@ -268,7 +256,7 @@ public class TriggersSet {
                 Term[] chosenSubs,
                 ImmutableArray<QuantifiableVariable> boundVars,
                 int i, TermServices services) {
-            final HashSet<Term> set = new LinkedHashSet<Term>();
+            final LinkedHashSet<Term> set = new LinkedHashSet<Term>();
             if (i >= possibleSubs.length) {
                 final Term res =
                         services.getTermFactory().createTerm(oriTerm.op(),
@@ -384,9 +372,8 @@ public class TriggersSet {
                 ImmutableSet<Trigger> tsi = DefaultImmutableSet.<Trigger>nil().add(trigger);
                 res.add(tsi);
                 Set<ImmutableSet<Trigger>> nextTriggers = setMultiTriggers(ts);
-
-                for (ImmutableSet<Trigger> nextTrigger : nextTriggers) {
-                    ImmutableSet<Trigger> next = nextTrigger;
+                res.addAll(nextTriggers);
+                for (ImmutableSet<Trigger> next : nextTriggers) {
                     next = next.add(trigger);
                     if (addMultiTrigger(next)) {
                         continue;

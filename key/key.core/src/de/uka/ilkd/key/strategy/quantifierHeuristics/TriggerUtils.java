@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -59,7 +59,7 @@ class TriggerUtils {
             result = setByOperator ( term.sub ( 0 ), op );
             result.addAll ( setByOperator ( term.sub ( 1 ), op ) );
         } else {
-            result = new HashSet<>();
+            result = new LinkedHashSet<>();
             result.add ( term );
         }
         return result;

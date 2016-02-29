@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -48,7 +48,7 @@ class Instantiation {
     * Literals occurring in the sequent at hand. This is used for branch
     * prediction
     */
-   private HashSet<Term> assumedLiterals = new HashSet<Term>();
+   private LinkedHashSet<Term> assumedLiterals = new LinkedHashSet<Term>();
 
    /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();
@@ -160,7 +160,7 @@ class Instantiation {
     *         succedent
     */
    private void initAssertLiterals(Sequent seq, TermServices services) {
-      assumedLiterals = new HashSet<>();
+      assumedLiterals = new LinkedHashSet<>();
       for (final SequentFormula cf : seq.antecedent()) {
          final Term atom = cf.formula();
          final Operator op = atom.op();

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -46,8 +47,8 @@ public class TriggeredInstantiations implements TermGenerator {
     }
     
     private Sequent last = Sequent.EMPTY_SEQUENT;
-    private Set<Term> lastCandidates = new HashSet<Term>();
-    private Set<Term> lastAxioms = new HashSet<>();
+    private LinkedHashSet<Term> lastCandidates = new LinkedHashSet<Term>();
+    private LinkedHashSet<Term> lastAxioms = new LinkedHashSet<>();
     
     private boolean checkConditions;
 
@@ -70,16 +71,16 @@ public class TriggeredInstantiations implements TermGenerator {
             final TacletApp tapp = (TacletApp) app;
             final Taclet taclet = tapp.taclet();
 
-            final Set<Term> terms;
-            final Set<Term> axiomSet;
-            Set<Term> axioms;
+            final LinkedHashSet<Term> terms;
+            final LinkedHashSet<Term> axiomSet;
+            final LinkedHashSet<Term> axioms;
  
             
             final Sequent seq = goal.sequent();
             if (seq != last) {
-                axioms = new HashSet<Term>();
-                terms = new HashSet<Term>();
-                axiomSet = new HashSet<Term>();
+                axioms = new LinkedHashSet<Term>();
+                terms = new LinkedHashSet<Term>();
+                axiomSet = new LinkedHashSet<Term>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
                 for (Term axiom : axiomSet) {
                     axioms.add(axiom);
@@ -169,7 +170,7 @@ public class TriggeredInstantiations implements TermGenerator {
         }
     }
 
-    private boolean isAvoidConditionProvable(Term cond, Set<Term> axioms,
+    private boolean isAvoidConditionProvable(Term cond, LinkedHashSet<Term> axioms,
             Services services) {
         
         long cost = PredictCostProver.computerInstanceCost(
@@ -180,10 +181,10 @@ public class TriggeredInstantiations implements TermGenerator {
 
     private HashSet<Term> computeInstances(Services services,
             final Term comprehension, final Metavariable mv,
-            final Term trigger, Set<Term> terms, Set<Term> axioms, TacletApp app) {
+            final Term trigger, LinkedHashSet<Term> terms, LinkedHashSet<Term> axioms, TacletApp app) {
 
-        final HashSet<Term> instances = new HashSet<Term>();
-        final HashSet<Term> alreadyChecked = new HashSet<Term>();
+        final LinkedHashSet<Term> instances = new LinkedHashSet<Term>();
+        final LinkedHashSet<Term> alreadyChecked = new LinkedHashSet<Term>();
 
         for (final Term t : terms) {
             boolean addToInstances = true;
