@@ -24,7 +24,8 @@ public class ABSAndBoolExp extends ABSBinaryOperatorPureExp {
     }
 
     
-    public String toString() {
+    @Override
+	public String toString() {
     	return getChildAt(0) + " && " + getChildAt(1);
     }
 

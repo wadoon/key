@@ -134,6 +134,11 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     }
 
     @Override
+    public void performActionOnABSNegExp(ABSNegExp x) {
+    	doDefaultAction(x);
+    }
+    
+    @Override
     public void performActionOnABSTypeReference(ABSTypeReference x) {
         doDefaultAction(x);
     }
@@ -216,13 +221,18 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     }
 
     @Override
+    public void performActionOnABSAssertStatement(ABSAssertStatement x) {
+        doDefaultAction(x);
+    }
+    
+    @Override
     public void performActionOnABSWhileStatement(ABSWhileStatement x) {
         doDefaultAction(x);
     }
 
     @Override
     public void performActionOnABSContextStatementBlock(
-            ABSContextStatementBlock x) {
+        ABSContextStatementBlock x) {
         doDefaultAction(x);
     }
 
@@ -271,4 +281,28 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     	doDefaultAction(x);
     }
     
+    @Override
+    public void performActionOnABSCaseBranchStatement(ABSCaseBranchStatement x) {
+    	doDefaultAction(x);
+    }
+    
+    @Override
+    public void performActionOnABSLiteralPattern(ABSLiteralPattern x) {
+    	doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnABSDataConstructor(ABSDataConstructor x) {
+        doDefaultAction(x);
+    }
+    
+    @Override
+    public void performActionOnABSConstructorPattern(ABSConstructorPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnABSUnderscorePattern(ABSUnderscorePattern x) {
+    	doDefaultAction(x);
+    }
 }

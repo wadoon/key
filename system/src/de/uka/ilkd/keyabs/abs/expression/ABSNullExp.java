@@ -25,7 +25,8 @@ public class ABSNullExp extends ABSProgramElement implements IABSPureExpression 
      * method implementation in ProgramElement by descending down to
      * the children.
      */
-    public boolean equalsModRenaming(SourceElement se, 
+    @Override
+	public boolean equalsModRenaming(SourceElement se, 
                                      NameAbstractionTable nat) {
         return this.equals(se);
     }
@@ -36,7 +37,8 @@ public class ABSNullExp extends ABSProgramElement implements IABSPureExpression 
         v.performActionOnABSNullExp(this);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "null";
     }
 

@@ -7,12 +7,10 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.keyabs.abs.ABSProgramElement;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSVisitor;
-import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 
-public class ABSIntLiteral extends ABSProgramElement implements IABSPureExpression {
+public class ABSIntLiteral extends ABSLiteralExp {
 
     private final BigInteger number;
     
@@ -29,7 +27,8 @@ public class ABSIntLiteral extends ABSProgramElement implements IABSPureExpressi
 	v.performActionOnABSIntLiteral(this);
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
 	return number.toString();
     }
 
@@ -40,7 +39,8 @@ public class ABSIntLiteral extends ABSProgramElement implements IABSPureExpressi
     
     /** tests if equals
      */
-    public boolean equalsModRenaming
+    @Override
+	public boolean equalsModRenaming
         ( SourceElement o, NameAbstractionTable nat) {
         if (!(o instanceof ABSIntLiteral)) {
             return false;
@@ -48,7 +48,8 @@ public class ABSIntLiteral extends ABSProgramElement implements IABSPureExpressi
         return ((ABSIntLiteral)o).getValue().equals(getValue()); 
     }
     
-    public int hashCode(){
+    @Override
+	public int hashCode(){
         int result = 17;
         result = 37 * result + getValue().hashCode();
         return result;

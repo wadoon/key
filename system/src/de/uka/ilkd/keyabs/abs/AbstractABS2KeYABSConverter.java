@@ -9,11 +9,14 @@ import abs.frontend.ast.AndBoolExp;
 import abs.frontend.ast.AssignStmt;
 import abs.frontend.ast.AsyncCall;
 import abs.frontend.ast.AwaitStmt;
+import abs.frontend.ast.AssertStmt;
 import abs.frontend.ast.Binary;
 import abs.frontend.ast.Block;
 import abs.frontend.ast.CaseBranchStmt;
 import abs.frontend.ast.CaseStmt;
 import abs.frontend.ast.ClaimGuard;
+import abs.frontend.ast.ConstructorPattern;
+import abs.frontend.ast.DataConstructor;
 import abs.frontend.ast.DataConstructorExp;
 import abs.frontend.ast.EqExp;
 import abs.frontend.ast.ExpGuard;
@@ -28,16 +31,19 @@ import abs.frontend.ast.IncompleteAccess;
 import abs.frontend.ast.IntLiteral;
 import abs.frontend.ast.LTEQExp;
 import abs.frontend.ast.LTExp;
-import abs.frontend.ast.List;
+import abs.frontend.ast.LiteralPattern;
 import abs.frontend.ast.MinusExp;
 import abs.frontend.ast.MultExp;
 import abs.frontend.ast.NewExp;
+import abs.frontend.ast.NegExp;
 import abs.frontend.ast.NotEqExp;
 import abs.frontend.ast.NullExp;
 import abs.frontend.ast.OrBoolExp;
+import abs.frontend.ast.Pattern;
 import abs.frontend.ast.PureExp;
 import abs.frontend.ast.ReturnStmt;
 import abs.frontend.ast.ThisExp;
+import abs.frontend.ast.UnderscorePattern;
 import abs.frontend.ast.VarDeclStmt;
 import abs.frontend.ast.VarUse;
 import abs.frontend.ast.WhileStmt;
@@ -62,11 +68,13 @@ import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
 import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLiteralExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNewExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNegExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 import de.uka.ilkd.keyabs.logic.sort.programSV.ABSFieldSV;
 
@@ -122,6 +130,8 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((MinusExp) x);
         } else if (x instanceof AwaitStmt) {
             result = convert((AwaitStmt) x);            
+        } else if (x instanceof AssertStmt) {
+            result = convert((AssertStmt) x);            
         } else if (x instanceof FnApp) {
             result = convert((FnApp)x);
         } else if (x instanceof GetExp) {
@@ -132,7 +142,13 @@ public abstract class AbstractABS2KeYABSConverter {
             result = convert((NewExp)x);
         } else if (x instanceof CaseStmt) {
         	result = convert((CaseStmt)x);
-        }
+        } else if (x instanceof Pattern){
+        	result = convert((Pattern)x);
+        } else if (x instanceof DataConstructor){
+        	result = convert((DataConstructor)x);
+        } else if (x instanceof NegExp){
+        	result = convert((NegExp)x);
+        } 
 
         if (result == null) {
             result = requestConversion(x);
@@ -167,6 +183,22 @@ public abstract class AbstractABS2KeYABSConverter {
         } else if (x instanceof LTExp) {
             result = convert((LTExp) x);
         }
+        return result;
+    }
+    
+    protected ProgramElement convert(Pattern x) {
+        ProgramElement result = null;
+        if (x instanceof LiteralPattern) {
+            result = convert((LiteralPattern) x);
+        } else if(x instanceof ConstructorPattern) {
+        	result = convert((ConstructorPattern) x);
+        }else if (x instanceof UnderscorePattern){
+            result = new ABSUnderscorePattern();
+        } else {
+        	throw new IllegalArgumentException("Conversion of " + x.getClass() + " not yet supported.");
+        }
+        
+        
         return result;
     }
 
@@ -242,9 +274,15 @@ public abstract class AbstractABS2KeYABSConverter {
 	}
         return claim ? new ABSAwaitClaimStatement(cond) : new ABSAwaitStatement(cond);
     }
-
     
-    public ABSFieldReference convert(FieldUse fieldUse) {
+    public ABSAssertStatement convert(AssertStmt x) {
+   	
+    	IABSPureExpression cond = (IABSPureExpression) convert(x.getCondition());
+	
+        return new ABSAssertStatement(cond);
+    }
+
+	public ABSFieldReference convert(FieldUse fieldUse) {
         IProgramVariable var = lookupFieldVariable(fieldUse.getDecl().getContextDecl().qualifiedName(), fieldUse.getName());
         return new ABSFieldReference(var);
     }
@@ -288,6 +326,10 @@ public abstract class AbstractABS2KeYABSConverter {
                 (IABSPureExpression) convert(x.getChild(1)));
     }
 
+    public ABSNegExp convert(NegExp x) {
+        return new ABSNegExp((IABSPureExpression) convert(x.getChild(0)));
+    }
+    
     public ABSGTExp convert(GTExp x) {
         return new ABSGTExp((IABSPureExpression) convert(x.getChild(0)),
                 (IABSPureExpression) convert(x.getChild(1)));
@@ -308,11 +350,11 @@ public abstract class AbstractABS2KeYABSConverter {
                 (IABSPureExpression) convert(x.getChild(1)));
     }
 
-    public ABSIntLiteral convert(IntLiteral x) {
+    public ABSLiteralExp convert(IntLiteral x) {
         return new ABSIntLiteral(new BigInteger(x.getContent()));
     }
 
-    public ABSFnApp convert(FnApp x) {
+    public ABSFnApp convert(FnApp x) {    	
         ProgramElementName fctName = new ProgramElementName(x.getName(), x.getDecl().moduleName());
         IABSPureExpression[] arguments = new IABSPureExpression[x.getNumParam()];
 
@@ -333,10 +375,8 @@ public abstract class AbstractABS2KeYABSConverter {
     }
 
     public ABSDataConstructorExp convert(DataConstructorExp x) {
-        ProgramElementName pen = new ProgramElementName(x.getDataConstructor()
-                .getName(), x.getDataConstructor().getDataTypeDecl()
-                .moduleName()
-                + "." + x.getDataConstructor().getDataTypeDecl().getName());
+        DataConstructor dataConstructor = x.getDataConstructor();
+		ProgramElementName pen = createDataConstructorName(dataConstructor);
 
         IABSPureExpression[] args = new IABSPureExpression[x.getNumParam()];
         for (int i = 0; i < x.getNumParam(); i++) {
@@ -344,6 +384,13 @@ public abstract class AbstractABS2KeYABSConverter {
         }
         return new ABSDataConstructorExp(pen, args);
     }
+
+	protected ProgramElementName createDataConstructorName(DataConstructor dataConstructor) {
+		return new ProgramElementName(dataConstructor
+                .getName(), dataConstructor.getDataTypeDecl()
+                .moduleName()
+                + "." + dataConstructor.getDataTypeDecl().getName());
+	}
 
     public ABSVariableDeclarationStatement convert(VarDeclStmt x) {
         KeYJavaType type = lookupType(x.getVarDecl().getType()
@@ -390,6 +437,30 @@ public abstract class AbstractABS2KeYABSConverter {
         }
         
         return new ABSCaseStatement(caseExp, branches);
+    }
+    
+    public ABSCaseBranchStatement convert(CaseBranchStmt x) {
+
+    	IABSPattern pattern = (IABSPattern) convert(x.getLeft());
+    	IABSStatement stmt = (IABSStatement) convert(x.getRight());
+    	
+        return new ABSCaseBranchStatement(pattern, stmt);
+    }
+    
+    public ABSLiteralPattern convert(LiteralPattern x) {
+    	return new ABSLiteralPattern((ABSLiteralExp) convert(x.getLiteral()));
+    }
+
+    public ABSDataConstructor convert(DataConstructor x) {
+    	ProgramElementName dataconstructorName = createDataConstructorName(x);
+    	if (x.getConstructorArgs().getNumChild() > 0) {
+    		throw new RuntimeException("DataConstructorPattern with arguments not yet supported.");
+    	}
+    	return new ABSDataConstructor(dataconstructorName);
+    }
+    
+    public ABSConstructorPattern convert(ConstructorPattern x) {
+    	return new ABSConstructorPattern(convert(x.getDataConstructor()));
     }
     
     protected KeYJavaType lookupType(String qualifiedName) {

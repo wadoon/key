@@ -122,7 +122,7 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 		} else if (pe instanceof ABSNullExp) {
 		    return TB.NULL(getServices());
 		} else if (pe instanceof ABSDataConstructorExp) {
-		    ABSDataConstructorExp dtCons = (ABSDataConstructorExp) pe;
+		    ABSDataConstructorExp dtCons = (ABSDataConstructorExp) pe;		   
 		    Function cons = (Function) services.getNamespaces()
 			    .functions().lookup((Name) dtCons.getChildAt(0));
 		    Term[] subs = new Term[dtCons.getArgumentCount()];
@@ -183,7 +183,7 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 
     @Override
     public ABSTypeConverter copy(ABSServices services) {
-	final ABSTypeConverter tc = new ABSTypeConverter((ABSServices) services);
+	final ABSTypeConverter tc = new ABSTypeConverter(services);
 	tc.init(models);
 	return tc;
     }
@@ -274,7 +274,8 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 	return historyLDT;
     }
 
-    public HeapLDT getHeapLDT() {
+    @Override
+	public HeapLDT getHeapLDT() {
 	return (HeapLDT) heapLDT;
     }
 

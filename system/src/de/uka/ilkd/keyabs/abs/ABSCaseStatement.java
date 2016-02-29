@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 
-public class ABSCaseStatement extends ABSNonTerminalProgramElement implements IABSStatement, IABSPureExpression, IABSCaseBranchStatement{
+public class ABSCaseStatement extends ABSNonTerminalProgramElement implements IABSPureExpression, IABSCaseBranchStatement{
 
     public ABSCaseStatement(IABSPureExpression caseExpression, List<IABSCaseBranchStatement> branchList) {
     	this.caseExpression = caseExpression;
@@ -35,7 +35,7 @@ public class ABSCaseStatement extends ABSNonTerminalProgramElement implements IA
     	return branches[index - 1];
     }
     
-    public IABSPureExpression getCondition() {
+    public IABSPureExpression getCaseExpression() {
         return caseExpression;
     }
   

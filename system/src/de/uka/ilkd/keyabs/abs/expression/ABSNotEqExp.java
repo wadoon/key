@@ -22,7 +22,8 @@ public class ABSNotEqExp extends ABSBinaryOperatorPureExp {
         v.performActionOnABSNotEqExp(this);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return getLeft() + " != " + getRight();
     }
     

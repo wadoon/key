@@ -23,7 +23,8 @@ public class ABSAddExp extends ABSBinaryOperatorPureExp {
         v.performActionOnABSAddExp(this);
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
     	return getChildAt(0) + " + " + getChildAt(1);
     }
 

@@ -1,15 +1,37 @@
 package de.uka.ilkd.keyabs.abs;
 
+import java.util.Stack;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.keyabs.abs.expression.*;
-import de.uka.ilkd.keyabs.logic.sort.ABSClassNameSV;
-
-import java.util.Stack;
+import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSGTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
+import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSLiteralExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNewExpression;
+import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNegExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
 
 public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         IProgramASTModifyingVisitor, ABSVisitor {
@@ -217,6 +239,17 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
     }
 
     @Override
+    public void performActionOnABSNegExp(ABSNegExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSNegExp((IABSPureExpression) children.get(0)));
+        } else {
+            addChild(x);
+        }
+    }
+    
+    @Override
     public void performActionOnABSStatementBlock(ABSStatementBlock x) {
         if (hasChanged()) {
             ExtList children = stack.peek();
@@ -408,6 +441,17 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
     }
 
     @Override
+    public void performActionOnABSAssertStatement(ABSAssertStatement x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSAssertStatement((IABSPureExpression) children.get(0)));
+        } else {
+            addChild(x);
+        }
+    }
+    
+    @Override
     public void performActionOnABSIfStatement(ABSIfStatement x) {
         if (hasChanged()) {
             ExtList children = stack.peek();
@@ -588,5 +632,69 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
           }
     }
 
+    @Override
+    public void performActionOnABSCaseBranchStatement(ABSCaseBranchStatement x) {
+    	  if (hasChanged()) {
+              ExtList children = stack.peek();
+              children.removeFirst();
+              IABSPattern newPattern = children.removeFirstOccurrence(IABSPattern.class);
+              IABSStatement newStmt = children.get(IABSStatement.class);
+            		                            
+          	  addNewChild(new ABSCaseBranchStatement(newPattern, newStmt));        	              
+          } else {
+              addChild(x);
+          }
+    } 
     
+    @Override
+	public void performActionOnABSLiteralPattern(ABSLiteralPattern x) {
+  	  if (hasChanged()) {
+          ExtList children = stack.peek();
+          children.removeFirst();
+          ABSLiteralExp newLiteralExp = children.removeFirstOccurrence(ABSLiteralExp.class);
+        		                            
+      	  addNewChild(new ABSLiteralPattern(newLiteralExp));        	              
+      } else {
+          addChild(x);
+      }
+    }
+
+    @Override
+	public void performActionOnABSConstructorPattern(ABSConstructorPattern x) {
+  	  if (hasChanged()) {
+          ExtList children = stack.peek();
+          children.removeFirst();
+          ABSDataConstructor newConstructorExp = children.removeFirstOccurrence(ABSDataConstructor.class);
+        		                            
+      	  addNewChild(new ABSConstructorPattern(newConstructorExp));        	              
+      } else {
+          addChild(x);
+      }
+    }
+
+    @Override
+    public void performActionOnABSUnderscorePattern(ABSUnderscorePattern x) {
+        addChild(x);
+    } 
+
+    @Override
+    public void performActionOnABSDataConstructor(ABSDataConstructor x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            ProgramElementName constructor = children
+                    .removeFirstOccurrence(ProgramElementName.class);
+
+            
+            if (children.size() > 0) throw new RuntimeException("Reminder: need to add args to AST");
+            IABSPureExpression[] arguments = new IABSPureExpression[children
+                    .size()];
+            for (int i = 0; i < children.size(); i++) {
+                arguments[i] = (IABSPureExpression) children.get(i);
+            }
+            addNewChild(new ABSDataConstructor(constructor));
+        } else {
+            addChild(x);
+        }
+    }
 }

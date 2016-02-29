@@ -78,4 +78,23 @@ public interface ABSVisitor extends ProgramVisitor {
     void performActionOnABSExecutionContext(ABSExecutionContext x);
 
     void performActionOnABSNewExp(ABSNewExpression absNewExpression);
+
+	void performActionOnABSCaseBranchStatement(ABSCaseBranchStatement x);
+
+	void performActionOnABSLiteralPattern(ABSLiteralPattern x);
+
+	void performActionOnABSConstructorPattern(ABSConstructorPattern x);
+	
+  //void performActionOnABSPatternVar(ABSPatternVar x);	
+    
+  //void performActionOnABSPatternVarUse(ABSPatternVarUse x);
+	
+    void performActionOnABSUnderscorePattern(ABSUnderscorePattern x);
+
+	void performActionOnABSDataConstructor(ABSDataConstructor x);
+
+	void performActionOnABSAssertStatement(ABSAssertStatement x);
+
+	void performActionOnABSNegExp(ABSNegExp x);
+
 }

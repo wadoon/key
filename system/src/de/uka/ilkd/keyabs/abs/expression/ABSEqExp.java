@@ -22,7 +22,8 @@ public class ABSEqExp extends ABSBinaryOperatorPureExp {
         v.performActionOnABSEqExp(this);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return getLeft() + " == " + getRight();
     }
     

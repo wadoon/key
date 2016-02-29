@@ -80,21 +80,29 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import de.uka.ilkd.keyabs.abs.ABSAssertStatement;
 import de.uka.ilkd.keyabs.abs.ABSAsyncMethodCall;
 import de.uka.ilkd.keyabs.abs.ABSAwaitClaimStatement;
 import de.uka.ilkd.keyabs.abs.ABSAwaitStatement;
+import de.uka.ilkd.keyabs.abs.ABSCaseBranchStatement;
 import de.uka.ilkd.keyabs.abs.ABSCaseStatement;
+import de.uka.ilkd.keyabs.abs.ABSConstructorPattern;
 import de.uka.ilkd.keyabs.abs.ABSContextStatementBlock;
+import de.uka.ilkd.keyabs.abs.ABSDataConstructor;
 import de.uka.ilkd.keyabs.abs.ABSExecutionContext;
 import de.uka.ilkd.keyabs.abs.ABSFieldReference;
 import de.uka.ilkd.keyabs.abs.ABSGetExp;
 import de.uka.ilkd.keyabs.abs.ABSIfStatement;
+import de.uka.ilkd.keyabs.abs.ABSLiteralPattern;
 import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
 import de.uka.ilkd.keyabs.abs.ABSMethodFrame;
+import de.uka.ilkd.keyabs.abs.ABSPatternVar;
+import de.uka.ilkd.keyabs.abs.ABSPatternVarUse;
 import de.uka.ilkd.keyabs.abs.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
 import de.uka.ilkd.keyabs.abs.ABSTypeReference;
+import de.uka.ilkd.keyabs.abs.ABSUnderscorePattern;
 import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.ABSWhileStatement;
 import de.uka.ilkd.keyabs.abs.CopyAssignment;
@@ -106,6 +114,7 @@ import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
 import de.uka.ilkd.keyabs.abs.expression.ABSIntLiteral;
 import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNegExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNewExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
 
@@ -2154,13 +2163,68 @@ public final class LogicPrinter implements ILogicPrinter {
 
 	public void printABSCaseStatement(ABSCaseStatement x) throws IOException {
 		layouter.print("case").print(" ");
-		x.getCondition().visit(programPrettyPrinter);
-		layouter.print(" {").brk(1, 2).beginC(2);
+		x.getCaseExpression().visit(programPrettyPrinter);
+		layouter.print(" {").brk(1, 2).beginC(0); // 1st arg of brk means 1-space break, 2nd arg of brk means 2-space break from the new line, beginC(2) means choose the 2nd choice by default
 		for (int i = 0; i < x.getBranchCount(); i++) {
 			x.getBranchAt(i).visit(programPrettyPrinter);
 			layouter.brk();
 		}
-		layouter.end().brk(1, -2).print("}");
+		layouter.end().print("}").brk(1, -2);
+	}
+
+	public void printABSCaseBranchStatement(ABSCaseBranchStatement x) throws IOException {
+		x.getPattern().visit(programPrettyPrinter);
+		layouter.print(" => {").brk(1, 2).beginC(0); // 1st arg of brk means 1-space break, 2nd arg of brk means 2-space break from the new line, beginC(2) means choose the 2nd choice by default
+		x.getStatement().visit(programPrettyPrinter);
+		layouter.end().print("}").brk(1, -2);
+	}
+
+	public void printABSLiteralPattern(ABSLiteralPattern x) throws IOException {
+		x.getLiteral().visit(programPrettyPrinter);
+	}
+
+	public void printABSConstructorPattern(ABSConstructorPattern x) throws IOException  {
+		x.getLiteral().visit(programPrettyPrinter);	
+	}
+
+	public void printABSPatternVar(ABSPatternVar x) throws IOException  {
+		x.getLiteral().visit(programPrettyPrinter);	
+	}
+
+	public void printABSPatternVarUse(ABSPatternVarUse x) throws IOException  {
+		x.getLiteral().visit(programPrettyPrinter);	
+	}
+
+	public void printABSUnderscorePattern(ABSUnderscorePattern x) throws IOException  {
+        layouter.print("_");
+    }
+    
+	public void printABSDataConstructor(ABSDataConstructor x) throws IOException {
+      x.getChildAt(0).visit(programPrettyPrinter);
+      if (x.getArgumentCount() > 0) {
+          layouter.beginC(0).print("(");
+          for (int i = 0; i < x.getArgumentCount(); i++) {
+              if (i != 0)
+                  layouter.print(",").brk(1);
+              x.getArgumentAt(i).visit(programPrettyPrinter);
+          }
+          layouter.print(")").end();
+      }
+	}
+
+    public void printABSAssertStatement(ABSAssertStatement x) throws IOException {
+        layouter.beginC(0);
+        layouter.print("assert ");
+        x.getCondition().visit(programPrettyPrinter);
+        layouter.print(";").brk(1);
+        layouter.ind().end();
+    }
+    
+	public void printABSNegExp(ABSNegExp x) throws IOException {
+        layouter.beginC(0);
+        layouter.print("~");
+        x.getExpression().visit(programPrettyPrinter);
+        layouter.end();
 	}
 
 }

@@ -171,6 +171,15 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
         }
     }
 
+	@Override
+	public void performActionOnABSNegExp(ABSNegExp x) {
+		  try {
+	            lp.printABSNegExp(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
+	
     @Override
     public void performActionOnABSTypeReference(ABSTypeReference x) {
         try {
@@ -390,5 +399,75 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 	        }		
 	}
 
+	@Override
+	public void performActionOnABSCaseBranchStatement(ABSCaseBranchStatement x) {
+		  try {
+	            lp.printABSCaseBranchStatement(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
 
+	@Override
+	public void performActionOnABSLiteralPattern(ABSLiteralPattern x) {
+		  try {
+	            lp.printABSLiteralPattern(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
+	
+	@Override
+	public void performActionOnABSConstructorPattern(ABSConstructorPattern x) {
+		  try {
+	            lp.printABSConstructorPattern(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
+/*	
+	@Override
+	public void performActionOnABSPatternVar(ABSPatternVar x) {
+		  try {
+	            lp.printABSPatternVar(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
+	
+	@Override
+	public void performActionOnABSPatternVarUse(ABSPatternVarUse x) {
+		  try {
+	            lp.printABSPatternVarUse(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}*/
+	
+	@Override
+	public void performActionOnABSUnderscorePattern(ABSUnderscorePattern x) {
+		  try {
+	            lp.printABSUnderscorePattern(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
+    
+	@Override
+	public void performActionOnABSDataConstructor(ABSDataConstructor x) {
+		  try {
+	            lp.printABSDataConstructor(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
+	
+	@Override
+	public void performActionOnABSAssertStatement(ABSAssertStatement x) {
+		  try {
+	            lp.printABSAssertStatement(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }		
+	}
 }

@@ -374,7 +374,18 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                     || jblockChanged
                     || operatorInst
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
-                Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
+            	Term newTerm;
+            	// TODO: remove this hack (just until proper support for generic types)
+            	if (newOp instanceof ElementaryUpdate) {
+            	    UpdateableOperator lhs = ((ElementaryUpdate) newOp).lhs();
+					if (!(lhs instanceof SchemaVariable) && !(neededsubs[0].sort().extendsTrans(lhs.sort()))) {
+						neededsubs[0] = services.getTermBuilder().cast(services, lhs.sort(), neededsubs[0]);
+            	    }
+
+                	newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);                
+                } else {
+                	newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
+                }
                 pushNew(resolveSubst(newTerm));
             } else {
                 final Term t = resolveSubst(visited);

@@ -1,36 +1,26 @@
-package de.uka.ilkd.keyabs.abs.expression;
+package de.uka.ilkd.keyabs.abs;
+
+
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.keyabs.abs.ABSNonTerminalProgramElement;
 import de.uka.ilkd.keyabs.abs.ABSVisitor;
-import de.uka.ilkd.keyabs.abs.IABSExpression;
 import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 
-public class ABSNewExpression extends ABSNonTerminalProgramElement implements IABSExpression {
+public class ABSDataConstructor extends ABSNonTerminalProgramElement  {
 
-    private final ProgramElementName className;
-    private final ProgramSV classNameSV;
+    private final ProgramElementName constructorName;
+   private final IABSPureExpression[] args;
     
-    private final KeYJavaType type;
-    private final IABSPureExpression[] args;
-    
-    public ABSNewExpression(ProgramElementName className, KeYJavaType type, IABSPureExpression[] args) {
-	this.args = (args == null ? new IABSPureExpression[0] : args);
-	this.className = className;
-	this.classNameSV = null;
-	this.type = type;
-    }
-    
-    public ABSNewExpression(ProgramSV classNameSV, IABSPureExpression[] args) {
-	this.args = (args == null ? new IABSPureExpression[0] : args);
-	this.className = null;
-	this.classNameSV = classNameSV;
-	this.type = null;
+  //  public ABSDataConstructor(ProgramElementName constructorName, IABSPureExpression[] args) {
+    public ABSDataConstructor(ProgramElementName constructorName) {
+//	this.args = (args == null ? new IABSPureExpression[0] : args);
+	this.constructorName = constructorName;
+    this.args = new IABSPureExpression[0];
     }
     
     @Override
@@ -41,20 +31,19 @@ public class ABSNewExpression extends ABSNonTerminalProgramElement implements IA
     @Override
     public ProgramElement getChildAt(int index) {
 	if (index == 0) {
-	    return className == null ? classNameSV : className;
+	    return constructorName;
 	}
 	return args[index - 1];
     }
 
     @Override
     public void visit(ABSVisitor v) {
-	v.performActionOnABSNewExp(this);
+	v.performActionOnABSDataConstructor(this);
     }
     
-    @Override
-	public String toString() {
+    public String toString() {
 	StringBuilder sb = new StringBuilder();
-	sb.append(className == null ? classNameSV : className);
+	sb.append(constructorName);
 	sb.append("(");
 	for (IABSPureExpression exp : args) {
 	    sb.append(exp);
@@ -73,10 +62,8 @@ public class ABSNewExpression extends ABSNonTerminalProgramElement implements IA
 	return args[i];
     }
 
-    @Override
     public KeYJavaType getKeYJavaType(IServices services, ExecutionContext ec) {
-	return type;
+	return services.getProgramInfo().getKeYJavaType(services.getNamespaces().functions().lookup(constructorName).sort());
     }
-
 
 }
