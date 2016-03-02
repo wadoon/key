@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.Pair;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
@@ -321,18 +322,20 @@ public class SequentViewController extends ViewController {
         // styling update.
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
-            double newHeight = posTranslator.getProofHeight();
+            Pair<Double, Double> newDimensions = posTranslator.getProofHeight();
 
             // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
             // Shall be patched in JDK9
-            if (newHeight > 8192) {
+            if (newDimensions.second > 8192) {
                 System.out.println(
-                        "Proof might be too large with Size " + newHeight);
+                        "Proof might be too large with Size " + newDimensions.second);
                 textArea.setPrefHeight(8192);
             }
             else {
-                textArea.setPrefHeight(newHeight);
+                textArea.setPrefHeight(newDimensions.second);
             }
+            
+            textArea.setPrefWidth(newDimensions.first);
             textArea.autosize();
         }
 

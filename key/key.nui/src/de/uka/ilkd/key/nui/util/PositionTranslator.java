@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nui.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
+import de.uka.ilkd.key.util.Pair;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -239,24 +240,30 @@ public class PositionTranslator {
     }
 
     /**
-     * computes height of the proofstring given to the PositionTranslator, if
+     * computes dimensions of the proofstring given to the PositionTranslator, if
      * drawn with the Font and Size as defined in the CSS
      * 
-     * @return a height value in px
+     * @return a Pair, with Pair.first = width and Pair.second = height
      */
 
-    public double getProofHeight() { // Adjustment for Margin
+    public Pair<Double, Double> getProofHeight() { // Adjustment for Margin
         this.readCSS();
-        double result = fontSize;
+        double height = 2*fontSize;
 
         Text text = new Text(" ");
         text.setFont(new Font(font, fontSize));
+        String longestLine = "";
 
         // Iterate over all lines to sum up Height
         for (int i = 0; i < strings.length; i++) {
-            result += Math.round(text.getLayoutBounds().getHeight());
+            if (strings[i].length() > longestLine.length()){
+                longestLine = strings[i];
+            }
+            height += Math.round(text.getLayoutBounds().getHeight());
         }
-        return result;
+        text.setText(longestLine);
+        
+        return new Pair<Double, Double>((double) Math.round(text.getLayoutBounds().getWidth()+2*fontSize), height);
     }
 
 }
