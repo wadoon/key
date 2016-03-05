@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/jsr305-3.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/reflections-0.9.10.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.ui"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

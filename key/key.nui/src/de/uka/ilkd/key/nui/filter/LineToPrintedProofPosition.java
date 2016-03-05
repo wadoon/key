@@ -9,6 +9,8 @@ public class LineToPrintedProofPosition {
      * @return
      */
     public static int getLineIndex(int currentChar, String[] originalLines) {
+        if (currentChar < 0)
+            throw new IndexOutOfBoundsException();
         int idx = 0;
         for (int line = 0; line < originalLines.length; line++) {
             // add + 1 to count for the line-break at the end of each line that
@@ -17,7 +19,7 @@ public class LineToPrintedProofPosition {
             if (idx > currentChar)
                 return line;
         }
-        return -1;
+        throw new IndexOutOfBoundsException();
     }
 
     /**
@@ -55,6 +57,7 @@ public class LineToPrintedProofPosition {
             // doesn't appear in the split document (thanks to max)
             charIndex += originalLines[i].length() + 1;
         }
-        return -1;
+
+        throw new IndexOutOfBoundsException();
     }
 }

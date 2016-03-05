@@ -99,21 +99,17 @@ public class FilterViewController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        searchText.disableProperty().bind(selectionRadio.selectedProperty());
+        // ui bindings
+        searchText.disableProperty().bind(userRadio.selectedProperty().not());
         selectionFilterToggle.disableProperty()
-                .bind(userRadio.selectedProperty());
-        userRadio.selectedProperty().addListener(event -> {
-            if (filterSelection != null) {
-                selectionFilterToggle.setSelected(false);
-                finishSelection();
-            }
-            currentFilter.setIsUserCriteria(true);
-        });
-        applyButton.setDisable(true);
-        useTextScope.selectedProperty().addListener(
-                o -> resultRangeText.setDisable(useAstScope.isSelected()));
-        useTextScope.setSelected(true);
+                .bind(selectionRadio.selectedProperty().not());
+        resultRangeText.disableProperty()
+                .bind(useTextScope.selectedProperty().not());
+        invertFilter.disableProperty()
+                .bind(useAstScope.selectedProperty().not());
 
+        // change propagation to currentFilter
+        //TODO implement all this as handling functions
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
             beforeNumber.setText(Integer.toString(new_val.intValue()));
             currentFilter.setBefore(new_val.intValue());
@@ -126,12 +122,22 @@ public class FilterViewController extends ViewController {
                 (o, old_val, new_val) -> currentFilter.setSearchText(new_val));
         filterModeBox.valueProperty().addListener((o, old_val,
                 new_val) -> currentFilter.setFilterLayout(new_val));
-        filterModeBox.getItems().add(FilterLayout.Minimize);
-        filterModeBox.getItems().add(FilterLayout.Collapse);
-
         useAstScope.selectedProperty().addListener(
                 (o, old_val, new_val) -> currentFilter.setUseAstScope(new_val));
+        userRadio.selectedProperty().addListener(event -> {
+            if (filterSelection != null) {
+                selectionFilterToggle.setSelected(false);
+                finishSelection();
+            }
+            currentFilter.setIsUserCriteria(true);
+        });
 
+        // default data
+        filterModeBox.getItems().add(FilterLayout.Minimize);
+        filterModeBox.getItems().add(FilterLayout.Collapse);
+        applyButton.setDisable(true);
+        useTextScope.setSelected(true);
+        
         currentFilter = new PrintFilter();
         loadCurrentFilter();
     }

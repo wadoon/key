@@ -51,23 +51,20 @@ public class SequentFilterer {
                         originalLines, proofString);
         }
 
-        // X: it may be better to apply this after invert, depends on user
-        // experience
         if (!filter.getUseAstScope())
             if (filter.getBefore() != 0 || filter.getAfter() != 0) {
                 criteria = new CriterionRange(criteria, filter.getBefore(),
                         filter.getAfter(), originalLines);
             }
 
-        // X: it may be better to apply this after invert, depends on user
-        // experience
-        if (filter.getUseAstScope())
+        if (filter.getUseAstScope()) {
             criteria = new CriterionAstScope(criteria, positionTable,
                     originalLines);
 
-        // apply invert as last
-        if (filter.getInvert())
-            criteria = new NotCriterion<>(criteria);
+            // apply invert as last
+            if (filter.getInvert())
+                criteria = new NotCriterion<>(criteria);
+        }
 
         return criteria;
     }
