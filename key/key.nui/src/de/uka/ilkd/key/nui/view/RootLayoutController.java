@@ -14,10 +14,10 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewObserver;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.ViewInformation;
-import de.uka.ilkd.key.nui.model.ViewSlot;
+import de.uka.ilkd.key.nui.ViewSlot;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.util.KeYConstants;
 import javafx.application.Platform;

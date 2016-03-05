@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nui;
 import java.util.Observable;
 import java.util.Observer;
 
-import de.uka.ilkd.key.nui.model.ViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 
 public class ViewObserver implements Observer {

@@ -1,11 +1,9 @@
-package de.uka.ilkd.key.nui.model;
+package de.uka.ilkd.key.nui;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Observable;
 
-import de.uka.ilkd.key.nui.ViewController;
-import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;

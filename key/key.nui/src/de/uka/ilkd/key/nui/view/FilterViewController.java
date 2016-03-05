@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.filter;
+package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -12,6 +12,8 @@ import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.event.EmptyEventArgs;
+import de.uka.ilkd.key.nui.filter.FilterSelection;
+import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.util.Pair;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

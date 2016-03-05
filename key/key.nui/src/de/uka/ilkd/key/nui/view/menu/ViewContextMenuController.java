@@ -4,8 +4,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.ViewInformation;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 

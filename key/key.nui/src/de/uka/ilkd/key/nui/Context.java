@@ -1,12 +1,7 @@
-package de.uka.ilkd.key.nui.model;
-
-import java.util.List;
+package de.uka.ilkd.key.nui;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.nui.MainApp;
-import de.uka.ilkd.key.nui.MediatorUserInterface;
-import de.uka.ilkd.key.nui.StatusManager;
 import de.uka.ilkd.key.nui.event.HandlerEvent;
 import de.uka.ilkd.key.nui.filter.FilterChangedEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;

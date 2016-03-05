@@ -2,8 +2,8 @@ package de.uka.ilkd.key.nui.util;
 
 import java.security.InvalidParameterException;
 
+import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.nui.model.ViewInformation;
 
 public class SerializableViewInformation {
 

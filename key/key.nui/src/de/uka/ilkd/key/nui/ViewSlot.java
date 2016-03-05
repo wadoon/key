@@ -1,9 +1,8 @@
-package de.uka.ilkd.key.nui.model;
+package de.uka.ilkd.key.nui;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.nui.ViewPosition;
 import javafx.scene.Node;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;

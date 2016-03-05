@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.model;
+package de.uka.ilkd.key.nui;
 
 import java.util.Arrays;
 import java.util.HashMap;
