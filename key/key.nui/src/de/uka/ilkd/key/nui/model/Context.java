@@ -7,11 +7,11 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.MediatorUserInterface;
 import de.uka.ilkd.key.nui.StatusManager;
+import de.uka.ilkd.key.nui.event.HandlerEvent;
 import de.uka.ilkd.key.nui.filter.FilterChangedEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
-import de.uka.ilkd.key.nui.util.CsEvent;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.view.menu.TacletMenuItem;
@@ -50,9 +50,9 @@ public class Context {
         return statusManager;
     }
 
-    private CsEvent<FilterChangedEventArgs> filterChangedEvent = new CsEvent<>();
+    private HandlerEvent<FilterChangedEventArgs> filterChangedEvent = new HandlerEvent<>();
 
-    public CsEvent<FilterChangedEventArgs> getFilterChangedEvent() {
+    public HandlerEvent<FilterChangedEventArgs> getFilterChangedEvent() {
         return filterChangedEvent;
     }
 
@@ -67,9 +67,9 @@ public class Context {
         return currentPrintFilter;
     }
 
-    private CsEvent<String> sequentHtmlChangedEvent = new CsEvent<>();
+    private HandlerEvent<String> sequentHtmlChangedEvent = new HandlerEvent<>();
 
-    public CsEvent<String> getSequentHtmlChangedEvent() {
+    public HandlerEvent<String> getSequentHtmlChangedEvent() {
         return sequentHtmlChangedEvent;
     }
 
@@ -100,9 +100,9 @@ public class Context {
         return cssFileHandler;
     }
 
-    private CsEvent<SelectModeEventArgs> selectModeActivatedEvent = new CsEvent<>();
+    private HandlerEvent<SelectModeEventArgs> selectModeActivatedEvent = new HandlerEvent<>();
 
-    public CsEvent<SelectModeEventArgs> getSelectModeActivateEvent() {
+    public HandlerEvent<SelectModeEventArgs> getSelectModeActivateEvent() {
         return selectModeActivatedEvent;
     }
 

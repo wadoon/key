@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.util;
+package de.uka.ilkd.key.nui.event;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  * @param <T>
  */
-public class CsEvent<T> {
+public class HandlerEvent<T> {
     private List<Consumer<T>> listeners = new LinkedList<>();
 
     /**

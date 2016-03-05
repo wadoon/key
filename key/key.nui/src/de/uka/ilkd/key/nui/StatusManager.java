@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.nui;
 
-import de.uka.ilkd.key.nui.util.CsEvent;
+import de.uka.ilkd.key.nui.event.HandlerEvent;
 
 public class StatusManager {
-    private CsEvent<String> statusUpdatedEvent = new CsEvent<String>();
-    public CsEvent<String> getStatusUpdatedEvent(){
+    private HandlerEvent<String> statusUpdatedEvent = new HandlerEvent<String>();
+    public HandlerEvent<String> getStatusUpdatedEvent(){
         return statusUpdatedEvent;
     }
     

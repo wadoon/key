@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.util;
+package de.uka.ilkd.key.nui.event;
 
 /**
  * Representation of no parameter for CsEvents.

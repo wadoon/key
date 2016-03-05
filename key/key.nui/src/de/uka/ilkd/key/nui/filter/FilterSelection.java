@@ -3,8 +3,8 @@ package de.uka.ilkd.key.nui.filter;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.nui.util.CsEvent;
-import de.uka.ilkd.key.nui.util.EmptyEventArgs;
+import de.uka.ilkd.key.nui.event.HandlerEvent;
+import de.uka.ilkd.key.nui.event.EmptyEventArgs;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
 
@@ -81,7 +81,7 @@ public class FilterSelection {
         return resolvedSelection;
     }
 
-    private CsEvent<EmptyEventArgs> selectionModeFinishedEvent = new CsEvent<>();
+    private HandlerEvent<EmptyEventArgs> selectionModeFinishedEvent = new HandlerEvent<>();
 
     /**
      * An event that is raised if the user aborts or closes the selection
@@ -89,7 +89,7 @@ public class FilterSelection {
      * 
      * @return
      */
-    public CsEvent<EmptyEventArgs> getSelectionModeFinishedEvent() {
+    public HandlerEvent<EmptyEventArgs> getSelectionModeFinishedEvent() {
         return selectionModeFinishedEvent;
     }
 }
