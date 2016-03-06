@@ -8,20 +8,28 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+/**
+ * Model for taclet instantiations. 
+ * @author Victor Schuemmer
+ */
 public class TacletInstantiationRowModel {
     private final ObjectProperty<SchemaVariable> variable;
     private final StringProperty instantiation;
     private final IntegerProperty rowNumber;
     private boolean editable;
     
+    /**
+     * The constructor.
+     * @param variable the variable
+     * @param instantiation the instantiation
+     * @param rowNumber the number of the row
+     * @param editable if the instantiation should be editable
+     */
     public TacletInstantiationRowModel(SchemaVariable variable, String instantiation, int rowNumber, boolean editable) {
         this.variable = new SimpleObjectProperty<SchemaVariable>(variable);
         this.instantiation = new SimpleStringProperty(instantiation != null ? instantiation : "");
         this.rowNumber = new SimpleIntegerProperty(rowNumber);
         this.editable = editable;
-    }
-    public TacletInstantiationRowModel(SchemaVariable variable, String instantiation, int rowNumber) {
-        this(variable, instantiation, rowNumber, false);
     }
     
     public SchemaVariable getVariable() {

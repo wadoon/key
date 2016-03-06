@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.pp.StringBackend;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -42,10 +43,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
 
+/**
+ * A view for instantiation of taclets.
+ * 
+ * @author Victor Schuemmer
+ */
 public class TacletInstantiationViewController extends ViewController {
 
     @FXML // fx:id="selectedTacletLabel"
@@ -69,190 +74,8 @@ public class TacletInstantiationViewController extends ViewController {
 
     private InstantiationProposerCollection instantiationProposers;
 
-    private void initProgramVariables() {
-        ImmutableList<Named> vars = models[0].programVariables().elements();
-        programVariables.setText(vars.size() > 0 ? vars.toString() : "none");
-
-    }
-
-    private void initTaclet() {
-        selectedTacletLabel.setText(models[0].taclet().name().toString());
-
-        Taclet taclet = models[0].taclet();
-        StringBackend backend = new StringBackend(68);
-        StringBuilder tacletSB = new StringBuilder();
-
-        Writer w = new StringWriter();
-
-        // XXX was: SequentViewLogicPrinter. any consequences?
-        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(w),
-                new NotationInfo(), backend, mediator.getServices(), true);
-
-        printer.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                        .getShowWholeTaclet(),
-                false);
-        tacletSB.append(backend.getString());
-
-        selectedTaclet.setText(tacletSB.toString());
-    }
-
-    private void initInputValidation() {
-        inputValidation.setText(models[current()].getStatusString());
-    }
-
-    @SuppressWarnings({ "static-access", "unchecked" })
-    private void initInstantiationsTabPane() {
-        for (int i = 0; i < models.length; i++) {
-            Tab tab = new Tab("Alt " + i);
-
-            TableView<TacletInstantiationRowModel> table = new TableView<TacletInstantiationRowModel>();
-            AnchorPane content = new AnchorPane(table);
-            content.setBottomAnchor(table, 5.0);
-            content.setTopAnchor(table, 5.0);
-            content.setLeftAnchor(table, 5.0);
-            content.setRightAnchor(table, 5.0);
-
-            tab.setContent(content);
-            instantiationsTabPane.getTabs().add(tab);
-
-            ObservableList<TacletInstantiationRowModel> tableModel = FXCollections
-                    .observableArrayList();
-
-            TacletFindModel tfm = models[i].tableModel();
-            for (int j = 0; j < tfm.getRowCount(); j++) {
-                tableModel.add(new TacletInstantiationRowModel(
-                        (SchemaVariable) tfm.getValueAt(j, 0),
-                        (String) tfm.getValueAt(j, 1), j,
-                        j > 0 ));//tfm.getNoEditRow()));
-            }
-
-            TableColumn<TacletInstantiationRowModel, Number> rowNrColumn = createCol(
-                    "Variable", TacletInstantiationRowModel::rowNumberProperty);
-            rowNrColumn.setPrefWidth(10.0);
-            TableColumn<TacletInstantiationRowModel, SchemaVariable> variableColumn = createCol(
-                    "Variable", TacletInstantiationRowModel::variableProperty);
-            TableColumn<TacletInstantiationRowModel, String> instantiationColumn = createCol(
-                    "Instantiation",
-                    TacletInstantiationRowModel::instantiationProperty);
-            int modelNr = i;
-            instantiationColumn.setOnEditCommit(evt -> {
-                TacletInstantiationRowModel rowModel = evt.getRowValue();
-                rowModel.setInstantiation(evt.getNewValue());
-                if (modelNr == current()) {
-                    models[modelNr].tableModel().setValueAt(
-                            rowModel.getInstantiation(),
-                            evt.getRowValue().getRowNumber(), 1);
-                    setStatus(getModels()[modelNr].getStatusString());
-                }
-            });
-
-            Callback<TableColumn<TacletInstantiationRowModel, String>, TableCell<TacletInstantiationRowModel, String>> defaultTextFieldCellFactory = TextFieldTableCell
-                    .<TacletInstantiationRowModel> forTableColumn();
-
-            instantiationColumn.setCellFactory(cellData -> {
-                TableCell<TacletInstantiationRowModel, String> cell = defaultTextFieldCellFactory
-                        .call(cellData);
-                cell.itemProperty().addListener((obs, oldValue, newValue) -> {
-                    TableRow<TacletInstantiationRowModel> row = cell
-                            .getTableRow();
-                    if (row == null) {
-                        cell.setEditable(false);
-                    }
-                    else {
-                        TacletInstantiationRowModel rowModel = row.getItem();
-                        if (rowModel == null) {
-                            cell.setEditable(false);
-                        }
-                        else {
-                            cell.setEditable(rowModel.isEditable());
-                            if (rowModel.isEditable())
-                                cell.setStyle("-fx-border-color: red");
-                        }
-                    }
-                });
-                return cell;
-            });
-
-            table.setEditable(true);
-            table.getColumns().addAll(variableColumn, instantiationColumn);
-            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-            table.setItems(tableModel);
-
-            if (!models[i].application().taclet().ifSequent().isEmpty()) {
-                // TODO implement TacletIfSelectionDialog
-
-                // TacletIfSelectionDialog ifSelection = new
-                // TacletIfSelectionDialog(models[i], this);
-                // dataTable[i].setIfSelectionPanel(ifSelection);
-                // tabContent.add(ifSelection);
-            }
-        }
-    }
-
-    private <S, T> TableColumn<S, T> createCol(String title,
-            Function<S, ObservableValue<T>> property) {
-        TableColumn<S, T> col = new TableColumn<>(title);
-        col.setCellValueFactory(
-                cellData -> property.apply(cellData.getValue()));
-        return col;
-    }
-
-    void setStatus(String s) {
-        inputValidation.setText(s);
-    }
-
-    public int current() {
-        int current = instantiationsTabPane.getSelectionModel()
-                .getSelectedIndex();
-        return (current > -1 ? current : 0);
-    }
-
-    public TacletInstantiationModel[] getModels() {
-        return models;
-    }
-
-    @FXML
-    void handleApply(ActionEvent event) {
-        try {
-            TacletApp app = models[current()].createTacletApp();
-            if (app == null) {
-                Alert alert = new Alert(AlertType.ERROR);
-                alert.setHeaderText("Rule Application Failure");
-                alert.setContentText("Could not apply rule");
-                return;
-            }
-            mediator.getUI().getProofControl().applyInteractive(app, goal);
-        }
-        catch (Exception exc) {
-            /*
-             * if (exc instanceof SVInstantiationExceptionWithPosition) {
-             * errorPositionKnown(exc.getMessage(),
-             * ((SVInstantiationExceptionWithPosition) exc).getRow(),
-             * ((SVInstantiationExceptionWithPosition) exc).getColumn(),
-             * ((SVInstantiationExceptionWithPosition) exc).inIfSequent()); }
-             */
-            // ExceptionDialog.showDialog(TacletMatchCompletionDialog.this,
-            // exc);
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Ooops.");
-            alert.setContentText("Something has gone wrong..");
-            return;
-        }
-        InstantiationFileHandler.saveListFor(models[current()]);
-        handleClose(event);
-    }
-
-    @FXML
-    void handleClose(Event event) {
-        mediator.freeModalAccess(this);
-        getStage().close();
-    }
-
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -270,12 +93,228 @@ public class TacletInstantiationViewController extends ViewController {
         instantiationProposers.add(mediator.getServices().getVariableNamer());
         instantiationProposers.add(VariableNameProposer.DEFAULT);
 
-        initProgramVariables();
-        initTaclet();
-        initInputValidation();
-        initInstantiationsTabPane();
+        showProgramVariables();
+        showTacletDescription();
+        showInstantiationsTabPane();
+        setStatus(models[current()].getStatusString());
 
         getStage().getScene().getWindow().setOnCloseRequest(this::handleClose);
-        
+    }
+
+    /**
+     * Shows program variables in the corresponding area.
+     */
+    private void showProgramVariables() {
+        ImmutableList<Named> vars = models[0].programVariables().elements();
+        programVariables.setText(vars.size() > 0 ? vars.toString() : "none");
+
+    }
+
+    /**
+     * Shows the description of the selected taclet in the corresponding area.
+     */
+    private void showTacletDescription() {
+        selectedTacletLabel.setText(models[0].taclet().name().toString());
+
+        Taclet taclet = models[0].taclet();
+        StringBackend backend = new StringBackend(68);
+        StringBuilder tacletSB = new StringBuilder();
+
+        Writer w = new StringWriter();
+
+        // XXX Formerly SequentViewLogicPrinter was used here. Any consequences?
+        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(w),
+                new NotationInfo(), backend, mediator.getServices(), true);
+
+        printer.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .getShowWholeTaclet(),
+                false);
+        tacletSB.append(backend.getString());
+
+        selectedTaclet.setText(tacletSB.toString());
+    }
+
+    /**
+     * Shows a tab for every model with the possibility to complete them.
+     */
+    @SuppressWarnings({ "static-access", "unchecked" })
+    private void showInstantiationsTabPane() {
+        for (int i = 0; i < models.length; i++) {
+            // Create new tab for every alternative.
+            Tab tab = new Tab("Alt " + i);
+            TableView<TacletInstantiationRowModel> table = new TableView<TacletInstantiationRowModel>();
+            AnchorPane content = new AnchorPane(table);
+            content.setBottomAnchor(table, 5.0);
+            content.setTopAnchor(table, 5.0);
+            content.setLeftAnchor(table, 5.0);
+            content.setRightAnchor(table, 5.0);
+            tab.setContent(content);
+            instantiationsTabPane.getTabs().add(tab);
+
+            // Build a table model from the swing table model returned by the
+            // TacletInstantiationModel.
+            ObservableList<TacletInstantiationRowModel> tableModel = FXCollections
+                    .observableArrayList();
+            TacletFindModel tfm = models[i].tableModel();
+            for (int j = 0; j < tfm.getRowCount(); j++) {
+                tableModel.add(new TacletInstantiationRowModel(
+                        (SchemaVariable) tfm.getValueAt(j, 0),
+                        (String) tfm.getValueAt(j, 1), j,
+                        tfm.isCellEditable(j, 1)));
+            }
+
+            TableColumn<TacletInstantiationRowModel, SchemaVariable> variableColumn = createCol(
+                    "Variable", TacletInstantiationRowModel::variableProperty);
+            TableColumn<TacletInstantiationRowModel, String> instantiationColumn = createCol(
+                    "Instantiation",
+                    TacletInstantiationRowModel::instantiationProperty);
+            int modelNr = i;
+
+            // Push edits back to swing table model.
+            instantiationColumn.setOnEditCommit(evt -> {
+                TacletInstantiationRowModel rowModel = evt.getRowValue();
+                rowModel.setInstantiation(evt.getNewValue());
+                if (modelNr == current()) {
+                    models[modelNr].tableModel().setValueAt(
+                            rowModel.getInstantiation(),
+                            evt.getRowValue().getRowNumber(), 1);
+                    setStatus(models[modelNr].getStatusString());
+                }
+            });
+
+            Callback<TableColumn<TacletInstantiationRowModel, String>, TableCell<TacletInstantiationRowModel, String>> defaultTextFieldCellFactory = TextAreaTableCell
+                    .<TacletInstantiationRowModel> forTableColumn();
+
+            // Pseudo class for editable table cells.
+            PseudoClass editableCssClass = PseudoClass
+                    .getPseudoClass("editable");
+            // Pseudo class for rows that do not allow editing.
+            PseudoClass completedCssClass = PseudoClass
+                    .getPseudoClass("completed");
+            
+            // Cell factory which makes the appropriate cells editable
+            instantiationColumn.setCellFactory(cellData -> {
+                TableCell<TacletInstantiationRowModel, String> cell = defaultTextFieldCellFactory
+                        .call(cellData);
+                cell.itemProperty().addListener((obs, oldValue, newValue) -> {
+                    TableRow<TacletInstantiationRowModel> row = cell
+                            .getTableRow();
+                    if (row == null) {
+                        cell.setEditable(false);
+                    }
+                    else {
+                        TacletInstantiationRowModel rowModel = row.getItem();
+                        if (rowModel == null) {
+                            cell.setEditable(false);
+                        }
+                        else {
+                            boolean editable = rowModel.isEditable();
+                            cell.setEditable(editable);
+                            row.setDisable(!editable);
+                            cell.pseudoClassStateChanged(editableCssClass,
+                                    editable);
+                            row.pseudoClassStateChanged(completedCssClass,
+                                    !editable);
+                        }
+                    }
+                });
+                return cell;
+            });
+
+            // Show data in table.
+            table.setEditable(true);
+            table.getColumns().addAll(variableColumn, instantiationColumn);
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            table.setItems(tableModel);
+
+            if (!models[i].application().taclet().ifSequent().isEmpty()) {
+                // TODO implement TacletIfSelectionDialog
+
+                // TacletIfSelectionDialog ifSelection = new
+                // TacletIfSelectionDialog(models[i], this);
+                // dataTable[i].setIfSelectionPanel(ifSelection);
+                // tabContent.add(ifSelection);
+            }
+        }
+    }
+
+    /**
+     * Creates a new column for the table
+     * 
+     * @param title
+     *            the title of the column
+     * @param property
+     *            function of the model that provides the data
+     * @return the column
+     */
+    private <S, T> TableColumn<S, T> createCol(String title,
+            Function<S, ObservableValue<T>> property) {
+        TableColumn<S, T> col = new TableColumn<>(title);
+        col.setCellValueFactory(
+                cellData -> property.apply(cellData.getValue()));
+        return col;
+    }
+
+    /**
+     * Sets the text of the input validation text area.
+     */
+    private void setStatus(String s) {
+        inputValidation.setText(s);
+    }
+
+    /**
+     * @return the currently selected model
+     */
+    private int current() {
+        int current = instantiationsTabPane.getSelectionModel()
+                .getSelectedIndex();
+        return (current > -1 ? current : 0);
+    }
+
+    /**
+     * Applies the rule.
+     */
+    @FXML
+    private void handleApply(ActionEvent event) {
+        try {
+            TacletApp app = models[current()].createTacletApp();
+            if (app == null) {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setHeaderText("Rule Application Failure");
+                alert.setContentText("Could not apply rule");
+                System.out.println("application failure");
+                return;
+            }
+            System.out.println("applyInteractive");
+            mediator.getUI().getProofControl().applyInteractive(app, goal);
+        }
+        catch (Exception exc) {
+            /*
+             * if (exc instanceof SVInstantiationExceptionWithPosition) {
+             * errorPositionKnown(exc.getMessage(),
+             * ((SVInstantiationExceptionWithPosition) exc).getRow(),
+             * ((SVInstantiationExceptionWithPosition) exc).getColumn(),
+             * ((SVInstantiationExceptionWithPosition) exc).inIfSequent()); }
+             */
+            // ExceptionDialog.showDialog(TacletMatchCompletionDialog.this,
+            // exc);
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setHeaderText("Ooops.");
+            alert.setContentText("Something has gone wrong..");
+            System.out.println("oops");
+            return;
+        }
+        InstantiationFileHandler.saveListFor(models[current()]);
+        handleClose(event);
+    }
+
+    /**
+     * Frees modal access and closes the stage.
+     */
+    @FXML
+    private void handleClose(Event event) {
+        mediator.freeModalAccess(this);
+        getStage().close();
     }
 }
